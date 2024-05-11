@@ -105,7 +105,6 @@ data _⊢_#_≤_ : Env n m → Counter → Type m → Type m → Set where
   s-refl : ∀ {A A'}
     → (ap : Γ ⟦ A ⟧⟹ A')
     → Γ ⊢ Z # A ≤ A'
--- → Γ ⊢ Z # A ≤ Γ ⟦ A ⟧
   s-int :
       Γ ⊢ ∞ # Int ≤ Int
   s-var : ∀ {X} 

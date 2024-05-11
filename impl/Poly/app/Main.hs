@@ -1,4 +1,6 @@
 {-# LANGUAGE MultiWayIf, GADTs, LambdaCase #-}
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+{-# HLINT ignore "Redundant multi-way if" #-}
 module Main where
 import Debug.Trace (trace)
 
@@ -111,23 +113,41 @@ genericConsumer _ = False
 fullInst :: SEnv -> Typ -> Typ
 fullInst = undefined
 
-closed :: SEnv -> Typ -> Bool
-closed = undefined
-
 isEx :: SEnv -> Int -> Bool
-isEx = undefined
+isEx (Base _) _ = False
+isEx (STyp senv) n = if | n == 0 -> False
+                        | otherwise -> isEx senv (n - 1)
+isEx (SEx senv) n = if | n == 0 -> True
+                       | otherwise -> isEx senv (n - 1)
+isEx (SSol _ env) n = if | n == 0 -> False
+                         | otherwise -> isEx env (n - 1)
+
+-- a bit worry, since the base could contain type variables
+-- let's define one
+
+isTyp :: SEnv -> Int -> Bool
+isTyp (Base _) _ = False
+isTyp (STyp senv) n = if | n == 0 -> True
+                         | otherwise -> isTyp senv (n - 1)
+isTyp (SEx senv) n = if | n == 0 -> False
+                        | otherwise -> isTyp senv (n - 1)
+isTyp (SSol _ env) n = if | n == 0 -> False
+                          | otherwise -> isTyp env (n - 1)
+
+closed :: SEnv -> Typ -> Bool
+closed _ TInt = True
+closed senv (TVar x) = not $ isEx senv x
+closed senv (TArr t1 t2) = closed senv t1 && closed senv t2
+closed senv (TForall t) = closed (STyp senv) t
+
+open :: SEnv -> Typ -> Bool
+open senv ty = not $ closed senv ty
 
 findSol :: SEnv -> Int -> Maybe Typ
 findSol = undefined
 
-isTyp :: SEnv -> Int -> Bool
-isTyp = undefined
-
 contextSubst :: Typ -> Int -> SEnv -> SEnv
 contextSubst = undefined
-
-open :: SEnv -> Typ -> Bool
-open = undefined
 
 erase :: SEnv -> Env
 erase = undefined
