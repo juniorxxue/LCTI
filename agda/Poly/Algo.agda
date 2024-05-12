@@ -152,11 +152,15 @@ data [_/_]_⟹_ : Type m → Fin m → SEnv n m → SEnv n m → Set where
 {-
   ⟹=0 : ∀ {Ψ : SEnv n m} {A B}
     → [ A / #0 ] (Ψ ,= B) ⟹ Ψ ,= B -- this is wrong, should be some equivlent reasoning
+-}
+
+  ⟹∙S : ∀ {Ψ Ψ' : SEnv n m} {A k}
+    → [ ↓ty0 A / k ] Ψ ⟹ Ψ'
+    → [ A / #S k ] (Ψ ,∙) ⟹ (Ψ' ,∙)
 
   ⟹=S : ∀ {Ψ Ψ' : SEnv n m} {A B k}
     → [ [ B ]ˢ A / k ] Ψ ⟹ Ψ'
-    → [ A / #S k ] (Ψ ,= B) ⟹ Ψ' ,= B
--}
+    → [ A / #S k ] (Ψ ,= B) ⟹ (Ψ' ,= B)
 
 infix 3 _^∈_
 data _^∈_ : Fin m → SEnv n m → Set where
