@@ -64,12 +64,16 @@ shiftTyp k (TForall t) = TForall (shiftTyp (k + 1) t)
 shiftTyp0 :: Typ -> Typ
 shiftTyp0 = shiftTyp 0
 
--- could do via substitution
-unshiftTyp :: Int -> Typ -> Typ
-unshiftTyp = undefined
+substTyp :: Int -> Typ -> Typ -> Typ
+substTyp _ _ TInt = TInt
+substTyp k tyA (TVar x) = if | k == x -> tyA
+                             | otherwise -> TVar $ punchOut k x
+                          where punchOut i j = if j > i then j - 1 else j
+substTyp k tyA (TArr t1 t2) = TArr (substTyp k tyA t1) (substTyp k tyA t2)
+substTyp k tyA (TForall tyB) = TForall (substTyp (k + 1) (shiftTyp0 tyA) tyB)
 
 unshiftTyp0 :: Typ -> Typ
-unshiftTyp0 = unshiftTyp 0
+unshiftTyp0 = substTyp 0 TInt
 
 shiftTerm :: Int -> Trm -> Trm
 shiftTerm _ (Lit i) = Lit i
