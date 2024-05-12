@@ -64,7 +64,6 @@ shiftTyp k (TForall t) = TForall (shiftTyp (k + 1) t)
 shiftTyp0 :: Typ -> Typ
 shiftTyp0 = shiftTyp 0
 
-
 -- could do via substitution
 unshiftTyp :: Int -> Typ -> Typ
 unshiftTyp = undefined
@@ -110,9 +109,6 @@ genericConsumer (Ann _ _) = True
 genericConsumer (TAbs _) = True
 genericConsumer _ = False
 
-fullInst :: SEnv -> Typ -> Typ
-fullInst = undefined
-
 isEx :: SEnv -> Int -> Bool
 isEx (Base _) _ = False
 isEx (STyp senv) n = if | n == 0 -> False
@@ -122,11 +118,17 @@ isEx (SEx senv) n = if | n == 0 -> True
 isEx (SSol _ env) n = if | n == 0 -> False
                          | otherwise -> isEx env (n - 1)
 
--- a bit worry, since the base could contain type variables
--- let's define one
+isTyp' :: Env -> Int -> Bool
+isTyp' EEmpty _ = False
+isTyp' (EBind _ env) n = if | n == 0 -> False
+                            | otherwise -> isTyp' env n
+isTyp' (ETyp env) n = if | n == 0 -> True
+                         | otherwise -> isTyp' env (n - 1)
+isTyp' (ESol _ env) n = if | n == 0 -> False
+                           | otherwise -> isTyp' env (n - 1)
 
 isTyp :: SEnv -> Int -> Bool
-isTyp (Base _) _ = False
+isTyp (Base env) n = isTyp' env n
 isTyp (STyp senv) n = if | n == 0 -> True
                          | otherwise -> isTyp senv (n - 1)
 isTyp (SEx senv) n = if | n == 0 -> False
@@ -143,14 +145,46 @@ closed senv (TForall t) = closed (STyp senv) t
 open :: SEnv -> Typ -> Bool
 open senv ty = not $ closed senv ty
 
-findSol :: SEnv -> Int -> Maybe Typ
-findSol = undefined
+findSol' :: Env -> Int -> Maybe Typ
+findSol' EEmpty _ = Nothing
+findSol' (EBind _ env) n = findSol' env n
+findSol' (ETyp env) n = if | n == 0 -> Nothing
+                           | otherwise -> shiftTyp0 <$> findSol' env (n - 1)
+findSol' (ESol ty env) n = if | n == 0 -> Just ty
+                              | otherwise -> shiftTyp0 <$> findSol' env (n - 1)
 
+findSol :: SEnv -> Int -> Maybe Typ
+findSol (Base env) n = findSol' env n
+findSol (STyp senv) n = if | n == 0 -> Nothing
+                           | otherwise -> shiftTyp0 <$> findSol senv (n - 1)
+findSol (SEx senv) n = if | n == 0 -> Nothing
+                          | otherwise -> shiftTyp0 <$> findSol senv (n - 1)
+findSol (SSol ty env) n = if | n == 0 -> Just ty
+                             | otherwise -> shiftTyp0 <$> findSol env (n - 1)
+
+fullInst :: SEnv -> Typ -> Typ
+fullInst _ TInt = TInt
+fullInst senv (TVar n) = case findSol senv n of
+  Just ty -> fullInst senv ty
+  Nothing -> TVar n
+fullInst senv (TArr t1 t2) = TArr (fullInst senv t1) (fullInst senv t2)
+fullInst senv (TForall t) = TForall $ fullInst (STyp senv) t
+
+-- the side conditions in the sub ensures that
+-- when reaching the zero, it should be SEx
+-- and I noticed that we iterate more than time, if it's possible to merge them?
 contextSubst :: Typ -> Int -> SEnv -> SEnv
-contextSubst = undefined
+contextSubst tyA 0 (SEx senv) = SSol (unshiftTyp0 tyA) senv
+contextSubst tyA n (SEx senv) | n /= 0 = SEx $ contextSubst (unshiftTyp0 tyA) (n - 1) senv
+contextSubst tyA n (STyp senv) | n /= 0 = STyp $ contextSubst (unshiftTyp0 tyA) (n - 1) senv
+contextSubst tyA n (SSol tyB senv) | n /= 0 = SSol tyB $ contextSubst (unshiftTyp0 tyA) (n - 1) senv
+contextSubst _ _ _ = error "contextSubst: invalid arguments"
 
 erase :: SEnv -> Env
-erase = undefined
+erase (Base env) = env
+erase (STyp senv) = ETyp $ erase senv
+erase (SEx senv) = ESol TInt $ erase senv
+erase (SSol ty senv) = ESol ty $ erase senv
 
 sub :: SEnv -> Typ -> Context -> Maybe (SEnv, Typ)
 sub senv TInt (CFullType TInt) = return (senv, TInt)
