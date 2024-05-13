@@ -207,7 +207,7 @@ logSub :: SEnv -> Typ -> Context -> String
 logSub senv ty ctx = show senv ++ " ⊢ " ++ show ty ++ " <: " ++ show ctx ++ " ⊣ "
 
 sub :: SEnv -> Typ -> Context -> WriterT Log Maybe (SEnv, Typ)
-sub a b c | trace ("sub " ++ show a ++ " |- " ++ show b ++ " <: " ++ show c) False = undefined
+-- sub a b c | trace ("sub " ++ show a ++ " |- " ++ show b ++ " <: " ++ show c) False = undefined
 sub senv TInt (CFullType TInt) = do
   tell ["[S-Int] " ++ logSub senv TInt (CFullType TInt)]
   return (senv, TInt)
@@ -278,7 +278,7 @@ indentAll :: [String] -> [String]
 indentAll = map ("  "++)
 
 infer :: Env -> Context -> Trm -> WriterT Log Maybe Typ
-infer a b c | trace ("infer " ++ show a ++ " |- " ++ show b ++ " => " ++ show c) False = undefined
+-- infer a b c | trace ("infer " ++ show a ++ " |- " ++ show b ++ " => " ++ show c) False = undefined
 infer env CEmpty (Lit n) = do
   tell ["[Ty-Int] " ++ logInfer env CEmpty (Lit n)]
   return TInt
@@ -318,26 +318,12 @@ infer _ _ _ = lift Nothing
 main :: IO ()
 main = do
   -- print idTyp
-  let results = runWriterT $ infer EEmpty CEmpty (App idTrm (Lit 1)) -- good
-  -- let results = runWriterT $ infer EEmpty CEmpty idTrm
-  -- let results = runWriterT $ infer EEmpty CEmpty (Ann (Lit 1) TInt)
-  -- let results = runWriterT $ sub (Base EEmpty) (TForall (TArr (TVar 0) (TVar 0))) (CTerm (Lit 1) CEmpty)
-  case results of
+  let ex_id = runWriterT $ infer EEmpty CEmpty idTrm
+      ex_id1 = runWriterT $ infer EEmpty CEmpty (App idTrm (Lit 1))
+      ex_idInt = runWriterT $ infer EEmpty CEmpty (TApp idTrm TInt)
+      ex_idInt1 = runWriterT $ infer EEmpty CEmpty (App (TApp idTrm TInt) (Lit 42))
+
+  case ex_idInt1 of
     Just (tyA, logs) -> do mapM_ putStrLn logs
                            putStrLn $ "Inferred type: " ++ show tyA
     Nothing -> print "Nothing"
-
-  -- let results = runWriterT $ lookupEnv 1 (EBind TInt (EBind TInt EEmpty))
-  -- case results of
-  --   Just (ty, log) -> mapM_ putStrLn log
-  --   Nothing -> print "Nothing"
-
-  -- print idTrm
-  -- print $ sub (Base EEmpty) (TForall (TArr (TVar 0) (TVar 0))) (CTerm (Lit 1) CEmpty)
-  -- print $ sub (Base EEmpty) (TForall (TArr (TVar 0) (TVar 0))) (CTApp TInt (CTerm (Lit 1) CEmpty))
-  -- print $ infer EEmpty CEmpty (App idTrm (Lit 1))
-  -- print $ infer EEmpty CEmpty idTrm
-  -- print $ infer (ETyp EEmpty) CEmpty (Ann (Abs (Var 0)) (TArr (TVar 0) (TVar 0)))
-  -- print $ infer EEmpty CEmpty idTrm
-  -- print $ infer EEmpty CEmpty (Lit 1)
-  -- print $ infer (ETyp EEmpty) CEmpty (Ann (Abs (Var 0)) (TArr (TVar 0) (TVar 0)))
