@@ -37,12 +37,12 @@ data SEnv = Base Env | STyp SEnv | SEx SEnv | SSol Typ SEnv
 instance Show Env where
   show EEmpty = "∅"
   show (EBind ty env) = show env ++ " , : " ++ show ty
-  show (ETyp env) = show env ++ " , ▸ "
+  show (ETyp env) = show env ++ " , • "
   show (ESol ty env) = show env ++ " , =" ++ show ty
 
 instance Show SEnv where
   show (Base env) = show env
-  show (STyp env) = show env ++ " , ▸"
+  show (STyp env) = show env ++ " , •"
   show (SEx env) = show env ++ " , ^"
   show (SSol ty env) = show env ++ " , =" ++ show ty
 
@@ -128,15 +128,16 @@ isEx (SSol _ env) n = if | n == 0 -> False
                          | otherwise -> isEx env (n - 1)
 
 isTyp' :: Env -> Int -> Bool
+-- isTyp' a b | trace ("isTyp' " ++ show a ++ " " ++ show b) False = undefined
 isTyp' EEmpty _ = False
-isTyp' (EBind _ env) n = if | n == 0 -> False
-                            | otherwise -> isTyp' env n
+isTyp' (EBind _ env) n = isTyp' env n
 isTyp' (ETyp env) n = if | n == 0 -> True
                          | otherwise -> isTyp' env (n - 1)
 isTyp' (ESol _ env) n = if | n == 0 -> False
                            | otherwise -> isTyp' env (n - 1)
 
 isTyp :: SEnv -> Int -> Bool
+-- isTyp a b | trace ("isTyp " ++ show a ++ " " ++ show b) False = undefined
 isTyp (Base env) n = isTyp' env n
 isTyp (STyp senv) n = if | n == 0 -> True
                          | otherwise -> isTyp senv (n - 1)
@@ -206,6 +207,7 @@ logSub :: SEnv -> Typ -> Context -> String
 logSub senv ty ctx = show senv ++ " ⊢ " ++ show ty ++ " <: " ++ show ctx ++ " ⊣ "
 
 sub :: SEnv -> Typ -> Context -> WriterT Log Maybe (SEnv, Typ)
+sub a b c | trace ("sub " ++ show a ++ " |- " ++ show b ++ " <: " ++ show c) False = undefined
 sub senv TInt (CFullType TInt) = do
   tell ["[S-Int] " ++ logSub senv TInt (CFullType TInt)]
   return (senv, TInt)
@@ -276,7 +278,7 @@ indentAll :: [String] -> [String]
 indentAll = map ("  "++)
 
 infer :: Env -> Context -> Trm -> WriterT Log Maybe Typ
-infer a b c | trace ("tracing -- infer " ++ show a ++ " " ++ show b ++ " " ++ show c) False = undefined
+infer a b c | trace ("infer " ++ show a ++ " |- " ++ show b ++ " => " ++ show c) False = undefined
 infer env CEmpty (Lit n) = do
   tell ["[Ty-Int] " ++ logInfer env CEmpty (Lit n)]
   return TInt
@@ -316,11 +318,13 @@ infer _ _ _ = lift Nothing
 main :: IO ()
 main = do
   -- print idTyp
-  -- let results = runWriterT $ infer EEmpty CEmpty (App idTrm (Lit 1))
+  let results = runWriterT $ infer EEmpty CEmpty (App idTrm (Lit 1)) -- good
+  -- let results = runWriterT $ infer EEmpty CEmpty idTrm
   -- let results = runWriterT $ infer EEmpty CEmpty (Ann (Lit 1) TInt)
-  let results = runWriterT $ sub (Base EEmpty) (TForall (TArr (TVar 0) (TVar 0))) (CTerm (Lit 1) CEmpty)
+  -- let results = runWriterT $ sub (Base EEmpty) (TForall (TArr (TVar 0) (TVar 0))) (CTerm (Lit 1) CEmpty)
   case results of
-    Just (_, logs) -> mapM_ putStrLn logs
+    Just (tyA, logs) -> do mapM_ putStrLn logs
+                           putStrLn $ "Inferred type: " ++ show tyA
     Nothing -> print "Nothing"
 
   -- let results = runWriterT $ lookupEnv 1 (EBind TInt (EBind TInt EEmpty))
