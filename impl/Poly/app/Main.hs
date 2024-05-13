@@ -3,6 +3,9 @@
 {-# HLINT ignore "Redundant multi-way if" #-}
 module Main where
 import Debug.Trace (trace)
+import Control.Monad.Writer
+
+type Log = [String]
 
 data Typ = TInt | TVar Int | TArr Typ Typ | TForall Typ
 data Trm = Lit Int | Var Int | Abs Trm | App Trm Trm | Ann Trm Typ | TAbs Trm | TApp Trm Typ
@@ -191,6 +194,7 @@ erase (SEx senv) = ESol TInt $ erase senv
 erase (SSol ty senv) = ESol ty $ erase senv
 
 sub :: SEnv -> Typ -> Context -> Maybe (SEnv, Typ)
+sub senv ty ctx | trace ("tracing -- sub " ++ show senv ++ " " ++ show ty ++ " " ++ show ctx) False = undefined
 sub senv TInt (CFullType TInt) = return (senv, TInt)
 sub senv tyA CEmpty | closed senv tyA = return (senv, newtyA)
   where newtyA = fullInst senv tyA
@@ -232,6 +236,10 @@ sub senv (TForall tyA) (CTApp tyB h) = do
   return (senv', unshiftTyp0 tyC)
 sub _ _ _ = Nothing
 
+nonEmptyContext :: Context -> Bool
+nonEmptyContext CEmpty = False
+nonEmptyContext _ = True
+
 infer :: Env -> Context -> Trm -> Maybe Typ
 infer a b c | trace ("tracing -- infer " ++ show a ++ " " ++ show b ++ " " ++ show c) False = undefined
 infer _ CEmpty (Lit _) = Just TInt
@@ -245,7 +253,7 @@ infer e (CTerm tm2 h) (Abs tm) = do
   tyA <- infer e CEmpty tm2
   tyB <- infer (EBind tyA e) (shiftContext0 h) tm
   return $ TArr tyA tyB
-infer e h g | genericConsumer g = do
+infer e h g | genericConsumer g && nonEmptyContext h = do
   tyA <- infer e CEmpty g
   (_, tyB) <- sub (Base e) tyA h
   return tyB
@@ -259,6 +267,11 @@ main :: IO ()
 main = do
   print idTyp
   print idTrm
+  -- print $ sub (Base EEmpty) (TForall (TArr (TVar 0) (TVar 0))) (CTerm (Lit 1) CEmpty)
+  -- print $ sub (Base EEmpty) (TForall (TArr (TVar 0) (TVar 0))) (CTApp TInt (CTerm (Lit 1) CEmpty))
+  -- print $ infer EEmpty CEmpty (App idTrm (Lit 1))
+  print $ infer EEmpty CEmpty idTrm
+  -- print $ infer (ETyp EEmpty) CEmpty (Ann (Abs (Var 0)) (TArr (TVar 0) (TVar 0)))
   -- print $ infer EEmpty CEmpty idTrm
   -- print $ infer EEmpty CEmpty (Lit 1)
   -- print $ infer (ETyp EEmpty) CEmpty (Ann (Abs (Var 0)) (TArr (TVar 0) (TVar 0)))
