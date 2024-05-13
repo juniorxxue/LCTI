@@ -1,9 +1,10 @@
-{-# LANGUAGE MultiWayIf #-}
+{-# LANGUAGE MultiWayIf, LambdaCase #-}
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 {-# HLINT ignore "Redundant multi-way if" #-}
 module Main where
 import Debug.Trace
 import Control.Monad.Writer
+import Control.Monad (forM_)
 
 type Log = [String]
 
@@ -13,7 +14,7 @@ data Trm = Lit Int | Var Int | Abs Trm | App Trm Trm | Ann Trm Typ | TAbs Trm | 
 instance Show Typ where
   show TInt = "Int"
   show (TVar i) = "t" ++ show i
-  show (TArr t1 t2) = "(" ++ show t1 ++ " -> " ++ show t2 ++ ")"
+  show (TArr t1 t2) = "(" ++ show t1 ++ " → " ++ show t2 ++ ")"
   show (TForall t) = "∀. " ++ show t
 
 instance Show Trm where
@@ -50,10 +51,10 @@ instance Show SEnv where
 data Context = CEmpty | CFullType Typ | CTerm Trm Context | CTApp Typ Context
 
 instance Show Context where
-  show CEmpty = "[]"
+  show CEmpty = "□"
   show (CFullType ty) = show ty
-  show (CTerm trm ctx) = "[" ++ show trm ++ "]" ++ " ~> " ++ show ctx
-  show (CTApp ty ctx) = "[" ++ show ty ++ "]" ++ " ~> " ++ show ctx
+  show (CTerm trm ctx) = "[" ++ show trm ++ "]" ++ " ↝ " ++ show ctx
+  show (CTApp ty ctx) = "[" ++ show ty ++ "]" ++ " ↝ " ++ show ctx
 
 -- shifting --
 
@@ -206,10 +207,13 @@ erase (SSol ty senv) = ESol ty $ erase senv
 logSub :: SEnv -> Typ -> Context -> String
 logSub senv ty ctx = show senv ++ " ⊢ " ++ show ty ++ " <: " ++ show ctx ++ " ⊣ "
 
+logSubFull :: SEnv -> Typ -> Context -> SEnv -> Typ -> String
+logSubFull senv ty ctx senv' ty' = show senv ++ " ⊢ " ++ show ty ++ " <: " ++ show ctx ++ " ⊣ " ++ show senv' ++ " ⇝ " ++ show ty'
+
 sub :: SEnv -> Typ -> Context -> WriterT Log Maybe (SEnv, Typ)
 -- sub a b c | trace ("sub " ++ show a ++ " |- " ++ show b ++ " <: " ++ show c) False = undefined
 sub senv TInt (CFullType TInt) = do
-  tell ["[S-Int] " ++ logSub senv TInt (CFullType TInt)]
+  tell ["[S-Int] " ++ logSubFull senv TInt (CFullType TInt) senv TInt]
   return (senv, TInt)
 sub senv tyA CEmpty | closed senv tyA = do
   tell ["[S-Var] " ++ logSub senv tyA CEmpty]
@@ -222,9 +226,9 @@ sub senv (TVar a) (CFullType tyA) | isEx senv a && closed senv tyA = do
   tell ["[S-Ex-L] " ++ logSub senv (TVar a) (CFullType tyA)]
   return (contextSubst tyA a senv, tyA)
 sub senv (TVar a) (CFullType tyA) | closed senv tyA = do
+  tell ["[S-Sol-L] " ++ logSub senv (TVar a) (CFullType tyA)]
   tyB <- censor indentAll $ findSol senv a
   (senv', tyA') <- censor indentAll $ sub senv tyB (CFullType tyA)
-  tell ["[S-Sol-L] " ++ logSub senv (TVar a) (CFullType tyA)]
   return (senv', tyA')
 sub senv tyA (CFullType (TVar a)) | isEx senv a && closed senv tyA = do
   tell ["[S-Ex-R] " ++ logSub senv tyA (CFullType (TVar a))]
@@ -272,7 +276,7 @@ nonEmptyContext CEmpty = False
 nonEmptyContext _ = True
 
 logInfer :: Env -> Context -> Trm -> String
-logInfer env ctx tm = show env ++ " ⊢ " ++ show ctx ++ " => " ++ show tm ++ " => "
+logInfer env ctx tm = show env ++ " ⊢ " ++ show ctx ++ " ⇒ " ++ show tm ++ " ⇒ "
 
 indentAll :: [String] -> [String]
 indentAll = map ("  "++)
@@ -318,12 +322,13 @@ infer _ _ _ = lift Nothing
 main :: IO ()
 main = do
   -- print idTyp
-  let ex_id = runWriterT $ infer EEmpty CEmpty idTrm
-      ex_id1 = runWriterT $ infer EEmpty CEmpty (App idTrm (Lit 1))
-      ex_idInt = runWriterT $ infer EEmpty CEmpty (TApp idTrm TInt)
-      ex_idInt1 = runWriterT $ infer EEmpty CEmpty (App (TApp idTrm TInt) (Lit 42))
-
-  case ex_idInt1 of
-    Just (tyA, logs) -> do mapM_ putStrLn logs
-                           putStrLn $ "Inferred type: " ++ show tyA
+  let ex_id = infer EEmpty CEmpty idTrm
+      ex_id1 = infer EEmpty CEmpty (App idTrm (Lit 1))
+      ex_idInt = infer EEmpty CEmpty (TApp idTrm TInt)
+      ex_idInt1 = infer EEmpty CEmpty (App (TApp idTrm TInt) (Lit 42))
+      ex_f1 = infer (EBind (TForall (TArr (TVar 0) (TVar 0))) EEmpty) CEmpty (App (Var 0) (Lit 42))
+  forM_ [ex_id, ex_id1, ex_idInt, ex_idInt1, ex_f1] $ \ex -> case runWriterT ex of
+    Just (tyA, logs) -> do
+      putStrLn $ "inferred type: " ++ show tyA
+      mapM_ putStrLn logs
     Nothing -> print "Nothing"
