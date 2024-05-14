@@ -92,6 +92,15 @@ shiftTerm k (TApp t ty) = TApp (shiftTerm k t) ty
 shiftTerm0 :: Trm -> Trm
 shiftTerm0 = shiftTerm 0
 
+shiftTypInTrm :: Int -> Trm -> Trm
+shiftTypInTrm _ (Lit i) = Lit i
+shiftTypInTrm _ (Var x) = Var x
+shiftTypInTrm k (Abs t) = Abs (shiftTypInTrm k t)
+shiftTypInTrm k (App t1 t2) = App (shiftTypInTrm k t1) (shiftTypInTrm k t2)
+shiftTypInTrm k (Ann t ty) = Ann (shiftTypInTrm k t) (shiftTyp k ty)
+shiftTypInTrm k (TAbs t) = TAbs (shiftTypInTrm (k + 1) t)
+shiftTypInTrm k (TApp t ty) = TApp (shiftTypInTrm k t) (shiftTyp k ty)
+
 shiftContext :: Int -> Context -> Context
 shiftContext _ CEmpty = CEmpty
 shiftContext _ (CFullType ty) = CFullType ty
@@ -100,6 +109,15 @@ shiftContext k (CTApp ty ctx) = CTApp ty (shiftContext k ctx)
 
 shiftContext0 :: Context -> Context
 shiftContext0 = shiftContext 0
+
+shiftTypInContext :: Int -> Context -> Context
+shiftTypInContext _ CEmpty = CEmpty
+shiftTypInContext k (CFullType ty) = CFullType (shiftTyp k ty)
+shiftTypInContext k (CTerm trm ctx) = CTerm (shiftTypInTrm k trm) (shiftTypInContext k ctx)
+shiftTypInContext k (CTApp ty ctx) = CTApp (shiftTyp k ty) (shiftTypInContext k ctx)
+
+shiftTypInContext0 :: Context -> Context
+shiftTypInContext0 = shiftTypInContext 0
 
 -- end shifting --
 
@@ -260,14 +278,14 @@ sub senv (TForall tyA) (CFullType (TForall tyB)) = do
   return (senv', TForall tyC)
 sub senv (TForall tyA) (CTerm e h) = do
   tell ["[S-Forall-L] " ++ logSub senv (TForall tyA) (CTerm e h)]
-  (senv', tyB) <- censor indentAll $ sub (SEx senv) tyA (shiftContext0 (CTerm e h))
+  (senv', tyB) <- censor indentAll $ sub (SEx senv) tyA (shiftTypInContext0 (CTerm e h))
   case senv' of
     STyp senv'' -> return (senv'', unshiftTyp0 tyB)
     SSol _ senv'' -> return (senv'', unshiftTyp0 tyB)
     _ -> lift Nothing
 sub senv (TForall tyA) (CTApp tyB h) = do
   tell ["[S-Forall-TApp] " ++ logSub senv (TForall tyA) (CTApp tyB h)]
-  (SSol _ senv', tyC) <- censor indentAll $ sub (SSol tyB senv) tyA (shiftContext0 h)
+  (SSol _ senv', tyC) <- censor indentAll $ sub (SSol tyB senv) tyA (shiftTypInContext0 h)
   return (senv', unshiftTyp0 tyC)
 sub _ _ _ = lift Nothing
 
@@ -327,7 +345,9 @@ main = do
       ex_idInt = infer EEmpty CEmpty (TApp idTrm TInt)
       ex_idInt1 = infer EEmpty CEmpty (App (TApp idTrm TInt) (Lit 42))
       ex_f1 = infer (EBind (TForall (TArr (TVar 0) (TVar 0))) EEmpty) CEmpty (App (Var 0) (Lit 42))
-  forM_ [ex_id, ex_id1, ex_idInt, ex_idInt1, ex_f1] $ \ex -> case runWriterT ex of
+      ex_sub1 = sub (Base EEmpty) (TForall (TVar 0)) (CFullType (TForall (TArr TInt TInt)))
+      ex_argfun = infer (EBind (TForall (TArr (TArr (TVar 0) (TVar 0)) (TVar 0))) (EBind (TArr TInt TInt) EEmpty)) CEmpty (App (Var 0) (Var 1))
+  forM_ [ex_id, ex_id1, ex_idInt, ex_idInt1, ex_f1, ex_argfun] $ \ex -> case runWriterT ex of
     Just (tyA, logs) -> do
       putStrLn $ "inferred type: " ++ show tyA
       mapM_ putStrLn logs
