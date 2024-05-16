@@ -116,21 +116,52 @@ data _⊢o_ : SEnv n m → Type m → Set where
     → Ψ ,∙ ⊢o A
     → Ψ ⊢o `∀ A
 
--- apply solutions in Env to a type
-infix 5 _⟦_⟧_
-_⟦_⟧_ : (Ψ : SEnv n m) → (A : Type m) → (Ψ ⊢c A) → Type m
-Ψ ⟦ Int ⟧ p = Int
-Ψ ⟦ ‶ X ⟧ p = applying Ψ X p
-  where
-    applying : (Ψ : SEnv n m) → (X : Fin m) → (Ψ ⊢c ‶ X) → Type m
-    applying (𝕓 Γ) X p                    = ‶ X
-    applying (Ψ ,∙) #0 p                  = ‶ #0
-    applying (Ψ ,∙) (#S X) (⊢c-var∙S p)   = ↑ty0 (applying Ψ X p)
-    applying (Ψ ,^) (#S X) (⊢c-var^S p)   = ↑ty0 (applying Ψ X p)
-    applying (Ψ ,= A) #0 p                = ↑ty0 A
-    applying (Ψ ,= A) (#S X) (⊢c-var=S p) = ↑ty0 (applying Ψ X p)
-Ψ ⟦ A `→ B ⟧ ⊢c-arr p p₁ = (Ψ ⟦ A ⟧ p) `→ (Ψ ⟦ B ⟧ p₁)
-Ψ ⟦ `∀ A ⟧ ⊢c-∀ p = `∀ ((Ψ ,∙) ⟦ A ⟧ p)
+-- ⚠️ this impl is changed recently, not justiifed alot
+infix 3 _:=_∈'_
+data _:=_∈'_ : Fin m → Type m → Env n m → Set where
+  Z  : ∀ {A} → #0 := A ∈' Γ ,= ↓ty0 A
+  S∙ : ∀ {k} {A}
+    → k := ↓ty0 A ∈' Γ
+    → #S k := A ∈' Γ ,∙
+  S= : ∀ {k A B}
+    → k := ↓ty0 A ∈' Γ
+    → #S k := A ∈' Γ ,= B
+  k, : ∀ {k A B}
+    → k := A ∈' Γ
+    → k := A ∈' Γ , B 
+
+infix 3 _:=_∈_
+data _:=_∈_ : Fin m → Type m → SEnv n m → Set where
+
+  kΓ : ∀ {k} {A}
+    → k := A ∈' Γ
+    → k := A ∈ (𝕓 Γ)
+  Z : ∀ {A} → #0 := A ∈ Ψ ,= ↓ty0 A
+  S^ : ∀ {k} {A : Type (1 + m)}
+    → k := ↓ty0 A ∈ Ψ
+    → #S k := A ∈ Ψ ,^
+  S∙ : ∀ {k} {A : Type (1 + m)}
+    → k := ↓ty0 A ∈ Ψ
+    → #S k := A ∈ Ψ ,∙
+  S= : ∀ {k B} {A : Type (1 + m)}
+    → k := ↓ty0 A ∈ Ψ
+    → #S k := A ∈ Ψ ,= B
+
+infix 5 inst_[_]⟹_
+data inst_[_]⟹_ : SEnv n m → Type m → Type m → Set where
+  inst-int : inst Ψ [ Int ]⟹ Int
+  inst-var : ∀ {X A A'}
+    → X := A ∈ Ψ
+    → inst Ψ [ A ]⟹ A'
+    → inst Ψ [ ‶ X ]⟹ A
+  inst-arr : ∀ {A B A' B'}
+    → inst Ψ [ A ]⟹ A'
+    → inst Ψ [ B ]⟹ B'
+    → inst Ψ [ A `→ B ]⟹ A' `→ B'
+  inst-∀ : ∀ {A A'}
+    → inst (Ψ ,∙) [ A ]⟹ A'
+    → inst Ψ [ `∀ A ]⟹ `∀ A'
+
 
 infix 4 [_/_]_⟹_
 
@@ -176,36 +207,7 @@ data _^∈_ : Fin m → SEnv n m → Set where
     → k ^∈ Ψ
     → #S k ^∈ Ψ ,= A    
 
--- ⚠️ this impl is changed recently, not justiifed alot
-infix 3 _:=_∈'_
-data _:=_∈'_ : Fin m → Type m → Env n m → Set where
-  Z  : ∀ {A} → #0 := A ∈' Γ ,= ↓ty0 A
-  S∙ : ∀ {k} {A}
-    → k := ↓ty0 A ∈' Γ
-    → #S k := A ∈' Γ ,∙
-  S= : ∀ {k A B}
-    → k := ↓ty0 A ∈' Γ
-    → #S k := A ∈' Γ ,= B
-  k, : ∀ {k A B}
-    → k := A ∈' Γ
-    → k := A ∈' Γ , B 
 
-infix 3 _:=_∈_
-data _:=_∈_ : Fin m → Type m → SEnv n m → Set where
-
---  Z : ∀ {A} → #0 := A ∈ Ψ ,= ↓ty0 A
-  kΓ : ∀ {k} {A}
-    → k := A ∈' Γ
-    → k := A ∈ (𝕓 Γ)
-  S^ : ∀ {k} {A : Type (1 + m)}
-    → k := ↓ty0 A ∈ Ψ
-    → #S k := A ∈ Ψ ,^
-  S∙ : ∀ {k} {A : Type (1 + m)}
-    → k := ↓ty0 A ∈ Ψ
-    → #S k := A ∈ Ψ ,∙
-  S= : ∀ {k B} {A : Type (1 + m)}
-    → k := ↓ty0 A ∈ Ψ
-    → #S k := A ∈ Ψ ,= B
 
 infix 3 _⊢_⇒_⇒_
 infix 3 _⊢_≤_⊣_↪_
@@ -260,9 +262,10 @@ data _⊢_≤_⊣_↪_ where
   s-int :
       Ψ ⊢ Int ≤ τ Int ⊣ Ψ ↪ Int
 
-  s-empty : ∀ {A}
+  s-empty : ∀ {A A'}
     → (p : Ψ ⊢c A)
-    → Ψ ⊢ A ≤ □ ⊣ Ψ ↪ Ψ ⟦ A ⟧ p
+    → inst Ψ [ A ]⟹ A'
+    → Ψ ⊢ A ≤ □ ⊣ Ψ ↪ A'
 
   s-var : ∀ {X}
     → Ψ ⊢ ‶ X ≤ τ (‶ X) ⊣ Ψ ↪ ‶ X
@@ -345,16 +348,16 @@ sub-id[Int]1 : ∀ {Γ : Env n m} → 𝕓 Γ ⊢ `∀ ‶ #0 `→ ‶ #0 ≤ �
 sub-id[Int]1 {Γ = Γ} = s-∀-t (s-term-c ⊢c-var=0
                                ⊢c-var=0
                                (⊢sub {Ψ = 𝕓 (Γ ,= Int)} ⊢lit (s-ex-r= ⊢c-int (kΓ Z) s-int))
-                               (s-empty ⊢c-var=0))
+                               (s-empty ⊢c-var=0 (inst-var Z inst-int)))
 
 sub-id[Int] : ∀ {Γ : Env n m} → 𝕓 Γ ⊢ `∀ ‶ #0 `→ ‶ #0 ≤ ⟦ Int ⟧↝ □ ⊣ 𝕓 Γ ↪ Int `→ Int
-sub-id[Int] = s-∀-t (s-empty (⊢c-arr ⊢c-var=0 ⊢c-var=0))
+sub-id[Int] = s-∀-t (s-empty (⊢c-arr ⊢c-var=0 ⊢c-var=0) (inst-arr (inst-var Z inst-int) (inst-var Z inst-int)))
 
 sub-id1 : ∀ {Γ : Env n m} → 𝕓 Γ ⊢ `∀ ‶ #0 `→ ‶ #0 ≤ [ lit 1 ]↝ □ ⊣ 𝕓 Γ ↪ Int `→ Int
 sub-id1 = s-∀l-eq (s-term-o ⊢o-var^0
                            ⊢lit
                            (s-ex-r^ ⊢c-int Z ⟹^0)
-                           (s-empty ⊢c-var=0))
+                           (s-empty ⊢c-var=0 (inst-var Z inst-int)))
 
 id[Int]1 : idEnv ⊢ □ ⇒ ((` #0) [ Int ]) · (lit 1) ⇒ Int
 id[Int]1 = ⊢app (⊢tapp (⊢sub (⊢var refl)
