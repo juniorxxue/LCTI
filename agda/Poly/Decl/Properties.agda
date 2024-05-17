@@ -87,7 +87,7 @@ slv-weaken : ∀ {Γ : Env (1 + n) m} {k A B}
   → (Γ /ˣ k) ⟦ A ⟧⟹ B
   → Γ ⟦ A ⟧⟹ B
 slv-weaken {A = Int} {Int} ⟦A⟧⟹B = slv-int
-slv-weaken {A = ‶ X} {B} (slv-var x) = slv-var (slv'-weaken x)
+slv-weaken {A = ‶ X} {B} (slv-var x a) = slv-var (slv'-weaken x) (slv-weaken a)
 slv-weaken {A = A `→ A₁} {B `→ B₁} (slv-arr ⟦A⟧⟹B ⟦A⟧⟹B₁) = slv-arr (slv-weaken ⟦A⟧⟹B) (slv-weaken ⟦A⟧⟹B₁)
 slv-weaken {A = `∀ A} {`∀ B} (slv-∀ ⟦A⟧⟹B) = slv-∀ (slv-weaken ⟦A⟧⟹B)
 
