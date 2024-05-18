@@ -28,21 +28,7 @@ data _:=_∈_ : Fin m → Type m → Env n m → Set where
 
 -- apply solutions in Env to a type
 
--- the function version is hard to destruct in the conclusion
--- thus model it as datatype in the next
-infix 5 _⟦_⟧
-_⟦_⟧ : (Γ : Env n m) → (A : Type m) → Type m
-Γ ⟦ Int ⟧    = Int
-Γ ⟦ ‶ X ⟧    = applying Γ X
-  where applying : (Γ : Env n m) → (X : Fin m) → Type m
-        applying (Γ , A) X       = applying Γ X
-        applying (Γ ,∙) #0       = ‶ #0
-        applying (Γ ,∙) (#S X)   = ↑ty0 (applying Γ X)
-        applying (Γ ,= A) #0     = ↑ty0 A
-        applying (Γ ,= A) (#S X) = ↑ty0 (applying Γ X)
-Γ ⟦ A `→ B ⟧ = (Γ ⟦ A ⟧) `→ (Γ ⟦ B ⟧)
-Γ ⟦ `∀ A ⟧   = `∀ ((Γ ,∙) ⟦ A ⟧)
-
+{-
 infix 4 _⟦_⟧⟹'_
 data _⟦_⟧⟹'_ : Env n m → Fin m → Type m → Set where
   slv'-, : ∀ {A B X}
@@ -62,12 +48,14 @@ data _⟦_⟧⟹'_ : Env n m → Fin m → Type m → Set where
     → Γ ⟦ X ⟧⟹' B
     → B' ≡ ↑ty0 B
     → (Γ ,= A) ⟦ #S X ⟧⟹' B'
+-}    
 
 infix 4 _⟦_⟧⟹_
 data _⟦_⟧⟹_ : Env n m → Type m → Type m → Set where
   slv-int : Γ ⟦ Int ⟧⟹ Int
   slv-var : ∀ {X A A'}
-    → Γ ⟦ X ⟧⟹' A
+--    → Γ ⟦ X ⟧⟹' A ⚠️
+    → X := A ∈' Γ
     → Γ ⟦ A ⟧⟹ A'
     → Γ ⟦ ‶ X ⟧⟹ A'
   slv-arr : ∀ {A B A' B'}
@@ -84,6 +72,8 @@ data bound : Type (1 + m) → Fin (1 + m) → Set where
   b-arr₂ : ∀ {A : Type (1 + m)} {B k} → bound B k → bound (A `→ B) k
   b-∀ : ∀ {A : Type (2 + m)} {k} → bound A (#S k) → bound (`∀ A) k
 
+-- find A k j
+-- at j-th position of A type, should have a bound variable, example: |-1 forall a. a -> a <: Int -> Int
 data find : Type (1 + m) → Fin (1 + m) → Counter → Set where
   f-∞ : ∀ {A : Type (1 + m)} {k} → find A k ∞ -- not sure
   f-Z : ∀ {A : Type (1 + m)} {k} → bound A k → find A k Z
@@ -103,7 +93,7 @@ data find : Type (1 + m) → Fin (1 + m) → Counter → Set where
 infix 3 _⊢_#_≤_
 data _⊢_#_≤_ : Env n m → Counter → Type m → Type m → Set where
   s-refl : ∀ {A A'}
-    → (ap : Γ ⟦ A ⟧⟹ A')
+    → (ap : Γ ⟦ A ⟧⟹ A') -- I want to simplify this judgment, but worried about type variables case
     → Γ ⊢ Z # A ≤ A'
   s-int :
       Γ ⊢ ∞ # Int ≤ Int
@@ -122,6 +112,8 @@ data _⊢_#_≤_ : Env n m → Counter → Type m → Type m → Set where
     → Γ ⊢ ∞ # `∀ A ≤ `∀ B
   s-∀l : ∀ {j A B C}
     → Γ ,= B ⊢ S j # A ≤ ↑ty0 C
+-- we guess a solution of B here, we must make sure this B is provided from the counter
+-- what we does is to make sure the all inputs matching the counter should at least have the quantifer contained
     → find A #0 (S j)
     → Γ ⊢ S j # `∀ A ≤ C
   s-∀lτ : ∀ {j A B C}
@@ -176,7 +168,7 @@ idEnv : Env 1 0
 idEnv = ∅ , `∀ (‶ #0 `→ ‶ #0)
 
 id[Int]1 : idEnv ⊢ Z # ((` #0) [ Int ]) · (lit 1) ⦂ Int
-id[Int]1 = ⊢app₁ (⊢tapp (⊢sub (⊢var refl) (s-∀lτ (s-refl (slv-arr (slv-var (slv'-=-Z refl) slv-int) (slv-var (slv'-=-Z refl) slv-int)))) λ ()))
+id[Int]1 = ⊢app₁ (⊢tapp (⊢sub (⊢var refl) (s-∀lτ (s-refl (slv-arr (slv-var Z slv-int) (slv-var Z slv-int)))) λ ()))
                  (⊢sub ⊢lit s-int λ ())
 
 idExp : Term 0 0
@@ -184,17 +176,17 @@ idExp = Λ (((ƛ ` #0) ⦂ ‶ #0 `→ ‶ #0))
 
 idExp[Int]1 : ∅ ⊢ Z # (idExp [ Int ]) · (lit 1) ⦂ Int
 idExp[Int]1 = ⊢app₁ (⊢tapp (⊢sub (⊢tabs₁ (⊢ann (⊢lam₁ (⊢sub (⊢var refl) s-var λ ()))))
-                                 (s-∀lτ (s-refl (slv-arr (slv-var (slv'-=-Z refl) slv-int) (slv-var (slv'-=-Z refl) slv-int)))) λ ()))
+                                 (s-∀lτ (s-refl (slv-arr (slv-var Z slv-int) (slv-var Z slv-int)))) λ ()))
                     (⊢sub ⊢lit s-int λ ())
 
 idExp[Int] : ∅ ⊢ Z # idExp [ Int ] ⦂ Int `→ Int
 idExp[Int] = ⊢tapp (⊢sub (⊢tabs₁ (⊢ann (⊢lam₁ (⊢sub (⊢var refl) s-var λ ()))))
-                         (s-∀lτ (s-refl (slv-arr (slv-var (slv'-=-Z refl) slv-int) (slv-var (slv'-=-Z refl) slv-int)))) λ ())
+                         (s-∀lτ (s-refl (slv-arr (slv-var Z slv-int) (slv-var Z slv-int)))) λ ())
 
 -- implicit inst
 id1 : idEnv ⊢ Z # (` #0) · (lit 1) ⦂ Int
 id1 = ⊢app₂ (⊢sub (⊢var refl)
-                  (s-∀l (s-arr₂ (s-var-r Z s-int) (s-refl (slv-var (slv'-=-Z refl) slv-int))) (f-S₁ b-var)) λ ())
+                  (s-∀l (s-arr₂ (s-var-r Z s-int) (s-refl (slv-var Z slv-int))) (f-S₁ b-var)) λ ())
             ⊢lit
 
 #1 : Fin (2 + m)

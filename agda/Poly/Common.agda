@@ -22,6 +22,7 @@ variable
   m n m' n' : ℕ
 
 
+
 data Type : ℕ → Set where
   Int    : Type m
   ‶_     : (X : Fin m) → Type m
@@ -64,12 +65,17 @@ data Env : ℕ → ℕ → Set where
   _,∙   : Env n m → Env n (1 + m)
   _,=_  : Env n m → (A : Type m) → Env n (1 + m)
 
+
+private variable
+  Γ : Env n m
+
 -- the n ensures we can find the type
 lookup : Env n m → Fin n → Type m
 lookup (Γ , A) #0     = A
 lookup (Γ , A) (#S k) = lookup Γ k
 lookup (Γ ,∙) k       = ↑ty0 (lookup Γ k)
 lookup (Γ ,= A) k     = ↑ty0 (lookup Γ k)
+
 
 ----------------------------------------------------------------------
 --+                           Type Subst                           +--
@@ -130,3 +136,17 @@ infix 6 [_]ᵗ_
 -- unshift is just substing with a random type
 ↓ty0 : Type (1 + m) → Type m
 ↓ty0 A = [ Int ]ˢ A
+
+-- solved existentials (k = A) is in Γ
+infix 3 _:=_∈'_
+data _:=_∈'_ : Fin m → Type m → Env n m → Set where
+  Z  : ∀ {A} → #0 := A ∈' Γ ,= ↓ty0 A
+  S∙ : ∀ {k} {A}
+    → k := ↓ty0 A ∈' Γ
+    → #S k := A ∈' Γ ,∙
+  S= : ∀ {k A B}
+    → k := ↓ty0 A ∈' Γ
+    → #S k := A ∈' Γ ,= B
+  k, : ∀ {k A B}
+    → k := A ∈' Γ
+    → k := A ∈' Γ , B 

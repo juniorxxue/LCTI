@@ -116,20 +116,6 @@ data _⊢o_ : SEnv n m → Type m → Set where
     → Ψ ,∙ ⊢o A
     → Ψ ⊢o `∀ A
 
--- ⚠️ this impl is changed recently, not justiifed alot
-infix 3 _:=_∈'_
-data _:=_∈'_ : Fin m → Type m → Env n m → Set where
-  Z  : ∀ {A} → #0 := A ∈' Γ ,= ↓ty0 A
-  S∙ : ∀ {k} {A}
-    → k := ↓ty0 A ∈' Γ
-    → #S k := A ∈' Γ ,∙
-  S= : ∀ {k A B}
-    → k := ↓ty0 A ∈' Γ
-    → #S k := A ∈' Γ ,= B
-  k, : ∀ {k A B}
-    → k := A ∈' Γ
-    → k := A ∈' Γ , B 
-
 infix 3 _:=_∈_
 data _:=_∈_ : Fin m → Type m → SEnv n m → Set where
 
@@ -162,9 +148,7 @@ data inst_[_]⟹_ : SEnv n m → Type m → Type m → Set where
     → inst (Ψ ,∙) [ A ]⟹ A'
     → inst Ψ [ `∀ A ]⟹ `∀ A'
 
-
 infix 4 [_/_]_⟹_
-
 data [_/_]_⟹_ : Type m → Fin m → SEnv n m → SEnv n m → Set where
 
 {-

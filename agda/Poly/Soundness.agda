@@ -45,14 +45,14 @@ record Log : Set where
 
 f' : ∀ {Ψ : SEnv n m} {Ψ' A Σ A'} → (Ψ ⊢ A ≤ Σ ⊣ Ψ' ↪ A') → Log
 f' s-int = record { s-counter = ∞ ; check-terms = [] ; infer-terms = [] }
-f' (s-empty p) = {!!}
+f' (s-empty p inst) = {!!}
 f' s-var = {!!}
 f' (s-ex-l^ x x₁ x₂) = {!!}
-f' (s-ex-l= x x₁ s s₁) = {!!}
+f' (s-ex-l= x x₁ s) = {!!}
 f' (s-ex-r^ x x₁ x₂) = {!!}
-f' (s-ex-r= x x₁ s s₁) = {!!}
+f' (s-ex-r= x x₁ s ) = {!!}
 f' (s-arr s s₁) = {!!}
-f' (s-term-c x x₁ s) = {!!}
+f' (s-term-c x x' x₁ s) = {!!}
 f' (s-term-o x x₁ s s₁) = {!!}
 f' (s-∀ s) = {!!}
 f' (s-∀l-^ s) = {!!}
@@ -61,14 +61,14 @@ f' (s-∀-t s) = {!!}
 
 f : ∀ {Ψ : SEnv n m} {Ψ' A Σ A'} → (Ψ ⊢ A ≤ Σ ⊣ Ψ' ↪ A') → Counter
 f s-int = ∞
-f (s-empty p) = Z
+f (s-empty p inst) = Z
 f s-var = ∞
 f (s-ex-l^ x x₁ x₂) = ∞
-f (s-ex-l= x x₁ s s₁) = ∞
+f (s-ex-l= x x₁ s) = ∞
 f (s-ex-r^ x x₁ x₂) = ∞
-f (s-ex-r= x x₁ s s₁) = ∞
+f (s-ex-r= x x₁ s) = ∞
 f (s-arr s s₁) = ∞
-f (s-term-c x x₁ s) = f s
+f (s-term-c x x₁ s s') = {!!}
 f (s-term-o x x₁ s s₁) = S (f s₁)
 f (s-∀ s) = ∞
 f (s-∀l-^ s) = f s
@@ -79,14 +79,14 @@ sound-≤ : ∀ {Ψ Ψ' : SEnv n m} {Σ A A'}
   → (s : Ψ ⊢ A ≤ Σ ⊣ Ψ' ↪ A')
   → (Ψ→Γ Ψ) ⊢ (f s) # A ≤ A'
 sound-≤ s-int = s-int
-sound-≤ (s-empty p) = {!!}
+sound-≤ (s-empty p inst) = {!!}
 sound-≤ s-var = {!!}
 sound-≤ (s-ex-l^ x x₁ x₂) = {!!}
-sound-≤ (s-ex-l= x x₁ s s₁) = {!!}
+sound-≤ (s-ex-l= x x₁ s) = {!!}
 sound-≤ (s-ex-r^ x x₁ x₂) = {!!}
-sound-≤ (s-ex-r= x x₁ s s₁) = {!!}
+sound-≤ (s-ex-r= x x₁ s) = {!!}
 sound-≤ (s-arr s s₁) = s-arr₁ {!sound-≤ s!} {!sound-≤ s₁!}
-sound-≤ (s-term-c x x₁ s) = {!!}
+sound-≤ (s-term-c x x₁ s s') = {!!}
 sound-≤ (s-term-o x x₁ s s₁) = {!!}
 sound-≤ (s-∀ s) = {!!}
 sound-≤ (s-∀l-^ s) = {!!}
@@ -98,15 +98,17 @@ app-elim : ∀ {Γ : Env n m} {A₁ Σ Ψ A e}
   → Γ ⊢ Z # e ⦂ A₁
   → Γ ⊢ (f s) # e ⦂ A
 app-elim s-int ⊢e = ⊢sub' ⊢e s-int
-app-elim (s-empty p) ⊢e = {!!}
+app-elim (s-empty p inst) ⊢e = {!!}
 app-elim s-var ⊢e = {!!}
 app-elim (s-arr s s₁) ⊢e = ⊢sub' ⊢e (s-arr₁ {!!} {!!}) -- implied by soundness of sub
-app-elim (s-term-c x x₁ s) ⊢e = ⊢sub' ⊢e {!!}
+app-elim (s-term-c x x₁ s s') ⊢e = ⊢sub' ⊢e {!!}
 app-elim (s-term-o x x₁ s s₁) ⊢e = ⊢sub' ⊢e {!!}
 app-elim (s-∀ s) ⊢e = {!!}
 app-elim (s-∀l-^ s) ⊢e = {!!}
 app-elim (s-∀l-eq s) ⊢e = {!!}
 app-elim (s-∀-t s) ⊢e = {!!}
+app-elim (s-ex-l= x₁ x₂ s) x = {!!}
+app-elim (s-ex-r= x₁ x₂ s) x = {!!}
 
 sound-i : ∀ {Γ : Env n m} {Σ e e̅ A A' A̅}
   → Γ ⊢ Σ ⇒ e ⇒ A
@@ -161,7 +163,6 @@ sound-c (⊢sub ⊢e s) spl = {!!}
 sound-c (⊢tapp ⊢e) spl = sound-c ⊢e (have-t spl)
 
 -- j <= length Σ
-
 
 -- f : ∀a. a -> a -> a
 

@@ -347,7 +347,9 @@ main = do
       ex_f1 = infer (EBind (TForall (TArr (TVar 0) (TVar 0))) EEmpty) CEmpty (App (Var 0) (Lit 42))
       ex_sub1 = sub (Base EEmpty) (TForall (TVar 0)) (CFullType (TForall (TArr TInt TInt)))
       ex_argfun = infer (EBind (TForall (TArr (TArr (TVar 0) (TVar 0)) (TVar 0))) (EBind (TArr TInt TInt) EEmpty)) CEmpty (App (Var 0) (Var 1))
-  forM_ [ex_id, ex_id1, ex_idInt, ex_idInt1, ex_f1, ex_argfun] $ \ex -> case runWriterT ex of
+      ex_idid = infer EEmpty CEmpty (App idTrm idTrm)
+
+  forM_ [ex_id, ex_id1, ex_idInt, ex_idInt1, ex_f1, ex_argfun, ex_idid] $ \ex -> case runWriterT ex of
     Just (tyA, logs) -> do
       putStrLn $ "inferred type: " ++ show tyA
       mapM_ putStrLn logs

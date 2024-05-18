@@ -52,4 +52,6 @@ s-closed (s-term-o x x₁ s s₁) rewrite s-closed s = s-closed s₁
 s-closed (s-∀ s) = {!!}
 s-closed (s-∀l-^ s) = {!!}
 s-closed (s-∀l-eq s) = {!!}
-s-closed (s-∀-t s) = {!   !}
+s-closed (s-∀-t s) = {!!}
+s-closed (s-ex-l= x x₁ x₂) = {!!}
+s-closed (s-ex-r= x x₁ x₂) = {!!}

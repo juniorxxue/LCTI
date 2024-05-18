@@ -1,3 +1,4 @@
+{-# OPTIONS --allow-unsolved-metas #-}
 module Poly.Decl.Properties where
 
 open import Poly.Common
@@ -73,6 +74,7 @@ lookup-weaken {Γ = Γ , A} {k = #S k} {x = #S x} = lookup-weaken {Γ = Γ} {k =
 lookup-weaken {Γ = Γ ,∙} {k = #S k} {x = #S x} = cong ↑ty0 (lookup-weaken {Γ = Γ})
 lookup-weaken {Γ = Γ ,= A} {k = #S k} {x = #S x} = cong ↑ty0 (lookup-weaken {Γ = Γ})
 
+{-
 slv'-weaken : ∀ {Γ : Env (1 + n) m} {k X B}
   → (Γ /ˣ k) ⟦ X ⟧⟹' B
   → Γ ⟦ X ⟧⟹' B
@@ -82,12 +84,13 @@ slv'-weaken {Γ = Γ ,∙} slv'-∙-Z = slv'-∙-Z
 slv'-weaken {Γ = Γ ,∙} (slv'-∙-S ⟦X⟧⟹'B refl) = slv'-∙-S (slv'-weaken ⟦X⟧⟹'B) refl
 slv'-weaken {Γ = Γ ,= A} (slv'-=-Z refl) = slv'-=-Z refl
 slv'-weaken {Γ = Γ ,= A} (slv'-=-S ⟦X⟧⟹'B refl) = slv'-=-S (slv'-weaken ⟦X⟧⟹'B) refl
+-}
 
 slv-weaken : ∀ {Γ : Env (1 + n) m} {k A B}
   → (Γ /ˣ k) ⟦ A ⟧⟹ B
   → Γ ⟦ A ⟧⟹ B
 slv-weaken {A = Int} {Int} ⟦A⟧⟹B = slv-int
-slv-weaken {A = ‶ X} {B} (slv-var x a) = slv-var (slv'-weaken x) (slv-weaken a)
+slv-weaken {A = ‶ X} {B} (slv-var x a) = slv-var {!!} (slv-weaken a)
 slv-weaken {A = A `→ A₁} {B `→ B₁} (slv-arr ⟦A⟧⟹B ⟦A⟧⟹B₁) = slv-arr (slv-weaken ⟦A⟧⟹B) (slv-weaken ⟦A⟧⟹B₁)
 slv-weaken {A = `∀ A} {`∀ B} (slv-∀ ⟦A⟧⟹B) = slv-∀ (slv-weaken ⟦A⟧⟹B)
 
