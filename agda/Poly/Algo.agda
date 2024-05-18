@@ -22,6 +22,12 @@ data Context : ℕ → ℕ → Set where
   [_]↝_ : (e : Term n m) → Context n m → Context n m
   ⟦_⟧↝_ : (A : Type m) → Context n m → Context n m
 
+data NonEmpty : Context n m → Set where
+  ne-τ    : ∀ {A : Type m} → NonEmpty (Context n m ∋⦂ τ A)
+  ne-app  : ∀ {e} {Σ : Context n m} → NonEmpty ([ e ]↝ Σ)
+  ne-tapp : ∀ {A} {Σ : Context n m} → NonEmpty (⟦ A ⟧↝ Σ)
+  
+
 ↑Σ : Fin (1 + n) → Context n m → Context (1 + n) m
 ↑Σ k □ = □
 ↑Σ k (τ A) = τ A
@@ -228,6 +234,7 @@ data _⊢_⇒_⇒_ where
 
   ⊢sub : ∀ {g A B}
     → Γ ⊢ □ ⇒ g ⇒ A          --- Γ ⊢ Z # e : A
+    → NonEmpty Σ
     → 𝕓 Γ ⊢ A ≤ Σ ⊣ Ψ ↪ B    --- Γ ⊢ j # A ≤ B
     → Γ ⊢ Σ ⇒ g ⇒ B          --- Γ ⊢ j # e ∶ B
 
@@ -331,7 +338,7 @@ idEnv = ∅ , `∀ (‶ #0 `→ ‶ #0)
 sub-id[Int]1 : ∀ {Γ : Env n m} → 𝕓 Γ ⊢ `∀ ‶ #0 `→ ‶ #0 ≤ ⟦ Int ⟧↝ [ lit 1 ]↝ □ ⊣ 𝕓 Γ ↪ Int `→ Int
 sub-id[Int]1 {Γ = Γ} = s-∀-t (s-term-c ⊢c-var=0
                                ⊢c-var=0
-                               (⊢sub {Ψ = 𝕓 (Γ ,= Int)} ⊢lit (s-ex-r= ⊢c-int (kΓ Z) s-int))
+                               (⊢sub {Ψ = 𝕓 (Γ ,= Int)} ⊢lit ne-τ (s-ex-r= ⊢c-int (kΓ Z) s-int))
                                (s-empty ⊢c-var=0 (inst-var Z inst-int)))
 
 sub-id[Int] : ∀ {Γ : Env n m} → 𝕓 Γ ⊢ `∀ ‶ #0 `→ ‶ #0 ≤ ⟦ Int ⟧↝ □ ⊣ 𝕓 Γ ↪ Int `→ Int
@@ -345,19 +352,21 @@ sub-id1 = s-∀l-eq (s-term-o ⊢o-var^0
 
 id[Int]1 : idEnv ⊢ □ ⇒ ((` #0) [ Int ]) · (lit 1) ⇒ Int
 id[Int]1 = ⊢app (⊢tapp (⊢sub (⊢var refl)
+                             ne-tapp
                              sub-id[Int]1))
 idExp : Term 0 0
 idExp = Λ (((ƛ ` #0) ⦂ ‶ #0 `→ ‶ #0))
 
 idExp[Int]1 : ∅ ⊢ □ ⇒ (idExp [ Int ]) · (lit 1) ⇒ Int
-idExp[Int]1 = ⊢app (⊢tapp (⊢sub (⊢tabs₁ (⊢ann (⊢lam₁ (⊢sub (⊢var refl) s-var)))) (sub-id[Int]1 {Γ = ∅})))
+idExp[Int]1 = ⊢app (⊢tapp (⊢sub
+                            (⊢tabs₁ (⊢ann (⊢lam₁ (⊢sub (⊢var refl) ne-τ s-var)))) ne-tapp (sub-id[Int]1 {Γ = ∅})))
 
 idExp[Int] : ∅ ⊢ □ ⇒ idExp [ Int ] ⇒ Int `→ Int
-idExp[Int] = ⊢tapp (⊢sub (⊢tabs₁ (⊢ann (⊢lam₁ (⊢sub (⊢var refl) s-var)))) sub-id[Int])
+idExp[Int] = ⊢tapp (⊢sub (⊢tabs₁ (⊢ann (⊢lam₁ (⊢sub (⊢var refl) ne-τ s-var)))) ne-tapp sub-id[Int])
 
 -- implicit inst
 id1 : idEnv ⊢ □ ⇒ (` #0) · (lit 1) ⇒ Int
-id1 = ⊢app (⊢sub (⊢var refl) sub-id1)
+id1 = ⊢app (⊢sub (⊢var refl) ne-app sub-id1)
 
 
 -- [e1] -> [e2] -> [e3] -> []
