@@ -59,6 +59,15 @@ _/ˣ_ {suc n} (Γ , A) (#S k) = (Γ /ˣ k) , A
 ∈-weaken {Γ = Γ ,= A} {B = B} (S= ∈Γ) = S= (∈-weaken ∈Γ)
 ∈-weaken {m = suc m} {Γ ,= A} {X = #0} Z = Z
 
+∈'-weaken : ∀ {Γ : Env (1 + n) m} {k X B}
+  → X := B ∈' (Γ /ˣ k)
+  → X := B ∈' Γ
+∈'-weaken {n} {suc m} {Γ = Γ , A} {#0} ∈'Γ = k, ∈'Γ
+∈'-weaken {suc n} {suc m} {Γ = Γ , A} {#S k} (k, ∈'Γ) = k, (∈'-weaken ∈'Γ) 
+∈'-weaken {n} {.(1 + _)} {Γ = Γ ,∙} (S∙ ∈'Γ) = S∙ (∈'-weaken ∈'Γ)
+∈'-weaken {n} {.(1 + _)} {Γ = Γ ,= .(↓ty0 B)} {B = B} Z = Z
+∈'-weaken {n} {.(1 + _)} {Γ = Γ ,= A} {B = B} (S= ∈'Γ) = S= (∈'-weaken ∈'Γ)
+
 lookup-weaken : ∀ {Γ : Env (1 + n) m} {k x}
   → lookup (Γ /ˣ k) x ≡ lookup Γ (punchIn k x)
 lookup-weaken {Γ = Γ , A} {k = #0} {x = #0} = refl
@@ -90,7 +99,7 @@ slv-weaken : ∀ {Γ : Env (1 + n) m} {k A B}
   → (Γ /ˣ k) ⟦ A ⟧⟹ B
   → Γ ⟦ A ⟧⟹ B
 slv-weaken {A = Int} {Int} ⟦A⟧⟹B = slv-int
-slv-weaken {A = ‶ X} {B} (slv-var x a) = slv-var {!!} (slv-weaken a)
+slv-weaken {A = ‶ X} {B} (slv-var x a) = slv-var (∈'-weaken x) (slv-weaken a)
 slv-weaken {A = A `→ A₁} {B `→ B₁} (slv-arr ⟦A⟧⟹B ⟦A⟧⟹B₁) = slv-arr (slv-weaken ⟦A⟧⟹B) (slv-weaken ⟦A⟧⟹B₁)
 slv-weaken {A = `∀ A} {`∀ B} (slv-∀ ⟦A⟧⟹B) = slv-∀ (slv-weaken ⟦A⟧⟹B)
 
@@ -147,3 +156,4 @@ s-trans {B = `∀ B} s1 s2 = {!!}
 -}
   
    
+  
