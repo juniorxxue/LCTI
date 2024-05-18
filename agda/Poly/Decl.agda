@@ -8,6 +8,11 @@ data Counter : Set where
   S  : Counter → Counter
   Sτ : Counter → Counter
 
+data NonZ : Counter → Set where
+  nz-∞ : NonZ ∞
+  nz-S : ∀ {j} → NonZ (S j)
+  nz-Sτ : ∀ {j} → NonZ (Sτ j)
+
 private
   variable
     Γ : Env n m
@@ -155,7 +160,7 @@ data _⊢_#_⦂_ : Env n m → Counter → Term n m → Type m → Set where
   ⊢sub : ∀ {e j A B}
     → Γ ⊢ Z # e ⦂ B
     → (B≤A : Γ ⊢ j # B ≤ A)
-    → (j≢Z : j ≢ Z)
+    → (j≢Z : NonZ j)
     → Γ ⊢ j # e ⦂ A
   ⊢tabs₁ : ∀ {e A}
     → Γ ,∙ ⊢ Z # e ⦂ A
@@ -168,25 +173,25 @@ idEnv : Env 1 0
 idEnv = ∅ , `∀ (‶ #0 `→ ‶ #0)
 
 id[Int]1 : idEnv ⊢ Z # ((` #0) [ Int ]) · (lit 1) ⦂ Int
-id[Int]1 = ⊢app₁ (⊢tapp (⊢sub (⊢var refl) (s-∀lτ (s-refl (slv-arr (slv-var Z slv-int) (slv-var Z slv-int)))) λ ()))
-                 (⊢sub ⊢lit s-int λ ())
+id[Int]1 = ⊢app₁ (⊢tapp (⊢sub (⊢var refl) (s-∀lτ (s-refl (slv-arr (slv-var Z slv-int) (slv-var Z slv-int)))) nz-Sτ))
+                 (⊢sub ⊢lit s-int nz-∞)
 
 idExp : Term 0 0
 idExp = Λ (((ƛ ` #0) ⦂ ‶ #0 `→ ‶ #0))
 
 idExp[Int]1 : ∅ ⊢ Z # (idExp [ Int ]) · (lit 1) ⦂ Int
-idExp[Int]1 = ⊢app₁ (⊢tapp (⊢sub (⊢tabs₁ (⊢ann (⊢lam₁ (⊢sub (⊢var refl) s-var λ ()))))
-                                 (s-∀lτ (s-refl (slv-arr (slv-var Z slv-int) (slv-var Z slv-int)))) λ ()))
-                    (⊢sub ⊢lit s-int λ ())
+idExp[Int]1 = ⊢app₁ (⊢tapp (⊢sub (⊢tabs₁ (⊢ann (⊢lam₁ (⊢sub (⊢var refl) s-var nz-∞))))
+                                 (s-∀lτ (s-refl (slv-arr (slv-var Z slv-int) (slv-var Z slv-int)))) nz-Sτ))
+                    (⊢sub ⊢lit s-int nz-∞)
 
 idExp[Int] : ∅ ⊢ Z # idExp [ Int ] ⦂ Int `→ Int
-idExp[Int] = ⊢tapp (⊢sub (⊢tabs₁ (⊢ann (⊢lam₁ (⊢sub (⊢var refl) s-var λ ()))))
-                         (s-∀lτ (s-refl (slv-arr (slv-var Z slv-int) (slv-var Z slv-int)))) λ ())
+idExp[Int] = ⊢tapp (⊢sub (⊢tabs₁ (⊢ann (⊢lam₁ (⊢sub (⊢var refl) s-var nz-∞))))
+                         (s-∀lτ (s-refl (slv-arr (slv-var Z slv-int) (slv-var Z slv-int)))) nz-Sτ)
 
 -- implicit inst
 id1 : idEnv ⊢ Z # (` #0) · (lit 1) ⦂ Int
 id1 = ⊢app₂ (⊢sub (⊢var refl)
-                  (s-∀l (s-arr₂ (s-var-r Z s-int) (s-refl (slv-var Z slv-int))) (f-S₁ b-var)) λ ())
+                  (s-∀l (s-arr₂ (s-var-r Z s-int) (s-refl (slv-var Z slv-int))) (f-S₁ b-var)) nz-S)
             ⊢lit
 
 #1 : Fin (2 + m)
