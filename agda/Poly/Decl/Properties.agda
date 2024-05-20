@@ -20,12 +20,7 @@ _↑ᵉ[_]_ : ∀ (Γ : Env n m) → Type m -> (k : Fin (1 + n)) → Env (1 + n)
   → Γ ⊢ Z # e ⦂ B
   → Γ ⊢ j # B ≤ A
   → Γ ⊢ j # e ⦂ A -- which no longer holds for zed case
-⊢sub' {j = Z} ⊢e (s-refl ap) = {!!}
-⊢sub' {j = Z} ⊢e (s-var-l x s) = {!!}
-⊢sub' {j = Z} ⊢e (s-var-r x s) = {!!}
-⊢sub' {j = ∞} ⊢e s = ⊢sub ⊢e s (λ ())
-⊢sub' {j = S j} ⊢e s = ⊢sub ⊢e s (λ ())
-⊢sub' {j = Sτ j} ⊢e s = ⊢sub ⊢e s (λ ())
+⊢sub' = {!   !}
 
 -- the needed lemmas
 -- will do later
@@ -34,9 +29,9 @@ postulate
     → Γ , A ⊢ j # ↑tm0 e ⦂ B
     → Γ ⊢ j # e ⦂ B
 
-  s-weaken-tm-0 : ∀ {Γ : Env n m} {A B C j}
-    → Γ , A ⊢ j # B ≤ C
-    → Γ ⊢ j # B ≤ C
+  -- s-strengthen-tm-0 : ∀ {Γ : Env n m} {A B C j}
+  --   → Γ , A ⊢ j # B ≤ C
+  --   → Γ ⊢ j # B ≤ C
 
 ----------------------------------------------------------------------
 --+                           Weakening                            +--
@@ -83,17 +78,6 @@ lookup-weaken {Γ = Γ , A} {k = #S k} {x = #S x} = lookup-weaken {Γ = Γ} {k =
 lookup-weaken {Γ = Γ ,∙} {k = #S k} {x = #S x} = cong ↑ty0 (lookup-weaken {Γ = Γ})
 lookup-weaken {Γ = Γ ,= A} {k = #S k} {x = #S x} = cong ↑ty0 (lookup-weaken {Γ = Γ})
 
-{-
-slv'-weaken : ∀ {Γ : Env (1 + n) m} {k X B}
-  → (Γ /ˣ k) ⟦ X ⟧⟹' B
-  → Γ ⟦ X ⟧⟹' B
-slv'-weaken {n} {m = m} {Γ = Γ , A} {#0} ⟦X⟧⟹'B = slv'-, ⟦X⟧⟹'B 
-slv'-weaken {suc n} {m = suc m} {Γ = Γ , A} {#S k} (slv'-, ⟦X⟧⟹'B) = slv'-, (slv'-weaken ⟦X⟧⟹'B)
-slv'-weaken {Γ = Γ ,∙} slv'-∙-Z = slv'-∙-Z 
-slv'-weaken {Γ = Γ ,∙} (slv'-∙-S ⟦X⟧⟹'B refl) = slv'-∙-S (slv'-weaken ⟦X⟧⟹'B) refl
-slv'-weaken {Γ = Γ ,= A} (slv'-=-Z refl) = slv'-=-Z refl
-slv'-weaken {Γ = Γ ,= A} (slv'-=-S ⟦X⟧⟹'B refl) = slv'-=-S (slv'-weaken ⟦X⟧⟹'B) refl
--}
 
 slv-weaken : ∀ {Γ : Env (1 + n) m} {k A B}
   → (Γ /ˣ k) ⟦ A ⟧⟹ B
@@ -116,6 +100,21 @@ s-weaken (s-∀l A≤B s) = s-∀l (s-weaken A≤B) s
 s-weaken (s-∀lτ A≤B) = s-∀lτ (s-weaken A≤B)
 s-weaken (s-var-l x A≤B) = s-var-l (∈-weaken x) (s-weaken A≤B)
 s-weaken (s-var-r x A≤B) = s-var-r (∈-weaken x) (s-weaken A≤B)
+
+
+s-strengthen-tm-0 : ∀ {Γ : Env n m} {A B C j}
+  → Γ , A ⊢ j # B ≤ C
+  → Γ ⊢ j # B ≤ C
+s-strengthen-tm-0 (s-refl ap) = {! ap !}
+s-strengthen-tm-0 s-int = s-int
+s-strengthen-tm-0 s-var = s-var
+s-strengthen-tm-0 (s-arr₁ C≤A B≤D) = s-arr₁ (s-strengthen-tm-0 C≤A) (s-strengthen-tm-0 B≤D)
+s-strengthen-tm-0 (s-arr₂ B≤C B≤C₁) = {!   !}
+s-strengthen-tm-0 (s-∀ B≤C) = s-∀ {!   !} -- IH not generalizable enough 
+s-strengthen-tm-0 (s-∀l B≤C x) = {!   !}
+s-strengthen-tm-0 (s-∀lτ B≤C) = {!   !}
+s-strengthen-tm-0 (s-var-l x B≤C) = {!   !}
+s-strengthen-tm-0 (s-var-r x B≤C) = {!   !}
 
 weaken : ∀ {Γ : Env (1 + n) m} {k j e A}
   → Γ /ˣ k ⊢ j # e ⦂ A
