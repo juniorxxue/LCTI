@@ -125,14 +125,14 @@ data _⊢_#_≤_ : Env n m → Counter → Type m → Type m → Set where
     → Γ ,= B ⊢ j # A ≤ ↑ty0 C 
     → Γ ⊢ Sτ j # `∀ A ≤ C
   -- two atomic rules, not sure where to use them
-  s-var-l : ∀ {X j A B}
+  s-var-l : ∀ {X A B}
     → X := B ∈ Γ
-    → Γ ⊢ j # B ≤ A
-    → Γ ⊢ j # ‶ X ≤ A
-  s-var-r : ∀ {X j A B}
+    → Γ ⊢ ∞ # B ≤ A
+    → Γ ⊢ ∞ # ‶ X ≤ A
+  s-var-r : ∀ {X A B}
     → X := B ∈ Γ
-    → Γ ⊢ j # A ≤ B
-    → Γ ⊢ j # A ≤ ‶ X
+    → Γ ⊢ ∞ # A ≤ B
+    → Γ ⊢ ∞ # A ≤ ‶ X
 
 infix 3 _⊢_#_⦂_
 data _⊢_#_⦂_ : Env n m → Counter → Term n m → Type m → Set where

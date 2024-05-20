@@ -234,7 +234,7 @@ sub senv TInt (CFullType TInt) = do
   tell ["[S-Int] " ++ logSubFull senv TInt (CFullType TInt) senv TInt]
   return (senv, TInt)
 sub senv tyA CEmpty | closed senv tyA = do
-  tell ["[S-Var] " ++ logSub senv tyA CEmpty]
+  tell ["[S-Empty] " ++ logSub senv tyA CEmpty]
   newtyA <- censor indentAll $ fullInst senv tyA
   return (senv, newtyA)
 sub senv (TVar a) (CFullType (TVar b)) | isTyp senv a && a == b = do
@@ -255,13 +255,14 @@ sub senv tyA (CFullType (TVar a)) | closed senv tyA = do
   tell ["[S-Sol-R] " ++ logSub senv tyA (CFullType (TVar a))]
   tyB <- censor indentAll $ findSol senv a
   (senv', tyA') <- censor indentAll $ sub senv tyA (CFullType tyB)
-  return (senv', tyA')
+  return (senv', TVar a)
+  -- return (senv', tyA')
 sub senv (TArr tyA tyB) (CFullType (TArr tyC tyD)) = do
   tell ["[S-Arr] " ++ logSub senv (TArr tyA tyB) (CFullType (TArr tyC tyD))]
   (senv1, _) <- censor indentAll $ sub senv tyC (CFullType tyA)
   (senv2, _) <- censor indentAll $ sub senv1 tyB (CFullType tyD)
   return (senv2, TArr tyC tyD)
-sub senv (TArr tyA tyB) (CTerm e h) | closed senv tyA = do
+sub senv (TArr tyA tyB) (CTerm e h) | closed senv tyA && closed senv tyB = do
   tell ["[S-Term-Closed] " ++ logSub senv (TArr tyA tyB) (CTerm e h)]
   _ <- censor indentAll $ infer (erase senv) (CFullType tyA) e
   (senv', tyD) <- censor indentAll $ sub senv tyB h
@@ -348,9 +349,19 @@ main = do
       ex_sub1 = sub (Base EEmpty) (TForall (TVar 0)) (CFullType (TForall (TArr TInt TInt)))
       ex_argfun = infer (EBind (TForall (TArr (TArr (TVar 0) (TVar 0)) (TVar 0))) (EBind (TArr TInt TInt) EEmpty)) CEmpty (App (Var 0) (Var 1))
       ex_idid = infer EEmpty CEmpty (App idTrm idTrm)
+      ex_sub_test = sub (SSol TInt (Base EEmpty)) TInt (CFullType (TVar 0))
+      ex_sub2 = sub (Base EEmpty) (TForall (TArr (TVar 0) (TVar 0))) (CTApp TInt (CTerm (Lit 42) CEmpty))
+      ex_lit1 = infer (ESol TInt EEmpty) (CFullType (TVar 0)) (Lit 1)
 
-  forM_ [ex_id, ex_id1, ex_idInt, ex_idInt1, ex_f1, ex_argfun, ex_idid] $ \ex -> case runWriterT ex of
+
+  forM_ [ex_id, ex_id1, ex_idInt, ex_idInt1, ex_f1, ex_argfun, ex_idid, ex_lit1] $ \ex -> case runWriterT ex of
     Just (tyA, logs) -> do
       putStrLn $ "inferred type: " ++ show tyA
       mapM_ putStrLn logs
     Nothing -> print "Nothing"
+
+  forM_ [ex_sub_test, ex_sub2] $ \ex -> case runWriterT ex of
+      Just (tyA, logs) -> do
+        putStrLn $ "inferred type: " ++ show tyA
+        mapM_ putStrLn logs
+      Nothing -> print "Nothing"

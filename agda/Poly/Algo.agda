@@ -145,7 +145,7 @@ data inst_[_]⟹_ : SEnv n m → Type m → Type m → Set where
   inst-var : ∀ {X A A'}
     → X := A ∈ Ψ
     → inst Ψ [ A ]⟹ A'
-    → inst Ψ [ ‶ X ]⟹ A
+    → inst Ψ [ ‶ X ]⟹ A'
   inst-arr : ∀ {A B A' B'}
     → inst Ψ [ A ]⟹ A'
     → inst Ψ [ B ]⟹ B'
@@ -280,12 +280,14 @@ data _⊢_≤_⊣_↪_ where
     → [ A / X ] Ψ ⟹ Ψ'
     → Ψ ⊢ A ≤ τ (‶ X) ⊣ Ψ' ↪ A
 
+  -- this rule attempts to break the property "if context is a full type, the result should be same"
+  -- but the definition of full type is whether contain a solved existetial variable
   s-ex-r= : ∀ {A A₂ B X}
     → Ψ ⊢c A
     → X := B ∈ Ψ
 --    → Ψ ⊢ B ≤ τ A ⊣ Ψ₁ ↪ A₁
     → Ψ₁ ⊢ A ≤ τ B ⊣ Ψ₂ ↪ A₂
-    → Ψ ⊢ A ≤ τ (‶ X) ⊣ Ψ₂ ↪ A₂
+    → Ψ ⊢ A ≤ τ (‶ X) ⊣ Ψ₂ ↪ (‶ X)
 
   s-arr : ∀ {A B C D A' D'}
     → Ψ₁ ⊢ C ≤ τ A ⊣ Ψ₂ ↪ A'
@@ -297,7 +299,7 @@ data _⊢_≤_⊣_↪_ where
     → Ψ ⊢c B
     → (Ψ→Γ Ψ) ⊢ τ A ⇒ e ⇒ A'
     → Ψ ⊢ B ≤ Σ ⊣ Ψ' ↪ D
-    → Ψ ⊢ (A `→ B) ≤ ([ e ]↝ Σ) ⊣ Ψ' ↪ A' `→ D
+    → Ψ ⊢ (A `→ B) ≤ ([ e ]↝ Σ) ⊣ Ψ' ↪ A `→ D
 
   s-term-o : ∀ {A A' B C D e}
     → Ψ ⊢o A
@@ -325,8 +327,8 @@ data _⊢_≤_⊣_↪_ where
     → Ψ ⊢ `∀ A ≤ (⟦ B ⟧↝ Σ) ⊣ Ψ' ↪ C
 -}
   s-∀-t : ∀ {A B C}
-    → Ψ ,= B ⊢ A ≤ ↑tyΣ0 Σ ⊣ Ψ' ,= B ↪ ↑ty0 C
-    → Ψ ⊢ `∀ A ≤ (⟦ B ⟧↝ Σ) ⊣ Ψ' ↪ C
+    → Ψ ,= B ⊢ A ≤ ↑tyΣ0 Σ ⊣ Ψ' ,= B ↪ C
+    → Ψ ⊢ `∀ A ≤ (⟦ B ⟧↝ Σ) ⊣ Ψ' ↪ [ B ]ˢ C
 
 ----------------------------------------------------------------------
 --+                            Examples                            +--
@@ -336,10 +338,9 @@ idEnv : Env 1 0
 idEnv = ∅ , `∀ (‶ #0 `→ ‶ #0)
 
 sub-id[Int]1 : ∀ {Γ : Env n m} → 𝕓 Γ ⊢ `∀ ‶ #0 `→ ‶ #0 ≤ ⟦ Int ⟧↝ [ lit 1 ]↝ □ ⊣ 𝕓 Γ ↪ Int `→ Int
-sub-id[Int]1 {Γ = Γ} = s-∀-t (s-term-c ⊢c-var=0
-                               ⊢c-var=0
-                               (⊢sub {Ψ = 𝕓 (Γ ,= Int)} ⊢lit ne-τ (s-ex-r= ⊢c-int (kΓ Z) s-int))
-                               (s-empty ⊢c-var=0 (inst-var Z inst-int)))
+sub-id[Int]1 {Γ = Γ} = s-∀-t (s-term-c ⊢c-var=0 ⊢c-var=0
+                             (⊢sub {Ψ = 𝕓 (Γ ,= Int)} ⊢lit ne-τ (s-ex-r= ⊢c-int (kΓ Z) s-int))
+                             (s-empty ⊢c-var=0 (inst-var Z inst-int)))
 
 sub-id[Int] : ∀ {Γ : Env n m} → 𝕓 Γ ⊢ `∀ ‶ #0 `→ ‶ #0 ≤ ⟦ Int ⟧↝ □ ⊣ 𝕓 Γ ↪ Int `→ Int
 sub-id[Int] = s-∀-t (s-empty (⊢c-arr ⊢c-var=0 ⊢c-var=0) (inst-arr (inst-var Z inst-int) (inst-var Z inst-int)))

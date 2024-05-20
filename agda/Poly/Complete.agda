@@ -44,7 +44,7 @@ complete : ∀ {Γ : Env n m} {Σ j e A}
 complete-≤ : ∀ {Γ : Env n m} {Σ j A B}
   → Γ ⊢ j # B ≤ A
   → Γ ⊢ ⟨ j , A ⟩ ~ Σ
-  → 𝕓 Γ ⊢ B ≤ Σ ⊣ 𝕓 Γ ↪ A
+  → 𝕓 Γ ⊢ B ≤ Σ ⊣ 𝕓 Γ ↪ A -- too strict
   
 complete-inf : ∀ {Γ : Env n m} {e A}
   → Γ ⊢ Z # e ⦂ A
@@ -55,6 +55,11 @@ complete-chk : ∀ {Γ : Env n m} {e A}
   → Γ ⊢ ∞ # e ⦂ A
   → Γ ⊢ τ A ⇒ e ⇒ A
 complete-chk ⊢e = complete ⊢e ~∞
+
+complete-≤-chk : ∀ {Γ : Env n m} {A B}
+  → Γ ⊢ ∞ # B ≤ A
+  → 𝕓 Γ ⊢ B ≤ τ A ⊣ 𝕓 Γ ↪ A
+complete-≤-chk B≤A = complete-≤ B≤A ~∞  
 
 complete ⊢lit ~Z = ⊢lit
 complete (⊢var x) ~Z = ⊢var x
@@ -67,3 +72,14 @@ complete (⊢app₂ ⊢e ⊢e₁) j~Σ = ⊢app (complete ⊢e (~S (complete-inf
 complete (⊢sub ⊢e B≤A j≢Z) j~Σ = subsumption0 (complete-inf ⊢e) (complete-≤ B≤A j~Σ)
 complete (⊢tabs₁ ⊢e) ~Z = ⊢tabs₁ (complete-inf ⊢e)
 complete (⊢tapp ⊢e) j~Σ = ⊢tapp (complete ⊢e (~Sτ j~Σ))
+
+complete-≤ (s-refl ap) ~Z = s-empty {!!} {!!} -- easy
+complete-≤ s-int ~∞ = s-int
+complete-≤ s-var ~∞ = s-var
+complete-≤ (s-arr₁ s s₁) ~∞ = s-arr (complete-≤-chk s) (complete-≤-chk s₁)
+complete-≤ (s-arr₂ s s₁) (~S ⊢e j~Σ) = {!!}
+complete-≤ (s-∀ s) j~Σ = {!!}
+complete-≤ (s-∀l s x) j~Σ = {!!}
+complete-≤ (s-∀lτ s) (~Sτ j~Σ) = {!!}
+complete-≤ (s-var-l x s) ~∞ = s-ex-l= {!!} {!!} (complete-≤-chk s) -- ok
+complete-≤ (s-var-r x s) ~∞ = s-ex-r= {!!} {!!} (complete-≤-chk s) -- ok
