@@ -134,11 +134,11 @@
     
     \inferrule*[lab=S-var-l]
     {\hat{a} = B \in \Gamma \\ \Gamma \vdash_n B <: A}
-    {\Gamma \vdash_n \hat{a} <: A}
+    {\Gamma \vdash_\infty \hat{a} <: A}
     
-%     \inferrule*[lab=S-var-r]
-%    {\hat{a} = B \in \Gamma \\ \Gamma \vdash_n A <: B}
-%    {\Gamma \vdash_n A <: \hat{a}}
+     \inferrule*[lab=S-var-r]
+    {\hat{a} = B \in \Gamma \\ \Gamma \vdash_n A <: B}
+    {\Gamma \vdash_\infty A <: \hat{a}}
 \end{mathpar}
 
 \paragraph{Properties}
