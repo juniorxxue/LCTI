@@ -92,15 +92,6 @@ shiftTerm k (TApp t ty) = TApp (shiftTerm k t) ty
 shiftTerm0 :: Trm -> Trm
 shiftTerm0 = shiftTerm 0
 
-shiftTypInTrm :: Int -> Trm -> Trm
-shiftTypInTrm _ (Lit i) = Lit i
-shiftTypInTrm _ (Var x) = Var x
-shiftTypInTrm k (Abs t) = Abs (shiftTypInTrm k t)
-shiftTypInTrm k (App t1 t2) = App (shiftTypInTrm k t1) (shiftTypInTrm k t2)
-shiftTypInTrm k (Ann t ty) = Ann (shiftTypInTrm k t) (shiftTyp k ty)
-shiftTypInTrm k (TAbs t) = TAbs (shiftTypInTrm (k + 1) t)
-shiftTypInTrm k (TApp t ty) = TApp (shiftTypInTrm k t) (shiftTyp k ty)
-
 shiftContext :: Int -> Context -> Context
 shiftContext _ CEmpty = CEmpty
 shiftContext _ (CFullType ty) = CFullType ty
@@ -109,15 +100,6 @@ shiftContext k (CTApp ty ctx) = CTApp ty (shiftContext k ctx)
 
 shiftContext0 :: Context -> Context
 shiftContext0 = shiftContext 0
-
-shiftTypInContext :: Int -> Context -> Context
-shiftTypInContext _ CEmpty = CEmpty
-shiftTypInContext k (CFullType ty) = CFullType (shiftTyp k ty)
-shiftTypInContext k (CTerm trm ctx) = CTerm (shiftTypInTrm k trm) (shiftTypInContext k ctx)
-shiftTypInContext k (CTApp ty ctx) = CTApp (shiftTyp k ty) (shiftTypInContext k ctx)
-
-shiftTypInContext0 :: Context -> Context
-shiftTypInContext0 = shiftTypInContext 0
 
 -- end shifting --
 
@@ -234,59 +216,77 @@ sub senv TInt (CFullType TInt) = do
   tell ["[S-Int] " ++ logSubFull senv TInt (CFullType TInt) senv TInt]
   return (senv, TInt)
 sub senv tyA CEmpty | closed senv tyA = do
-  tell ["[S-Empty] " ++ logSub senv tyA CEmpty]
-  newtyA <- censor indentAll $ fullInst senv tyA
+  (newtyA, log') <- censor (const mempty) . listen $ fullInst senv tyA
+  tell ["[S-Var] " ++ logSubFull senv tyA CEmpty senv newtyA]
+  tell $ indentAll log'
   return (senv, newtyA)
 sub senv (TVar a) (CFullType (TVar b)) | isTyp senv a && a == b = do
-  tell ["[S-Refl] " ++ logSub senv (TVar a) (CFullType (TVar b))]
+  tell ["[S-Refl] " ++ logSubFull senv (TVar a) (CFullType (TVar b)) senv (TVar a)]
   return (senv, TVar a)
 sub senv (TVar a) (CFullType tyA) | isEx senv a && closed senv tyA = do
-  tell ["[S-Ex-L] " ++ logSub senv (TVar a) (CFullType tyA)]
+  tell ["[S-Ex-L] " ++ logSubFull senv (TVar a) (CFullType tyA) (contextSubst tyA a senv) tyA]
   return (contextSubst tyA a senv, tyA)
 sub senv (TVar a) (CFullType tyA) | closed senv tyA = do
-  tell ["[S-Sol-L] " ++ logSub senv (TVar a) (CFullType tyA)]
-  tyB <- censor indentAll $ findSol senv a
-  (senv', tyA') <- censor indentAll $ sub senv tyB (CFullType tyA)
+  (tyB, _log1) <- censor (const mempty) . listen $ findSol senv a
+  ((senv', tyA'), _log2) <- censor (const mempty) . listen $ sub senv tyB (CFullType tyA)
+  tell ["[S-Sol-L] " ++ logSubFull senv (TVar a) (CFullType tyA) senv' tyA']
+  tell $ indentAll _log1
+  tell $ indentAll _log2
   return (senv', tyA')
 sub senv tyA (CFullType (TVar a)) | isEx senv a && closed senv tyA = do
-  tell ["[S-Ex-R] " ++ logSub senv tyA (CFullType (TVar a))]
+  tell ["[S-Ex-R] " ++ logSubFull senv tyA (CFullType (TVar a)) (contextSubst tyA a senv) tyA]
   return (contextSubst tyA a senv, tyA)
 sub senv tyA (CFullType (TVar a)) | closed senv tyA = do
-  tell ["[S-Sol-R] " ++ logSub senv tyA (CFullType (TVar a))]
-  tyB <- censor indentAll $ findSol senv a
-  (senv', tyA') <- censor indentAll $ sub senv tyA (CFullType tyB)
-  return (senv', TVar a)
-  -- return (senv', tyA')
+  (tyB, _log1) <- censor (const mempty) . listen $ findSol senv a
+  ((senv', tyA'), _log2) <- censor (const mempty) . listen $ sub senv tyA (CFullType tyB)
+  tell ["[S-Sol-R] " ++ logSubFull senv tyA (CFullType (TVar a)) senv' tyA']
+  tell $ indentAll _log1
+  tell $ indentAll _log2
+  return (senv', tyA')
 sub senv (TArr tyA tyB) (CFullType (TArr tyC tyD)) = do
-  tell ["[S-Arr] " ++ logSub senv (TArr tyA tyB) (CFullType (TArr tyC tyD))]
-  (senv1, _) <- censor indentAll $ sub senv tyC (CFullType tyA)
-  (senv2, _) <- censor indentAll $ sub senv1 tyB (CFullType tyD)
+  ((senv1, _), _log1) <- censor (const mempty) . listen $ sub senv tyC (CFullType tyA)
+  ((senv2, _), _log2) <- censor (const mempty) . listen $ sub senv1 tyB (CFullType tyD)
+  tell ["[S-Arr] " ++ logSubFull senv (TArr tyA tyB) (CFullType (TArr tyC tyD)) senv2 (TArr tyC tyD)]
+  tell $ indentAll _log1
+  tell $ indentAll _log2
   return (senv2, TArr tyC tyD)
-sub senv (TArr tyA tyB) (CTerm e h) | closed senv tyA && closed senv tyB = do
-  tell ["[S-Term-Closed] " ++ logSub senv (TArr tyA tyB) (CTerm e h)]
-  _ <- censor indentAll $ infer (erase senv) (CFullType tyA) e
-  (senv', tyD) <- censor indentAll $ sub senv tyB h
+sub senv (TArr tyA tyB) (CTerm e h) | closed senv tyA = do
+  (_ , _log1) <- censor (const mempty) . listen $ infer (erase senv) (CFullType tyA) e
+  ((senv', tyD), _log2) <- censor (const mempty) . listen $ sub senv tyB h
+  tell ["[S-Term-Closed] " ++ logSubFull senv (TArr tyA tyB) (CTerm e h) senv' (TArr tyA tyD)]
+  tell $ indentAll _log1
+  tell $ indentAll _log2
   return (senv', TArr tyA tyD)
 sub senv (TArr tyA tyB) (CTerm e h) | open senv tyA = do
-  tell ["[S-Term-Open] " ++ logSub senv (TArr tyA tyB) (CTerm e h)]
-  tyC <- censor indentAll $ infer (erase senv) CEmpty e
-  (senv1, tyA') <- censor indentAll $ sub senv tyC (CFullType tyA)
-  (senv2, tyD) <- censor indentAll $ sub senv1 tyB h
+  (tyC, _log1) <- censor (const mempty) . listen $ infer (erase senv) CEmpty e
+  ((senv1, tyA'), _log2) <- censor (const mempty) . listen $ sub senv tyC (CFullType tyA)
+  ((senv2, tyD), _log3) <- censor (const mempty) . listen $ sub senv1 tyB h
+  tell ["[S-Term-Open] " ++ logSubFull senv (TArr tyA tyB) (CTerm e h) senv2 (TArr tyA' tyD)]
+  tell $ indentAll _log1
+  tell $ indentAll _log2
+  tell $ indentAll _log3
   return (senv2, TArr tyA' tyD)
 sub senv (TForall tyA) (CFullType (TForall tyB)) = do
-  tell ["[S-Forall] " ++ logSub senv (TForall tyA) (CFullType (TForall tyB))]
-  (STyp senv', tyC) <- censor indentAll $ sub senv tyA (CFullType tyB)
+  ((STyp senv', tyC), _log1) <- censor (const mempty) . listen $ sub senv tyA (CFullType tyB)
+  tell ["[S-Forall] " ++ logSubFull senv (TForall tyA) (CFullType (TForall tyB)) senv' (TForall tyC)]
+  tell $ indentAll _log1
   return (senv', TForall tyC)
 sub senv (TForall tyA) (CTerm e h) = do
-  tell ["[S-Forall-L] " ++ logSub senv (TForall tyA) (CTerm e h)]
-  (senv', tyB) <- censor indentAll $ sub (SEx senv) tyA (shiftTypInContext0 (CTerm e h))
+  ((senv', tyB), _log1) <- censor (const mempty) . listen $ sub (SEx senv) tyA (shiftContext0 (CTerm e h))
   case senv' of
-    STyp senv'' -> return (senv'', unshiftTyp0 tyB)
-    SSol _ senv'' -> return (senv'', unshiftTyp0 tyB)
+    STyp senv'' -> do
+      tell ["[S-Forall-L] " ++ logSubFull senv (TForall tyA) (CTerm e h) senv'' (unshiftTyp0 tyB)]
+      tell $ indentAll _log1
+      return (senv'', unshiftTyp0 tyB)
+    SSol _ senv'' -> do
+      tell ["[S-Forall-L] " ++ logSubFull senv (TForall tyA) (CTerm e h) senv'' (unshiftTyp0 tyB)]
+      tell $ indentAll _log1
+      return (senv'', unshiftTyp0 tyB)
     _ -> lift Nothing
 sub senv (TForall tyA) (CTApp tyB h) = do
-  tell ["[S-Forall-TApp] " ++ logSub senv (TForall tyA) (CTApp tyB h)]
-  (SSol _ senv', tyC) <- censor indentAll $ sub (SSol tyB senv) tyA (shiftTypInContext0 h)
+  ((SSol _ senv', tyC), _log1) <- censor (const mempty) . listen $ sub (SSol tyB senv) tyA (shiftContext0 h)
+  tell ["[S-Forall-TApp] " ++ logSubFull senv (TForall tyA) (CTApp tyB h) senv' (unshiftTyp0 tyC)]
+  tell $ indentAll _log1
   return (senv', unshiftTyp0 tyC)
 sub _ _ _ = lift Nothing
 
@@ -297,45 +297,59 @@ nonEmptyContext _ = True
 logInfer :: Env -> Context -> Trm -> String
 logInfer env ctx tm = show env ++ " ⊢ " ++ show ctx ++ " ⇒ " ++ show tm ++ " ⇒ "
 
+logInferFull :: Env -> Context -> Trm -> Typ -> String
+logInferFull env ctx tm ty = show env ++ " ⊢ " ++ show ctx ++ " ⇒ " ++ show tm ++ " ⇒ " ++ show ty
+
 indentAll :: [String] -> [String]
 indentAll = map ("  "++)
 
 infer :: Env -> Context -> Trm -> WriterT Log Maybe Typ
 -- infer a b c | trace ("infer " ++ show a ++ " |- " ++ show b ++ " => " ++ show c) False = undefined
 infer env CEmpty (Lit n) = do
-  tell ["[Ty-Int] " ++ logInfer env CEmpty (Lit n)]
+  tell ["[Ty-Int] " ++ logInferFull env CEmpty (Lit n) TInt]
   return TInt
 infer env CEmpty (Var i) = do
-  tell ["[Ty-Var] " ++ logInfer env CEmpty (Var i)]
+  tell ["[Ty-Var] " ++ logInferFull env CEmpty (Var i) TInt]
   censor indentAll $ lookupEnv i env
 infer env CEmpty (Ann tm tyA) = do
-  tell ["[Ty-Ann] " ++ logInfer env CEmpty (Ann tm tyA)]
-  censor indentAll $ infer env (CFullType tyA) tm >> return tyA
+  (_, _log) <- censor (const mempty) . listen $ infer env (CFullType tyA) tm
+  tell ["[Ty-Ann] " ++ logInferFull env CEmpty (Ann tm tyA) tyA]
+  tell $ indentAll _log
+  return tyA
 infer env h (App tm1 tm2) = do
-  tell ["[Ty-App] " ++ logInfer env h (App tm1 tm2)]
-  (TArr _ ty12) <- censor indentAll $ infer env (CTerm tm2 h) tm1
+  (TArr _ ty12, _log) <- censor (const mempty) . listen $ infer env (CTerm tm2 h) tm1
+  tell ["[Ty-App] " ++ logInferFull env h (App tm1 tm2) ty12]
+  tell $ indentAll _log
   return ty12
 infer env (CFullType (TArr tyA tyB)) (Abs tm) = do
-  tell ["[Ty-Abs1] " ++ logInfer env (CFullType (TArr tyA tyB)) (Abs tm)]
-  tyC <- censor indentAll $ infer (EBind tyA env) (CFullType tyB) tm
+  (tyC, _log) <- censor (const mempty) . listen $ infer (EBind tyA env) (CFullType tyB) tm
+  tell ["[Ty-Abs1] " ++ logInferFull env (CFullType (TArr tyA tyB)) (Abs tm) (TArr tyA tyC)]
+  tell $ indentAll _log
   return $ TArr tyA tyC
 infer env (CTerm tm2 h) (Abs tm) = do
-  tell ["[Ty-Abs2] " ++ logInfer env (CTerm tm2 h) (Abs tm)]
-  tyA <- censor indentAll $ infer env CEmpty tm2
-  tyB <- censor indentAll $ infer (EBind tyA env) (shiftContext0 h) tm
+  (tyA, _log1) <- censor (const mempty) . listen $ infer env CEmpty tm2
+  (tyB, _log2) <- censor (const mempty) . listen $ infer (EBind tyA env) (shiftContext0 h) tm
+  tell ["[Ty-Abs2] " ++ logInferFull env (CTerm tm2 h) (Abs tm) (TArr tyA tyB)]
+  tell $ indentAll _log1
+  tell $ indentAll _log2
   return $ TArr tyA tyB
 infer env h g | genericConsumer g && nonEmptyContext h = do
-  tell ["[Ty-Sub] " ++ logInfer env h g]
-  tyA <- censor indentAll $ infer env CEmpty g
-  (_, tyB) <- censor indentAll $ sub (Base env) tyA h
+  (tyA, _log1) <- censor (const mempty) . listen $ infer env CEmpty g
+  ((_, tyB), _log2) <- censor (const mempty) . listen $ sub (Base env) tyA h
+  tell ["[Ty-Sub] " ++ logInferFull env h g tyB]
+  tell $ indentAll _log1
+  tell $ indentAll _log2
   return tyB
 infer e CEmpty (TAbs tm) = do
-  tell ["[Ty-TAbs] " ++ logInfer e CEmpty (TAbs tm)]
-  tyA <- censor indentAll $ infer (ETyp e) CEmpty tm
+  (tyA, _log) <- censor (const mempty) . listen $ infer (ETyp e) CEmpty tm
+  tell ["[Ty-TAbs] " ++ logInferFull e CEmpty (TAbs tm) (TForall tyA)]
+  tell $ indentAll _log
   return $ TForall tyA
 infer e h (TApp tm tyA) = do
-  tell ["[Ty-TApp] " ++ logInfer e h (TApp tm tyA)]
-  censor indentAll $ infer e (CTApp tyA h) tm
+  (tyB, _log) <- censor (const mempty) . listen $ infer e (CTApp tyA h) tm
+  tell ["[Ty-TApp] " ++ logInferFull e h (TApp tm tyA) tyB]
+  tell $ indentAll _log
+  return tyB
 infer _ _ _ = lift Nothing
 
 main :: IO ()
@@ -346,22 +360,8 @@ main = do
       ex_idInt = infer EEmpty CEmpty (TApp idTrm TInt)
       ex_idInt1 = infer EEmpty CEmpty (App (TApp idTrm TInt) (Lit 42))
       ex_f1 = infer (EBind (TForall (TArr (TVar 0) (TVar 0))) EEmpty) CEmpty (App (Var 0) (Lit 42))
-      ex_sub1 = sub (Base EEmpty) (TForall (TVar 0)) (CFullType (TForall (TArr TInt TInt)))
-      ex_argfun = infer (EBind (TForall (TArr (TArr (TVar 0) (TVar 0)) (TVar 0))) (EBind (TArr TInt TInt) EEmpty)) CEmpty (App (Var 0) (Var 1))
-      ex_idid = infer EEmpty CEmpty (App idTrm idTrm)
-      ex_sub_test = sub (SSol TInt (Base EEmpty)) TInt (CFullType (TVar 0))
-      ex_sub2 = sub (Base EEmpty) (TForall (TArr (TVar 0) (TVar 0))) (CTApp TInt (CTerm (Lit 42) CEmpty))
-      ex_lit1 = infer (ESol TInt EEmpty) (CFullType (TVar 0)) (Lit 1)
-
-
-  forM_ [ex_id, ex_id1, ex_idInt, ex_idInt1, ex_f1, ex_argfun, ex_idid, ex_lit1] $ \ex -> case runWriterT ex of
+  forM_ [ex_id, ex_id1, ex_idInt, ex_idInt1, ex_f1] $ \ex -> case runWriterT ex of
     Just (tyA, logs) -> do
       putStrLn $ "inferred type: " ++ show tyA
       mapM_ putStrLn logs
     Nothing -> print "Nothing"
-
-  forM_ [ex_sub_test, ex_sub2] $ \ex -> case runWriterT ex of
-      Just (tyA, logs) -> do
-        putStrLn $ "inferred type: " ++ show tyA
-        mapM_ putStrLn logs
-      Nothing -> print "Nothing"
