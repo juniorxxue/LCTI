@@ -189,8 +189,8 @@ A false lemma, but find the correct one later.
 
 \inferrule*[lab=T-Sub]
 {\Gamma \vdash \square \Rightarrow g \Rightarrow A \\
- \Gamma \vdash A <: \Sigma \dashv \Gamma' \rightsquigarrow B}
-{\Gamma \vdash \Sigma \Rightarrow g \Rightarrow B}
+ \Gamma \vdash A <: \Sigma \dashv \Gamma, \Psi \rightsquigarrow B}
+{\Gamma \vdash \Sigma \Rightarrow g \Rightarrow \Psi(B)}
 
 \inferrule*[lab=T-TAbs1]
 {\Gamma, a \vdash \square \Rightarrow e \Rightarrow A}
@@ -275,10 +275,10 @@ Some properties are waiting to be justified:
 {\Psi \vdash \mathtt{Int} <: \mathtt{Int} \dashv \Psi \rightsquigarrow \mathtt{Int}}
 
 \inferrule*[lab=S-Empty]
-{\Psi \vdash_{close} A}
-{\Psi \vdash A <: \square \dashv \Psi \rightsquigarrow \Psi(A)}
+{ }
+{\Psi \vdash A <: \square \dashv \Psi \rightsquigarrow A}
 
-\inferrule*[lab=S-Var]
+\inferrule*[lab=S-Var-refl]
 { }
 {\Psi \vdash a <: a \dashv \Psi \rightsquigarrow a}
 
@@ -286,7 +286,7 @@ Some properties are waiting to be justified:
 \inferrule*[lab=S-Ex-L]
 {\hat{a} \in \Psi \\
 \Psi \vdash_{close} A}
-{\Psi \vdash a <: A \dashv [A/a]~\Psi \rightsquigarrow A}
+{\Psi \vdash a <: A \dashv [a = A]~\Psi \rightsquigarrow A}
 
 \inferrule*[lab=S-Ex-L-eq]
 {\hat{a} = B \in \Psi \\
@@ -298,7 +298,7 @@ Some properties are waiting to be justified:
 \inferrule*[lab=S-Ex-R]
 {\hat{a} \in \Psi \\
 \Psi \vdash_{close} A}
-{\Psi \vdash A <: a \dashv [A/a]~\Psi \rightsquigarrow A}
+{\Psi \vdash A <: a \dashv [a = A]~\Psi \rightsquigarrow A}
 %
 \inferrule*[lab=S-Ex-R-eq]
 {\hat{a} = B \in \Psi \\
@@ -332,15 +332,15 @@ Some properties are waiting to be justified:
 
 \inferrule*[lab=S-All-L]
 {\Psi, \hat{o} \vdash A <: \boxed{e} \leadsto \Sigma \dashv \Psi', \hat{o} \rightsquigarrow B}
-{\Psi \vdash \forall A <: \boxed{e} \leadsto \Sigma \dashv \Psi' \rightsquigarrow B}
+{\Psi \vdash \forall A <: \boxed{e} \leadsto \Sigma \dashv \Psi', \hat{o} \rightsquigarrow B}
 
 \inferrule*[lab=S-All-L-Eq]
 {\Psi, \hat{o} \vdash A <: \boxed{e} \leadsto \Sigma \dashv \Psi', =A \rightsquigarrow B}
-{\Psi \vdash \forall A <: \boxed{e} \leadsto \Sigma \dashv \Psi' \rightsquigarrow B}
+{\Psi \vdash \forall A <: \boxed{e} \leadsto \Sigma \dashv \Psi' , =A \rightsquigarrow B}
 
 \inferrule*[lab=S-$\forall$-t]
 {\Psi ,= B \vdash A <: \Sigma \dashv \Psi',= B \rightsquigarrow C}
-{\Psi \vdash \forall A <: \boxed{B} \leadsto \Sigma \dashv \Psi' \rightsquigarrow C }
+{\Psi \vdash \forall A <: \boxed{B} \leadsto \Sigma \dashv \Psi' , =B \rightsquigarrow C }
 \end{mathpar}
 
 Some properties are waiting to be justified:
@@ -351,20 +351,5 @@ Some properties are waiting to be justified:
 	\item If the context is a full type, then result type is a full type.
 	\item The property between input env and output env, such as, if input env is a $\Gamma$, the output should be the same $\Gamma$.
 \end{itemize}
-
-Some worries:
-
-\begin{itemize}
-	\item \texttt{S-Hole-Ex}, is one-open enough now, since two rules are now not complementary. 
-\end{itemize}
-
-\subsection{Environment Replacement}
-
-\begin{align*}
-[A/\hat{a}] ~(\Psi , \hat{a}) &= \Psi, \hat{a}:=A\\
-[A/\hat{a}]~(\Psi, \hat{b}) &= [A/\hat{a}]~\Psi , \hat{b}\\
-%[A/\hat{a}]~(\Psi, \hat{a}:=B) &= \Psi, \hat{a}:=A \quad when~ B \approx A\\
-%[A/\hat{a}]~(\Psi, \hat{b}:= B) &= [[\hat{b} := B] A/\hat{a}]~\Psi , \hat{b}:= B
-\end{align*}
 
 \end{document}

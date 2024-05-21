@@ -1,4 +1,4 @@
-module Poly.Soundness where
+module Poly.Sound where
 
 open import Poly.Common
 open import Poly.Decl
