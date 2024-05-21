@@ -139,6 +139,8 @@ data _:=_∈_ : Fin m → Type m → SEnv n m → Set where
     → k := ↓ty0 A ∈ Ψ
     → #S k := A ∈ Ψ ,= B
 
+data inst_by_[_]⟹_ : SEnv n m' → Env n m → Type m' → Type m → Set where
+
 infix 5 inst_[_]⟹_
 data inst_[_]⟹_ : SEnv n m → Type m → Type m → Set where
   inst-int : inst Ψ [ Int ]⟹ Int
@@ -204,7 +206,9 @@ infix 3 _⊢_≤_⊣_↪_
 
 data _⊢_⇒_⇒_ : Env n m → Context n m → Term n m → Type m → Set
 -- we cannot syntactically distinguish the result type here, which should contain unsolved variables
-data _⊢_≤_⊣_↪_ : SEnv n m → Type m → Context n m → SEnv n m → Type m → Set
+
+-- how do I enforce that m' = k + m (exist a k)
+data _⊢_≤_⊣_↪_ : SEnv n m → Type m → Context n m → SEnv n m' → Type m' → Set
 
 data _⊢_⇒_⇒_ where
 
@@ -232,11 +236,12 @@ data _⊢_⇒_⇒_ where
     → Γ , A ⊢ ↑Σ0 Σ ⇒ e ⇒ B
     → Γ ⊢ [ e₂ ]↝ Σ ⇒ ƛ e ⇒ A `→ B
 
-  ⊢sub : ∀ {g A B}
-    → Γ ⊢ □ ⇒ g ⇒ A          --- Γ ⊢ Z # e : A
+  ⊢sub : ∀ {Γ : Env n m} {Ψ : SEnv n m'} {g A B B'}
+    → Γ ⊢ □ ⇒ g ⇒ A
     → NonEmpty Σ
-    → 𝕓 Γ ⊢ A ≤ Σ ⊣ Ψ ↪ B    --- Γ ⊢ j # A ≤ B
-    → Γ ⊢ Σ ⇒ g ⇒ B          --- Γ ⊢ j # e ∶ B
+    → 𝕓 Γ ⊢ A ≤ Σ ⊣ Ψ ↪ B
+    → inst Ψ by Γ [ B ]⟹ B'
+    → Γ ⊢ Σ ⇒ g ⇒ B'
 
   -- design choices here,
   -- (1) we maybe need a checking for tabs
@@ -250,30 +255,28 @@ data _⊢_⇒_⇒_ where
     → Γ ⊢ Σ ⇒ e [ A ] ⇒ B
   
 data _⊢_≤_⊣_↪_ where
-  s-int :
-      Ψ ⊢ Int ≤ τ Int ⊣ Ψ ↪ Int
+  s-int : ∀ {Ψ : SEnv n m}
+      → Ψ ⊢ Int ≤ τ Int ⊣ Ψ ↪ Int
 
-  s-empty : ∀ {A A'}
-    → (p : Ψ ⊢c A)
-    → inst Ψ [ A ]⟹ A'
-    → Ψ ⊢ A ≤ □ ⊣ Ψ ↪ A'
+  s-empty : ∀ {Ψ : SEnv n m} {A}
+    → Ψ ⊢ A ≤ □ ⊣ Ψ ↪ A
 
-  s-var : ∀ {X}
+  s-var : ∀ {Ψ : SEnv n m} {X}
     → Ψ ⊢ ‶ X ≤ τ (‶ X) ⊣ Ψ ↪ ‶ X
 
-  s-ex-l^ : ∀ {A X}
+  s-ex-l^ : ∀ {Ψ : SEnv n m} {A X}
     → Ψ ⊢c A
     → X ^∈ Ψ
     → [ A / X ] Ψ ⟹ Ψ'
     → Ψ ⊢ ‶ X ≤ τ A ⊣ Ψ' ↪ A
 
-  s-ex-l= : ∀ {A A₁ A₂ B X}
+  s-ex-l= : ∀ {Ψ Ψ' : SEnv n m} {A A₁ A₂ B X}
     → Ψ ⊢c A
     → X := B ∈ Ψ
     → Ψ ⊢ B ≤ τ A ⊣ Ψ' ↪ A₁
     → Ψ ⊢ ‶ X ≤ τ A ⊣ Ψ' ↪ A₂
 
-  s-ex-r^ : ∀ {A X}
+  s-ex-r^ : ∀ {Ψ : SEnv n m} {A X}
     → Ψ ⊢c A
     → X ^∈ Ψ
     → [ A / X ] Ψ ⟹ Ψ'
@@ -281,53 +284,46 @@ data _⊢_≤_⊣_↪_ where
 
   -- this rule attempts to break the property "if context is a full type, the result should be same"
   -- but the definition of full type is whether contain a solved existetial variable
-  s-ex-r= : ∀ {A A₂ B X}
+  s-ex-r= : ∀ {Ψ Ψ' : SEnv n m} {A A₂ B X}
     → Ψ ⊢c A
     → X := B ∈ Ψ
     → Ψ ⊢ A ≤ τ B ⊣ Ψ' ↪ A₂
     → Ψ ⊢ A ≤ τ (‶ X) ⊣ Ψ' ↪ (‶ X)
 
-  s-arr : ∀ {A B C D A' D'}
+  s-arr : ∀ {Ψ₁ Ψ₂ Ψ₃ : SEnv n m} {A B C D A' D'}
     → Ψ₁ ⊢ C ≤ τ A ⊣ Ψ₂ ↪ A'
     → Ψ₂ ⊢ B ≤ τ D ⊣ Ψ₃ ↪ D'
     → Ψ₁ ⊢ A `→ B ≤ τ (C `→ D) ⊣ Ψ₃ ↪ (C `→ D)
 
-  s-term-c : ∀ {A B A' D e}
+  s-term-c : ∀ {Ψ Ψ' : SEnv n m} {A B A' D e}
     → Ψ ⊢c A
     → Ψ ⊢c B
     → (Ψ→Γ Ψ) ⊢ τ A ⇒ e ⇒ A'
     → Ψ ⊢ B ≤ Σ ⊣ Ψ' ↪ D
     → Ψ ⊢ (A `→ B) ≤ ([ e ]↝ Σ) ⊣ Ψ' ↪ A `→ D
 
-  s-term-o : ∀ {A A' B C D e}
+  s-term-o : ∀ {Ψ Ψ₁ Ψ₂ : SEnv n m} {A A' B C D e}
     → Ψ ⊢o A
     → (Ψ→Γ Ψ) ⊢ □ ⇒ e ⇒ C
     → Ψ ⊢ C ≤ τ A ⊣ Ψ₁ ↪ A'
     → Ψ₁ ⊢ B ≤ Σ ⊣ Ψ₂ ↪ D
     → Ψ ⊢ A `→ B ≤ ([ e ]↝ Σ) ⊣ Ψ₂ ↪ A' `→ D
 
-  s-∀ : ∀ {A B C}
+  s-∀ : ∀ {Ψ Ψ' : SEnv n m} {A B C}
     → Ψ ,∙ ⊢ A ≤ τ B ⊣ Ψ' ,∙ ↪ C
     → Ψ ⊢ `∀ A ≤ τ (`∀ B) ⊣ Ψ' ↪ `∀ C
 
-  s-∀l-^ : ∀ {A B e}
-    → Ψ ,^ ⊢ A ≤ ↑tyΣ0 ([ e ]↝ Σ) ⊣ Ψ' ,^ ↪ ↑ty0 B
-    → Ψ ⊢ `∀ A ≤ ([ e ]↝ Σ) ⊣ Ψ' ↪ B
+  s-∀l-^ : ∀ {Ψ : SEnv n m} {Ψ' : SEnv n m} {A B e}
+    → Ψ ,^ ⊢ A ≤ ↑tyΣ0 ([ e ]↝ Σ) ⊣ Ψ' ,^ ↪ B
+    → Ψ ⊢ `∀ A ≤ ([ e ]↝ Σ) ⊣ Ψ' ,^ ↪ B
 
   s-∀l-eq : ∀ {A B C e}
-    → Ψ ,^ ⊢ A ≤ ↑tyΣ0 ([ e ]↝ Σ) ⊣ Ψ' ,= C ↪ ↑ty0 B
-    → Ψ ⊢ `∀ A ≤ ([ e ]↝ Σ) ⊣ Ψ' ↪ B
+    → Ψ ,^ ⊢ A ≤ ↑tyΣ0 ([ e ]↝ Σ) ⊣ Ψ' ,= C ↪ B
+    → Ψ ⊢ `∀ A ≤ ([ e ]↝ Σ) ⊣ Ψ' ,= C ↪ B
 
-  -- explicit type applicatoin
-{-
   s-∀-t : ∀ {A B C}
-    → Ψ ⊢ [ B ]ˢ A ≤ Σ ⊣ Ψ' ↪ C
-    → Ψ ⊢ `∀ A ≤ (⟦ B ⟧↝ Σ) ⊣ Ψ' ↪ C
--}
-  s-∀-t : ∀ {A B C C'}
     → Ψ ,= B ⊢ A ≤ ↑tyΣ0 Σ ⊣ Ψ' ,= B ↪ C
-    → [ B ]ˢ C ≡ C' -- feel like this will be changed to a datatype later
-    → Ψ ⊢ `∀ A ≤ (⟦ B ⟧↝ Σ) ⊣ Ψ' ↪ C'
+    → Ψ ⊢ `∀ A ≤ (⟦ B ⟧↝ Σ) ⊣ Ψ' ,= B ↪ C
 
 ----------------------------------------------------------------------
 --+                            Examples                            +--
