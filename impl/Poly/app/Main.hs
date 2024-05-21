@@ -1,4 +1,4 @@
-{-# LANGUAGE MultiWayIf, LambdaCase #-}
+{-# LANGUAGE MultiWayIf, LambdaCase, RankNTypes #-}
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 {-# HLINT ignore "Redundant multi-way if" #-}
 module Main where
@@ -216,7 +216,7 @@ sub senv TInt (CFullType TInt) = do
   tell ["[S-Int] " ++ logSubFull senv TInt (CFullType TInt) senv TInt]
   return (senv, TInt)
 sub senv tyA CEmpty | closed senv tyA = do
-  (newtyA, log') <- censor (const mempty) . listen $ fullInst senv tyA
+  (newtyA, log') <- peek $ fullInst senv tyA
   tell ["[S-Var] " ++ logSubFull senv tyA CEmpty senv newtyA]
   tell $ indentAll log'
   return (senv, newtyA)
@@ -227,8 +227,8 @@ sub senv (TVar a) (CFullType tyA) | isEx senv a && closed senv tyA = do
   tell ["[S-Ex-L] " ++ logSubFull senv (TVar a) (CFullType tyA) (contextSubst tyA a senv) tyA]
   return (contextSubst tyA a senv, tyA)
 sub senv (TVar a) (CFullType tyA) | closed senv tyA = do
-  (tyB, _log1) <- censor (const mempty) . listen $ findSol senv a
-  ((senv', tyA'), _log2) <- censor (const mempty) . listen $ sub senv tyB (CFullType tyA)
+  (tyB, _log1) <- peek $ findSol senv a
+  ((senv', tyA'), _log2) <- peek $ sub senv tyB (CFullType tyA)
   tell ["[S-Sol-L] " ++ logSubFull senv (TVar a) (CFullType tyA) senv' tyA']
   tell $ indentAll _log1
   tell $ indentAll _log2
@@ -237,42 +237,42 @@ sub senv tyA (CFullType (TVar a)) | isEx senv a && closed senv tyA = do
   tell ["[S-Ex-R] " ++ logSubFull senv tyA (CFullType (TVar a)) (contextSubst tyA a senv) tyA]
   return (contextSubst tyA a senv, tyA)
 sub senv tyA (CFullType (TVar a)) | closed senv tyA = do
-  (tyB, _log1) <- censor (const mempty) . listen $ findSol senv a
-  ((senv', tyA'), _log2) <- censor (const mempty) . listen $ sub senv tyA (CFullType tyB)
+  (tyB, _log1) <- peek $ findSol senv a
+  ((senv', tyA'), _log2) <- peek $ sub senv tyA (CFullType tyB)
   tell ["[S-Sol-R] " ++ logSubFull senv tyA (CFullType (TVar a)) senv' tyA']
   tell $ indentAll _log1
   tell $ indentAll _log2
   return (senv', tyA')
 sub senv (TArr tyA tyB) (CFullType (TArr tyC tyD)) = do
-  ((senv1, _), _log1) <- censor (const mempty) . listen $ sub senv tyC (CFullType tyA)
-  ((senv2, _), _log2) <- censor (const mempty) . listen $ sub senv1 tyB (CFullType tyD)
+  ((senv1, _), _log1) <- peek $ sub senv tyC (CFullType tyA)
+  ((senv2, _), _log2) <- peek $ sub senv1 tyB (CFullType tyD)
   tell ["[S-Arr] " ++ logSubFull senv (TArr tyA tyB) (CFullType (TArr tyC tyD)) senv2 (TArr tyC tyD)]
   tell $ indentAll _log1
   tell $ indentAll _log2
   return (senv2, TArr tyC tyD)
 sub senv (TArr tyA tyB) (CTerm e h) | closed senv tyA = do
-  (_ , _log1) <- censor (const mempty) . listen $ infer (erase senv) (CFullType tyA) e
-  ((senv', tyD), _log2) <- censor (const mempty) . listen $ sub senv tyB h
+  (_ , _log1) <- peek $ infer (erase senv) (CFullType tyA) e
+  ((senv', tyD), _log2) <- peek $ sub senv tyB h
   tell ["[S-Term-Closed] " ++ logSubFull senv (TArr tyA tyB) (CTerm e h) senv' (TArr tyA tyD)]
   tell $ indentAll _log1
   tell $ indentAll _log2
   return (senv', TArr tyA tyD)
 sub senv (TArr tyA tyB) (CTerm e h) | open senv tyA = do
-  (tyC, _log1) <- censor (const mempty) . listen $ infer (erase senv) CEmpty e
-  ((senv1, tyA'), _log2) <- censor (const mempty) . listen $ sub senv tyC (CFullType tyA)
-  ((senv2, tyD), _log3) <- censor (const mempty) . listen $ sub senv1 tyB h
+  (tyC, _log1) <- peek $ infer (erase senv) CEmpty e
+  ((senv1, tyA'), _log2) <- peek $ sub senv tyC (CFullType tyA)
+  ((senv2, tyD), _log3) <- peek $ sub senv1 tyB h
   tell ["[S-Term-Open] " ++ logSubFull senv (TArr tyA tyB) (CTerm e h) senv2 (TArr tyA' tyD)]
   tell $ indentAll _log1
   tell $ indentAll _log2
   tell $ indentAll _log3
   return (senv2, TArr tyA' tyD)
 sub senv (TForall tyA) (CFullType (TForall tyB)) = do
-  ((STyp senv', tyC), _log1) <- censor (const mempty) . listen $ sub senv tyA (CFullType tyB)
+  ((STyp senv', tyC), _log1) <- peek $ sub senv tyA (CFullType tyB)
   tell ["[S-Forall] " ++ logSubFull senv (TForall tyA) (CFullType (TForall tyB)) senv' (TForall tyC)]
   tell $ indentAll _log1
   return (senv', TForall tyC)
 sub senv (TForall tyA) (CTerm e h) = do
-  ((senv', tyB), _log1) <- censor (const mempty) . listen $ sub (SEx senv) tyA (shiftContext0 (CTerm e h))
+  ((senv', tyB), _log1) <- peek $ sub (SEx senv) tyA (shiftContext0 (CTerm e h))
   case senv' of
     STyp senv'' -> do
       tell ["[S-Forall-L] " ++ logSubFull senv (TForall tyA) (CTerm e h) senv'' (unshiftTyp0 tyB)]
@@ -284,7 +284,7 @@ sub senv (TForall tyA) (CTerm e h) = do
       return (senv'', unshiftTyp0 tyB)
     _ -> lift Nothing
 sub senv (TForall tyA) (CTApp tyB h) = do
-  ((SSol _ senv', tyC), _log1) <- censor (const mempty) . listen $ sub (SSol tyB senv) tyA (shiftContext0 h)
+  ((SSol _ senv', tyC), _log1) <- peek $ sub (SSol tyB senv) tyA (shiftContext0 h)
   tell ["[S-Forall-TApp] " ++ logSubFull senv (TForall tyA) (CTApp tyB h) senv' (unshiftTyp0 tyC)]
   tell $ indentAll _log1
   return (senv', unshiftTyp0 tyC)
@@ -303,50 +303,55 @@ logInferFull env ctx tm ty = show env ++ " ⊢ " ++ show ctx ++ " ⇒ " ++ show 
 indentAll :: [String] -> [String]
 indentAll = map ("  "++)
 
+peek :: forall w m a. MonadWriter w m => m a -> m (a, w)
+peek = censor (const mempty) . listen
+
 infer :: Env -> Context -> Trm -> WriterT Log Maybe Typ
 -- infer a b c | trace ("infer " ++ show a ++ " |- " ++ show b ++ " => " ++ show c) False = undefined
 infer env CEmpty (Lit n) = do
   tell ["[Ty-Int] " ++ logInferFull env CEmpty (Lit n) TInt]
   return TInt
 infer env CEmpty (Var i) = do
-  tell ["[Ty-Var] " ++ logInferFull env CEmpty (Var i) TInt]
-  censor indentAll $ lookupEnv i env
+  (tyA, _log) <- peek $ lookupEnv i env
+  tell ["[Ty-Var] " ++ logInferFull env CEmpty (Var i) tyA]
+  tell $ indentAll _log
+  return tyA
 infer env CEmpty (Ann tm tyA) = do
-  (_, _log) <- censor (const mempty) . listen $ infer env (CFullType tyA) tm
+  (_, _log) <- peek $ infer env (CFullType tyA) tm
   tell ["[Ty-Ann] " ++ logInferFull env CEmpty (Ann tm tyA) tyA]
   tell $ indentAll _log
   return tyA
 infer env h (App tm1 tm2) = do
-  (TArr _ ty12, _log) <- censor (const mempty) . listen $ infer env (CTerm tm2 h) tm1
+  (TArr _ ty12, _log) <- peek $ infer env (CTerm tm2 h) tm1
   tell ["[Ty-App] " ++ logInferFull env h (App tm1 tm2) ty12]
   tell $ indentAll _log
   return ty12
 infer env (CFullType (TArr tyA tyB)) (Abs tm) = do
-  (tyC, _log) <- censor (const mempty) . listen $ infer (EBind tyA env) (CFullType tyB) tm
+  (tyC, _log) <- peek $ infer (EBind tyA env) (CFullType tyB) tm
   tell ["[Ty-Abs1] " ++ logInferFull env (CFullType (TArr tyA tyB)) (Abs tm) (TArr tyA tyC)]
   tell $ indentAll _log
   return $ TArr tyA tyC
 infer env (CTerm tm2 h) (Abs tm) = do
-  (tyA, _log1) <- censor (const mempty) . listen $ infer env CEmpty tm2
-  (tyB, _log2) <- censor (const mempty) . listen $ infer (EBind tyA env) (shiftContext0 h) tm
+  (tyA, _log1) <- peek $ infer env CEmpty tm2
+  (tyB, _log2) <- peek $ infer (EBind tyA env) (shiftContext0 h) tm
   tell ["[Ty-Abs2] " ++ logInferFull env (CTerm tm2 h) (Abs tm) (TArr tyA tyB)]
   tell $ indentAll _log1
   tell $ indentAll _log2
   return $ TArr tyA tyB
 infer env h g | genericConsumer g && nonEmptyContext h = do
-  (tyA, _log1) <- censor (const mempty) . listen $ infer env CEmpty g
-  ((_, tyB), _log2) <- censor (const mempty) . listen $ sub (Base env) tyA h
+  (tyA, _log1) <- peek $ infer env CEmpty g
+  ((_, tyB), _log2) <- peek $ sub (Base env) tyA h
   tell ["[Ty-Sub] " ++ logInferFull env h g tyB]
   tell $ indentAll _log1
   tell $ indentAll _log2
   return tyB
 infer e CEmpty (TAbs tm) = do
-  (tyA, _log) <- censor (const mempty) . listen $ infer (ETyp e) CEmpty tm
+  (tyA, _log) <- peek $ infer (ETyp e) CEmpty tm
   tell ["[Ty-TAbs] " ++ logInferFull e CEmpty (TAbs tm) (TForall tyA)]
   tell $ indentAll _log
   return $ TForall tyA
 infer e h (TApp tm tyA) = do
-  (tyB, _log) <- censor (const mempty) . listen $ infer e (CTApp tyA h) tm
+  (tyB, _log) <- peek $ infer e (CTApp tyA h) tm
   tell ["[Ty-TApp] " ++ logInferFull e h (TApp tm tyA) tyB]
   tell $ indentAll _log
   return tyB
