@@ -9,21 +9,6 @@ import Control.Monad (forM_)
 import Data.Tree (Tree (Node))
 import Data.Tree.View
 
-ex :: Tree NodeInfo
-ex = Node exInfo [Node exInfo [], Node exInfo []]
-
-exInfo :: NodeInfo
-exInfo = NodeInfo InitiallyCollapsed "2" "No comments"
-
-type Derivation = Tree NodeInfo
-
-instance Semigroup (Tree a) where
-  (Node x tr1) <> (Node y tr2) = _
-  -- Node x (tr1 ++ [(Node y tr2)])
-
-instance Monoid (Tree a) where
-  mempty = _
-
 type Log = [String]
 
 data Typ = TInt | TVar Int | TArr Typ Typ | TForall Typ
@@ -36,8 +21,8 @@ instance Show Typ where
   show (TForall t) = "∀. " ++ show t
 
 instance Show Trm where
-  show (Lit i) = show i
-  show (Var i) = show i
+  show (Lit i) = "lit " ++ show i
+  show (Var i) = "e" ++ show i
   show (Abs t) = "(λ. " ++ show t ++ ")"
   show (App t1 t2) = "(" ++ show t1 ++ " " ++ show t2 ++ ")"
   show (Ann t ty) = "(" ++ show t ++ " : " ++ show ty ++ ")"
@@ -60,7 +45,7 @@ instance Show Env where
   show (ESol ty env) = show env ++ " , =" ++ show ty
 
 instance Show SEnv where
-  show (Base env) = show env
+  show (Base env) = show env ++ " |"
   show (STyp env) = show env ++ " , •"
   show (SEx env) = show env ++ " , ^"
   show (SSol ty env) = show env ++ " , =" ++ show ty
@@ -206,6 +191,46 @@ fullInst senv (TForall t) = do
   t' <- fullInst (STyp senv) t
   return $ TForall t'
 
+level :: Env -> Int
+level EEmpty = 0
+level (EBind _ env) = level env
+level (ETyp env) = level env + 1
+level (ESol _ env) = level env + 1
+
+slevel :: SEnv -> Int
+slevel (Base env) = level env
+slevel (STyp senv) = slevel senv + 1
+slevel (SEx senv) = slevel senv + 1
+slevel (SSol _ env) = slevel env + 1
+
+instBy :: Env -> SEnv -> Typ -> WriterT Log Maybe Typ
+instBy env senv TInt = do
+  tell ["[Inst-Int] " ++ show senv ++ " / " ++ show env ++ " (" ++ show TInt ++ ") = " ++ "TInt"]
+  return TInt
+instBy env senv (TVar k) | k <= level env = do
+  tell ["[Inst-Var-In] " ++ show senv ++ " / " ++ show env ++ " (" ++ show (TVar k) ++ ") = " ++ show (TVar k)]
+  return $ TVar k
+instBy env senv (TVar k) | k > level env = do
+  (tyA, _log1) <- peek $ findSol senv k
+  (tyA', _log2) <- peek $ instBy env senv tyA
+  tell ["[Inst-Var-Out] " ++ show senv ++ " / " ++ show env ++ " (" ++ show (TVar k) ++ ") = " ++ show tyA']
+  tell $ indentAll _log1
+  tell $ indentAll _log2
+  return tyA'
+instBy env senv (TArr tyA tyB) = do
+  (tyA', _log1) <- peek $ instBy env senv tyA
+  (tyB', _log2) <- peek $ instBy env senv tyB
+  tell ["[Inst-Arr] " ++ show senv ++ " / " ++ show env ++ " (" ++ show (TArr tyA tyB) ++ ") = " ++ show (TArr tyA' tyB')]
+  tell $ indentAll _log1
+  tell $ indentAll _log2
+  return $ TArr tyA' tyB'
+instBy env senv (TForall tyA) = do
+  (tyA', _log1) <- peek $ instBy (ETyp env) (STyp senv) tyA
+  tell ["[Inst-Forall] " ++ show senv ++ " / " ++ show env ++ " (" ++ show (TForall tyA) ++ ") = " ++ show (TForall tyA')]
+  tell $ indentAll _log1
+  return $ TForall tyA'
+instBy _ _ _ = error "instBy: invalid arguments"
+
 -- the side conditions in the sub ensures that
 -- when reaching the zero, it should be SEx
 -- and I noticed that we iterate more than time, if it's possible to merge them?
@@ -234,10 +259,10 @@ sub senv TInt (CFullType TInt) = do
   tell ["[S-Int] " ++ logSubFull senv TInt (CFullType TInt) senv TInt]
   return (senv, TInt)
 sub senv tyA CEmpty | closed senv tyA = do
-  (newtyA, log') <- peek $ fullInst senv tyA
-  tell ["[S-Var] " ++ logSubFull senv tyA CEmpty senv newtyA]
-  tell $ indentAll log'
-  return (senv, newtyA)
+--  (newtyA, log') <- peek $ fullInst senv tyA
+  tell ["[S-Var] " ++ logSubFull senv tyA CEmpty senv tyA]
+--  tell $ indentAll log'
+  return (senv, tyA)
 sub senv (TVar a) (CFullType (TVar b)) | isTyp senv a && a == b = do
   tell ["[S-Refl] " ++ logSubFull senv (TVar a) (CFullType (TVar b)) senv (TVar a)]
   return (senv, TVar a)
@@ -291,21 +316,14 @@ sub senv (TForall tyA) (CFullType (TForall tyB)) = do
   return (senv', TForall tyC)
 sub senv (TForall tyA) (CTerm e h) = do
   ((senv', tyB), _log1) <- peek $ sub (SEx senv) tyA (shiftContext0 (CTerm e h))
-  case senv' of
-    STyp senv'' -> do
-      tell ["[S-Forall-L] " ++ logSubFull senv (TForall tyA) (CTerm e h) senv'' (unshiftTyp0 tyB)]
-      tell $ indentAll _log1
-      return (senv'', unshiftTyp0 tyB)
-    SSol _ senv'' -> do
-      tell ["[S-Forall-L] " ++ logSubFull senv (TForall tyA) (CTerm e h) senv'' (unshiftTyp0 tyB)]
-      tell $ indentAll _log1
-      return (senv'', unshiftTyp0 tyB)
-    _ -> lift Nothing
-sub senv (TForall tyA) (CTApp tyB h) = do
-  ((SSol _ senv', tyC), _log1) <- peek $ sub (SSol tyB senv) tyA (shiftContext0 h)
-  tell ["[S-Forall-TApp] " ++ logSubFull senv (TForall tyA) (CTApp tyB h) senv' (unshiftTyp0 tyC)]
+  tell ["[S-Forall-L] " ++ logSubFull senv (TForall tyA) (CTerm e h) senv' tyB]
   tell $ indentAll _log1
-  return (senv', unshiftTyp0 tyC)
+  return (senv', tyB)
+sub senv (TForall tyA) (CTApp tyB h) = do
+  ((senv', tyC), _log1) <- peek $ sub (SSol tyB senv) tyA (shiftContext0 h)
+  tell ["[S-Forall-TApp] " ++ logSubFull senv (TForall tyA) (CTApp tyB h) senv' tyC]
+  tell $ indentAll _log1
+  return (senv', tyC)
 sub _ _ _ = lift Nothing
 
 nonEmptyContext :: Context -> Bool
@@ -358,11 +376,13 @@ infer env (CTerm tm2 h) (Abs tm) = do
   return $ TArr tyA tyB
 infer env h g | genericConsumer g && nonEmptyContext h = do
   (tyA, _log1) <- peek $ infer env CEmpty g
-  ((_, tyB), _log2) <- peek $ sub (Base env) tyA h
-  tell ["[Ty-Sub] " ++ logInferFull env h g tyB]
+  ((senv, tyB), _log2) <- peek $ sub (Base env) tyA h
+  (tyB', _log3) <- peek $ instBy env senv tyB
+  tell ["[Ty-Sub] " ++ logInferFull env h g tyB']
   tell $ indentAll _log1
   tell $ indentAll _log2
-  return tyB
+  tell $ indentAll _log3
+  return tyB'
 infer e CEmpty (TAbs tm) = do
   (tyA, _log) <- peek $ infer (ETyp e) CEmpty tm
   tell ["[Ty-TAbs] " ++ logInferFull e CEmpty (TAbs tm) (TForall tyA)]
@@ -388,4 +408,3 @@ main = do
       putStrLn $ "inferred type: " ++ show tyA
       mapM_ putStrLn logs
     Nothing -> print "Nothing"
-  putStr $ htmlTree Nothing ex

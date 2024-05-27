@@ -331,16 +331,16 @@ Some properties are waiting to be justified:
 {\Psi \vdash \forall A <: \forall B \dashv \Psi' \rightsquigarrow \forall C}
 
 \inferrule*[lab=S-All-L]
-{\Psi, \hat{o} \vdash A <: \boxed{e} \leadsto \Sigma \dashv \Psi', \hat{o} \rightsquigarrow B}
-{\Psi \vdash \forall A <: \boxed{e} \leadsto \Sigma \dashv \Psi', \hat{o} \rightsquigarrow B}
+{\Psi, \hat{o} \vdash A <: \boxed{e} \leadsto \Sigma \dashv \Psi \rightsquigarrow B}
+{\Psi \vdash \forall A <: \boxed{e} \leadsto \Sigma \dashv \Psi \rightsquigarrow B}
 
-\inferrule*[lab=S-All-L-Eq]
-{\Psi, \hat{o} \vdash A <: \boxed{e} \leadsto \Sigma \dashv \Psi', =A \rightsquigarrow B}
-{\Psi \vdash \forall A <: \boxed{e} \leadsto \Sigma \dashv \Psi' , =A \rightsquigarrow B}
+%\inferrule*[lab=S-All-L-Eq]
+%{\Psi, \hat{o} \vdash A <: \boxed{e} \leadsto \Sigma \dashv \Psi', =A \rightsquigarrow B}
+%{\Psi \vdash \forall A <: \boxed{e} \leadsto \Sigma \dashv \Psi' , =A \rightsquigarrow B}
 
 \inferrule*[lab=S-$\forall$-t]
-{\Psi ,= B \vdash A <: \Sigma \dashv \Psi',= B \rightsquigarrow C}
-{\Psi \vdash \forall A <: \boxed{B} \leadsto \Sigma \dashv \Psi' , =B \rightsquigarrow C }
+{\Psi ,= B \vdash A <: \Sigma \dashv \Psi \rightsquigarrow C}
+{\Psi \vdash \forall A <: \boxed{B} \leadsto \Sigma \dashv \Psi \rightsquigarrow C }
 \end{mathpar}
 
 Some properties are waiting to be justified:
