@@ -2,6 +2,7 @@ module Poly.Algo where
 
 open import Poly.Common
 
+
 -- Env for algorithmic subtyping
 data SEnv : ℕ → ℕ → Set where
   𝕓     : (Γ : Env n m) → SEnv n m
@@ -139,22 +140,54 @@ data _:=_∈_ : Fin m → Type m → SEnv n m → Set where
     → k := ↓ty0 A ∈ Ψ
     → #S k := A ∈ Ψ ,= B
 
-data inst_by_[_]⟹_ : SEnv n m' → Env n m → Type m' → Type m → Set where
+data More : ℕ → ℕ → Set where
 
-infix 5 inst_[_]⟹_
-data inst_[_]⟹_ : SEnv n m → Type m → Type m → Set where
-  inst-int : inst Ψ [ Int ]⟹ Int
-  inst-var : ∀ {X A A'}
-    → X := A ∈ Ψ
-    → inst Ψ [ A ]⟹ A'
-    → inst Ψ [ ‶ X ]⟹ A'
+  Z : ∀ {m}
+    → More m m
+  S : ∀ {m n}
+    → More m n
+    → More m (suc n)
+
+-- X := A ∈ Ψ by m
+-- Ψ should be in m' level, and m' ≥ m
+-- whether X := A in Ψ outside m-level
+-- Ψ = Γ , 
+data _:=_∈_by_ : Fin m' → Type m' → SEnv n m' → (m : ℕ) → Set where
+
+data _:=_∈_by_w/_ : Fin m' → Type m' → SEnv n m' → (m : ℕ) → More m m' → Set where
+
+  d0 : ∀ {Ψ : SEnv n m'} {k A}
+    → k := A ∈ Ψ by m' w/ Z
+
+-- the Γ is used only for making sure the result type is at m level
+-- inst Ψ by Γ [ A ]⟹ A'
+-- where Ψ is Γ , Ψ', and we apply solutions in Ψ' to A and then get A'
+infix 4 inst_by_[_]⟹_
+data inst_by_[_]⟹_ : SEnv n m' → (m : ℕ) → Type m' → Type m → Set where
+  inst-int : inst Ψ by m [ Int ]⟹ Int
+  inst-var-in : ∀ {X}
+    → toℕ X ≤ m
+    → inst Ψ by m [ ‶ X ]⟹ ‶ X
+  inst-var-out : ∀ {X A A'}
+    → toℕ X > m   -- m < k ≤ m'
+    → X := A ∈ Ψ by m
+    → inst Ψ by m [ A ]⟹ A'
+    → inst Ψ by m [ ‶ X ]⟹ A'
   inst-arr : ∀ {A B A' B'}
-    → inst Ψ [ A ]⟹ A'
-    → inst Ψ [ B ]⟹ B'
-    → inst Ψ [ A `→ B ]⟹ A' `→ B'
+    → inst Ψ by m [ A ]⟹ A'
+    → inst Ψ by m [ B ]⟹ B'
+    → inst Ψ by m [ A `→ B ]⟹ A' `→ B'
   inst-∀ : ∀ {A A'}
-    → inst (Ψ ,∙) [ A ]⟹ A'
-    → inst Ψ [ `∀ A ]⟹ `∀ A'
+    → inst (Ψ ,∙) by (suc m) [ A ]⟹ A'
+    → inst Ψ by m [ `∀ A ]⟹ `∀ A'
+
+
+infix 4 inst'_[_]⟹_
+data inst'_[_]⟹_ : SEnv n (m' + m) → Type (m' + m) → Type m → Set where
+  inst-int : ∀ {m' m} {Ψ : SEnv n (m' + m)}
+    → inst' Ψ [ Type (m' + m) ∋⦂ Int ]⟹ (Type m ∋⦂ Int)
+  
+
 
 infix 4 [_/_]_⟹_
 data [_/_]_⟹_ : Type m → Fin m → SEnv n m → SEnv n m → Set where
@@ -199,8 +232,6 @@ data _^∈_ : Fin m → SEnv n m → Set where
     → k ^∈ Ψ
     → #S k ^∈ Ψ ,= A    
 
-
-
 infix 3 _⊢_⇒_⇒_
 infix 3 _⊢_≤_⊣_↪_
 
@@ -236,11 +267,12 @@ data _⊢_⇒_⇒_ where
     → Γ , A ⊢ ↑Σ0 Σ ⇒ e ⇒ B
     → Γ ⊢ [ e₂ ]↝ Σ ⇒ ƛ e ⇒ A `→ B
 
-  ⊢sub : ∀ {Γ : Env n m} {Ψ : SEnv n m'} {g A B B'}
+  ⊢sub : ∀ {Γ : Env n m} {Ψ : SEnv n m'} {g A B B' k}
     → Γ ⊢ □ ⇒ g ⇒ A
     → NonEmpty Σ
     → 𝕓 Γ ⊢ A ≤ Σ ⊣ Ψ ↪ B
-    → inst Ψ by Γ [ B ]⟹ B'
+    → inst' Ψ [ Type (k + m) ∋⦂ B ]⟹ (Type m ∋⦂ B')
+--    → inst Ψ by m [ B ]⟹ B'
     → Γ ⊢ Σ ⇒ g ⇒ B'
 
   -- design choices here,
@@ -328,14 +360,16 @@ data _⊢_≤_⊣_↪_ where
 ----------------------------------------------------------------------
 --+                            Examples                            +--
 ----------------------------------------------------------------------
-{-
+
+
 idEnv : Env 1 0
 idEnv = ∅ , `∀ (‶ #0 `→ ‶ #0)
 
-sub-id[Int]1 : ∀ {Γ : Env n m} → 𝕓 Γ ⊢ `∀ ‶ #0 `→ ‶ #0 ≤ ⟦ Int ⟧↝ [ lit 1 ]↝ □ ⊣ 𝕓 Γ ↪ Int `→ Int
+sub-id[Int]1 : ∀ {Γ : Env n m} → 𝕓 Γ ⊢ `∀ ‶ #0 `→ ‶ #0 ≤ ⟦ Int ⟧↝ [ lit 1 ]↝ □ ⊣ 𝕓 Γ ,= Int ↪ ‶ #0 `→ ‶ #0
 sub-id[Int]1 {Γ = Γ} = s-∀-t (s-term-c ⊢c-var=0 ⊢c-var=0
-                             (⊢sub {Ψ = 𝕓 (Γ ,= Int)} ⊢lit ne-τ (s-ex-r= ⊢c-int (kΓ Z) s-int))
-                             (s-empty ⊢c-var=0 (inst-var Z inst-int)))
+                               (⊢sub ⊢lit ne-τ (s-ex-r= ⊢c-int (kΓ Z) s-int) {!!}) s-empty)
+
+{-
 
 
 sub-id[Int] : ∀ {Γ : Env n m} → 𝕓 Γ ⊢ `∀ ‶ #0 `→ ‶ #0 ≤ ⟦ Int ⟧↝ □ ⊣ 𝕓 Γ ↪ Int `→ Int
