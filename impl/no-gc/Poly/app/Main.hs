@@ -204,19 +204,20 @@ slevel (SEx senv) = slevel senv + 1
 slevel (SSol _ env) = slevel env + 1
 
 instBy :: Env -> SEnv -> Typ -> WriterT Log Maybe Typ
+-- instBy env senv tyA | trace ("instBy " ++ show env ++ " " ++ show senv ++ " " ++ show tyA) False = undefined
 instBy env senv TInt = do
   tell ["[Inst-Int] " ++ show senv ++ " / " ++ show env ++ " (" ++ show TInt ++ ") = " ++ "TInt"]
   return TInt
-instBy env senv (TVar k) | k <= level env = do
-  tell ["[Inst-Var-In] " ++ show senv ++ " / " ++ show env ++ " (" ++ show (TVar k) ++ ") = " ++ show (TVar k)]
-  return $ TVar k
-instBy env senv (TVar k) | k > level env = do
+instBy env senv (TVar k) | k < (slevel senv - level env) = do
   (tyA, _log1) <- peek $ findSol senv k
   (tyA', _log2) <- peek $ instBy env senv tyA
   tell ["[Inst-Var-Out] " ++ show senv ++ " / " ++ show env ++ " (" ++ show (TVar k) ++ ") = " ++ show tyA']
   tell $ indentAll _log1
   tell $ indentAll _log2
   return tyA'
+instBy env senv (TVar k) | k >= (slevel senv - level env) = do
+  tell ["[Inst-Var-In] " ++ show senv ++ " / " ++ show env ++ " (" ++ show (TVar k) ++ ") = " ++ show (TVar k)]
+  return $ TVar k
 instBy env senv (TArr tyA tyB) = do
   (tyA', _log1) <- peek $ instBy env senv tyA
   (tyB', _log2) <- peek $ instBy env senv tyB
