@@ -68,7 +68,7 @@ executable Poly
     -- other-extensions:
 
     -- Other library packages from which modules are imported.
-    build-depends:    base ^>=4.18.2.0, mtl
+    build-depends:    base ^>=4.18.2.0, mtl, prettyprinter, containers, tree-view
 
     -- Directories containing source files.
     hs-source-dirs:   app

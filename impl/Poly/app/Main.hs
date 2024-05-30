@@ -1,10 +1,13 @@
-{-# LANGUAGE MultiWayIf, LambdaCase, RankNTypes #-}
+{-# LANGUAGE MultiWayIf, LambdaCase, RankNTypes, TypeSynonymInstances #-}
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 {-# HLINT ignore "Redundant multi-way if" #-}
 module Main where
 import Debug.Trace
 import Control.Monad.Writer
 import Control.Monad (forM_)
+
+import Data.Tree (Tree (Node))
+import Data.Tree.View
 
 type Log = [String]
 
@@ -75,6 +78,10 @@ substTyp k tyA (TVar x) = if | k == x -> tyA
                           where punchOut i j = if j > i then j - 1 else j
 substTyp k tyA (TArr t1 t2) = TArr (substTyp k tyA t1) (substTyp k tyA t2)
 substTyp k tyA (TForall tyB) = TForall (substTyp (k + 1) (shiftTyp0 tyA) tyB)
+
+-- substTyp0 A B: subst A at 0th index in B
+substTyp0 :: Typ -> Typ -> Typ
+substTyp0 = substTyp 0
 
 unshiftTyp0 :: Typ -> Typ
 unshiftTyp0 = substTyp 0 TInt
@@ -278,16 +285,16 @@ sub senv (TForall tyA) (CTerm e h) = do
       tell ["[S-Forall-L] " ++ logSubFull senv (TForall tyA) (CTerm e h) senv'' (unshiftTyp0 tyB)]
       tell $ indentAll _log1
       return (senv'', unshiftTyp0 tyB)
-    SSol _ senv'' -> do
-      tell ["[S-Forall-L] " ++ logSubFull senv (TForall tyA) (CTerm e h) senv'' (unshiftTyp0 tyB)]
+    SSol tyB' senv'' -> do
+      tell ["[S-Forall-L] " ++ logSubFull senv (TForall tyA) (CTerm e h) senv'' (substTyp0 tyB' tyB)]
       tell $ indentAll _log1
-      return (senv'', unshiftTyp0 tyB)
+      return (senv'', substTyp0 tyB' tyB)
     _ -> lift Nothing
 sub senv (TForall tyA) (CTApp tyB h) = do
-  ((SSol _ senv', tyC), _log1) <- peek $ sub (SSol tyB senv) tyA (shiftContext0 h)
-  tell ["[S-Forall-TApp] " ++ logSubFull senv (TForall tyA) (CTApp tyB h) senv' (unshiftTyp0 tyC)]
+  ((SSol tyB' senv', tyC), _log1) <- peek $ sub (SSol tyB senv) tyA (shiftContext0 h)
+  tell ["[S-Forall-TApp] " ++ logSubFull senv (TForall tyA) (CTApp tyB h) senv' (substTyp0 tyB' tyC)]
   tell $ indentAll _log1
-  return (senv', unshiftTyp0 tyC)
+  return (senv', substTyp0 tyB' tyC)
 sub _ _ _ = lift Nothing
 
 nonEmptyContext :: Context -> Bool
