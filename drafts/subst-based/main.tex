@@ -130,11 +130,11 @@
     {\Gamma \vdash_{S_\tau~n} \forall a. ~A <: [B/\hat{a}]C \to [B/\hat{a}]D}    
     
     \inferrule*[lab=S-var-l]
-    {\hat{a} = B \in \Gamma \\ \Gamma \vdash_n B <: A}
+    {\hat{a} = B \in \Gamma \\ \Gamma \vdash_\infty B <: A}
     {\Gamma \vdash_\infty \hat{a} <: A}
     
      \inferrule*[lab=S-var-r]
-    {\hat{a} = B \in \Gamma \\ \Gamma \vdash_n A <: B}
+    {\hat{a} = B \in \Gamma \\ \Gamma \vdash_\infty A <: B}
     {\Gamma \vdash_\infty A <: \hat{a}}
 \end{mathpar}
 
