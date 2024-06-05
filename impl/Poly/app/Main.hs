@@ -1,13 +1,13 @@
-{-# LANGUAGE MultiWayIf, LambdaCase, RankNTypes, TypeSynonymInstances #-}
+{-# LANGUAGE MultiWayIf, LambdaCase, RankNTypes #-}
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 {-# HLINT ignore "Redundant multi-way if" #-}
 module Main where
-import Debug.Trace
+-- import Debug.Trace
 import Control.Monad.Writer
 import Control.Monad (forM_)
 
-import Data.Tree (Tree (Node))
-import Data.Tree.View
+-- import Data.Tree (Tree (Node))
+-- import Data.Tree.View
 
 type Log = [String]
 
@@ -22,7 +22,7 @@ instance Show Typ where
 
 instance Show Trm where
   show (Lit i) = show i
-  show (Var i) = show i
+  show (Var i) = "e" ++ show i
   show (Abs t) = "(λ. " ++ show t ++ ")"
   show (App t1 t2) = "(" ++ show t1 ++ " " ++ show t2 ++ ")"
   show (Ann t ty) = "(" ++ show t ++ " : " ++ show ty ++ ")"
@@ -107,6 +107,24 @@ shiftContext k (CTApp ty ctx) = CTApp ty (shiftContext k ctx)
 
 shiftContext0 :: Context -> Context
 shiftContext0 = shiftContext 0
+
+shiftTypTrm :: Int -> Trm -> Trm
+shiftTypTrm _ (Lit i) = Lit i
+shiftTypTrm _ (Var x) = Var x
+shiftTypTrm k (Abs t) = Abs (shiftTypTrm k t)
+shiftTypTrm k (App t1 t2) = App (shiftTypTrm k t1) (shiftTypTrm k t2)
+shiftTypTrm k (Ann t ty) = Ann (shiftTypTrm k t) (shiftTyp k ty)
+shiftTypTrm k (TAbs t) = TAbs (shiftTypTrm (1 + k) t)
+shiftTypTrm k (TApp t ty) = TApp (shiftTypTrm k t) (shiftTyp k ty)
+
+shiftTypContext :: Int -> Context -> Context
+shiftTypContext _ CEmpty = CEmpty
+shiftTypContext k (CFullType ty) = CFullType (shiftTyp k ty)
+shiftTypContext k (CTerm trm ctx) = CTerm (shiftTypTrm k trm) (shiftTypContext k ctx)
+shiftTypContext k (CTApp ty ctx) = CTApp (shiftTyp k ty) (shiftTypContext k ctx)
+
+shiftTypContext0 :: Context -> Context
+shiftTypContext0 = shiftTypContext 0
 
 -- end shifting --
 
@@ -223,13 +241,16 @@ sub senv TInt (CFullType TInt) = do
   tell ["[S-Int] " ++ logSubFull senv TInt (CFullType TInt) senv TInt]
   return (senv, TInt)
 sub senv tyA CEmpty | closed senv tyA = do
-  (newtyA, log') <- peek $ fullInst senv tyA
-  tell ["[S-Var] " ++ logSubFull senv tyA CEmpty senv newtyA]
-  tell $ indentAll log'
-  return (senv, newtyA)
+  -- (newtyA, log') <- peek $ fullInst senv tyA
+  tell ["[S-Var] " ++ logSubFull senv tyA CEmpty senv tyA]
+  -- tell $ indentAll log'
+  return (senv, tyA)
 sub senv (TVar a) (CFullType (TVar b)) | isTyp senv a && a == b = do
   tell ["[S-Refl] " ++ logSubFull senv (TVar a) (CFullType (TVar b)) senv (TVar a)]
   return (senv, TVar a)
+-- sub senv (TVar a) (CFullType (TVar b)) | isEx senv a && a == b = do
+--   tell ["[S-Refl] " ++ logSubFull senv (TVar a) (CFullType (TVar b)) senv (TVar a)]
+--   return (senv, TVar a)
 sub senv (TVar a) (CFullType tyA) | isEx senv a && closed senv tyA = do
   tell ["[S-Ex-L] " ++ logSubFull senv (TVar a) (CFullType tyA) (contextSubst tyA a senv) tyA]
   return (contextSubst tyA a senv, tyA)
@@ -274,12 +295,12 @@ sub senv (TArr tyA tyB) (CTerm e h) | open senv tyA = do
   tell $ indentAll _log3
   return (senv2, TArr tyA' tyD)
 sub senv (TForall tyA) (CFullType (TForall tyB)) = do
-  ((STyp senv', tyC), _log1) <- peek $ sub senv tyA (CFullType tyB)
+  ((STyp senv', tyC), _log1) <- peek $ sub (STyp senv) tyA (CFullType tyB)
   tell ["[S-Forall] " ++ logSubFull senv (TForall tyA) (CFullType (TForall tyB)) senv' (TForall tyC)]
   tell $ indentAll _log1
   return (senv', TForall tyC)
 sub senv (TForall tyA) (CTerm e h) = do
-  ((senv', tyB), _log1) <- peek $ sub (SEx senv) tyA (shiftContext0 (CTerm e h))
+  ((senv', tyB), _log1) <- peek $ sub (SEx senv) tyA (shiftTypContext0 (CTerm e h))
   case senv' of
     STyp senv'' -> do
       tell ["[S-Forall-L] " ++ logSubFull senv (TForall tyA) (CTerm e h) senv'' (unshiftTyp0 tyB)]
@@ -291,7 +312,7 @@ sub senv (TForall tyA) (CTerm e h) = do
       return (senv'', substTyp0 tyB' tyB)
     _ -> lift Nothing
 sub senv (TForall tyA) (CTApp tyB h) = do
-  ((SSol tyB' senv', tyC), _log1) <- peek $ sub (SSol tyB senv) tyA (shiftContext0 h)
+  ((SSol tyB' senv', tyC), _log1) <- peek $ sub (SSol tyB senv) tyA (shiftTypContext0 h)
   tell ["[S-Forall-TApp] " ++ logSubFull senv (TForall tyA) (CTApp tyB h) senv' (substTyp0 tyB' tyC)]
   tell $ indentAll _log1
   return (senv', substTyp0 tyB' tyC)
@@ -364,15 +385,27 @@ infer e h (TApp tm tyA) = do
   return tyB
 infer _ _ _ = lift Nothing
 
+higherRankEnv :: Env
+higherRankEnv = EBind (TArr (TForall (TArr (TVar 0) (TVar 0))) TInt)
+                  (EBind (TForall (TArr (TArr (TForall (TArr (TVar 0) (TVar 0))) (TVar 0)) (TVar 0))) EEmpty)
+
+higherRankEnv2 :: Env
+higherRankEnv2 = EBind (TArr (TForall (TArr (TVar 0) (TVar 0))) TInt)
+                                     (EBind (TForall (TArr (TArr (TForall (TArr (TVar 0) (TVar 0))) (TVar 0)) (TVar 0))) EEmpty)
+
 main :: IO ()
 main = do
   -- print idTyp
-  let ex_id = infer EEmpty CEmpty idTrm
+  -- print higherRankEnv
+  let ex_fg = infer higherRankEnv CEmpty (App (Var 1) (Var 0))
+      ex_id = infer EEmpty CEmpty idTrm
       ex_id1 = infer EEmpty CEmpty (App idTrm (Lit 1))
       ex_idInt = infer EEmpty CEmpty (TApp idTrm TInt)
       ex_idInt1 = infer EEmpty CEmpty (App (TApp idTrm TInt) (Lit 42))
       ex_f1 = infer (EBind (TForall (TArr (TVar 0) (TVar 0))) EEmpty) CEmpty (App (Var 0) (Lit 42))
-  forM_ [ex_id, ex_id1, ex_idInt, ex_idInt1, ex_f1] $ \ex -> case runWriterT ex of
+      ex_idid = infer EEmpty CEmpty (App idTrm idTrm)
+  forM_ [ex_fg, ex_id, ex_id1, ex_idInt, ex_idInt1, ex_f1, ex_idid] $ \ex -> case runWriterT ex of
+  -- forM_ [ex_fg] $ \ex -> case runWriterT ex of
     Just (tyA, logs) -> do
       putStrLn $ "inferred type: " ++ show tyA
       mapM_ putStrLn logs
