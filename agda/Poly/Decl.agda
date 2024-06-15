@@ -115,12 +115,12 @@ data _⊢_#_≤_ : Env n m → Counter → Type m → Type m → Set where
   s-∀ : ∀ {A B}
     → Γ ,∙ ⊢ ∞ # A ≤ B
     → Γ ⊢ ∞ # `∀ A ≤ `∀ B
-  s-∀l : ∀ {j A B C}
-    → Γ ,= B ⊢ S j # A ≤ C
+  s-∀l : ∀ {j A B C D}
+    → Γ ,= B ⊢ S j # A ≤ C `→ D
 -- we guess a solution of B here, we must make sure this B is provided from the counter
 -- what we does is to make sure the all inputs matching the counter should at least have the quantifer contained
     → find A #0 (S j)
-    → Γ ⊢ S j # `∀ A ≤ [ B ]ˢ C
+    → Γ ⊢ S j # `∀ A ≤ ([ B ]ˢ C) `→ ([ B ]ˢ D)
   s-∀lτ : ∀ {j A B C}
     → Γ ,= B ⊢ j # A ≤ C
     → Γ ⊢ Sτ j # `∀ A ≤ [ B ]ˢ C

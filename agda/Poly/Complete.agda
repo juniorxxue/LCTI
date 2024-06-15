@@ -32,7 +32,7 @@ postulate
     → Γ ⊢ ⟨ j , B ⟩ ~ Σ
     → Γ , A ⊢ ⟨ j , B ⟩ ~ ↑Σ0 Σ
 
-  ⊢-to-⊢c : ∀ {Γ : Env n m} {Σ e A}
+  ⊢to⊢c : ∀ {Γ : Env n m} {Σ e A}
     → Γ ⊢ Σ ⇒ e ⇒ A
     → 𝕓 Γ ⊢c A
 
@@ -80,6 +80,6 @@ complete-≤ (s-arr₁ s s₁) ~∞ = s-arr (complete-≤-chk s) (complete-≤-c
 complete-≤ (s-arr₂ s s₁) (~S ⊢e j~Σ) = {!!}
 complete-≤ (s-∀ s) ~∞ = s-∀ {!complete-≤-chk s!} -- a trouble
 complete-≤ (s-∀l s x) (~S ⊢e j~Σ) = s-∀l-eq {!!}
-complete-≤ (s-∀lτ s) (~Sτ j~Σ) = s-∀-t {!!} {!!}
+complete-≤ (s-∀lτ s) (~Sτ j~Σ) = {!!}
 complete-≤ (s-var-l x s) ~∞ = s-ex-l= {!!} {!!} (complete-≤-chk s) -- ok
 complete-≤ (s-var-r x s) ~∞ = s-ex-r= {!!} {!!} (complete-≤-chk s) -- ok
