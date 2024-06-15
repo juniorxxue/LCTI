@@ -29,77 +29,12 @@ data _:=_∈_ : Fin m → Type m → Env n m → Set where
     → #S k := A ∈ Γ ,∙
   S= : ∀ {k A B}
     → k := ↓ty0 A ∈ Γ
-    → #S k := A ∈ Γ ,= B
-
--- apply solutions in Env to a type
-
-{-
-infix 4 _⟦_⟧⟹'_
-data _⟦_⟧⟹'_ : Env n m → Fin m → Type m → Set where
-  slv'-, : ∀ {A B X}
-    → Γ ⟦ X ⟧⟹' B
-    → (Γ , A) ⟦ X ⟧⟹' B
-  slv'-∙-Z : 
-      (Γ ,∙) ⟦ #0 ⟧⟹' ‶ #0
-  slv'-∙-S : ∀ {X A A'}
-    → Γ ⟦ X ⟧⟹' A
-    → A' ≡ ↑ty0 A
-    → (Γ ,∙) ⟦ #S X ⟧⟹' A'
---    → (Γ ,∙) ⟦ #S X ⟧⟹' ↑ty0 A
-  slv'-=-Z : ∀ {A A'}
-    → A' ≡ ↑ty0 A
-    → (Γ ,= A) ⟦ #0 ⟧⟹' A'
-  slv'-=-S : ∀ {A X B B'}
-    → Γ ⟦ X ⟧⟹' B
-    → B' ≡ ↑ty0 B
-    → (Γ ,= A) ⟦ #S X ⟧⟹' B'
--}    
-
-infix 4 _⟦_⟧⟹_
-data _⟦_⟧⟹_ : Env n m → Type m → Type m → Set where
-  slv-int : Γ ⟦ Int ⟧⟹ Int
-  slv-var : ∀ {X A A'}
---    → Γ ⟦ X ⟧⟹' A ⚠️
-    → X := A ∈' Γ
-    → Γ ⟦ A ⟧⟹ A'
-    → Γ ⟦ ‶ X ⟧⟹ A'
-  slv-arr : ∀ {A B A' B'}
-    → Γ ⟦ A ⟧⟹ A'
-    → Γ ⟦ B ⟧⟹ B'
-    → Γ ⟦ A `→ B ⟧⟹ A' `→ B'
-  slv-∀ : ∀ {A A'}
-    → (Γ ,∙) ⟦ A ⟧⟹ A'
-    → Γ ⟦ `∀ A ⟧⟹ `∀ A'
-
-data bound : Type (1 + m) → Fin (1 + m) → Set where
-  b-var : bound (Type (1 + m) ∋⦂ ‶ #0) #0
-  b-arr₁ : ∀ {A : Type (1 + m)} {B k} → bound A k → bound (A `→ B) k
-  b-arr₂ : ∀ {A : Type (1 + m)} {B k} → bound B k → bound (A `→ B) k
-  b-∀ : ∀ {A : Type (2 + m)} {k} → bound A (#S k) → bound (`∀ A) k
-
--- find A k j
--- at j-th position of A type, should have a bound variable, example: |-1 forall a. a -> a <: Int -> Int
-data find : Type (1 + m) → Fin (1 + m) → Counter → Set where
-  f-∞ : ∀ {A : Type (1 + m)} {k} → find A k ∞ -- not sure
-  f-Z : ∀ {A : Type (1 + m)} {k} → bound A k → find A k Z
-  f-S₁ : ∀ {A : Type (1 + m)} {B k j}
-    → bound A k
-    → find (A `→ B) k (S j)
-  f-S₂ : ∀ {A : Type (1 + m)} {B k j}
-    → find B k j
-    → find (A `→ B) k (S j)
-  f-S₃ :  ∀ {A : Type (2 + m)} {k j}
-    → find A (#S k) (S j)
-    → find (`∀ A) k (S j)
-  f-Sτ : ∀ {A : Type (2 + m)} {k j}
-    → find A (#S k) j
-    → find (`∀ A) k (Sτ j)
+    → #S k := A ∈ Γ ,= B    
   
 infix 3 _⊢_#_≤_
 data _⊢_#_≤_ : Env n m → Counter → Type m → Type m → Set where
-  s-refl : ∀ {A A'}
-    → (ap : Γ ⟦ A ⟧⟹ A') -- I want to simplify this judgment, but worried about type variables case
-    → Γ ⊢ Z # A ≤ A'
+  s-refl : ∀ {A}
+    → Γ ⊢ Z # A ≤ A
   s-int :
       Γ ⊢ ∞ # Int ≤ Int
   s-var : ∀ {X} 
@@ -115,12 +50,6 @@ data _⊢_#_≤_ : Env n m → Counter → Type m → Type m → Set where
   s-∀ : ∀ {A B}
     → Γ ,∙ ⊢ ∞ # A ≤ B
     → Γ ⊢ ∞ # `∀ A ≤ `∀ B
-  s-∀l : ∀ {j A B C D}
-    → Γ ,= B ⊢ S j # A ≤ C `→ D
--- we guess a solution of B here, we must make sure this B is provided from the counter
--- what we does is to make sure the all inputs matching the counter should at least have the quantifer contained
-    → find A #0 (S j)
-    → Γ ⊢ S j # `∀ A ≤ ([ B ]ˢ C) `→ ([ B ]ˢ D)
   s-∀lτ : ∀ {j A B C}
     → Γ ,= B ⊢ j # A ≤ C
     → Γ ⊢ Sτ j # `∀ A ≤ [ B ]ˢ C
@@ -173,7 +102,7 @@ idEnv : Env 1 0
 idEnv = ∅ , `∀ (‶ #0 `→ ‶ #0)
 
 id[Int]1 : idEnv ⊢ Z # ((` #0) [ Int ]) · (lit 1) ⦂ Int
-id[Int]1 = ⊢app₁ (⊢tapp (⊢sub (⊢var refl) (s-∀lτ (s-refl (slv-arr (slv-var Z slv-int) (slv-var Z slv-int)))) nz-Sτ))
+id[Int]1 = ⊢app₁ (⊢tapp (⊢sub (⊢var refl) (s-∀lτ {B = Int} s-refl) nz-Sτ))
                  (⊢sub ⊢lit s-int nz-∞)
 
 idExp : Term 0 0
@@ -181,18 +110,12 @@ idExp = Λ (((ƛ ` #0) ⦂ ‶ #0 `→ ‶ #0))
 
 idExp[Int]1 : ∅ ⊢ Z # (idExp [ Int ]) · (lit 1) ⦂ Int
 idExp[Int]1 = ⊢app₁ (⊢tapp (⊢sub (⊢tabs₁ (⊢ann (⊢lam₁ (⊢sub (⊢var refl) s-var nz-∞))))
-                                 (s-∀lτ (s-refl (slv-arr (slv-var Z slv-int) (slv-var Z slv-int)))) nz-Sτ))
+                                 (s-∀lτ {B = Int} s-refl) nz-Sτ))
                     (⊢sub ⊢lit s-int nz-∞)
 
 idExp[Int] : ∅ ⊢ Z # idExp [ Int ] ⦂ Int `→ Int
 idExp[Int] = ⊢tapp (⊢sub (⊢tabs₁ (⊢ann (⊢lam₁ (⊢sub (⊢var refl) s-var nz-∞))))
-                         (s-∀lτ (s-refl (slv-arr (slv-var Z slv-int) (slv-var Z slv-int)))) nz-Sτ)
-
--- implicit inst
-id1 : idEnv ⊢ Z # (` #0) · (lit 1) ⦂ Int
-id1 = ⊢app₂ (⊢sub (⊢var refl)
-                  (s-∀l (s-arr₂ (s-var-r Z s-int) (s-refl (slv-var Z slv-int))) (f-S₁ b-var)) nz-S)
-            ⊢lit
+                         (s-∀lτ {B = Int} s-refl) nz-Sτ)
 
 #1 : Fin (2 + m)
 #1 = #S #0

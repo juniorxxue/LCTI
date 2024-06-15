@@ -79,24 +79,15 @@ lookup-weaken {Γ = Γ ,∙} {k = #S k} {x = #S x} = cong ↑ty0 (lookup-weaken 
 lookup-weaken {Γ = Γ ,= A} {k = #S k} {x = #S x} = cong ↑ty0 (lookup-weaken {Γ = Γ})
 
 
-slv-weaken : ∀ {Γ : Env (1 + n) m} {k A B}
-  → (Γ /ˣ k) ⟦ A ⟧⟹ B
-  → Γ ⟦ A ⟧⟹ B
-slv-weaken {A = Int} {Int} ⟦A⟧⟹B = slv-int
-slv-weaken {A = ‶ X} {B} (slv-var x a) = slv-var (∈'-weaken x) (slv-weaken a)
-slv-weaken {A = A `→ A₁} {B `→ B₁} (slv-arr ⟦A⟧⟹B ⟦A⟧⟹B₁) = slv-arr (slv-weaken ⟦A⟧⟹B) (slv-weaken ⟦A⟧⟹B₁)
-slv-weaken {A = `∀ A} {`∀ B} (slv-∀ ⟦A⟧⟹B) = slv-∀ (slv-weaken ⟦A⟧⟹B)
-
 s-weaken : ∀ {Γ : Env (1 + n) m} {k j A B }
   → Γ /ˣ k ⊢ j # A ≤ B
   → Γ ⊢ j # A ≤ B
-s-weaken (s-refl ap) = s-refl (slv-weaken ap)
+s-weaken (s-refl) = s-refl
 s-weaken s-int = s-int
 s-weaken s-var = s-var
 s-weaken (s-arr₁ C≤A B≤D) = s-arr₁ (s-weaken C≤A) (s-weaken B≤D)
 s-weaken (s-arr₂ C≤A B≤D) = s-arr₂ (s-weaken C≤A) (s-weaken B≤D)
 s-weaken (s-∀ A≤B) = s-∀ (s-weaken A≤B)
-s-weaken (s-∀l A≤B s) = s-∀l (s-weaken A≤B) s
 s-weaken (s-∀lτ A≤B) = s-∀lτ (s-weaken A≤B)
 s-weaken (s-var-l x A≤B) = s-var-l (∈-weaken x) (s-weaken A≤B)
 s-weaken (s-var-r x A≤B) = s-var-r (∈-weaken x) (s-weaken A≤B)
@@ -105,13 +96,12 @@ s-weaken (s-var-r x A≤B) = s-var-r (∈-weaken x) (s-weaken A≤B)
 s-strengthen-tm-0 : ∀ {Γ : Env n m} {A B C j}
   → Γ , A ⊢ j # B ≤ C
   → Γ ⊢ j # B ≤ C
-s-strengthen-tm-0 (s-refl ap) = {! ap !}
+s-strengthen-tm-0 (s-refl) = {! ap !}
 s-strengthen-tm-0 s-int = s-int
 s-strengthen-tm-0 s-var = s-var
 s-strengthen-tm-0 (s-arr₁ C≤A B≤D) = s-arr₁ (s-strengthen-tm-0 C≤A) (s-strengthen-tm-0 B≤D)
 s-strengthen-tm-0 (s-arr₂ B≤C B≤C₁) = {!   !}
 s-strengthen-tm-0 (s-∀ B≤C) = s-∀ {!   !} -- IH not generalizable enough 
-s-strengthen-tm-0 (s-∀l B≤C x) = {!   !}
 s-strengthen-tm-0 (s-∀lτ B≤C) = {!   !}
 s-strengthen-tm-0 (s-var-l x B≤C) = {!   !}
 s-strengthen-tm-0 (s-var-r x B≤C) = {!   !}
