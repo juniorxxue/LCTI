@@ -340,25 +340,8 @@ Some properties are waiting to be justified:
 Some properties are waiting to be justified:
 
 \begin{itemize}
-	\item The existential variables will never appear in the context position (right side of the subtyping)
-  (edits: this is obviously wrong, many cases need existential at the right side, but I have't found cases need ex in the left?)
 	\item If the context is a full type, then result type is a full type.
 	\item The property between input env and output env, such as, if input env is a $\Gamma$, the output should be the same $\Gamma$.
 \end{itemize}
-
-Some worries:
-
-\begin{itemize}
-	\item \texttt{S-Hole-Ex}, is one-open enough now, since two rules are now not complementary. 
-\end{itemize}
-
-\subsection{Environment Replacement}
-
-\begin{align*}
-[A/\hat{a}] ~(\Psi , \hat{a}) &= \Psi, \hat{a}:=A\\
-[A/\hat{a}]~(\Psi, \hat{b}) &= [A/\hat{a}]~\Psi , \hat{b}\\
-%[A/\hat{a}]~(\Psi, \hat{a}:=B) &= \Psi, \hat{a}:=A \quad when~ B \approx A\\
-%[A/\hat{a}]~(\Psi, \hat{b}:= B) &= [[\hat{b} := B] A/\hat{a}]~\Psi , \hat{b}:= B
-\end{align*}
 
 \end{document}
