@@ -20,7 +20,7 @@
 \newtheorem{lemma}{Lemma}
 
 
-\title{Contextual Typing (System F)}
+\title{Contextual Typing (Implicit System F)}
 \author{Xu Xue}
 
 \begin{document}
@@ -126,8 +126,8 @@
     
     \inferrule*[lab=S-$\forall$L-t]
     {\Gamma \vdash B \\
-     \Gamma, \hat{a} = B \vdash_{n}  A <: C \to D}
-    {\Gamma \vdash_{S_\tau~n} \forall a. ~A <: [B/\hat{a}]C \to [B/\hat{a}]D}    
+     \Gamma, \hat{a} = B \vdash_{n}  A <: C}
+    {\Gamma \vdash_{S_\tau~n} \forall a. ~A <: [B/\hat{a}]C }    
     
     \inferrule*[lab=S-var-l]
     {\hat{a} = B \in \Gamma \\ \Gamma \vdash_\infty B <: A}
