@@ -159,6 +159,14 @@ data _:=_∈_by_w/_ : Fin m' → Type m' → SEnv n m' → (m : ℕ) → More m 
   d0 : ∀ {Ψ : SEnv n m'} {k A}
     → k := A ∈ Ψ by m' w/ Z
 
+rebase : (i : Fin (m' + m)) → (toℕ i < m) → Fin m
+rebase {zero} {m} i p = i
+rebase {suc m'} {.(suc _)} #0 (s≤s p) = #0
+rebase {suc m'} {.(suc _)} (#S i) (s≤s p) = rebase i (<-trans p (s≤s m≤m))
+
+rebase' : (i : Fin m') → (m ≤ m') → (toℕ i < m) → Fin m
+rebase' i m≤m' i<m = {!!}
+
 -- the Γ is used only for making sure the result type is at m level
 -- inst Ψ by Γ [ A ]⟹ A'
 -- where Ψ is Γ , Ψ', and we apply solutions in Ψ' to A and then get A'
@@ -166,10 +174,10 @@ infix 4 inst_by_[_]⟹_
 data inst_by_[_]⟹_ : SEnv n m' → (m : ℕ) → Type m' → Type m → Set where
   inst-int : inst Ψ by m [ Int ]⟹ Int
   inst-var-in : ∀ {X}
-    → toℕ X ≤ m
-    → inst Ψ by m [ ‶ X ]⟹ ‶ X
+    → (p : toℕ X < m)
+    → inst Ψ by m [ ‶ X ]⟹ ‶ {!!}
   inst-var-out : ∀ {X A A'}
-    → toℕ X > m   -- m < k ≤ m'
+    → toℕ X ≥ m   -- m < k ≤ m'
     → X := A ∈ Ψ by m
     → inst Ψ by m [ A ]⟹ A'
     → inst Ψ by m [ ‶ X ]⟹ A'
@@ -178,17 +186,29 @@ data inst_by_[_]⟹_ : SEnv n m' → (m : ℕ) → Type m' → Type m → Set wh
     → inst Ψ by m [ B ]⟹ B'
     → inst Ψ by m [ A `→ B ]⟹ A' `→ B'
   inst-∀ : ∀ {A A'}
-    → inst (Ψ ,∙) by (suc m) [ A ]⟹ A'
+    → inst (Ψ ,∙) by (1 + m) [ A ]⟹ A'
     → inst Ψ by m [ `∀ A ]⟹ `∀ A'
 
-
-infix 4 inst'_[_]⟹_
-data inst'_[_]⟹_ : SEnv n (m' + m) → Type (m' + m) → Type m → Set where
+infix 4 inst_[_]⟹_
+data inst_[_]⟹_ : SEnv n m' → Type m' → Type m → Set where
   inst-int : ∀ {m' m} {Ψ : SEnv n (m' + m)}
-    → inst' Ψ [ Type (m' + m) ∋⦂ Int ]⟹ (Type m ∋⦂ Int)
+    → inst Ψ [ Type (m' + m) ∋⦂ Int ]⟹ (Type m ∋⦂ Int)
+  inst-var-in : ∀ {m' m} {Ψ : SEnv n (m' + m)} {X}
+    → (p : toℕ X < m)
+    → inst Ψ [ ‶ X ]⟹ ‶ rebase X p
+  inst-var-out : ∀ {m' m} {Ψ : SEnv n (m' + m)} {X : Fin (m' + m)} {A : Type (m' + m)} {A' : Type m}
+    → (p : toℕ X ≥ m)
+    → X := A ∈ Ψ -- I'm a bit worried about its correctness
+    → inst Ψ [ A ]⟹ A'
+    → inst Ψ [ ‶ X ]⟹ A'
+  inst-arr : ∀ {Ψ : SEnv n (m' + m)} {A B : Type (m' + m)} {A' B' : Type m}
+    → inst Ψ [ A ]⟹ A'
+    → inst Ψ [ B ]⟹ B'
+    → inst Ψ [ A `→ B ]⟹ A' `→ B'
+  inst-∀ : ∀ {Ψ : SEnv n (m' + m)} {A : Type (1 + (m' + m))} {A' : Type (1 + m)}
+    → inst (Ψ ,∙) [ A ]⟹ A'
+    → inst Ψ [ `∀ A ]⟹ `∀ A' 
   
-
-
 infix 4 [_/_]_⟹_
 data [_/_]_⟹_ : Type m → Fin m → SEnv n m → SEnv n m → Set where
 
@@ -267,12 +287,11 @@ data _⊢_⇒_⇒_ where
     → Γ , A ⊢ ↑Σ0 Σ ⇒ e ⇒ B
     → Γ ⊢ [ e₂ ]↝ Σ ⇒ ƛ e ⇒ A `→ B
 
-  ⊢sub : ∀ {Γ : Env n m} {Ψ : SEnv n m'} {g A B B' k}
+  ⊢sub : ∀ {Γ : Env n m} {Ψ : SEnv n (m' + m)} {g A B B'}
     → Γ ⊢ □ ⇒ g ⇒ A
     → NonEmpty Σ
+    → inst Ψ [ B ]⟹ B'
     → 𝕓 Γ ⊢ A ≤ Σ ⊣ Ψ ↪ B
-    → inst' Ψ [ Type (k + m) ∋⦂ B ]⟹ (Type m ∋⦂ B')
---    → inst Ψ by m [ B ]⟹ B'
     → Γ ⊢ Σ ⇒ g ⇒ B'
 
   -- design choices here,
@@ -367,7 +386,9 @@ idEnv = ∅ , `∀ (‶ #0 `→ ‶ #0)
 
 sub-id[Int]1 : ∀ {Γ : Env n m} → 𝕓 Γ ⊢ `∀ ‶ #0 `→ ‶ #0 ≤ ⟦ Int ⟧↝ [ lit 1 ]↝ □ ⊣ 𝕓 Γ ,= Int ↪ ‶ #0 `→ ‶ #0
 sub-id[Int]1 {Γ = Γ} = s-∀-t (s-term-c ⊢c-var=0 ⊢c-var=0
-                               (⊢sub ⊢lit ne-τ (s-ex-r= ⊢c-int (kΓ Z) s-int) {!!}) s-empty)
+                             (⊢sub {m' = 0} ⊢lit ne-τ (inst-var-in {m' = 0} (s≤s z≤n)) (s-ex-r= ⊢c-int (kΓ Z) s-int))
+                             s-empty)
+                              
 
 {-
 
