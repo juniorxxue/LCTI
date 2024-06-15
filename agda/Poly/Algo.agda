@@ -315,8 +315,8 @@ data _⊢_≤_⊣_↪_ where
     → Ψ ⊢ `∀ A ≤ ([ e ]↝ Σ) ⊣ Ψ' ↪ B
 
   s-∀l-eq : ∀ {A B C e}
-    → Ψ ,^ ⊢ A ≤ ↑tyΣ0 ([ e ]↝ Σ) ⊣ Ψ' ,= C ↪ ↑ty0 B
-    → Ψ ⊢ `∀ A ≤ ([ e ]↝ Σ) ⊣ Ψ' ↪ B
+    → Ψ ,^ ⊢ A ≤ ↑tyΣ0 ([ e ]↝ Σ) ⊣ Ψ' ,= C ↪ B
+    → Ψ ⊢ `∀ A ≤ ([ e ]↝ Σ) ⊣ Ψ' ↪ [ C ]ˢ B
 
   -- explicit type applicatoin
 {-
@@ -324,10 +324,9 @@ data _⊢_≤_⊣_↪_ where
     → Ψ ⊢ [ B ]ˢ A ≤ Σ ⊣ Ψ' ↪ C
     → Ψ ⊢ `∀ A ≤ (⟦ B ⟧↝ Σ) ⊣ Ψ' ↪ C
 -}
-  s-∀-t : ∀ {A B C C'}
+  s-∀-t : ∀ {A B C}
     → Ψ ,= B ⊢ A ≤ ↑tyΣ0 Σ ⊣ Ψ' ,= B ↪ C
-    → [ B ]ˢ C ≡ C' -- feel like this will be changed to a datatype later
-    → Ψ ⊢ `∀ A ≤ (⟦ B ⟧↝ Σ) ⊣ Ψ' ↪ C'
+    → Ψ ⊢ `∀ A ≤ (⟦ B ⟧↝ Σ) ⊣ Ψ' ↪ [ B ]ˢ C
 
 ----------------------------------------------------------------------
 --+                            Examples                            +--
