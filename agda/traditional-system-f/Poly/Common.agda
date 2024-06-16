@@ -138,15 +138,16 @@ infix 6 [_]ᵗ_
 ↓ty0 A = [ Int ]ˢ A
 
 -- solved existentials (k = A) is in Γ
-infix 3 _:=_∈'_
-data _:=_∈'_ : Fin m → Type m → Env n m → Set where
-  Z  : ∀ {A} → #0 := A ∈' Γ ,= ↓ty0 A
-  S∙ : ∀ {k} {A}
-    → k := ↓ty0 A ∈' Γ
-    → #S k := A ∈' Γ ,∙
+infix 3 _:=_∈_
+data _:=_∈_ : Fin m → Type m → Env n m → Set where
+
+  Z : ∀ {A} → #0 := A ∈ Γ ,= ↓ty0 A
+  S, : ∀ {k A B}
+    → k := A ∈ Γ
+    → k := A ∈ Γ , B
+  S∙ : ∀ {k A}
+    → k := ↓ty0 A ∈ Γ
+    → #S k := A ∈ Γ ,∙
   S= : ∀ {k A B}
-    → k := ↓ty0 A ∈' Γ
-    → #S k := A ∈' Γ ,= B
-  k, : ∀ {k A B}
-    → k := A ∈' Γ
-    → k := A ∈' Γ , B 
+    → k := ↓ty0 A ∈ Γ
+    → #S k := A ∈ Γ ,= B   

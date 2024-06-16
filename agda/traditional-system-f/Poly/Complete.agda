@@ -39,8 +39,8 @@ complete : ∀ {Γ : Env n m} {Σ j e A}
 
 complete-≤ : ∀ {Γ : Env n m} {Σ j A B}
   → Γ ⊢ j # B ≤ A
-  → Γ ⊢ ⟨ j , A ⟩ ~ Σ -- should be gen to consider existential vars
-  → Γ ⊢ B ≤ Σ ⊣ Γ ↪ A -- too strict
+  → Γ ⊢ ⟨ j , A ⟩ ~ Σ
+  → Γ ⊢ B ≤ Σ ⊣ Γ ↪ A
   
 complete-inf : ∀ {Γ : Env n m} {e A}
   → Γ ⊢ Z # e ⦂ A
@@ -62,8 +62,7 @@ complete (⊢var x) ~Z = ⊢var x
 complete (⊢ann ⊢e) ~Z = ⊢ann (complete-chk ⊢e)
 complete (⊢lam₁ ⊢e) ~∞ = ⊢lam₁ (complete-chk ⊢e)
 complete (⊢lam₂ ⊢e) (~S ⊢e' j~Σ) = ⊢lam₂ ⊢e' (complete ⊢e (~weaken0 j~Σ))
-complete (⊢app₁ ⊢e ⊢e₁) j~Σ = ⊢app (subsumption0 (complete-inf ⊢e) {!!}) -- more thinking needed
--- maybe some property like checking rule in previous system could be generlised
+complete (⊢app₁ ⊢e ⊢e₁) ~Z = ⊢app (subsumption0 (complete-inf ⊢e) (s-term-c (complete-chk ⊢e₁) s-empty))
 complete (⊢app₂ ⊢e ⊢e₁) j~Σ = ⊢app (complete ⊢e (~S (complete-inf ⊢e₁) j~Σ))
 complete (⊢sub ⊢e B≤A j≢Z) j~Σ = subsumption0 (complete-inf ⊢e) (complete-≤ B≤A j~Σ)
 complete (⊢tabs₁ ⊢e) ~Z = ⊢tabs₁ (complete-inf ⊢e)
@@ -73,8 +72,7 @@ complete-≤ s-refl ~Z = s-empty
 complete-≤ s-int ~∞ = s-int
 complete-≤ s-var ~∞ = s-var
 complete-≤ (s-arr₁ s s₁) ~∞ = s-arr (complete-≤-chk s) (complete-≤-chk s₁)
-complete-≤ (s-arr₂ s s₁) (~S ⊢e j~Σ) = {!!}
-complete-≤ (s-∀ s) ~∞ = s-∀ {!complete-≤-chk s!} -- a trouble
-complete-≤ (s-∀lτ s) (~Sτ j~Σ) = {!!}
-complete-≤ (s-var-l x s) ~∞ = s-ex-l= {!!} (complete-≤-chk s) -- ok
-complete-≤ (s-var-r x s) ~∞ = s-ex-r= {!!} (complete-≤-chk s) -- ok
+complete-≤ (s-∀ s) ~∞ = s-∀ (complete-≤-chk s)
+complete-≤ (s-∀lτ s) (~Sτ j~Σ) = {!!} -- problem
+complete-≤ (s-var-l x s) ~∞ = s-ex-l= x (complete-≤-chk s) -- ok
+complete-≤ (s-var-r x s) ~∞ = s-ex-r= x (complete-≤-chk s) -- ok
