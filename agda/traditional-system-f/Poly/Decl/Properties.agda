@@ -54,15 +54,6 @@ _/ˣ_ {suc n} (Γ , A) (#S k) = (Γ /ˣ k) , A
 ∈-weaken {Γ = Γ ,= A} {B = B} (S= ∈Γ) = S= (∈-weaken ∈Γ)
 ∈-weaken {m = suc m} {Γ ,= A} {X = #0} Z = Z
 
-∈'-weaken : ∀ {Γ : Env (1 + n) m} {k X B}
-  → X := B ∈' (Γ /ˣ k)
-  → X := B ∈' Γ
-∈'-weaken {n} {suc m} {Γ = Γ , A} {#0} ∈'Γ = k, ∈'Γ
-∈'-weaken {suc n} {suc m} {Γ = Γ , A} {#S k} (k, ∈'Γ) = k, (∈'-weaken ∈'Γ) 
-∈'-weaken {n} {.(1 + _)} {Γ = Γ ,∙} (S∙ ∈'Γ) = S∙ (∈'-weaken ∈'Γ)
-∈'-weaken {n} {.(1 + _)} {Γ = Γ ,= .(↓ty0 B)} {B = B} Z = Z
-∈'-weaken {n} {.(1 + _)} {Γ = Γ ,= A} {B = B} (S= ∈'Γ) = S= (∈'-weaken ∈'Γ)
-
 lookup-weaken : ∀ {Γ : Env (1 + n) m} {k x}
   → lookup (Γ /ˣ k) x ≡ lookup Γ (punchIn k x)
 lookup-weaken {Γ = Γ , A} {k = #0} {x = #0} = refl
@@ -86,7 +77,6 @@ s-weaken (s-refl) = s-refl
 s-weaken s-int = s-int
 s-weaken s-var = s-var
 s-weaken (s-arr₁ C≤A B≤D) = s-arr₁ (s-weaken C≤A) (s-weaken B≤D)
-s-weaken (s-arr₂ C≤A B≤D) = s-arr₂ (s-weaken C≤A) (s-weaken B≤D)
 s-weaken (s-∀ A≤B) = s-∀ (s-weaken A≤B)
 s-weaken (s-∀lτ A≤B) = s-∀lτ (s-weaken A≤B)
 s-weaken (s-var-l x A≤B) = s-var-l (∈-weaken x) (s-weaken A≤B)
@@ -100,7 +90,6 @@ s-strengthen-tm-0 (s-refl) = {! ap !}
 s-strengthen-tm-0 s-int = s-int
 s-strengthen-tm-0 s-var = s-var
 s-strengthen-tm-0 (s-arr₁ C≤A B≤D) = s-arr₁ (s-strengthen-tm-0 C≤A) (s-strengthen-tm-0 B≤D)
-s-strengthen-tm-0 (s-arr₂ B≤C B≤C₁) = {!   !}
 s-strengthen-tm-0 (s-∀ B≤C) = s-∀ {!   !} -- IH not generalizable enough 
 s-strengthen-tm-0 (s-∀lτ B≤C) = {!   !}
 s-strengthen-tm-0 (s-var-l x B≤C) = {!   !}

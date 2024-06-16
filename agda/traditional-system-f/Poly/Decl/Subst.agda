@@ -8,16 +8,6 @@ open import Poly.Decl.Properties
 --+                              Roll                              +--
 ----------------------------------------------------------------------
 
-data Apps : ℕ → ℕ → Set where
-  nil : Apps n m
-  _∷a_ : Term n m → Apps n m → Apps n m
-  _∷t_ : Type m → Apps n m → Apps n m
-
-data AppsType : ℕ → Set where
-  nil : AppsType m
-  _∷a_ : Type m → AppsType m → AppsType m
-  _∷t_ : Type m → AppsType m → AppsType m
-
 _▻_ : Term n m → Apps n m → Term n m
 e ▻ nil = e
 e ▻ (e' ∷a es) = (e · e') ▻ es

@@ -45,6 +45,12 @@ private
     Γ Γ' Γ₁ Γ₂ Γ₃ : Env n m
     Σ : Context n m
 
+data GenericConsumer : Term n m → Set where
+  gc-i : ∀ {i} → GenericConsumer (Term n m ∋⦂ lit i)
+  gc-var : ∀ {x} → GenericConsumer (Term n m ∋⦂ ` x)
+  gc-ann : ∀ {e : Term n m} {A} → GenericConsumer (e ⦂ A)
+  gc-tlam : ∀ {e : Term n (1 + m)} → GenericConsumer (Λ e)
+
 infix 3 _⊢_⇒_⇒_
 infix 3 _⊢_≤_⊣_↪_
 
@@ -80,8 +86,9 @@ data _⊢_⇒_⇒_ where
 
   ⊢sub : ∀ {g A B}
     → Γ ⊢ □ ⇒ g ⇒ A          --- Γ ⊢ Z # e : A
-    → NonEmpty Σ
-    → Γ ⊢ A ≤ Σ ⊣ Γ' ↪ B    --- Γ ⊢ j # A ≤ B
+    → (¬□ : NonEmpty Σ)
+    → (gc : GenericConsumer g)
+    → (s : Γ ⊢ A ≤ Σ ⊣ Γ' ↪ B)    --- Γ ⊢ j # A ≤ B
     → Γ ⊢ Σ ⇒ g ⇒ B          --- Γ ⊢ j # e ∶ B
 
   -- design choices here,
@@ -140,7 +147,7 @@ idEnv : Env 1 0
 idEnv = ∅ , `∀ (‶ #0 `→ ‶ #0)
 
 sub-id[Int]1 : ∀ {Γ : Env n m} → Γ ⊢ `∀ ‶ #0 `→ ‶ #0 ≤ ⟦ Int ⟧↝ [ lit 1 ]↝ □ ⊣ Γ ↪ Int `→ Int
-sub-id[Int]1 {Γ = Γ} = s-∀-t (s-term-c (⊢sub ⊢lit ne-τ (s-ex-r= Z s-int)) s-empty)
+sub-id[Int]1 {Γ = Γ} = s-∀-t (s-term-c (⊢sub ⊢lit ne-τ gc-i (s-ex-r= Z s-int)) s-empty)
 
 
 sub-id[Int] : ∀ {Γ : Env n m} → Γ ⊢ `∀ ‶ #0 `→ ‶ #0 ≤ ⟦ Int ⟧↝ □ ⊣ Γ ↪ Int `→ Int
@@ -149,13 +156,41 @@ sub-id[Int] = s-∀-t s-empty
 id[Int]1 : idEnv ⊢ □ ⇒ ((` #0) [ Int ]) · (lit 1) ⇒ Int
 id[Int]1 = ⊢app (⊢tapp (⊢sub (⊢var refl)
                              ne-tapp
+                             gc-var
                              sub-id[Int]1))
 idExp : Term 0 0
 idExp = Λ (((ƛ ` #0) ⦂ ‶ #0 `→ ‶ #0))
 
 idExp[Int]1 : ∅ ⊢ □ ⇒ (idExp [ Int ]) · (lit 1) ⇒ Int
 idExp[Int]1 = ⊢app (⊢tapp (⊢sub
-                            (⊢tabs₁ (⊢ann (⊢lam₁ (⊢sub (⊢var refl) ne-τ s-var)))) ne-tapp (sub-id[Int]1 {Γ = ∅})))
+                            (⊢tabs₁ (⊢ann (⊢lam₁ (⊢sub (⊢var refl) ne-τ gc-var s-var)))) ne-tapp gc-tlam (sub-id[Int]1 {Γ = ∅})))
 
 idExp[Int] : ∅ ⊢ □ ⇒ idExp [ Int ] ⇒ Int `→ Int
-idExp[Int] = ⊢tapp (⊢sub (⊢tabs₁ (⊢ann (⊢lam₁ (⊢sub (⊢var refl) ne-τ s-var)))) ne-tapp sub-id[Int])
+idExp[Int] = ⊢tapp (⊢sub (⊢tabs₁ (⊢ann (⊢lam₁ (⊢sub (⊢var refl) ne-τ gc-var s-var)))) ne-tapp gc-tlam sub-id[Int])
+
+
+----------------------------------------------------------------------
+--+                           Splitting                            +--
+----------------------------------------------------------------------
+
+infix 4 ⟦_,_⟧→⟦_,_,_,_⟧
+
+data ⟦_,_⟧→⟦_,_,_,_⟧ : Context n m → Type m → Apps n m → Context n m → AppsType m → Type m → Set where
+
+  none-□ : ∀ {A}
+    → ⟦ (Context n m ∋⦂ □) , A ⟧→⟦ nil , □ , nil , A ⟧
+
+  none-τ : ∀ {A B}
+    → ⟦ (Context n m ∋⦂ τ A) , B ⟧→⟦ nil , τ A , nil , B ⟧
+
+  have-e : ∀ {Σ : Context n m} {e A B es A' B' Bs}
+    → ⟦ Σ , B ⟧→⟦ es , A' , Bs , B' ⟧
+    → ⟦ ([ e ]↝ Σ) , A `→ B ⟧→⟦ e ∷a es , A' , A ∷a Bs , B' ⟧
+
+  have-t : ∀ {Σ : Context n m} {B A es A' B' Bs}
+    → ⟦ Σ , B ⟧→⟦ es , A' , Bs , B' ⟧
+    → ⟦ ⟦ A ⟧↝ Σ , B ⟧→⟦ A ∷t es , A' , Bs , B' ⟧
+
+
+
+

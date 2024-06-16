@@ -150,4 +150,18 @@ data _:=_∈_ : Fin m → Type m → Env n m → Set where
     → #S k := A ∈ Γ ,∙
   S= : ∀ {k A B}
     → k := ↓ty0 A ∈ Γ
-    → #S k := A ∈ Γ ,= B   
+    → #S k := A ∈ Γ ,= B
+
+----------------------------------------------------------------------
+--+                            Structs                             +--
+----------------------------------------------------------------------
+
+data Apps : ℕ → ℕ → Set where
+  nil : Apps n m
+  _∷a_ : Term n m → Apps n m → Apps n m
+  _∷t_ : Type m → Apps n m → Apps n m
+
+data AppsType : ℕ → Set where
+  nil : AppsType m
+  _∷a_ : Type m → AppsType m → AppsType m
+  _∷t_ : Type m → AppsType m → AppsType m

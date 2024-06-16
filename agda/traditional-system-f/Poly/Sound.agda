@@ -6,27 +6,7 @@ open import Poly.Decl.Subst
 open import Poly.Decl.Properties
 open import Poly.Algo
 
-----------------------------------------------------------------------
---+                             Split                              +--
-----------------------------------------------------------------------
 
-infix 4 ⟦_,_⟧→⟦_,_,_,_⟧
-
-data ⟦_,_⟧→⟦_,_,_,_⟧ : Context n m → Type m → Apps n m → Context n m → AppsType m → Type m → Set where
-
-  none-□ : ∀ {A}
-    → ⟦ (Context n m ∋⦂ □) , A ⟧→⟦ nil , □ , nil , A ⟧
-
-  none-τ : ∀ {A B}
-    → ⟦ (Context n m ∋⦂ τ A) , B ⟧→⟦ nil , τ A , nil , B ⟧
-
-  have-a : ∀ {Σ : Context n m} {e A B es A' B' Bs}
-    → ⟦ Σ , B ⟧→⟦ es , A' , Bs , B' ⟧
-    → ⟦ ([ e ]↝ Σ) , A `→ B ⟧→⟦ e ∷a es , A' , A ∷a Bs , B' ⟧
-
-  have-t : ∀ {Σ : Context n m} {B A es A' B' Bs}
-    → ⟦ Σ , B ⟧→⟦ es , A' , Bs , B' ⟧
-    → ⟦ ⟦ A ⟧↝ Σ , B ⟧→⟦ A ∷t es , A' , Bs , B' ⟧
 
 spl-weaken : ∀ {Σ Σ' : Context n m} {A e̅ A̅ A' k}
   → ⟦ Σ , A ⟧→⟦ e̅ , Σ' , A̅ , A' ⟧
