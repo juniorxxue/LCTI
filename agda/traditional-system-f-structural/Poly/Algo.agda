@@ -18,8 +18,7 @@ data Context : ℕ → ℕ → Set where
 data NonEmpty : Context n m → Set where
   ne-τ    : ∀ {A : Type m} → NonEmpty (Context n m ∋⦂ τ A)
   ne-app  : ∀ {e} {Σ : Context n m} → NonEmpty ([ e ]↝ Σ)
-  ne-tapp : ∀ {A} {Σ : Context n m} → NonEmpty (⟦ A ⟧↝ Σ)
-  
+  ne-tapp : ∀ {A} {Σ : Context n m} → NonEmpty (⟦ A ⟧↝ Σ)  
 
 ↑Σ : Fin (1 + n) → Context n m → Context (1 + n) m
 ↑Σ k □ = □
@@ -39,11 +38,26 @@ data NonEmpty : Context n m → Set where
 ↑tyΣ0 : Context n m → Context n (1 + m)
 ↑tyΣ0 = ↑tyΣ #0
 
+infix 3 ty-in-con_↑_⇨_
+data ty-in-con_↑_⇨_ : Context n m → Fin (1 + m) → Context n (1 + m) → Set where
+  ↑empty : ∀ {k}
+    → ty-in-con (Context n m ∋⦂ □) ↑ k ⇨ □
+  ↑type  : ∀ {k A A'}
+    → ty A ↑ k ⇨ A'
+    → ty-in-con (Context n m ∋⦂ τ A) ↑ k ⇨ τ A'
+  ↑term  : ∀ {Σ : Context n m} {k e e' Σ'}
+    → ty-in-tm e ↑ k ⇨ e'
+    → ty-in-con Σ ↑ k ⇨ Σ'
+    → ty-in-con [ e ]↝ Σ ↑ k ⇨ [ e' ]↝ Σ'
+  ↑tapp : ∀ {Σ : Context n m} {k A A' Σ'}
+    → ty A ↑ k ⇨ A'
+    → ty-in-con Σ ↑ k ⇨ Σ'
+    → ty-in-con ⟦ A ⟧↝ Σ ↑ k ⇨ ⟦ A' ⟧↝ Σ'
   
 private
   variable
     Γ Γ' Γ₁ Γ₂ Γ₃ : Env n m
-    Σ : Context n m
+    Σ Σ' : Context n m
 
 data GenericConsumer : Term n m → Set where
   gc-i : ∀ {i} → GenericConsumer (Term n m ∋⦂ lit i)
@@ -136,38 +150,11 @@ data _⊢_≤_⊣_↪_ where
     → Γ ,∙ ⊢ A ≤ τ B ⊣ Γ' ,∙ ↪ C
     → Γ ⊢ `∀ A ≤ τ (`∀ B) ⊣ Γ' ↪ `∀ C
     
-  s-∀-t : ∀ {A B C}
-    → Γ ,= B ⊢ A ≤ ↑tyΣ0 Σ ⊣ Γ' ,= B ↪ C
-    → Γ ⊢ `∀ A ≤ (⟦ B ⟧↝ Σ) ⊣ Γ' ↪ [ B ]ˢ C
-
-----------------------------------------------------------------------
---+                            Examples                            +--
-----------------------------------------------------------------------
-idEnv : Env 1 0
-idEnv = ∅ , `∀ (‶ #0 `→ ‶ #0)
-
-sub-id[Int]1 : ∀ {Γ : Env n m} → Γ ⊢ `∀ ‶ #0 `→ ‶ #0 ≤ ⟦ Int ⟧↝ [ lit 1 ]↝ □ ⊣ Γ ↪ Int `→ Int
-sub-id[Int]1 {Γ = Γ} = s-∀-t (s-term-c (⊢sub ⊢lit ne-τ gc-i (s-ex-r= Z s-int)) s-empty)
-
-
-sub-id[Int] : ∀ {Γ : Env n m} → Γ ⊢ `∀ ‶ #0 `→ ‶ #0 ≤ ⟦ Int ⟧↝ □ ⊣ Γ ↪ Int `→ Int
-sub-id[Int] = s-∀-t s-empty
-
-id[Int]1 : idEnv ⊢ □ ⇒ ((` #0) [ Int ]) · (lit 1) ⇒ Int
-id[Int]1 = ⊢app (⊢tapp (⊢sub (⊢var refl)
-                             ne-tapp
-                             gc-var
-                             sub-id[Int]1))
-idExp : Term 0 0
-idExp = Λ (((ƛ ` #0) ⦂ ‶ #0 `→ ‶ #0))
-
-idExp[Int]1 : ∅ ⊢ □ ⇒ (idExp [ Int ]) · (lit 1) ⇒ Int
-idExp[Int]1 = ⊢app (⊢tapp (⊢sub
-                            (⊢tabs₁ (⊢ann (⊢lam₁ (⊢sub (⊢var refl) ne-τ gc-var s-var)))) ne-tapp gc-tlam (sub-id[Int]1 {Γ = ∅})))
-
-idExp[Int] : ∅ ⊢ □ ⇒ idExp [ Int ] ⇒ Int `→ Int
-idExp[Int] = ⊢tapp (⊢sub (⊢tabs₁ (⊢ann (⊢lam₁ (⊢sub (⊢var refl) ne-τ gc-var s-var)))) ne-tapp gc-tlam sub-id[Int])
-
+  s-∀-t : ∀ {A B C C'}
+    → ty-in-con Σ ↑ #0 ⇨ Σ' -- a type shift of the context
+    → Γ ,= B ⊢ A ≤ Σ' ⊣ Γ' ,= B ↪ C
+    → [ B ]ˢ C ⇨ C'
+    → Γ ⊢ `∀ A ≤ (⟦ B ⟧↝ Σ) ⊣ Γ' ↪ C'
 
 ----------------------------------------------------------------------
 --+                           Splitting                            +--

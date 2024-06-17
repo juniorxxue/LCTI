@@ -29,12 +29,12 @@ spl-weaken-tm none-τ = none-τ
 spl-weaken-tm (have-e spl) = have-e (spl-weaken-tm spl)
 spl-weaken-tm (have-t spl) = have-t (spl-weaken-tm spl)
 
-spl-weaken-ty : ∀ {Σ Σ' : Context n m} {A es As A' n B}
-  → ⟦ Σ , [ B ]ˢ A ⟧→⟦ es , Σ' , As , A' ⟧
-  → ⟦ ↑tyΣ n Σ , A ⟧→⟦ ↑ty-apps n es , ↑tyΣ n Σ' , ↑ty-appstype n As , ↑ty n A' ⟧
-spl-weaken-ty {A = Int} none-□ = none-□
-spl-weaken-ty {A = Int} none-τ = none-τ
-spl-weaken-ty {A = Int} {B = B} (have-t spl) = have-t (spl-weaken-ty {B = B} spl)
+spl-weaken-ty : ∀ {Σ Σ' : Context n m} {Σ' T A es As A' n B}
+  → [ B ]ˢ A ⇨ A'
+  → ⟦ Σ , A' ⟧→⟦ es , τ T , As , A' ⟧
+  → ty-in-con Σ ↑ #0 ⇨ Σ'
+  → ⟦ Σ' , A ⟧→⟦ {!!} , τ {!!} , {!!} , {!!} ⟧
+spl-weaken = {!!}
 
 spl-weaken-ty {A = ‶ X} spl = {!!}
 spl-weaken-ty {A = A `→ A₁} spl = {!!}
@@ -78,8 +78,7 @@ postulate
 ≤id (s-arr s s₁) none-τ = refl
 ≤id (s-term-c x s) (have-e spl) = ≤id s spl
 ≤id (s-∀ s) none-τ rewrite ≤id-0 s = refl
-≤id (s-∀-t s) (have-t spl) with ≤id s (spl-weaken-ty spl)
-... | eq = ↑ty-eq eq
+≤id (s-∀-t sf s st) (have-t spl) = {!≤id s!}
 
 
 {-
@@ -101,5 +100,4 @@ s-closed (s-arr s s₁) rewrite s-closed s | s-closed s₁ = refl
 s-closed (s-term-c x s) = s-closed s
 s-closed (s-∀ s) with s-closed s
 ... | refl = refl
-s-closed (s-∀-t s) with s-closed s
-... | refl = refl
+s-closed (s-∀-t sf s st) = {!!}
