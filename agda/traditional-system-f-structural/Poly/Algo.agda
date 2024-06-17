@@ -142,7 +142,7 @@ data _⊢_≤_⊣_↪_ where
     → Γ₁ ⊢ A `→ B ≤ τ (C `→ D) ⊣ Γ₃ ↪ (C `→ D)
 
   s-term-c : ∀ {A B A' D e}
-    → Γ ⊢ τ A ⇒ e ⇒ A'
+    → (⊢e : Γ ⊢ τ A ⇒ e ⇒ A')
     → Γ ⊢ B ≤ Σ ⊣ Γ' ↪ D
     → Γ ⊢ (A `→ B) ≤ ([ e ]↝ Σ) ⊣ Γ' ↪ A `→ D
 
@@ -151,9 +151,9 @@ data _⊢_≤_⊣_↪_ where
     → Γ ⊢ `∀ A ≤ τ (`∀ B) ⊣ Γ' ↪ `∀ C
     
   s-∀-t : ∀ {A B C C'}
-    → ty-in-con Σ ↑ #0 ⇨ Σ' -- a type shift of the context
+    → (↑Σ : ty-in-con Σ ↑ #0 ⇨ Σ') -- a type shift of the context
     → Γ ,= B ⊢ A ≤ Σ' ⊣ Γ' ,= B ↪ C
-    → [ B ]ˢ C ⇨ C'
+    → (st : [ B ]ˢ C ⇨ C')
     → Γ ⊢ `∀ A ≤ (⟦ B ⟧↝ Σ) ⊣ Γ' ↪ C'
 
 ----------------------------------------------------------------------

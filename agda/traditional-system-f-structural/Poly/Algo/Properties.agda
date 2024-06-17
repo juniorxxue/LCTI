@@ -100,4 +100,5 @@ s-closed (s-arr s s₁) rewrite s-closed s | s-closed s₁ = refl
 s-closed (s-term-c x s) = s-closed s
 s-closed (s-∀ s) with s-closed s
 ... | refl = refl
-s-closed (s-∀-t sf s st) = {!!}
+s-closed (s-∀-t sf s st) with s-closed s
+... | refl = refl

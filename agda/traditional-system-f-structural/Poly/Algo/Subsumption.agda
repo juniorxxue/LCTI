@@ -44,14 +44,26 @@ subsumption0 ⊢e s = subsumption ⊢e none-□ ⊕nil s
 ⊢to≤ (⊢lam₁ ⊢e) = {!!}
 ⊢to≤ (⊢lam₂ ⊢e ⊢e₁) = {!!}
 ⊢to≤ (⊢sub ⊢e x x₁ x₂) = {!!}
-⊢to≤ (⊢tabs₁ ⊢e) = {!!}
-⊢to≤ (⊢tapp ⊢e) = {!!}
+⊢to≤ (⊢tabs₁ ⊢e) = s-empty
+⊢to≤ (⊢tapp ⊢e) with ⊢to≤ ⊢e
+... | s-∀-t ↑Σ₁ s st = {!!}
 
-subsumption {Σ = .□} ⊢lit spl chan s = {!!}
-subsumption {Σ = .□} (⊢var x∈Γ) spl chan s = {!!}
-subsumption {Σ = .□} (⊢ann ⊢e) spl chan s = {!!}
-subsumption {Σ = Σ} (⊢app ⊢e) spl chan s = {!!}
-subsumption {Σ = .([ _ ]↝ _)} (⊢lam₂ ⊢e ⊢e₁) spl chan s = {!!}
-subsumption {Σ = Σ} (⊢sub ⊢e x x₁ x₂) spl chan s = {!!}
-subsumption {Σ = .□} (⊢tabs₁ ⊢e) spl chan s = {!!}
-subsumption {Σ = Σ} (⊢tapp ⊢e) spl chan s = ⊢tapp {!!}
+-- the proof of subsumption follows the side-condition in subsumption rule
+-- first we case analysis on the empty/non-empty of the context
+-- second we case analysis on the generic consumer/non-generic consumer of the expression
+-- for non-empty gc cases: subsumption rule applies
+-- for others: induction hypothesis applies
+
+-- empty
+subsumption {Σ' = □} ⊢e none-□ ⊕nil s-empty = ⊢e
+-- non empty, will repeat the case three times
+subsumption {Σ' = τ _} ⊢lit none-□ ⊕nil s = ⊢sub ⊢lit ne-τ gc-i s
+subsumption {Σ' = τ _} (⊢var x∈Γ) none-□ ⊕nil s = ⊢sub (⊢var x∈Γ) ne-τ gc-var s
+subsumption {Σ' = τ _} (⊢ann ⊢e) none-□ ⊕nil s = ⊢sub (⊢ann ⊢e) ne-τ gc-ann s
+subsumption {Σ' = τ _} (⊢app ⊢e) none-□ ⊕nil s with ⊢to≤ ⊢e
+... | s-term-c ⊢e' s-empty = ⊢app (subsumption ⊢e (have-e none-□) (⊕cons-a ⊕nil) (s-term-c ⊢e' s))
+subsumption {Σ' = τ _} (⊢tabs₁ ⊢e) none-□ ⊕nil s = {!!}
+subsumption {Σ' = τ _} (⊢tapp ⊢e) none-□ ⊕nil s = {!!}
+
+subsumption {Σ' = [ _ ]↝ Σ'} ⊢e spl ch s = {!!}
+subsumption {Σ' = ⟦ _ ⟧↝ Σ'} ⊢e spl ch s = {!!}
