@@ -63,7 +63,9 @@ subsumption {Σ' = τ _} (⊢ann ⊢e) none-□ ⊕nil s = ⊢sub (⊢ann ⊢e) 
 subsumption {Σ' = τ _} (⊢app ⊢e) none-□ ⊕nil s with ⊢to≤ ⊢e
 ... | s-term-c ⊢e' s-empty = ⊢app (subsumption ⊢e (have-e none-□) (⊕cons-a ⊕nil) (s-term-c ⊢e' s))
 subsumption {Σ' = τ _} (⊢tabs₁ ⊢e) none-□ ⊕nil s = {!!}
-subsumption {Σ' = τ _} (⊢tapp ⊢e) none-□ ⊕nil s = {!!}
+subsumption {Σ' = τ _} (⊢tapp ⊢e) none-□ ⊕nil s with ⊢to≤ ⊢e
+... | s-∀-t ↑Σ₁ r st = {!!}
+
 
 subsumption {Σ' = [ _ ]↝ Σ'} ⊢e spl ch s = {!!}
 subsumption {Σ' = ⟦ _ ⟧↝ Σ'} ⊢e spl ch s = {!!}

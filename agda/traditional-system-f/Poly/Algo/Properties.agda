@@ -78,8 +78,7 @@ postulate
 ≤id (s-arr s s₁) none-τ = refl
 ≤id (s-term-c x s) (have-e spl) = ≤id s spl
 ≤id (s-∀ s) none-τ rewrite ≤id-0 s = refl
-≤id (s-∀-t s) (have-t spl) with ≤id s (spl-weaken-ty spl)
-... | eq = ↑ty-eq eq
+≤id (s-∀-t s) (have-t spl) = {!≤id s!}
 
 
 {-
