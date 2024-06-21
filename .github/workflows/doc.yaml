@@ -1,8 +1,10 @@
 name: Build LaTeX document
 on: 
-  push : 
+  push: 
     paths:
       ['drafts/**']
+  workflow_dispatch:
+    
 jobs:
   build_latex:
     runs-on: ubuntu-latest
