@@ -20,7 +20,7 @@
 \newtheorem{lemma}{Lemma}
 
 
-\title{Contextual Typing (Implicit System F)}
+\title{Contextual Typing (Exciplit System F)}
 \author{Xu Xue}
 
 \begin{document}
@@ -33,8 +33,8 @@
 
 \begin{align*}
 &\text{Types} \quad\quad &A, B, C, D ::=&~ a \mid \mathtt{Int} \mid A \rightarrow B \mid \forall a.~A\\
-&\text{Expressions} \quad \quad &e::=&~ i \mid x \mid \lambda x . ~e \mid e_1~e_2 \mid e : A \mid \Lambda a.~e \mid e[A]\\
-&\text{Environments} \quad\quad &\Gamma::=&~ . \mid \Gamma, x : A \mid \Gamma, a \mid \Gamma, \hat{a} = A\\
+&\text{Expressions} \quad \quad &e::=&~ i \mid x \mid \lambda x . ~e \mid e_1~e_2 \mid e : A \mid \Lambda a.~e \mid e ~@~ A\\
+&\text{Environments} \quad\quad &\Gamma::=&~ . \mid \Gamma, x : A \mid \Gamma, a\\
 &\text{Counters} \quad\quad &n ::=&~ 0 \mid \infty \mid S~n \mid S_{\tau}~n\\
 \end{align*}
 
@@ -43,7 +43,7 @@
 \begin{align*}
     &\text{Contexts} \quad\quad &\Sigma ::=&~ A \mid \square \mid \boxed{e} \leadsto \Sigma \mid \boxed{A} \leadsto \Sigma\\
     &\text{Generic Consumers} \quad \quad &g::=&~ i \mid x \mid e : A \mid \Lambda a.~e\\
-    &\text{Environments} \quad\quad &\Gamma ::=&~ . \mid \Gamma, x : A \mid \Gamma, a \mid \Gamma, \hat{a}= A\\
+    &\text{Environments} \quad\quad &\Gamma ::=&~ . \mid \Gamma, x : A \mid \Gamma, a \\
 \end{align*}
 
 
@@ -81,79 +81,47 @@
     \\
 
     \inferrule*[lab=Sub]
-    {\Gamma \vdash_0 e : B \\
-    \Gamma \vdash B <:_n A}
+    {\Gamma \vdash_0 e : A \\
+    \Gamma \vdash_n A}
     {\Gamma \vdash_n e : A}
 
     \inferrule*[lab=TAbs1]
     {\Gamma, a \vdash_0 e : A}
     {\Gamma \vdash_0 \Lambda a.~e : \forall a.~A}
     
+    \inferrule*[lab=TAbs2]
+    {\Gamma, a \vdash_{n\ominus} e : A}
+    {\Gamma \vdash_n \Lambda a.~e : \forall a .~ A}
+    
     \inferrule*[lab=TApp]
-    {\Gamma \vdash_{S_{\tau}~n} e : B}
-    {\Gamma \vdash_n e~[A] : B}
+    {\Gamma \vdash_{S_{\tau}~n} e : \forall a. ~B}
+    {\Gamma \vdash_n e~@~A : [B/a]A}
 \end{mathpar}
 
-\subsection{Subtyping}
+\begin{itemize}
+	\item $n-$ is defined over infty and $S~n$.
+	\item $n\ominus$ is defined over infty and $S_\tau~n$.
+\end{itemize}
+
+\subsection{Matching}
 
 \begin{mathpar}
-    \inferrule*[lab=S-Refl]
+    \inferrule*[lab=S-Empty]
     { }
-    {\Gamma \vdash_0 A <: A}
+    {\Gamma \vdash_0 A }
 
-    \inferrule*[lab=S-Int]
+    \inferrule*[lab=S-Infty]
     { }
-    {\Gamma \vdash_{\infty} \mathtt{Int} <: \mathtt{Int}}
+    {\Gamma \vdash_{\infty} A}
     
-    \inferrule*[lab=S-Var]
-    { }
-    {\Gamma \vdash_\infty a <: a}
-
     \inferrule*[lab=S-Arr]
-    {\Gamma \vdash_{\infty} C <: A \\
-     \Gamma \vdash_{n-} B <: D}
-    {\Gamma \vdash_n A \rightarrow B <:C \rightarrow D}
-
-    \inferrule*[lab=S-$\forall$]
-    {\Gamma , a \vdash_{\infty} A <: B}
-    {\Gamma \vdash_{\infty} \forall a.~A <: \forall a.~B}
-
-%
-%    \inferrule*[lab=S-$\forall$L]
-%    {\Gamma \vdash B \\
-%     \hat{a} \in FV(S~n, A) \\
-%     \Gamma, \hat{a} = B \vdash_{S~n}  A <: C \to D}
-%    {\Gamma \vdash_{S~n} \forall a. ~A <: [B/\hat{a}]C \to [B/\hat{a}]D}
+    {\Gamma \vdash_n B}
+    {\Gamma \vdash_{S~n} A \to B}
     
     \inferrule*[lab=S-$\forall$L-t]
-    {\Gamma \vdash B \\
-     \Gamma, \hat{a} = B \vdash_{n}  A <: C}
-    {\Gamma \vdash_{S_\tau~n} \forall a. ~A <: [B/\hat{a}]C }    
-    
-    \inferrule*[lab=S-var-l]
-    {\hat{a} = B \in \Gamma \\ \Gamma \vdash_\infty B <: A}
-    {\Gamma \vdash_\infty \hat{a} <: A}
-    
-     \inferrule*[lab=S-var-r]
-    {\hat{a} = B \in \Gamma \\ \Gamma \vdash_\infty A <: B}
-    {\Gamma \vdash_\infty A <: \hat{a}}
+    {\Gamma, a \vdash_{n}  A}
+    {\Gamma \vdash_{S_\tau~n} \forall a. ~A }    
 \end{mathpar}
-
-\paragraph{Properties}
-
-\begin{lemma}[Reflexivity under infinity counter]
-$\Gamma \vdash_\infty A <: A$.
-\end{lemma}
-
-\begin{lemma}[Solve is derivable]
-$\Gamma \vdash_\infty A <: \Gamma(A)$.
-\end{lemma}
-
-\begin{lemma}[Transitivity]
-If $\Gamma \vdash_{n_1} A <: B$	 and $\Gamma \vdash_{n_2} B <: C$, then $\Gamma \vdash_{n_1 + n_2} A <: C$.
-\end{lemma}
-
-A false lemma, but find the correct one later.
 
 \section{Algo.}
 
@@ -194,71 +162,38 @@ A false lemma, but find the correct one later.
 {\Gamma, a \vdash \square \Rightarrow e \Rightarrow A}
 {\Gamma \vdash \square \Rightarrow \Lambda a.~e \Rightarrow \forall a.~A}
 
-%\inferrule*[lab=T-TAbs2]
-%{\Gamma, a \vdash \Sigma  \Rightarrow e \Rightarrow B}
-%{\Gamma \vdash \boxed{A} \leadsto \Sigma \Rightarrow \Lambda a. ~e \Rightarrow [A/a]B}
+\inferrule*[lab=T-TAbs2]
+{\Gamma, a \vdash B \Rightarrow e \Rightarrow A}
+{\Gamma \vdash \forall a.~B \Rightarrow \Lambda a.~e \Rightarrow \forall a.~A}
+
+\inferrule*[lab=T-TAbs3]
+{\Gamma, a \vdash \Sigma \Rightarrow e \Rightarrow A}
+{\Gamma \vdash \boxed{B} \leadsto \Sigma \Rightarrow \Lambda a.~e \Rightarrow \forall a.~A}
 
 \inferrule*[lab=T-TApp]
-%{\Gamma \vdash H \Rightarrow e \Rightarrow \forall X.~B}
-{\Gamma \vdash \boxed{A} \leadsto \Sigma \Rightarrow e \Rightarrow B}
-{\Gamma \vdash  \Sigma \Rightarrow e[A] \Rightarrow B}
+{\Gamma \vdash \boxed{A} \leadsto \Sigma \Rightarrow e \Rightarrow \forall a.~B}
+{\Gamma \vdash  \Sigma \Rightarrow e ~@~ A \Rightarrow [A/a]B}
 
 \end{mathpar}
 
-People will expect the \texttt{TApp} and \texttt{App} has the same shape, while they are not. This is because the type abstraction can infer a type without any contextual information, what's why we treat it as a generic consumer and deals with the instantiation in the subtyping.
-
-Some properties are waiting to be justified:
-
-\begin{itemize}
-	\item If the context is a full type, then the inferred type is \emph{almost} the same, but will be finer (some parts will be instantiated)
-\end{itemize}
-
-\subsection{Subtyping: $\boxed{\Gamma \vdash A <: \Sigma \dashv \Gamma' \rightsquigarrow A'}$}
+\subsection{Matching: $\boxed{\Gamma \vdash A <: \Sigma}$}
 
 \begin{mathpar}
-\inferrule*[lab=S-Int]
-{ }
-{\Psi \vdash \mathtt{Int} <: \mathtt{Int} \dashv \Psi \rightsquigarrow \mathtt{Int}}
-
 \inferrule*[lab=S-Empty]
-{\Psi \vdash_{close} A}
-{\Psi \vdash A <: \square \dashv \Psi \rightsquigarrow A}
-
-\inferrule*[lab=S-Var]
 { }
-{\Psi \vdash a <: a \dashv \Psi \rightsquigarrow a}
+{\Gamma \vdash A <: \square}
 
-\inferrule*[lab=S-Ex-L-eq]
-{\hat{a} = B \in \Psi \\
-\Psi \vdash B <: A \dashv \Psi' \rightsquigarrow A'\\
-\Psi \vdash_{close} A}
-{\Psi \vdash \hat{a} <: A \dashv \Psi' \rightsquigarrow A'}
-
-\inferrule*[lab=S-Ex-R-eq]
-{\hat{a} = B \in \Psi \\
-\Psi \vdash A <: B \dashv \Psi' \rightsquigarrow A''\\
-\Psi \vdash_{close} A}
-{\Psi \vdash A <: \hat{a} \dashv \Psi' \rightsquigarrow A''}
+\inferrule*[lab=S-Refl]
+{ }
+{\Gamma \vdash A <: A}
 
 \inferrule*[lab=S-Arr]
-{\Psi \vdash C <: A \dashv \Psi_1 \rightsquigarrow A' \\
- \Psi_1 \vdash B <: D \dashv \Psi_2 \rightsquigarrow D'}
-{\Psi \vdash A \rightarrow B <: C \rightarrow D \dashv \Psi_2 \rightsquigarrow C \rightarrow D}
+{\Gamma \vdash B <: \Sigma}
+{\Gamma \vdash A \to B <: \boxed{e} \leadsto \Sigma}
 
 \inferrule*[lab=S-$\forall$]
-{\Psi, a \vdash A <: B \dashv \Psi', a\rightsquigarrow C}
-{\Psi \vdash \forall a.~A <: \forall a.~B \dashv \Psi' \rightsquigarrow \forall a. C}
-
-\inferrule*[lab=S-$\forall$-TApp]
-{\Psi , \hat{a} = B \vdash A <: \Sigma \dashv \Psi', \hat{a}= B \rightsquigarrow C}
-{\Psi \vdash \forall a. A <: \boxed{B} \leadsto \Sigma \dashv \Psi' \rightsquigarrow [B/\hat{a}]C }
+{\Gamma \vdash [A/a] B <: \Sigma}
+{\Gamma \vdash \forall a.~B <: \boxed{A} \leadsto \Sigma}
 \end{mathpar}
-
-Some properties are waiting to be justified:
-
-\begin{itemize}
-	\item If the context is a full type, then result type is a full type.
-	\item The property between input env and output env, such as, if input env is a $\Gamma$, the output should be the same $\Gamma$.
-\end{itemize}
 
 \end{document}
