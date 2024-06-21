@@ -78,7 +78,7 @@ data _⊢_⇒_⇒_ where
     → Γ ⊢ □ ⇒ lit i ⇒ Int
 
   ⊢var : ∀ {x A}
-    → (x∈Γ : lookup Γ x ≡ A)
+    → (x∈Γ : Γ ∋ x ⦂ A)
     → Γ ⊢ □ ⇒ ` x ⇒ A
 
   ⊢ann : ∀ {e A B}
@@ -134,7 +134,8 @@ data _⊢_≤_ where
     → Γ ⊢ τ A ⇒ e ⇒ C
     → Γ ⊢ A `→ B ≤ [ e ]↝ Σ
   s-∀ : ∀ {A B}
-    → Γ ⊢ [ A ]ˢ B ≤ Σ
+    → ty-in-con Σ ↑ #0 ⇨ Σ'
+    → Γ ,∙ ⊢ B ≤ Σ'
     → Γ ⊢ `∀ B ≤ ⟦ A ⟧↝ Σ
 
 

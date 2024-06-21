@@ -24,7 +24,7 @@ data _⊢m_#_ : Env n m → Counter → Type m → Set where
   s-inf : ∀ {A}
     → Γ ⊢m ∞ # A
   s-arr : ∀ {A B j}
-    → Γ , A ⊢m j # B
+    → Γ ⊢m j # B
     → Γ ⊢m S j # A `→ B
   s-∀ : ∀ {A j}
     → Γ ,∙ ⊢m j # A
@@ -53,8 +53,8 @@ data _⊢_#_⦂_ : Env n m → Counter → Term n m → Type m → Set where
     → Γ ⊢ S j # e₁ ⦂ A `→ B
     → Γ ⊢ Z # e₂ ⦂ A
     → Γ ⊢ j # e₁ · e₂ ⦂ B
-  ⊢sub : ∀ {e j A B}
-    → Γ ⊢ Z # e ⦂ B
+  ⊢sub : ∀ {e j A}
+    → Γ ⊢ Z # e ⦂ A
     → Γ ⊢m j # A
     → (j≢Z : NonZ j)
     → Γ ⊢ j # e ⦂ A
@@ -69,5 +69,5 @@ data _⊢_#_⦂_ : Env n m → Counter → Term n m → Type m → Set where
     → Γ ⊢ Sτ j # Λ e ⦂ `∀ A
   ⊢tapp : ∀ {e j A B B'}
     → Γ ⊢ Sτ j # e ⦂ `∀ B
-    → [ A ]ˢ B ⇨ B'
+    → (st : [ A ]ˢ B ⇨ B')
     → Γ ⊢ j # e [ A ] ⦂ B'
