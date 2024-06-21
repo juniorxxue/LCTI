@@ -1,5 +1,8 @@
 name: Build LaTeX document
-on: [push]
+on: 
+  push : 
+    paths:
+      ['drafts/**']
 jobs:
   build_latex:
     runs-on: ubuntu-latest
@@ -9,7 +12,8 @@ jobs:
       - name: Compile LaTeX document
         uses: xu-cheng/latex-action@v3
         with:
-          root_file: ./drafts/subst-based-traditional-system-f/worklist/main.tex
+          working_directory: ./drafts/subst-based-traditional-system-f/worklist
+          root_file: main.tex
       - name: Upload PDF file
         uses: actions/upload-artifact@v4
         with:
