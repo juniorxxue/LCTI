@@ -22,10 +22,10 @@ data _⊢_~_ where
     → Γ ⊢ ⟨ j , B ⟩ ~ Σ
     → Γ ⊢ ⟨ S j , A `→ B ⟩ ~ ([ e ]↝ Σ)
 
-  ~Sτ : ∀ {Γ : Env n m} {j A B Σ} {B' : Type (1 + m)}
-    → Γ ⊢ ⟨ j , `∀ B' ⟩ ~ Σ
-    → [ A ]ˢ B' ⇨ B
-    → Γ ⊢ ⟨ Sτ j , B ⟩ ~ (⟦ A ⟧↝ Σ) -- this A shouldn't be arbitrary, something missing here
+  ~Sτ : ∀ {Γ : Env n m} {j A Σ Σ'} {B : Type (1 + m)}
+    → ty-in-con Σ ↑ #0 ⇨ Σ'
+    → Γ ,∙ ⊢ ⟨ j , B ⟩ ~ Σ'
+    → Γ ⊢ ⟨ Sτ j , `∀ B ⟩ ~ (⟦ A ⟧↝ Σ)
 
 
 postulate
@@ -38,10 +38,10 @@ complete : ∀ {Γ : Env n m} {Σ j e A}
   → Γ ⊢ ⟨ j , A ⟩ ~ Σ
   → Γ ⊢ Σ ⇒ e ⇒ A
 
-complete-≤ : ∀ {Γ : Env n m} {Σ j A B}
-  → Γ ⊢ j # B ≤ A
+complete-≤ : ∀ {Γ : Env n m} {Σ j A}
+  → Γ ⊢m j # A
   → Γ ⊢ ⟨ j , A ⟩ ~ Σ
-  → Γ ⊢ B ≤ Σ ⊣ Γ ↪ A
+  → Γ ⊢ A ≤ Σ
   
 complete-inf : ∀ {Γ : Env n m} {e A}
   → Γ ⊢ Z # e ⦂ A
@@ -52,29 +52,3 @@ complete-chk : ∀ {Γ : Env n m} {e A}
   → Γ ⊢ ∞ # e ⦂ A
   → Γ ⊢ τ A ⇒ e ⇒ A
 complete-chk ⊢e = complete ⊢e ~∞
-
-complete-≤-chk : ∀ {Γ : Env n m} {A B}
-  → Γ ⊢ ∞ # B ≤ A
-  → Γ ⊢ B ≤ τ A ⊣ Γ ↪ A
-complete-≤-chk B≤A = complete-≤ B≤A ~∞  
-
-complete ⊢lit ~Z = ⊢lit
-complete (⊢var x) ~Z = ⊢var x
-complete (⊢ann ⊢e) ~Z = ⊢ann (complete-chk ⊢e)
-complete (⊢lam₁ ⊢e) ~∞ = ⊢lam₁ (complete-chk ⊢e)
-complete (⊢lam₂ ⊢e) (~S ⊢e' j~Σ) = ⊢lam₂ ⊢e' (complete ⊢e (~weaken0 j~Σ))
-complete (⊢app₁ ⊢e ⊢e₁) ~Z = {!!}
--- ⊢app (subsumption0 (complete-inf ⊢e) (s-term-c (complete-chk ⊢e₁) s-empty))
-complete (⊢app₂ ⊢e ⊢e₁) j~Σ = ⊢app (complete ⊢e (~S (complete-inf ⊢e₁) j~Σ))
-complete (⊢sub ⊢e B≤A j≢Z) j~Σ = {!!} -- subsumption0 (complete-inf ⊢e) (complete-≤ B≤A j~Σ)
-complete (⊢tabs₁ ⊢e) ~Z = ⊢tabs₁ (complete-inf ⊢e)
-complete (⊢tapp ⊢e) j~Σ = ⊢tapp (complete ⊢e {!!})
-
-complete-≤ s-refl ~Z = s-empty
-complete-≤ s-int ~∞ = s-int
-complete-≤ s-var ~∞ = s-var
-complete-≤ (s-arr₁ s s₁) ~∞ = s-arr (complete-≤-chk s) (complete-≤-chk s₁)
-complete-≤ (s-∀ s) ~∞ = s-∀ (complete-≤-chk s)
-complete-≤ (s-∀lτ s st) (~Sτ j~Σ x) = s-∀-t {!!} {!!} {!!}
-complete-≤ (s-var-l x s) ~∞ = s-ex-l= x (complete-≤-chk s) -- ok
-complete-≤ (s-var-r x s) ~∞ = s-ex-r= x (complete-≤-chk s) -- ok

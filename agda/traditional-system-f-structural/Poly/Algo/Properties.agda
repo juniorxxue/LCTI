@@ -45,60 +45,18 @@ spl-weaken-ty {A = `∀ A} spl = {!!}
   → ⟦ Σ , A ⟧→⟦ es , τ T , As , A' ⟧
   → T ≡ A'
 
-≤id : ∀ {Γ Γ' : Env n m} {Σ A B Bs B' es T}
-  → Γ ⊢ A ≤ Σ ⊣ Γ' ↪ B
-  → ⟦ Σ , B ⟧→⟦ es , τ T , Bs , B' ⟧
-  → T ≡ B'
-
 ⊢id-0 : ∀ {Γ : Env n m} {e A B}
   → Γ ⊢ τ B ⇒ e ⇒ A
   → A ≡ B
 ⊢id-0 ⊢e = sym (⊢id ⊢e none-τ)
 
-≤id-0 : ∀ {Γ Γ' : Env n m} {A B C}
-  → Γ ⊢ A ≤ τ B ⊣ Γ' ↪ C
-  → C ≡ B
-≤id-0 A≤B = sym (≤id A≤B none-τ)
-
 ⊢id (⊢app ⊢e) spl = ⊢id ⊢e (have-e spl)
 ⊢id (⊢lam₁ ⊢e) none-τ rewrite ⊢id-0 ⊢e = refl
 ⊢id (⊢lam₂ ⊢e ⊢e₁) (have-e spl) = ⊢id ⊢e₁ (spl-weaken-tm spl)
-⊢id (⊢sub ⊢e ¬□ gc s) spl = ≤id s spl
+⊢id (⊢sub ⊢e ¬□ gc s) spl = {!!}
 ⊢id (⊢tapp ⊢e) spl = ⊢id ⊢e (have-t spl)
 
 postulate
   ↑ty-eq : ∀ {A : Type m} {B k}
     → ↑ty k A ≡ ↑ty k B
     → A ≡ B
-
-≤id s-int none-τ = refl
-≤id s-var none-τ = refl
-≤id (s-ex-l= x s) none-τ = sym (≤id-0 s)
-≤id (s-ex-r= x s) none-τ = refl
-≤id (s-arr s s₁) none-τ = refl
-≤id (s-term-c x s) (have-e spl) = ≤id s spl
-≤id (s-∀ s) none-τ rewrite ≤id-0 s = refl
-≤id (s-∀-t sf s st) (have-t spl) = {!≤id s!}
-
-
-{-
-↑ty-eq {A = Int} {B = Int} refl = refl
-↑ty-eq {A = ‶ X} {B = ‶ X₁} eq = {!!}
-↑ty-eq {A = A `→ A₁} {B = B `→ B₁} eq = {!!}
-↑ty-eq {A = `∀ A} {B = `∀ B} eq = {!!}
--}
-  
-s-closed : ∀ {Γ Γ' : Env n m} {A B Σ}
-  → Γ ⊢ A ≤ Σ ⊣ Γ' ↪ B
-  → Γ ≡ Γ'
-s-closed s-int = refl
-s-closed s-empty = refl
-s-closed s-var = refl
-s-closed (s-ex-l= x s) = s-closed s
-s-closed (s-ex-r= x s) = s-closed s
-s-closed (s-arr s s₁) rewrite s-closed s | s-closed s₁ = refl
-s-closed (s-term-c x s) = s-closed s
-s-closed (s-∀ s) with s-closed s
-... | refl = refl
-s-closed (s-∀-t sf s st) with s-closed s
-... | refl = refl

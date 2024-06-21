@@ -16,12 +16,6 @@ _↑ᵉ[_]_ : ∀ (Γ : Env n m) → Type m -> (k : Fin (1 + n)) → Env (1 + n)
 -}
 
 
-⊢sub' : ∀ {Γ : Env n m} {e A B j}
-  → Γ ⊢ Z # e ⦂ B
-  → Γ ⊢ j # B ≤ A
-  → Γ ⊢ j # e ⦂ A -- which no longer holds for zed case
-⊢sub' = {!   !}
-
 -- the needed lemmas
 -- will do later
 postulate
@@ -69,44 +63,20 @@ lookup-weaken {Γ = Γ , A} {k = #S k} {x = #S x} = lookup-weaken {Γ = Γ} {k =
 lookup-weaken {Γ = Γ ,∙} {k = #S k} {x = #S x} = cong ↑ty0 (lookup-weaken {Γ = Γ})
 lookup-weaken {Γ = Γ ,= A} {k = #S k} {x = #S x} = cong ↑ty0 (lookup-weaken {Γ = Γ})
 
-
-s-weaken : ∀ {Γ : Env (1 + n) m} {k j A B }
-  → Γ /ˣ k ⊢ j # A ≤ B
-  → Γ ⊢ j # A ≤ B
-s-weaken (s-refl) = s-refl
-s-weaken s-int = s-int
-s-weaken s-var = s-var
-s-weaken (s-arr₁ C≤A B≤D) = s-arr₁ (s-weaken C≤A) (s-weaken B≤D)
-s-weaken (s-∀ A≤B) = s-∀ (s-weaken A≤B)
-s-weaken (s-∀lτ A≤B) = s-∀lτ (s-weaken A≤B)
-s-weaken (s-var-l x A≤B) = s-var-l (∈-weaken x) (s-weaken A≤B)
-s-weaken (s-var-r x A≤B) = s-var-r (∈-weaken x) (s-weaken A≤B)
-
-
-s-strengthen-tm-0 : ∀ {Γ : Env n m} {A B C j}
-  → Γ , A ⊢ j # B ≤ C
-  → Γ ⊢ j # B ≤ C
-s-strengthen-tm-0 (s-refl) = {! ap !}
-s-strengthen-tm-0 s-int = s-int
-s-strengthen-tm-0 s-var = s-var
-s-strengthen-tm-0 (s-arr₁ C≤A B≤D) = s-arr₁ (s-strengthen-tm-0 C≤A) (s-strengthen-tm-0 B≤D)
-s-strengthen-tm-0 (s-∀ B≤C) = s-∀ {!   !} -- IH not generalizable enough 
-s-strengthen-tm-0 (s-∀lτ B≤C) = {!   !}
-s-strengthen-tm-0 (s-var-l x B≤C) = {!   !}
-s-strengthen-tm-0 (s-var-r x B≤C) = {!   !}
-
 weaken : ∀ {Γ : Env (1 + n) m} {k j e A}
   → Γ /ˣ k ⊢ j # e ⦂ A
   → Γ ⊢ j # ↑tm k e ⦂ A
 weaken ⊢lit = ⊢lit
-weaken {Γ = Γ} {k = k} (⊢var {x = x} refl) = ⊢var (sym (lookup-weaken {Γ = Γ}))
+weaken {Γ = Γ} {k = k} (⊢var {x = x} x∈Γ) = ⊢var {!!}
 weaken (⊢ann e⇔A) = ⊢ann (weaken e⇔A)
 weaken (⊢lam₁ e⇔A) = ⊢lam₁ (weaken e⇔A)
 weaken (⊢lam₂ e⇔A) = ⊢lam₂ (weaken e⇔A)
 weaken (⊢app₁ e₁⇔A e₂⇔A) = ⊢app₁ (weaken e₁⇔A) (weaken e₂⇔A)
 weaken (⊢app₂ e₁⇔A e₂⇔A) = ⊢app₂ (weaken e₁⇔A) (weaken e₂⇔A)
-weaken (⊢sub e⇔A B≤A j≢Z) = ⊢sub (weaken e⇔A) (s-weaken B≤A)  j≢Z
+weaken (⊢sub e⇔A B≤A j≢Z) = ⊢sub (weaken e⇔A) {!!}  j≢Z
 weaken (⊢tabs₁ e⇔A) = ⊢tabs₁ (weaken e⇔A)
+weaken (⊢tabs₂ e⇔A) = ⊢tabs₂ (weaken e⇔A)
+weaken (⊢tabs₃ e⇔A) = ⊢tabs₃ (weaken e⇔A)
 weaken (⊢tapp e⇔A) = ⊢tapp (weaken e⇔A)
 
 weaken-0 : ∀ {Γ : Env (1 + n) m} {j e A}

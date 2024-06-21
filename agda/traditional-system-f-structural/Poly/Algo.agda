@@ -66,11 +66,11 @@ data GenericConsumer : Term n m → Set where
   gc-tlam : ∀ {e : Term n (1 + m)} → GenericConsumer (Λ e)
 
 infix 3 _⊢_⇒_⇒_
-infix 3 _⊢_≤_⊣_↪_
+infix 3 _⊢_≤_
 
 data _⊢_⇒_⇒_ : Env n m → Context n m → Term n m → Type m → Set
 -- we cannot syntactically distinguish the result type here, which should contain unsolved variables
-data _⊢_≤_⊣_↪_ : Env n m → Type m → Context n m → Env n m → Type m → Set
+data _⊢_≤_ : Env n m → Type m → Context n m → Set
 
 data _⊢_⇒_⇒_ where
 
@@ -97,64 +97,46 @@ data _⊢_⇒_⇒_ where
     → Γ ⊢ □ ⇒ e₂ ⇒ A
     → Γ , A ⊢ ↑Σ0 Σ ⇒ e ⇒ B
     → Γ ⊢ [ e₂ ]↝ Σ ⇒ ƛ e ⇒ A `→ B
-
-  ⊢sub : ∀ {g A B}
+    
+  ⊢sub : ∀ {g A}
     → Γ ⊢ □ ⇒ g ⇒ A          --- Γ ⊢ Z # e : A
     → (¬□ : NonEmpty Σ)
     → (gc : GenericConsumer g)
-    → (s : Γ ⊢ A ≤ Σ ⊣ Γ' ↪ B)    --- Γ ⊢ j # A ≤ B
-    → Γ ⊢ Σ ⇒ g ⇒ B          --- Γ ⊢ j # e ∶ B
+    → (s : Γ ⊢ A ≤ Σ)    --- Γ ⊢ j # A ≤ B
+    → Γ ⊢ Σ ⇒ g ⇒ A         --- Γ ⊢ j # e ∶ B
 
-  -- design choices here,
-  -- (1) we maybe need a checking for tabs
-  -- (2) we need a context (must have, if we intend to be consistent)
   ⊢tabs₁ : ∀ {e A}
     → Γ ,∙ ⊢ □ ⇒ e ⇒ A
     → Γ ⊢ □ ⇒ Λ e ⇒ `∀ A
 
-  ⊢tapp : ∀ {e A B}
-    → Γ ⊢ ⟦ A ⟧↝ Σ ⇒ e ⇒ B
-    → Γ ⊢ Σ ⇒ e [ A ] ⇒ B
+  ⊢tabs₂ : ∀ {A B e}
+    → Γ ,∙ ⊢ τ B ⇒ e ⇒ A
+    → Γ ⊢ τ (`∀ B) ⇒ Λ e ⇒ `∀ A
+
+  ⊢tabs₃ : ∀ {A B e}
+    → ty-in-con Σ ↑ #0 ⇨ Σ'
+    → Γ ,∙ ⊢ Σ' ⇒ e ⇒ A -- a bit concern
+    → Γ ⊢ ⟦ B ⟧↝ Σ ⇒ Λ e ⇒ `∀ A
+
+  ⊢tapp : ∀ {e A B B'}
+    → Γ ⊢ ⟦ A ⟧↝ Σ ⇒ e ⇒ `∀ B
+    → [ A ]ˢ B ⇨ B'
+    → Γ ⊢ Σ ⇒ e [ A ] ⇒ B'
   
-data _⊢_≤_⊣_↪_ where
-  s-int :
-      Γ ⊢ Int ≤ τ Int ⊣ Γ ↪ Int
+data _⊢_≤_ where
 
   s-empty : ∀ {A}
-    → Γ ⊢ A ≤ □ ⊣ Γ ↪ A
+    → Γ ⊢ A ≤ □
+  s-refl : ∀ {A}
+    → Γ ⊢ A ≤ τ A
+  s-arr : ∀ {e A B C}
+    → Γ ⊢ B ≤ Σ
+    → Γ ⊢ τ A ⇒ e ⇒ C
+    → Γ ⊢ A `→ B ≤ [ e ]↝ Σ
+  s-∀ : ∀ {A B}
+    → Γ ⊢ [ A ]ˢ B ≤ Σ
+    → Γ ⊢ `∀ B ≤ ⟦ A ⟧↝ Σ
 
-  s-var : ∀ {X}
-    → Γ ⊢ ‶ X ≤ τ (‶ X) ⊣ Γ ↪ ‶ X
-
-  s-ex-l= : ∀ {A A' B X}
-    → X := B ∈ Γ
-    → Γ ⊢ B ≤ τ A ⊣ Γ' ↪ A'
-    → Γ ⊢ ‶ X ≤ τ A ⊣ Γ' ↪ A'
-
-  s-ex-r= : ∀ {A A' B X}
-    → X := B ∈ Γ
-    → Γ ⊢ A ≤ τ B ⊣ Γ' ↪ A'
-    → Γ ⊢ A ≤ τ (‶ X) ⊣ Γ' ↪ (‶ X)
-
-  s-arr : ∀ {A B C D A' D'}
-    → Γ₁ ⊢ C ≤ τ A ⊣ Γ₂ ↪ A'
-    → Γ₂ ⊢ B ≤ τ D ⊣ Γ₃ ↪ D'
-    → Γ₁ ⊢ A `→ B ≤ τ (C `→ D) ⊣ Γ₃ ↪ (C `→ D)
-
-  s-term-c : ∀ {A B A' D e}
-    → (⊢e : Γ ⊢ τ A ⇒ e ⇒ A')
-    → Γ ⊢ B ≤ Σ ⊣ Γ' ↪ D
-    → Γ ⊢ (A `→ B) ≤ ([ e ]↝ Σ) ⊣ Γ' ↪ A `→ D
-
-  s-∀ : ∀ {A B C}
-    → Γ ,∙ ⊢ A ≤ τ B ⊣ Γ' ,∙ ↪ C
-    → Γ ⊢ `∀ A ≤ τ (`∀ B) ⊣ Γ' ↪ `∀ C
-    
-  s-∀-t : ∀ {A B C C'}
-    → (↑Σ : ty-in-con Σ ↑ #0 ⇨ Σ') -- a type shift of the context
-    → Γ ,= B ⊢ A ≤ Σ' ⊣ Γ' ,= B ↪ C
-    → (st : [ B ]ˢ C ⇨ C')
-    → Γ ⊢ `∀ A ≤ (⟦ B ⟧↝ Σ) ⊣ Γ' ↪ C'
 
 ----------------------------------------------------------------------
 --+                           Splitting                            +--

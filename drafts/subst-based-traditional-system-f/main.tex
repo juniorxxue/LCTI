@@ -82,7 +82,8 @@
 
     \inferrule*[lab=Sub]
     {\Gamma \vdash_0 e : A \\
-    \Gamma \vdash_n A}
+    \Gamma \vdash_n A \\
+    n \neq 0}
     {\Gamma \vdash_n e : A}
 
     \inferrule*[lab=TAbs1]
@@ -95,7 +96,7 @@
     
     \inferrule*[lab=TApp]
     {\Gamma \vdash_{S_{\tau}~n} e : \forall a. ~B}
-    {\Gamma \vdash_n e~@~A : [B/a]A}
+    {\Gamma \vdash_n e~@~A : [A/a]B}
 \end{mathpar}
 
 \begin{itemize}
@@ -155,7 +156,8 @@
 
 \inferrule*[lab=T-Sub]
 {\Gamma \vdash \square \Rightarrow g \Rightarrow A \\
- \Gamma \vdash A <: \Sigma \dashv \Gamma' \rightsquigarrow B}
+ \Gamma \vdash A <: \Sigma \dashv \Gamma' \rightsquigarrow B \\
+ \Sigma \neq \square}
 {\Gamma \vdash \Sigma \Rightarrow g \Rightarrow B}
 
 \inferrule*[lab=T-TAbs1]
@@ -188,7 +190,8 @@
 {\Gamma \vdash A <: A}
 
 \inferrule*[lab=S-Arr]
-{\Gamma \vdash B <: \Sigma}
+{\Gamma \vdash A \Rightarrow e \Rightarrow C\\
+\Gamma \vdash B <: \Sigma}
 {\Gamma \vdash A \to B <: \boxed{e} \leadsto \Sigma}
 
 \inferrule*[lab=S-$\forall$]
