@@ -14,10 +14,10 @@ jobs:
       - name: Compile LaTeX document
         uses: xu-cheng/latex-action@v3
         with:
-          working_directory: ./drafts/subst-based-traditional-system-f/worklist
+          working_directory: ./drafts/subst-based-traditional-system-f
           root_file: main.tex
       - name: Upload PDF file
         uses: actions/upload-artifact@v4
         with:
           name: PDF
-          path: ./drafts/subst-based-traditional-system-f/worklist/main.pdf
+          path: ./drafts/subst-based-traditional-system-f/main.pdf
