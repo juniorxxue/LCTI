@@ -77,7 +77,7 @@ weaken (⊢sub e⇔A B≤A j≢Z) = ⊢sub (weaken e⇔A) {!!}  j≢Z
 weaken (⊢tabs₁ e⇔A) = ⊢tabs₁ (weaken e⇔A)
 weaken (⊢tabs₂ e⇔A) = ⊢tabs₂ (weaken e⇔A)
 weaken (⊢tabs₃ e⇔A) = ⊢tabs₃ (weaken e⇔A)
-weaken (⊢tapp e⇔A) = ⊢tapp (weaken e⇔A)
+weaken (⊢tapp e⇔A st) = ⊢tapp (weaken e⇔A) {!!}
 
 weaken-0 : ∀ {Γ : Env (1 + n) m} {j e A}
   → Γ ⊢ j # e ⦂ A

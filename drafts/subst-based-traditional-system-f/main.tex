@@ -42,7 +42,7 @@
 
 \begin{align*}
     &\text{Contexts} \quad\quad &\Sigma ::=&~ A \mid \square \mid \boxed{e} \leadsto \Sigma \mid \boxed{A} \leadsto \Sigma\\
-    &\text{Generic Consumers} \quad \quad &g::=&~ i \mid x \mid e : A \mid \Lambda a.~e\\
+    &\text{Generic Consumers} \quad \quad &g::=&~ i \mid x \mid e : A \\
     &\text{Environments} \quad\quad &\Gamma ::=&~ . \mid \Gamma, x : A \mid \Gamma, a \\
 \end{align*}
 
@@ -152,11 +152,11 @@
 \inferrule*[lab=T-Lam2]
 {\Gamma \vdash \square \Rightarrow e_2 \Rightarrow A\\
  \Gamma , x : A \vdash \Sigma \Rightarrow e \Rightarrow B}
-{\Gamma \vdash \boxed{e_2} \leadsto \Sigma \Rightarrow \lambda x.~e \Rightarrow A \rightarrow B}
+{\Gamma \vdash \boxed{e_2} \leadsto \Sigma \Rightarrow \lambda x.~e \Rightarrow A \rightarrow A}
 
 \inferrule*[lab=T-Sub]
 {\Gamma \vdash \square \Rightarrow g \Rightarrow A \\
- \Gamma \vdash A <: \Sigma \dashv \Gamma' \rightsquigarrow B \\
+ \Gamma \vdash A <: \Sigma \\
  \Sigma \neq \square}
 {\Gamma \vdash \Sigma \Rightarrow g \Rightarrow B}
 

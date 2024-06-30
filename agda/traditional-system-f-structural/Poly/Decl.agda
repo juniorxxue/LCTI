@@ -71,3 +71,14 @@ data _⊢_#_⦂_ : Env n m → Counter → Term n m → Type m → Set where
     → Γ ⊢ Sτ j # e ⦂ `∀ B
     → (st : [ A ]ˢ B ⇨ B')
     → Γ ⊢ j # e [ A ] ⦂ B'
+
+
+⊢sub' : ∀ {e j A}
+  → Γ ⊢ Z # e ⦂ A
+  → Γ ⊢m j # A
+  → Γ ⊢ j # e ⦂ A
+⊢sub' {j = Z} ⊢e jA = ⊢e
+⊢sub' {j = ∞} ⊢e jA = ⊢sub ⊢e jA nz-∞
+⊢sub' {j = S j} ⊢e jA = ⊢sub ⊢e jA nz-S
+⊢sub' {j = Sτ j} ⊢e jA = ⊢sub ⊢e jA nz-Sτ
+  

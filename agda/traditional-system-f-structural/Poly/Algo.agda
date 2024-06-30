@@ -63,7 +63,6 @@ data GenericConsumer : Term n m → Set where
   gc-i : ∀ {i} → GenericConsumer (Term n m ∋⦂ lit i)
   gc-var : ∀ {x} → GenericConsumer (Term n m ∋⦂ ` x)
   gc-ann : ∀ {e : Term n m} {A} → GenericConsumer (e ⦂ A)
-  gc-tlam : ∀ {e : Term n (1 + m)} → GenericConsumer (Λ e)
 
 infix 3 _⊢_⇒_⇒_
 infix 3 _⊢_≤_
@@ -133,9 +132,10 @@ data _⊢_≤_ where
     → Γ ⊢ B ≤ Σ
     → Γ ⊢ τ A ⇒ e ⇒ C
     → Γ ⊢ A `→ B ≤ [ e ]↝ Σ
-  s-∀ : ∀ {A B}
-    → ty-in-con Σ ↑ #0 ⇨ Σ'
-    → Γ ,∙ ⊢ B ≤ Σ'
+  s-∀ : ∀ {A B B'}
+--    → ty-in-con Σ ↑ #0 ⇨ Σ'
+    → [ A ]ˢ B ⇨ B'
+    → Γ ⊢ B' ≤ Σ
     → Γ ⊢ `∀ B ≤ ⟦ A ⟧↝ Σ
 
 

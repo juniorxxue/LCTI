@@ -19,34 +19,40 @@ data _⊕_:=_ : Apps n m → Context n m → Context n m → Set where
     → (A ∷t a̅) ⊕ Σ := ⟦ A ⟧↝ Σ'
 
 
-subsumption : ∀ {Γ : Env n m} {Σ Σ' Σ'' A B A' A̅ a̅ e}
+subsumption : ∀ {Γ : Env n m} {Σ Σ' Σ'' A B A̅ a̅ e}
   → Γ ⊢ Σ ⇒ e ⇒ A
   → ⟦ Σ , A ⟧→⟦ a̅ , □ , A̅ , B ⟧
   → a̅ ⊕ Σ'' := Σ'
-  → Γ ⊢ A ≤ Σ' ⊣ Γ ↪ A'
-  → Γ ⊢ Σ' ⇒ e ⇒ A'
+  → Γ ⊢ A ≤ Σ'
+  → Γ ⊢ Σ' ⇒ e ⇒ A
 
 ⊢to≤ : ∀ {Γ : Env n m} {e Σ A}
   → Γ ⊢ Σ ⇒ e ⇒ A
-  → Γ ⊢ A ≤ Σ ⊣ Γ ↪ A
+  → Γ ⊢ A ≤ Σ
   
-subsumption0 : ∀ {Γ : Env n m} {Σ e A A'}
+subsumption0 : ∀ {Γ : Env n m} {Σ e A}
   → Γ ⊢ □ ⇒ e ⇒ A
-  → Γ ⊢ A ≤ Σ ⊣ Γ ↪ A'
-  → Γ ⊢ Σ ⇒ e ⇒ A'
+  → Γ ⊢ A ≤ Σ
+  → Γ ⊢ Σ ⇒ e ⇒ A
 subsumption0 ⊢e s = subsumption ⊢e none-□ ⊕nil s
 
 ⊢to≤ ⊢lit = s-empty
 ⊢to≤ (⊢var x∈Γ) = s-empty
 ⊢to≤ (⊢ann ⊢e) = s-empty
 ⊢to≤ (⊢app ⊢e) with ⊢to≤ ⊢e
-... | s-term-c x s = s
-⊢to≤ (⊢lam₁ ⊢e) = {!!}
-⊢to≤ (⊢lam₂ ⊢e ⊢e₁) = {!!}
-⊢to≤ (⊢sub ⊢e x x₁ x₂) = {!!}
+... | s-arr r x = r
+⊢to≤ (⊢lam₁ ⊢e) with ⊢to≤ ⊢e
+... | s-refl = s-refl
+⊢to≤ (⊢lam₂ ⊢e ⊢e₁) with ⊢to≤ ⊢e₁
+... | r = s-arr {!!} (subsumption0 ⊢e s-refl)
+⊢to≤ (⊢sub ⊢e ¬□ gc s) = s
 ⊢to≤ (⊢tabs₁ ⊢e) = s-empty
-⊢to≤ (⊢tapp ⊢e) with ⊢to≤ ⊢e
-... | s-∀-t ↑Σ₁ s st = {!!}
+⊢to≤ (⊢tabs₂ ⊢e) with ⊢to≤ ⊢e
+... | s-refl = s-refl
+⊢to≤ (⊢tabs₃ x ⊢e) with ⊢to≤ ⊢e
+... | r = s-∀ {!!} {!!}
+⊢to≤ (⊢tapp ⊢e x) with ⊢to≤ ⊢e
+... | s-∀ x₁ r = {!!} -- ok
 
 -- the proof of subsumption follows the side-condition in subsumption rule
 -- first we case analysis on the empty/non-empty of the context
@@ -55,17 +61,4 @@ subsumption0 ⊢e s = subsumption ⊢e none-□ ⊕nil s
 -- for others: induction hypothesis applies
 
 -- empty
-subsumption {Σ' = □} ⊢e none-□ ⊕nil s-empty = ⊢e
--- non empty, will repeat the case three times
-subsumption {Σ' = τ _} ⊢lit none-□ ⊕nil s = ⊢sub ⊢lit ne-τ gc-i s
-subsumption {Σ' = τ _} (⊢var x∈Γ) none-□ ⊕nil s = ⊢sub (⊢var x∈Γ) ne-τ gc-var s
-subsumption {Σ' = τ _} (⊢ann ⊢e) none-□ ⊕nil s = ⊢sub (⊢ann ⊢e) ne-τ gc-ann s
-subsumption {Σ' = τ _} (⊢app ⊢e) none-□ ⊕nil s with ⊢to≤ ⊢e
-... | s-term-c ⊢e' s-empty = ⊢app (subsumption ⊢e (have-e none-□) (⊕cons-a ⊕nil) (s-term-c ⊢e' s))
-subsumption {Σ' = τ _} (⊢tabs₁ ⊢e) none-□ ⊕nil s = {!!}
-subsumption {Σ' = τ _} (⊢tapp ⊢e) none-□ ⊕nil s with ⊢to≤ ⊢e
-... | s-∀-t ↑Σ₁ r st = {!!}
-
-
-subsumption {Σ' = [ _ ]↝ Σ'} ⊢e spl ch s = {!!}
-subsumption {Σ' = ⟦ _ ⟧↝ Σ'} ⊢e spl ch s = {!!}
+subsumption ⊢e spl newΣ s = {!!}
