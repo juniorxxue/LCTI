@@ -22,17 +22,17 @@ data _⊢_~_ where
     → Γ ⊢ ⟨ j , B ⟩ ~ Σ
     → Γ ⊢ ⟨ S j , A `→ B ⟩ ~ ([ e ]↝ Σ) -- got a deeper undersantding of it, how the S will be eliminated, at least in two places in STLC
 
-{-
   ~Sτ : ∀ {Γ : Env n m} {j A Σ Σ'} {B : Type (1 + m)}
     → (↑Σ' : ty-in-con Σ ↑ #0 ⇨ Σ')
     → Γ ,∙ ⊢ ⟨ j , B ⟩ ~ Σ'
     → Γ ⊢ ⟨ Sτ j , `∀ B ⟩ ~ (⟦ A ⟧↝ Σ)
--}
 
+{-
   ~Sτ : ∀ {Γ : Env n m} {j A Σ B'} {B : Type (1 + m)}
     → Γ ⊢ ⟨ j , B' ⟩ ~ Σ    
     → [ A ]ˢ B ⇨ B'
     → Γ ⊢ ⟨ Sτ j , `∀ B ⟩ ~ (⟦ A ⟧↝ Σ)
+-}    
 
 -- we have two eliminations for Sτ
 -- we only provide the first one, we want to show that the second one can be subsumed.
@@ -43,9 +43,19 @@ data _⊢_~_ where
   → ty-in-con Σ ↑ #0 ⇨ Σ'
   → Γ ,∙ ⊢ ⟨ j , B ⟩ ~ Σ'
 ~subsume st ~Z ↑empty = ~Z
-~subsume st ~∞ (↑type x) = {!!}
+~subsume st ~∞ (↑type x) = {!~∞!}
 ~subsume st (~S ⊢e j~Σ) ↑Σ = {!!}
 ~subsume st (~Sτ ↑Σ' j~Σ) (↑tapp x ↑Σ₁) = {!!}
+
+~subsume' : ∀ {Γ : Env n m} {j Σ A B B'}
+  → [ A ]ˢ B ⇨ B'
+  → Γ ⊢ ⟨ j , B' ⟩ ~ Σ
+  ---------------------------
+  → ∃[ Σ' ] Γ ,∙ ⊢ ⟨ j , B ⟩ ~ Σ'
+~subsume' st ~Z = ⟨ □ , ~Z ⟩
+~subsume' {B = B} st ~∞ = ⟨ τ B , ~∞ ⟩
+~subsume' st (~S ⊢e j~Σ) = {!!}
+~subsume' st (~Sτ ↑Σ' j~Σ) = {!!}
 
 postulate
   ~weaken0 : ∀ {Γ : Env n m} {Σ A B j}
@@ -86,10 +96,12 @@ complete (⊢app₂ ⊢e ⊢e₁) j~Σ = ⊢app {!!} -- requires a general subsu
 complete (⊢sub ⊢e x j≢Z) j~Σ = subsumption0 (complete-inf ⊢e) (complete-≤ x j~Σ)
 complete (⊢tabs₁ ⊢e) ~Z = ⊢tabs₁ (complete-inf ⊢e)
 complete (⊢tabs₂ ⊢e) ~∞ = ⊢tabs₂ (complete-chk ⊢e)
-complete (⊢tabs₃ ⊢e) (~Sτ x j~Σ) = ⊢tabs₃ {!!} (complete ⊢e {!!})
-complete (⊢tapp ⊢e st) j~Σ = ⊢tapp (complete ⊢e (~Sτ j~Σ st)) st
+complete (⊢tabs₃ ⊢e) (~Sτ x j~Σ) = ⊢tabs₃ x (complete ⊢e j~Σ)
+complete (⊢tapp ⊢e st) j~Σ with ~subsume' st j~Σ
+... | ⟨ Σ' , j~Σ' ⟩ = ⊢tapp (complete ⊢e (~Sτ {!!} j~Σ')) st
+-- ⊢tapp (complete ⊢e {!!}) {!!}
 
 complete-≤ s-zero ~Z = s-empty
 complete-≤ s-inf ~∞ = s-refl
 complete-≤ (s-arr jA) (~S ⊢e j~Σ) = s-arr (complete-≤ jA j~Σ) (subsumption0 ⊢e s-refl)
-complete-≤ (s-∀ jA) (~Sτ x j~Σ) = s-∀ {!!} (complete-≤ jA {!!})
+complete-≤ (s-∀ st jA) (~Sτ x j~Σ) = s-∀ {!!} (complete-≤ jA {!!})

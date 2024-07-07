@@ -37,3 +37,15 @@ sound-c-0 : ∀ {Γ : Env n m} {e A B}
   → Γ ⊢ τ B ⇒ e ⇒ A
   → Γ ⊢ ∞ # e ⦂ B
 sound-c-0 ⊢e = sound-c ⊢e none-τ
+
+sound-i ⊢lit spl = {!!}
+sound-i (⊢var x∈Γ) spl = {!!}
+sound-i (⊢ann ⊢e) spl = {!!}
+sound-i (⊢app ⊢e) spl = {!!}
+sound-i (⊢lam₂ ⊢e ⊢e₁) spl = {!!}
+sound-i (⊢sub ⊢e ¬□ gc s) spl = {!!}
+sound-i (⊢tabs₁ ⊢e) none-□ = ⊢tabs₁ (sound-i-0 ⊢e)
+sound-i (⊢tabs₃ x ⊢e) (have-t spl) = {!!}
+sound-i (⊢tapp ⊢e x) spl = sound-i ⊢e (have-t {!!})
+
+sound-c ⊢e spl = {!!}

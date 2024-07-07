@@ -20,7 +20,7 @@
 \newtheorem{lemma}{Lemma}
 
 
-\title{Contextual Typing (Exciplit System F)}
+\title{Contextual Typing (Explicit System F)}
 \author{Xu Xue}
 
 \begin{document}
@@ -121,6 +121,10 @@
     
     \inferrule*[lab=S-$\forall$L-t]
     {\Gamma, a \vdash_{n}  A}
+    {\Gamma \vdash_{S_\tau~n} \forall a. ~A }    
+    
+     \inferrule*[lab=S-$\forall$L-t]
+    {\Gamma \vdash_{n}  [B/a]A}
     {\Gamma \vdash_{S_\tau~n} \forall a. ~A }    
 \end{mathpar}
 

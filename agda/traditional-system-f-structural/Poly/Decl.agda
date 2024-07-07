@@ -26,9 +26,16 @@ data _⊢m_#_ : Env n m → Counter → Type m → Set where
   s-arr : ∀ {A B j}
     → Γ ⊢m j # B
     → Γ ⊢m S j # A `→ B
+  s-∀ : ∀ {A B A' j}
+--    → Γ ⊢m j # [ B ]ˢ A
+    → [ B ]ˢ A ⇨ A'
+    → Γ ⊢m j # A'
+    → Γ ⊢m (Sτ j) # `∀ A
+{-    
   s-∀ : ∀ {A j}
     → Γ ,∙ ⊢m j # A
     → Γ ⊢m (Sτ j) # `∀ A
+-}    
 
 infix 3 _⊢_#_⦂_
 data _⊢_#_⦂_ : Env n m → Counter → Term n m → Type m → Set where
