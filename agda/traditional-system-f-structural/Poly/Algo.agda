@@ -113,8 +113,7 @@ data _⊢_⇒_⇒_ where
     → Γ ⊢ τ (`∀ B) ⇒ Λ e ⇒ `∀ A
 
   ⊢tabs₃ : ∀ {A B e}
-    → ty-in-con Σ ↑ #0 ⇨ Σ'
-    → Γ ,∙ ⊢ Σ' ⇒ e ⇒ A -- a bit concern
+    → Γ ⊢ Σ ⇒ Λ e ⇒ `∀ A
     → Γ ⊢ ⟦ B ⟧↝ Σ ⇒ Λ e ⇒ `∀ A
 
   ⊢tapp : ∀ {e A B B'}
@@ -132,11 +131,13 @@ data _⊢_≤_ where
     → Γ ⊢ B ≤ Σ
     → Γ ⊢ τ A ⇒ e ⇒ C
     → Γ ⊢ A `→ B ≤ [ e ]↝ Σ
-  s-∀ : ∀ {A B B'}
---    → ty-in-con Σ ↑ #0 ⇨ Σ'
-    → [ A ]ˢ B ⇨ B'
-    → Γ ⊢ B' ≤ Σ
-    → Γ ⊢ `∀ B ≤ ⟦ A ⟧↝ Σ
+  s-∀ : ∀ {A}
+    → ty-in-con Σ ↑ #0 ⇨ Σ'
+    → Γ ,∙ ⊢ A ≤ Σ'
+    → Γ ⊢ `∀ A ≤ Σ    
+  s-∀-t : ∀ {A B}
+    → Γ ⊢ `∀ A ≤ Σ
+    → Γ ⊢ `∀ A ≤ ⟦ B ⟧↝ Σ
 
 
 ----------------------------------------------------------------------
@@ -160,6 +161,25 @@ data ⟦_,_⟧→⟦_,_,_,_⟧ : Context n m → Type m → Apps n m → Context
   have-t : ∀ {Σ : Context n m} {B A es A' B' Bs}
     → ⟦ Σ , B ⟧→⟦ es , A' , Bs , B' ⟧
     → ⟦ ⟦ A ⟧↝ Σ , B ⟧→⟦ A ∷t es , A' , Bs , B' ⟧
+
+
+infix 4 _⊢⟦_,_⟧→⟦_,_,_,_⟧
+
+data _⊢⟦_,_⟧→⟦_,_,_,_⟧ : Env n m → Context n m → Type m → Apps n m → Context n m → AppsType m → Type m → Set where
+
+  none-□ : ∀ {Γ A}
+    → Γ ⊢⟦ (Context n m ∋⦂ □) , A ⟧→⟦ nil , □ , nil , A ⟧
+
+  none-τ : ∀ {Γ A B}
+    → Γ ⊢⟦ (Context n m ∋⦂ τ A) , B ⟧→⟦ nil , τ A , nil , B ⟧
+
+  have-e : ∀ {Σ : Context n m} {Γ e A B es A' B' Bs}
+    → Γ ⊢⟦ Σ , B ⟧→⟦ es , A' , Bs , B' ⟧
+    → Γ ⊢⟦ ([ e ]↝ Σ) , A `→ B ⟧→⟦ e ∷a es , A' , A ∷a Bs , B' ⟧
+
+  have-t : ∀ {Γ} {Σ : Context n m} {B A es A' B' Bs}
+    → Γ ⊢⟦ Σ , B ⟧→⟦ es , A' , Bs , B' ⟧
+    → Γ ⊢⟦ ⟦ A ⟧↝ Σ , B ⟧→⟦ A ∷t es , A' , Bs , B' ⟧
 
 
 

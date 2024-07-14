@@ -96,7 +96,7 @@ complete (⊢app₂ ⊢e ⊢e₁) j~Σ = ⊢app {!!} -- requires a general subsu
 complete (⊢sub ⊢e x j≢Z) j~Σ = subsumption0 (complete-inf ⊢e) (complete-≤ x j~Σ)
 complete (⊢tabs₁ ⊢e) ~Z = ⊢tabs₁ (complete-inf ⊢e)
 complete (⊢tabs₂ ⊢e) ~∞ = ⊢tabs₂ (complete-chk ⊢e)
-complete (⊢tabs₃ ⊢e) (~Sτ x j~Σ) = ⊢tabs₃ x (complete ⊢e j~Σ)
+complete (⊢tabs₃ ⊢e) (~Sτ x j~Σ) = ⊢tabs₃ yx (complete ⊢e j~Σ)
 complete (⊢tapp ⊢e st) j~Σ with ~subsume' st j~Σ
 ... | ⟨ Σ' , j~Σ' ⟩ = ⊢tapp (complete ⊢e (~Sτ {!!} j~Σ')) st
 -- ⊢tapp (complete ⊢e {!!}) {!!}
