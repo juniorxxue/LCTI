@@ -1,8 +1,5 @@
 name: Build LaTeX document
 on: 
-  push: 
-    paths:
-      ['drafts/**']
   workflow_dispatch:
     
 jobs:
