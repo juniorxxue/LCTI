@@ -35,14 +35,14 @@
 &\text{Types} \quad\quad &A, B, C, D ::=&~ a \mid \mathtt{Int} \mid A \rightarrow B \mid \forall a.~A \\
 &\text{Expressions} \quad \quad &e::=&~ i \mid x \mid \lambda x . ~e \mid e_1~e_2 \mid e : A \mid \Lambda a.~e \mid e ~@~ A\\
 &\text{Environments} \quad\quad &\Gamma::=&~ . \mid \Gamma, x : A \mid \Gamma, a\\
-&\text{Counters} \quad\quad &n ::=&~ 0 \mid \infty \mid S~n \mid S_{\tau}~n\\
+&\text{Counters} \quad\quad &n ::=&~ 0 \mid \infty \mid S~n\\
 \end{align*}
 
 \subsection{Algo.}
 
 \begin{align*}
     &\text{Contexts} \quad\quad &\Sigma ::=&~ A \mid \square \mid \boxed{e} \leadsto \Sigma \mid \boxed{A} \leadsto \Sigma\\
-    &\text{Generic Consumers} \quad \quad &g::=&~ i \mid x \mid e : A \\
+    &\text{Generic Consumers} \quad \quad &g::=&~ i \mid x \mid e : A \mid \Lambda a.~e  \\
     &\text{Environments} \quad\quad &\Gamma ::=&~ . \mid \Gamma, x : A \mid \Gamma, a \\
 \end{align*}
 
@@ -90,16 +90,8 @@
     {\Gamma, a \vdash_0 e : A}
     {\Gamma \vdash_0 \Lambda a.~e : \forall a.~A}
     
-    \inferrule*[lab=TAbs2]
-    {\Gamma, a \vdash_\infty e : A}
-    {\Gamma \vdash_\infty \Lambda a.~e : \forall a .~ A}
-    
-    \inferrule*[lab=TAbs3]
-    {\Gamma  \vdash_n \Lambda a.~e : \forall a .~ A}
-    {\Gamma \vdash_{S_\tau~n}  \Lambda a.~e : \forall a .~ A}
-    
     \inferrule*[lab=TApp]
-    {\Gamma \vdash_{S_{\tau}~n} e : \forall a. ~B}
+    {\Gamma \vdash_{0} e : \forall a. ~B}
     {\Gamma \vdash_n e~@~A : [A/a]B}
 \end{mathpar}
 
@@ -122,10 +114,6 @@
     \inferrule*[lab=S-Arr]
     {\Gamma \vdash_n B}
     {\Gamma \vdash_{S~n} A \to B}
-
-    \inferrule*[lab=S-$\forall$L-t]
-    {\Gamma \vdash_{n} \forall a. ~A }
-    {\Gamma \vdash_{S_\tau~n} \forall a. ~A }    
 \end{mathpar}
 
 \section{Algo.}
@@ -168,14 +156,6 @@
 {\Gamma, a \vdash \square \Rightarrow e \Rightarrow A}
 {\Gamma \vdash \square \Rightarrow \Lambda a.~e \Rightarrow \forall a.~A}
 
-\inferrule*[lab=T-TAbs2]
-{\Gamma, a \vdash B \Rightarrow e \Rightarrow A}
-{\Gamma \vdash \forall a.~B \Rightarrow \Lambda a.~e \Rightarrow \forall a.~A}
-
-\inferrule*[lab=T-TAbs3]
-{\Gamma \vdash \Sigma \Rightarrow \Lambda a.~e \Rightarrow \forall a.~A}
-{\Gamma \vdash \boxed{B} \leadsto \Sigma \Rightarrow \Lambda a.~e \Rightarrow \forall a.~A}
-
 \inferrule*[lab=T-TApp]
 {\Gamma \vdash \boxed{A} \leadsto \Sigma \Rightarrow e \Rightarrow \forall a.~B}
 {\Gamma \vdash  \Sigma \Rightarrow e ~@~ A \Rightarrow [A/a]B}
@@ -198,8 +178,8 @@
 \Gamma \vdash B <: \Sigma}
 {\Gamma \vdash A \to B <: \boxed{e} \leadsto \Sigma}
 
-\inferrule*[lab=S-$\forall$-t]
-{\Gamma \vdash \forall a.~B <: \Sigma}
+\inferrule*[lab=S-$\forall$]
+{\Gamma \vdash  [A/a] B <: \Sigma}
 {\Gamma \vdash \forall a.~B <: \boxed{A} \leadsto \Sigma}
 \end{mathpar}
 

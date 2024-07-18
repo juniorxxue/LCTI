@@ -63,6 +63,7 @@ data GenericConsumer : Term n m → Set where
   gc-i : ∀ {i} → GenericConsumer (Term n m ∋⦂ lit i)
   gc-var : ∀ {x} → GenericConsumer (Term n m ∋⦂ ` x)
   gc-ann : ∀ {e : Term n m} {A} → GenericConsumer (e ⦂ A)
+  gc-tlam : ∀ {e : Term n (1 + m)} → GenericConsumer (Λ e)
 
 infix 3 _⊢_⇒_⇒_
 infix 3 _⊢_≤_
@@ -106,19 +107,7 @@ data _⊢_⇒_⇒_ where
 
   ⊢tabs₁ : ∀ {e A}
     → Γ ,∙ ⊢ □ ⇒ e ⇒ A
-    → Γ ⊢ □ ⇒ Λ e ⇒ `∀ A
-
-  ⊢tabs₂ : ∀ {A B e}
-    → Γ ,∙ ⊢ τ B ⇒ e ⇒ A
-    → Γ ⊢ τ (`∀ B) ⇒ Λ e ⇒ `∀ A
-{-    
-we could take the big lambda as the generic consumer, thus abbrev the ⊢tabs₂,
-but we want to extend later to allow more exampels, to check the type application, thus we keep this design
-
-  ⊢tabs₃ : ∀ {A B e}
-    → Γ ⊢ Σ ⇒ Λ e ⇒ `∀ A
-    → Γ ⊢ ⟦ B ⟧↝ Σ ⇒ Λ e ⇒ `∀ A
--}    
+    → Γ ⊢ □ ⇒ Λ e ⇒ `∀ A  
 
   ⊢tapp : ∀ {e A B B'}
     → Γ ⊢ ⟦ A ⟧↝ Σ ⇒ e ⇒ `∀ B
@@ -134,15 +123,11 @@ data _⊢_≤_ where
   s-arr : ∀ {e A B C}
     → Γ ⊢ B ≤ Σ
     → Γ ⊢ τ A ⇒ e ⇒ C
-    → Γ ⊢ A `→ B ≤ [ e ]↝ Σ
-  s-∀ : ∀ {A}
-    → ty-in-con Σ ↑ #0 ⇨ Σ'
-    → Γ ,∙ ⊢ A ≤ Σ'
-    → Γ ⊢ `∀ A ≤ Σ    
-  s-∀-t : ∀ {A B}
-    → Γ ⊢ `∀ A ≤ Σ
+    → Γ ⊢ A `→ B ≤ [ e ]↝ Σ 
+  s-∀-t : ∀ {A B A'}
+    → [ B ]ˢ A ⇨ A'
+    → Γ ⊢ A' ≤ Σ
     → Γ ⊢ `∀ A ≤ ⟦ B ⟧↝ Σ
-
 
 ----------------------------------------------------------------------
 --+                           Splitting                            +--

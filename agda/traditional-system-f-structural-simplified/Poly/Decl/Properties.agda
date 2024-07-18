@@ -75,7 +75,7 @@ weaken (⊢app₁ e₁⇔A e₂⇔A) = ⊢app₁ (weaken e₁⇔A) (weaken e₂�
 weaken (⊢app₂ e₁⇔A e₂⇔A) = ⊢app₂ (weaken e₁⇔A) (weaken e₂⇔A)
 weaken (⊢sub e⇔A B≤A j≢Z) = ⊢sub (weaken e⇔A) {!!}  j≢Z
 weaken (⊢tabs₁ e⇔A) = ⊢tabs₁ (weaken e⇔A)
-weaken (⊢tabs₂ e⇔A) = ⊢tabs₂ (weaken e⇔A)
+-- weaken (⊢tabs₂ e⇔A) = ⊢tabs₂ (weaken e⇔A)
 -- weaken (⊢tabs₃ e⇔A) = ⊢tabs₃ (weaken e⇔A)
 weaken (⊢tapp e⇔A st) = ⊢tapp (weaken e⇔A) {!!}
 
