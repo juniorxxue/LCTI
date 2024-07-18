@@ -97,6 +97,10 @@ data _~⇧~_ : Context → ℕ → Set where
 ⊢weaken (⊢ann ⊢e) = ⊢ann (⊢weaken ⊢e)
 ⊢weaken (⊢app ⊢e) = ⊢app (⊢weaken ⊢e)
 ⊢weaken {n≤l = n≤l} (⊢lam₁ ⊢e) = ⊢lam₁ (⊢weaken {n≤l = s≤s n≤l} ⊢e)
+⊢weaken {n≤l = n≤l} (⊢lam-a₁ ⊢e) = ⊢lam-a₁ (⊢weaken {n≤l = s≤s n≤l} ⊢e)
+⊢weaken {Σ = [ _ ]↝ Σ} {A = A} {n = n} {n≤l = n≤l} (⊢lam-a₂ ⊢e ⊢e') with ⊢weaken {A = A} {n = suc n} {n≤l = s≤s n≤l} ⊢e
+... | ind-e rewrite sym (⇧-⇧-comm-0 Σ n) = ⊢lam-a₂ ind-e (⊢weaken ⊢e')
+⊢weaken {n≤l = n≤l} (⊢lam-a₃ ⊢e) = ⊢lam-a₃ (⊢weaken {n≤l = s≤s n≤l} ⊢e)
 ⊢weaken {Σ = [ _ ]↝ Σ} {A = A} {n = n} {n≤l = n≤l} (⊢lam₂ ⊢e ⊢f) with ⊢weaken {A = A} {n = suc n} {n≤l = s≤s n≤l} ⊢f
 ... | ind-f rewrite sym (⇧-⇧-comm-0 Σ n) = ⊢lam₂ (⊢weaken ⊢e) ind-f
 ⊢weaken (⊢sub ⊢e B≈Σ p Σ≢□) = ⊢sub (⊢weaken ⊢e) (≈weaken B≈Σ) (↑-gc p) (ts Σ≢□)
@@ -138,6 +142,10 @@ spl-weaken (have spl) = have (spl-weaken spl)
 ⊢strengthen (⊢ann ⊢e) (sd-ann en) Σn n≤l = ⊢ann (⊢strengthen ⊢e en sdh-τ n≤l)
 ⊢strengthen (⊢app ⊢e) (sd-app en en₁) Σn n≤l = ⊢app (⊢strengthen ⊢e en (sdh-h en₁ Σn) n≤l)
 ⊢strengthen (⊢lam₁ ⊢e) (sd-lam sd) sdh n≤l = ⊢lam₁ (⊢strengthen ⊢e sd sdh-τ (s≤s n≤l))
+⊢strengthen (⊢lam-a₁ ⊢e) (sd-lam-a sd) sdh n≤l = ⊢lam-a₁ (⊢strengthen ⊢e sd sdh-τ (s≤s n≤l))
+⊢strengthen {Σ = [ _ ]↝ Σ} {n = n} (⊢lam-a₂ ⊢f ⊢e) (sd-lam-a sd) (sdh-h x sdh) n≤l with ⊢strengthen ⊢f sd (⇧-shiftedh-n z≤n sdh) (s≤s n≤l)
+... | ind-f rewrite sym (⇩-⇧-comm Σ 0 n z≤n sdh) = ⊢lam-a₂ ind-f (⊢strengthen ⊢e x sdh-τ n≤l)
+⊢strengthen (⊢lam-a₃ ⊢e) (sd-lam-a sd) sdh n≤l = ⊢lam-a₃ (⊢strengthen ⊢e sd sdh-□ (s≤s n≤l))
 ⊢strengthen {Σ = [ _ ]↝ Σ} {n = n} (⊢lam₂ ⊢e ⊢f) (sd-lam sd₁) (sdh-h sd₂ sdh) n≤l with ⊢strengthen ⊢f sd₁ (⇧-shiftedh-n z≤n sdh) (s≤s n≤l)
 ... | ind-f rewrite sym (⇩-⇧-comm Σ 0 n z≤n sdh) = ⊢lam₂ (⊢strengthen ⊢e sd₂ sdh-□ n≤l) ind-f
 ⊢strengthen (⊢sub ⊢e A≈Σ p Σ≢□) en Σn n≤l = ⊢sub (⊢strengthen ⊢e en sdh-□ n≤l) (≈strengthen A≈Σ Σn n≤l) (↓-gc p) (ts Σ≢□)
@@ -183,7 +191,7 @@ ch-weaken (ch-cons ch) = ch-cons (ch-weaken ch)
 -- we prove it simultaneously with general subsumption
 ⊢to≈ : ∀ {Γ e Σ A}
   → Γ ⊢ Σ ⇒ e ⇒ A
-  → Γ ⊢ A ≈ Σ
+  → Γ ⊢ A ≈ Σ  
 
 -- the general subsumption
 -- the intuition is we extract all the terms out of the context: e̅
@@ -203,6 +211,8 @@ subsumption {Σ' = τ _} (⊢ann ⊢e) spl ch A≤Σ' = ⊢sub (⊢ann ⊢e) A�
 subsumption {Σ' = τ _} (⊢app ⊢e) spl ch A≤Σ' with ⊢to≈ ⊢e
 ... | ≈term x r = ⊢app (subsumption ⊢e (have spl) (ch-cons ch) (≈term x A≤Σ'))
 subsumption {Σ' = τ _} (⊢lam₂ ⊢e ⊢e₁) (have spl) () A≤Σ'
+subsumption {Σ' = τ _} (⊢lam-a₂ ⊢e ⊢e') (have spl) () A≤Σ'
+subsumption {Σ' = τ _} (⊢lam-a₃ ⊢e) none-□ ch-none ≈τ = ⊢lam-a₁ (subsumption ⊢e none-□ ch-none ≈τ)
 subsumption {Σ' = τ _} (⊢sub ⊢e x x₁ x₂) spl ch A≤Σ' = ⊢sub ⊢e A≤Σ' x₁ ¬□-τ
 subsumption {Σ' = [ e ]↝ Σ'} (⊢var x) spl ch A≤Σ' = ⊢sub (⊢var x) A≤Σ' gc-var ¬□-term
 subsumption {Σ' = [ e ]↝ Σ'} (⊢ann ⊢e) spl ch A≤Σ' = ⊢sub (⊢ann ⊢e) A≤Σ' gc-ann ¬□-term
@@ -210,6 +220,9 @@ subsumption {Σ' = [ e ]↝ Σ'} (⊢app ⊢e) spl ch A≤Σ' with ⊢to≈ ⊢e
 ... | ≈term x r = ⊢app (subsumption ⊢e (have spl) (ch-cons ch) (≈term x A≤Σ'))
 subsumption {Σ' = [ _ ]↝ Σ'} (⊢lam₂ ⊢e ⊢e₁) (have spl) (ch-cons ch) (≈term x A≤Σ') =
   ⊢lam₂ ⊢e (subsumption ⊢e₁ (spl-weaken spl) (ch-weaken ch) (≈weaken {n≤l = z≤n} A≤Σ'))
+subsumption {Σ' = [ _ ]↝ Σ'} (⊢lam-a₂ ⊢e ⊢e₁) (have spl) (ch-cons ch) (≈term ⊢e' A≤Σ') =
+  ⊢lam-a₂ (subsumption ⊢e (spl-weaken spl) (ch-weaken ch) (≈weaken {n≤l = z≤n} A≤Σ')) ⊢e'
+subsumption {Σ' = [ _ ]↝ Σ'} (⊢lam-a₃ ⊢e) none-□ ch-none (≈term x A≤Σ') = ⊢lam-a₂ (subsumption ⊢e none-□ ch-none (≈weaken {n≤l = z≤n} A≤Σ')) x
 subsumption {Σ' = [ e ]↝ Σ'} (⊢sub ⊢e x x₁ x₂) spl ch A≤Σ' = ⊢sub ⊢e A≤Σ' x₁ ¬□-term
   
 ⊢to≈ ⊢lit = ≈□
@@ -226,6 +239,10 @@ subsumption {Σ' = [ e ]↝ Σ'} (⊢sub ⊢e x x₁ x₂) spl ch A≤Σ' = ⊢s
       → Γ ⊢ B ≈ τ A
       → Γ ⊢ τ A ⇒ e ⇒ B
     rebase ⊢f B≤A = subsumption ⊢f none-□ ch-none B≤A
+⊢to≈ (⊢lam-a₁ ⊢e) with ⊢to≈ ⊢e
+... | ≈τ = ≈τ
+⊢to≈ (⊢lam-a₂ ⊢e' ⊢e) = ≈term ⊢e (≈a-strengthen-0 (⊢to≈ ⊢e'))
+⊢to≈ (⊢lam-a₃ ⊢e) = ≈□
 ⊢to≈ (⊢sub ⊢e x x₁ Σ≢□) = x
 
 -- the subsumption rule without side conditions can be derived

@@ -1,3 +1,4 @@
+
 module STLC.Common where
 
 open import STLC.Prelude hiding (_≤?_)
@@ -7,6 +8,7 @@ open import STLC.Prelude hiding (_≤?_)
 ----------------------------------------------------------------------
 
 infixr 5  ƛ_
+infixr 5  ƛ⦂_⇒_
 infixl 7  _·_
 infix  9  `_
 infix  5  _⦂_
@@ -22,6 +24,7 @@ data Term : Set where
   lit      : ℕ → Term           -- literals
   `_       : ℕ → Term           -- variables
   ƛ_       : Term → Term        -- unannotated lambdas, we use de bruijn indices to deal with binding
+  ƛ⦂_⇒_    : Type → Term → Term -- annotated lambda, annotating the binder
   _·_      : Term → Term → Term -- applications
   _⦂_      : Term → Type → Term -- annotated terms
 
@@ -62,6 +65,7 @@ _↑_ : Term → ℕ → Term
 lit i ↑ n = lit i
 ` x ↑ n = ` (↑-var n x)
 (ƛ e) ↑ n = ƛ (e ↑ (suc n))
+(ƛ⦂ A ⇒ e) ↑ n = ƛ⦂ A ⇒ (e ↑ (1 + n))
 e₁ · e₂ ↑ n = (e₁ ↑ n) · (e₂ ↑ n)
 (e ⦂ A) ↑ n = (e ↑ n) ⦂ A
 
@@ -77,6 +81,7 @@ _↓_ : Term → ℕ → Term
 lit i ↓ n = lit i
 ` x ↓ n = ` (↓-var n x)
 (ƛ e) ↓ n = ƛ (e ↓ (suc n))
+(ƛ⦂ A ⇒ e) ↓ n = ƛ⦂ A ⇒ e ↓ (1 + n)
 e₁ · e₂ ↓ n = (e₁ ↓ n) · (e₂ ↓ n)
 (e ⦂ A) ↓ n = (e ↓ n) ⦂ A
 
@@ -96,6 +101,7 @@ e₁ · e₂ ↓ n = (e₁ ↓ n) · (e₂ ↓ n)
 ↑-↓-id (lit _) n = refl
 ↑-↓-id (` x) n = cong `_ (↑-↓-var x n)
 ↑-↓-id (ƛ e) n rewrite ↑-↓-id e (suc n) = refl
+↑-↓-id (ƛ⦂ x ⇒ e) n rewrite ↑-↓-id e (suc n) = refl
 ↑-↓-id (e₁ · e₂) n rewrite ↑-↓-id e₁ n | ↑-↓-id e₂ n = refl
 ↑-↓-id (e ⦂ A) n rewrite ↑-↓-id e n = refl
 
@@ -129,6 +135,7 @@ e₁ · e₂ ↓ n = (e₁ ↓ n) · (e₂ ↓ n)
 ↑-↑-comm (lit _) m n m≤n = refl
 ↑-↑-comm (` x) m n m≤n = cong `_ (↑-↑-comm-var m n x m≤n)
 ↑-↑-comm (ƛ e) m n m≤n rewrite ↑-↑-comm e (suc m) (suc n) (s≤s m≤n) = refl
+↑-↑-comm (ƛ⦂ A ⇒ e) m n m≤n rewrite ↑-↑-comm e (suc m) (suc n) (s≤s m≤n) = refl
 ↑-↑-comm (e₁ · e₂) m n m≤n rewrite ↑-↑-comm e₁ m n m≤n | ↑-↑-comm e₂ m n m≤n = refl
 ↑-↑-comm (e ⦂ A) m n m≤n rewrite ↑-↑-comm e m n m≤n = refl
 
@@ -149,6 +156,10 @@ data _~↑~_ : Term → ℕ → Set where
     → e ~↑~ (suc n)
     → (ƛ e) ~↑~ n
 
+  sd-lam-a : ∀ {n e A}
+    → e ~↑~ (suc n)
+    → (ƛ⦂ A ⇒ e) ~↑~ n
+
   sd-app : ∀ {n e₁ e₂}
     → e₁ ~↑~ n
     → e₂ ~↑~ n
@@ -165,6 +176,7 @@ data _~↑~_ : Term → ℕ → Set where
 ... | yes p = sd-var (<⇒≢ (s≤s p))
 ... | no ¬p = sd-var (>⇒≢ (≰⇒> ¬p))
 ↑-shifted {ƛ e} {n} = sd-lam ↑-shifted
+↑-shifted {ƛ⦂ A ⇒ e} {n} = sd-lam-a ↑-shifted
 ↑-shifted {e₁ · e₂} {n} = sd-app ↑-shifted ↑-shifted
 ↑-shifted {e ⦂ A} {n} = sd-ann ↑-shifted
 
@@ -203,6 +215,7 @@ data _~↑~_ : Term → ℕ → Set where
 ↓-↑-comm (lit x) m n m≤n sd = refl
 ↓-↑-comm (` x) m n m≤n (sd-var n≢x) = cong `_ (↓-↑-comm-var m n x m≤n n≢x)
 ↓-↑-comm (ƛ e) m n m≤n (sd-lam sd) rewrite ↓-↑-comm e (suc m) (suc n) (s≤s m≤n) sd = refl
+↓-↑-comm (ƛ⦂ A ⇒ e) m n m≤n (sd-lam-a sd) rewrite ↓-↑-comm e (suc m) (suc n) (s≤s m≤n) sd = refl
 ↓-↑-comm (e₁ · e₂) m n m≤n (sd-app sd₁ sd₂) rewrite ↓-↑-comm e₁ m n m≤n sd₁ | ↓-↑-comm e₂ m n m≤n sd₂ = refl
 ↓-↑-comm (e ⦂ A) m n m≤n (sd-ann sd) rewrite ↓-↑-comm e m n m≤n sd = refl
 
@@ -216,5 +229,6 @@ data _~↑~_ : Term → ℕ → Set where
 ... | yes p = sd-var λ n+1≡x+1 → x₁ (cong pred n+1≡x+1)
 ... | no ¬p = sd-var (≢-sym (<⇒≢ (<-≤-trans (m≰n⇒n<m ¬p) m≤n+1)))
 ↑-shifted-n {ƛ e} m≤n+1 (sd-lam sd) = sd-lam (↑-shifted-n (s≤s m≤n+1) sd)
+↑-shifted-n {ƛ⦂ A ⇒ e} m≤n+1 (sd-lam-a sd) = sd-lam-a (↑-shifted-n (s≤s m≤n+1) sd)
 ↑-shifted-n {e · e₁} m≤n+1 (sd-app sd sd₁) = sd-app (↑-shifted-n m≤n+1 sd) (↑-shifted-n m≤n+1 sd₁)
 ↑-shifted-n {e ⦂ x} m≤n+1 (sd-ann sd) = sd-ann (↑-shifted-n m≤n+1 sd)

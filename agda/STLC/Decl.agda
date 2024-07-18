@@ -45,6 +45,18 @@ data _⊢_#_⦂_ : Env → Counter → Term → Type → Set where
     → Γ , A ⊢ j # e ⦂ B
     → Γ ⊢ S j # (ƛ e) ⦂ A `→ B
 
+  ⊢lam-a-∞ : ∀ {Γ e A B}
+    → Γ , A ⊢ ∞ # e ⦂ B
+    → Γ ⊢ ∞ # (ƛ⦂ A ⇒ e) ⦂ A `→ B
+
+  ⊢lam-a-n : ∀ {Γ e A B j}
+    → Γ , A ⊢ j # e ⦂ B
+    → Γ ⊢ S j # (ƛ⦂ A ⇒ e) ⦂ A `→ B
+
+  ⊢lam-a-Z : ∀ {Γ e A B}
+    → Γ , A ⊢ Z # e ⦂ B
+    → Γ ⊢ Z # (ƛ⦂ A ⇒ e) ⦂ A `→ B
+
   ⊢app₁ : ∀ {Γ e₁ e₂ A B}
     → Γ ⊢ Z # e₁ ⦂ A `→ B
     → Γ ⊢ ∞ # e₂ ⦂ A
