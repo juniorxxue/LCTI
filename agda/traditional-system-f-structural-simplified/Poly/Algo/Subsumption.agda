@@ -2,6 +2,7 @@ module Poly.Algo.Subsumption where
 
 open import Poly.Common
 open import Poly.Algo
+open import Poly.Algo.Properties
 
 infix 4 _⊕_:=_
 
@@ -47,12 +48,8 @@ subsumption0 ⊢e s = subsumption ⊢e none-□ ⊕nil s
 ... | r = s-arr {!!} (subsumption0 ⊢e s-refl)
 ⊢to≤ (⊢sub ⊢e ¬□ gc s) = s
 ⊢to≤ (⊢tabs₁ ⊢e) = s-empty
-⊢to≤ (⊢tabs₂ ⊢e) with ⊢to≤ ⊢e
-... | s-refl = s-refl
-⊢to≤ (⊢tabs₃ x ⊢e) with ⊢to≤ ⊢e
-... | r = s-∀ {!!} {!!}
 ⊢to≤ (⊢tapp ⊢e x) with ⊢to≤ ⊢e
-... | s-∀ x₁ r = {!!} -- ok
+... | s-∀-t x₁ r rewrite subst-unique x x₁ = r
 
 -- the proof of subsumption follows the side-condition in subsumption rule
 -- first we case analysis on the empty/non-empty of the context

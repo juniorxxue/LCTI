@@ -166,9 +166,11 @@ data _⊢⟦_,_⟧→⟦_,_,_,_⟧ : Env n m → Context n m → Type m → Apps
     → Γ ⊢⟦ Σ , B ⟧→⟦ es , A' , Bs , B' ⟧
     → Γ ⊢⟦ ([ e ]↝ Σ) , A `→ B ⟧→⟦ e ∷a es , A' , A ∷a Bs , B' ⟧
 
-  have-t : ∀ {Γ} {Σ : Context n m} {B A es A' B' Bs}
-    → Γ ⊢⟦ Σ , B ⟧→⟦ es , A' , Bs , B' ⟧
-    → Γ ⊢⟦ ⟦ A ⟧↝ Σ , B ⟧→⟦ A ∷t es , A' , Bs , B' ⟧
+  have-t : ∀ {Γ} {Σ : Context n m} {B A es A' B' Bs Bs' C C'}
+    → [ A ]ˢ B ⇨ B'
+    → [ A ]ˢˢ Bs ⇨ Bs'
+    → Γ ⊢⟦ Σ , B' ⟧→⟦ es , A' , Bs' , C' ⟧
+    → Γ ⊢⟦ ⟦ A ⟧↝ Σ , `∀ B ⟧→⟦ A ∷t es , A' , `∀ Bs , `∀ C ⟧
 
 
 

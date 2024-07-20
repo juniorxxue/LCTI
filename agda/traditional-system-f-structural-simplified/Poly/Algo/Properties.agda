@@ -29,6 +29,7 @@ spl-weaken-tm none-τ = none-τ
 spl-weaken-tm (have-e spl) = have-e (spl-weaken-tm spl)
 spl-weaken-tm (have-t spl) = have-t (spl-weaken-tm spl)
 
+{-
 spl-weaken-ty : ∀ {Σ Σ' : Context n m} {Σ' T A es As A' n B}
   → [ B ]ˢ A ⇨ A'
   → ⟦ Σ , A' ⟧→⟦ es , τ T , As , A' ⟧
@@ -39,6 +40,10 @@ spl-weaken = {!!}
 spl-weaken-ty {A = ‶ X} spl = {!!}
 spl-weaken-ty {A = A `→ A₁} spl = {!!}
 spl-weaken-ty {A = `∀ A} spl = {!!}
+-}
+
+
+-- this property is not true
 
 ⊢id : ∀ {Γ : Env n m} {Σ e A A' T es As}
   → Γ ⊢ Σ ⇒ e ⇒ A
@@ -53,9 +58,5 @@ spl-weaken-ty {A = `∀ A} spl = {!!}
 ⊢id (⊢app ⊢e) spl = ⊢id ⊢e (have-e spl)
 ⊢id (⊢lam₁ ⊢e) none-τ rewrite ⊢id-0 ⊢e = refl
 ⊢id (⊢lam₂ ⊢e ⊢e₁) (have-e spl) = ⊢id ⊢e₁ (spl-weaken-tm spl)
+⊢id (⊢tapp ⊢e ⊢e₁) spl = ⊢id ⊢e {!!}
 ⊢id (⊢sub ⊢e ¬□ gc s) spl = {!!}
-
-postulate
-  ↑ty-eq : ∀ {A : Type m} {B k}
-    → ↑ty k A ≡ ↑ty k B
-    → A ≡ B
