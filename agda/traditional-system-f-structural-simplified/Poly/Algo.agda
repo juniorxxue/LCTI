@@ -154,6 +154,25 @@ data ⟦_,_⟧→⟦_,_,_,_⟧ : Context n m → Type m → Apps n m → Context
     → ⟦ Σ , B' ⟧→⟦ es , A' , Bs' , C' ⟧ -- we lose a B == Bs + C here
     → ⟦ ⟦ A ⟧↝ Σ , `∀ B ⟧→⟦ A ∷t es , A' , `∀ Bs , `∀ C ⟧
 
+infix 4 ⟦_,_⟧⇢⟦_,_,_⟧
+
+data ⟦_,_⟧⇢⟦_,_,_⟧ : Context n m → Type m → Apps n m → Context n m → Type m → Set where
+
+  none-□ : ∀ {A}
+    → ⟦ (Context n m ∋⦂ □) , A ⟧⇢⟦ nil , □  , A ⟧
+
+  none-τ : ∀ {A B}
+    → ⟦ (Context n m ∋⦂ τ A) , B ⟧⇢⟦ nil , τ A , B ⟧
+
+  have-e : ∀ {Σ : Context n m} {e A B es A' B'}
+    → ⟦ Σ , B ⟧⇢⟦ es , A' , B' ⟧
+    → ⟦ ([ e ]↝ Σ) , A `→ B ⟧⇢⟦ e ∷a es , A' , B' ⟧
+
+  have-t : ∀ {Σ : Context n m} {B A es B' C}
+    → [ A ]ˢ B ⇨ B'
+    → ⟦ Σ , B' ⟧⇢⟦ es , Σ' , C ⟧
+    → ⟦ ⟦ A ⟧↝ Σ , `∀ B ⟧⇢⟦ A ∷t es , Σ' , C ⟧
+
 infix 4 ⟦_⟧⇒⟦_,_⟧
 
 data ⟦_⟧⇒⟦_,_⟧ : Context n m → Apps n m → Context n m → Set where

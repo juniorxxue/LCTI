@@ -1,3 +1,4 @@
+{-# OPTIONS --allow-unsolved-metas #-}
 module Poly.Decl.Properties where
 
 open import Poly.Common
