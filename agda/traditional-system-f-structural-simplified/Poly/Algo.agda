@@ -111,7 +111,7 @@ data _⊢_⇒_⇒_ where
 
   ⊢tapp : ∀ {e A B B'}
     → Γ ⊢ ⟦ A ⟧↝ Σ ⇒ e ⇒ `∀ B
-    → [ A ]ˢ B ⇨ B'
+    → (st : [ A ]ˢ B ⇨ B')
     → Γ ⊢ Σ ⇒ e [ A ] ⇒ B'
   
 data _⊢_≤_ where
@@ -125,7 +125,7 @@ data _⊢_≤_ where
     → Γ ⊢ τ A ⇒ e ⇒ C
     → Γ ⊢ A `→ B ≤ [ e ]↝ Σ 
   s-∀-t : ∀ {A B A'}
-    → [ B ]ˢ A ⇨ A'
+    → (st : [ B ]ˢ A ⇨ A')
     → Γ ⊢ A' ≤ Σ
     → Γ ⊢ `∀ A ≤ ⟦ B ⟧↝ Σ
 
@@ -147,30 +147,30 @@ data ⟦_,_⟧→⟦_,_,_,_⟧ : Context n m → Type m → Apps n m → Context
     → ⟦ Σ , B ⟧→⟦ es , A' , Bs , B' ⟧
     → ⟦ ([ e ]↝ Σ) , A `→ B ⟧→⟦ e ∷a es , A' , A ∷a Bs , B' ⟧
 
-  have-t : ∀ {Σ : Context n m} {B A es A' B' Bs}
-    → ⟦ Σ , B ⟧→⟦ es , A' , Bs , B' ⟧
-    → ⟦ ⟦ A ⟧↝ Σ , B ⟧→⟦ A ∷t es , A' , Bs , B' ⟧
-
-
-infix 4 _⊢⟦_,_⟧→⟦_,_,_,_⟧
-
-data _⊢⟦_,_⟧→⟦_,_,_,_⟧ : Env n m → Context n m → Type m → Apps n m → Context n m → AppsType m → Type m → Set where
-
-  none-□ : ∀ {Γ A}
-    → Γ ⊢⟦ (Context n m ∋⦂ □) , A ⟧→⟦ nil , □ , nil , A ⟧
-
-  none-τ : ∀ {Γ A B}
-    → Γ ⊢⟦ (Context n m ∋⦂ τ A) , B ⟧→⟦ nil , τ A , nil , B ⟧
-
-  have-e : ∀ {Σ : Context n m} {Γ e A B es A' B' Bs}
-    → Γ ⊢⟦ Σ , B ⟧→⟦ es , A' , Bs , B' ⟧
-    → Γ ⊢⟦ ([ e ]↝ Σ) , A `→ B ⟧→⟦ e ∷a es , A' , A ∷a Bs , B' ⟧
-
-  have-t : ∀ {Γ} {Σ : Context n m} {B A es A' B' Bs Bs' C C'}
+  have-t : ∀ {Σ : Context n m} {B A es A' B' Bs Bs' C C'}
     → [ A ]ˢ B ⇨ B'
+    → [ A ]ˢ C ⇨ C'
     → [ A ]ˢˢ Bs ⇨ Bs'
-    → Γ ⊢⟦ Σ , B' ⟧→⟦ es , A' , Bs' , C' ⟧
-    → Γ ⊢⟦ ⟦ A ⟧↝ Σ , `∀ B ⟧→⟦ A ∷t es , A' , `∀ Bs , `∀ C ⟧
+    → ⟦ Σ , B' ⟧→⟦ es , A' , Bs' , C' ⟧ -- we lose a B == Bs + C here
+    → ⟦ ⟦ A ⟧↝ Σ , `∀ B ⟧→⟦ A ∷t es , A' , `∀ Bs , `∀ C ⟧
+
+infix 4 ⟦_⟧⇒⟦_,_⟧
+
+data ⟦_⟧⇒⟦_,_⟧ : Context n m → Apps n m → Context n m → Set where
+
+  none-□ :
+      ⟦ (Context n m ∋⦂ □) ⟧⇒⟦ nil , □ ⟧
+
+  none-τ : ∀ {A}
+    → ⟦ (Context n m ∋⦂ τ A) ⟧⇒⟦ nil , τ A ⟧
+
+  have-e : ∀ {e es}
+    → ⟦ Σ ⟧⇒⟦ es , Σ' ⟧
+    → ⟦ [ e ]↝ Σ ⟧⇒⟦ e ∷a es , Σ' ⟧
+
+  have-t : ∀ {es A}
+    → ⟦ Σ ⟧⇒⟦ es , Σ' ⟧
+    → ⟦ ⟦ A ⟧↝ Σ ⟧⇒⟦ A ∷t es , Σ' ⟧
 
 
 

@@ -1,4 +1,3 @@
-{-# OPTIONS --allow-unsolved-metas #-}
 module Poly.Decl.Properties where
 
 open import Poly.Common
@@ -73,7 +72,7 @@ weaken (⊢lam₁ e⇔A) = ⊢lam₁ (weaken e⇔A)
 weaken (⊢lam₂ e⇔A) = ⊢lam₂ (weaken e⇔A)
 weaken (⊢app₁ e₁⇔A e₂⇔A) = ⊢app₁ (weaken e₁⇔A) (weaken e₂⇔A)
 weaken (⊢app₂ e₁⇔A e₂⇔A) = ⊢app₂ (weaken e₁⇔A) (weaken e₂⇔A)
-weaken (⊢sub e⇔A B≤A j≢Z) = ⊢sub (weaken e⇔A) {!!}  j≢Z
+weaken (⊢sub e⇔A j≢Z) = {!!}
 weaken (⊢tabs₁ e⇔A) = ⊢tabs₁ (weaken e⇔A)
 -- weaken (⊢tabs₂ e⇔A) = ⊢tabs₂ (weaken e⇔A)
 -- weaken (⊢tabs₃ e⇔A) = ⊢tabs₃ (weaken e⇔A)
