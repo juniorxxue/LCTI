@@ -4,12 +4,6 @@ open import Poly.Common
 open import Poly.Algo
 open import Poly.Algo.Properties
 
-up : Fin (1 + n) → Apps n m → Apps (1 + n) m
-up k nil = nil
-up k (e ∷a as) = ↑tm k e ∷a (up k as)
-up k (A ∷t as) = A ∷t (up k as)
-
-
 postulate
   ≤strengthen0 : ∀ {Γ : Env n m} {Σ A B}
     → Γ , A ⊢ B ≤ ↑Σ #0 Σ
@@ -19,7 +13,7 @@ postulate
     → Γ , A ⊢ B ≤ ↑Σ #0 Σ
   Σspl-weaken0 : ∀ {Σ : Context n m} {a̅}
     → ⟦ Σ ⟧⇒⟦ a̅ , □ ⟧
-    → ⟦ ↑Σ0 Σ ⟧⇒⟦ up #0 a̅ , □ ⟧
+    → ⟦ ↑Σ0 Σ ⟧⇒⟦ up0 a̅ , □ ⟧
 
 
 infix 4 _⊕_:=_
@@ -40,7 +34,7 @@ data _⊕_:=_ : Apps n m → Context n m → Context n m → Set where
 postulate
   ⊕-weaken0 : ∀ {Σ : Context n m} {es Σ'}
     → es ⊕ Σ' := Σ
-    → (up #0 es) ⊕ (↑Σ0 Σ') := ↑Σ0 Σ
+    → (up0 es) ⊕ (↑Σ0 Σ') := ↑Σ0 Σ
 
 
 subsumption : ∀ {Γ : Env n m} {Σ Σ' Σ'' A a̅ e}
@@ -117,3 +111,15 @@ subsumption {Σ' = ⟦ _ ⟧↝ Σ'} (⊢sub ⊢e ¬□ gc s₁) spl newΣ s = �
 subsumption {Σ' = ⟦ _ ⟧↝ Σ'} (⊢tabs₁ ⊢e) spl newΣ s = ⊢sub (⊢tabs₁ ⊢e) ne-tapp gc-tlam s
 subsumption {Σ' = ⟦ _ ⟧↝ Σ'} (⊢tapp ⊢e st) spl newΣ s with ⊢to≤ ⊢e
 ... | s-∀-t st' r = ⊢tapp (subsumption ⊢e (have-t spl) (⊕cons-t newΣ) (s-∀-t st s)) st
+
+
+----------------------------------------------------------------------
+--+                             Check                              +--
+----------------------------------------------------------------------
+
+-- if the context is a full type, then the inferred type should be same with the context
+⊢context-full-type : ∀ {Γ : Env n m} {e A B}
+  → Γ ⊢ τ A ⇒ e ⇒ B
+  → A ≡ B
+⊢context-full-type ⊢e with ⊢to≤ ⊢e
+... | s-refl = refl

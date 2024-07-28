@@ -14,14 +14,6 @@ e ▻ nil = e
 e ▻ (e' ∷a es) = (e · e') ▻ es
 e ▻ (A  ∷t es) = (e [ A ]) ▻ es
 
-up : Fin (1 + n) → Apps n m → Apps (1 + n) m
-up n nil = nil
-up n (e ∷a as) = (↑tm n e) ∷a (up n as)
-up n (A ∷t as) = A ∷t (up n as)
-
-up0 : Apps n m → Apps (1 + n) m
-up0 = up #0
-
 size-apps : Apps n m → ℕ
 size-apps nil = 0
 size-apps (_ ∷a as) = 1 + size-apps as
@@ -182,7 +174,9 @@ subst-3-tapp (suc k₁) (suc k₂) (suc k₃) x̅ x {j = S j} sz₁ sz₂ sz₃ 
   ⊢sub' (subst-3-tapp (suc k₁) k₂ {!!} x̅ x sz₁ sz-proof (s≤s m≤m) ⊢1 ⊢2)
     where sz-proof = (≤-<-trans (size-counter≥0 j) (<-pred sz₂))
 
-subst-3-tapp (suc k₁) (suc k₂) (suc k₃) x̅ x sz₁ sz₂ sz₃ (⊢tapp ⊢1 st) ⊢2 = {!!}
+subst-3-tapp (suc k₁) (suc k₂) (suc k₃) x̅ x (s≤s sz₁) sz₂ sz₃ (⊢tapp ⊢1 st) ⊢2 =
+  let ind-e₁ = subst-3 k₁ {!!} {!!} x̅ sz₁ {!!} {!!} ⊢1 ⊢2
+  in ⊢tapp ind-e₁ st
 
 subst-3 (suc k₁) (suc k₂) (suc k₃) e̅ sz₁ sz₂ sz₃ ⊢1 ⊢2 with size-apps e̅ >? 0
 subst-3 (suc k₁) (suc k₂) (suc k₃) e̅ {e = e} {e₁ = e₁} sz₁ sz₂ sz₃ ⊢1 ⊢2 | yes p with apps-destruct e̅ p

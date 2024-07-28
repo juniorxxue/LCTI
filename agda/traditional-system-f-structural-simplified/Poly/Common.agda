@@ -209,7 +209,6 @@ subst-unique' (st-var-neq ¬p) (st-var-neq ¬p₁) = refl
 subst-unique' (st-arr st1 st3) (st-arr st2 st4) rewrite subst-unique' st1 st2 | subst-unique' st3 st4 = refl
 subst-unique' (st-∀ up st1) (st-∀ up₁ st2) rewrite shift-unique up up₁ | subst-unique' st1 st2 = refl
 
-
 subst-unique : ∀ {A : Type m} {B B₁ B₂}
   → [ A ]ˢ B ⇨ B₁
   → [ A ]ˢ B ⇨ B₂
@@ -286,4 +285,18 @@ data [_/_]ˢˢ_⇨_ : Fin (1 + m) → Type m → AppsType (1 + m) → AppsType m
 [_]ˢˢ_⇨_ = [_/_]ˢˢ_⇨_ #0
 
 
+postulate
+  substs-unique : ∀ {A : Type m} {B B₁ B₂}
+    → [ A ]ˢˢ B ⇨ B₁
+    → [ A ]ˢˢ B ⇨ B₂
+    → B₁ ≡ B₂
+
+
+up : Fin (1 + n) → Apps n m → Apps (1 + n) m
+up n nil = nil
+up n (e ∷a as) = (↑tm n e) ∷a (up n as)
+up n (A ∷t as) = A ∷t (up n as)
+
+up0 : Apps n m → Apps (1 + n) m
+up0 = up #0
 

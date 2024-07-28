@@ -147,12 +147,11 @@ data ⟦_,_⟧→⟦_,_,_,_⟧ : Context n m → Type m → Apps n m → Context
     → ⟦ Σ , B ⟧→⟦ es , A' , Bs , B' ⟧
     → ⟦ ([ e ]↝ Σ) , A `→ B ⟧→⟦ e ∷a es , A' , A ∷a Bs , B' ⟧
 
-  have-t : ∀ {Σ : Context n m} {B A es A' B' Bs Bs' C C'}
-    → [ A ]ˢ B ⇨ B'
-    → [ A ]ˢ C ⇨ C'
-    → [ A ]ˢˢ Bs ⇨ Bs'
-    → ⟦ Σ , B' ⟧→⟦ es , A' , Bs' , C' ⟧ -- we lose a B == Bs + C here
-    → ⟦ ⟦ A ⟧↝ Σ , `∀ B ⟧→⟦ A ∷t es , A' , `∀ Bs , `∀ C ⟧
+  have-t : ∀ {Σ Σ' : Context n m} {B A es B' Bs Bs' C}
+    → (st : [ A ]ˢ B ⇨ B')
+    → (sts : [ A ]ˢˢ Bs ⇨ Bs')
+    → ⟦ Σ , B' ⟧→⟦ es , Σ' , Bs' , C ⟧
+    → ⟦ ⟦ A ⟧↝ Σ , `∀ B ⟧→⟦ A ∷t es , Σ' , `∀ Bs , C ⟧
 
 infix 4 ⟦_,_⟧⇢⟦_,_,_⟧
 

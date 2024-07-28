@@ -20,6 +20,7 @@ open import Poly.Algo
 
 -- subst-appstype : Fin (1 + m) → AppsType m → AppsType (1 + m)
 
+{-
 spl-weaken-tm : ∀ {Σ Σ' : Context n m} {A es As A' n}
   → ⟦ Σ , A ⟧→⟦ es , Σ' , As , A' ⟧
   → ⟦ ↑Σ n Σ , A ⟧→⟦ ↑tm-apps n es , ↑Σ n Σ' , As , A' ⟧
@@ -27,6 +28,7 @@ spl-weaken-tm none-□ = none-□
 spl-weaken-tm none-τ = none-τ
 spl-weaken-tm (have-e spl) = have-e (spl-weaken-tm spl)
 spl-weaken-tm (have-t st1 st2 sts spl) = have-t st1 st2 sts (spl-weaken-tm spl)
+-}
 
 {-
 spl-weaken-ty : ∀ {Σ Σ' : Context n m} {Σ' T A es As A' n B}
