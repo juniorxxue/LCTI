@@ -93,11 +93,11 @@ sound-c (⊢sub ⊢e ¬□ gc s) spl = {!!}
 sound-c (⊢tapp ⊢e st) spl = sound-c ⊢e (have-t st spl)
 -}
 
-create-sts : ∀ {Γ : Env n m} {Σ Σ' A A₁ A̅ B A' e̅}
-  → ⟦ Σ , A₁ ⟧→⟦ e̅ , Σ' , A̅ , A' ⟧
-  → [ A ]ˢ B ⇨ A₁
-  → Γ ⊢ A₁ ≤ Σ
-  → ∃[ B̅ ]([ A ]ˢˢ B̅ ⇨ A̅)
+create-sts : ∀ {Γ : Env n m} {Σ Σ' A B B' B̅' C e̅}
+  → ⟦ Σ , B' ⟧→⟦ e̅ , Σ' , B̅' , C ⟧
+  → [ A ]ˢ B ⇨ B'
+  → Γ ⊢ B' ≤ Σ
+  → ∃[ B̅ ]([ A ]ˢˢ B̅ ⇨ B̅')
 create-sts none-□ st s-empty = ⟨ nil , st-nil ⟩
 create-sts none-τ st s-refl = ⟨ nil , st-nil ⟩
 create-sts (have-e spl) st-var-eq (s-arr s ⊢e) with create-sts spl st-var-eq s
