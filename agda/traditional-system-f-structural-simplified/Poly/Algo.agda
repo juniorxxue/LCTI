@@ -122,7 +122,7 @@ data _⊢_≤_ where
     → Γ ⊢ A ≤ τ A
   s-arr : ∀ {e A B C}
     → Γ ⊢ B ≤ Σ
-    → Γ ⊢ τ A ⇒ e ⇒ C
+    → (⊢e : Γ ⊢ τ A ⇒ e ⇒ C)
     → Γ ⊢ A `→ B ≤ [ e ]↝ Σ 
   s-∀-t : ∀ {A B A'}
     → (st : [ B ]ˢ A ⇨ A')
