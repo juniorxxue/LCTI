@@ -7,13 +7,13 @@ open import Data.String using (String) public
 open import Relation.Nullary using (yes; no; Dec; ¬_) public
 open import Relation.Nullary.Decidable using (True; toWitness; fromWitness) public
 open import Function.Base using (case_of_; case_return_of_) public
-open import Relation.Binary.PropositionalEquality as Eq using (_≡_; _≢_; refl; cong; sym; ≢-sym) public
+open import Relation.Binary.PropositionalEquality as Eq using (_≡_; _≢_; refl; cong; cong₂; sym; ≢-sym) public
 open import Data.Empty public
 open import Data.Product using (_×_; proj₁; proj₂; ∃; ∃-syntax) renaming (_,_ to ⟨_,_⟩) public
 open import Data.List using (List; []; _∷_; _++_; reverse; map; foldr; downFrom) renaming (length to len) public
 open import Data.List.Properties using (map-++) public
 open import Data.Maybe using (Maybe; just; nothing) renaming (map to mmap) public
-open import Data.Fin using (Fin; punchIn; punchOut) renaming (zero to #0; suc to #S; pred to #pred) public
+open import Data.Fin using (Fin; punchIn; punchOut; inject₁) renaming (zero to #0; suc to #S; pred to #pred; _≤_ to _F≤_) public
 open import Data.Fin.Properties using () renaming (<-cmp to #<-cmp; _≟_ to _#≟_) public
 open import Function renaming (_∋_ to _∋⦂_) public
 

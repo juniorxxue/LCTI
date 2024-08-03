@@ -38,19 +38,17 @@ data _⊢_~_ where
 ↑ΣnonEmpty ne-app = ne-app
 ↑ΣnonEmpty ne-tapp = ne-tapp
 
-↑Σsymm : ∀ {Σ : Context n m} {k}
-  → ↑Σ0 (↑Σ k Σ) ≡ ↑Σ (#S k) (↑Σ0 Σ)
-↑Σsymm = {!   !}
+↑Σ-comm : ∀ {Σ : Context n m} {j : Fin (1 + n)} {k : Fin (1 + n)}
+  → j F≤ k
+  → ↑Σ (inject₁ j) (↑Σ k Σ) ≡ ↑Σ (#S k) (↑Σ j Σ)
+↑Σ-comm {Σ = □} j≤k = refl
+↑Σ-comm {Σ = τ A} j≤k = refl
+↑Σ-comm {Σ = [ e ]↝ Σ} j≤k = cong₂ [_]↝_ (↑tm-comm j≤k) (↑Σ-comm j≤k)
+↑Σ-comm {Σ = ⟦ A ⟧↝ Σ} j≤k = cong (⟦_⟧↝_ A) (↑Σ-comm j≤k)
 
-∈-weaken : ∀ {Γ : Env (1 + n) m} {k x A}
-  → (Γ /ˣ k) ∋ x ⦂ A
-  → Γ ∋ (punchIn k x) ⦂ A
-∈-weaken {Γ = Γ , A} {#0} ∈Γ = S, ∈Γ
-∈-weaken {m = zero} {Γ = Γ , A} {#S k} Z = Z
-∈-weaken {m = zero} {Γ = Γ , A} {#S k} (S, ∈Γ) = S, (∈-weaken ∈Γ)
-∈-weaken {suc n} {m = suc m} {Γ = Γ , A} {#S k} Z = Z
-∈-weaken {suc n} {m = suc m} {Γ = Γ , A} {#S k} (S, ∈Γ) = S, (∈-weaken ∈Γ)
-∈-weaken {Γ = Γ ,∙} (S∙ ∈Γ x) = S∙ (∈-weaken ∈Γ) x 
+↑Σ-comm0 : ∀ {Σ : Context n m} {k}
+  → ↑Σ0 (↑Σ k Σ) ≡ ↑Σ (#S k) (↑Σ0 Σ)
+↑Σ-comm0 = ↑Σ-comm _≤_.z≤n
 
 mutual
   ≤weaken : ∀ {Γ : Env (1 + n) m} {Σ k A}
@@ -70,7 +68,7 @@ mutual
   ⊢weaken (⊢app ⊢e) = ⊢app (⊢weaken ⊢e)
   ⊢weaken (⊢lam₁ ⊢e) = ⊢lam₁ (⊢weaken ⊢e)
   ⊢weaken {Γ = Γ} {k = k} (⊢lam₂ {Σ = Σ} {A} ⊢e ⊢e₁) with ⊢weaken {Γ = Γ , A} { k = #S k} ⊢e₁ 
-  ... | p rewrite (sym (↑Σsymm {Σ = Σ} {k = k})) = ⊢lam₂ (⊢weaken ⊢e) p
+  ... | p rewrite (sym (↑Σ-comm0 {Σ = Σ} {k = k})) = ⊢lam₂ (⊢weaken ⊢e) p
   ⊢weaken (⊢sub ⊢e ¬□ gc s) = ⊢sub (⊢weaken ⊢e) (↑ΣnonEmpty ¬□) (↑tmGenCon gc) (≤weaken s)
   ⊢weaken (⊢tabs₁ ⊢e) = ⊢tabs₁ (⊢weaken ⊢e)
   ⊢weaken (⊢tapp ⊢e st) = ⊢tapp (⊢weaken ⊢e) st  
