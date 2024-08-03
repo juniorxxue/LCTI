@@ -45,11 +45,12 @@ data _⊢_~_ where
 ∈-weaken : ∀ {Γ : Env (1 + n) m} {k x A}
   → (Γ /ˣ k) ∋ x ⦂ A
   → Γ ∋ (punchIn k x) ⦂ A
-∈-weaken ∈Γ = {!   !} 
-
-weaken_cons_eq : ∀ {Γ : Env (1 + n) m} {A k} → 
-  ((Γ /ˣ k) , A) ≡ ((Γ , A) /ˣ ( #S k ))
-weaken_cons_eq = refl
+∈-weaken {Γ = Γ , A} {#0} ∈Γ = S, ∈Γ
+∈-weaken {m = zero} {Γ = Γ , A} {#S k} Z = Z
+∈-weaken {m = zero} {Γ = Γ , A} {#S k} (S, ∈Γ) = S, (∈-weaken ∈Γ)
+∈-weaken {suc n} {m = suc m} {Γ = Γ , A} {#S k} Z = Z
+∈-weaken {suc n} {m = suc m} {Γ = Γ , A} {#S k} (S, ∈Γ) = S, (∈-weaken ∈Γ)
+∈-weaken {Γ = Γ ,∙} (S∙ ∈Γ x) = S∙ (∈-weaken ∈Γ) x 
 
 mutual
   ≤weaken : ∀ {Γ : Env (1 + n) m} {Σ k A}
@@ -68,7 +69,7 @@ mutual
   ⊢weaken (⊢ann ⊢e) = ⊢ann (⊢weaken ⊢e)
   ⊢weaken (⊢app ⊢e) = ⊢app (⊢weaken ⊢e)
   ⊢weaken (⊢lam₁ ⊢e) = ⊢lam₁ (⊢weaken ⊢e)
-  ⊢weaken {Γ = Γ} {k = k} (⊢lam₂ {Σ = Σ} {A} ⊢e ⊢e₁) rewrite (weaken_cons_eq { Γ = Γ } { A = A } { k =  k } ) with ⊢weaken {Γ = Γ , A} { k = #S k} ⊢e₁ 
+  ⊢weaken {Γ = Γ} {k = k} (⊢lam₂ {Σ = Σ} {A} ⊢e ⊢e₁) with ⊢weaken {Γ = Γ , A} { k = #S k} ⊢e₁ 
   ... | p rewrite (sym (↑Σsymm {Σ = Σ} {k = k})) = ⊢lam₂ (⊢weaken ⊢e) p
   ⊢weaken (⊢sub ⊢e ¬□ gc s) = ⊢sub (⊢weaken ⊢e) (↑ΣnonEmpty ¬□) (↑tmGenCon gc) (≤weaken s)
   ⊢weaken (⊢tabs₁ ⊢e) = ⊢tabs₁ (⊢weaken ⊢e)
