@@ -38,18 +38,41 @@ data _⊢_~_ where
 ↑ΣnonEmpty ne-app = ne-app
 ↑ΣnonEmpty ne-tapp = ne-tapp
 
-⊢weaken : ∀ {Γ : Env (1 + n) m} { Σ k e A }
-  → (Γ /ˣ k) ⊢ Σ ⇒ e ⇒ A
-  → Γ ⊢ ↑Σ k Σ ⇒ ↑tm k e ⇒ A
-⊢weaken ⊢lit = ⊢lit
-⊢weaken (⊢var x∈Γ) = ⊢var {!   !}
-⊢weaken (⊢ann ⊢e) = ⊢ann (⊢weaken ⊢e)
-⊢weaken (⊢app ⊢e) = ⊢app (⊢weaken ⊢e)
-⊢weaken (⊢lam₁ ⊢e) = ⊢lam₁ (⊢weaken ⊢e)
-⊢weaken (⊢lam₂ ⊢e ⊢e₁) = ⊢lam₂ (⊢weaken ⊢e) {!   !}
-⊢weaken (⊢sub ⊢e ¬□ gc s) = ⊢sub (⊢weaken ⊢e) (↑ΣnonEmpty ¬□) (↑tmGenCon gc) {!   !}
-⊢weaken (⊢tabs₁ ⊢e) = ⊢tabs₁ (⊢weaken ⊢e)
-⊢weaken (⊢tapp ⊢e st) = ⊢tapp (⊢weaken ⊢e) st  
+↑Σsymm : ∀ {Σ : Context n m} {k}
+  → ↑Σ0 (↑Σ k Σ) ≡ ↑Σ (#S k) (↑Σ0 Σ)
+↑Σsymm = {!   !}
+
+∈-weaken : ∀ {Γ : Env (1 + n) m} {k x A}
+  → (Γ /ˣ k) ∋ x ⦂ A
+  → Γ ∋ (punchIn k x) ⦂ A
+∈-weaken ∈Γ = {!   !} 
+
+weaken_cons_eq : ∀ {Γ : Env (1 + n) m} {A k} → 
+  ((Γ /ˣ k) , A) ≡ ((Γ , A) /ˣ ( #S k ))
+weaken_cons_eq = refl
+
+mutual
+  ≤weaken : ∀ {Γ : Env (1 + n) m} {Σ k A}
+    → (Γ /ˣ k) ⊢ A ≤ Σ
+    → Γ ⊢ A ≤ ↑Σ k Σ
+  ≤weaken s-empty = s-empty
+  ≤weaken s-refl = s-refl
+  ≤weaken (s-arr ≤A ⊢e) = s-arr (≤weaken ≤A) (⊢weaken ⊢e)
+  ≤weaken (s-∀-t st ≤A) = s-∀-t st (≤weaken ≤A)
+
+  ⊢weaken : ∀ {Γ : Env (1 + n) m} { Σ k e A }
+    → (Γ /ˣ k) ⊢ Σ ⇒ e ⇒ A
+    → Γ ⊢ ↑Σ k Σ ⇒ ↑tm k e ⇒ A
+  ⊢weaken ⊢lit = ⊢lit
+  ⊢weaken (⊢var x∈Γ) = ⊢var (∈-weaken x∈Γ)
+  ⊢weaken (⊢ann ⊢e) = ⊢ann (⊢weaken ⊢e)
+  ⊢weaken (⊢app ⊢e) = ⊢app (⊢weaken ⊢e)
+  ⊢weaken (⊢lam₁ ⊢e) = ⊢lam₁ (⊢weaken ⊢e)
+  ⊢weaken {Γ = Γ} {k = k} (⊢lam₂ {Σ = Σ} {A} ⊢e ⊢e₁) rewrite (weaken_cons_eq { Γ = Γ } { A = A } { k =  k } ) with ⊢weaken {Γ = Γ , A} { k = #S k} ⊢e₁ 
+  ... | p rewrite (sym (↑Σsymm {Σ = Σ} {k = k})) = ⊢lam₂ (⊢weaken ⊢e) p
+  ⊢weaken (⊢sub ⊢e ¬□ gc s) = ⊢sub (⊢weaken ⊢e) (↑ΣnonEmpty ¬□) (↑tmGenCon gc) (≤weaken s)
+  ⊢weaken (⊢tabs₁ ⊢e) = ⊢tabs₁ (⊢weaken ⊢e)
+  ⊢weaken (⊢tapp ⊢e st) = ⊢tapp (⊢weaken ⊢e) st  
 
 -- postulate
 ~weaken : ∀ {Γ : Env (1 + n) m} {Σ B j k}
