@@ -3,6 +3,7 @@ module Poly.Complete where
 open import Poly.Common
 open import Poly.Decl
 open import Poly.Algo
+open import Poly.Basic
 open import Poly.Algo.Subsumption
 
 infix 3 _⊢_~_
@@ -22,16 +23,46 @@ data _⊢_~_ where
     → Γ ⊢ ⟨ j , B ⟩ ~ Σ
     → Γ ⊢ ⟨ S j , A `→ B ⟩ ~ ([ e ]↝ Σ) -- got a deeper undersantding of it, how the S will be eliminated, at least in two places in STLC
 
-postulate
-  ~weaken0 : ∀ {Γ : Env n m} {Σ A B j}
-    → Γ ⊢ ⟨ j , B ⟩ ~ Σ
-    → Γ , A ⊢ ⟨ j , B ⟩ ~ ↑Σ0 Σ
-{-    
-  subsumption0 : ∀ {Γ : Env n m} {Σ A e}
-    → Γ ⊢ □ ⇒ e ⇒ A
-    → Γ ⊢ A ≤ Σ
-    → Γ ⊢ Σ ⇒ e ⇒ A
--}    
+↑tmGenCon : ∀ {e : Term n m} {k }
+  → GenericConsumer e 
+  → GenericConsumer (↑tm k e)
+↑tmGenCon {e = .(Term _ _ ∋⦂ lit _)} gc-i = gc-i
+↑tmGenCon {e = .(Term _ _ ∋⦂ ` _)} gc-var = gc-var
+↑tmGenCon {e = .(_ ⦂ _)} gc-ann = gc-ann
+↑tmGenCon {e = .(Λ _)} gc-tlam = gc-tlam 
+
+↑ΣnonEmpty : ∀ {Σ : Context n m} {k}
+  → NonEmpty Σ
+  → NonEmpty (↑Σ k Σ)
+↑ΣnonEmpty ne-τ = ne-τ
+↑ΣnonEmpty ne-app = ne-app
+↑ΣnonEmpty ne-tapp = ne-tapp
+
+⊢weaken : ∀ {Γ : Env (1 + n) m} { Σ k e A }
+  → (Γ /ˣ k) ⊢ Σ ⇒ e ⇒ A
+  → Γ ⊢ ↑Σ k Σ ⇒ ↑tm k e ⇒ A
+⊢weaken ⊢lit = ⊢lit
+⊢weaken (⊢var x∈Γ) = ⊢var {!   !}
+⊢weaken (⊢ann ⊢e) = ⊢ann (⊢weaken ⊢e)
+⊢weaken (⊢app ⊢e) = ⊢app (⊢weaken ⊢e)
+⊢weaken (⊢lam₁ ⊢e) = ⊢lam₁ (⊢weaken ⊢e)
+⊢weaken (⊢lam₂ ⊢e ⊢e₁) = ⊢lam₂ (⊢weaken ⊢e) {!   !}
+⊢weaken (⊢sub ⊢e ¬□ gc s) = ⊢sub (⊢weaken ⊢e) (↑ΣnonEmpty ¬□) (↑tmGenCon gc) {!   !}
+⊢weaken (⊢tabs₁ ⊢e) = ⊢tabs₁ (⊢weaken ⊢e)
+⊢weaken (⊢tapp ⊢e st) = ⊢tapp (⊢weaken ⊢e) st  
+
+-- postulate
+~weaken : ∀ {Γ : Env (1 + n) m} {Σ B j k}
+  → Γ /ˣ k ⊢ ⟨ j , B ⟩ ~ Σ
+  → Γ ⊢ ⟨ j , B ⟩ ~ ↑Σ k Σ 
+~weaken ~Z = ~Z 
+~weaken ~∞ = ~∞
+~weaken (~S ⊢e ~) = ~S (⊢weaken ⊢e) (~weaken ~)
+
+~weaken0 : ∀ {Γ : Env n m} {Σ A B j}
+  → Γ ⊢ ⟨ j , B ⟩ ~ Σ
+  → Γ , A ⊢ ⟨ j , B ⟩ ~ ↑Σ0 Σ
+~weaken0 {Γ = Γ} {A = A} ~ = ~weaken {Γ = Γ , A} { k = #0 } ~
 
 complete : ∀ {Γ : Env n m} {Σ j e A}
   → Γ ⊢ j # e ⦂ A
