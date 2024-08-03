@@ -78,13 +78,11 @@ shift-unique (↑∀ sf1) (↑∀ sf2) rewrite shift-unique sf1 sf2 = refl
 
 infixl 4 _,_
 infixl 4 _,∙
-infixl 4 _,=_
 
 data Env : ℕ → ℕ → Set where
   ∅     : Env 0 0
   _,_   : Env n m → (A : Type m) → Env (1 + n) m
   _,∙   : Env n m → Env n (1 + m)
-  _,=_  : Env n m → (A : Type m) → Env n (1 + m)
 
 
 private variable
@@ -95,23 +93,18 @@ lookup : Env n m → Fin n → Type m
 lookup (Γ , A) #0     = A
 lookup (Γ , A) (#S k) = lookup Γ k
 lookup (Γ ,∙) k       = ↑ty0 (lookup Γ k)
-lookup (Γ ,= A) k     = ↑ty0 (lookup Γ k)
 
 infix 3 _∋_⦂_
 data _∋_⦂_ : Env n m → Fin n → Type m → Set where
   Z : ∀ {A}
-    → Γ ∋ #0 ⦂ A
-  S, : ∀ {A k}
+    → Γ , A ∋ #0 ⦂ A
+  S, : ∀ {A B k}
     → Γ ∋ k ⦂ A
-    → Γ , A ∋ #S k ⦂ A
+    → Γ , B ∋ #S k ⦂ A
   S∙ : ∀ {A A' k}
     → Γ ∋ k ⦂ A
     → ty A ↑ #0 ⇨ A'
     → Γ ,∙ ∋ k ⦂ A'
-  S,= : ∀ {A A' B k}
-    → Γ ∋ k ⦂ A
-    → ty A ↑ #0 ⇨ A'
-    → Γ ,= B ∋ k ⦂ A'
 
 ----------------------------------------------------------------------
 --+                           Type Subst                           +--
@@ -237,21 +230,6 @@ infix 6 [_]ᵗ_
 -- unshift is just substing with a random type
 ↓ty0 : Type (1 + m) → Type m
 ↓ty0 A = [ Int ]ˢ A
-
--- solved existentials (k = A) is in Γ
-infix 3 _:=_∈_
-data _:=_∈_ : Fin m → Type m → Env n m → Set where
-
-  Z : ∀ {A} → #0 := A ∈ Γ ,= ↓ty0 A
-  S, : ∀ {k A B}
-    → k := A ∈ Γ
-    → k := A ∈ Γ , B
-  S∙ : ∀ {k A}
-    → k := ↓ty0 A ∈ Γ
-    → #S k := A ∈ Γ ,∙
-  S= : ∀ {k A B}
-    → k := ↓ty0 A ∈ Γ
-    → #S k := A ∈ Γ ,= B
 
 ----------------------------------------------------------------------
 --+                            Structs                             +--

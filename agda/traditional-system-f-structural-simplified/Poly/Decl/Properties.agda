@@ -36,32 +36,17 @@ _/ˣ_ : Env (1 + n) m → Fin (1 + n) → Env n m
 (Γ , A) /ˣ #0 = Γ
 _/ˣ_ {suc n} (Γ , A) (#S k) = (Γ /ˣ k) , A
 (Γ ,∙) /ˣ k = (Γ /ˣ k) ,∙
-(Γ ,= A) /ˣ k = (Γ /ˣ k) ,= A
-
-∈-weaken : ∀ {Γ : Env (1 + n) m} {k X B}
-  → X := B ∈ (Γ /ˣ k)
-  → X := B ∈ Γ
-∈-weaken {m = suc m} {Γ = Γ , A} {#0} ∈Γ = S, ∈Γ
-∈-weaken {suc n} {m = suc m} {Γ = Γ , A} {#S k} (S, ∈Γ) = S, (∈-weaken ∈Γ)
-∈-weaken {Γ = _,∙ {m = zero} Γ} (S∙ {k = ()} ∈Γ)
-∈-weaken {Γ = _,∙ {m = suc m} Γ} (S∙ ∈Γ) = S∙ (∈-weaken ∈Γ)
-∈-weaken {Γ = Γ ,= A} {B = B} (S= ∈Γ) = S= (∈-weaken ∈Γ)
-∈-weaken {m = suc m} {Γ ,= A} {X = #0} Z = Z
 
 lookup-weaken : ∀ {Γ : Env (1 + n) m} {k x}
   → lookup (Γ /ˣ k) x ≡ lookup Γ (punchIn k x)
 lookup-weaken {Γ = Γ , A} {k = #0} {x = #0} = refl
 lookup-weaken {Γ = Γ ,∙} {k = #0} {x = #0} = cong ↑ty0 (lookup-weaken {Γ = Γ})
-lookup-weaken {Γ = Γ ,= A} {k = #0} {x = #0} = cong ↑ty0 (lookup-weaken {Γ = Γ})
 lookup-weaken {Γ = Γ , A} {k = #S k} {x = #0} = refl
 lookup-weaken {Γ = Γ ,∙} {k = #S k} {x = #0} = cong ↑ty0 (lookup-weaken {Γ = Γ})
-lookup-weaken {Γ = Γ ,= A} {k = #S k} {x = #0} = cong ↑ty0 (lookup-weaken {Γ = Γ})
 lookup-weaken {Γ = Γ , A} {k = #0} {x = #S x} = refl
 lookup-weaken {Γ = Γ ,∙} {k = #0} {x = #S x} = cong ↑ty0 (lookup-weaken {Γ = Γ})
-lookup-weaken {Γ = Γ ,= A} {k = #0} {x = #S x} = cong ↑ty0 (lookup-weaken {Γ = Γ})
 lookup-weaken {Γ = Γ , A} {k = #S k} {x = #S x} = lookup-weaken {Γ = Γ} {k = k} {x = x}
 lookup-weaken {Γ = Γ ,∙} {k = #S k} {x = #S x} = cong ↑ty0 (lookup-weaken {Γ = Γ})
-lookup-weaken {Γ = Γ ,= A} {k = #S k} {x = #S x} = cong ↑ty0 (lookup-weaken {Γ = Γ})
 
 weaken : ∀ {Γ : Env (1 + n) m} {k j e A}
   → Γ /ˣ k ⊢ j # e ⦂ A
