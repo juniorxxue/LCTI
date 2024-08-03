@@ -1,8 +1,4 @@
-{-# OPTIONS --allow-unsolved-metas #-}
-
 module Poly.Basic where
-
--- open import Data.Fin using (_≤_; inject₁)
 
 open import Poly.Common
 
