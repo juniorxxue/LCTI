@@ -133,6 +133,23 @@ data _⊢_≤_ where
 --+                           Splitting                            +--
 ----------------------------------------------------------------------
 
+-- Bs' / A by B ⇨ Bs
+infix 4 _/_by_⇨_
+data _/_by_⇨_ : AppsType m → Type m → Type (1 + m) → AppsType (1 + m) → Set where
+  /by-nil : ∀ {A : Type m} {B}
+    → nil / A by B ⇨ nil
+  /by-cons : ∀ {A : Type m} {B' Bs Bs' B₁ B₂}
+    → [ A ]ˢ B₁ ⇨ B'
+    → Bs' / A by B₂ ⇨ Bs
+    → B' ∷a Bs' / A by (B₁ `→ B₂) ⇨ B₁ ∷a Bs
+  /by-∀ : ∀ {A : Type m} {B Bs Bs' A'}
+--    → [ A ]ˢ B₁ ⇨ B'
+    → ty A ↑ #0 ⇨ A'
+    → Bs' / A' by B ⇨ Bs
+    → `∀ Bs' / A by `∀ B ⇨ `∀ Bs
+
+
+
 infix 4 ⟦_,_⟧→⟦_,_,_,_⟧
 
 data ⟦_,_⟧→⟦_,_,_,_⟧ : Context n m → Type m → Apps n m → Context n m → AppsType m → Type m → Set where
@@ -147,11 +164,31 @@ data ⟦_,_⟧→⟦_,_,_,_⟧ : Context n m → Type m → Apps n m → Context
     → ⟦ Σ , B ⟧→⟦ es , A' , Bs , B' ⟧
     → ⟦ ([ e ]↝ Σ) , A `→ B ⟧→⟦ e ∷a es , A' , A ∷a Bs , B' ⟧
 
-  have-t : ∀ {Σ Σ' : Context n m} {B A es B' Bs Bs' C}
+  have-t : ∀ {Σ Σ' : Context n m} {B A es B' Bs' C Bs}
     → (st : [ A ]ˢ B ⇨ B')
-    → (sts : [ A ]ˢˢ Bs ⇨ Bs')
+    → (sts : [ A ]ˢˢ Bs ⇨ Bs') -- new
+    -- may be
     → ⟦ Σ , B' ⟧→⟦ es , Σ' , Bs' , C ⟧
+    --  → (sts' : with Bs' / A by `∀ B ⇨ `∀ Bs
+    -- sts' should derive sts
     → ⟦ ⟦ A ⟧↝ Σ , `∀ B ⟧→⟦ A ∷t es , Σ' , `∀ Bs , C ⟧
+
+data ⟦_,_⟧⇒⟦_⟧ : Context n m → Type m → AppsType m → Set where
+
+  none-□ : ∀ {A}
+    → ⟦ (Context n m ∋⦂ □) , A ⟧⇒⟦ nil ⟧
+
+  none-τ : ∀ {A B}
+    → ⟦ (Context n m ∋⦂ τ A) , B ⟧⇒⟦ nil ⟧
+
+  have-e : ∀ {Σ : Context n m} {e A B Bs}
+    → ⟦ Σ , B ⟧⇒⟦  Bs ⟧
+    → ⟦ ([ e ]↝ Σ) , A `→ B ⟧⇒⟦ A ∷a Bs ⟧
+
+  have-t : ∀ {Σ : Context n m} {B A Bs}
+    → ty-in-con Σ ↑ #0 ⇨ Σ'
+    → ⟦ Σ' , B ⟧⇒⟦ Bs ⟧
+    → ⟦ ⟦ A ⟧↝ Σ , `∀ B ⟧⇒⟦ `∀ Bs ⟧
 
 infix 4 ⟦_,_⟧⇢⟦_,_,_⟧
 
