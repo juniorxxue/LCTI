@@ -161,6 +161,13 @@ data _/_at_by_⇨_ : AppsType m → Type m → Fin (1 + m) →  Type (1 + m) →
     → Bs' / A' at (#S k) by B ⇨ Bs
     → `∀ Bs' / A at k by `∀ B ⇨ `∀ Bs
 
+
+-- which implies a multi-substitution
+postulate
+  shallow-split-implies-substs : ∀ {A : Type m} {Bs' Bs B}
+    → Bs' / A at #0 by B ⇨ Bs
+    → [ A ]ˢˢ Bs ⇨ Bs'
+
 infix 4 ⟦_,_⟧→⟦_,_,_,_⟧
 
 data ⟦_,_⟧→⟦_,_,_,_⟧ : Context n m → Type m → Apps n m → Context n m → AppsType m → Type m → Set where
@@ -177,8 +184,9 @@ data ⟦_,_⟧→⟦_,_,_,_⟧ : Context n m → Type m → Apps n m → Context
 
   have-t : ∀ {Σ Σ' : Context n m} {B A es B' Bs' C Bs}
     → (st : [ A ]ˢ B ⇨ B')
-    → (sts : [ A ]ˢˢ Bs ⇨ Bs') -- new
+--    → (sts : [ A ]ˢˢ Bs ⇨ Bs') -- new
     -- may be
+    → Bs' / A at #0 by B ⇨ Bs
     → ⟦ Σ , B' ⟧→⟦ es , Σ' , Bs' , C ⟧
     --  → (sts' : with Bs' / A by `∀ B ⇨ `∀ Bs
     -- sts' should derive sts
