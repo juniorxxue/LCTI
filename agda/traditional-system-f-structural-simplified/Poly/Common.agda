@@ -63,6 +63,16 @@ shift-unique ↑var ↑var = refl
 shift-unique (↑arr sf1 sf3) (↑arr sf2 sf4) rewrite shift-unique sf1 sf2 | shift-unique sf3 sf4 = refl
 shift-unique (↑∀ sf1) (↑∀ sf2) rewrite shift-unique sf1 sf2 = refl
 
+shift-total : forall (A : Type m) (k)
+  → ∃ λ A' → ty A ↑ k ⇨ A'
+shift-total Int k = ⟨ Int , ↑int ⟩
+shift-total (‶ X) k = ⟨ (‶ punchIn k X) , ↑var ⟩
+shift-total (A `→ A₁) k with shift-total A k
+... | ⟨ fst , snd ⟩ with shift-total A₁ k
+... | ⟨ fst₁ , snd₁ ⟩ = ⟨ (fst `→ fst₁) , ↑arr snd snd₁ ⟩
+shift-total (`∀ A) k with shift-total A (#S k) 
+... | ⟨ fst , snd ⟩ = ⟨ (`∀ fst) , (↑∀ snd) ⟩
+
 ↑ty : Fin (1 + m) → Type m → Type (1 + m)
 ↑ty k Int      = Int
 ↑ty k (‶ X)    = ‶ punchIn k X
