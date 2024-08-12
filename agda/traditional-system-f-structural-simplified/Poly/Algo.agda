@@ -148,7 +148,18 @@ data _/_by_⇨_ : AppsType m → Type m → Type (1 + m) → AppsType (1 + m) �
     → Bs' / A' by B ⇨ Bs
     → `∀ Bs' / A by `∀ B ⇨ `∀ Bs
 
-
+infix 4 _/_at_by_⇨_
+data _/_at_by_⇨_ : AppsType m → Type m → Fin (1 + m) →  Type (1 + m) → AppsType (1 + m) → Set where
+  /by-nil : ∀ {A : Type m} {B k}
+    → nil / A at k by B ⇨ nil
+  /by-cons : ∀ {A : Type m} {B' Bs Bs' B₁ B₂ k}
+    → [ k / A ]ˢ B₁ ⇨ B'
+    → Bs' / A at k by B₂ ⇨ Bs
+    → B' ∷a Bs' / A at k by (B₁ `→ B₂) ⇨ B₁ ∷a Bs
+  /by-∀ : ∀ {A : Type m} {B Bs Bs' A' k}
+    → ty A ↑ #0 ⇨ A'
+    → Bs' / A' at (#S k) by B ⇨ Bs
+    → `∀ Bs' / A at k by `∀ B ⇨ `∀ Bs
 
 infix 4 ⟦_,_⟧→⟦_,_,_,_⟧
 

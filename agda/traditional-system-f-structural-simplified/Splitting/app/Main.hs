@@ -3,9 +3,11 @@
 {-# HLINT ignore "Redundant multi-way if" #-}
 module Main where
 
+import Debug.Trace
 
-data Typ = TInt | TVar Int | TArr Typ Typ | TForall Typ
-data Trm = Lit Int | Var Int | Abs Trm | App Trm Trm | Ann Trm Typ | TAbs Trm | TApp Trm Typ
+
+data Typ = TInt | TVar Int | TArr Typ Typ | TForall Typ deriving Eq
+data Trm = Lit Int | Var Int | Abs Trm | App Trm Trm | Ann Trm Typ | TAbs Trm | TApp Trm Typ deriving Eq
 
 instance Show Typ where
   show TInt = "Int"
@@ -120,8 +122,14 @@ instance Show AppsTyp where
   show (ConsTyp ty apps) = show ty ++ "; " ++ show apps
   show (AppsForall apps) = "∀. " ++ show apps
 
-split' :: Context -> Typ -> AppsTyp -> AppsTyp
-split' = undefined
+-- examples
+-- split' (Cons TInt (Cons TInt Nil)) TInt (TForall (TArr (TVar 0) (TVar 0)))
+split' :: AppsTyp -> Typ -> Typ -> AppsTyp
+split' appstyp tyA tyB | trace ("split' " ++ show appstyp ++ " " ++ show tyA ++ " " ++ show tyB) False = undefined
+split' NilTyp tyA tyB = NilTyp
+-- split' (ConsTyp ty apps) tyA (TArr tyB1 tyB2) | substTyp0 tyA tyB1 == ty = ConsTyp ty (split' apps tyA tyB2)
+split' (ConsTyp ty apps) tyA (TArr tyB1 tyB2) = ConsTyp ty (split' apps tyA tyB2)
+split' (AppsForall apps) tyA (TForall tyB) = AppsForall (split' apps tyA tyB)
 
 split :: Context -> Typ -> ((Apps, Context), (AppsTyp, Typ))
 split CEmpty tyA = ((Nil, CEmpty), (NilTyp, tyA))
@@ -131,10 +139,11 @@ split (CTerm trm ctx) (TArr tyA tyB) = ((Cons trm apps, ctx'), (ConsTyp tyA apps
 split (CTApp tyA ctx) (TForall tyB) = ((ConsTy tyA apps, ctx'), (AppsForall appsTyp, tyC))
                                       where
                                         ((apps, ctx'), (appsTyp', tyC)) = split ctx (substTyp0 tyA tyB)
-                                        appsTyp = split' ctx tyB appsTyp'
+                                        appsTyp = split' appsTyp' tyA tyB
 
 
 main :: IO ()
 main = do
-    print $ split (CTerm (Lit 1) CEmpty) (TArr TInt TInt)
-    putStrLn "Hello, Haskell!"
+    -- print $ split (CTerm (Lit 1) CEmpty) (TArr TInt TInt)
+    print $ split' (ConsTyp TInt (ConsTyp TInt NilTyp)) TInt (TForall (TArr (TVar 0) (TVar 0)))
+    -- putStrLn "Hello, Haskell!"
