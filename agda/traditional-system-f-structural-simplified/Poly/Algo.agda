@@ -174,7 +174,6 @@ shallow-split-implies-substs {Bs = nil} /by-nil = st-nil
 shallow-split-implies-substs {Bs = x ∷a Bs} (/by-cons st spls) = st-cons st (shallow-split-implies-substs {Bs = Bs} spls)
 shallow-split-implies-substs {Bs = `∀ Bs} (/by-∀ x spls) = st-∀ x (shallow-split-implies-substs {Bs = Bs} spls)
 
-
 infix 4 ⟦_,_⟧→⟦_,_,_,_⟧
 
 data ⟦_,_⟧→⟦_,_,_,_⟧ : Context n m → Type m → Apps n m → Context n m → AppsType m → Type m → Set where
@@ -215,5 +214,13 @@ data ⟦_⟧⇒⟦_,_⟧ : Context n m → Apps n m → Context n m → Set wher
     → ⟦ ⟦ A ⟧↝ Σ ⟧⇒⟦ A ∷t es , Σ' ⟧
 
 
-
-
+-- not sure this is correct
+-- some side-condition might need to constrain between the Bs and B
+shallow-split-is-algo' : ∀ (A : Type m) Bs' B {A₁ e̅ A' k}
+  → (⟦ Σ , A₁ ⟧→⟦ e̅ , □ , Bs' , A' ⟧)
+  → [ k / A ]ˢ B ⇨ A₁
+  → (Γ ⊢ `∀ B ≤ ⟦ A ⟧↝ Σ)
+  → ∃[ Bs ](Bs' / A at k by B ⇨ Bs)
+shallow-split-is-algo' A nil B spl st s = ⟨ nil , /by-nil ⟩
+shallow-split-is-algo' A (x ∷a Bs') B (have-e spl) st (s-∀-t st₁ s) = {!!}
+shallow-split-is-algo' A (`∀ Bs') B (have-t st₂ x spl) st (s-∀-t st₁ (s-∀-t st₃ s)) = {!shallow-split-is-algo' ? ? ? spl ? ?!}
