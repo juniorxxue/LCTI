@@ -153,7 +153,7 @@ data _/_at_by_⇨_ : AppsType m → Type m → Fin (1 + m) →  Type (1 + m) →
   /by-nil : ∀ {A : Type m} {B k}
     → nil / A at k by B ⇨ nil
   /by-cons : ∀ {A : Type m} {B' Bs Bs' B₁ B₂ k}
-    → [ k / A ]ˢ B₁ ⇨ B'
+    → (st : [ k / A ]ˢ B₁ ⇨ B')
     → Bs' / A at k by B₂ ⇨ Bs
     → B' ∷a Bs' / A at k by (B₁ `→ B₂) ⇨ B₁ ∷a Bs
   /by-∀ : ∀ {A : Type m} {B Bs Bs' A' k}
@@ -164,11 +164,15 @@ data _/_at_by_⇨_ : AppsType m → Type m → Fin (1 + m) →  Type (1 + m) →
 
 -- which implies a multi-substitution
 postulate
-  shallow-split-implies-substs : ∀ {A : Type m} {Bs' Bs B}
-    → Bs' / A at #0 by B ⇨ Bs
-    → [ A ]ˢˢ Bs ⇨ Bs'
   shallow-split-is-algo : ∀ (A : Type m) Bs' B
     → ∃[ Bs ](Bs' / A at #0 by B ⇨ Bs)
+
+shallow-split-implies-substs : ∀ {A : Type m} {k Bs' Bs B}
+  → Bs' / A at k by B ⇨ Bs
+  → [ k / A ]ˢˢ Bs ⇨ Bs'
+shallow-split-implies-substs {Bs = nil} /by-nil = st-nil
+shallow-split-implies-substs {Bs = x ∷a Bs} (/by-cons st spls) = st-cons st (shallow-split-implies-substs {Bs = Bs} spls)
+shallow-split-implies-substs {Bs = `∀ Bs} (/by-∀ x spls) = st-∀ x (shallow-split-implies-substs {Bs = Bs} spls)
 
 
 infix 4 ⟦_,_⟧→⟦_,_,_,_⟧
