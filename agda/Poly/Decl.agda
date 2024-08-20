@@ -6,12 +6,10 @@ data Counter : Set where
   Z  : Counter
   ∞  : Counter
   S  : Counter → Counter
-  Sτ : Counter → Counter
 
 data NonZ : Counter → Set where
   nz-∞ : NonZ ∞
   nz-S : ∀ {j} → NonZ (S j)
-  nz-Sτ : ∀ {j} → NonZ (Sτ j)
 
 private
   variable
@@ -91,9 +89,11 @@ data find : Type (1 + m) → Fin (1 + m) → Counter → Set where
   f-S₃ :  ∀ {A : Type (2 + m)} {k j}
     → find A (#S k) (S j)
     → find (`∀ A) k (S j)
+{-    
   f-Sτ : ∀ {A : Type (2 + m)} {k j}
     → find A (#S k) j
     → find (`∀ A) k (Sτ j)
+-}    
   
 infix 3 _⊢_#_≤_
 data _⊢_#_≤_ : Env n m → Counter → Type m → Type m → Set where
@@ -121,9 +121,6 @@ data _⊢_#_≤_ : Env n m → Counter → Type m → Type m → Set where
 -- what we does is to make sure the all inputs matching the counter should at least have the quantifer contained
     → find A #0 (S j)
     → Γ ⊢ S j # `∀ A ≤ ([ B ]ˢ C) `→ ([ B ]ˢ D)
-  s-∀lτ : ∀ {j A B C}
-    → Γ ,= B ⊢ j # A ≤ C
-    → Γ ⊢ Sτ j # `∀ A ≤ [ B ]ˢ C
   -- two atomic rules, not sure where to use them
   s-var-l : ∀ {X A B}
     → X := B ∈ Γ
@@ -164,38 +161,11 @@ data _⊢_#_⦂_ : Env n m → Counter → Term n m → Type m → Set where
     → Γ ⊢ j # e ⦂ A
   ⊢tabs₁ : ∀ {e A}
     → Γ ,∙ ⊢ Z # e ⦂ A
-    → Γ ⊢ Z # Λ e ⦂ `∀ A    
-  ⊢tapp : ∀ {e j A B}
-    → Γ ⊢ Sτ j # e ⦂ B
-    → Γ ⊢ j # e [ A ] ⦂ B
-
-idEnv : Env 1 0
-idEnv = ∅ , `∀ (‶ #0 `→ ‶ #0)
-
-id[Int]1 : idEnv ⊢ Z # ((` #0) [ Int ]) · (lit 1) ⦂ Int
-id[Int]1 = ⊢app₁ (⊢tapp (⊢sub (⊢var refl) (s-∀lτ (s-refl (slv-arr (slv-var Z slv-int) (slv-var Z slv-int)))) nz-Sτ))
-                 (⊢sub ⊢lit s-int nz-∞)
-
-idExp : Term 0 0
-idExp = Λ (((ƛ ` #0) ⦂ ‶ #0 `→ ‶ #0))
-
-idExp[Int]1 : ∅ ⊢ Z # (idExp [ Int ]) · (lit 1) ⦂ Int
-idExp[Int]1 = ⊢app₁ (⊢tapp (⊢sub (⊢tabs₁ (⊢ann (⊢lam₁ (⊢sub (⊢var refl) s-var nz-∞))))
-                                 (s-∀lτ (s-refl (slv-arr (slv-var Z slv-int) (slv-var Z slv-int)))) nz-Sτ))
-                    (⊢sub ⊢lit s-int nz-∞)
-
-idExp[Int] : ∅ ⊢ Z # idExp [ Int ] ⦂ Int `→ Int
-idExp[Int] = ⊢tapp (⊢sub (⊢tabs₁ (⊢ann (⊢lam₁ (⊢sub (⊢var refl) s-var nz-∞))))
-                         (s-∀lτ (s-refl (slv-arr (slv-var Z slv-int) (slv-var Z slv-int)))) nz-Sτ)
-
--- implicit inst
-id1 : idEnv ⊢ Z # (` #0) · (lit 1) ⦂ Int
-id1 = ⊢app₂ (⊢sub (⊢var refl)
-                  (s-∀l (s-arr₂ (s-var-r Z s-int) (s-refl (slv-var Z slv-int))) (f-S₁ b-var)) nz-S)
-            ⊢lit
+    → Γ ⊢ Z # Λ e ⦂ `∀ A
+  ⊢tapp : ∀ {e j A B B'}
+    → Γ ⊢ Z # e ⦂ `∀ B
+    → (st : [ A ]ˢ B ⇨ B')
+    → Γ ⊢ j # e [ A ] ⦂ B'    
 
 #1 : Fin (2 + m)
 #1 = #S #0
-
-_ : Env 3 3
-_ = ∅ ,∙ , ‶ #0  ,∙ , ‶ #1 ,∙ , ‶ #0

@@ -21,8 +21,6 @@ infixr 8  `∀_
 variable
   m n m' n' : ℕ
 
-
-
 data Type : ℕ → Set where
   Int    : Type m
   ‶_     : (X : Fin m) → Type m
@@ -150,3 +148,123 @@ data _:=_∈'_ : Fin m → Type m → Env n m → Set where
   k, : ∀ {k A B}
     → k := A ∈' Γ
     → k := A ∈' Γ , B 
+
+
+----------------------------------------------------------------------
+--+                            Structs                             +--
+----------------------------------------------------------------------
+infix 3 ty_↑_⇨_
+
+data ty_↑_⇨_ : Type m → Fin (1 + m) → Type (1 + m) → Set where
+  ↑int : ∀ {k : Fin (1 + m)} → ty Int ↑ k ⇨ Int
+  ↑var : ∀ {k : Fin (1 + m)} {X} → ty (‶ X) ↑ k ⇨ ‶ punchIn k X
+  ↑arr : ∀ {A B : Type m} {A' B' : Type (1 + m)} {k}
+    → ty A ↑ k ⇨ A'
+    → ty B ↑ k ⇨ B'
+    → ty A `→ B ↑ k ⇨ A' `→ B'
+  ↑∀ : ∀ {A : Type (1 + m)} {A' k}
+    → ty A ↑ #S k ⇨ A'
+    → ty (`∀ A) ↑ k ⇨ `∀ A'
+
+-- shift is unique
+shift-unique : ∀ {A : Type m} {k A₁ A₂}
+  → ty A ↑ k ⇨ A₁
+  → ty A ↑ k ⇨ A₂
+  → A₁ ≡ A₂
+shift-unique ↑int ↑int = refl
+shift-unique ↑var ↑var = refl
+shift-unique (↑arr sf1 sf3) (↑arr sf2 sf4) rewrite shift-unique sf1 sf2 | shift-unique sf3 sf4 = refl
+shift-unique (↑∀ sf1) (↑∀ sf2) rewrite shift-unique sf1 sf2 = refl
+
+shift-total : forall (A : Type m) (k)
+  → ∃ λ A' → ty A ↑ k ⇨ A'
+shift-total Int k = ⟨ Int , ↑int ⟩
+shift-total (‶ X) k = ⟨ (‶ punchIn k X) , ↑var ⟩
+shift-total (A `→ A₁) k with shift-total A k
+... | ⟨ fst , snd ⟩ with shift-total A₁ k
+... | ⟨ fst₁ , snd₁ ⟩ = ⟨ (fst `→ fst₁) , ↑arr snd snd₁ ⟩
+shift-total (`∀ A) k with shift-total A (#S k) 
+... | ⟨ fst , snd ⟩ = ⟨ (`∀ fst) , (↑∀ snd) ⟩
+
+infix 3 [_/_]ˢ_⇨_
+data [_/_]ˢ_⇨_ : Fin (1 + m) → Type m → Type (1 + m) → Type m → Set where
+  st-int : ∀ {k} {A : Type m}
+    → [ k / A ]ˢ Int ⇨ Int
+  st-var-eq : ∀ {k} {A : Type m}
+    → [ k / A ]ˢ (‶ k) ⇨ A
+  st-var-neq : ∀ {k X} {A : Type m}
+    → (¬p : k ≢ X)
+    → [ k / A ]ˢ (‶ X) ⇨ ‶ punchOut {i = k} {j = X} ¬p
+  st-arr : ∀ {A : Type m} {B C B' C' k}
+    → [ k / A ]ˢ B ⇨ B'
+    → [ k / A ]ˢ C ⇨ C'
+    → [ k / A ]ˢ (B `→ C) ⇨ B' `→ C'
+  st-∀ : ∀ {A : Type m} {A' B B' k}
+    → (up : ty A ↑ #0 ⇨ A')
+    → [ #S k / A' ]ˢ B ⇨ B'
+    → [ k / A ]ˢ (`∀ B) ⇨ `∀ B'
+
+[_]ˢ_⇨_ : Type m → Type (1 + m) → Type m → Set
+[_]ˢ_⇨_ = [_/_]ˢ_⇨_ #0
+
+-- type subst is unique
+subst-unique' : ∀ {A : Type m} {k B B₁ B₂}
+  → [ k / A ]ˢ B ⇨ B₁
+  → [ k / A ]ˢ B ⇨ B₂
+  → B₁ ≡ B₂
+subst-unique' st-int st-int = refl
+subst-unique' st-var-eq st-var-eq = refl
+subst-unique' st-var-eq (st-var-neq ¬p) = ⊥-elim (¬p refl)
+subst-unique' (st-var-neq ¬p) st-var-eq = ⊥-elim (¬p refl)
+subst-unique' (st-var-neq ¬p) (st-var-neq ¬p₁) = refl
+subst-unique' (st-arr st1 st3) (st-arr st2 st4) rewrite subst-unique' st1 st2 | subst-unique' st3 st4 = refl
+subst-unique' (st-∀ up st1) (st-∀ up₁ st2) rewrite shift-unique up up₁ | subst-unique' st1 st2 = refl
+
+subst-unique : ∀ {A : Type m} {B B₁ B₂}
+  → [ A ]ˢ B ⇨ B₁
+  → [ A ]ˢ B ⇨ B₂
+  → B₁ ≡ B₂
+subst-unique st1 st2 = subst-unique' {k = #0} st1 st2
+
+data Apps : ℕ → ℕ → Set where
+  nil : Apps n m
+  _∷a_ : Term n m → Apps n m → Apps n m
+  _∷t_ : Type m → Apps n m → Apps n m
+
+data AppsType : ℕ → Set where
+  nil : AppsType m
+  _∷a_ : Type m → AppsType m → AppsType m
+  `∀_ : AppsType (1 + m) → AppsType m
+
+infix 3 [_/_]ˢˢ_⇨_
+data [_/_]ˢˢ_⇨_ : Fin (1 + m) → Type m → AppsType (1 + m) → AppsType m → Set where
+
+  st-nil : ∀ {k : Fin (1 + m)} {A}
+    → [ k / A ]ˢˢ nil ⇨ nil
+  st-cons : ∀ {k : Fin (1 + m)} {A B B' Bs Bs'}
+    → [ k / A ]ˢ B ⇨ B'
+    → [ k / A ]ˢˢ Bs ⇨ Bs'
+    → [ k / A ]ˢˢ B ∷a Bs ⇨ B' ∷a Bs'
+  st-∀ : ∀ {k : Fin (1 + m)} {A A' B B'}
+    → (up : ty A ↑ #0 ⇨ A')
+    → [ #S k / A' ]ˢˢ B ⇨ B'
+    → [ k / A ]ˢˢ (`∀ B) ⇨ `∀ B'
+
+[_]ˢˢ_⇨_ : Type m → AppsType (1 + m) → AppsType m → Set
+[_]ˢˢ_⇨_ = [_/_]ˢˢ_⇨_ #0
+
+
+postulate
+  substs-unique : ∀ {A : Type m} {B B₁ B₂}
+    → [ A ]ˢˢ B ⇨ B₁
+    → [ A ]ˢˢ B ⇨ B₂
+    → B₁ ≡ B₂
+
+
+up : Fin (1 + n) → Apps n m → Apps (1 + n) m
+up n nil = nil
+up n (e ∷a as) = (↑tm n e) ∷a (up n as)
+up n (A ∷t as) = A ∷t (up n as)
+
+up0 : Apps n m → Apps (1 + n) m
+up0 = up #0

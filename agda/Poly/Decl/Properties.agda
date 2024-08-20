@@ -97,7 +97,6 @@ s-weaken (s-arr₁ C≤A B≤D) = s-arr₁ (s-weaken C≤A) (s-weaken B≤D)
 s-weaken (s-arr₂ C≤A B≤D) = s-arr₂ (s-weaken C≤A) (s-weaken B≤D)
 s-weaken (s-∀ A≤B) = s-∀ (s-weaken A≤B)
 s-weaken (s-∀l A≤B s) = s-∀l (s-weaken A≤B) s
-s-weaken (s-∀lτ A≤B) = s-∀lτ (s-weaken A≤B)
 s-weaken (s-var-l x A≤B) = s-var-l (∈-weaken x) (s-weaken A≤B)
 s-weaken (s-var-r x A≤B) = s-var-r (∈-weaken x) (s-weaken A≤B)
 
@@ -112,7 +111,6 @@ s-strengthen-tm-0 (s-arr₁ C≤A B≤D) = s-arr₁ (s-strengthen-tm-0 C≤A) (s
 s-strengthen-tm-0 (s-arr₂ B≤C B≤C₁) = {!   !}
 s-strengthen-tm-0 (s-∀ B≤C) = s-∀ {!   !} -- IH not generalizable enough 
 s-strengthen-tm-0 (s-∀l B≤C x) = {!   !}
-s-strengthen-tm-0 (s-∀lτ B≤C) = {!   !}
 s-strengthen-tm-0 (s-var-l x B≤C) = {!   !}
 s-strengthen-tm-0 (s-var-r x B≤C) = {!   !}
 
@@ -128,7 +126,7 @@ weaken (⊢app₁ e₁⇔A e₂⇔A) = ⊢app₁ (weaken e₁⇔A) (weaken e₂�
 weaken (⊢app₂ e₁⇔A e₂⇔A) = ⊢app₂ (weaken e₁⇔A) (weaken e₂⇔A)
 weaken (⊢sub e⇔A B≤A j≢Z) = ⊢sub (weaken e⇔A) (s-weaken B≤A)  j≢Z
 weaken (⊢tabs₁ e⇔A) = ⊢tabs₁ (weaken e⇔A)
-weaken (⊢tapp e⇔A) = ⊢tapp (weaken e⇔A)
+weaken (⊢tapp st e⇔A) = ⊢tapp {!!} {!!}
 
 weaken-0 : ∀ {Γ : Env (1 + n) m} {j e A}
   → Γ ⊢ j # e ⦂ A

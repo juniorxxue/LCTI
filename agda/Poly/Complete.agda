@@ -22,11 +22,6 @@ data _⊢_~_ where
     → Γ ⊢ ⟨ j , B ⟩ ~ Σ
     → Γ ⊢ ⟨ S j , A `→ B ⟩ ~ ([ e ]↝ Σ)
 
-  ~Sτ : ∀ {Γ : Env n m} {j A B Σ}
-    → Γ ⊢ ⟨ j , B ⟩ ~ Σ
-    → Γ ⊢ ⟨ Sτ j , B ⟩ ~ (⟦ A ⟧↝ Σ) -- this A shouldn't be arbitrary, something missing here
-
-
 postulate
   ~weaken0 : ∀ {Γ : Env n m} {Σ A B j}
     → Γ ⊢ ⟨ j , B ⟩ ~ Σ
@@ -71,7 +66,7 @@ complete (⊢app₁ ⊢e ⊢e₁) j~Σ = ⊢app (subsumption0 (complete-inf ⊢e
 complete (⊢app₂ ⊢e ⊢e₁) j~Σ = ⊢app (complete ⊢e (~S (complete-inf ⊢e₁) j~Σ))
 complete (⊢sub ⊢e B≤A j≢Z) j~Σ = subsumption0 (complete-inf ⊢e) (complete-≤ B≤A j~Σ)
 complete (⊢tabs₁ ⊢e) ~Z = ⊢tabs₁ (complete-inf ⊢e)
-complete (⊢tapp ⊢e) j~Σ = ⊢tapp (complete ⊢e (~Sτ j~Σ))
+complete (⊢tapp ⊢e st) j~Σ = {!!}
 
 complete-≤ (s-refl ap) ~Z = s-empty {!!} {!!} -- easy
 complete-≤ s-int ~∞ = s-int
@@ -80,6 +75,5 @@ complete-≤ (s-arr₁ s s₁) ~∞ = s-arr (complete-≤-chk s) (complete-≤-c
 complete-≤ (s-arr₂ s s₁) (~S ⊢e j~Σ) = {!!}
 complete-≤ (s-∀ s) ~∞ = s-∀ {!complete-≤-chk s!} -- a trouble
 complete-≤ (s-∀l s x) (~S ⊢e j~Σ) = s-∀l-eq {!!}
-complete-≤ (s-∀lτ s) (~Sτ j~Σ) = {!!}
 complete-≤ (s-var-l x s) ~∞ = s-ex-l= {!!} {!!} (complete-≤-chk s) -- ok
 complete-≤ (s-var-r x s) ~∞ = s-ex-r= {!!} {!!} (complete-≤-chk s) -- ok

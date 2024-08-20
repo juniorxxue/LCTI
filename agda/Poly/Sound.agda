@@ -73,7 +73,6 @@ f (s-term-o x x₁ s s₁) = S (f s₁)
 f (s-∀ s) = ∞
 f (s-∀l-^ s) = f s
 f (s-∀l-eq s) = f s
-f (s-∀-t s) = Sτ (f s)
 
 sound-≤ : ∀ {Ψ Ψ' : SEnv n m} {Σ A A'}
   → (s : Ψ ⊢ A ≤ Σ ⊣ Ψ' ↪ A')
@@ -91,7 +90,6 @@ sound-≤ (s-term-o x x₁ s s₁) = {!!}
 sound-≤ (s-∀ s) = {!!}
 sound-≤ (s-∀l-^ s) = {!!}
 sound-≤ (s-∀l-eq s) = {!!}
-sound-≤ (s-∀-t s) = s-∀lτ {!sound-≤ s!}
 
 app-elim : ∀ {Γ : Env n m} {A₁ Σ Ψ A e}
   → (s : 𝕓 Γ ⊢ A₁ ≤ Σ ⊣ Ψ ↪ A)
