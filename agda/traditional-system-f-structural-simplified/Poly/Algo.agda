@@ -132,6 +132,16 @@ data _⊢_≤_ where
 ----------------------------------------------------------------------
 --+                           Splitting                            +--
 ----------------------------------------------------------------------
+infix 4 _by_⇨_
+data _by_⇨_ : AppsType m → Type (1 + m) → AppsType (1 + m) → Set where
+  by-nil : ∀ {B : Type (1 + m)}
+    → nil by B ⇨ nil
+  by-cons : ∀ {B' Bs Bs'} {B₁ B₂ : Type (1 + m)}
+    → Bs' by B₂ ⇨ Bs
+    → B' ∷a Bs' by (B₁ `→ B₂) ⇨ B₁ ∷a Bs
+  by-∀ : ∀ {Bs' : AppsType (1 + m)} {Bs B}
+    → Bs' by B ⇨ Bs
+    → `∀ Bs' by `∀ B ⇨ `∀ Bs
 
 -- Bs' / A by B ⇨ Bs
 infix 4 _/_by_⇨_
@@ -188,11 +198,34 @@ data ⟦_,_⟧→⟦_,_,_,_⟧ : Context n m → Type m → Apps n m → Context
     → ⟦ Σ , B ⟧→⟦ es , A' , Bs , B' ⟧
     → ⟦ ([ e ]↝ Σ) , A `→ B ⟧→⟦ e ∷a es , A' , A ∷a Bs , B' ⟧
 
-  have-t : ∀ {Σ Σ' : Context n m} {B A es B' Bs' C Bs}
+  have-t : ∀ {Σ Σ' : Context n m} {B A es B' Bs' C Bs C' Σ'' Σ''' es'}
     → (st : [ A ]ˢ B ⇨ B')
-    → Bs' / A at #0 by B ⇨ Bs
+--    → [ A ]ˢˢ Bs ⇨ Bs'
+--    → Bs' by B ⇨ Bs
     → ⟦ Σ , B' ⟧→⟦ es , Σ' , Bs' , C ⟧
+    → ty-in-con Σ ↑ #0 ⇨ Σ''
+    → ⟦ Σ'' , B ⟧→⟦ es' , Σ''' , Bs , C' ⟧ 
     → ⟦ ⟦ A ⟧↝ Σ , `∀ B ⟧→⟦ A ∷t es , Σ' , `∀ Bs , C ⟧
+
+some-imply : ∀ {A : Type m} {Σ : Context n m} {B Bs' Bs B' C es Σ' k}
+  → (st : [ k / A ]ˢ B ⇨ B')
+  → Bs' by B ⇨ Bs
+  → ⟦ Σ , B' ⟧→⟦ es , Σ' , Bs' , C ⟧
+  → [ k / A ]ˢˢ Bs ⇨ Bs'
+some-imply st-int by-nil spl = st-nil
+some-imply st-var-eq by-nil spl = st-nil
+some-imply (st-var-neq ¬p) by-nil spl = st-nil
+some-imply (st-arr st st₁) by-nil spl = st-nil
+some-imply (st-arr st st₁) (by-cons sts) (have-e spl) = st-cons st (some-imply st₁ sts spl)
+some-imply (st-∀ up₁ st) by-nil spl = st-nil
+some-imply (st-∀ up₁ st) (by-∀ sts) (have-t st₁ x x₁ spl) = st-∀ up₁ (some-imply st sts {!spl!})
+
+{-
+some-imply st by-nil none-□ = st-nil
+some-imply st by-nil none-τ = st-nil
+some-imply (st-arr st st₁) (by-cons sts) (have-e spl) = st-cons st (some-imply st₁ sts spl)
+some-imply (st-∀ up₁ st) (by-∀ sts) (have-t st₁ x x₁ spl) = st-∀ up₁ (some-imply st sts {!!})
+-}
 
 
 -- used in Subsumption.agda
@@ -214,35 +247,3 @@ data ⟦_⟧⇒⟦_,_⟧ : Context n m → Apps n m → Context n m → Set wher
     → ⟦ Σ ⟧⇒⟦ es , Σ' ⟧
     → ⟦ ⟦ A ⟧↝ Σ ⟧⇒⟦ A ∷t es , Σ' ⟧
 
--- not sure this is correct
--- some side-condition might need to constrain between the Bs and B
--- side-condition is taken from where this lemma is used, and might be raw
-
-shallow-split-is-algo' : ∀  Bs' B (A : Type m) {A₁ e̅ A' k}
-  → [ k / A ]ˢ B ⇨ A₁
-  → (⟦ Σ , A₁ ⟧→⟦ e̅ , □ , Bs' , A' ⟧)
-  → ∃[ Bs ](Bs' / A at k by B ⇨ Bs)
-shallow-split-is-algo' nil B A st spl = {!!}
-shallow-split-is-algo' (x ∷a Bs') B A st spl = {!!}
-shallow-split-is-algo' (`∀ Bs') .(‶ _) .(`∀ _) st-var-eq (have-t st₁ x spl) = {!!}
-shallow-split-is-algo' (`∀ Bs') (`∀ C) A (st-∀ {A' = A'} up₁ st) spl'@(have-t st₁ x spl) = {!shallow-split-is-algo' Bs' C A' st!}
-  
-
-{-
-shallow-split-is-algo' A nil B spl st = {!!}
-shallow-split-is-algo' A (x ∷a Bs') B spl st = {!!}
-shallow-split-is-algo' .(`∀ _) (`∀ Bs') .(‶ _) (have-t st₁ x spl) st-var-eq = {!!}
-shallow-split-is-algo' A (`∀ Bs') (`∀ C) (have-t st₁ x spl) (st-∀ up₁ st) = {!shallow-split-is-algo' ? ? ? ? st!}
--}
-
-
---  → ∃ λ Bs → Bs' / A at #0 by B ⇨ Bs
-{-  
-shallow-split-is-algo' A nil B spl st s = {!!}
-shallow-split-is-algo' .(B' `→ _) (B' ∷a Bs') .(‶ #0) (have-e spl) st-var-eq (s-∀-t st₁ s) = {!!}
-shallow-split-is-algo' A (B' ∷a Bs') (C `→ D) (have-e spl) (st-arr st st₂) (s-∀-t (st-arr st₁ st₃) (s-arr s ⊢e)) with shallow-split-is-algo' A  Bs' D spl st₂ (s-∀-t st₃ s)
-... | ⟨ ind-Bs , ind-j ⟩ = ⟨ (C ∷a ind-Bs) , /by-cons st ind-j ⟩
-shallow-split-is-algo' .(`∀ _) (`∀ Bs') .(‶ #0) (have-t st₁ x spl) st-var-eq (s-∀-t st₂ s) = {!!}
-shallow-split-is-algo' A (`∀ Bs') (`∀ C) (have-t st₁ x spl) (st-∀ up₁ st) (s-∀-t (st-∀ up₂ st₂) (s-∀-t st₃ s)) rewrite shift-unique up₁ up₂ | subst-unique' st st₂ with shallow-split-is-algo' {!!} {!!} {!!} spl st₁ (s-∀-t st₃ s)
-... | ⟨ ind-Bs , ind-j ⟩ = ⟨ {!`∀ ind-Bs!} , /by-∀ up₁ {!!} ⟩
--}
