@@ -15,7 +15,6 @@ postulate
     → ⟦ Σ ⟧⇒⟦ a̅ , □ ⟧
     → ⟦ ↑Σ0 Σ ⟧⇒⟦ up0 a̅ , □ ⟧
 
-
 infix 4 _⊕_:=_
 
 data _⊕_:=_ : Apps n m → Context n m → Context n m → Set where

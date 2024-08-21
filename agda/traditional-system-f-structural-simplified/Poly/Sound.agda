@@ -12,11 +12,6 @@ postulate
   spl-weaken : ∀ {Σ Σ' : Context n m} {A e̅ A̅ A' k}
     → ⟦ Σ , A ⟧→⟦ e̅ , Σ' , A̅ , A' ⟧
     → ⟦ ↑Σ k Σ , A ⟧→⟦ up k e̅ , ↑Σ k Σ' , A̅ , A' ⟧
-  sts-unique : ∀ {Bs : AppsType (1 + m)} {B Bs₁ Bs₂}
-    → [ B ]ˢˢ Bs ⇨ Bs₁
-    → [ B ]ˢˢ Bs ⇨ Bs₂
-    → Bs₁ ≡ Bs₂
-
 
 ⊢spl-eq : ∀ {Γ : Env n m} {Σ A e es T As A'}
   → Γ ⊢ Σ ⇒ e ⇒ A

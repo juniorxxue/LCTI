@@ -273,13 +273,6 @@ data [_/_]ˢˢ_⇨_ : Fin (1 + m) → Type m → AppsType (1 + m) → AppsType m
 [_]ˢˢ_⇨_ = [_/_]ˢˢ_⇨_ #0
 
 
-postulate
-  substs-unique : ∀ {A : Type m} {B B₁ B₂}
-    → [ A ]ˢˢ B ⇨ B₁
-    → [ A ]ˢˢ B ⇨ B₂
-    → B₁ ≡ B₂
-
-
 up : Fin (1 + n) → Apps n m → Apps (1 + n) m
 up n nil = nil
 up n (e ∷a as) = (↑tm n e) ∷a (up n as)

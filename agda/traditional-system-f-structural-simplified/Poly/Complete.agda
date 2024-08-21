@@ -73,7 +73,6 @@ mutual
   ⊢weaken (⊢tabs₁ ⊢e) = ⊢tabs₁ (⊢weaken ⊢e)
   ⊢weaken (⊢tapp ⊢e st) = ⊢tapp (⊢weaken ⊢e) st  
 
--- postulate
 ~weaken : ∀ {Γ : Env (1 + n) m} {Σ B j k}
   → Γ /ˣ k ⊢ ⟨ j , B ⟩ ~ Σ
   → Γ ⊢ ⟨ j , B ⟩ ~ ↑Σ k Σ 

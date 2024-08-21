@@ -1,4 +1,3 @@
-{-# OPTIONS --allow-unsolved-metas #-}
 module Poly.Decl.Properties where
 
 open import Poly.Common
@@ -48,6 +47,7 @@ lookup-weaken {Γ = Γ ,∙} {k = #0} {x = #S x} = cong ↑ty0 (lookup-weaken {�
 lookup-weaken {Γ = Γ , A} {k = #S k} {x = #S x} = lookup-weaken {Γ = Γ} {k = k} {x = x}
 lookup-weaken {Γ = Γ ,∙} {k = #S k} {x = #S x} = cong ↑ty0 (lookup-weaken {Γ = Γ})
 
+{-
 weaken : ∀ {Γ : Env (1 + n) m} {k j e A}
   → Γ /ˣ k ⊢ j # e ⦂ A
   → Γ ⊢ j # ↑tm k e ⦂ A
@@ -64,10 +64,12 @@ weaken (⊢tabs₁ e⇔A) = ⊢tabs₁ (weaken e⇔A)
 -- weaken (⊢tabs₃ e⇔A) = ⊢tabs₃ (weaken e⇔A)
 weaken (⊢tapp e⇔A st) = ⊢tapp (weaken e⇔A) {!!}
 
+
 weaken-0 : ∀ {Γ : Env (1 + n) m} {j e A}
   → Γ ⊢ j # e ⦂ A
   → Γ , A ⊢ j # ↑tm0 e ⦂ A
 weaken-0 {Γ = Γ} {A = A} ⊢e = weaken {Γ = Γ , A} {k = #0} ⊢e
+-}
 
 ----------------------------------------------------------------------
 --+                           Subtyping                            +--
