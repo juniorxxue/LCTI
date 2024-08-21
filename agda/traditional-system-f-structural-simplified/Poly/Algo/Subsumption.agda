@@ -11,9 +11,13 @@ postulate
   ≤weaken0 : ∀ {Γ : Env n m} {Σ A B}
     → Γ ⊢ B ≤ Σ
     → Γ , A ⊢ B ≤ ↑Σ #0 Σ
-  Σspl-weaken0 : ∀ {Σ : Context n m} {a̅}
-    → ⟦ Σ ⟧⇒⟦ a̅ , □ ⟧
-    → ⟦ ↑Σ0 Σ ⟧⇒⟦ up0 a̅ , □ ⟧
+    
+Σspl-weaken0 : ∀ {Σ : Context n m} {a̅}
+  → ⟦ Σ ⟧⇒⟦ a̅ , □ ⟧
+  → ⟦ ↑Σ0 Σ ⟧⇒⟦ up0 a̅ , □ ⟧
+Σspl-weaken0 none-□ = none-□
+Σspl-weaken0 (have-e s) = have-e (Σspl-weaken0 s)
+Σspl-weaken0 (have-t s) = have-t (Σspl-weaken0 s)
 
 infix 4 _⊕_:=_
 
@@ -30,11 +34,12 @@ data _⊕_:=_ : Apps n m → Context n m → Context n m → Set where
     → a̅ ⊕ Σ := Σ'
     → (A ∷t a̅) ⊕ Σ := ⟦ A ⟧↝ Σ'
 
-postulate
-  ⊕-weaken0 : ∀ {Σ : Context n m} {es Σ'}
-    → es ⊕ Σ' := Σ
-    → (up0 es) ⊕ (↑Σ0 Σ') := ↑Σ0 Σ
-
+⊕-weaken0 : ∀ {Σ : Context n m} {es Σ'}
+  → es ⊕ Σ' := Σ
+  → (up0 es) ⊕ (↑Σ0 Σ') := ↑Σ0 Σ
+⊕-weaken0 ⊕nil = ⊕nil
+⊕-weaken0 (⊕cons-e x) = ⊕cons-e (⊕-weaken0 x)
+⊕-weaken0 (⊕cons-t x) = ⊕cons-t (⊕-weaken0 x)
 
 subsumption : ∀ {Γ : Env n m} {Σ Σ' Σ'' A a̅ e}
   → Γ ⊢ Σ ⇒ e ⇒ A
