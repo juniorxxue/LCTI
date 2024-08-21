@@ -172,18 +172,6 @@ data _/_at_by_⇨_ : AppsType m → Type m → Fin (1 + m) →  Type (1 + m) →
     → `∀ Bs' / A at k by `∀ B ⇨ `∀ Bs
 
 
--- which implies a multi-substitution
-postulate
-  shallow-split-is-algo : ∀ (A : Type m) Bs' B
-    → ∃[ Bs ](Bs' / A at #0 by B ⇨ Bs)
-
-shallow-split-implies-substs : ∀ {A : Type m} {k Bs' Bs B}
-  → Bs' / A at k by B ⇨ Bs
-  → [ k / A ]ˢˢ Bs ⇨ Bs'
-shallow-split-implies-substs {Bs = nil} /by-nil = st-nil
-shallow-split-implies-substs {Bs = x ∷a Bs} (/by-cons st spls) = st-cons st (shallow-split-implies-substs {Bs = Bs} spls)
-shallow-split-implies-substs {Bs = `∀ Bs} (/by-∀ x spls) = st-∀ x (shallow-split-implies-substs {Bs = Bs} spls)
-
 infix 4 ⟦_,_⟧→⟦_,_,_,_⟧
 
 data ⟦_,_⟧→⟦_,_,_,_⟧ : Context n m → Type m → Apps n m → Context n m → AppsType m → Type m → Set where
@@ -198,14 +186,10 @@ data ⟦_,_⟧→⟦_,_,_,_⟧ : Context n m → Type m → Apps n m → Context
     → ⟦ Σ , B ⟧→⟦ es , A' , Bs , B' ⟧
     → ⟦ ([ e ]↝ Σ) , A `→ B ⟧→⟦ e ∷a es , A' , A ∷a Bs , B' ⟧
 
-  have-t : ∀ {Σ Σ' : Context n m} {B A es B' Bs' C Bs C' Σ'' Σ''' es'}
+  have-t : ∀ {Σ Σ' : Context n m} {B A es B' Bs' C}
     → (st : [ A ]ˢ B ⇨ B')
---    → [ A ]ˢˢ Bs ⇨ Bs'
---    → Bs' by B ⇨ Bs
     → ⟦ Σ , B' ⟧→⟦ es , Σ' , Bs' , C ⟧
-    → ty-in-con Σ ↑ #0 ⇨ Σ''
-    → ⟦ Σ'' , B ⟧→⟦ es' , Σ''' , Bs , C' ⟧ 
-    → ⟦ ⟦ A ⟧↝ Σ , `∀ B ⟧→⟦ A ∷t es , Σ' , `∀ Bs , C ⟧
+    → ⟦ ⟦ A ⟧↝ Σ , `∀ B ⟧→⟦ A ∷t es , Σ' , Bs' , C ⟧
 
 {-
 some-imply st by-nil none-□ = st-nil

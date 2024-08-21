@@ -24,7 +24,7 @@ postulate
   → T ≡ A'
 ⊢spl-eq ⊢e none-τ = ⊢context-full-type ⊢e
 ⊢spl-eq ⊢e (have-e spl) = ⊢spl-eq (⊢app ⊢e) spl
-⊢spl-eq ⊢e (have-t st sts sps spl) = ⊢spl-eq (⊢tapp ⊢e st) {!!}
+⊢spl-eq ⊢e (have-t st spl) = ⊢spl-eq (⊢tapp ⊢e st) spl
   
 ----------------------------------------------------------------------
 --+                             Typing                             +--
@@ -40,10 +40,9 @@ data _⊩_⇐_ : Env n m → Apps n m → AppsType m → Set where
     → Γ ⊢ ∞ # e ⦂ A
     → Γ ⊩ (e ∷a es) ⇐ (A ∷a As)
 
-  ⊩cons-t : ∀ {Γ : Env n m} {es A Bs Bs'}
-    → Γ ⊩ es ⇐ Bs'
-    → [ A ]ˢˢ Bs ⇨ Bs'
-    → Γ ⊩ (A ∷t es) ⇐ `∀ Bs
+  ⊩cons-t : ∀ {Γ : Env n m} {es A Bs}
+    → Γ ⊩ es ⇐ Bs
+    → Γ ⊩ (A ∷t es) ⇐ Bs
 
 ⊩-elim : ∀ {Γ : Env n m} {e Σ A es T As A'}
   → Γ ⊢ Z # e ⦂ A
@@ -53,7 +52,7 @@ data _⊩_⇐_ : Env n m → Apps n m → AppsType m → Set where
 ⊩-elim ⊢e ⊩none none-□ = ⊢e
 ⊩-elim ⊢e ⊩none none-τ = ⊢e
 ⊩-elim ⊢e (⊩cons-a ⊢es x) (have-e spl) = ⊩-elim (⊢app₁ ⊢e x) ⊢es spl
-⊩-elim ⊢e (⊩cons-t ⊢es st1) (have-t st sts sps spl) = ⊩-elim (⊢tapp ⊢e st) ⊢es {!!}
+⊩-elim ⊢e (⊩cons-t ⊢es) (have-t st spl) = ⊩-elim (⊢tapp ⊢e st) ⊢es spl
 
 sound-i : ∀ {Γ : Env n m} {Σ e e̅ A A' A̅}
   → Γ ⊢ Σ ⇒ e ⇒ A
@@ -83,7 +82,7 @@ sound-c-0 ⊢e = sound-c ⊢e none-τ
 sound-≤ s-empty none-□ = ⊩none
 sound-≤ s-refl none-τ = ⊩none
 sound-≤ (s-arr A≤Σ x) (have-e spl) = ⊩cons-a (sound-≤ A≤Σ spl) (sound-c-0 x)
-sound-≤ (s-∀-t st A≤Σ) (have-t st₁ sts sps spl) rewrite subst-unique st st₁ = ⊩cons-t (sound-≤ A≤Σ {!!}) {!!}
+sound-≤ (s-∀-t st A≤Σ) (have-t st' spl) rewrite subst-unique st st' = ⊩cons-t (sound-≤ A≤Σ spl)
 
 sound-i ⊢lit none-□ = ⊢lit
 sound-i (⊢var x∈Γ) none-□ = ⊢var x∈Γ
@@ -92,12 +91,12 @@ sound-i (⊢app ⊢e) spl = sound-i ⊢e (have-e spl)
 sound-i {e̅ = e ∷a e̅} (⊢lam₂ ⊢e ⊢e₁) (have-e spl) = subst e̅ (sound-i ⊢e₁ (spl-weaken spl)) (sound-i-0 ⊢e) -- weaken
 sound-i (⊢sub ⊢e ¬□ gc s) spl = ⊩-elim (sound-i-0 ⊢e) (sound-≤ s spl) spl
 sound-i (⊢tabs₁ ⊢e) none-□ = ⊢tabs₁ (sound-i-0 ⊢e)
-sound-i {A̅ = A̅} (⊢tapp {A = A} {B} ⊢e st) spl = sound-i ⊢e (have-t st spl {!!} {!!})
+sound-i {A̅ = A̅} (⊢tapp {A = A} {B} ⊢e st) spl = sound-i ⊢e (have-t st spl)
 -- 
 
 sound-c (⊢app ⊢e) spl = sound-c ⊢e (have-e spl)
 sound-c (⊢lam₁ ⊢e) none-τ = ⊢lam₁ (sound-c-0 ⊢e)
 sound-c {e̅ = e ∷a e̅} (⊢lam₂ ⊢e ⊢e₁) (have-e spl) = subst e̅ (sound-c ⊢e₁ (spl-weaken spl)) (sound-i-0 ⊢e) -- weaken
 sound-c ty@(⊢sub ⊢e ¬□ gc s) spl rewrite ⊢spl-eq ty spl = ⊢sub' (⊩-elim (sound-i-0 ⊢e) (sound-≤ s spl) spl)
-sound-c {A̅ = A̅} (⊢tapp {A = A} {B} ⊢e st) spl = {!!}
+sound-c {A̅ = A̅} (⊢tapp {A = A} {B} ⊢e st) spl = sound-c ⊢e (have-t st spl)
 
