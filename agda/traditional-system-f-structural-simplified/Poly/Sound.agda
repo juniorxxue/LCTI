@@ -7,11 +7,13 @@ open import Poly.Decl.Properties
 open import Poly.Algo
 open import Poly.Algo.Subsumption
 
-
-postulate
-  spl-weaken : ∀ {Σ Σ' : Context n m} {A e̅ A̅ A' k}
-    → ⟦ Σ , A ⟧→⟦ e̅ , Σ' , A̅ , A' ⟧
-    → ⟦ ↑Σ k Σ , A ⟧→⟦ up k e̅ , ↑Σ k Σ' , A̅ , A' ⟧
+spl-weaken : ∀ {Σ Σ' : Context n m} {A e̅ A̅ A' k}
+  → ⟦ Σ , A ⟧→⟦ e̅ , Σ' , A̅ , A' ⟧
+  → ⟦ ↑Σ k Σ , A ⟧→⟦ up k e̅ , ↑Σ k Σ' , A̅ , A' ⟧
+spl-weaken none-□ = none-□
+spl-weaken none-τ = none-τ
+spl-weaken (have-e spl) = have-e (spl-weaken spl)
+spl-weaken (have-t st spl) = have-t st (spl-weaken spl)
 
 ⊢spl-eq : ∀ {Γ : Env n m} {Σ A e es T As A'}
   → Γ ⊢ Σ ⇒ e ⇒ A
