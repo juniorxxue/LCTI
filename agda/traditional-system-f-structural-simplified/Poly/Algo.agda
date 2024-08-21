@@ -207,19 +207,6 @@ data ⟦_,_⟧→⟦_,_,_,_⟧ : Context n m → Type m → Apps n m → Context
     → ⟦ Σ'' , B ⟧→⟦ es' , Σ''' , Bs , C' ⟧ 
     → ⟦ ⟦ A ⟧↝ Σ , `∀ B ⟧→⟦ A ∷t es , Σ' , `∀ Bs , C ⟧
 
-some-imply : ∀ {A : Type m} {Σ : Context n m} {B Bs' Bs B' C es Σ' k}
-  → (st : [ k / A ]ˢ B ⇨ B')
-  → Bs' by B ⇨ Bs
-  → ⟦ Σ , B' ⟧→⟦ es , Σ' , Bs' , C ⟧
-  → [ k / A ]ˢˢ Bs ⇨ Bs'
-some-imply st-int by-nil spl = st-nil
-some-imply st-var-eq by-nil spl = st-nil
-some-imply (st-var-neq ¬p) by-nil spl = st-nil
-some-imply (st-arr st st₁) by-nil spl = st-nil
-some-imply (st-arr st st₁) (by-cons sts) (have-e spl) = st-cons st (some-imply st₁ sts spl)
-some-imply (st-∀ up₁ st) by-nil spl = st-nil
-some-imply (st-∀ up₁ st) (by-∀ sts) (have-t st₁ x x₁ spl) = st-∀ up₁ (some-imply st sts {!spl!})
-
 {-
 some-imply st by-nil none-□ = st-nil
 some-imply st by-nil none-τ = st-nil
