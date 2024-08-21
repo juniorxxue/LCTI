@@ -1,4 +1,3 @@
-{-# OPTIONS --allow-unsolved-metas #-}
 module Poly.Decl.Subst where
 
 open import Poly.Common
@@ -162,20 +161,20 @@ subst-3-app (suc k₁) (suc k₂) (suc k₃) x̅ x sz₁ sz₂ sz₃ (⊢app₂ 
   let ind-e₁ = subst-3 k₁ (suc (suc k₂)) (suc (suc (size-type A) + (size-type B))) x̅ (≤-pred sz₁) (s≤s sz₂) (s≤s m≤m) ⊢1 ⊢2
   in ⊢app₂ ind-e₁ (strengthen-0 ⊢3)  
 subst-3-app (suc k₁) (suc k₂) (suc k₃) x̅ x {j = Z} sz₁ sz₂ sz₃ (⊢sub ⊢1 ()) ⊢2
-subst-3-app (suc k₁) (suc k₂) (suc k₃) x̅ x {j = ∞} sz₁ sz₂ sz₃ (⊢sub ⊢1 j≢Z) ⊢2 =
-  ⊢sub' (subst-3-app (suc k₁) k₂ {!!} x̅ x sz₁ (<-pred sz₂) (s≤s m≤m) ⊢1 ⊢2)
-subst-3-app (suc k₁) (suc k₂) (suc k₃) x̅ x {j = S j} sz₁ sz₂ sz₃ (⊢sub ⊢1 j≢Z) ⊢2 =
-  ⊢sub' (subst-3-app (suc k₁) k₂ {!!} x̅ x sz₁ sz-proof (s≤s m≤m) ⊢1 ⊢2)
+subst-3-app (suc k₁) (suc k₂) (suc k₃) x̅ x {j = ∞} sz₁ sz₂ sz₃ (⊢sub {A = A} ⊢1 j≢Z) ⊢2 =
+  ⊢sub' (subst-3-app (suc k₁) k₂ (1 + size-type A) x̅ x sz₁ (<-pred sz₂) (s≤s m≤m) ⊢1 ⊢2)
+subst-3-app (suc k₁) (suc k₂) (suc k₃) x̅ x {j = S j} sz₁ sz₂ sz₃ (⊢sub {A = A} ⊢1 j≢Z) ⊢2 =
+  ⊢sub' (subst-3-app (suc k₁) k₂ (1 + size-type A) x̅ x sz₁ sz-proof (s≤s m≤m) ⊢1 ⊢2)
     where sz-proof = (≤-<-trans (size-counter≥0 j) (<-pred sz₂))
 subst-3-tapp (suc k₁) (suc k₂) (suc k₃) x̅ x {j = Z} sz₁ sz₂ sz₃ (⊢sub ⊢1 ()) ⊢2
-subst-3-tapp (suc k₁) (suc k₂) (suc k₃) x̅ x {j = ∞} sz₁ sz₂ sz₃ (⊢sub ⊢1 j≢Z) ⊢2 =
-  ⊢sub' (subst-3-tapp (suc k₁) k₂ {!!} x̅ x sz₁ (<-pred sz₂) (s≤s m≤m) ⊢1 ⊢2)
-subst-3-tapp (suc k₁) (suc k₂) (suc k₃) x̅ x {j = S j} sz₁ sz₂ sz₃ (⊢sub ⊢1 j≢Z) ⊢2 =
-  ⊢sub' (subst-3-tapp (suc k₁) k₂ {!!} x̅ x sz₁ sz-proof (s≤s m≤m) ⊢1 ⊢2)
+subst-3-tapp (suc k₁) (suc k₂) (suc k₃) x̅ x {j = ∞} sz₁ sz₂ sz₃ (⊢sub {A = A} ⊢1 j≢Z) ⊢2 =
+  ⊢sub' (subst-3-tapp (suc k₁) k₂ (1 + size-type A) x̅ x sz₁ (<-pred sz₂) (s≤s m≤m) ⊢1 ⊢2)
+subst-3-tapp (suc k₁) (suc k₂) (suc k₃) x̅ x {j = S j} sz₁ sz₂ sz₃ (⊢sub {A = A} ⊢1 j≢Z) ⊢2 =
+  ⊢sub' (subst-3-tapp (suc k₁) k₂ (1 + size-type A) x̅ x sz₁ sz-proof (s≤s m≤m) ⊢1 ⊢2)
     where sz-proof = (≤-<-trans (size-counter≥0 j) (<-pred sz₂))
 
-subst-3-tapp (suc k₁) (suc k₂) (suc k₃) x̅ x (s≤s sz₁) sz₂ sz₃ (⊢tapp ⊢1 st) ⊢2 =
-  let ind-e₁ = subst-3 k₁ {!!} {!!} x̅ sz₁ {!!} {!!} ⊢1 ⊢2
+subst-3-tapp (suc k₁) (suc k₂) (suc k₃) x̅ x (s≤s sz₁) sz₂ sz₃ (⊢tapp {B = B} ⊢1 st) ⊢2 =
+  let ind-e₁ = subst-3 k₁ (1 + k₂) (2 + size-type B) x̅ sz₁ (s≤s z≤n) (s≤s m≤m) ⊢1 ⊢2
   in ⊢tapp ind-e₁ st
 
 subst-3 (suc k₁) (suc k₂) (suc k₃) e̅ sz₁ sz₂ sz₃ ⊢1 ⊢2 with size-apps e̅ >? 0
