@@ -194,6 +194,7 @@ data ⟦_,_⟧→⟦_,_,_,_⟧ : Context n m → Type m → Apps n m → Context
     → ⟦ Σ , B' ⟧→⟦ es , Σ' , Bs' , C ⟧
     → ⟦ ⟦ A ⟧↝ Σ , `∀ B ⟧→⟦ A ∷t es , Σ' , `∀ Bs , C ⟧
 
+
 -- used in Subsumption.agda
 infix 4 ⟦_⟧⇒⟦_,_⟧
 
@@ -217,16 +218,31 @@ data ⟦_⟧⇒⟦_,_⟧ : Context n m → Apps n m → Context n m → Set wher
 -- some side-condition might need to constrain between the Bs and B
 -- side-condition is taken from where this lemma is used, and might be raw
 
-shallow-split-is-algo' : ∀ (A : Type m) Bs' B {A₁ e̅ A'}
+shallow-split-is-algo' : ∀  Bs' B (A : Type m) {A₁ e̅ A' k}
+  → [ k / A ]ˢ B ⇨ A₁
   → (⟦ Σ , A₁ ⟧→⟦ e̅ , □ , Bs' , A' ⟧)
-  → [ #0 / A ]ˢ B ⇨ A₁
-  → (Γ ⊢ `∀ B ≤ ⟦ A ⟧↝ Σ)
---  → ∃[ Bs ](Bs' / A at k by B ⇨ Bs)
-  → ∃ λ Bs → Bs' / A at #0 by B ⇨ Bs
+  → ∃[ Bs ](Bs' / A at k by B ⇨ Bs)
+shallow-split-is-algo' nil B A st spl = {!!}
+shallow-split-is-algo' (x ∷a Bs') B A st spl = {!!}
+shallow-split-is-algo' (`∀ Bs') .(‶ _) .(`∀ _) st-var-eq (have-t st₁ x spl) = {!!}
+shallow-split-is-algo' (`∀ Bs') (`∀ C) A (st-∀ {A' = A'} up₁ st) spl'@(have-t st₁ x spl) = {!shallow-split-is-algo' Bs' C A' st!}
+  
+
+{-
+shallow-split-is-algo' A nil B spl st = {!!}
+shallow-split-is-algo' A (x ∷a Bs') B spl st = {!!}
+shallow-split-is-algo' .(`∀ _) (`∀ Bs') .(‶ _) (have-t st₁ x spl) st-var-eq = {!!}
+shallow-split-is-algo' A (`∀ Bs') (`∀ C) (have-t st₁ x spl) (st-∀ up₁ st) = {!shallow-split-is-algo' ? ? ? ? st!}
+-}
+
+
+--  → ∃ λ Bs → Bs' / A at #0 by B ⇨ Bs
+{-  
 shallow-split-is-algo' A nil B spl st s = {!!}
 shallow-split-is-algo' .(B' `→ _) (B' ∷a Bs') .(‶ #0) (have-e spl) st-var-eq (s-∀-t st₁ s) = {!!}
 shallow-split-is-algo' A (B' ∷a Bs') (C `→ D) (have-e spl) (st-arr st st₂) (s-∀-t (st-arr st₁ st₃) (s-arr s ⊢e)) with shallow-split-is-algo' A  Bs' D spl st₂ (s-∀-t st₃ s)
 ... | ⟨ ind-Bs , ind-j ⟩ = ⟨ (C ∷a ind-Bs) , /by-cons st ind-j ⟩
 shallow-split-is-algo' .(`∀ _) (`∀ Bs') .(‶ #0) (have-t st₁ x spl) st-var-eq (s-∀-t st₂ s) = {!!}
 shallow-split-is-algo' A (`∀ Bs') (`∀ C) (have-t st₁ x spl) (st-∀ up₁ st) (s-∀-t (st-∀ up₂ st₂) (s-∀-t st₃ s)) rewrite shift-unique up₁ up₂ | subst-unique' st st₂ with shallow-split-is-algo' {!!} {!!} {!!} spl st₁ (s-∀-t st₃ s)
-... | ⟨ ind-Bs , ind-j ⟩ = ⟨ {!`∀ ind-Bs!} , {!ind-j!} ⟩
+... | ⟨ ind-Bs , ind-j ⟩ = ⟨ {!`∀ ind-Bs!} , /by-∀ up₁ {!!} ⟩
+-}
