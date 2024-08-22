@@ -4,13 +4,66 @@ open import Poly.Common
 open import Poly.Algo
 open import Poly.Algo.Properties
 
+↑tmGenCon : ∀ {e : Term n m} {k }
+  → GenericConsumer e 
+  → GenericConsumer (↑tm k e)
+↑tmGenCon {e = .(Term _ _ ∋⦂ lit _)} gc-i = gc-i
+↑tmGenCon {e = .(Term _ _ ∋⦂ ` _)} gc-var = gc-var
+↑tmGenCon {e = .(_ ⦂ _)} gc-ann = gc-ann
+↑tmGenCon {e = .(Λ _)} gc-tlam = gc-tlam 
+
+↑ΣnonEmpty : ∀ {Σ : Context n m} {k}
+  → NonEmpty Σ
+  → NonEmpty (↑Σ k Σ)
+↑ΣnonEmpty ne-τ = ne-τ
+↑ΣnonEmpty ne-app = ne-app
+↑ΣnonEmpty ne-tapp = ne-tapp
+
+↑Σ-comm : ∀ {Σ : Context n m} {j : Fin (1 + n)} {k : Fin (1 + n)}
+  → j F≤ k
+  → ↑Σ (inject₁ j) (↑Σ k Σ) ≡ ↑Σ (#S k) (↑Σ j Σ)
+↑Σ-comm {Σ = □} j≤k = refl
+↑Σ-comm {Σ = τ A} j≤k = refl
+↑Σ-comm {Σ = [ e ]↝ Σ} j≤k = cong₂ [_]↝_ (↑tm-comm j≤k) (↑Σ-comm j≤k)
+↑Σ-comm {Σ = ⟦ A ⟧↝ Σ} j≤k = cong (⟦_⟧↝_ A) (↑Σ-comm j≤k)
+
+↑Σ-comm0 : ∀ {Σ : Context n m} {k}
+  → ↑Σ0 (↑Σ k Σ) ≡ ↑Σ (#S k) (↑Σ0 Σ)
+↑Σ-comm0 = ↑Σ-comm _≤_.z≤n
+
+≤weaken : ∀ {Γ : Env (1 + n) m} {Σ k A}
+  → (Γ /ˣ k) ⊢ A ≤ Σ
+  → Γ ⊢ A ≤ ↑Σ k Σ
+
+⊢weaken : ∀ {Γ : Env (1 + n) m} { Σ k e A }
+  → (Γ /ˣ k) ⊢ Σ ⇒ e ⇒ A
+  → Γ ⊢ ↑Σ k Σ ⇒ ↑tm k e ⇒ A
+    
+≤weaken s-empty = s-empty
+≤weaken s-refl = s-refl
+≤weaken (s-arr ≤A ⊢e) = s-arr (≤weaken ≤A) (⊢weaken ⊢e)
+≤weaken (s-∀-t st ≤A) = s-∀-t st (≤weaken ≤A)
+
+⊢weaken ⊢lit = ⊢lit
+⊢weaken (⊢var x∈Γ) = ⊢var (∈-weaken x∈Γ)
+⊢weaken (⊢ann ⊢e) = ⊢ann (⊢weaken ⊢e)
+⊢weaken (⊢app ⊢e) = ⊢app (⊢weaken ⊢e)
+⊢weaken (⊢lam₁ ⊢e) = ⊢lam₁ (⊢weaken ⊢e)
+⊢weaken {Γ = Γ} {k = k} (⊢lam₂ {Σ = Σ} {A} ⊢e ⊢e₁) with ⊢weaken {Γ = Γ , A} { k = #S k} ⊢e₁ 
+... | p rewrite (sym (↑Σ-comm0 {Σ = Σ} {k = k})) = ⊢lam₂ (⊢weaken ⊢e) p
+⊢weaken (⊢sub ⊢e ¬□ gc s) = ⊢sub (⊢weaken ⊢e) (↑ΣnonEmpty ¬□) (↑tmGenCon gc) (≤weaken s)
+⊢weaken (⊢tabs₁ ⊢e) = ⊢tabs₁ (⊢weaken ⊢e)
+⊢weaken (⊢tapp ⊢e st) = ⊢tapp (⊢weaken ⊢e) st  
+
 postulate
   ≤strengthen0 : ∀ {Γ : Env n m} {Σ A B}
     → Γ , A ⊢ B ≤ ↑Σ #0 Σ
     → Γ ⊢ B ≤ Σ
-  ≤weaken0 : ∀ {Γ : Env n m} {Σ A B}
-    → Γ ⊢ B ≤ Σ
-    → Γ , A ⊢ B ≤ ↑Σ #0 Σ
+
+≤weaken0 : ∀ {Γ : Env n m} {Σ A B}
+  → Γ ⊢ B ≤ Σ
+  → Γ , A ⊢ B ≤ ↑Σ #0 Σ
+≤weaken0 s = ≤weaken s  
     
 Σspl-weaken0 : ∀ {Σ : Context n m} {a̅}
   → ⟦ Σ ⟧⇒⟦ a̅ , □ ⟧

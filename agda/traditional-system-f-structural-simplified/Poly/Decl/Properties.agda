@@ -15,8 +15,6 @@ _↑ᵉ[_]_ : ∀ (Γ : Env n m) → Type m -> (k : Fin (1 + n)) → Env (1 + n)
 -}
 
 
--- the needed lemmas
--- will do later
 postulate
   strengthen-0 : ∀ {Γ : Env n m} {j A B e}
     → Γ , A ⊢ j # ↑tm0 e ⦂ B
@@ -29,12 +27,6 @@ postulate
 ----------------------------------------------------------------------
 --+                           Weakening                            +--
 ----------------------------------------------------------------------
-
-
-_/ˣ_ : Env (1 + n) m → Fin (1 + n) → Env n m
-(Γ , A) /ˣ #0 = Γ
-_/ˣ_ {suc n} (Γ , A) (#S k) = (Γ /ˣ k) , A
-(Γ ,∙) /ˣ k = (Γ /ˣ k) ,∙
 
 lookup-weaken : ∀ {Γ : Env (1 + n) m} {k x}
   → lookup (Γ /ˣ k) x ≡ lookup Γ (punchIn k x)
