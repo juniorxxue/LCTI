@@ -130,6 +130,44 @@ data _∋_⦂_ : Env n m → Fin n → Type m → Set where
 ↑tm k (Λ e)      = Λ (↑tm k e)
 ↑tm k (e [ A ])  = ↑tm k e [ A ]
 
+
+infix 4 _~↑tm~_
+data _~↑tm~_ : Term (1 + n) m → Fin (1 + n) → Set where
+
+  sd-lit : ∀ {i k}
+    → (Term (1 + n) m ∋⦂ lit i) ~↑tm~ k
+  sd-var : ∀ {x k}
+    → (k≢x : k ≢ x)
+    → (Term (1 + n) m ∋⦂ ` x) ~↑tm~ k
+  sd-lam : ∀ {e k}
+    → (e~↑tm~k : e ~↑tm~ #S k)
+    → (Term (1 + n) m ∋⦂ ƛ e) ~↑tm~ k
+  sd-app : ∀ {e₁ : Term (1 + n) m} {e₂ k}
+    → (e₁~↑tm~k : e₁ ~↑tm~ k)
+    → (e₂~↑tm~k : e₂ ~↑tm~ k)
+    → ( e₁ · e₂) ~↑tm~ k
+  sd-ann : ∀ {e : Term (1 + n) m} {A k}
+    → (e~↑tm~k : e ~↑tm~ k)
+    → ( e ⦂ A) ~↑tm~ k
+  sd-Λ : ∀ {e k}
+    → (e~↑tm~k : e ~↑tm~ k)
+    → (Term (1 + n) m ∋⦂ Λ e) ~↑tm~ k
+  sd-tapp : ∀ {e : Term (1 + n) m} {A k}
+    → (e~↑tm~k : e ~↑tm~ k)
+    → ( e [ A ]) ~↑tm~ k
+
+↓tm : (k : Fin (1 + n)) → (e : Term (1 + n) m) → (sd : e ~↑tm~ k) → Term n m
+↓tm k (lit i) _ = lit i
+↓tm k (` x) (sd-var x≢k) with k #≟ x
+... | yes p = ⊥-elim (x≢k p)
+... | no ¬p = ` punchOut {i = k} {j = x} ¬p
+↓tm k (ƛ e) (sd-lam sd) = ƛ (↓tm (#S k) e sd)
+↓tm k (e₁ · e₂) (sd-app sd sd₁) = (↓tm k e₁ sd) · (↓tm k e₂ sd₁)
+↓tm k (e ⦂ A) (sd-ann sd) = (↓tm k e sd) ⦂ A
+↓tm k (Λ e) (sd-Λ sd) = Λ (↓tm k e sd)
+↓tm k (e [ A ]) (sd-tapp sd) = (↓tm k e sd) [ A ]
+
+
 ↑tm0 : Term n m → Term (1 + n) m
 ↑tm0 = ↑tm #0
 
