@@ -3,7 +3,6 @@ module Poly.Complete where
 open import Poly.Common
 open import Poly.Decl
 open import Poly.Algo
-open import Poly.Basic
 open import Poly.Algo.Subsumption
 
 infix 3 _⊢_~_
@@ -22,9 +21,6 @@ data _⊢_~_ where
     → (⊢e : Γ ⊢ □ ⇒ e ⇒ A)
     → Γ ⊢ ⟨ j , B ⟩ ~ Σ
     → Γ ⊢ ⟨ S j , A `→ B ⟩ ~ ([ e ]↝ Σ) -- got a deeper undersantding of it, how the S will be eliminated, at least in two places in STLC
-
-
-
 
 ~weaken : ∀ {Γ : Env (1 + n) m} {Σ B j k}
   → Γ /ˣ k ⊢ ⟨ j , B ⟩ ~ Σ

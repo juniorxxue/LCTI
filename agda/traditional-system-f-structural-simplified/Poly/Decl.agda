@@ -30,7 +30,7 @@ infix 3 _⊢_#_⦂_
 data _⊢_#_⦂_ : Env n m → Counter → Term n m → Type m → Set where
   ⊢lit : ∀ {i} → Γ ⊢ Z # (lit i) ⦂ Int
   ⊢var : ∀ {x A}
-    → Γ ∋ x ⦂ A
+    → (x∈Γ : Γ ∋ x ⦂ A)
     → Γ ⊢ Z # ` x ⦂ A
   ⊢ann : ∀ {e A}
     → Γ ⊢ ∞ # e ⦂ A

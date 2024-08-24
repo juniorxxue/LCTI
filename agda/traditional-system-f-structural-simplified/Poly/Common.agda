@@ -167,9 +167,56 @@ data _~↑tm~_ : Term (1 + n) m → Fin (1 + n) → Set where
 ↓tm k (Λ e) (sd-Λ sd) = Λ (↓tm k e sd)
 ↓tm k (e [ A ]) (sd-tapp sd) = (↓tm k e sd) [ A ]
 
+#S-injective : ∀ {k₁ : Fin n} {k₂}
+  → #S k₁ ≡ #S k₂
+  → k₁ ≡ k₂
+#S-injective {k₁ = k₁} {k₂ = .k₁} refl = refl
+
+
+k≢punchInk : ∀ (k : Fin (1 + n)) x
+  → k ≢ punchIn k x
+k≢punchInk #0 x = λ ()
+k≢punchInk (#S k) #0 = λ ()
+k≢punchInk (#S k) (#S x) with k≢punchInk k x
+... | ind = λ eq → ⊥-elim (ind (#S-injective eq))
+
+↑tm-~ : ∀ (e : Term n m) k
+  → ↑tm k e ~↑tm~ k
+↑tm-~ (lit i) k = sd-lit
+↑tm-~ (` x) k = sd-var (k≢punchInk k x)
+↑tm-~ (ƛ e) k = sd-lam (↑tm-~ e (#S k))
+↑tm-~ (e · e₁) k = sd-app (↑tm-~ e k) (↑tm-~ e₁ k)
+↑tm-~ (e ⦂ A) k = sd-ann (↑tm-~ e k)
+↑tm-~ (Λ e) k = sd-Λ (↑tm-~ e k)
+↑tm-~ (e [ A ]) k = sd-tapp (↑tm-~ e k)
 
 ↑tm0 : Term n m → Term (1 + n) m
 ↑tm0 = ↑tm #0
+
+↑tm-↓tm-id-var : ∀ (x : Fin n) (k : Fin (1 + n))
+  → (neq : k ≢ punchIn k x)
+  → punchOut neq ≡ x
+↑tm-↓tm-id-var #0 #0 neq = refl
+↑tm-↓tm-id-var #0 (#S k) neq = refl
+↑tm-↓tm-id-var (#S x) #0 neq = refl
+↑tm-↓tm-id-var (#S x) (#S k) neq = cong #S (↑tm-↓tm-id-var x k λ eq → neq (cong #S eq))
+
+↑tm-↓tm-id : ∀ (e : Term n m) k
+  → (sd : (↑tm k e) ~↑tm~ k)
+  → ↓tm k (↑tm k e) sd ≡ e
+↑tm-↓tm-id (lit i) k sd-lit = refl
+↑tm-↓tm-id (` x) k (sd-var neq) with k #≟ punchIn k x
+... | yes p = ⊥-elim (neq p)
+... | no ¬p = cong `_ (↑tm-↓tm-id-var x k ¬p)
+↑tm-↓tm-id (ƛ e) k (sd-lam sd) rewrite ↑tm-↓tm-id e (#S k) sd = refl
+↑tm-↓tm-id (e₁ · e₂) k (sd-app sd1 sd2) rewrite ↑tm-↓tm-id e₁ k sd1 | ↑tm-↓tm-id e₂ k sd2 = refl
+↑tm-↓tm-id (e ⦂ A) k (sd-ann sd) rewrite ↑tm-↓tm-id e k sd = refl
+↑tm-↓tm-id (Λ e) k (sd-Λ sd) rewrite ↑tm-↓tm-id e k sd = refl
+↑tm-↓tm-id (e [ A ]) k (sd-tapp sd) rewrite ↑tm-↓tm-id e k sd = refl
+
+↑tm-↓tm-id0 : ∀ (e : Term n m)
+  → ↓tm #0 (↑tm #0 e) (↑tm-~ e #0) ≡ e
+↑tm-↓tm-id0 e = ↑tm-↓tm-id e #0 (↑tm-~ e #0)
 
 -- shift type in term
 ↑ty-in-tm : Fin (1 + m) → Term n m → Term n (1 + m)
@@ -333,7 +380,7 @@ _/ˣ_ {suc n} (Γ , A) (#S k) = (Γ /ˣ k) , A
 ∈-weaken {m = zero} {Γ = Γ , A} {#S k} (S, ∈Γ) = S, (∈-weaken ∈Γ)
 ∈-weaken {suc n} {m = suc m} {Γ = Γ , A} {#S k} Z = Z
 ∈-weaken {suc n} {m = suc m} {Γ = Γ , A} {#S k} (S, ∈Γ) = S, (∈-weaken ∈Γ)
-∈-weaken {Γ = Γ ,∙} (S∙ ∈Γ x) = S∙ (∈-weaken ∈Γ) x 
+∈-weaken {Γ = Γ ,∙} (S∙ ∈Γ x) = S∙ (∈-weaken ∈Γ) x
 
 punchIn-comm : ∀ {x : Fin n} {j k} 
    → j F≤ k
@@ -354,3 +401,16 @@ punchIn-comm {x = #S x} {#S j} {#S k} (s≤s j≤k) = cong #S (punchIn-comm j≤
 ↑tm-comm {e = e ⦂ A} j≤k = cong (_⦂ A) (↑tm-comm j≤k)
 ↑tm-comm {e = Λ e} j≤k = cong Λ_ (↑tm-comm j≤k)
 ↑tm-comm {e = e [ A ]} j≤k = cong (_[ A ]) (↑tm-comm j≤k)
+
+
+∈-strengthen : ∀ {Γ : Env (1 + n) m} {k x A}
+  → Γ ∋ x ⦂ A
+  → (neq : k ≢ x)
+  → (Γ /ˣ k) ∋ punchOut neq ⦂ A
+∈-strengthen {Γ = Γ} {k = #0} {x = #0} x∈Γ neq = ⊥-elim (neq refl)
+∈-strengthen {Γ = .(_ , _)} {k = #0} {x = #S x} (S, x∈Γ) neq = x∈Γ
+∈-strengthen {Γ = Γ ,∙} {k = #0} {x = #S x} (S∙ x∈Γ x₁) neq = S∙ (∈-strengthen {Γ = Γ} x∈Γ neq) x₁
+∈-strengthen {suc n} {Γ = .(_ , _)} {k = #S k} {x = #0} Z neq = Z
+∈-strengthen {Γ = .(_ ,∙)} {k = #S k} {x = #0} (S∙ x∈Γ x) neq = S∙ (∈-strengthen x∈Γ neq) x
+∈-strengthen {suc n} {Γ = .(_ , _)} {k = #S k} {x = #S x} (S, x∈Γ) neq = S, (∈-strengthen x∈Γ λ eq → neq (cong #S eq))
+∈-strengthen {Γ = .(_ ,∙)} {k = #S k} {x = #S x} (S∙ x∈Γ x₁) neq = S∙ (∈-strengthen x∈Γ neq) x₁

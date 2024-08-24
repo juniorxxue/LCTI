@@ -3,22 +3,28 @@ module Poly.Decl.Properties where
 open import Poly.Common
 open import Poly.Decl
 
-postulate
-  strengthen-0 : ∀ {Γ : Env n m} {j A B e}
-    → Γ , A ⊢ j # ↑tm0 e ⦂ B
-    → Γ ⊢ j # e ⦂ B
-
 ⊢strengthen : ∀ {Γ : Env (1 + n) m} {j A e} {k : Fin (1 + n)}
-  → (sd : e ~↑tm~ k)
   → Γ ⊢ j # e ⦂ A
+  → (sd : e ~↑tm~ k)
   → Γ /ˣ k ⊢ j # ↓tm k e sd ⦂ A
-⊢strengthen sd ⊢e = {!!}  
-
-strengthen-0' : ∀ {Γ : Env n m} {j A B e}
+⊢strengthen ⊢lit sd = ⊢lit
+⊢strengthen {k = k} (⊢var {x = x} x∈Γ) (sd-var k≢x) with k #≟ x
+... | yes p = ⊥-elim (k≢x p)
+... | no ¬p = ⊢var (∈-strengthen x∈Γ k≢x)
+⊢strengthen (⊢ann ⊢e) (sd-ann sd) = ⊢ann (⊢strengthen ⊢e sd)
+⊢strengthen (⊢lam₁ ⊢e) (sd-lam sd) = ⊢lam₁ (⊢strengthen ⊢e sd)
+⊢strengthen (⊢lam₂ ⊢e) (sd-lam sd) = ⊢lam₂ (⊢strengthen ⊢e sd)
+⊢strengthen (⊢app₁ ⊢e ⊢e₁) (sd-app sd sd₁) = ⊢app₁ (⊢strengthen ⊢e sd) (⊢strengthen ⊢e₁ sd₁)
+⊢strengthen (⊢app₂ ⊢e ⊢e₁) (sd-app sd sd₁) = ⊢app₂ (⊢strengthen ⊢e sd) (⊢strengthen ⊢e₁ sd₁)
+⊢strengthen (⊢sub ⊢e j≢Z) sd = ⊢sub (⊢strengthen ⊢e sd) j≢Z
+⊢strengthen (⊢tabs₁ ⊢e) (sd-Λ sd) = ⊢tabs₁ (⊢strengthen ⊢e sd)
+⊢strengthen (⊢tapp ⊢e st) (sd-tapp sd) = ⊢tapp (⊢strengthen ⊢e sd) st
+  
+strengthen-0 : ∀ {Γ : Env n m} {j A B e}
   → Γ , A ⊢ j # ↑tm0 e ⦂ B
   → Γ ⊢ j # e ⦂ B
-strengthen-0' {Γ = Γ} {j = j} {A = A} {B = B} {e = e} ⊢e with ⊢strengthen {Γ = Γ , A} {k = #0} {!!} ⊢e
-... | ind = {!!}
+strengthen-0 {Γ = Γ} {j = j} {A = A} {B = B} {e = e} ⊢e with ⊢strengthen {Γ = Γ , A} {k = #0} ⊢e (↑tm-~ e #0)
+... | ind rewrite ↑tm-↓tm-id0 e = ind
 
 ----------------------------------------------------------------------
 --+                           Weakening                            +--
