@@ -140,7 +140,7 @@ data _~↑Σ~_ : Context (1 + n) m → Fin (1 + n) → Set where
 ↓tm-GenericConsumer gc-tlam (sd-Λ sde) = gc-tlam
 
 ↓tm-↑tm-comm-var : ∀ x (k₁ : Fin (1 + n)) k₂
-  → k₁ F≤ k₂
+  → k₂ F≤ k₁
   → (p1 : k₁ ≢ x)
   → (p2 : #S k₁ ≢ punchIn (inject₁ k₂) x)
   → punchIn k₂ (punchOut p1) ≡ punchOut p2
@@ -149,7 +149,7 @@ data _~↑Σ~_ : Context (1 + n) m → Fin (1 + n) → Set where
 ↓tm-↑tm-comm-var (#S x) k₁ k₂ sm p1 p2 = {!!}
 
 ↓tm-↑tm-comm : ∀ {e : Term (1 + n) m} {k₁ k₂}
-  → k₁ F≤ k₂
+  → k₂ F≤ k₁
   → (sd1 : e ~↑tm~ k₁)
   → (sd2 : (↑tm (inject₁ k₂) e) ~↑tm~ #S k₁)
   → ↑tm k₂ (↓tm k₁ e sd1) ≡ ↓tm (#S k₁) (↑tm (inject₁ k₂) e) sd2
@@ -167,7 +167,7 @@ data _~↑Σ~_ : Context (1 + n) m → Fin (1 + n) → Set where
 
 
 ↓Σ-↑Σ-comm : ∀ {Σ : Context (1 + n) m} {k₁ k₂}
-  → k₁ F≤ k₂
+  → k₂ F≤ k₁
   → (sd1 : Σ ~↑Σ~ k₁)
   → (sd2 : ↑Σ (inject₁ k₂) Σ ~↑Σ~ #S k₁)
   → ↑Σ k₂ (↓Σ k₁ Σ sd1) ≡ ↓Σ (#S k₁) (↑Σ (inject₁ k₂) Σ) sd2
@@ -175,6 +175,10 @@ data _~↑Σ~_ : Context (1 + n) m → Fin (1 + n) → Set where
 ↓Σ-↑Σ-comm {Σ = τ A} sm sd1 sd2 = refl
 ↓Σ-↑Σ-comm {Σ = [ e ]↝ Σ} sm (↑Σ-e sd-e sd1) (↑Σ-e sd-e₁ sd2) rewrite ↓Σ-↑Σ-comm {Σ = Σ} sm sd1 sd2 | ↓tm-↑tm-comm sm sd-e sd-e₁ = refl
 ↓Σ-↑Σ-comm {Σ = ⟦ A ⟧↝ Σ} sm (↑Σ-t sd1) (↑Σ-t sd2) rewrite ↓Σ-↑Σ-comm {Σ = Σ} sm sd1 sd2 = refl
+
+helper : ∀ {Σ : Context (1 + n) m} {k}
+  → Σ ~↑Σ~ k
+  → ↑Σ #0 Σ ~↑Σ~ #S k
 
 ⊢strengthen : ∀ {Γ : Env (1 + n) m} {Σ k e A}
   → Γ ⊢ Σ ⇒ e ⇒ A
@@ -194,7 +198,8 @@ data _~↑Σ~_ : Context (1 + n) m → Fin (1 + n) → Set where
 ⊢strengthen (⊢ann ⊢e) sdΣ (sd-ann sde) = ⊢ann (⊢strengthen ⊢e ↑Σ-τ sde)
 ⊢strengthen (⊢app ⊢e) sdΣ (sd-app sde sde₁) = ⊢app (⊢strengthen ⊢e (↑Σ-e sde₁ sdΣ) sde)
 ⊢strengthen (⊢lam₁ ⊢e) ↑Σ-τ (sd-lam sde) = ⊢lam₁ (⊢strengthen ⊢e ↑Σ-τ sde)
-⊢strengthen (⊢lam₂ ⊢e ⊢e₁) (↑Σ-e sd-e sdΣ) (sd-lam sde) = ⊢lam₂ (⊢strengthen ⊢e ↑Σ-□ sd-e) {!!}
+⊢strengthen {k = k} (⊢lam₂ {Σ = Σ} ⊢e ⊢e₁) (↑Σ-e sd-e sdΣ) (sd-lam sde) with ↓Σ-↑Σ-comm {Σ = Σ} {k₁ = k} {k₂ = #0} z≤n sdΣ (helper sdΣ)
+... | r = ⊢lam₂ (⊢strengthen ⊢e ↑Σ-□ sd-e) {!!}
 ⊢strengthen (⊢sub ⊢e ¬□ gc s) sdΣ sde = ⊢sub (⊢strengthen ⊢e ↑Σ-□ sde) (↓Σ-NonEmpty ¬□ sdΣ) (↓tm-GenericConsumer gc sde) (≤strengthen s sdΣ)
 ⊢strengthen (⊢tabs₁ ⊢e) ↑Σ-□ (sd-Λ sde) = ⊢tabs₁ (⊢strengthen ⊢e ↑Σ-□ sde)
 ⊢strengthen (⊢tapp ⊢e st) sdΣ (sd-tapp sde) = ⊢tapp (⊢strengthen ⊢e (↑Σ-t sdΣ) sde) st
