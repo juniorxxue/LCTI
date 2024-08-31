@@ -245,10 +245,10 @@ data _⊢_⇒_⇒_ where
     → Γ ,∙ ⊢ □ ⇒ e ⇒ A
     → Γ ⊢ □ ⇒ Λ e ⇒ `∀ A
 
-  ⊢tapp : ∀ {e A B B'}
-    → Γ ⊢ ⟦ A ⟧↝ Σ ⇒ e ⇒ `∀ B
-    → (st : [ A ]ˢ B ⇨ B')
-    → Γ ⊢ Σ ⇒ e [ A ] ⇒ B'    
+  ⊢tapp : ∀ {e A B}
+    → Γ ⊢ ⟦ A ⟧↝ Σ ⇒ e ⇒ B
+--    → (st : [ A ]ˢ B ⇨ B')
+    → Γ ⊢ Σ ⇒ e [ A ] ⇒ B    
   
 data _⊢_≤_⊣_↪_ where
   s-int :

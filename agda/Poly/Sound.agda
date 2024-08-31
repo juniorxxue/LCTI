@@ -20,18 +20,21 @@ data ⟦_,_⟧→⟦_,_,_,_⟧ : Context n m → Type m → Apps n m → Context
   none-τ : ∀ {A B}
     → ⟦ (Context n m ∋⦂ τ A) , B ⟧→⟦ nil , τ A , nil , B ⟧
 
-  have-a : ∀ {Σ : Context n m} {e A B es A' B' Bs}
+  have-e : ∀ {Σ : Context n m} {e A B es A' B' Bs}
     → ⟦ Σ , B ⟧→⟦ es , A' , Bs , B' ⟧
     → ⟦ ([ e ]↝ Σ) , A `→ B ⟧→⟦ e ∷a es , A' , A ∷a Bs , B' ⟧
 
-  have-t : ∀ {Σ : Context n m} {B A es A' B' Bs}
-    → ⟦ Σ , B ⟧→⟦ es , A' , Bs , B' ⟧
-    → ⟦ ⟦ A ⟧↝ Σ , B ⟧→⟦ A ∷t es , A' , Bs , B' ⟧
+  have-t : ∀ {Σ Σ' : Context n m} {B A es B' Bs' C}
+    → (st : [ A ]ˢ B ⇨ B')
+    → ⟦ Σ , B' ⟧→⟦ es , Σ' , Bs' , C ⟧
+    → ⟦ ⟦ A ⟧↝ Σ , `∀ B ⟧→⟦ A ∷t es , Σ' , Bs' , C ⟧
 
 spl-weaken : ∀ {Σ Σ' : Context n m} {A e̅ A̅ A' k}
   → ⟦ Σ , A ⟧→⟦ e̅ , Σ' , A̅ , A' ⟧
   → ⟦ ↑Σ k Σ , A ⟧→⟦ up k e̅ , ↑Σ k Σ' , A̅ , A' ⟧
 spl-weaken = {!!}  
+
+
   
 ----------------------------------------------------------------------
 --+                             Typing                             +--
@@ -68,11 +71,12 @@ f (s-ex-l= x x₁ s) = ∞
 f (s-ex-r^ x x₁ x₂) = ∞
 f (s-ex-r= x x₁ s) = ∞
 f (s-arr s s₁) = ∞
-f (s-term-c x x₁ s s') = {!!}
+f (s-term-c x x₁ s s') = f s'
 f (s-term-o x x₁ s s₁) = S (f s₁)
 f (s-∀ s) = ∞
 f (s-∀l-^ s) = f s
 f (s-∀l-eq s) = f s
+f (s-∀-t x) = {!!}
 
 sound-≤ : ∀ {Ψ Ψ' : SEnv n m} {Σ A A'}
   → (s : Ψ ⊢ A ≤ Σ ⊣ Ψ' ↪ A')
@@ -90,6 +94,8 @@ sound-≤ (s-term-o x x₁ s s₁) = {!!}
 sound-≤ (s-∀ s) = {!!}
 sound-≤ (s-∀l-^ s) = {!!}
 sound-≤ (s-∀l-eq s) = {!!}
+sound-≤ (s-∀-t s) = {!!}
+
 
 app-elim : ∀ {Γ : Env n m} {A₁ Σ Ψ A e}
   → (s : 𝕓 Γ ⊢ A₁ ≤ Σ ⊣ Ψ ↪ A)
@@ -131,10 +137,10 @@ sound-c-0 ⊢e = sound-c ⊢e none-τ
 sound-i ⊢lit none-□ = ⊢lit
 sound-i (⊢var x∈Γ) none-□ = ⊢var x∈Γ
 sound-i (⊢ann ⊢e) none-□ = ⊢ann (sound-c-0 ⊢e)
-sound-i (⊢app ⊢e) spl = sound-i ⊢e (have-a spl)
-sound-i {e̅ = e ∷a e̅} (⊢lam₂ ⊢e ⊢e₁) (have-a spl) = subst e̅ (sound-i ⊢e₁ (spl-weaken spl)) (sound-i-0 ⊢e)
+sound-i (⊢app ⊢e) spl = sound-i ⊢e (have-e spl)
+sound-i {e̅ = e ∷a e̅} (⊢lam₂ ⊢e ⊢e₁) (have-e spl) = subst e̅ (sound-i ⊢e₁ (spl-weaken spl)) (sound-i-0 ⊢e)
 
-sound-i (⊢sub ⊢e s _) spl = {!!}
+sound-i (⊢sub ⊢e ne s) spl = {!!}
 
 {- let ind-e = sound-i-0 ⊢e
                               ind-s = sound-≤ s
@@ -152,13 +158,13 @@ sound-i (⊢sub ⊢e (s-∀-t s)) (have-t spl) = {!!}
 
 -- (𝕓 Γ ⊢ A₁ ≤ Σ ⊣ Ψ ↪ A) ~ j
 sound-i (⊢tabs₁ ⊢e) none-□ = ⊢tabs₁ (sound-i-0 ⊢e)
-sound-i (⊢tapp ⊢e) spl = sound-i ⊢e (have-t spl)
+sound-i (⊢tapp ⊢e st) spl = sound-i ⊢e (have-t st spl)
 
-sound-c (⊢app ⊢e) spl = sound-c ⊢e (have-a spl)
+sound-c (⊢app ⊢e) spl = sound-c ⊢e (have-e spl)
 sound-c (⊢lam₁ ⊢e) none-τ = ⊢lam₁ (sound-c-0 ⊢e)
-sound-c {e̅ = e ∷a e̅} (⊢lam₂ ⊢e ⊢e₁) (have-a spl) = subst e̅ (sound-c ⊢e₁ (spl-weaken spl)) (sound-i-0 ⊢e)
-sound-c (⊢sub ⊢e s _) spl = {!!}
-sound-c (⊢tapp ⊢e) spl = sound-c ⊢e (have-t spl)
+sound-c {e̅ = e ∷a e̅} (⊢lam₂ ⊢e ⊢e₁) (have-e spl) = subst e̅ (sound-c ⊢e₁ (spl-weaken spl)) (sound-i-0 ⊢e)
+sound-c (⊢sub ⊢e ne s) spl = {!!}
+sound-c (⊢tapp ⊢e st) spl = sound-c ⊢e (have-t st spl)
 
 -- j <= length Σ
 

@@ -6,6 +6,7 @@ data Counter : Set where
   Z  : Counter
   ∞  : Counter
   S  : Counter → Counter
+  T  : Counter → Counter
 
 data NonZ : Counter → Set where
   nz-∞ : NonZ ∞
@@ -89,11 +90,9 @@ data find : Type (1 + m) → Fin (1 + m) → Counter → Set where
   f-S₃ :  ∀ {A : Type (2 + m)} {k j}
     → find A (#S k) (S j)
     → find (`∀ A) k (S j)
-{-    
-  f-Sτ : ∀ {A : Type (2 + m)} {k j}
+  f-T : ∀ {A : Type (2 + m)} {k j}
     → find A (#S k) j
-    → find (`∀ A) k (Sτ j)
--}    
+    → find (`∀ A) k (T j)
   
 infix 3 _⊢_#_≤_
 data _⊢_#_≤_ : Env n m → Counter → Type m → Type m → Set where
@@ -155,17 +154,20 @@ data _⊢_#_⦂_ : Env n m → Counter → Term n m → Type m → Set where
     → Γ ⊢ Z # e₂ ⦂ A
     → Γ ⊢ j # e₁ · e₂ ⦂ B
   ⊢sub : ∀ {e j A B}
-    → Γ ⊢ Z # e ⦂ B
-    → (B≤A : Γ ⊢ j # B ≤ A)
+    → Γ ⊢ Z # e ⦂ A
+    → (B≤A : Γ ⊢ j # A ≤ B)
     → (j≢Z : NonZ j)
-    → Γ ⊢ j # e ⦂ A
+    → Γ ⊢ j # e ⦂ B
   ⊢tabs₁ : ∀ {e A}
     → Γ ,∙ ⊢ Z # e ⦂ A
     → Γ ⊢ Z # Λ e ⦂ `∀ A
-  ⊢tapp : ∀ {e j A B B'}
+  ⊢tapp : ∀ {e : Term n m} {j A B B'}
     → Γ ⊢ Z # e ⦂ `∀ B
     → (st : [ A ]ˢ B ⇨ B')
-    → Γ ⊢ j # e [ A ] ⦂ B'    
+    → Γ ⊢ j # e [ A ] ⦂ B'
 
 #1 : Fin (2 + m)
 #1 = #S #0
+
+-- small note: e @ A must be inferreable, and in the form of
+-- (e @ A) e', e' could only be checked
