@@ -139,14 +139,24 @@ data _~↑Σ~_ : Context (1 + n) m → Fin (1 + n) → Set where
 ↓tm-GenericConsumer gc-ann (sd-ann sde) = gc-ann
 ↓tm-GenericConsumer gc-tlam (sd-Λ sde) = gc-tlam
 
+≢-pred : ∀ {x y : Fin n}
+  → #S x ≢ #S y
+  → x ≢ y
+≢-pred neq eq = neq (cong #S eq)  
+  
+
 ↓tm-↑tm-comm-var : ∀ x (k₁ : Fin (1 + n)) k₂
   → k₂ F≤ k₁
   → (p1 : k₁ ≢ x)
   → (p2 : #S k₁ ≢ punchIn (inject₁ k₂) x)
   → punchIn k₂ (punchOut p1) ≡ punchOut p2
 ↓tm-↑tm-comm-var #0 #0 k₂ sm p1 p2 = ⊥-elim (p1 refl)
-↓tm-↑tm-comm-var #0 (#S k₁) k₂ sm p1 p2 = {!!}
-↓tm-↑tm-comm-var (#S x) k₁ k₂ sm p1 p2 = {!!}
+↓tm-↑tm-comm-var {suc n} #0 (#S k₁) #0 sm p1 p2 = refl
+↓tm-↑tm-comm-var {suc n} #0 (#S k₁) (#S k₂) sm p1 p2 = refl
+↓tm-↑tm-comm-var {suc n} (#S x) #0 #0 sm p1 p2 = refl
+↓tm-↑tm-comm-var {suc n} (#S x) (#S k₁) #0 sm p1 p2 = refl
+↓tm-↑tm-comm-var {suc n} (#S x) (#S k₁) (#S k₂) (s≤s sm) p1 p2 with ↓tm-↑tm-comm-var {n} x k₁ k₂ sm (≢-pred p1) (≢-pred p2)
+... | r = cong #S r
 
 ↓tm-↑tm-comm : ∀ {e : Term (1 + n) m} {k₁ k₂}
   → k₂ F≤ k₁
@@ -158,7 +168,7 @@ data _~↑Σ~_ : Context (1 + n) m → Fin (1 + n) → Set where
 ... | yes p1 | yes p2 = ⊥-elim (k≢x p1)
 ... | yes p1 | no ¬p2 = ⊥-elim (k≢x p1)
 ... | no ¬p1 | yes p2 = ⊥-elim (k≢x₁ p2)
-... | no ¬p1 | no ¬p2 = {!!}
+... | no ¬p1 | no ¬p2 = cong `_ (↓tm-↑tm-comm-var x k₁ k₂ sm ¬p1 ¬p2)
 ↓tm-↑tm-comm {e = ƛ e} sm (sd-lam sd1) (sd-lam sd2) rewrite ↓tm-↑tm-comm {e = e} (s≤s sm) sd1 sd2 = refl
 ↓tm-↑tm-comm {e = e · e₁} sm (sd-app sd1 sd3) (sd-app sd2 sd4) rewrite ↓tm-↑tm-comm {e = e} sm sd1 sd2 | ↓tm-↑tm-comm {e = e₁} sm sd3 sd4 = refl
 ↓tm-↑tm-comm {e = e ⦂ A} sm (sd-ann sd1) (sd-ann sd2) rewrite ↓tm-↑tm-comm {e = e} sm sd1 sd2 = refl
@@ -179,6 +189,8 @@ data _~↑Σ~_ : Context (1 + n) m → Fin (1 + n) → Set where
 helper : ∀ {Σ : Context (1 + n) m} {k}
   → Σ ~↑Σ~ k
   → ↑Σ #0 Σ ~↑Σ~ #S k
+helper = {!!}
+  
 
 ⊢strengthen : ∀ {Γ : Env (1 + n) m} {Σ k e A}
   → Γ ⊢ Σ ⇒ e ⇒ A
@@ -199,7 +211,7 @@ helper : ∀ {Σ : Context (1 + n) m} {k}
 ⊢strengthen (⊢app ⊢e) sdΣ (sd-app sde sde₁) = ⊢app (⊢strengthen ⊢e (↑Σ-e sde₁ sdΣ) sde)
 ⊢strengthen (⊢lam₁ ⊢e) ↑Σ-τ (sd-lam sde) = ⊢lam₁ (⊢strengthen ⊢e ↑Σ-τ sde)
 ⊢strengthen {k = k} (⊢lam₂ {Σ = Σ} ⊢e ⊢e₁) (↑Σ-e sd-e sdΣ) (sd-lam sde) with ↓Σ-↑Σ-comm {Σ = Σ} {k₁ = k} {k₂ = #0} z≤n sdΣ (helper sdΣ)
-... | r = ⊢lam₂ (⊢strengthen ⊢e ↑Σ-□ sd-e) {!!}
+... | eq = ⊢lam₂ (⊢strengthen ⊢e ↑Σ-□ sd-e) {!!}
 ⊢strengthen (⊢sub ⊢e ¬□ gc s) sdΣ sde = ⊢sub (⊢strengthen ⊢e ↑Σ-□ sde) (↓Σ-NonEmpty ¬□ sdΣ) (↓tm-GenericConsumer gc sde) (≤strengthen s sdΣ)
 ⊢strengthen (⊢tabs₁ ⊢e) ↑Σ-□ (sd-Λ sde) = ⊢tabs₁ (⊢strengthen ⊢e ↑Σ-□ sde)
 ⊢strengthen (⊢tapp ⊢e st) sdΣ (sd-tapp sde) = ⊢tapp (⊢strengthen ⊢e (↑Σ-t sdΣ) sde) st
