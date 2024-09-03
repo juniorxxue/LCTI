@@ -70,6 +70,8 @@ spl-weaken-ty {A = `∀ A} spl = {!!}
   → ↑Σ0 (↑Σ k Σ) ≡ ↑Σ (#S k) (↑Σ0 Σ)
 ↑Σ-comm0 = ↑Σ-comm _≤_.z≤n
 
+
+
 ≤weaken : ∀ {Γ : Env (1 + n) m} {Σ k A}
   → (Γ /ˣ k) ⊢ A ≤ Σ
   → Γ ⊢ A ≤ ↑Σ k Σ
@@ -95,10 +97,6 @@ spl-weaken-ty {A = `∀ A} spl = {!!}
 ⊢weaken (⊢tapp ⊢e st) = ⊢tapp (⊢weaken ⊢e) st
 
 
-postulate
-  ≤strengthen0 : ∀ {Γ : Env n m} {Σ A B}
-    → Γ , A ⊢ B ≤ ↑Σ #0 Σ
-    → Γ ⊢ B ≤ Σ
 
 infix 4 _~↑Σ~_
 data _~↑Σ~_ : Context (1 + n) m → Fin (1 + n) → Set where
@@ -143,7 +141,6 @@ data _~↑Σ~_ : Context (1 + n) m → Fin (1 + n) → Set where
   → #S x ≢ #S y
   → x ≢ y
 ≢-pred neq eq = neq (cong #S eq)  
-  
 
 ↓tm-↑tm-comm-var : ∀ x (k₁ : Fin (1 + n)) k₂
   → k₂ F≤ k₁
@@ -175,6 +172,11 @@ data _~↑Σ~_ : Context (1 + n) m → Fin (1 + n) → Set where
 ↓tm-↑tm-comm {e = Λ e} sm (sd-Λ sd1) (sd-Λ sd2) rewrite ↓tm-↑tm-comm {e = e} sm sd1 sd2 = refl
 ↓tm-↑tm-comm {e = e [ A ]} sm (sd-tapp sd1) (sd-tapp sd2)  rewrite ↓tm-↑tm-comm {e = e} sm sd1 sd2 = refl
 
+≡-pred : ∀ {j k : Fin n}
+  → #S j ≡ #S k
+  → j ≡ k
+≡-pred refl = refl
+
 
 ↓Σ-↑Σ-comm : ∀ {Σ : Context (1 + n) m} {k₁ k₂}
   → k₂ F≤ k₁
@@ -186,11 +188,40 @@ data _~↑Σ~_ : Context (1 + n) m → Fin (1 + n) → Set where
 ↓Σ-↑Σ-comm {Σ = [ e ]↝ Σ} sm (↑Σ-e sd-e sd1) (↑Σ-e sd-e₁ sd2) rewrite ↓Σ-↑Σ-comm {Σ = Σ} sm sd1 sd2 | ↓tm-↑tm-comm sm sd-e sd-e₁ = refl
 ↓Σ-↑Σ-comm {Σ = ⟦ A ⟧↝ Σ} sm (↑Σ-t sd1) (↑Σ-t sd2) rewrite ↓Σ-↑Σ-comm {Σ = Σ} sm sd1 sd2 = refl
 
-helper : ∀ {Σ : Context (1 + n) m} {k}
+toℕ≤0 : ∀ {k : Fin (1 + n)}
+  → toℕ k ≤ 0
+  → k ≡ #0
+toℕ≤0 {k = #0} neq = refl
+
+↑tm-↑-var : ∀ {k : Fin n} {l x}
+  → l F≤ #S k
+  → x ≢ k
+  → #S k ≢ punchIn l x
+↑tm-↑-var {l = #0} l≤k k≢x refl = k≢x refl
+↑tm-↑-var {k = #0} {l = #S l} {#S x} (s≤s l≤k) k≢x eq rewrite toℕ≤0 l≤k = k≢x (sym (≡-pred eq))
+↑tm-↑-var {k = #S k} {l = #S l} {#S x} (s≤s l≤k) k≢x eq = ↑tm-↑-var {k = k} {l} {x} l≤k (≢-pred k≢x) (≡-pred eq)
+
+↑tm-↑ : ∀ {e : Term (1 + n) m} {k l}
+  → l F≤ #S k
+  → e ~↑tm~ k
+  → ↑tm l e ~↑tm~ #S k
+↑tm-↑ l≤k sd-lit = sd-lit
+↑tm-↑ l≤k (sd-var k≢x) = sd-var (↑tm-↑-var l≤k (≢-sym k≢x))
+↑tm-↑ l≤k (sd-lam sd) = sd-lam (↑tm-↑ (s≤s l≤k) sd)
+↑tm-↑ l≤k (sd-app sd sd₁) = sd-app (↑tm-↑ l≤k sd) (↑tm-↑ l≤k sd₁)
+↑tm-↑ l≤k (sd-ann sd) = sd-ann (↑tm-↑ l≤k sd)
+↑tm-↑ l≤k (sd-Λ sd) = sd-Λ (↑tm-↑ l≤k sd)
+↑tm-↑ l≤k (sd-tapp sd) = sd-tapp (↑tm-↑ l≤k sd)
+
+
+↑Σ-↑ : ∀ {Σ : Context (1 + n) m} {k l}
+  → l F≤ #S k
   → Σ ~↑Σ~ k
-  → ↑Σ #0 Σ ~↑Σ~ #S k
-helper = {!!}
-  
+  → ↑Σ l Σ ~↑Σ~ #S k
+↑Σ-↑ l≤k ↑Σ-□ = ↑Σ-□
+↑Σ-↑ l≤k ↑Σ-τ = ↑Σ-τ
+↑Σ-↑ l≤k (↑Σ-e sd-e sd) = ↑Σ-e (↑tm-↑ l≤k sd-e) (↑Σ-↑ l≤k sd)
+↑Σ-↑ l≤k (↑Σ-t sd) = ↑Σ-t (↑Σ-↑ l≤k sd)
 
 ⊢strengthen : ∀ {Γ : Env (1 + n) m} {Σ k e A}
   → Γ ⊢ Σ ⇒ e ⇒ A
@@ -210,8 +241,9 @@ helper = {!!}
 ⊢strengthen (⊢ann ⊢e) sdΣ (sd-ann sde) = ⊢ann (⊢strengthen ⊢e ↑Σ-τ sde)
 ⊢strengthen (⊢app ⊢e) sdΣ (sd-app sde sde₁) = ⊢app (⊢strengthen ⊢e (↑Σ-e sde₁ sdΣ) sde)
 ⊢strengthen (⊢lam₁ ⊢e) ↑Σ-τ (sd-lam sde) = ⊢lam₁ (⊢strengthen ⊢e ↑Σ-τ sde)
-⊢strengthen {k = k} (⊢lam₂ {Σ = Σ} ⊢e ⊢e₁) (↑Σ-e sd-e sdΣ) (sd-lam sde) with ↓Σ-↑Σ-comm {Σ = Σ} {k₁ = k} {k₂ = #0} z≤n sdΣ (helper sdΣ)
-... | eq = ⊢lam₂ (⊢strengthen ⊢e ↑Σ-□ sd-e) {!!}
+⊢strengthen {k = k} (⊢lam₂ {Σ = Σ} ⊢e ⊢e₁) (↑Σ-e sd-e sdΣ) (sd-lam sde) with ⊢strengthen ⊢e₁ (↑Σ-↑ z≤n sdΣ) sde
+                                                                           | ↓Σ-↑Σ-comm {Σ = Σ} {k₁ = k} {k₂ = #0} z≤n sdΣ (↑Σ-↑ z≤n sdΣ)
+... | ih | eq rewrite sym eq = ⊢lam₂ (⊢strengthen ⊢e ↑Σ-□ sd-e) ih
 ⊢strengthen (⊢sub ⊢e ¬□ gc s) sdΣ sde = ⊢sub (⊢strengthen ⊢e ↑Σ-□ sde) (↓Σ-NonEmpty ¬□ sdΣ) (↓tm-GenericConsumer gc sde) (≤strengthen s sdΣ)
 ⊢strengthen (⊢tabs₁ ⊢e) ↑Σ-□ (sd-Λ sde) = ⊢tabs₁ (⊢strengthen ⊢e ↑Σ-□ sde)
 ⊢strengthen (⊢tapp ⊢e st) sdΣ (sd-tapp sde) = ⊢tapp (⊢strengthen ⊢e (↑Σ-t sdΣ) sde) st
@@ -220,6 +252,27 @@ helper = {!!}
 ≤strengthen s-refl sdΣ = s-refl
 ≤strengthen (s-arr s ⊢e) (↑Σ-e sd-e sdΣ) = s-arr (≤strengthen s sdΣ) (⊢strengthen ⊢e ↑Σ-τ sd-e)
 ≤strengthen (s-∀-t st s) (↑Σ-t sdΣ) = s-∀-t st (≤strengthen s sdΣ)
+
+↑Σ-↓Σ-id : ∀ {Σ : Context n m} {k}
+  → (sdΣ : ↑Σ k Σ ~↑Σ~ k)
+  → ↓Σ k (↑Σ k Σ) sdΣ ≡ Σ
+↑Σ-↓Σ-id {Σ = □} sd = refl
+↑Σ-↓Σ-id {Σ = τ A} sd = refl
+↑Σ-↓Σ-id {Σ = [ e ]↝ Σ} {k = k} (↑Σ-e sd-e sd) rewrite ↑Σ-↓Σ-id {Σ = Σ} sd | ↑tm-↓tm-id e k sd-e = refl
+↑Σ-↓Σ-id {Σ = ⟦ A ⟧↝ Σ} (↑Σ-t sd) rewrite ↑Σ-↓Σ-id {Σ = Σ} sd = refl
+
+↑Σ-~ : ∀ {Σ : Context n m} {k}
+  → ↑Σ k Σ ~↑Σ~ k
+↑Σ-~ {Σ = □} = ↑Σ-□
+↑Σ-~ {Σ = τ A} = ↑Σ-τ
+↑Σ-~ {Σ = [ e ]↝ Σ} {k = k} = ↑Σ-e (↑tm-~ e k) (↑Σ-~ {Σ = Σ})
+↑Σ-~ {Σ = ⟦ A ⟧↝ Σ} = ↑Σ-t (↑Σ-~ {Σ = Σ})
+
+≤strengthen0 : ∀ {Γ : Env n m} {Σ A B}
+  → Γ , A ⊢ B ≤ ↑Σ #0 Σ
+  → Γ ⊢ B ≤ Σ
+≤strengthen0 {Γ = Γ} {Σ} {A} {B} s with ≤strengthen {Γ = Γ , A} {k = #0} s ↑Σ-~
+... | r rewrite ↑Σ-↓Σ-id {Σ = Σ} {k = #0} ↑Σ-~ = r
 
 
 ≤weaken0 : ∀ {Γ : Env n m} {Σ A B}

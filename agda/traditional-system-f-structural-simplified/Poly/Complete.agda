@@ -3,6 +3,7 @@ module Poly.Complete where
 open import Poly.Common
 open import Poly.Decl
 open import Poly.Algo
+open import Poly.Algo.Properties
 open import Poly.Algo.Subsumption
 
 infix 3 _⊢_~_
