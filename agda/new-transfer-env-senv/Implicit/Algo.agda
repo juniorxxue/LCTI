@@ -4,7 +4,8 @@ open import Implicit.Common
 
 -- Env for algorithmic subtyping
 data SEnv : ℕ → ℕ → Set where
-  𝕓     : (Γ : Env n m) → SEnv n m
+  ∅     : SEnv 0 0
+  _,_   : SEnv n m → (A : Type m) → SEnv (1 + n) m
   _,∙   : SEnv n m → SEnv n (1 + m) -- universal variable
   _,^   : SEnv n m → SEnv n (1 + m) -- existential variable
   _,=_  : SEnv n m → (A : Type m) → SEnv n (1 + m) -- solved equation
@@ -56,14 +57,6 @@ data NonEmpty : Context n m → Set where
 [ Ψ /ᵉ `∀ A ] = {!!}
 -}
 
-Ψ→Γ : SEnv n m → Env n m
-Ψ→Γ (𝕓 Γ)    = Γ
-Ψ→Γ (Ψ ,∙)   = (Ψ→Γ Ψ) ,∙
--- this seems to be dangerous, I give a solution which could never reach (`e` is shifted)
--- so that I no need to touch the indices in expression `e`
-Ψ→Γ (Ψ ,^)   = (Ψ→Γ Ψ) ,= Int
-Ψ→Γ (Ψ ,= A) = (Ψ→Γ Ψ) ,= A
-
 infix 3 _↪_,_
 data _↪_,_ : SEnv n (1 + m) → Env n m → Type m → Set where
   
@@ -86,7 +79,7 @@ infix 3 _⊢o_
 data _⊢c_ : SEnv n m → Type m → Set where
   ⊢c-int : Ψ ⊢c Int
   ⊢c-base : ∀ {X}
-    → 𝕓 Γ ⊢c ‶ X
+    → ∅ ⊢c ‶ X
   ⊢c-var∙0 : Ψ ,∙ ⊢c ‶ #0
   ⊢c-var=0 : ∀ {A} → Ψ ,= A ⊢c ‶ #0
   ⊢c-var∙S : ∀ {X}
@@ -149,7 +142,7 @@ data _:=_∈_ : Fin m → Type m → SEnv n m → Set where
 
   kΓ : ∀ {k} {A}
     → k := A ∈' Γ
-    → k := A ∈ (𝕓 Γ)
+    → k := A ∈ ∅
   Z : ∀ {A} → #0 := A ∈ Ψ ,= ↓ty0 A
   S^ : ∀ {k} {A : Type (1 + m)}
     → k := ↓ty0 A ∈ Ψ
@@ -217,8 +210,22 @@ data _^∈_ : Fin m → SEnv n m → Set where
     → #S k ^∈ Ψ ,∙
   S= : ∀ {k A}
     → k ^∈ Ψ
-    → #S k ^∈ Ψ ,= A    
+    → #S k ^∈ Ψ ,= A
 
+infix 8 𝕎 𝕄
+
+𝕎 : Env n m → SEnv n m
+𝕎 ∅ = ∅
+𝕎 (Γ , A) = 𝕎 Γ , A
+𝕎 (Γ ,∙) = 𝕎 Γ ,∙
+𝕎 (Γ ,= A) = 𝕎 Γ ,= A
+
+𝕄 : SEnv n m → Env n m
+𝕄 ∅ = ∅
+𝕄 (Ψ , A) = 𝕄 Ψ , A
+𝕄 (Ψ ,∙) = 𝕄 Ψ ,∙
+𝕄 (Ψ ,^) = 𝕄 Ψ ,= Int
+𝕄 (Ψ ,= A) = 𝕄 Ψ ,= A
 
 
 infix 3 _⊢_⇒_⇒_
@@ -258,7 +265,7 @@ data _⊢_⇒_⇒_ where
     → Γ ⊢ □ ⇒ g ⇒ A          --- Γ ⊢ Z # e : A
     → NonEmpty Σ
     → GenericConsumer g
-    → 𝕓 Γ ⊢ A ≤ Σ ⊣ 𝕓 Γ ↪ B    --- Γ ⊢ j # A ≤ B
+    → 𝕎 Γ ⊢ A ≤ Σ ⊣ 𝕎 Γ ↪ B    --- Γ ⊢ j # A ≤ B
     → Γ ⊢ Σ ⇒ g ⇒ B          --- Γ ⊢ j # e ∶ B
 
   -- design choices here,
@@ -319,13 +326,13 @@ data _⊢_≤_⊣_↪_ where
   s-term-c : ∀ {A B A' D e}
     → Ψ ⊢c A
     → Ψ ⊢c B
-    → (Ψ→Γ Ψ) ⊢ τ A ⇒ e ⇒ A'
+    → (𝕄 Ψ) ⊢ τ A ⇒ e ⇒ A'
     → Ψ ⊢ B ≤ Σ ⊣ Ψ' ↪ D
     → Ψ ⊢ (A `→ B) ≤ ([ e ]↝ Σ) ⊣ Ψ' ↪ A' `→ D
 
   s-term-o : ∀ {A A' B C D e}
     → Ψ ⊢o A
-    → (Ψ→Γ Ψ) ⊢ □ ⇒ e ⇒ C
+    → (𝕄 Ψ) ⊢ □ ⇒ e ⇒ C
     → Ψ ⊢ C ≤ τ A ⊣ Ψ₁ ↪ A'
     → Ψ₁ ⊢ B ≤ Σ ⊣ Ψ₂ ↪ D
     → Ψ ⊢ A `→ B ≤ ([ e ]↝ Σ) ⊣ Ψ₂ ↪ A' `→ D
@@ -344,59 +351,7 @@ data _⊢_≤_⊣_↪_ where
     → Ψ ⊢ `∀ A ≤ ([ e ]↝ Σ) ⊣ Ψ' ↪ C'
 
   -- explicit type applicatoin
-{-
-  s-∀-t : ∀ {A B C}
-    → Ψ ⊢ [ B ]ˢ A ≤ Σ ⊣ Ψ' ↪ C
-    → Ψ ⊢ `∀ A ≤ (⟦ B ⟧↝ Σ) ⊣ Ψ' ↪ C
--}
   s-∀-t : ∀ {A B C C'}
     → Ψ ,= B ⊢ A ≤ ↑tyΣ0 Σ ⊣ Ψ' ,= B ↪ C
     → [ B ]ˢ C ⇨ C'
     → Ψ ⊢ `∀ A ≤ (⟦ B ⟧↝ Σ) ⊣ Ψ' ↪ C'
-
-----------------------------------------------------------------------
---+                            Examples                            +--
-----------------------------------------------------------------------
-{-
-idEnv : Env 1 0
-idEnv = ∅ , `∀ (‶ #0 `→ ‶ #0)
-
-sub-id[Int]1 : ∀ {Γ : Env n m} → 𝕓 Γ ⊢ `∀ ‶ #0 `→ ‶ #0 ≤ ⟦ Int ⟧↝ [ lit 1 ]↝ □ ⊣ 𝕓 Γ ↪ Int `→ Int
-sub-id[Int]1 {Γ = Γ} = s-∀-t (s-term-c ⊢c-var=0 ⊢c-var=0
-                             (⊢sub {Ψ = 𝕓 (Γ ,= Int)} ⊢lit ne-τ (s-ex-r= ⊢c-int (kΓ Z) s-int))
-                             (s-empty ⊢c-var=0 (inst-var Z inst-int)))
-
-
-sub-id[Int] : ∀ {Γ : Env n m} → 𝕓 Γ ⊢ `∀ ‶ #0 `→ ‶ #0 ≤ ⟦ Int ⟧↝ □ ⊣ 𝕓 Γ ↪ Int `→ Int
-sub-id[Int] = s-∀-t (s-empty (⊢c-arr ⊢c-var=0 ⊢c-var=0) (inst-arr (inst-var Z inst-int) (inst-var Z inst-int)))
-
-sub-id1 : ∀ {Γ : Env n m} → 𝕓 Γ ⊢ `∀ ‶ #0 `→ ‶ #0 ≤ [ lit 1 ]↝ □ ⊣ 𝕓 Γ ↪ Int `→ Int
-sub-id1 = s-∀l-eq (s-term-o ⊢o-var^0
-                           ⊢lit
-                           (s-ex-r^ ⊢c-int Z ⟹^0)
-                           (s-empty ⊢c-var=0 (inst-var Z inst-int)))
-
-id[Int]1 : idEnv ⊢ □ ⇒ ((` #0) [ Int ]) · (lit 1) ⇒ Int
-id[Int]1 = ⊢app (⊢tapp (⊢sub (⊢var refl)
-                             ne-tapp
-                             sub-id[Int]1))
-idExp : Term 0 0
-idExp = Λ (((ƛ ` #0) ⦂ ‶ #0 `→ ‶ #0))
-
-idExp[Int]1 : ∅ ⊢ □ ⇒ (idExp [ Int ]) · (lit 1) ⇒ Int
-idExp[Int]1 = ⊢app (⊢tapp (⊢sub
-                            (⊢tabs₁ (⊢ann (⊢lam₁ (⊢sub (⊢var refl) ne-τ s-var)))) ne-tapp (sub-id[Int]1 {Γ = ∅})))
-
-idExp[Int] : ∅ ⊢ □ ⇒ idExp [ Int ] ⇒ Int `→ Int
-idExp[Int] = ⊢tapp (⊢sub (⊢tabs₁ (⊢ann (⊢lam₁ (⊢sub (⊢var refl) ne-τ s-var)))) ne-tapp sub-id[Int])
-
--- implicit inst
-id1 : idEnv ⊢ □ ⇒ (` #0) · (lit 1) ⇒ Int
-id1 = ⊢app (⊢sub (⊢var refl) ne-app sub-id1)
-
-
--- [e1] -> [e2] -> [e3] -> []
--- ------- Inf----- Chk -------
-
--- [1] -> [2] -> [] -- can we ensure the order of inference of 1 / 2
--}
