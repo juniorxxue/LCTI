@@ -6,7 +6,7 @@ data Counter : Set where
   Z  : Counter
   ∞  : Counter
   S  : Counter → Counter
-  T  : Counter → Counter
+--  T  : Counter → Counter
 
 data NonZ : Counter → Set where
   nz-∞ : NonZ ∞
@@ -71,7 +71,7 @@ data _⟦_⟧⟹_ : Env n m → Type m → Type m → Set where
     → Γ ⟦ `∀ A ⟧⟹ `∀ A'
 
 data bound : Type (1 + m) → Fin (1 + m) → Set where
-  b-var : bound (Type (1 + m) ∋⦂ ‶ #0) #0
+  b-var : ∀ {k} → bound (Type (1 + m) ∋⦂ ‶ k) k
   b-arr₁ : ∀ {A : Type (1 + m)} {B k} → bound A k → bound (A `→ B) k
   b-arr₂ : ∀ {A : Type (1 + m)} {B k} → bound B k → bound (A `→ B) k
   b-∀ : ∀ {A : Type (2 + m)} {k} → bound A (#S k) → bound (`∀ A) k
@@ -90,15 +90,17 @@ data find : Type (1 + m) → Fin (1 + m) → Counter → Set where
   f-S₃ :  ∀ {A : Type (2 + m)} {k j}
     → find A (#S k) (S j)
     → find (`∀ A) k (S j)
+{-    
   f-T : ∀ {A : Type (2 + m)} {k j}
     → find A (#S k) j
     → find (`∀ A) k (T j)
+-}
   
 infix 3 _⊢_#_≤_
 data _⊢_#_≤_ : Env n m → Counter → Type m → Type m → Set where
-  s-refl : ∀ {A A'}
-    → (ap : Γ ⟦ A ⟧⟹ A') -- I want to simplify this judgment, but worried about type variables case
-    → Γ ⊢ Z # A ≤ A'
+  s-refl : ∀ {A}
+--    → (ap : Γ ⟦ A ⟧⟹ A') -- I want to simplify this judgment, but worried about type variables case
+    → Γ ⊢ Z # A ≤ A
   s-int :
       Γ ⊢ ∞ # Int ≤ Int
   s-var : ∀ {X} 
@@ -145,10 +147,10 @@ data _⊢_#_⦂_ : Env n m → Counter → Term n m → Type m → Set where
   ⊢lam₂ : ∀ {e j A B}
     → Γ , A ⊢ j # e ⦂ B
     → Γ ⊢ S j # ƛ e ⦂ A `→ B
-  ⊢app₁ : ∀ {e₁ e₂ j A B}
+  ⊢app₁ : ∀ {e₁ e₂ A B}
     → Γ ⊢ Z # e₁ ⦂ A `→ B
     → Γ ⊢ ∞ # e₂ ⦂ A
-    → Γ ⊢ j # e₁ · e₂ ⦂ B
+    → Γ ⊢ Z # e₁ · e₂ ⦂ B
   ⊢app₂ : ∀ {e₁ e₂ j A B}
     → Γ ⊢ S j # e₁ ⦂ A `→ B
     → Γ ⊢ Z # e₂ ⦂ A
@@ -161,10 +163,10 @@ data _⊢_#_⦂_ : Env n m → Counter → Term n m → Type m → Set where
   ⊢tabs₁ : ∀ {e A}
     → Γ ,∙ ⊢ Z # e ⦂ A
     → Γ ⊢ Z # Λ e ⦂ `∀ A
-  ⊢tapp : ∀ {e : Term n m} {j A B B'}
+  ⊢tapp : ∀ {e : Term n m} {A B B'}
     → Γ ⊢ Z # e ⦂ `∀ B
     → (st : [ A ]ˢ B ⇨ B')
-    → Γ ⊢ j # e [ A ] ⦂ B'
+    → Γ ⊢ Z # e [ A ] ⦂ B'
 
 #1 : Fin (2 + m)
 #1 = #S #0

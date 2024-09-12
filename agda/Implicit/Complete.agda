@@ -22,6 +22,13 @@ data _⊢_~_ where
     → Γ ⊢ ⟨ j , B ⟩ ~ Σ
     → Γ ⊢ ⟨ S j , A `→ B ⟩ ~ ([ e ]↝ Σ)
 
+{-
+  ~∀ : ∀ {Γ : Env n m} {j A B Σ}
+    → Γ ,= A ⊢ ⟨ j , B ⟩ ~ ↑tyΣ0 Σ
+    → Γ ⊢ ⟨ j , `∀ B ⟩ ~ (⟦ A ⟧↝ Σ)
+-}    
+
+
 postulate
   ~weaken0 : ∀ {Γ : Env n m} {Σ A B j}
     → Γ ⊢ ⟨ j , B ⟩ ~ Σ
@@ -61,14 +68,16 @@ complete (⊢var x) ~Z = ⊢var x
 complete (⊢ann ⊢e) ~Z = ⊢ann (complete-chk ⊢e)
 complete (⊢lam₁ ⊢e) ~∞ = ⊢lam₁ (complete-chk ⊢e)
 complete (⊢lam₂ ⊢e) (~S ⊢e' j~Σ) = ⊢lam₂ ⊢e' (complete ⊢e (~weaken0 j~Σ))
-complete (⊢app₁ ⊢e ⊢e₁) j~Σ = ⊢app (subsumption0 (complete-inf ⊢e) (s-term-c {!!} {!!} (complete-chk ⊢e₁) {!!})) -- more thinking needed
+complete (⊢app₁ ⊢e ⊢e₁) ~Z = ⊢app (subsumption0 (complete-inf ⊢e) (s-term-c {!!} {!!} (complete-chk ⊢e₁) (s-empty {!!} {!!})))
+-- (s-term-c {!!} {!!} (complete-chk ⊢e₁) (complete-≤ {!!} j~Σ)))
 -- maybe some property like checking rule in previous system could be generlised
 complete (⊢app₂ ⊢e ⊢e₁) j~Σ = ⊢app (complete ⊢e (~S (complete-inf ⊢e₁) j~Σ))
 complete (⊢sub ⊢e B≤A j≢Z) j~Σ = subsumption0 (complete-inf ⊢e) (complete-≤ B≤A j~Σ)
 complete (⊢tabs₁ ⊢e) ~Z = ⊢tabs₁ (complete-inf ⊢e)
-complete (⊢tapp ⊢e st) j~Σ = {!!}
+complete (⊢tapp ⊢e st) ~Z = ⊢tapp (subsumption0 (complete-inf ⊢e) (s-∀-t (s-empty {!!} {!!}) st))
+-- ⊢tapp (subsumption0 (complete-inf ⊢e) (complete-≤ {!!} {!!}))
 
-complete-≤ (s-refl ap) ~Z = s-empty {!!} {!!} -- easy
+complete-≤ (s-refl) ~Z = s-empty {!!} {!!} -- easy
 complete-≤ s-int ~∞ = s-int
 complete-≤ s-var ~∞ = s-var
 complete-≤ (s-arr₁ s s₁) ~∞ = s-arr (complete-≤-chk s) (complete-≤-chk s₁)
@@ -77,3 +86,10 @@ complete-≤ (s-∀ s) ~∞ = s-∀ {!complete-≤-chk s!} -- a trouble
 complete-≤ (s-∀l s x) (~S ⊢e j~Σ) = s-∀l-eq {!!}
 complete-≤ (s-var-l x s) ~∞ = s-ex-l= {!!} {!!} (complete-≤-chk s) -- ok
 complete-≤ (s-var-r x s) ~∞ = s-ex-r= {!!} {!!} (complete-≤-chk s) -- ok
+
+
+s-sol-gen : ∀ {Ψ : SEnv n m} {B C A Σ Ψ'}
+  → Ψ ⊢ `∀ B ≤ Σ ⊣ Ψ' ↪ C
+  → [ A ]ˢ B ⇨ C
+  → Ψ ,= A ⊢ B ≤ ↑tyΣ0 Σ ⊣ Ψ' ,= A ↪ B
+s-sol-gen s st = {!!}  

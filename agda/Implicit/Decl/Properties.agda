@@ -1,26 +1,17 @@
-{-# OPTIONS --allow-unsolved-metas #-}
 module Implicit.Decl.Properties where
 
 open import Implicit.Common
 open import Implicit.Decl
 
 {-
-
-_↑ᵗ_ : ∀ (Γ : Env n m) -> (k : Fin (1 + m)) → Env n (1 + m)
-Γ ↑ᵗ #0 = Γ ,∙
-Γ ↑ᵗ #S k = {!   !}
-
-_↑ᵉ[_]_ : ∀ (Γ : Env n m) → Type m -> (k : Fin (1 + n)) → Env (1 + n) m
-Γ ↑ᵉ[ e ] k = {!   !}
-
--}
-
-
 ⊢sub' : ∀ {Γ : Env n m} {e A B j}
   → Γ ⊢ Z # e ⦂ B
   → Γ ⊢ j # B ≤ A
   → Γ ⊢ j # e ⦂ A -- which no longer holds for zed case
-⊢sub' = {!   !}
+⊢sub' {j = Z} ⊢e (s-refl ap) = {!!}
+⊢sub' {j = ∞} ⊢e s = ⊢sub ⊢e s nz-∞
+⊢sub' {j = S j} ⊢e s = ⊢sub ⊢e s nz-S
+-}
 
 -- the needed lemmas
 -- will do later
@@ -90,7 +81,7 @@ slv-weaken {A = `∀ A} {`∀ B} (slv-∀ ⟦A⟧⟹B) = slv-∀ (slv-weaken ⟦
 s-weaken : ∀ {Γ : Env (1 + n) m} {k j A B }
   → Γ /ˣ k ⊢ j # A ≤ B
   → Γ ⊢ j # A ≤ B
-s-weaken (s-refl ap) = s-refl (slv-weaken ap)
+s-weaken (s-refl) = s-refl
 s-weaken s-int = s-int
 s-weaken s-var = s-var
 s-weaken (s-arr₁ C≤A B≤D) = s-arr₁ (s-weaken C≤A) (s-weaken B≤D)
@@ -100,34 +91,15 @@ s-weaken (s-∀l A≤B s) = s-∀l (s-weaken A≤B) s
 s-weaken (s-var-l x A≤B) = s-var-l (∈-weaken x) (s-weaken A≤B)
 s-weaken (s-var-r x A≤B) = s-var-r (∈-weaken x) (s-weaken A≤B)
 
+postulate
+  weaken : ∀ {Γ : Env (1 + n) m} {k j e A}
+    → Γ /ˣ k ⊢ j # e ⦂ A
+    → Γ ⊢ j # ↑tm k e ⦂ A
 
-s-strengthen-tm-0 : ∀ {Γ : Env n m} {A B C j}
-  → Γ , A ⊢ j # B ≤ C
-  → Γ ⊢ j # B ≤ C
-s-strengthen-tm-0 (s-refl ap) = {! ap !}
-s-strengthen-tm-0 s-int = s-int
-s-strengthen-tm-0 s-var = s-var
-s-strengthen-tm-0 (s-arr₁ C≤A B≤D) = s-arr₁ (s-strengthen-tm-0 C≤A) (s-strengthen-tm-0 B≤D)
-s-strengthen-tm-0 (s-arr₂ B≤C B≤C₁) = {!   !}
-s-strengthen-tm-0 (s-∀ B≤C) = s-∀ {!   !} -- IH not generalizable enough 
-s-strengthen-tm-0 (s-∀l B≤C x) = {!   !}
-s-strengthen-tm-0 (s-var-l x B≤C) = {!   !}
-s-strengthen-tm-0 (s-var-r x B≤C) = {!   !}
-
-weaken : ∀ {Γ : Env (1 + n) m} {k j e A}
-  → Γ /ˣ k ⊢ j # e ⦂ A
-  → Γ ⊢ j # ↑tm k e ⦂ A
-weaken ⊢lit = ⊢lit
-weaken {Γ = Γ} {k = k} (⊢var {x = x} refl) = ⊢var (sym (lookup-weaken {Γ = Γ}))
-weaken (⊢ann e⇔A) = ⊢ann (weaken e⇔A)
-weaken (⊢lam₁ e⇔A) = ⊢lam₁ (weaken e⇔A)
-weaken (⊢lam₂ e⇔A) = ⊢lam₂ (weaken e⇔A)
-weaken (⊢app₁ e₁⇔A e₂⇔A) = ⊢app₁ (weaken e₁⇔A) (weaken e₂⇔A)
-weaken (⊢app₂ e₁⇔A e₂⇔A) = ⊢app₂ (weaken e₁⇔A) (weaken e₂⇔A)
-weaken (⊢sub e⇔A B≤A j≢Z) = ⊢sub (weaken e⇔A) (s-weaken B≤A)  j≢Z
-weaken (⊢tabs₁ e⇔A) = ⊢tabs₁ (weaken e⇔A)
-weaken (⊢tapp st e⇔A) = ⊢tapp {!!} {!!}
-
+  s-strengthen-tm-0 : ∀ {Γ : Env n m} {A B C j}
+    → Γ , A ⊢ j # B ≤ C
+    → Γ ⊢ j # B ≤ C
+  
 weaken-0 : ∀ {Γ : Env (1 + n) m} {j e A}
   → Γ ⊢ j # e ⦂ A
   → Γ , A ⊢ j # ↑tm0 e ⦂ A

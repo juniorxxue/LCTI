@@ -41,12 +41,13 @@ postulate
     → Γ ⊢ □ ⇒ e ⇒ A
     → 𝕓 Γ ⊢ A ≤ Σ ⊣ Ψ ↪ A'
     → Γ ⊢ Σ ⇒ e ⇒ A'
-
-subsumption : ∀ {Γ : Env n m} {Σ Σ' Σ'' Ψ e A A' a̅}
-  → Γ ⊢ Σ ⇒ e ⇒ A
-  → ⟦ Σ ⟧⇒⟦ a̅ , □ ⟧
-  → a̅ ⊕ Σ'' := Σ'
-  → 𝕓 Γ ⊢ A ≤ Σ'' ⊣ Ψ ↪ A'
-  → Γ ⊢ Σ' ⇒ e ⇒ A'
+    
+postulate
+  subsumption : ∀ {Γ : Env n m} {Σ Σ' Σ'' Ψ e A A' a̅}
+    → Γ ⊢ Σ ⇒ e ⇒ A
+    → ⟦ Σ ⟧⇒⟦ a̅ , □ ⟧
+    → a̅ ⊕ Σ'' := Σ'
+    → 𝕓 Γ ⊢ A ≤ Σ'' ⊣ Ψ ↪ A'
+    → Γ ⊢ Σ' ⇒ e ⇒ A'
 
 

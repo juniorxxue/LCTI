@@ -6,19 +6,6 @@ open import Implicit.Algo
 -- open import Relation.Binary.PropositionalEquality.≡-Reasoning
 -- why does it not work?
 
-data Γext : SEnv n m → SEnv n m → SEnv n' m' → SEnv n' m' → Set where
-  base : ∀ {Γ : Env n m} {Ψ}
-    → Γext (𝕓 Γ) Ψ (𝕓 Γ) Ψ
-  uvar : ∀ {Ψ Ψ' : SEnv n m} {Γ : Env n' m'} {Ψ''}
-    → Γext Ψ Ψ' (𝕓 Γ) Ψ''
-    → Γext (Ψ ,∙) (Ψ' ,∙) (𝕓 Γ) Ψ'' 
-  evar : ∀ {Ψ Ψ' : SEnv n m} {Γ : Env n' m'} {Ψ''}
-    → Γext Ψ Ψ' (𝕓 Γ) Ψ''
-    → Γext (Ψ ,^) (Ψ' ,^) (𝕓 Γ) Ψ''
-  svar : ∀ {Ψ Ψ' : SEnv n m} {A} {Γ : Env n' m'} {Ψ''}
-    → Γext Ψ Ψ' (𝕓 Γ) Ψ''
-    → Γext (Ψ ,^) (Ψ' ,= A) (𝕓 Γ) Ψ''
-
 infix 3 _~~_
 data _~~_ : SEnv n m → SEnv n m → Set where
   base : ∀ {Γ : Env n m}
@@ -81,7 +68,7 @@ s-closed-gen (s-∀l-^ s) with s-closed-gen s
 ... | evar r = r
 s-closed-gen (s-∀l-eq s) with s-closed-gen s
 ... | evar-sol r = r
-s-closed-gen (s-∀-t s) with s-closed-gen s
+s-closed-gen (s-∀-t s st) with s-closed-gen s
 ... | svar r = r
   
 s-closed : ∀ {Γ : Env n m} {Ψ A B Σ}
@@ -89,3 +76,7 @@ s-closed : ∀ {Γ : Env n m} {Ψ A B Σ}
   → Ψ ≡ 𝕓 Γ
 s-closed s with s-closed-gen s
 ... | base = refl
+
+
+-- Goal: (𝕓 Γ ,= A) ⊢ B ≤ ↑tyΣ0 Σ ⊣ Γ ,= A ↪ B
+-- Have: 𝕓 Γ ⊢ `∀ B ≤ Σ ⊣ 𝕓 Γ ↪ B' → [ A] B

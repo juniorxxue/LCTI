@@ -73,6 +73,12 @@ private
     Ψ Ψ' Ψ₁ Ψ₂ Ψ₃ : SEnv n m
     Σ : Context n m
 
+data GenericConsumer : Term n m → Set where
+  gc-i : ∀ {i} → GenericConsumer (Term n m ∋⦂ lit i)
+  gc-var : ∀ {x} → GenericConsumer (Term n m ∋⦂ ` x)
+  gc-ann : ∀ {e : Term n m} {A} → GenericConsumer (e ⦂ A)
+  gc-tlam : ∀ {e : Term n (1 + m)} → GenericConsumer (Λ e)
+
 infix 3 _⊢c_
 infix 3 _⊢o_
 
@@ -235,7 +241,8 @@ data _⊢_⇒_⇒_ where
   ⊢sub : ∀ {g A B}
     → Γ ⊢ □ ⇒ g ⇒ A          --- Γ ⊢ Z # e : A
     → NonEmpty Σ
-    → 𝕓 Γ ⊢ A ≤ Σ ⊣ Ψ ↪ B    --- Γ ⊢ j # A ≤ B
+    → GenericConsumer g
+    → 𝕓 Γ ⊢ A ≤ Σ ⊣ 𝕓 Γ ↪ B    --- Γ ⊢ j # A ≤ B
     → Γ ⊢ Σ ⇒ g ⇒ B          --- Γ ⊢ j # e ∶ B
 
   -- design choices here,
@@ -254,10 +261,10 @@ data _⊢_≤_⊣_↪_ where
   s-int :
       Ψ ⊢ Int ≤ τ Int ⊣ Ψ ↪ Int
 
-  s-empty : ∀ {A A'}
+  s-empty : ∀ {A}
     → (p : Ψ ⊢c A)
-    → inst Ψ [ A ]⟹ A'
-    → Ψ ⊢ A ≤ □ ⊣ Ψ ↪ A'
+--    → inst Ψ [ A ]⟹ A'
+    → Ψ ⊢ A ≤ □ ⊣ Ψ ↪ A
 
   s-var : ∀ {X}
     → Ψ ⊢ ‶ X ≤ τ (‶ X) ⊣ Ψ ↪ ‶ X
@@ -315,9 +322,10 @@ data _⊢_≤_⊣_↪_ where
     → Ψ ,^ ⊢ A ≤ ↑tyΣ0 ([ e ]↝ Σ) ⊣ Ψ' ,^ ↪ ↑ty0 B
     → Ψ ⊢ `∀ A ≤ ([ e ]↝ Σ) ⊣ Ψ' ↪ B
 
-  s-∀l-eq : ∀ {A B C e}
-    → Ψ ,^ ⊢ A ≤ ↑tyΣ0 ([ e ]↝ Σ) ⊣ Ψ' ,= C ↪ B
-    → Ψ ⊢ `∀ A ≤ ([ e ]↝ Σ) ⊣ Ψ' ↪ [ C ]ˢ B
+  s-∀l-eq : ∀ {A B C C' e}
+    → Ψ ,^ ⊢ A ≤ ↑tyΣ0 ([ e ]↝ Σ) ⊣ Ψ' ,= B ↪ C
+    → [ B ]ˢ C ⇨ C'
+    → Ψ ⊢ `∀ A ≤ ([ e ]↝ Σ) ⊣ Ψ' ↪ C'
 
   -- explicit type applicatoin
 {-
@@ -325,9 +333,10 @@ data _⊢_≤_⊣_↪_ where
     → Ψ ⊢ [ B ]ˢ A ≤ Σ ⊣ Ψ' ↪ C
     → Ψ ⊢ `∀ A ≤ (⟦ B ⟧↝ Σ) ⊣ Ψ' ↪ C
 -}
-  s-∀-t : ∀ {A B C}
+  s-∀-t : ∀ {A B C C'}
     → Ψ ,= B ⊢ A ≤ ↑tyΣ0 Σ ⊣ Ψ' ,= B ↪ C
-    → Ψ ⊢ `∀ A ≤ (⟦ B ⟧↝ Σ) ⊣ Ψ' ↪ [ B ]ˢ C
+    → [ B ]ˢ C ⇨ C'
+    → Ψ ⊢ `∀ A ≤ (⟦ B ⟧↝ Σ) ⊣ Ψ' ↪ C'
 
 ----------------------------------------------------------------------
 --+                            Examples                            +--

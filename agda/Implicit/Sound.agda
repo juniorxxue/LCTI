@@ -60,7 +60,6 @@ f' (s-term-o x x₁ s s₁) = {!!}
 f' (s-∀ s) = {!!}
 f' (s-∀l-^ s) = {!!}
 f' (s-∀l-eq s) = {!!}
-f' (s-∀-t s) = {!!}
 
 f : ∀ {Ψ : SEnv n m} {Ψ' A Σ A'} → (Ψ ⊢ A ≤ Σ ⊣ Ψ' ↪ A') → Counter
 f s-int = ∞
@@ -76,7 +75,6 @@ f (s-term-o x x₁ s s₁) = S (f s₁)
 f (s-∀ s) = ∞
 f (s-∀l-^ s) = f s
 f (s-∀l-eq s) = f s
-f (s-∀-t x) = {!!}
 
 sound-≤ : ∀ {Ψ Ψ' : SEnv n m} {Σ A A'}
   → (s : Ψ ⊢ A ≤ Σ ⊣ Ψ' ↪ A')
@@ -94,23 +92,21 @@ sound-≤ (s-term-o x x₁ s s₁) = {!!}
 sound-≤ (s-∀ s) = {!!}
 sound-≤ (s-∀l-^ s) = {!!}
 sound-≤ (s-∀l-eq s) = {!!}
-sound-≤ (s-∀-t s) = {!!}
 
 
 app-elim : ∀ {Γ : Env n m} {A₁ Σ Ψ A e}
   → (s : 𝕓 Γ ⊢ A₁ ≤ Σ ⊣ Ψ ↪ A)
   → Γ ⊢ Z # e ⦂ A₁
   → Γ ⊢ (f s) # e ⦂ A
-app-elim s-int ⊢e = ⊢sub' ⊢e s-int
+app-elim s-int ⊢e = {!!}
 app-elim (s-empty p inst) ⊢e = {!!}
 app-elim s-var ⊢e = {!!}
-app-elim (s-arr s s₁) ⊢e = ⊢sub' ⊢e (s-arr₁ {!!} {!!}) -- implied by soundness of sub
-app-elim (s-term-c x x₁ s s') ⊢e = ⊢sub' ⊢e {!!}
-app-elim (s-term-o x x₁ s s₁) ⊢e = ⊢sub' ⊢e {!!}
+app-elim (s-arr s s₁) ⊢e = {!!}
+app-elim (s-term-c x x₁ s s') ⊢e = {!!}
+app-elim (s-term-o x x₁ s s₁) ⊢e = {!!}
 app-elim (s-∀ s) ⊢e = {!!}
 app-elim (s-∀l-^ s) ⊢e = {!!}
 app-elim (s-∀l-eq s) ⊢e = {!!}
-app-elim (s-∀-t s) ⊢e = {!!}
 app-elim (s-ex-l= x₁ x₂ s) x = {!!}
 app-elim (s-ex-r= x₁ x₂ s) x = {!!}
 
@@ -140,7 +136,7 @@ sound-i (⊢ann ⊢e) none-□ = ⊢ann (sound-c-0 ⊢e)
 sound-i (⊢app ⊢e) spl = sound-i ⊢e (have-e spl)
 sound-i {e̅ = e ∷a e̅} (⊢lam₂ ⊢e ⊢e₁) (have-e spl) = subst e̅ (sound-i ⊢e₁ (spl-weaken spl)) (sound-i-0 ⊢e)
 
-sound-i (⊢sub ⊢e ne s) spl = {!!}
+sound-i (⊢sub ⊢e ne gc s) spl = {!!}
 
 {- let ind-e = sound-i-0 ⊢e
                               ind-s = sound-≤ s
@@ -158,13 +154,13 @@ sound-i (⊢sub ⊢e (s-∀-t s)) (have-t spl) = {!!}
 
 -- (𝕓 Γ ⊢ A₁ ≤ Σ ⊣ Ψ ↪ A) ~ j
 sound-i (⊢tabs₁ ⊢e) none-□ = ⊢tabs₁ (sound-i-0 ⊢e)
-sound-i (⊢tapp ⊢e st) spl = sound-i ⊢e (have-t st spl)
+sound-i (⊢tapp ⊢e) spl = sound-i ⊢e {!!}
 
 sound-c (⊢app ⊢e) spl = sound-c ⊢e (have-e spl)
 sound-c (⊢lam₁ ⊢e) none-τ = ⊢lam₁ (sound-c-0 ⊢e)
 sound-c {e̅ = e ∷a e̅} (⊢lam₂ ⊢e ⊢e₁) (have-e spl) = subst e̅ (sound-c ⊢e₁ (spl-weaken spl)) (sound-i-0 ⊢e)
-sound-c (⊢sub ⊢e ne s) spl = {!!}
-sound-c (⊢tapp ⊢e st) spl = sound-c ⊢e (have-t st spl)
+sound-c (⊢sub ⊢e ne gc s) spl = {!!}
+sound-c (⊢tapp ⊢e) spl = sound-c ⊢e {!!}
 
 -- j <= length Σ
 
