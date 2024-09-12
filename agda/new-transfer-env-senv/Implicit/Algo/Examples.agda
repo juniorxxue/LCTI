@@ -11,7 +11,7 @@ id[Int]1 = ⊢app (⊢tapp (⊢sub (⊢var refl) ne-tapp gc-var
                        (s-∀-t
                          (s-term-c ⊢c-var=0 ⊢c-var=0
                            (⊢sub ⊢lit ne-τ gc-i
-                                 (s-ex-r= ⊢c-int (kΓ Z) s-int))
+                                 (s-ex-r= ⊢c-int Z s-int))
                            (s-empty ⊢c-var=0)) (st-arr st-var-eq st-var-eq))))
 
 idExp : Term 0 0

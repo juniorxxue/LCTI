@@ -78,10 +78,11 @@ infix 3 _⊢o_
 -- closed: no free existential variables
 data _⊢c_ : SEnv n m → Type m → Set where
   ⊢c-int : Ψ ⊢c Int
-  ⊢c-base : ∀ {X}
-    → ∅ ⊢c ‶ X
   ⊢c-var∙0 : Ψ ,∙ ⊢c ‶ #0
   ⊢c-var=0 : ∀ {A} → Ψ ,= A ⊢c ‶ #0
+  ⊢c-var,S : ∀ {X A}
+    → Ψ ⊢c ‶ X
+    → Ψ , A ⊢c ‶ X
   ⊢c-var∙S : ∀ {X}
     → Ψ ⊢c ‶ X
     → Ψ ,∙ ⊢c ‶ #S X
@@ -117,10 +118,13 @@ postulate
 
 -- open: have free existential variables
 data _⊢o_ : SEnv n m → Type m → Set where
+  ⊢o-var^0 : Ψ ,^ ⊢o ‶ #0
   ⊢o-var∙S : ∀ {X}
     → Ψ ⊢o ‶ X
     → Ψ ,∙ ⊢o ‶ #S X
-  ⊢o-var^0 : Ψ ,^ ⊢o ‶ #0
+  ⊢o-var,S : ∀ {X : Fin (1 + m)} {A}
+    → Ψ ⊢o ‶ X
+    → Ψ , A ⊢o ‶ X
   ⊢o-var^S : ∀ {X}
     → Ψ ⊢o ‶ X
     → Ψ ,^ ⊢o ‶ #S X
@@ -140,10 +144,10 @@ data _⊢o_ : SEnv n m → Type m → Set where
 infix 3 _:=_∈_
 data _:=_∈_ : Fin m → Type m → SEnv n m → Set where
 
-  kΓ : ∀ {k} {A}
-    → k := A ∈' Γ
-    → k := A ∈ ∅
   Z : ∀ {A} → #0 := A ∈ Ψ ,= ↓ty0 A
+  S, : ∀ {k} {A B}
+    → k := A ∈ Ψ
+    → k := A ∈ Ψ , B
   S^ : ∀ {k} {A : Type (1 + m)}
     → k := ↓ty0 A ∈ Ψ
     → #S k := A ∈ Ψ ,^
@@ -194,6 +198,10 @@ data [_/_]_⟹_ : Type m → Fin m → SEnv n m → SEnv n m → Set where
     → [ ↓ty0 A / k ] Ψ ⟹ Ψ'
     → [ A / #S k ] (Ψ ,∙) ⟹ (Ψ' ,∙)
 
+  ⟹,S : ∀ {Ψ Ψ' : SEnv n m} {A k B}
+    → [ A / k ] Ψ ⟹ Ψ'
+    → [ A / k ] (Ψ , B) ⟹ (Ψ' , B)
+
   ⟹=S : ∀ {Ψ Ψ' : SEnv n m} {A B k}
     → [ [ B ]ˢ A / k ] Ψ ⟹ Ψ'
     → [ A / #S k ] (Ψ ,= B) ⟹ (Ψ' ,= B)
@@ -208,6 +216,9 @@ data _^∈_ : Fin m → SEnv n m → Set where
   S∙ : ∀ {k}
     → k ^∈ Ψ
     → #S k ^∈ Ψ ,∙
+  S, : ∀ {k A}
+    → k ^∈ Ψ
+    → k ^∈ Ψ , A
   S= : ∀ {k A}
     → k ^∈ Ψ
     → #S k ^∈ Ψ ,= A
