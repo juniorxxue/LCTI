@@ -88,13 +88,13 @@ data _⊢c_ : SEnv n m → Type m → Set where
   ⊢c-base : ∀ {X}
     → 𝕓 Γ ⊢c ‶ X
   ⊢c-var∙0 : Ψ ,∙ ⊢c ‶ #0
+  ⊢c-var=0 : ∀ {A} → Ψ ,= A ⊢c ‶ #0
   ⊢c-var∙S : ∀ {X}
     → Ψ ⊢c ‶ X
     → Ψ ,∙ ⊢c ‶ #S X
   ⊢c-var^S : ∀ {X}
     → Ψ ⊢c ‶ X
     → Ψ ,^ ⊢c ‶ #S X
-  ⊢c-var=0 : ∀ {A} → Ψ ,= A ⊢c ‶ #0
   ⊢c-var=S : ∀ {A X}
     → Ψ ⊢c ‶ X
     → Ψ ,= A ⊢c ‶ #S X
@@ -105,6 +105,22 @@ data _⊢c_ : SEnv n m → Type m → Set where
   ⊢c-∀ : ∀ {A}
     → Ψ ,∙ ⊢c A
     → Ψ ⊢c `∀ A
+
+⊢c-arr-inv-l : ∀ {A B}
+  → Ψ ⊢c (A `→ B)
+  → Ψ ⊢c A
+⊢c-arr-inv-l (⊢c-arr s s₁) = s
+
+⊢c-arr-inv-r : ∀ {A B}
+  → Ψ ⊢c (A `→ B)
+  → Ψ ⊢c B
+⊢c-arr-inv-r (⊢c-arr s s₁) = s₁
+
+postulate
+  ⊢c-∀-= : ∀ {A B}
+    → Ψ ⊢c `∀ B
+    → Ψ ,= A ⊢c B -- requires a lemma: if a universal varialbe in a context, you can replace it with a solution without affecting it's closedness
+    
 
 -- open: have free existential variables
 data _⊢o_ : SEnv n m → Type m → Set where
@@ -305,7 +321,7 @@ data _⊢_≤_⊣_↪_ where
     → Ψ ⊢c B
     → (Ψ→Γ Ψ) ⊢ τ A ⇒ e ⇒ A'
     → Ψ ⊢ B ≤ Σ ⊣ Ψ' ↪ D
-    → Ψ ⊢ (A `→ B) ≤ ([ e ]↝ Σ) ⊣ Ψ' ↪ A `→ D
+    → Ψ ⊢ (A `→ B) ≤ ([ e ]↝ Σ) ⊣ Ψ' ↪ A' `→ D
 
   s-term-o : ∀ {A A' B C D e}
     → Ψ ⊢o A
