@@ -39,7 +39,7 @@ data _⊕_:=_ : Apps n m → Context n m → Context n m → Set where
 postulate
   subsumption0 : ∀ {Γ : Env n m} {Ψ Σ e A A'}
     → Γ ⊢ □ ⇒ e ⇒ A
-    → 𝕓 Γ ⊢ A ≤ Σ ⊣ Ψ ↪ A'
+    → 𝕎 Γ ⊢ A ≤ Σ ⊣ Ψ ↪ A'
     → Γ ⊢ Σ ⇒ e ⇒ A'
     
 postulate
@@ -47,7 +47,7 @@ postulate
     → Γ ⊢ Σ ⇒ e ⇒ A
     → ⟦ Σ ⟧⇒⟦ a̅ , □ ⟧
     → a̅ ⊕ Σ'' := Σ'
-    → 𝕓 Γ ⊢ A ≤ Σ'' ⊣ Ψ ↪ A'
+    → 𝕎 Γ ⊢ A ≤ Σ'' ⊣ Ψ ↪ A'
     → Γ ⊢ Σ' ⇒ e ⇒ A'
 
 
