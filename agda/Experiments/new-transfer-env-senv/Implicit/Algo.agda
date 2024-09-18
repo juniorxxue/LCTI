@@ -274,9 +274,9 @@ data _⊢_⇒_⇒_ where
 
   ⊢sub : ∀ {g A B}
     → Γ ⊢ □ ⇒ g ⇒ A          --- Γ ⊢ Z # e : A
-    → NonEmpty Σ
-    → GenericConsumer g
-    → 𝕎 Γ ⊢ A ≤ Σ ⊣ 𝕎 Γ ↪ B    --- Γ ⊢ j # A ≤ B
+    → (ne : NonEmpty Σ)
+    → (gc : GenericConsumer g)
+    → (s : 𝕎 Γ ⊢ A ≤ Σ ⊣ 𝕎 Γ ↪ B)    --- Γ ⊢ j # A ≤ B
     → Γ ⊢ Σ ⇒ g ⇒ B          --- Γ ⊢ j # e ∶ B
 
   -- design choices here,
@@ -304,28 +304,28 @@ data _⊢_≤_⊣_↪_ where
     → Ψ ⊢ ‶ X ≤ τ (‶ X) ⊣ Ψ ↪ ‶ X
 
   s-ex-l^ : ∀ {A X}
-    → Ψ ⊢c A
-    → X ^∈ Ψ
-    → [ A / X ] Ψ ⟹ Ψ'
+    → (clo : Ψ ⊢c A)
+    → (x-in : X ^∈ Ψ)
+    → (inst : [ A / X ] Ψ ⟹ Ψ')
     → Ψ ⊢ ‶ X ≤ τ A ⊣ Ψ' ↪ A
 
-  s-ex-l= : ∀ {A A₁ A₂ B X}
-    → Ψ ⊢c A
-    → X := B ∈ Ψ
-    → Ψ ⊢ B ≤ τ A ⊣ Ψ' ↪ A₁
-    → Ψ ⊢ ‶ X ≤ τ A ⊣ Ψ' ↪ A₂
+  s-ex-l= : ∀ {A A' B X}
+    → (clo : Ψ ⊢c A)
+    → (x-in : X := B ∈ Ψ)
+    → Ψ ⊢ B ≤ τ A ⊣ Ψ' ↪ A'
+    → Ψ ⊢ ‶ X ≤ τ A ⊣ Ψ' ↪ A
 
   s-ex-r^ : ∀ {A X}
-    → Ψ ⊢c A
-    → X ^∈ Ψ
-    → [ A / X ] Ψ ⟹ Ψ'
-    → Ψ ⊢ A ≤ τ (‶ X) ⊣ Ψ' ↪ A
+    → (clo : Ψ ⊢c A)
+    → (x-in : X ^∈ Ψ)
+    → (inst : [ A / X ] Ψ ⟹ Ψ')
+    → Ψ ⊢ A ≤ τ (‶ X) ⊣ Ψ' ↪ ‶ X
 
   -- this rule attempts to break the property "if context is a full type, the result should be same"
   -- but the definition of full type is whether contain a solved existetial variable
   s-ex-r= : ∀ {A A₂ B X}
-    → Ψ ⊢c A
-    → X := B ∈ Ψ
+    → (clo : Ψ ⊢c A)
+    → (x-in : X := B ∈ Ψ)
     → Ψ ⊢ A ≤ τ B ⊣ Ψ' ↪ A₂
     → Ψ ⊢ A ≤ τ (‶ X) ⊣ Ψ' ↪ (‶ X)
 
@@ -335,15 +335,15 @@ data _⊢_≤_⊣_↪_ where
     → Ψ₁ ⊢ A `→ B ≤ τ (C `→ D) ⊣ Ψ₃ ↪ (C `→ D)
 
   s-term-c : ∀ {A B A' D e}
-    → Ψ ⊢c A
-    → Ψ ⊢c B
-    → (𝕄 Ψ) ⊢ τ A ⇒ e ⇒ A'
+    → (cloA : Ψ ⊢c A)
+    → (cloB : Ψ ⊢c B)
+    → (⊢e : (𝕄 Ψ) ⊢ τ A ⇒ e ⇒ A')
     → Ψ ⊢ B ≤ Σ ⊣ Ψ' ↪ D
     → Ψ ⊢ (A `→ B) ≤ ([ e ]↝ Σ) ⊣ Ψ' ↪ A' `→ D
 
   s-term-o : ∀ {A A' B C D e}
-    → Ψ ⊢o A
-    → (𝕄 Ψ) ⊢ □ ⇒ e ⇒ C
+    → (op : Ψ ⊢o A)
+    → (⊢e : (𝕄 Ψ) ⊢ □ ⇒ e ⇒ C)
     → Ψ ⊢ C ≤ τ A ⊣ Ψ₁ ↪ A'
     → Ψ₁ ⊢ B ≤ Σ ⊣ Ψ₂ ↪ D
     → Ψ ⊢ A `→ B ≤ ([ e ]↝ Σ) ⊣ Ψ₂ ↪ A' `→ D
@@ -358,11 +358,31 @@ data _⊢_≤_⊣_↪_ where
 
   s-∀l-eq : ∀ {A B C C' e}
     → Ψ ,^ ⊢ A ≤ ↑tyΣ0 ([ e ]↝ Σ) ⊣ Ψ' ,= B ↪ C
-    → [ B ]ˢ C ⇨ C'
+    → (st : [ B ]ˢ C ⇨ C')
     → Ψ ⊢ `∀ A ≤ ([ e ]↝ Σ) ⊣ Ψ' ↪ C'
 
   -- explicit type applicatoin
   s-∀-t : ∀ {A B C C'}
     → Ψ ,= B ⊢ A ≤ ↑tyΣ0 Σ ⊣ Ψ' ,= B ↪ C
-    → [ B ]ˢ C ⇨ C'
+    → (st : [ B ]ˢ C ⇨ C')
     → Ψ ⊢ `∀ A ≤ (⟦ B ⟧↝ Σ) ⊣ Ψ' ↪ C'
+
+
+infix 4 ⟦_,_⟧→⟦_,_,_,_⟧
+
+data ⟦_,_⟧→⟦_,_,_,_⟧ : Context n m → Type m → Apps n m → Context n m → AppsType m → Type m → Set where
+
+  none-□ : ∀ {A}
+    → ⟦ (Context n m ∋⦂ □) , A ⟧→⟦ nil , □ , nil , A ⟧
+
+  none-τ : ∀ {A B}
+    → ⟦ (Context n m ∋⦂ τ A) , B ⟧→⟦ nil , τ A , nil , B ⟧
+
+  have-e : ∀ {Σ : Context n m} {e A B es A' B' Bs}
+    → ⟦ Σ , B ⟧→⟦ es , A' , Bs , B' ⟧
+    → ⟦ ([ e ]↝ Σ) , A `→ B ⟧→⟦ e ∷a es , A' , A ∷a Bs , B' ⟧
+
+  have-t : ∀ {Σ Σ' : Context n m} {B A es Bs' C}
+--    → (st : [ A ]ˢ B ⇨ B')
+    → ⟦ Σ , B ⟧→⟦ es , Σ' , Bs' , C ⟧
+    → ⟦ ⟦ A ⟧↝ Σ , B ⟧→⟦ A ∷t es , Σ' , Bs' , C ⟧

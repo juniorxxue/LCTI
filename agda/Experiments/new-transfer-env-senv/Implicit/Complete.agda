@@ -53,6 +53,11 @@ complete-≤ : ∀ {Γ : Env n m} {Σ j A B}
   → Γ ⊢ j # B ≤ A
   → Γ ⊢ ⟨ j , A ⟩ ~ Σ -- should be gen to consider existential vars
   → 𝕎 Γ ⊢ B ≤ Σ ⊣ 𝕎 Γ ↪ A -- too strict
+
+complete-≤' : ∀ {Γ : Env n m} {Ψ Σ j A B}
+  → Γ ⊢ j # B ≤ A
+  → Γ ⊢ ⟨ j , A ⟩ ~ Σ
+  → Ψ ⊢ B ≤ Σ ⊣ 𝕎 Γ ↪ A -- this is too loose, abtrary Ψ cannot prove simple cases
   
 complete-inf : ∀ {Γ : Env n m} {e A}
   → Γ ⊢ Z # e ⦂ A
@@ -88,6 +93,17 @@ complete-≤ s-var ~∞ = s-var
 complete-≤ (s-arr₁ s s₁) ~∞ = s-arr (complete-≤-chk s) (complete-≤-chk s₁)
 complete-≤ (s-arr₂ s s₁) (~S ⊢e j~Σ) = s-term-c {!!} {!!} {!!} (complete-≤ s₁ j~Σ) -- ok
 complete-≤ (s-∀ s) ~∞ = s-∀ (complete-≤-chk s)
-complete-≤ (s-∀l s fd st₁ st₂) (~S ⊢e j~Σ) = s-∀l-eq {!!} (st-arr st₁ st₂)
+complete-≤ (s-∀l s fd st₁ st₂) (~S ⊢e j~Σ) = s-∀l-eq {!complete-≤ s ?!} (st-arr st₁ st₂)
+-- s-∀l-eq {!!} (st-arr st₁ st₂)
 complete-≤ (s-var-l x s) ~∞ = s-ex-l= {!!} {!!} (complete-≤-chk s) -- ok
 complete-≤ (s-var-r x s) ~∞ = s-ex-r= {!!} {!!} (complete-≤-chk s) -- ok
+
+complete-≤' s-refl ~Z = {!!}
+complete-≤' s-int ~j = {!!}
+complete-≤' s-var ~j = {!!}
+complete-≤' (s-arr₁ s s₁) ~j = {!!}
+complete-≤' (s-arr₂ s s₁) ~j = {!!}
+complete-≤' (s-∀ s) ~j = {!!}
+complete-≤' (s-∀l s fd st₁ st₂) (~S ⊢e ~j) = s-∀l-eq (complete-≤' s (~S {!!} {!!})) {!!}
+complete-≤' (s-var-l x s) ~j = {!!}
+complete-≤' (s-var-r x s) ~j = {!!}

@@ -48,7 +48,7 @@ record Log : Set where
 
 f' : ∀ {Ψ : SEnv n m} {Ψ' A Σ A'} → (Ψ ⊢ A ≤ Σ ⊣ Ψ' ↪ A') → Log
 f' s-int = record { s-counter = ∞ ; check-terms = [] ; infer-terms = [] }
-f' (s-empty p inst) = {!!}
+f' (s-empty p) = {!!}
 f' s-var = {!!}
 f' (s-ex-l^ x x₁ x₂) = {!!}
 f' (s-ex-l= x x₁ s) = {!!}
@@ -59,11 +59,11 @@ f' (s-term-c x x' x₁ s) = {!!}
 f' (s-term-o x x₁ s s₁) = {!!}
 f' (s-∀ s) = {!!}
 f' (s-∀l-^ s) = {!!}
-f' (s-∀l-eq s) = {!!}
+f' (s-∀l-eq s st) = {!!}
 
 f : ∀ {Ψ : SEnv n m} {Ψ' A Σ A'} → (Ψ ⊢ A ≤ Σ ⊣ Ψ' ↪ A') → Counter
 f s-int = ∞
-f (s-empty p inst) = Z
+f (s-empty p) = Z
 f s-var = ∞
 f (s-ex-l^ x x₁ x₂) = ∞
 f (s-ex-l= x x₁ s) = ∞
@@ -74,13 +74,13 @@ f (s-term-c x x₁ s s') = f s'
 f (s-term-o x x₁ s s₁) = S (f s₁)
 f (s-∀ s) = ∞
 f (s-∀l-^ s) = f s
-f (s-∀l-eq s) = f s
+f (s-∀l-eq s st) = f s
 
 sound-≤ : ∀ {Ψ Ψ' : SEnv n m} {Σ A A'}
   → (s : Ψ ⊢ A ≤ Σ ⊣ Ψ' ↪ A')
-  → (Ψ→Γ Ψ) ⊢ (f s) # A ≤ A'
+  → (𝕄 Ψ) ⊢ (f s) # A ≤ A'
 sound-≤ s-int = s-int
-sound-≤ (s-empty p inst) = {!!}
+sound-≤ (s-empty p) = {!!}
 sound-≤ s-var = {!!}
 sound-≤ (s-ex-l^ x x₁ x₂) = {!!}
 sound-≤ (s-ex-l= x x₁ s) = {!!}
@@ -91,22 +91,22 @@ sound-≤ (s-term-c x x₁ s s') = {!!}
 sound-≤ (s-term-o x x₁ s s₁) = {!!}
 sound-≤ (s-∀ s) = {!!}
 sound-≤ (s-∀l-^ s) = {!!}
-sound-≤ (s-∀l-eq s) = {!!}
+sound-≤ (s-∀l-eq s st) = {!!}
 
 
 app-elim : ∀ {Γ : Env n m} {A₁ Σ Ψ A e}
-  → (s : 𝕓 Γ ⊢ A₁ ≤ Σ ⊣ Ψ ↪ A)
+  → (s : 𝕎 Γ ⊢ A₁ ≤ Σ ⊣ Ψ ↪ A)
   → Γ ⊢ Z # e ⦂ A₁
   → Γ ⊢ (f s) # e ⦂ A
 app-elim s-int ⊢e = {!!}
-app-elim (s-empty p inst) ⊢e = {!!}
+app-elim (s-empty p) ⊢e = {!!}
 app-elim s-var ⊢e = {!!}
 app-elim (s-arr s s₁) ⊢e = {!!}
 app-elim (s-term-c x x₁ s s') ⊢e = {!!}
 app-elim (s-term-o x x₁ s s₁) ⊢e = {!!}
 app-elim (s-∀ s) ⊢e = {!!}
 app-elim (s-∀l-^ s) ⊢e = {!!}
-app-elim (s-∀l-eq s) ⊢e = {!!}
+app-elim (s-∀l-eq s st) ⊢e = {!!}
 app-elim (s-ex-l= x₁ x₂ s) x = {!!}
 app-elim (s-ex-r= x₁ x₂ s) x = {!!}
 

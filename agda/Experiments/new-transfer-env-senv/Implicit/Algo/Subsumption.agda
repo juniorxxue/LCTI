@@ -2,6 +2,7 @@ module Implicit.Algo.Subsumption where
 
 open import Implicit.Common
 open import Implicit.Algo
+open import Implicit.Algo.Properties
 
 infix 4 ⟦_⟧⇒⟦_,_⟧
 
@@ -41,13 +42,38 @@ postulate
     → Γ ⊢ □ ⇒ e ⇒ A
     → 𝕎 Γ ⊢ A ≤ Σ ⊣ Ψ ↪ A'
     → Γ ⊢ Σ ⇒ e ⇒ A'
-    
-postulate
-  subsumption : ∀ {Γ : Env n m} {Σ Σ' Σ'' Ψ e A A' a̅}
-    → Γ ⊢ Σ ⇒ e ⇒ A
-    → ⟦ Σ ⟧⇒⟦ a̅ , □ ⟧
-    → a̅ ⊕ Σ'' := Σ'
-    → 𝕎 Γ ⊢ A ≤ Σ'' ⊣ Ψ ↪ A'
-    → Γ ⊢ Σ' ⇒ e ⇒ A'
+
+⊢to≤ : ∀ {Γ : Env n m} {e Σ A}
+  → Γ ⊢ Σ ⇒ e ⇒ A
+  → 𝕎 Γ ⊢ A ≤ Σ ⊣ 𝕎 Γ ↪ A
+
+subsumption : ∀ {Γ : Env n m} {Σ Σ' Σ'' Ψ e A A' a̅}
+  → Γ ⊢ Σ ⇒ e ⇒ A
+  → ⟦ Σ ⟧⇒⟦ a̅ , □ ⟧
+  → a̅ ⊕ Σ'' := Σ'
+  → 𝕎 Γ ⊢ A ≤ Σ'' ⊣ Ψ ↪ A'
+  → Γ ⊢ Σ' ⇒ e ⇒ A'
+
+⊢to≤ ⊢lit = s-empty ⊢c-int
+⊢to≤ (⊢var x∈Γ) = s-empty {!!}
+⊢to≤ (⊢ann ⊢e) = s-empty {!!}
+⊢to≤ (⊢app ⊢e) with ⊢to≤ ⊢e
+... | s-term-c x x₁ x₂ r = r
+... | s-term-o x x₁ r r₁ rewrite s-closed r = r₁
+⊢to≤ (⊢lam₁ ⊢e) with ⊢to≤ ⊢e
+... | s = {!!}
+⊢to≤ (⊢lam₂ ⊢e ⊢e₁) = {!!}
+⊢to≤ (⊢sub ⊢e x x₁ x₂) = {!!}
+⊢to≤ (⊢tabs₁ ⊢e) = {!!}
+⊢to≤ (⊢tapp ⊢e) = {!!}
+
+subsumption ⊢lit spl ch s = {!!}
+subsumption (⊢var x∈Γ) spl ch s = {!!}
+subsumption (⊢ann ⊢e) spl ch s = {!!}
+subsumption (⊢app ⊢e) spl ch s = {!!}
+subsumption (⊢lam₂ ⊢e ⊢e₁) spl ch s = {!!}
+subsumption (⊢sub ⊢e x x₁ x₂) spl ch s = {!!}
+subsumption (⊢tabs₁ ⊢e) spl ch s = {!!}
+subsumption (⊢tapp ⊢e) spl ch s = {!!}
 
 
