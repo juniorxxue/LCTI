@@ -186,6 +186,14 @@ shift-total (A `→ A₁) k with shift-total A k
 shift-total (`∀ A) k with shift-total A (#S k) 
 ... | ⟨ fst , snd ⟩ = ⟨ (`∀ fst) , (↑∀ snd) ⟩
 
+infix 3 [_/_]v_⇨_
+data [_/_]v_⇨_ : Fin (1 + m) → Type m → Fin (1 + m) → Type m → Set where
+  st-var-eq : ∀ {k} {A : Type m}
+    → [ k / A ]v k ⇨ A
+  st-var-neq : ∀ {k X} {A : Type m}
+    → (¬p : k ≢ X)
+    → [ k / A ]v X ⇨ ‶ punchOut {i = k} {j = X} ¬p
+
 infix 3 [_/_]ˢ_⇨_
 data [_/_]ˢ_⇨_ : Fin (1 + m) → Type m → Type (1 + m) → Type m → Set where
   st-int : ∀ {k} {A : Type m}
@@ -268,3 +276,21 @@ up n (A ∷t as) = A ∷t (up n as)
 
 up0 : Apps n m → Apps (1 + n) m
 up0 = up #0
+
+upty : Fin (1 + m) → Apps n m → Apps n (1 + m)
+upty k nil = nil
+upty k (e ∷a as) = ↑ty-in-tm k e ∷a upty k as
+upty k (A ∷t as) = ↑ty k A ∷t (upty k as)
+
+upty0 : Apps n m → Apps n (1 + m)
+upty0 = upty #0
+
+uptyT : Fin (1 + m) → AppsType m → AppsType (1 + m)
+uptyT k nil = nil
+uptyT k (A ∷a As) = ↑ty k A ∷a uptyT k As
+uptyT k (`∀ As) = `∀ uptyT (#S k) As
+
+uptyT0 : AppsType m → AppsType (1 + m)
+uptyT0 = uptyT #0
+
+

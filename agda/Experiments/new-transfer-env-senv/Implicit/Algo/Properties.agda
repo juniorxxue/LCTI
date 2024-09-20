@@ -1,6 +1,7 @@
 module Implicit.Algo.Properties where
 
 open import Implicit.Common
+open import Implicit.Properties
 open import Implicit.Algo
 
 -- open import Relation.Binary.PropositionalEquality.≡-Reasoning
@@ -120,6 +121,24 @@ postulate
   spl-weaken : ∀ {Σ : Context n m} {B Bs A' es T}
     → ⟦ Σ , B ⟧→⟦ es , τ T , Bs , A' ⟧
     → ⟦ ↑Σ0 Σ , B ⟧→⟦ up0 es , τ T , Bs , A' ⟧
+  spl-weaken-ty : ∀ {Σ : Context n m} {B Bs A' es T}
+    → ⟦ Σ , B ⟧→⟦ es , τ T , Bs , A' ⟧
+    → ⟦ ↑tyΣ0 Σ , ↑ty0 B ⟧→⟦ upty0 es , τ ↑ty0 T , uptyT0 Bs , ↑ty0 A' ⟧
+
+punchIn-pred : ∀ {k : Fin (1 + m)} {x y}
+  → punchIn k x ≡ punchIn k y
+  → x ≡ y
+punchIn-pred {k = #0} {x = x} {.x} refl = refl
+punchIn-pred {k = #S k} {x = #0} {#0} eq = refl
+punchIn-pred {k = #S k} {x = #S x} {#S y} eq = {!!}
+    
+↑ty-pred : ∀ {k : Fin (1 + m)} {A B}
+  → ↑ty k A ≡ ↑ty k B
+  → A ≡ B
+↑ty-pred {A = Int} {Int} eq = refl
+↑ty-pred {A = ‶ X} {‶ X₁} eq = {!!}
+↑ty-pred {A = A `→ A₁} {B} eq = {!!}
+↑ty-pred {A = `∀ A} {B} eq = {!!}
 
 ⊢id : ∀ {Γ : Env n m } {Σ e A A' T es As}
   → Γ ⊢ Σ ⇒ e ⇒ A
@@ -147,7 +166,7 @@ postulate
 ≤id (s-term-c cloA cloB ⊢e s) (have-e spl) = ≤id s spl
 ≤id (s-term-o op ⊢e s s₁) (have-e spl) = ≤id s₁ spl
 ≤id (s-∀ s) none-τ = cong `∀_ (≤id s none-τ)
-≤id (s-∀l-^ s) (have-e spl) with ≤id s (have-e {!!})
+≤id (s-∀l-^ s) (have-e spl) with ≤id s (have-e (spl-weaken-ty spl))
 ... | r = {!!}
 ≤id (s-∀l-eq s st) (have-e spl) = {!!}
 ≤id (s-∀-t s st) (have-t spl) = {!≤id s!}
