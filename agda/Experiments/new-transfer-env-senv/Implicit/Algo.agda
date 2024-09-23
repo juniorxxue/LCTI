@@ -356,10 +356,11 @@ data _⊢_≤_⊣_↪_ where
     → Ψ ,^ ⊢ A ≤ ↑tyΣ0 ([ e ]↝ Σ) ⊣ Ψ' ,^ ↪ ↑ty0 B
     → Ψ ⊢ `∀ A ≤ ([ e ]↝ Σ) ⊣ Ψ' ↪ B
 
-  s-∀l-eq : ∀ {A B C C' e}
-    → Ψ ,^ ⊢ A ≤ ↑tyΣ0 ([ e ]↝ Σ) ⊣ Ψ' ,= B ↪ C
-    → (st : [ B ]ˢ C ⇨ C')
-    → Ψ ⊢ `∀ A ≤ ([ e ]↝ Σ) ⊣ Ψ' ↪ C'
+  s-∀l-eq : ∀ {A B C C' D D' e}
+    → Ψ ,^ ⊢ A ≤ ↑tyΣ0 ([ e ]↝ Σ) ⊣ Ψ' ,= B ↪ C `→ D -- could be more specific
+    → (st₁ : [ B ]ˢ C ⇨ C')
+    → (st₂ : [ B ]ˢ D ⇨ D')
+    → Ψ ⊢ `∀ A ≤ ([ e ]↝ Σ) ⊣ Ψ' ↪ C' `→ D'
 
   -- explicit type applicatoin
   s-∀-t : ∀ {A B A' C}
@@ -383,26 +384,8 @@ data ⟦_,_⟧→⟦_,_,_,_⟧ : Context n m → Type m → Apps n m → Context
     → ⟦ ([ e ]↝ Σ) , A `→ B ⟧→⟦ e ∷a es , A' , A ∷a Bs , B' ⟧
 
   have-t : ∀ {Σ Σ' : Context n m} {B A es Bs C}
---   → (st : [ A ]ˢ B ⇨ B')
     → ⟦ Σ , B ⟧→⟦ es , Σ' , Bs , C ⟧
     → ⟦ ⟦ A ⟧↝ Σ , B ⟧→⟦ A ∷t es , Σ' , Bs , C ⟧
-
-infix 4 ⟦_,_⟧_→⟦_,_,_,_⟧
-data ⟦_,_⟧_→⟦_,_,_,_⟧ : Context n m → Type m → Term n m → Apps n m → Context n m → AppsType m → Type m → Set where
-
-  none-□ : ∀ {A e}
-    → ⟦ (Context n m ∋⦂ □) , A ⟧ e →⟦ nil , □ , nil , A ⟧
-
-  none-τ : ∀ {A B e}
-    → ⟦ (Context n m ∋⦂ τ A) , B ⟧ e →⟦ nil , τ A , nil , B ⟧
-
-  have-e : ∀ {Σ : Context n m} {A B es A' B' Bs e₁ e₂}
-    → ⟦ Σ , B ⟧ (e₁ · e₂) →⟦ es , A' , Bs , B' ⟧
-    → ⟦ ([ e₂ ]↝ Σ) , A `→ B ⟧ e₁ →⟦ e₂ ∷a es , A' , A ∷a Bs , B' ⟧
-
-  have-t : ∀ {Σ Σ' : Context n m} {B A es Bs' C e}
-    → ⟦ Σ , B ⟧ (e [ A ]) →⟦ es , Σ' , Bs' , C ⟧
-    → ⟦ ⟦ A ⟧↝ Σ , B ⟧ e →⟦ A ∷t es , Σ' , Bs' , C ⟧
 
 infix 4 _⊢⟦_,_⟧→⟦_,_,_,_⟧⊣_
 data _⊢⟦_,_⟧→⟦_,_,_,_⟧⊣_ : SEnv n m → Context n m → Type m → Apps n m → Context n m → AppsType m → Type m → SEnv n m → Set where
@@ -417,20 +400,7 @@ data _⊢⟦_,_⟧→⟦_,_,_,_⟧⊣_ : SEnv n m → Context n m → Type m →
     → Ψ ⊢⟦ Σ , B ⟧→⟦ es , A' , Bs , B' ⟧⊣ Ψ
     → Ψ ⊢⟦ ([ e ]↝ Σ) , A `→ B ⟧→⟦ e ∷a es , A' , A ∷a Bs , B' ⟧⊣ Ψ
 
-  have-e2 : ∀ {Σ : Context n m} {Ψ e A es B' Bs Σ'}
-    → Ψ ,^ ⊢⟦ ↑tyΣ0 ([ e ]↝ Σ) , A ⟧→⟦ upty0 es , ↑tyΣ0 Σ' , uptyT0 Bs , ↑ty0 B' ⟧⊣ Ψ ,^
-    → Ψ ⊢⟦ ([ e ]↝ Σ) , `∀ A ⟧→⟦ e ∷a es , Σ' , Bs , B' ⟧⊣ Ψ
-
-  have-t1 : ∀ {Ψ} {Σ Σ' : Context n m} {B A es Bs' C C' B'}
-    → (Ψ ,= A) ⊢⟦ ↑tyΣ0 Σ , B ⟧→⟦ upty0 es , ↑tyΣ0 Σ' , uptyT0 Bs' , C ⟧⊣ (Ψ ,= A)
-    → (st₁ : [ A ]ˢ B ⇨ B')
-    → (st₂ : [ A ]ˢ C ⇨ C')
-    → Ψ ⊢⟦ ⟦ A ⟧↝ Σ , B' ⟧→⟦ A ∷t es , Σ' , Bs' , C' ⟧⊣ Ψ
-
-{-
-
-  have-t2 : ∀ {Γ} {Σ Σ' : Context n m} {B A es Bs C}
-    → 𝕎 Γ ⊢⟦ Σ , B ⟧→⟦ es ,  Σ' , Bs , C ⟧⊣ 𝕎 Γ
-    → 𝕎 Γ ⊢⟦ ⟦ A ⟧↝ Σ , B ⟧→⟦ A ∷t es , Σ' , Bs , C ⟧⊣ 𝕎 Γ
-
--}
+  have-e2 : ∀ {Σ : Context n m} {Ψ e A es B' Bs Σ' C A'}
+    → Ψ ,^ ⊢⟦ ↑tyΣ0 ([ e ]↝ Σ) , A ⟧→⟦ upty0 es , ↑tyΣ0 Σ' , uptyT0 Bs , ↑ty0 B' ⟧⊣ (Ψ ,= C)
+    → [ C ]ˢ A ⇨ A'
+    → Ψ ⊢⟦ ([ e ]↝ Σ) , A' ⟧→⟦ e ∷a es , Σ' , Bs , B' ⟧⊣ Ψ
