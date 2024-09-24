@@ -97,7 +97,6 @@ s-closed-gen (s-∀l-^ s) with s-closed-gen s
 ... | evar r = r
 s-closed-gen (s-∀l-eq s st st1) with s-closed-gen s
 ... | evar-sol r = r
-s-closed-gen (s-∀-t st s) = s-closed-gen s
 
 𝕎-Γ-like : ∀ (Γ : Env n m)
   → Γ-like (𝕎 Γ)
@@ -183,7 +182,6 @@ spl-≋ : ∀ {Σ : Context n m} {T As A' es B A}
 spl-≋ {B = B} none-τ A≋B = ⟨ nil , ⟨ B , none-τ ⟩ ⟩
 spl-≋ (have-e spl) var-r = {!!}
 spl-≋ (have-e spl) (arr A≋B) = {!!}
-spl-≋ (have-t spl) A≋B = {!!}
 
 -- issue: splitting doesn't preserve before subst
 
@@ -198,10 +196,6 @@ spl-pre-st {B = A `→ C} (have-e spl) (st-arr st st₁) = ⟨ A ∷a spl-pre-st
                                                         ⟨ spl-pre-st spl st₁ .proj₂ .proj₁ ,
                                                         have-e (spl-pre-st spl st₁ .proj₂ .proj₂) ⟩
                                                         ⟩
-spl-pre-st (have-t spl) st = ⟨ spl-pre-st spl st .proj₁ ,
-                              ⟨ spl-pre-st spl st .proj₂ .proj₁ ,
-                              have-t (spl-pre-st spl st .proj₂ .proj₂) ⟩
-                              ⟩
 
 spl-st : ∀ {Σ : Context n m} {T As A' es C B A Bs B'}
   → ⟦ Σ , A ⟧→⟦ es , τ T , As , A' ⟧
@@ -210,7 +204,6 @@ spl-st : ∀ {Σ : Context n m} {T As A' es C B A Bs B'}
   → [ C ]ˢ B' ⇨ A'
 spl-st none-τ st none-τ = st
 spl-st (have-e spl) (st-arr st st₁) (have-e pre-spl) = spl-st spl st₁ pre-spl
-spl-st (have-t spl) st (have-t pre-spl) = spl-st spl st pre-spl
 
 ≤id0 : ∀ {Ψ Ψ' : SEnv n m} {A B C}
   → Ψ ⊢ A ≤ τ B ⊣ Ψ' ↪ C
@@ -218,7 +211,7 @@ spl-st (have-t spl) st (have-t pre-spl) = spl-st spl st pre-spl
 ≤id0 s-int = refl
 ≤id0 s-var = refl
 ≤id0 (s-ex-l^ clo x-in inst) = refl
-≤id0 (s-ex-l= clo x-in s) = refl
+≤id0 (s-ex-l= clo x-in s) = ≤id0 s
 ≤id0 (s-ex-r^ clo x-in inst) = refl
 ≤id0 (s-ex-r= clo x-in s) = refl
 ≤id0 (s-arr s s₁) = refl
@@ -230,7 +223,6 @@ spl-st (have-t spl) st (have-t pre-spl) = spl-st spl st pre-spl
 ⊢id0 (⊢app ⊢e) = {!!}
 ⊢id0 (⊢lam₁ ⊢e) = {!!}
 ⊢id0 (⊢sub ⊢e ne gc s) = {!!}
-⊢id0 (⊢tapp ⊢e) = {!!}
 
 ⊢id : ∀ {Γ : Env n m } {Σ e A A' T es As}
   → Γ ⊢ Σ ⇒ e ⇒ A
@@ -246,12 +238,11 @@ spl-st (have-t spl) st (have-t pre-spl) = spl-st spl st pre-spl
 ⊢id (⊢lam₁ ⊢e) none-τ rewrite ⊢id ⊢e none-τ = refl
 ⊢id (⊢lam₂ ⊢e ⊢e₁) (have-e spl) = ⊢id ⊢e₁ (spl-weaken spl)
 ⊢id (⊢sub ⊢e ne gc s) spl = {!!}
-⊢id (⊢tapp ⊢e) spl = ⊢id ⊢e (have-t spl)
 
 ≤id s-int none-τ = refl
 ≤id s-var none-τ = refl
 ≤id (s-ex-l^ clo x-in inst) none-τ = refl
-≤id (s-ex-l= clo x-in s) none-τ = refl
+≤id (s-ex-l= clo x-in s) spl = ≤id s spl
 ≤id (s-ex-r^ clo x-in inst) none-τ = refl
 ≤id (s-ex-r= clo x-in s) none-τ = refl
 ≤id (s-arr s s₁) none-τ = refl
@@ -271,4 +262,3 @@ with spl-pre-st spl' (st-arr st1 st2)
                → A ≡ B'
         helper refl st = ↑ty-st st
 -}        
-≤id (s-∀-t st s) (have-t spl) = ≤id s spl -- solved by a workaround
