@@ -306,11 +306,11 @@ Some properties are waiting to be justified:
 
 \inferrule*[lab=S-$\forall$]
 {\Psi, a \vdash A <: B \dashv \Psi', a\rightsquigarrow C}
-{\Psi \vdash \forall a.~A <: \forall a.~B \dashv \Psi' \rightsquigarrow \forall a. C}
+{\Psi \vdash \forall a.A <: \forall a.~B \dashv \Psi' \rightsquigarrow \forall a. C}
 
 \inferrule*[lab=S-$\forall$-L]
 {\Psi, \hat{a} \vdash A <: \boxed{e} \leadsto \Sigma \dashv \Psi', \hat{a} \rightsquigarrow B}
-{\Psi \vdash \forall A <: \boxed{e} \leadsto \Sigma \dashv \Psi' \rightsquigarrow B}
+{\Psi \vdash \forall a.A <: \boxed{e} \leadsto \Sigma \dashv \Psi' \rightsquigarrow B}
 
 \inferrule*[lab=S-$\forall$-L-Eq]
 {\Psi, \hat{a} \vdash A <: \boxed{e} \leadsto \Sigma \dashv \Psi', \hat{a}=A \rightsquigarrow B}
