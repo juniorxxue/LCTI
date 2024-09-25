@@ -44,11 +44,11 @@ postulate
   s-weaken0 : ∀ {Ψ Ψ' : SEnv n m} {Σ A B B'}
     → Ψ ⊢ B ≤ Σ ⊣ Ψ' ↪ B'
     → Ψ , A ⊢ B ≤ ↑Σ0 Σ ⊣ Ψ' , A ↪ B'
-    
-  subsumption0 : ∀ {Γ : Env n m} {Ψ Σ e A A'}
-    → Γ ⊢ □ ⇒ e ⇒ A
-    → 𝕎 Γ ⊢ A ≤ Σ ⊣ Ψ ↪ A'
-    → Γ ⊢ Σ ⇒ e ⇒ A'
+
+  s-strengthen0 : ∀ {Ψ Ψ' : SEnv n m} {Σ A B B'}
+    → Ψ , A ⊢ B ≤ ↑Σ0 Σ ⊣ Ψ' , A ↪ B'
+    → Ψ ⊢ B ≤ Σ ⊣ Ψ' ↪ B'
+
 
   s-closed-r : ∀ {Ψ : SEnv n m} {Γ A B Σ}
     → 𝕎 Γ ⊢ A ≤ Σ ⊣ Ψ ↪ B
@@ -65,9 +65,14 @@ postulate
     → Γ ⊢ τ A ⇒ e ⇒ B
     → A ≡ B
 
-  s-id : ∀ {Ψ Ψ' : SEnv n m} {A A' Σ}
-    → Ψ ⊢ A ≤ Σ ⊣ Ψ' ↪ A'
-    → A ≡ A'
+  s-id : ∀ {Ψ Ψ' : SEnv n m} {A A' B}
+    → Ψ ⊢ A ≤ τ B ⊣ Ψ' ↪ A'
+    → B ≡ A'
+
+  ⊢a→⊢c : ∀ {Γ : Env n m} {Σ e A}
+    → Γ ⊢ Σ ⇒ e ⇒ A
+    → 𝕎 Γ ⊢c A
+
 
 postulate
   s-trans : ∀ {Ψ : SEnv n m} {A Σ Σ' Σ'' Ψ' Ψ'' A' a̅ A''}
@@ -76,7 +81,19 @@ postulate
     → a̅ ⊕ Σ'' := Σ'
     → Ψ ⊢ A' ≤ Σ' ⊣ Ψ'' ↪ A''
     → Ψ ⊢ A ≤ Σ' ⊣ Ψ'' ↪ A''
-  
+
+  s-refl : ∀ {Ψ Ψ' : SEnv n m} {A}
+    → Ψ ⊢ A ≤ τ A ⊣ Ψ' ↪ A
+
+
+  m-w-eq : ∀ (Γ : Env n m)
+    → 𝕄 (𝕎 Γ) ≡ Γ
+
+
+⊢a-m-w : ∀ {Γ : Env n m} {Σ e A}
+  → Γ ⊢ Σ ⇒ e ⇒ A
+  → 𝕄 (𝕎 Γ) ⊢ Σ ⇒ e ⇒ A
+⊢a-m-w {Γ = Γ} ⊢e rewrite m-w-eq Γ = ⊢e  
 
 ⊢to≤ : ∀ {Γ : Env n m} {e Σ A}
   → Γ ⊢ Σ ⇒ e ⇒ A
@@ -89,6 +106,14 @@ subsumption : ∀ {Γ : Env n m} {Σ Σ' Σ'' Ψ e A A' a̅}
   → 𝕎 Γ ⊢ A ≤ Σ' ⊣ Ψ ↪ A'
   → Γ ⊢ Σ' ⇒ e ⇒ A'
 
+{-
+subsumption0 : ∀ {Γ : Env n m} {Ψ Σ e A A'}
+  → Γ ⊢ □ ⇒ e ⇒ A
+  → 𝕎 Γ ⊢ A ≤ Σ ⊣ Ψ ↪ A'
+  → Γ ⊢ Σ ⇒ e ⇒ A'
+subsumption0 ⊢e s = subsumption ⊢e none-□ ⊕nil s
+-}
+
 ⊢to≤ ⊢lit = s-empty ⊢c-int
 ⊢to≤ (⊢var x∈Γ) = s-empty {!!}
 ⊢to≤ (⊢ann ⊢e) = s-empty {!!}
@@ -97,9 +122,9 @@ subsumption : ∀ {Γ : Env n m} {Σ Σ' Σ'' Ψ e A A' a̅}
 ... | s-term-o x x₁ r r₁ = s-closed-l r₁
 ⊢to≤ (⊢lam₁ ⊢e) with ⊢to≤ ⊢e
 ... | s = {!!}
-⊢to≤ (⊢lam₂ ⊢e ⊢e₁) = {!!}
+⊢to≤ {Γ = Γ} (⊢lam₂ ⊢e ⊢e₁) = s-term-c {!!} {!!} (subsumption (⊢a-m-w ⊢e) {!!} {!!} s-refl) (s-strengthen0 (⊢to≤ ⊢e₁))
 ⊢to≤ (⊢sub ⊢e x x₁ x₂) = {!!}
-⊢to≤ (⊢tabs ⊢e) = {!!}
+⊢to≤ (⊢tabs ⊢e) = s-empty {!!}
 
 subsumption {Σ' = □} ⊢e none-□ ⊕nil (s-empty p) = ⊢e
 

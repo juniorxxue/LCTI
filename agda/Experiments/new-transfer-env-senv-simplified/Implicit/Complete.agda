@@ -33,13 +33,11 @@ postulate
   ~weaken0 : ∀ {Γ : Env n m} {Σ A B j}
     → Γ ⊢ ⟨ j , B ⟩ ~ Σ
     → Γ , A ⊢ ⟨ j , B ⟩ ~ ↑Σ0 Σ
-
-  ⊢a→⊢c : ∀ {Γ : Env n m} {Σ e A}
-    → Γ ⊢ Σ ⇒ e ⇒ A
-    → 𝕎 Γ ⊢c A
+    
   ⊢d→⊢c : ∀ {Γ : Env n m} {e A j}
     → Γ ⊢ j # e ⦂ A
     → 𝕎 Γ ⊢c A
+
   ⊢m-w : ∀ {Γ : Env n m} {A e j}
     → Γ ⊢ j # e ⦂ A
     → 𝕄 (𝕎 Γ) ⊢ j # e ⦂ A
