@@ -310,6 +310,7 @@ data _⊢_≤_⊣_↪_ where
   s-ex-l= : ∀ {A B X Σ}
     → (clo : Ψ ⊢c A)
     → (x-in : X := B ∈ Ψ)
+    → (ne : NonEmpty Σ)
     → Ψ ⊢ B ≤ Σ ⊣ Ψ' ↪ A
     → Ψ ⊢ ‶ X ≤ Σ ⊣ Ψ' ↪ A
 
@@ -355,11 +356,10 @@ data _⊢_≤_⊣_↪_ where
     → Ψ ,^ ⊢ A ≤ ↑tyΣ0 ([ e ]↝ Σ) ⊣ Ψ' ,^ ↪ ↑ty0 B
     → Ψ ⊢ `∀ A ≤ ([ e ]↝ Σ) ⊣ Ψ' ↪ B
 
-  s-∀l-eq : ∀ {A B C C' D D' e}
-    → Ψ ,^ ⊢ A ≤ ↑tyΣ0 ([ e ]↝ Σ) ⊣ Ψ' ,= B ↪ C `→ D -- could be more specific
+  s-∀l-eq : ∀ {A B C C' e}
+    → Ψ ,^ ⊢ A ≤ ↑tyΣ0 ([ e ]↝ Σ) ⊣ Ψ' ,= B ↪ C
     → (st₁ : [ B ]ˢ C ⇨ C')
-    → (st₂ : [ B ]ˢ D ⇨ D')
-    → Ψ ⊢ `∀ A ≤ ([ e ]↝ Σ) ⊣ Ψ' ↪ C' `→ D'
+    → Ψ ⊢ `∀ A ≤ ([ e ]↝ Σ) ⊣ Ψ' ↪ C'
 
 
 infix 4 ⟦_,_⟧→⟦_,_,_,_⟧
@@ -372,9 +372,9 @@ data ⟦_,_⟧→⟦_,_,_,_⟧ : Context n m → Type m → Apps n m → Context
   none-τ : ∀ {A B}
     → ⟦ (Context n m ∋⦂ τ A) , B ⟧→⟦ nil , τ A , nil , B ⟧
 
-  have-e : ∀ {Σ : Context n m} {e A B es A' B' Bs}
-    → ⟦ Σ , B ⟧→⟦ es , A' , Bs , B' ⟧
-    → ⟦ ([ e ]↝ Σ) , A `→ B ⟧→⟦ e ∷a es , A' , A ∷a Bs , B' ⟧
+  have-e : ∀ {Σ : Context n m} {e A B e̅ A' B' B̅}
+    → ⟦ Σ , B ⟧→⟦ e̅ , A' , B̅ , B' ⟧
+    → ⟦ ([ e ]↝ Σ) , A `→ B ⟧→⟦ e ∷a e̅ , A' , A ∷a B̅ , B' ⟧
 
 infix 4 _⊢⟦_,_⟧→⟦_,_,_,_⟧⊣_
 data _⊢⟦_,_⟧→⟦_,_,_,_⟧⊣_ : SEnv n m → Context n m → Type m → Apps n m → Context n m → AppsType m → Type m → SEnv n m → Set where
@@ -390,6 +390,6 @@ data _⊢⟦_,_⟧→⟦_,_,_,_⟧⊣_ : SEnv n m → Context n m → Type m →
     → Ψ ⊢⟦ ([ e ]↝ Σ) , A `→ B ⟧→⟦ e ∷a es , A' , A ∷a Bs , B' ⟧⊣ Ψ
 
   have-e2 : ∀ {Σ : Context n m} {Ψ e A es B' Bs Σ' C A'}
-    → Ψ ,^ ⊢⟦ ↑tyΣ0 ([ e ]↝ Σ) , A ⟧→⟦ upty0 es , ↑tyΣ0 Σ' , uptyT0 Bs , ↑ty0 B' ⟧⊣ (Ψ ,= C)
-    → [ C ]ˢ A ⇨ A'
     → Ψ ⊢⟦ ([ e ]↝ Σ) , A' ⟧→⟦ e ∷a es , Σ' , Bs , B' ⟧⊣ Ψ
+    → [ C ]ˢ A ⇨ A'
+    → Ψ ,^ ⊢⟦ ↑tyΣ0 ([ e ]↝ Σ) , A ⟧→⟦ upty0 es , ↑tyΣ0 Σ' , uptyT0 Bs , ↑ty0 B' ⟧⊣ (Ψ ,= C)
