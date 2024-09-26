@@ -73,6 +73,13 @@ postulate
     → Γ ⊢ Σ ⇒ e ⇒ A
     → 𝕎 Γ ⊢c A
 
+  ⊢a→⊢c-τ : ∀ {Γ : Env n m} {e A B}
+    → Γ ⊢ τ B ⇒ e ⇒ A
+    → 𝕎 Γ ⊢c B
+
+  ⊢a→⊢c-weaken : ∀ {Γ : Env n m} {Σ e A B}
+    → Γ , B ⊢ Σ ⇒ e ⇒ A
+    → 𝕎 Γ ⊢c A
 
 postulate
   s-trans : ∀ {Ψ : SEnv n m} {A Σ Σ' Σ'' Ψ' Ψ'' A' a̅ A''}
@@ -85,10 +92,25 @@ postulate
   s-refl : ∀ {Ψ Ψ' : SEnv n m} {A}
     → Ψ ⊢ A ≤ τ A ⊣ Ψ' ↪ A
 
-
   m-w-eq : ∀ (Γ : Env n m)
     → 𝕄 (𝕎 Γ) ≡ Γ
 
+s-refined : ∀ {Ψ Ψ' : SEnv n m} {Σ A B}
+  → Ψ ⊢ A ≤ Σ ⊣ Ψ' ↪ B
+  → Ψ ⊢ B ≤ Σ ⊣ Ψ' ↪ B
+s-refined s-int = s-int
+s-refined (s-empty p) = s-empty p
+s-refined s-var = s-var
+s-refined (s-ex-l^ clo x-in inst) = s-refl
+s-refined (s-ex-l= clo x-in ne s) = s-refined s
+s-refined (s-ex-r^ clo x-in inst) = s-refl
+s-refined (s-ex-r= clo x-in s) = s-refl
+s-refined (s-arr s s₁) = s-refl
+s-refined (s-term-c cloA cloB ⊢e s) = s-term-c {!!} {!!} {!!} (s-refined s)
+s-refined (s-term-o op ⊢e s s₁) = s-term-o {!!} {!!} s-refl (s-refined s₁) 
+s-refined (s-∀ s) = s-∀ (s-refined s)
+s-refined (s-∀l-^ s) = {!(s-refined s)!}
+s-refined (s-∀l-eq s st₁) = {!s-∀l-eq (s-refined s) st₁!}
 
 ⊢a-m-w : ∀ {Γ : Env n m} {Σ e A}
   → Γ ⊢ Σ ⇒ e ⇒ A
@@ -106,25 +128,23 @@ subsumption : ∀ {Γ : Env n m} {Σ Σ' Σ'' Ψ e A A' a̅}
   → 𝕎 Γ ⊢ A ≤ Σ' ⊣ Ψ ↪ A'
   → Γ ⊢ Σ' ⇒ e ⇒ A'
 
-{-
 subsumption0 : ∀ {Γ : Env n m} {Ψ Σ e A A'}
   → Γ ⊢ □ ⇒ e ⇒ A
   → 𝕎 Γ ⊢ A ≤ Σ ⊣ Ψ ↪ A'
   → Γ ⊢ Σ ⇒ e ⇒ A'
 subsumption0 ⊢e s = subsumption ⊢e none-□ ⊕nil s
--}
 
 ⊢to≤ ⊢lit = s-empty ⊢c-int
-⊢to≤ (⊢var x∈Γ) = s-empty {!!}
-⊢to≤ (⊢ann ⊢e) = s-empty {!!}
+⊢to≤ ⊢e@(⊢var x∈Γ) = s-empty (⊢a→⊢c ⊢e)
+⊢to≤ (⊢ann ⊢e) rewrite ⊢id ⊢e = s-empty (⊢a→⊢c ⊢e)
 ⊢to≤ (⊢app ⊢e) with ⊢to≤ ⊢e
 ... | s-term-c x x₁ x₂ r = r
 ... | s-term-o x x₁ r r₁ = s-closed-l r₁
 ⊢to≤ (⊢lam₁ ⊢e) with ⊢to≤ ⊢e
-... | s = {!!}
-⊢to≤ {Γ = Γ} (⊢lam₂ ⊢e ⊢e₁) = s-term-c {!!} {!!} (subsumption (⊢a-m-w ⊢e) {!!} {!!} s-refl) (s-strengthen0 (⊢to≤ ⊢e₁))
-⊢to≤ (⊢sub ⊢e x x₁ x₂) = {!!}
-⊢to≤ (⊢tabs ⊢e) = s-empty {!!}
+... | s rewrite ⊢id ⊢e = s-refl
+⊢to≤ {Γ = Γ} (⊢lam₂ ⊢e ⊢e₁) = s-term-c (⊢a→⊢c ⊢e) (⊢a→⊢c-weaken ⊢e₁) (⊢a-m-w (subsumption0 {Ψ = 𝕎 Γ} ⊢e s-refl)) (s-strengthen0 (⊢to≤ ⊢e₁))
+⊢to≤ (⊢sub ⊢e x x₁ x₂) = s-refined x₂
+⊢to≤ (⊢tabs ⊢e) = s-empty (⊢c-∀ (⊢a→⊢c ⊢e))
 
 subsumption {Σ' = □} ⊢e none-□ ⊕nil (s-empty p) = ⊢e
 
