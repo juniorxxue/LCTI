@@ -298,21 +298,13 @@ data _⊢_≤_⊣_↪_ where
     → (x-in : X ^∈ Ψ)
     → (inst : [ A / X ] Ψ ⟹ Ψ')
     → Ψ ⊢ ‶ X ≤ τ A ⊣ Ψ' ↪ A
+ 
 
-{-
-  s-ex-l= : ∀ {A A' B X}
+  s-ex-l= : ∀ {A B X A'}
     → (clo : Ψ ⊢c A)
     → (x-in : X := B ∈ Ψ)
     → Ψ ⊢ B ≤ τ A ⊣ Ψ' ↪ A'
     → Ψ ⊢ ‶ X ≤ τ A ⊣ Ψ' ↪ A
--}    
-
-  s-ex-l= : ∀ {A B X Σ}
-    → (clo : Ψ ⊢c A)
-    → (x-in : X := B ∈ Ψ)
-    → (ne : NonEmpty Σ)
-    → Ψ ⊢ B ≤ Σ ⊣ Ψ' ↪ A
-    → Ψ ⊢ ‶ X ≤ Σ ⊣ Ψ' ↪ A
 
   s-ex-r^ : ∀ {A X}
     → (clo : Ψ ⊢c A)
@@ -356,10 +348,11 @@ data _⊢_≤_⊣_↪_ where
     → Ψ ,^ ⊢ A ≤ ↑tyΣ0 ([ e ]↝ Σ) ⊣ Ψ' ,^ ↪ ↑ty0 B
     → Ψ ⊢ `∀ A ≤ ([ e ]↝ Σ) ⊣ Ψ' ↪ B
 
-  s-∀l-eq : ∀ {A B C C' e}
-    → Ψ ,^ ⊢ A ≤ ↑tyΣ0 ([ e ]↝ Σ) ⊣ Ψ' ,= B ↪ C
+  s-∀l-eq : ∀ {A B C C' D D' e}
+    → Ψ ,^ ⊢ A ≤ ↑tyΣ0 ([ e ]↝ Σ) ⊣ Ψ' ,= B ↪ (C `→ D)
     → (st₁ : [ B ]ˢ C ⇨ C')
-    → Ψ ⊢ `∀ A ≤ ([ e ]↝ Σ) ⊣ Ψ' ↪ C'
+    → (st₂ : [ B ]ˢ D ⇨ D')
+    → Ψ ⊢ `∀ A ≤ ([ e ]↝ Σ) ⊣ Ψ' ↪ C' `→ D'
 
 
 infix 4 ⟦_,_⟧→⟦_,_,_,_⟧

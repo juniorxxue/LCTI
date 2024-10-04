@@ -95,7 +95,7 @@ s-closed-gen (s-∀ s) with s-closed-gen s
 ... | uvar r = r
 s-closed-gen (s-∀l-^ s) with s-closed-gen s
 ... | evar r = r
-s-closed-gen (s-∀l-eq s st) with s-closed-gen s
+s-closed-gen (s-∀l-eq s st st') with s-closed-gen s
 ... | evar-sol r = r
 
 𝕎-Γ-like : ∀ (Γ : Env n m)
@@ -184,7 +184,7 @@ arr-pred refl = ⟨ refl , refl ⟩
 ≤id s-int none-τ = refl
 ≤id s-var none-τ = refl
 ≤id (s-ex-l^ clo x-in inst) none-τ = refl
-≤id (s-ex-l= clo x-in s) spl = ≤id s spl
+≤id (s-ex-l= clo x-in s) spl = {!!}
 ≤id (s-ex-r^ clo x-in inst) none-τ = refl
 ≤id (s-ex-r= clo x-in s) none-τ = refl
 ≤id (s-arr s s₁) none-τ = refl
@@ -193,7 +193,7 @@ arr-pred refl = ⟨ refl , refl ⟩
 ≤id (s-∀ s) none-τ = cong `∀_ (≤id s none-τ)
 ≤id (s-∀l-^ s) (have-e spl) with ≤id s (have-e (spl-weaken-ty spl))
 ... | r = ↑ty-pred r
-≤id (s-∀l-eq s st1) spl = {!≤id s ?!} 
+≤id (s-∀l-eq s st1 st2) spl'@(have-e spl) = {!≤id s!}
 
 ≤id' : ∀ {Ψ Ψ' : SEnv n m} {Σ A B Bs B' es T}
   → Ψ ⊢ A ≤ Σ ⊣ Ψ' ↪ B
@@ -210,4 +210,4 @@ arr-pred refl = ⟨ refl , refl ⟩
 ≤id' (s-term-o op ⊢e s s₁) spl = {!!}
 ≤id' (s-∀ s) spl = {!!}
 ≤id' (s-∀l-^ s) spl = {!!}
-≤id' (s-∀l-eq s st₁) spl = {!≤id' s!}
+≤id' (s-∀l-eq x₁ st₁ st₂) spl = {!!}

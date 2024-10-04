@@ -232,7 +232,7 @@ subst-unique st1 st2 = subst-unique' {k = #0} st1 st2
 data Apps : ℕ → ℕ → Set where
   nil : Apps n m
   _∷a_ : Term n m → Apps n m → Apps n m
-  _∷t_ : Type m → Apps n m → Apps n m
+--   _∷t_ : Type m → Apps n m → Apps n m
 
 data AppsType : ℕ → Set where
   nil : AppsType m
@@ -267,7 +267,6 @@ postulate
 up : Fin (1 + n) → Apps n m → Apps (1 + n) m
 up n nil = nil
 up n (e ∷a as) = (↑tm n e) ∷a (up n as)
-up n (A ∷t as) = A ∷t (up n as)
 
 up0 : Apps n m → Apps (1 + n) m
 up0 = up #0
@@ -275,7 +274,6 @@ up0 = up #0
 upty : Fin (1 + m) → Apps n m → Apps n (1 + m)
 upty k nil = nil
 upty k (e ∷a as) = ↑ty-in-tm k e ∷a upty k as
-upty k (A ∷t as) = ↑ty k A ∷t (upty k as)
 
 upty0 : Apps n m → Apps n (1 + m)
 upty0 = upty #0
