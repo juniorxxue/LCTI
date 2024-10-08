@@ -33,7 +33,7 @@
 
 \begin{align*}
 &\text{Types} \quad\quad &A, B, C, D ::=&~ a \mid \mathtt{Int} \mid A \rightarrow B \mid \forall a.~A\\
-&\text{Expressions} \quad \quad &e::=&~ i \mid x \mid \lambda x . ~e \mid e_1~e_2 \mid e : A \mid \Lambda a.~e \mid e ~@~ A\\
+&\text{Expressions} \quad \quad &e::=&~ i \mid x \mid \lambda x . ~e \mid e_1~e_2 \mid e : A \mid \Lambda a.~e\\
 &\text{Environments} \quad\quad &\Gamma::=&~ . \mid \Gamma, x : A \mid \Gamma, a \mid \Gamma, \hat{a} = A\\
 &\text{Counters} \quad\quad &n ::=&~ 0 \mid \infty \mid S~n\\
 \end{align*}
@@ -82,16 +82,13 @@
 
     \inferrule*[lab=Sub]
     {\Gamma \vdash_0 e : B \\
+    n \neq 0\\
     \Gamma \vdash_n B <: A}
     {\Gamma \vdash_n e : A}
 
     \inferrule*[lab=TAbs]
     {\Gamma, a \vdash_0 e : A}
     {\Gamma \vdash_0 \Lambda a.~e : \forall a.~A}
-    
-    \inferrule*[lab=TApp]
-    {\Gamma \vdash_0 e : \forall a.~B}
-    {\Gamma \vdash_0 e ~@~A : [A/a]B}
 \end{mathpar}
 
 \subsection{Subtyping}
@@ -123,11 +120,6 @@
      \hat{a} \in FV(S~n, A) \\
      \Gamma, \hat{a} = B \vdash_{S~n}  A <: C \to D}
     {\Gamma \vdash_{S~n} \forall a. ~A <: [B/\hat{a}]C \to [B/\hat{a}]D}
-    
-    \inferrule*[lab=S-$\forall$L-t]
-    {\Gamma \vdash B \\
-     \Gamma, \hat{a} = B \vdash_{n}  A <: C}
-    {\Gamma \vdash_{S_\tau~n} \forall a. ~A <: [B/\hat{a}]C }    
     
     \inferrule*[lab=S-var-l]
     {\hat{a} = B \in \Gamma \\ \Gamma \vdash_\infty B <: A}
@@ -169,11 +161,12 @@
 {\Gamma \vdash \boxed{e_2} \leadsto \Sigma \Rightarrow \lambda x.~e \Rightarrow A \rightarrow B}
 
 \inferrule*[lab=T-Sub]
-{\Gamma \vdash \square \Rightarrow g \Rightarrow A \\
+{\Gamma \vdash \square \Rightarrow g \Rightarrow A\\
+\Sigma \neq \square\\
  \Gamma \vdash A <: \Sigma \dashv \Gamma \rightsquigarrow B}
 {\Gamma \vdash \Sigma \Rightarrow g \Rightarrow B}
 
-\inferrule*[lab=T-TAbs1]
+\inferrule*[lab=T-TAbs]
 {\Gamma, a \vdash \square \Rightarrow e \Rightarrow A}
 {\Gamma \vdash \square \Rightarrow \Lambda a.~e \Rightarrow \forall a.~A}
 
@@ -185,16 +178,7 @@
 %{\Gamma \vdash H \Rightarrow e \Rightarrow \forall X.~B}
 {\Gamma \vdash \boxed{A} \leadsto \Sigma \Rightarrow e \Rightarrow B}
 {\Gamma \vdash  \Sigma \Rightarrow e[A] \Rightarrow B}
-
 \end{mathpar}
-
-People will expect the \texttt{TApp} and \texttt{App} has the same shape, while they are not. This is because the type abstraction can infer a type without any contextual information, what's why we treat it as a generic consumer and deals with the instantiation in the subtyping.
-
-Some properties are waiting to be justified:
-
-\begin{itemize}
-	\item If the context is a full type, then the inferred type is \emph{almost} the same, but will be finer (some parts will be instantiated)
-\end{itemize}
 
 \begin{comment}
 \subsection{Subtyping: $\boxed{\Gamma \vdash A <: \Sigma \dashv \Gamma' \rightsquigarrow A}$}
@@ -244,7 +228,7 @@ Some properties are waiting to be justified:
 \end{mathpar}
 \end{comment}
 
-\subsection{Subtyping: $\boxed{\Gamma \vdash A <: \Sigma \dashv \Gamma' \rightsquigarrow A'}$}
+\subsection{Subtyping: $\boxed{\Psi \vdash A <: \Sigma \dashv \Psi' \rightsquigarrow A'}$}
 
 \begin{align*}
     &\text{Environments} \quad\quad &\Gamma ::=&~ . \mid \Gamma, A \mid \Gamma, a \mid \Gamma, \hat{a} = A \\
@@ -315,10 +299,6 @@ Some properties are waiting to be justified:
 \inferrule*[lab=S-$\forall$-L-Eq]
 {\Psi, \hat{a} \vdash A <: \boxed{e} \leadsto \Sigma \dashv \Psi', \hat{a}=A \rightsquigarrow B}
 {\Psi \vdash \forall a. A <: \boxed{e} \leadsto \Sigma \dashv \Psi' \rightsquigarrow [A/\hat{a}]B}
-
-\inferrule*[lab=S-$\forall$-TApp]
-{\Psi , \hat{a} = B \vdash A <: \Sigma \dashv \Psi', \hat{a}= B \rightsquigarrow C}
-{\Psi \vdash \forall a. A <: \boxed{B} \leadsto \Sigma \dashv \Psi' \rightsquigarrow [B/\hat{a}]C }
 \end{mathpar}
 
 \end{document}
