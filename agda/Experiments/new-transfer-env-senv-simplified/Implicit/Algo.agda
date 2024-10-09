@@ -299,7 +299,6 @@ data _⊢_≤_⊣_↪_ where
     → (inst : [ A / X ] Ψ ⟹ Ψ')
     → Ψ ⊢ ‶ X ≤ τ A ⊣ Ψ' ↪ A
  
-
   s-ex-l= : ∀ {A B X A'}
     → (clo : Ψ ⊢c A)
     → (x-in : X := B ∈ Ψ)
@@ -369,20 +368,70 @@ data ⟦_,_⟧→⟦_,_,_,_⟧ : Context n m → Type m → Apps n m → Context
     → ⟦ Σ , B ⟧→⟦ e̅ , A' , B̅ , B' ⟧
     → ⟦ ([ e ]↝ Σ) , A `→ B ⟧→⟦ e ∷a e̅ , A' , A ∷a B̅ , B' ⟧
 
-infix 4 _⊢⟦_,_⟧→⟦_,_,_,_⟧⊣_
-data _⊢⟦_,_⟧→⟦_,_,_,_⟧⊣_ : SEnv n m → Context n m → Type m → Apps n m → Context n m → AppsType m → Type m → SEnv n m → Set where
+infix 4 ⟦_,_⟧→s⟦_,_⟧
+data ⟦_,_⟧→s⟦_,_⟧ : Context n m → Type m → Context n m → Type m → Set where
 
-  none-□ : ∀ {Ψ : SEnv n m} {A}
-    → Ψ ⊢⟦ (Context n m ∋⦂ □) , A ⟧→⟦ nil , □ , nil , A ⟧⊣ Ψ
+  none-□ : ∀ {A}
+    → ⟦ (Context n m ∋⦂ □) , A ⟧→s⟦ □ , A ⟧
 
-  none-τ : ∀ {Ψ A B}
-    → Ψ ⊢⟦ (Context n m ∋⦂ τ A) , B ⟧→⟦ nil , τ A , nil , B ⟧⊣ Ψ
+  none-τ : ∀ {A B}
+    → ⟦ (Context n m ∋⦂ τ A) , B ⟧→s⟦ τ A , B ⟧
 
-  have-e1 : ∀ {Σ : Context n m} {Ψ e A B es A' B' Bs}
-    → Ψ ⊢⟦ Σ , B ⟧→⟦ es , A' , Bs , B' ⟧⊣ Ψ
-    → Ψ ⊢⟦ ([ e ]↝ Σ) , A `→ B ⟧→⟦ e ∷a es , A' , A ∷a Bs , B' ⟧⊣ Ψ
+  have-e : ∀ {Σ : Context n m} {e A B Σ' B'}
+    → ⟦ Σ , B ⟧→s⟦ Σ' , B' ⟧
+    → ⟦ ([ e ]↝ Σ) , A `→ B ⟧→s⟦ Σ' , B' ⟧
 
-  have-e2 : ∀ {Σ : Context n m} {Ψ e A es B' Bs Σ' C A'}
-    → Ψ ⊢⟦ ([ e ]↝ Σ) , A' ⟧→⟦ e ∷a es , Σ' , Bs , B' ⟧⊣ Ψ
-    → [ C ]ˢ A ⇨ A'
-    → Ψ ,^ ⊢⟦ ↑tyΣ0 ([ e ]↝ Σ) , A ⟧→⟦ upty0 es , ↑tyΣ0 Σ' , uptyT0 Bs , ↑ty0 B' ⟧⊣ (Ψ ,= C)
+-- Ψ ⊢ A ≤ B ⊣ Ψ' ↪ C
+-- B = C
+
+-- Ψ ⊢ A ≤ Σ ⊣ Ψ' ↪ C
+--
+data NonEndEmpty : Context n m → Set where
+  eee-τ : ∀ {A} → NonEndEmpty (Context n m ∋⦂ τ A)
+  eee-e : ∀ {Σ : Context n m} {e}
+    → NonEndEmpty Σ
+    → NonEndEmpty ([ e ]↝ Σ)
+
+⊢id : ∀ {Γ : Env n m } {Σ e A A' T es As}
+  → Γ ⊢ Σ ⇒ e ⇒ A
+  → ⟦ Σ , A ⟧→⟦ es , τ T , As , A' ⟧
+  → T ≡ A'
+
+≤id : ∀ {Ψ Ψ' : SEnv n m} {Σ A B}
+  → Ψ ⊢ A ≤ Σ ⊣ Ψ' ↪ B
+  → ∃[ T ] ∃[ B' ](⟦ Σ , B ⟧→s⟦ τ T , B' ⟧ → (T ≡ B'))
+
+≤id' : ∀ {Ψ Ψ' : SEnv n m} {Σ A B T B'}
+  → Ψ ⊢ A ≤ Σ ⊣ Ψ' ↪ B
+  → ⟦ Σ , B ⟧→s⟦ τ T , B' ⟧
+  → T ≡ B'
+≤id' s spl with ≤id s
+... | ⟨ T' , ⟨ B'' , r ⟩ ⟩ = {!!}
+
+⊢id (⊢app ⊢e) spl = {!!}
+⊢id (⊢lam₁ ⊢e) spl = {!!}
+⊢id (⊢lam₂ ⊢e ⊢e₁) spl = {!!}
+⊢id (⊢sub ⊢e ne gc s) spl = {!!}
+
+≤id s-int = ⟨ Int , ⟨ Int , ⟨ none-τ , refl ⟩ ⟩ ⟩
+≤id {A = A} (s-empty p) 
+≤id (s-var {X = X}) ne = ⟨ ‶ X , ⟨ ‶ X , ⟨ none-τ , refl ⟩ ⟩ ⟩
+≤id {B = B} (s-ex-l^ clo x-in inst) ne = ⟨ B , ⟨ B , ⟨ none-τ , refl ⟩ ⟩ ⟩
+≤id {B = B} (s-ex-l= clo x-in s) ne = ⟨ B , ⟨ B , ⟨ none-τ , refl ⟩ ⟩ ⟩
+≤id (s-ex-r^ {X = X} clo x-in inst) ne = ⟨ ‶ X , ⟨ ‶ X , ⟨ none-τ , refl ⟩ ⟩ ⟩
+≤id (s-ex-r= {X = X} clo x-in s) ne = ⟨ ‶ X , ⟨ ‶ X , ⟨ none-τ , refl ⟩ ⟩ ⟩
+≤id (s-arr {C = C} {D = D} s s₁) ne = ⟨ C `→ D , ⟨ C `→ D , ⟨ none-τ , refl ⟩ ⟩ ⟩
+≤id (s-term-c cloA cloB ⊢e s) (eee-e ne) = ⟨ ≤id s ne .proj₁ ,
+                                            ⟨ ≤id s ne .proj₂ .proj₁ ,
+                                            ⟨ have-e (≤id s ne .proj₂ .proj₂ .proj₁) ,
+                                            ≤id s ne .proj₂ .proj₂ .proj₂ ⟩
+                                            ⟩
+                                            ⟩
+≤id (s-term-o op ⊢e s s₁) (eee-e ne) = {!!}
+≤id (s-∀ {B = B} s) eee-τ with ≤id s eee-τ
+... | ⟨ T , ⟨ B' , ⟨ none-τ , refl ⟩ ⟩ ⟩ = ⟨ (`∀ T) , ⟨ (`∀ T) , ⟨ none-τ , refl ⟩ ⟩ ⟩
+≤id (s-∀l-^ s) ne with ≤id s {!!}
+... | ⟨ T , ⟨ B' , ⟨ spl , refl ⟩ ⟩ ⟩ = ⟨ ↓ty0 T , ⟨ ↓ty0 B' , ⟨ {!!} , refl ⟩ ⟩ ⟩
+≤id (s-∀l-eq s st₁ st₂) ne with ≤id s {!!}
+... | ⟨ T , ⟨ B' , ⟨ spl , refl ⟩ ⟩ ⟩ = ⟨ {!!} , ⟨ {!!} , ⟨ {!!} , refl ⟩ ⟩ ⟩
+

@@ -2,7 +2,7 @@ module Implicit.Algo.Subsumption where
 
 open import Implicit.Common
 open import Implicit.Algo
-open import Implicit.Algo.Properties
+-- open import Implicit.Algo.Properties
 
 infix 4 ⟦_⟧⇒⟦_,_⟧
 
@@ -60,14 +60,6 @@ postulate
   𝕎-open : ∀ {Γ : Env n m} {A}
     → ¬ (𝕎 Γ ⊢o A)
 
-  ⊢id : ∀ {Γ : Env n m} {A B e}
-    → Γ ⊢ τ A ⇒ e ⇒ B
-    → A ≡ B
-
-  s-id : ∀ {Ψ Ψ' : SEnv n m} {A A' B}
-    → Ψ ⊢ A ≤ τ B ⊣ Ψ' ↪ A'
-    → B ≡ A'
-
   ⊢a→⊢c : ∀ {Γ : Env n m} {Σ e A}
     → Γ ⊢ Σ ⇒ e ⇒ A
     → 𝕎 Γ ⊢c A
@@ -80,18 +72,28 @@ postulate
     → Γ , B ⊢ Σ ⇒ e ⇒ A
     → 𝕎 Γ ⊢c A
 
+{-
+⊢id : ∀ {Γ : Env n m} {A B e}
+  → Γ ⊢ τ A ⇒ e ⇒ B
+  → A ≡ B
+
+s-id : ∀ {Ψ Ψ' : SEnv n m} {A A' B}
+  → Ψ ⊢ A ≤ τ B ⊣ Ψ' ↪ A'
+  → B ≡ A'
+-}
+
 s-trans : ∀ {Ψ : SEnv n m} {A Σ Σ' Σ'' Ψ' Ψ'' A' a̅ A''}
   → Ψ ⊢ A ≤ Σ ⊣ Ψ' ↪ A'
   → ⟦ Σ ⟧⇒⟦ a̅ , □ ⟧  
   → a̅ ⊕ Σ'' := Σ'
   → Ψ ⊢ A' ≤ Σ' ⊣ Ψ'' ↪ A''
   → Ψ ⊢ A ≤ Σ' ⊣ Ψ'' ↪ A''
-s-trans (s-empty p) none-□ ch s2 = s2
+s-trans (s-empty p inst) none-□ ch s2 = {!!}
 s-trans (s-term-c cloA cloB ⊢e s1) (have-e spl) (⊕cons-e ch) (s-term-c cloA₁ cloB₁ ⊢e₁ s2) = s-term-c cloA cloB {!!} (s-trans s1 spl ch s2) -- easy
 s-trans (s-term-c cloA cloB ⊢e s1) (have-e spl) (⊕cons-e ch) (s-term-o op ⊢e₁ s2 s3) = {!!} -- false case
 s-trans (s-term-o op ⊢e s1 s3) (have-e spl) (⊕cons-e ch) s2 = {!!}
 s-trans (s-∀l-^ s1) spl ch s2 = {!!}
-s-trans (s-∀l-eq s1 st₁ st₂) spl ch s2 = {!!}
+s-trans (s-∀l-eq s1) spl ch s2 = {!!}
 
 
 s-refl : ∀ {Ψ : SEnv n m} {A}
@@ -112,19 +114,21 @@ s-refined : ∀ {Ψ Ψ' : SEnv n m} {Σ A B}
   → Ψ ⊢ A ≤ Σ ⊣ Ψ' ↪ B
   → Ψ' ⊢ B ≤ Σ ⊣ Ψ' ↪ B
 s-refined s-int = s-int
-s-refined (s-empty p) = s-empty p
+s-refined (s-empty p inst) = {!!} -- ok
 s-refined s-var = s-var
 s-refined (s-ex-l^ clo x-in inst) = s-refl -- s-refl
 s-refined s'@(s-ex-l= clo x-in s) = s-refl -- s-refl
-s-refined (s-ex-r^ clo x-in inst) = s-refl
-s-refined (s-ex-r= clo x-in s) = s-refl
+s-refined (s-ex-r^ clo x-in inst) = s-ex-r= {!!} {!!} s-refl -- ok
+s-refined (s-ex-r= clo x-in s) = s-ex-r= {!!} {!!} s-refl
 s-refined (s-arr s s₁) = {!!}
 s-refined (s-term-c cloA cloB ⊢e s) = s-term-c {!!} {!!} {!!} (s-refined s) -- easy
-s-refined s'@(s-term-o op ⊢e s s₁) with s-id s
+s-refined s'@(s-term-o op ⊢e s s₁) = {!!}
+{-with s-id s
 ... | refl = s-term-c {!!} {!!} {!!} (s-refined s₁)
+-}
 s-refined (s-∀ s) = s-∀ (s-refined s)
 s-refined (s-∀l-^ s) = {!s-refined s!}
-s-refined (s-∀l-eq s st₁ st₂) = {!s-refined s!} -- substituition lemma
+s-refined (s-∀l-eq s) = {!s-refined s!} -- substituition lemma
 -- s-term-c {!!} {!!} {!!} {!!}
 
 ⊢a-m-w : ∀ {Γ : Env n m} {Σ e A}
@@ -140,50 +144,52 @@ subsumption : ∀ {Γ : Env n m} {Σ Σ' Σ'' Ψ e A A' a̅}
   → Γ ⊢ Σ ⇒ e ⇒ A
   → ⟦ Σ ⟧⇒⟦ a̅ , □ ⟧
   → a̅ ⊕ Σ'' := Σ'
+  → NonEmpty Σ'
   → 𝕎 Γ ⊢ A ≤ Σ' ⊣ Ψ ↪ A'
   → Γ ⊢ Σ' ⇒ e ⇒ A'
 
 subsumption0 : ∀ {Γ : Env n m} {Ψ Σ e A A'}
   → Γ ⊢ □ ⇒ e ⇒ A
+  → NonEmpty Σ
   → 𝕎 Γ ⊢ A ≤ Σ ⊣ Ψ ↪ A'
   → Γ ⊢ Σ ⇒ e ⇒ A'
-subsumption0 ⊢e s = subsumption ⊢e none-□ ⊕nil s
+subsumption0 ⊢e ne s = subsumption ⊢e none-□ ⊕nil ne s
 
-⊢to≤ ⊢lit = s-empty ⊢c-int
-⊢to≤ ⊢e@(⊢var x∈Γ) = s-empty (⊢a→⊢c ⊢e)
-⊢to≤ (⊢ann ⊢e) rewrite ⊢id ⊢e = s-empty (⊢a→⊢c ⊢e)
+⊢to≤ ⊢lit = s-empty ⊢c-int inst-int
+⊢to≤ ⊢e@(⊢var x∈Γ) = s-empty (⊢a→⊢c ⊢e) {!!}
+⊢to≤ ⊢e'@(⊢ann ⊢e) = s-empty {!!} {!!}
 ⊢to≤ (⊢app ⊢e) with ⊢to≤ ⊢e
 ... | s-term-c x x₁ x₂ r = r
 ... | s-term-o x x₁ r r₁ = s-closed-l r₁
-⊢to≤ (⊢lam₁ ⊢e) with ⊢to≤ ⊢e
-... | s rewrite ⊢id ⊢e = s-refl
-⊢to≤ {Γ = Γ} (⊢lam₂ ⊢e ⊢e₁) = s-term-c (⊢a→⊢c ⊢e) (⊢a→⊢c-weaken ⊢e₁) (⊢a-m-w (subsumption0 {Ψ = 𝕎 Γ} ⊢e s-refl)) (s-strengthen0 (⊢to≤ ⊢e₁))
-⊢to≤ (⊢sub ⊢e x x₁ x₂) = {!!}
+⊢to≤ (⊢lam₁ ⊢e) = s-arr s-refl {!⊢to≤ ⊢e!} -- weaken is oko
+⊢to≤ {Γ = Γ} (⊢lam₂ ⊢e ⊢e₁) = s-term-c (⊢a→⊢c ⊢e) (⊢a→⊢c-weaken ⊢e₁) (⊢a-m-w (subsumption0 {Ψ = 𝕎 Γ} ⊢e {!!} {!!})) (s-strengthen0 (⊢to≤ ⊢e₁))
+⊢to≤ (⊢sub ⊢e x x₁ x₂) = s-refined x₂
 -- s-refined x₂
-⊢to≤ (⊢tabs ⊢e) = s-empty (⊢c-∀ (⊢a→⊢c ⊢e))
+⊢to≤ (⊢tabs ⊢e) = s-empty (⊢c-∀ (⊢a→⊢c ⊢e)) {!!}
 
-subsumption {Σ' = □} ⊢e none-□ ⊕nil (s-empty p) = ⊢e
+subsumption {Σ' = □} ⊢e none-□ ⊕nil () (s-empty p inst)
 
-subsumption {Σ' = τ _} ⊢lit spl ⊕nil s = ⊢sub ⊢lit ne-τ gc-i (s-closed-r s)
-subsumption {Σ' = τ _} (⊢var x∈Γ) none-□ ⊕nil s = ⊢sub (⊢var x∈Γ) ne-τ gc-var (s-closed-r s)
-subsumption {Σ' = τ _} (⊢ann ⊢e) none-□ ⊕nil s = ⊢sub (⊢ann ⊢e) ne-τ gc-ann (s-closed-r s)
-subsumption {Σ' = τ _} (⊢app ⊢e) none-□ ⊕nil s with ⊢to≤ ⊢e
-... | s-term-c cloA cloB ⊢e₁ s₁ = ⊢app (subsumption ⊢e (have-e none-□) (⊕cons-e ⊕nil) (s-term-c cloA cloB ⊢e₁ s))
+subsumption {Σ' = τ _} ⊢lit spl ⊕nil ne s = ⊢sub ⊢lit ne-τ gc-i (s-closed-r s)
+subsumption {Σ' = τ _} (⊢var x∈Γ) none-□ ⊕nil ne s = ⊢sub (⊢var x∈Γ) ne-τ gc-var (s-closed-r s)
+subsumption {Σ' = τ _} (⊢ann ⊢e) none-□ ⊕nil ne s = ⊢sub (⊢ann ⊢e) ne-τ gc-ann (s-closed-r s)
+subsumption {Σ' = τ _} (⊢app ⊢e) none-□ ⊕nil ne s with ⊢to≤ ⊢e
+... | s-term-c cloA cloB ⊢e₁ s₁ = ⊢app (subsumption ⊢e (have-e none-□) (⊕cons-e ⊕nil) ne-app (s-term-c cloA cloB ⊢e₁ s))
 ... | s-term-o op ⊢e₁ s₁ s₂ = ⊥-elim (𝕎-open op)
-subsumption {Σ' = τ _} (⊢lam₂ ⊢e ⊢e₁) (have-e spl) () s
-subsumption {Σ' = τ _} (⊢sub ⊢e ne gc (s-empty p)) none-□ ⊕nil s = ⊢sub ⊢e ne-τ gc (s-closed-r s)
+subsumption {Σ' = τ _} (⊢lam₂ ⊢e ⊢e₁) (have-e spl) () ne s
+subsumption {Σ' = τ _} (⊢sub ⊢e ne gc (s-empty p inst)) none-□ ⊕nil ne' s = ⊢sub ⊢e ne-τ gc {!!}
 -- subsumption {Σ' = τ _} (⊢sub ⊢e ne gc (s-ex-l= clo x-in s₁)) none-□ ⊕nil s = ?
-subsumption {Σ' = τ _} (⊢tabs ⊢e) none-□ ⊕nil s = ⊢sub (⊢tabs ⊢e) ne-τ gc-tlam (s-closed-r s)
+subsumption {Σ' = τ _} (⊢tabs ⊢e) none-□ ⊕nil ne s = ⊢sub (⊢tabs ⊢e) ne-τ gc-tlam (s-closed-r s)
 
-subsumption {Σ' = [ e ]↝ Σ'} (⊢var x∈Γ) spl ch s = ⊢sub (⊢var x∈Γ) ne-app gc-var (s-closed-r s)
-subsumption {Σ' = [ e ]↝ Σ'} (⊢ann ⊢e) spl ch s = ⊢sub (⊢ann ⊢e) ne-app gc-ann (s-closed-r s)
-subsumption {Σ' = [ e ]↝ Σ'} (⊢app ⊢e) spl ch s with ⊢to≤ ⊢e
-... | s-term-c cloA cloB ⊢e₁ s₁ = ⊢app (subsumption ⊢e (have-e spl) (⊕cons-e ch) (s-term-c cloA cloB ⊢e₁ s))
+subsumption {Σ' = [ e ]↝ Σ'} (⊢var x∈Γ) spl ch ne s = ⊢sub (⊢var x∈Γ) ne-app gc-var (s-closed-r s)
+subsumption {Σ' = [ e ]↝ Σ'} (⊢ann ⊢e) spl ch ne s = ⊢sub (⊢ann ⊢e) ne-app gc-ann (s-closed-r s)
+subsumption {Σ' = [ e ]↝ Σ'} (⊢app ⊢e) spl ch ne s with ⊢to≤ ⊢e
+... | s-term-c cloA cloB ⊢e₁ s₁ = ⊢app (subsumption ⊢e (have-e spl) (⊕cons-e ch) ne-app (s-term-c cloA cloB ⊢e₁ s))
 ... | s-term-o op ⊢e₁ s₁ s₂ = ⊥-elim (𝕎-open op)
-subsumption {Σ' = [ e ]↝ Σ'} (⊢lam₂ ⊢e ⊢e₁) (have-e spl) (⊕cons-e ch) (s-term-c cloA cloB ⊢e₂ s) rewrite ⊢id ⊢e₂ =
-  ⊢lam₂ ⊢e (subsumption ⊢e₁ (Σsplit-weaken0 spl) (⊕-weaken0 ch) (s-weaken0 s))
-subsumption {Σ' = [ e ]↝ Σ'} (⊢lam₂ ⊢e ⊢e₁) (have-e spl) (⊕cons-e ch) (s-term-o op ⊢e₂ s s₁) = ⊥-elim (𝕎-open op)
-subsumption {Σ' = [ e ]↝ Σ'} (⊢sub ⊢e ne gc s₁) spl ch s = ⊢sub ⊢e ne-app gc (s-trans s₁ spl ch (s-closed-r s))
-subsumption {Σ' = [ e ]↝ Σ'} (⊢tabs ⊢e) none-□ ch s = ⊢sub (⊢tabs ⊢e) ne-app gc-tlam (s-closed-r s)
+subsumption {Σ' = [ e ]↝ Σ'} (⊢lam₂ ⊢e ⊢e₁) (have-e spl) (⊕cons-e ch) ne (s-term-c cloA cloB ⊢e₂ s) = ⊢lam₂ {!!} {!!}
+-- rewrite ⊢id ⊢e₂ =
+--  ⊢lam₂ ⊢e (subsumption ⊢e₁ (Σsplit-weaken0 spl) (⊕-weaken0 ch) (s-weaken0 s))
+subsumption {Σ' = [ e ]↝ Σ'} (⊢lam₂ ⊢e ⊢e₁) (have-e spl) (⊕cons-e ch) ne (s-term-o op ⊢e₂ s s₁) = ⊥-elim (𝕎-open op)
+subsumption {Σ' = [ e ]↝ Σ'} (⊢sub ⊢e ne gc s₁) spl ch ne' s = ⊢sub ⊢e ne-app gc (s-trans s₁ spl ch (s-closed-r s))
+subsumption {Σ' = [ e ]↝ Σ'} (⊢tabs ⊢e) none-□ ch ne s = ⊢sub (⊢tabs ⊢e) ne-app gc-tlam (s-closed-r s)
 
 

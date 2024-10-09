@@ -82,7 +82,7 @@ s-closed-gen : ∀ {Ψ Ψ' : SEnv n m} {A B Σ}
   → Ψ ⊢ A ≤ Σ ⊣ Ψ' ↪ B
   → Ψ ~~ Ψ'
 s-closed-gen s-int = ~~refl
-s-closed-gen (s-empty p) = ~~refl
+s-closed-gen (s-empty p inst) = ~~refl
 s-closed-gen s-var = ~~refl
 s-closed-gen (s-ex-l^ x x₁ x₂) = ⟹closed x₂
 s-closed-gen (s-ex-l= x x₁ s) = s-closed-gen s
@@ -95,7 +95,7 @@ s-closed-gen (s-∀ s) with s-closed-gen s
 ... | uvar r = r
 s-closed-gen (s-∀l-^ s) with s-closed-gen s
 ... | evar r = r
-s-closed-gen (s-∀l-eq s st st') with s-closed-gen s
+s-closed-gen (s-∀l-eq s) with s-closed-gen s
 ... | evar-sol r = r
 
 𝕎-Γ-like : ∀ (Γ : Env n m)
@@ -159,12 +159,6 @@ arr-pred refl = ⟨ refl , refl ⟩
 ... | ⟨ eq1 , eq2 ⟩ rewrite ↑ty-pred {A = A} {B} eq1 | ↑ty-pred {A = A₁} {B₁} eq2 = refl
 ↑ty-pred {A = `∀ A} {`∀ B} eq = cong `∀_ (↑ty-pred (∀-pred eq))
 
-⊢id0 : ∀ {Γ : Env n m} {A B e}
-  → Γ ⊢ τ B ⇒ e ⇒ A
-  → A ≡ B
-⊢id0 (⊢app ⊢e) = {!!}
-⊢id0 (⊢lam₁ ⊢e) = {!!}
-⊢id0 (⊢sub ⊢e ne gc s) = {!!}
 
 infix 3 _~≈_
 
@@ -181,24 +175,6 @@ data _~≈_ : Type m → Context n m' → Set where
     → A ~≈ Σ
     → `∀ A ~≈ Σ
 
-s-~≈ : ∀ {Ψ Ψ' : SEnv n m} {Σ A B}
-  → Ψ ⊢ A ≤ Σ ⊣ Ψ' ↪ B
-  → B ~≈ Σ
-s-~≈ s-int = {!!}
-s-~≈ (s-empty p) = {!!}
-s-~≈ s-var = {!!}
-s-~≈ (s-ex-l^ clo x-in inst) = {!!}
-s-~≈ (s-ex-l= clo x-in s) = {!!}
-s-~≈ (s-ex-r^ clo x-in inst) = {!!}
-s-~≈ (s-ex-r= clo x-in s) = {!!}
-s-~≈ (s-arr s s₁) = {!!}
-s-~≈ (s-term-c cloA cloB ⊢e s) = {!!}
-s-~≈ (s-term-o op ⊢e s s₁) = {!!}
-s-~≈ (s-∀ s) = {!!}
-s-~≈ (s-∀l-^ s) = {!!}
-s-~≈ (s-∀l-eq s st₁ st₂) = {!s-~≈ s!}
-
-
 ⊢id : ∀ {Γ : Env n m } {Σ e A A' T es As}
   → Γ ⊢ Σ ⇒ e ⇒ A
   → ⟦ Σ , A ⟧→⟦ es , τ T , As , A' ⟧ -- splitting
@@ -212,43 +188,19 @@ s-~≈ (s-∀l-eq s st₁ st₂) = {!s-~≈ s!}
 ⊢id (⊢app ⊢e) spl = ⊢id ⊢e (have-e spl)
 ⊢id (⊢lam₁ ⊢e) none-τ rewrite ⊢id ⊢e none-τ = refl
 ⊢id (⊢lam₂ ⊢e ⊢e₁) (have-e spl) = ⊢id ⊢e₁ (spl-weaken spl)
-⊢id (⊢sub ⊢e ne gc s) spl = {!!}
+⊢id (⊢sub ⊢e ne gc s) spl = ≤id s spl
 
 ≤id s-int none-τ = refl
 ≤id s-var none-τ = refl
 ≤id (s-ex-l^ clo x-in inst) none-τ = refl
-≤id (s-ex-l= clo x-in s) spl = {!!}
-≤id (s-ex-r^ clo x-in inst) none-τ = refl
-≤id (s-ex-r= clo x-in s) none-τ = refl
+≤id (s-ex-l= clo x-in s) none-τ = refl
+≤id (s-ex-r^ clo x-in inst) none-τ = {!!}
+≤id (s-ex-r= clo x-in s) none-τ = {!!}
 ≤id (s-arr s s₁) none-τ = refl
 ≤id (s-term-c cloA cloB ⊢e s) (have-e spl) = ≤id s spl
 ≤id (s-term-o op ⊢e s s₁) (have-e spl) = ≤id s₁ spl
 ≤id (s-∀ s) none-τ = cong `∀_ (≤id s none-τ)
 ≤id (s-∀l-^ s) (have-e spl) with ≤id s (have-e (spl-weaken-ty spl))
 ... | r = ↑ty-pred r
-≤id (s-∀l-eq s st1 st2) spl = {!≤id s!}
-
--- spl: [1] -> [2] -> [], Int -> Int -> Int
--- spl (pre subst) : [1] -> [2] -> [], Int -> ^a -> ^a  ~~  not hold
--- spl (pre subst) : [1] -> [2] -> [], Int -> Int -> ^a
-
--- property / maybe restrict
-
--- the replacement of existential should be subject to the context
-
-≤id' : ∀ {Ψ Ψ' : SEnv n m} {Σ A B Bs B' es T}
-  → Ψ ⊢ A ≤ Σ ⊣ Ψ' ↪ B
-  → Ψ ⊢⟦ Σ , B ⟧→⟦ es , τ T , Bs , B' ⟧⊣ Ψ'
-  → T ≡ B'
-≤id' s-int spl = {!!}
-≤id' s-var spl = {!!}
-≤id' (s-ex-l^ clo x-in inst) spl = {!!}
-≤id' (s-ex-l= clo x-in s) spl = {!!}
-≤id' (s-ex-r^ clo x-in inst) spl = {!!}
-≤id' (s-ex-r= clo x-in s) spl = {!!}
-≤id' (s-arr s s₁) spl = {!!}
-≤id' (s-term-c cloA cloB ⊢e s) spl = {!!}
-≤id' (s-term-o op ⊢e s s₁) spl = {!!}
-≤id' (s-∀ s) spl = {!!}
-≤id' (s-∀l-^ s) spl = {!!}
-≤id' (s-∀l-eq x₁ st₁ st₂) spl = {!!}
+≤id (s-∀l-eq s) (have-e spl) with ≤id s (have-e (spl-weaken-ty spl))
+... | r = ↑ty-pred r

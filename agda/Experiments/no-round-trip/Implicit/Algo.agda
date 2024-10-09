@@ -252,7 +252,7 @@ data _⊢_⇒_⇒_ where
 
   ⊢ann : ∀ {e A B}
     → Γ ⊢ τ A ⇒ e ⇒ B
-    → Γ ⊢ □ ⇒ e ⦂ A ⇒ A
+    → Γ ⊢ □ ⇒ e ⦂ A ⇒ B
 
   ⊢app : ∀ {e₁ e₂ A B}
     → Γ ⊢ [ e₂ ]↝ Σ ⇒ e₁ ⇒ A `→ B
@@ -285,10 +285,10 @@ data _⊢_≤_⊣_↪_ where
   s-int :
       Ψ ⊢ Int ≤ τ Int ⊣ Ψ ↪ Int
 
-  s-empty : ∀ {A}
+  s-empty : ∀ {A A'}
     → (p : Ψ ⊢c A)
---    → inst Ψ [ A ]⟹ A'
-    → Ψ ⊢ A ≤ □ ⊣ Ψ ↪ A
+    → inst Ψ [ A ]⟹ A'
+    → Ψ ⊢ A ≤ □ ⊣ Ψ ↪ A'
 
   s-var : ∀ {X}
     → Ψ ⊢ ‶ X ≤ τ (‶ X) ⊣ Ψ ↪ ‶ X
@@ -310,7 +310,7 @@ data _⊢_≤_⊣_↪_ where
     → (clo : Ψ ⊢c A)
     → (x-in : X ^∈ Ψ)
     → (inst : [ A / X ] Ψ ⟹ Ψ')
-    → Ψ ⊢ A ≤ τ (‶ X) ⊣ Ψ' ↪ ‶ X
+    → Ψ ⊢ A ≤ τ (‶ X) ⊣ Ψ' ↪ A
 
   -- this rule attempts to break the property "if context is a full type, the result should be same"
   -- but the definition of full type is whether contain a solved existetial variable
@@ -319,12 +319,12 @@ data _⊢_≤_⊣_↪_ where
     → (clo : Ψ ⊢c A)
     → (x-in : X := B ∈ Ψ)
     → Ψ ⊢ A ≤ τ B ⊣ Ψ' ↪ A₂
-    → Ψ ⊢ A ≤ τ (‶ X) ⊣ Ψ' ↪ (‶ X)
+    → Ψ ⊢ A ≤ τ (‶ X) ⊣ Ψ' ↪ B
 
   s-arr : ∀ {A B C D A' D'}
     → Ψ₁ ⊢ C ≤ τ A ⊣ Ψ₂ ↪ A'
     → Ψ₂ ⊢ B ≤ τ D ⊣ Ψ₃ ↪ D'
-    → Ψ₁ ⊢ A `→ B ≤ τ (C `→ D) ⊣ Ψ₃ ↪ (C `→ D)
+    → Ψ₁ ⊢ A `→ B ≤ τ (C `→ D) ⊣ Ψ₃ ↪ (A' `→ D')
 
   s-term-c : ∀ {A B A' D e}
     → (cloA : Ψ ⊢c A)
@@ -344,15 +344,13 @@ data _⊢_≤_⊣_↪_ where
     → Ψ ,∙ ⊢ A ≤ τ B ⊣ Ψ' ,∙ ↪ C
     → Ψ ⊢ `∀ A ≤ τ (`∀ B) ⊣ Ψ' ↪ `∀ C
 
-  s-∀l-^ : ∀ {A B e}
-    → Ψ ,^ ⊢ A ≤ ↑tyΣ0 ([ e ]↝ Σ) ⊣ Ψ' ,^ ↪ ↑ty0 B
-    → Ψ ⊢ `∀ A ≤ ([ e ]↝ Σ) ⊣ Ψ' ↪ B
+  s-∀l-^ : ∀ {A C D e}
+    → Ψ ,^ ⊢ A ≤ ↑tyΣ0 ([ e ]↝ Σ) ⊣ Ψ' ,^ ↪ ↑ty0 (C `→ D)
+    → Ψ ⊢ `∀ A ≤ ([ e ]↝ Σ) ⊣ Ψ' ↪ C `→ D
 
-  s-∀l-eq : ∀ {A B C C' D D' e}
-    → Ψ ,^ ⊢ A ≤ ↑tyΣ0 ([ e ]↝ Σ) ⊣ Ψ' ,= B ↪ (C `→ D)
-    → (st₁ : [ B ]ˢ C ⇨ C')
-    → (st₂ : [ B ]ˢ D ⇨ D')
-    → Ψ ⊢ `∀ A ≤ ([ e ]↝ Σ) ⊣ Ψ' ↪ C' `→ D'
+  s-∀l-eq : ∀ {A B C D e}
+    → Ψ ,^ ⊢ A ≤ ↑tyΣ0 ([ e ]↝ Σ) ⊣ Ψ' ,= B ↪ ↑ty0 (C `→ D)
+    → Ψ ⊢ `∀ A ≤ ([ e ]↝ Σ) ⊣ Ψ' ↪ C `→ D
 
 
 infix 4 ⟦_,_⟧→⟦_,_,_,_⟧
@@ -368,21 +366,3 @@ data ⟦_,_⟧→⟦_,_,_,_⟧ : Context n m → Type m → Apps n m → Context
   have-e : ∀ {Σ : Context n m} {e A B e̅ A' B' B̅}
     → ⟦ Σ , B ⟧→⟦ e̅ , A' , B̅ , B' ⟧
     → ⟦ ([ e ]↝ Σ) , A `→ B ⟧→⟦ e ∷a e̅ , A' , A ∷a B̅ , B' ⟧
-
-infix 4 _⊢⟦_,_⟧→⟦_,_,_,_⟧⊣_
-data _⊢⟦_,_⟧→⟦_,_,_,_⟧⊣_ : SEnv n m → Context n m → Type m → Apps n m → Context n m → AppsType m → Type m → SEnv n m → Set where
-
-  none-□ : ∀ {Ψ : SEnv n m} {A}
-    → Ψ ⊢⟦ (Context n m ∋⦂ □) , A ⟧→⟦ nil , □ , nil , A ⟧⊣ Ψ
-
-  none-τ : ∀ {Ψ A B}
-    → Ψ ⊢⟦ (Context n m ∋⦂ τ A) , B ⟧→⟦ nil , τ A , nil , B ⟧⊣ Ψ
-
-  have-e1 : ∀ {Σ : Context n m} {Ψ e A B es A' B' Bs}
-    → Ψ ⊢⟦ Σ , B ⟧→⟦ es , A' , Bs , B' ⟧⊣ Ψ
-    → Ψ ⊢⟦ ([ e ]↝ Σ) , A `→ B ⟧→⟦ e ∷a es , A' , A ∷a Bs , B' ⟧⊣ Ψ
-
-  have-e2 : ∀ {Σ : Context n m} {Ψ e A es B' Bs Σ' C A'}
-    → Ψ ⊢⟦ ([ e ]↝ Σ) , A' ⟧→⟦ e ∷a es , Σ' , Bs , B' ⟧⊣ Ψ
-    → [ C ]ˢ A ⇨ A'
-    → Ψ ,^ ⊢⟦ ↑tyΣ0 ([ e ]↝ Σ) , A ⟧→⟦ upty0 es , ↑tyΣ0 Σ' , uptyT0 Bs , ↑ty0 B' ⟧⊣ (Ψ ,= C)
