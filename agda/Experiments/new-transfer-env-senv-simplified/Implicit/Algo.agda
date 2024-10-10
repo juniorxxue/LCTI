@@ -51,12 +51,6 @@ data NonEmpty : Context n m → Set where
 ↓tyΣ0 : Context n (1 + m) → Context n m
 ↓tyΣ0 Σ = [ Int ]ᶜ Σ
 
-↑tyΣ-st : ∀ (Σ : Context n m) {A}
-  → [ A ]ᶜ (↑tyΣ0 Σ) ≡ Σ
-↑tyΣ-st □ = refl
-↑tyΣ-st (τ B) {A = A} rewrite ↑ty-st' B {C = A} = refl
-↑tyΣ-st ([ e ]↝ Σ) {A = A} rewrite ↑ty-tm-st' e {C = A} | ↑tyΣ-st Σ {A = A} = refl
-
 {-
 -- environment substition
 [_/ᵉ_] : SEnv n m → Type m → Type m
@@ -109,22 +103,6 @@ data _⊢c_ : SEnv n m → Type m → Set where
   ⊢c-∀ : ∀ {A}
     → Ψ ,∙ ⊢c A
     → Ψ ⊢c `∀ A
-
-⊢c-arr-inv-l : ∀ {A B}
-  → Ψ ⊢c (A `→ B)
-  → Ψ ⊢c A
-⊢c-arr-inv-l (⊢c-arr s s₁) = s
-
-⊢c-arr-inv-r : ∀ {A B}
-  → Ψ ⊢c (A `→ B)
-  → Ψ ⊢c B
-⊢c-arr-inv-r (⊢c-arr s s₁) = s₁
-
-postulate
-  ⊢c-∀-= : ∀ {A B}
-    → Ψ ⊢c `∀ B
-    → Ψ ,= A ⊢c B -- requires a lemma: if a universal varialbe in a context, you can replace it with a solution without affecting it's closedness
-    
 
 -- open: have free existential variables
 data _⊢o_ : SEnv n m → Type m → Set where
@@ -395,104 +373,3 @@ data ⟦_,_⟧→s⟦_,_⟧ : Context n m → Type m → Context n m → Type m 
   have-e : ∀ {Σ : Context n m} {e A B Σ' B'}
     → ⟦ Σ , B ⟧→s⟦ Σ' , B' ⟧
     → ⟦ ([ e ]↝ Σ) , A `→ B ⟧→s⟦ Σ' , B' ⟧
-
-
-data Split : (Σ : Context n m) → (B : Type m) → Set where
-  case-τ : ∀ {Σ : Context n m} {B T B'}
-    → (spl : ⟦ Σ , B ⟧→s⟦ τ T , B' ⟧)
-    → (eq : T ≡ B')
-    → Split Σ B
-    
-  case-□ : ∀ {Σ : Context n m} {B B'}
-    → (spl : ⟦ Σ , B ⟧→s⟦ □ , B' ⟧)
-    → Split Σ B
-
-spl-deterministic : ∀ {Σ : Context n m} {A A₁ A₂ Σ₁ Σ₂}
-  → ⟦ Σ , A ⟧→s⟦ Σ₁ ,  A₁ ⟧
-  → ⟦ Σ , A ⟧→s⟦ Σ₂ ,  A₂ ⟧
-  → Σ₁ ≡ Σ₂ × A₁ ≡ A₂
-spl-deterministic none-□ none-□ = ⟨ refl , refl ⟩  
-spl-deterministic none-τ none-τ = ⟨ refl , refl ⟩
-spl-deterministic (have-e spl1) (have-e spl2) = spl-deterministic spl1 spl2
-
-spl-↑ty : ∀ {Σ : Context n (1 + m)} {B Σ' A C}
-  → ⟦ Σ , B ⟧→s⟦ Σ' , A ⟧
-  → ⟦ [ C ]ᶜ Σ , [ C ]ˢ B ⟧→s⟦ [ C ]ᶜ Σ' , [ C ]ˢ A ⟧
-spl-↑ty none-□ = none-□  
-spl-↑ty none-τ = none-τ
-spl-↑ty (have-e spl) = have-e (spl-↑ty spl)
-
-spl-↑ty-case : ∀ {Σ : Context n m} {Σ' e B T C}
-  → ⟦ ↑tyΣ0 ([ e ]↝ Σ) , ↑ty #0 B ⟧→s⟦ Σ' , T ⟧
-  → ⟦ [ e ]↝ Σ , B ⟧→s⟦ [ C ]ᶜ Σ' , [ C ]ˢ T ⟧
-spl-↑ty-case {Σ = Σ} {e = e} {B = B} {C = C} spl with spl-↑ty {C = C} spl
-... | spl' rewrite ↑ty-st' B {C = C} | ↑tyΣ-st ([ e ]↝ Σ) {A = C} = spl'
-
-spl-↑ty-case' : ∀ {Σ : Context n m} {Σ' e B T C}
-  → ⟦ ↑tyΣ0 ([ e ]↝ Σ) , B ⟧→s⟦ Σ' , T ⟧
-  → ⟦ [ e ]↝ Σ , [ C ]ˢ B ⟧→s⟦ [ C ]ᶜ Σ' , [ C ]ˢ T ⟧
-spl-↑ty-case' {Σ = Σ} {e = e} {B = B} {C = C} spl with spl-↑ty {C = C} spl
-... | spl' rewrite ↑tyΣ-st ([ e ]↝ Σ) {A = C} = spl'
-
-spl-implies-simple : ∀ {Σ Σ' : Context n m} {es A As A'}
-  → ⟦ Σ , A ⟧→⟦ es , Σ' , As , A' ⟧
-  → ⟦ Σ , A ⟧→s⟦ Σ' , A' ⟧
-spl-implies-simple none-□ = none-□
-spl-implies-simple none-τ = none-τ
-spl-implies-simple (have-e spl) = have-e (spl-implies-simple spl)
-
-spl-weaken : ∀ {Σ Σ' : Context n m} {A es As A' k}
-  → ⟦ Σ , A ⟧→⟦ es , Σ' , As , A' ⟧
-  → ⟦ ↑Σ k Σ , A ⟧→⟦ up k es , ↑Σ k Σ' , As , A' ⟧
-spl-weaken none-□ = none-□
-spl-weaken none-τ = none-τ
-spl-weaken (have-e spl) = have-e (spl-weaken spl)
-  
-⊢id : ∀ {Γ : Env n m } {Σ e A A' T es As}
-  → Γ ⊢ Σ ⇒ e ⇒ A
-  → ⟦ Σ , A ⟧→⟦ es , τ T , As , A' ⟧
-  → T ≡ A'
-
-≤id : ∀ {Ψ Ψ' : SEnv n m} {Σ A B}
-  → Ψ ⊢ A ≤ Σ ⊣ Ψ' ↪ B
-  → Split Σ B
-
-≤id' : ∀ {Ψ Ψ' : SEnv n m} {Σ A B T B'}
-  → Ψ ⊢ A ≤ Σ ⊣ Ψ' ↪ B
-  → ⟦ Σ , B ⟧→s⟦ τ T , B' ⟧
-  → T ≡ B'
-≤id' s spl with ≤id s
-... | case-τ spl' refl with spl-deterministic spl spl'
-... | ⟨ refl , refl ⟩ = refl
-≤id' s spl | case-□ spl' with spl-deterministic spl spl'
-... | ()
-
-⊢id (⊢app ⊢e) spl = ⊢id ⊢e (have-e spl)
-⊢id (⊢lam₁ ⊢e) none-τ rewrite ⊢id ⊢e none-τ = refl
-⊢id (⊢lam₂ ⊢e ⊢e₁) (have-e spl) = ⊢id ⊢e₁ (spl-weaken spl)
-⊢id (⊢sub ⊢e ne gc s) spl = ≤id' s (spl-implies-simple spl)
-
-≤id s-int = case-τ none-τ refl
-≤id (s-empty p) = case-□ none-□
-≤id s-var = case-τ none-τ refl
-≤id (s-ex-l^ clo x-in inst) = case-τ none-τ refl
-≤id (s-ex-l= clo x-in s) = case-τ none-τ refl
-≤id (s-ex-r^ clo x-in inst) = case-τ none-τ refl
-≤id (s-ex-r= clo x-in s) = case-τ none-τ refl
-≤id (s-arr s s₁) = case-τ none-τ refl
-≤id (s-term-c cloA cloB ⊢e s) with ≤id s
-... | case-τ spl eq = case-τ (have-e spl) eq
-... | case-□ spl = case-□ (have-e spl)
-≤id (s-term-o op ⊢e s s₁) with ≤id s₁
-... | case-τ spl eq = case-τ (have-e spl) eq
-... | case-□ spl = case-□ (have-e spl)
-≤id (s-∀ s) with ≤id s
-... | case-τ none-τ refl = case-τ none-τ refl
-≤id (s-∀l-^ s) with ≤id s
-... | case-τ spl refl = case-τ (spl-↑ty-case {C = Int} spl) refl
-... | case-□ spl = case-□ (spl-↑ty-case {C = Int} spl)
-≤id (s-∀l-eq {B = B} s st₁ st₂) with ≤id s
-... | case-τ spl refl rewrite sym (st-st st₁) | sym (st-st st₂) = case-τ (spl-↑ty-case' {C = B} spl) refl
-... | case-□ spl rewrite sym (st-st st₁) | sym (st-st st₂) = case-□ (spl-↑ty-case' {C = B} spl)
--- spl-↑ty-case' {C = B} spl
-

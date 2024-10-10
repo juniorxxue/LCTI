@@ -289,5 +289,3 @@ uptyT k (`∀ As) = `∀ uptyT (#S k) As
 
 uptyT0 : AppsType m → AppsType (1 + m)
 uptyT0 = uptyT #0
-
-
