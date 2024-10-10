@@ -1,6 +1,7 @@
 module Implicit.Algo where
 
 open import Implicit.Common
+open import Implicit.Properties
 
 -- Env for algorithmic subtyping
 data SEnv : ℕ → ℕ → Set where
@@ -41,6 +42,20 @@ data NonEmpty : Context n m → Set where
 
 ↑tyΣ0 : Context n m → Context n (1 + m)
 ↑tyΣ0 = ↑tyΣ #0
+
+[_]ᶜ_ : Type m → Context n (1 + m) → Context n m
+[ A ]ᶜ □ = □
+[ A ]ᶜ (τ B) = τ ([ A ]ˢ B)
+[ A ]ᶜ ([ e ]↝ Σ) = [ [ A ]ᵗ e ]↝ ([ A ]ᶜ Σ)
+
+↓tyΣ0 : Context n (1 + m) → Context n m
+↓tyΣ0 Σ = [ Int ]ᶜ Σ
+
+↑tyΣ-st : ∀ (Σ : Context n m) {A}
+  → [ A ]ᶜ (↑tyΣ0 Σ) ≡ Σ
+↑tyΣ-st □ = refl
+↑tyΣ-st (τ B) {A = A} rewrite ↑ty-st' B {C = A} = refl
+↑tyΣ-st ([ e ]↝ Σ) {A = A} rewrite ↑ty-tm-st' e {C = A} | ↑tyΣ-st Σ {A = A} = refl
 
 {-
 -- environment substition
@@ -381,17 +396,58 @@ data ⟦_,_⟧→s⟦_,_⟧ : Context n m → Type m → Context n m → Type m 
     → ⟦ Σ , B ⟧→s⟦ Σ' , B' ⟧
     → ⟦ ([ e ]↝ Σ) , A `→ B ⟧→s⟦ Σ' , B' ⟧
 
--- Ψ ⊢ A ≤ B ⊣ Ψ' ↪ C
--- B = C
 
--- Ψ ⊢ A ≤ Σ ⊣ Ψ' ↪ C
---
-data NonEndEmpty : Context n m → Set where
-  eee-τ : ∀ {A} → NonEndEmpty (Context n m ∋⦂ τ A)
-  eee-e : ∀ {Σ : Context n m} {e}
-    → NonEndEmpty Σ
-    → NonEndEmpty ([ e ]↝ Σ)
+data Split : (Σ : Context n m) → (B : Type m) → Set where
+  case-τ : ∀ {Σ : Context n m} {B T B'}
+    → (spl : ⟦ Σ , B ⟧→s⟦ τ T , B' ⟧)
+    → (eq : T ≡ B')
+    → Split Σ B
+    
+  case-□ : ∀ {Σ : Context n m} {B B'}
+    → (spl : ⟦ Σ , B ⟧→s⟦ □ , B' ⟧)
+    → Split Σ B
 
+spl-deterministic : ∀ {Σ : Context n m} {A A₁ A₂ Σ₁ Σ₂}
+  → ⟦ Σ , A ⟧→s⟦ Σ₁ ,  A₁ ⟧
+  → ⟦ Σ , A ⟧→s⟦ Σ₂ ,  A₂ ⟧
+  → Σ₁ ≡ Σ₂ × A₁ ≡ A₂
+spl-deterministic none-□ none-□ = ⟨ refl , refl ⟩  
+spl-deterministic none-τ none-τ = ⟨ refl , refl ⟩
+spl-deterministic (have-e spl1) (have-e spl2) = spl-deterministic spl1 spl2
+
+spl-↑ty : ∀ {Σ : Context n (1 + m)} {B Σ' A C}
+  → ⟦ Σ , B ⟧→s⟦ Σ' , A ⟧
+  → ⟦ [ C ]ᶜ Σ , [ C ]ˢ B ⟧→s⟦ [ C ]ᶜ Σ' , [ C ]ˢ A ⟧
+spl-↑ty none-□ = none-□  
+spl-↑ty none-τ = none-τ
+spl-↑ty (have-e spl) = have-e (spl-↑ty spl)
+
+spl-↑ty-case : ∀ {Σ : Context n m} {Σ' e B T C}
+  → ⟦ ↑tyΣ0 ([ e ]↝ Σ) , ↑ty #0 B ⟧→s⟦ Σ' , T ⟧
+  → ⟦ [ e ]↝ Σ , B ⟧→s⟦ [ C ]ᶜ Σ' , [ C ]ˢ T ⟧
+spl-↑ty-case {Σ = Σ} {e = e} {B = B} {C = C} spl with spl-↑ty {C = C} spl
+... | spl' rewrite ↑ty-st' B {C = C} | ↑tyΣ-st ([ e ]↝ Σ) {A = C} = spl'
+
+spl-↑ty-case' : ∀ {Σ : Context n m} {Σ' e B T C}
+  → ⟦ ↑tyΣ0 ([ e ]↝ Σ) , B ⟧→s⟦ Σ' , T ⟧
+  → ⟦ [ e ]↝ Σ , [ C ]ˢ B ⟧→s⟦ [ C ]ᶜ Σ' , [ C ]ˢ T ⟧
+spl-↑ty-case' {Σ = Σ} {e = e} {B = B} {C = C} spl with spl-↑ty {C = C} spl
+... | spl' rewrite ↑tyΣ-st ([ e ]↝ Σ) {A = C} = spl'
+
+spl-implies-simple : ∀ {Σ Σ' : Context n m} {es A As A'}
+  → ⟦ Σ , A ⟧→⟦ es , Σ' , As , A' ⟧
+  → ⟦ Σ , A ⟧→s⟦ Σ' , A' ⟧
+spl-implies-simple none-□ = none-□
+spl-implies-simple none-τ = none-τ
+spl-implies-simple (have-e spl) = have-e (spl-implies-simple spl)
+
+spl-weaken : ∀ {Σ Σ' : Context n m} {A es As A' k}
+  → ⟦ Σ , A ⟧→⟦ es , Σ' , As , A' ⟧
+  → ⟦ ↑Σ k Σ , A ⟧→⟦ up k es , ↑Σ k Σ' , As , A' ⟧
+spl-weaken none-□ = none-□
+spl-weaken none-τ = none-τ
+spl-weaken (have-e spl) = have-e (spl-weaken spl)
+  
 ⊢id : ∀ {Γ : Env n m } {Σ e A A' T es As}
   → Γ ⊢ Σ ⇒ e ⇒ A
   → ⟦ Σ , A ⟧→⟦ es , τ T , As , A' ⟧
@@ -399,39 +455,44 @@ data NonEndEmpty : Context n m → Set where
 
 ≤id : ∀ {Ψ Ψ' : SEnv n m} {Σ A B}
   → Ψ ⊢ A ≤ Σ ⊣ Ψ' ↪ B
-  → ∃[ T ] ∃[ B' ](⟦ Σ , B ⟧→s⟦ τ T , B' ⟧ → (T ≡ B'))
+  → Split Σ B
 
 ≤id' : ∀ {Ψ Ψ' : SEnv n m} {Σ A B T B'}
   → Ψ ⊢ A ≤ Σ ⊣ Ψ' ↪ B
   → ⟦ Σ , B ⟧→s⟦ τ T , B' ⟧
   → T ≡ B'
 ≤id' s spl with ≤id s
-... | ⟨ T' , ⟨ B'' , r ⟩ ⟩ = {!!}
+... | case-τ spl' refl with spl-deterministic spl spl'
+... | ⟨ refl , refl ⟩ = refl
+≤id' s spl | case-□ spl' with spl-deterministic spl spl'
+... | ()
 
-⊢id (⊢app ⊢e) spl = {!!}
-⊢id (⊢lam₁ ⊢e) spl = {!!}
-⊢id (⊢lam₂ ⊢e ⊢e₁) spl = {!!}
-⊢id (⊢sub ⊢e ne gc s) spl = {!!}
+⊢id (⊢app ⊢e) spl = ⊢id ⊢e (have-e spl)
+⊢id (⊢lam₁ ⊢e) none-τ rewrite ⊢id ⊢e none-τ = refl
+⊢id (⊢lam₂ ⊢e ⊢e₁) (have-e spl) = ⊢id ⊢e₁ (spl-weaken spl)
+⊢id (⊢sub ⊢e ne gc s) spl = ≤id' s (spl-implies-simple spl)
 
-≤id s-int = ⟨ Int , ⟨ Int , ⟨ none-τ , refl ⟩ ⟩ ⟩
-≤id {A = A} (s-empty p) 
-≤id (s-var {X = X}) ne = ⟨ ‶ X , ⟨ ‶ X , ⟨ none-τ , refl ⟩ ⟩ ⟩
-≤id {B = B} (s-ex-l^ clo x-in inst) ne = ⟨ B , ⟨ B , ⟨ none-τ , refl ⟩ ⟩ ⟩
-≤id {B = B} (s-ex-l= clo x-in s) ne = ⟨ B , ⟨ B , ⟨ none-τ , refl ⟩ ⟩ ⟩
-≤id (s-ex-r^ {X = X} clo x-in inst) ne = ⟨ ‶ X , ⟨ ‶ X , ⟨ none-τ , refl ⟩ ⟩ ⟩
-≤id (s-ex-r= {X = X} clo x-in s) ne = ⟨ ‶ X , ⟨ ‶ X , ⟨ none-τ , refl ⟩ ⟩ ⟩
-≤id (s-arr {C = C} {D = D} s s₁) ne = ⟨ C `→ D , ⟨ C `→ D , ⟨ none-τ , refl ⟩ ⟩ ⟩
-≤id (s-term-c cloA cloB ⊢e s) (eee-e ne) = ⟨ ≤id s ne .proj₁ ,
-                                            ⟨ ≤id s ne .proj₂ .proj₁ ,
-                                            ⟨ have-e (≤id s ne .proj₂ .proj₂ .proj₁) ,
-                                            ≤id s ne .proj₂ .proj₂ .proj₂ ⟩
-                                            ⟩
-                                            ⟩
-≤id (s-term-o op ⊢e s s₁) (eee-e ne) = {!!}
-≤id (s-∀ {B = B} s) eee-τ with ≤id s eee-τ
-... | ⟨ T , ⟨ B' , ⟨ none-τ , refl ⟩ ⟩ ⟩ = ⟨ (`∀ T) , ⟨ (`∀ T) , ⟨ none-τ , refl ⟩ ⟩ ⟩
-≤id (s-∀l-^ s) ne with ≤id s {!!}
-... | ⟨ T , ⟨ B' , ⟨ spl , refl ⟩ ⟩ ⟩ = ⟨ ↓ty0 T , ⟨ ↓ty0 B' , ⟨ {!!} , refl ⟩ ⟩ ⟩
-≤id (s-∀l-eq s st₁ st₂) ne with ≤id s {!!}
-... | ⟨ T , ⟨ B' , ⟨ spl , refl ⟩ ⟩ ⟩ = ⟨ {!!} , ⟨ {!!} , ⟨ {!!} , refl ⟩ ⟩ ⟩
+≤id s-int = case-τ none-τ refl
+≤id (s-empty p) = case-□ none-□
+≤id s-var = case-τ none-τ refl
+≤id (s-ex-l^ clo x-in inst) = case-τ none-τ refl
+≤id (s-ex-l= clo x-in s) = case-τ none-τ refl
+≤id (s-ex-r^ clo x-in inst) = case-τ none-τ refl
+≤id (s-ex-r= clo x-in s) = case-τ none-τ refl
+≤id (s-arr s s₁) = case-τ none-τ refl
+≤id (s-term-c cloA cloB ⊢e s) with ≤id s
+... | case-τ spl eq = case-τ (have-e spl) eq
+... | case-□ spl = case-□ (have-e spl)
+≤id (s-term-o op ⊢e s s₁) with ≤id s₁
+... | case-τ spl eq = case-τ (have-e spl) eq
+... | case-□ spl = case-□ (have-e spl)
+≤id (s-∀ s) with ≤id s
+... | case-τ none-τ refl = case-τ none-τ refl
+≤id (s-∀l-^ s) with ≤id s
+... | case-τ spl refl = case-τ (spl-↑ty-case {C = Int} spl) refl
+... | case-□ spl = case-□ (spl-↑ty-case {C = Int} spl)
+≤id (s-∀l-eq {B = B} s st₁ st₂) with ≤id s
+... | case-τ spl refl rewrite sym (st-st st₁) | sym (st-st st₂) = case-τ (spl-↑ty-case' {C = B} spl) refl
+... | case-□ spl rewrite sym (st-st st₁) | sym (st-st st₂) = case-□ (spl-↑ty-case' {C = B} spl)
+-- spl-↑ty-case' {C = B} spl
 

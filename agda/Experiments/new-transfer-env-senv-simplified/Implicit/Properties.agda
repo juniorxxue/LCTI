@@ -18,3 +18,15 @@ postulate
 ↑ty-st {A = ‶ X} {k} st = ↑ty-st-var st
 ↑ty-st {A = D `→ E} (st-arr st st₁) rewrite ↑ty-st {A = D} st | ↑ty-st {A = E} st₁ = refl
 ↑ty-st {A = `∀ A} (st-∀ up₁ st) = cong `∀_ (↑ty-st {A = A} st)
+
+postulate
+  ↑ty-st' : ∀ (A : Type m) {C}
+    → [ C ]ˢ (↑ty0 A) ≡ A
+    
+  ↑ty-tm-st' : ∀ (e : Term n m) {C}
+    → [ C ]ᵗ (↑ty0-tm e) ≡ e
+
+  st-st : ∀ {A : Type (1 + m)} {B A'}
+    → [ B ]ˢ A ⇨ A'
+    → [ B ]ˢ A ≡ A'
+  

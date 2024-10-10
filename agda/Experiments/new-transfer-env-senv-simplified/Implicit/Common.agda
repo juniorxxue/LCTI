@@ -98,6 +98,9 @@ lookup (Γ ,= A) k     = ↑ty0 (lookup Γ k)
 ↑ty-in-tm k (e ⦂ A)    = (↑ty-in-tm k e) ⦂ (↑ty k A)
 ↑ty-in-tm k (Λ e)      = Λ (↑ty-in-tm (#S k) e)
 
+↑ty0-tm : Term n m → Term n (1 + m)
+↑ty0-tm = ↑ty-in-tm #0
+
 -- subst
 infix 6 [_/_]ˢ_
 
@@ -129,6 +132,7 @@ infix 6 [_]ᵗ_
 -- unshift is just substing with a random type
 ↓ty0 : Type (1 + m) → Type m
 ↓ty0 A = [ Int ]ˢ A
+
 
 -- solved existentials (k = A) is in Γ
 infix 3 _:=_∈'_
