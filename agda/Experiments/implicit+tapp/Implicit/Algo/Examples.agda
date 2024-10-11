@@ -8,7 +8,11 @@ idEnv = ∅ , `∀ (‶ #0 `→ ‶ #0)
 
 id[Int]1 : idEnv ⊢ □ ⇒ ((` #0) [ Int ]) · (lit 1) ⇒ Int
 id[Int]1 = ⊢app (⊢tapp (⊢sub (⊢var refl) ne-tapp gc-var
-                       ? (st-arr st-var-eq st-var-eq)))
+                       (s-∀-t
+                         (s-term-c ⊢c-var=0 ⊢c-var=0
+                           (⊢sub ⊢lit ne-τ gc-i
+                                 (s-ex-r= ⊢c-int (kΓ Z) s-int))
+                           (s-empty ⊢c-var=0)) (st-arr st-var-eq st-var-eq))))
 
 idExp : Term 0 0
 idExp = Λ (((ƛ ` #0) ⦂ ‶ #0 `→ ‶ #0))
@@ -24,7 +28,7 @@ id1 = ⊢app (⊢sub (⊢var refl) ne-app gc-var
                  (s-∀l-eq (s-term-o ⊢o-var^0 ⊢lit
                                     (s-ex-r^ ⊢c-int Z ⟹^0)
                                     (s-empty ⊢c-var=0))
-                                    (st-arr st-var-eq st-var-eq)))
+                                    (st-arr st-int st-var-eq)))
 
 #1 : Fin 2
 #1 = #S #0
@@ -37,7 +41,7 @@ f12 = ⊢app (⊢app (⊢sub (⊢var refl) ne-app gc-var
                        (s-∀l-eq (s-∀l-eq (s-term-o (⊢o-var^S ⊢o-var^0) ⊢lit
                                                    (s-ex-r^ ⊢c-int (S^ Z) (⟹^S ⟹^0))
                                                    (s-term-o ⊢o-var^0 ⊢lit (s-ex-r^ ⊢c-int Z ⟹^0) (s-empty ⊢c-var=0)))
-                                                     (st-arr (st-var-neq λ ()) (st-arr st-var-eq st-var-eq)))
-                                (st-arr st-var-eq (st-arr st-int st-int)))))
+                                                     (st-arr st-int (st-arr st-int st-var-eq)))
+                                (st-arr st-int (st-arr st-int st-int)))))
                        
 

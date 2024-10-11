@@ -12,10 +12,12 @@ open import Implicit.Decl.Properties
 _▻_ : Term n m → Apps n m → Term n m
 e ▻ nil = e
 e ▻ (e' ∷a es) = (e · e') ▻ es
+e ▻ (A  ∷t es) = (e [ A ]) ▻ es
 
 size-apps : Apps n m → ℕ
 size-apps nil = 0
 size-apps (_ ∷a as) = 1 + size-apps as
+size-apps (_ ∷t as) = 1 + size-apps as
 
 size-counter : Counter → ℕ
 size-counter Z = 0
@@ -38,11 +40,16 @@ size-type (`∀ A) = 1 + size-type A
 _+++_ : Apps n m → Apps n m → Apps n m
 nil +++ as₂ = as₂
 (e ∷a as₁) +++ as₂ = e ∷a (as₁ +++ as₂)
+(A ∷t as₁) +++ as₂ = A ∷t (as₁ +++ as₂)
 
 data AppsDes (as : Apps n m) : Set where
 
   des-app : ∀ x x̅
     → as ≡ x̅ +++ (x ∷a nil)
+    → AppsDes as
+
+  des-tapp : ∀ A x̅
+    → as ≡ x̅ +++ (A ∷t nil)
     → AppsDes as
 
 apps-destruct : ∀ (as : Apps n m)
@@ -51,13 +58,26 @@ apps-destruct : ∀ (as : Apps n m)
 apps-destruct (x ∷a nil) (s≤s sz) = des-app x nil refl
 apps-destruct (x ∷a (y ∷a as)) (s≤s sz) with apps-destruct (y ∷a as) (s≤s z≤n)
 ... | des-app x' x̅ eq rewrite eq = des-app x' (x ∷a x̅) refl
+... | des-tapp l x̅ eq rewrite eq = des-tapp l (x ∷a x̅) refl
+apps-destruct (x ∷a (y ∷t as)) (s≤s sz) with apps-destruct (y ∷t as) (s≤s z≤n)
+... | des-app x' x̅ eq rewrite eq = des-app x' (x ∷a x̅) refl
+... | des-tapp l x̅ eq rewrite eq = des-tapp l (x ∷a x̅) refl
+apps-destruct (x ∷t nil) sz = des-tapp x nil refl
+apps-destruct (x ∷t (y ∷a as)) (s≤s sz) with apps-destruct (y ∷a as) (s≤s z≤n)
+... | des-app x' x̅ eq rewrite eq = des-app x' (x ∷t x̅) refl
+... | des-tapp l x̅ eq rewrite eq = des-tapp l (x ∷t x̅) refl
+apps-destruct (x ∷t (y ∷t as)) (s≤s sz) with apps-destruct (y ∷t as) (s≤s z≤n)
+... | des-app x' x̅ eq rewrite eq = des-app x' (x ∷t x̅) refl
+... | des-tapp l x̅ eq rewrite eq = des-tapp l (x ∷t x̅) refl
 
 pattern ⟦_⟧a z = z ∷a nil
+pattern ⟦_⟧t z = z ∷t nil
 
 rw-apps-gen : ∀ (es : Apps n m) {e es'}
   → e ▻ (es +++ es') ≡ (e ▻ es) ▻ es'
 rw-apps-gen nil = refl
 rw-apps-gen (x ∷a es) = rw-apps-gen es
+rw-apps-gen (A ∷t es) = rw-apps-gen es
 
 rw-apps-a : ∀ (es : Apps n m) e x
   → e ▻ (es +++ ⟦ x ⟧a) ≡ (e ▻ es) · x
@@ -67,16 +87,34 @@ up-+++-distri-a : ∀ (x̅ : Apps n m) x
   → up0 (x̅ +++ ⟦ x ⟧a) ≡ (up0 x̅) +++ (up0 ⟦ x ⟧a)
 up-+++-distri-a nil x = refl
 up-+++-distri-a (x₁ ∷a x̅) x rewrite up-+++-distri-a x̅ x = refl
+up-+++-distri-a (x₁ ∷t x̅) x rewrite up-+++-distri-a x̅ x = refl
+
+up-+++-distri-l : ∀ (x̅ : Apps n m) A
+  → up0 (x̅ +++ ⟦ A ⟧t) ≡ (up0 x̅) +++ (up0 ⟦ A ⟧t)
+up-+++-distri-l nil x = refl
+up-+++-distri-l (x₁ ∷a x̅) x rewrite up-+++-distri-l x̅ x = refl
+up-+++-distri-l (x₁ ∷t x̅) x rewrite up-+++-distri-l x̅ x = refl
 
 size-+++-distri : ∀ (x̅ : Apps n m) ys
   → size-apps (x̅ +++ ys) ≡ size-apps x̅ + size-apps ys
 size-+++-distri nil ys = refl
 size-+++-distri (x ∷a x̅) ys rewrite size-+++-distri x̅ ys = refl
+size-+++-distri (x ∷t x̅) ys rewrite size-+++-distri x̅ ys = refl
 
 size-apps-+++a : ∀ x (x̅ : Apps n m) k
   → suc (size-apps (x̅ +++ ⟦ x ⟧a)) ≤ suc k
   → suc (size-apps x̅) < suc k
 size-apps-+++a x x̅ k (s≤s sz) rewrite size-+++-distri x̅ ⟦ x ⟧a | +-comm 1 (size-apps x̅) = s≤s sz
+
+size-apps-+++l : ∀ l (x̅ : Apps n m) k
+  → suc (size-apps (x̅ +++ ⟦ l ⟧t)) ≤ suc k
+  → suc (size-apps x̅) < suc k
+size-apps-+++l l x̅ k (s≤s sz) rewrite size-+++-distri x̅ ⟦ l ⟧t | +-comm 1 (size-apps x̅) = s≤s sz
+
+rw-apps-t : ∀ (es : Apps n m) e x
+  → e ▻ (es +++ ⟦ x ⟧t) ≡ (e ▻ es) [ x ]
+rw-apps-t es e x = rw-apps-gen es {e = e} {es' = ⟦ x ⟧t}
+
 
 -- main proof
 ¬<0→nil : ∀ {e̅ : Apps n m}
@@ -84,6 +122,7 @@ size-apps-+++a x x̅ k (s≤s sz) rewrite size-+++-distri x̅ ⟦ x ⟧a | +-com
   → e̅ ≡ nil
 ¬<0→nil {e̅ = nil} sz = refl
 ¬<0→nil {e̅ = x ∷a e̅} sz = ⊥-elim (sz (s≤s z≤n))
+¬<0→nil {e̅ = x ∷t e̅} sz = ⊥-elim (sz (s≤s z≤n))
 
 subst-case-0 : ∀ {Γ : Env n m} {A B e̅ j e e₁}
   → ¬ 1 ≤ size-apps e̅

@@ -11,7 +11,6 @@ infixr 5  ƛ_
 infixl 7  _·_
 infix  9  `_
 infixr 5  Λ_
-infixl 5  _[_]
 infix  5  _⦂_
 
 infix  9  ‶_
@@ -34,7 +33,6 @@ data Term : ℕ → ℕ → Set where
   _·_      : (e₁ : Term n m) → (e₂ : Term n m) → Term n m
   _⦂_      : (e : Term n m) → (A : Type m) → Term n m
   Λ_       : (e : Term n (1 + m)) → Term n m
-  _[_]     : (e : Term n m) → (A : Type m) → Term n m
 
 ----------------------------------------------------------------------
 --+                             Shift                              +--
@@ -87,7 +85,6 @@ lookup (Γ ,= A) k     = ↑ty0 (lookup Γ k)
 ↑tm k (e₁ · e₂)  = ↑tm k e₁ · ↑tm k e₂
 ↑tm k (e ⦂ A)    = (↑tm k e) ⦂ A
 ↑tm k (Λ e)      = Λ (↑tm k e)
-↑tm k (e [ A ])  = ↑tm k e [ A ]
 
 ↑tm0 : Term n m → Term (1 + n) m
 ↑tm0 = ↑tm #0
@@ -100,7 +97,9 @@ lookup (Γ ,= A) k     = ↑ty0 (lookup Γ k)
 ↑ty-in-tm k (e₁ · e₂)  = ↑ty-in-tm k e₁ · ↑ty-in-tm k e₂
 ↑ty-in-tm k (e ⦂ A)    = (↑ty-in-tm k e) ⦂ (↑ty k A)
 ↑ty-in-tm k (Λ e)      = Λ (↑ty-in-tm (#S k) e)
-↑ty-in-tm k (e [ A ])  = ↑ty-in-tm k e [ ↑ty k A ]
+
+↑ty0-tm : Term n m → Term n (1 + m)
+↑ty0-tm = ↑ty-in-tm #0
 
 -- subst
 infix 6 [_/_]ˢ_
@@ -125,7 +124,6 @@ infix 6 [_/_]ᵗ_
 [ k / A ]ᵗ e₁ · e₂ = ([ k / A ]ᵗ e₁) · ([ k / A ]ᵗ e₂)
 [ k / A ]ᵗ (e ⦂ B) = ([ k / A ]ᵗ e) ⦂ ([ k / A ]ˢ B)
 [ k / A ]ᵗ (Λ e) = Λ [ #S k / ↑ty0 A ]ᵗ e
-[ k / A ]ᵗ (e [ B ]) = ([ k / A ]ᵗ e) [ ([ k / A ]ˢ B) ]
 
 infix 6 [_]ᵗ_
 [_]ᵗ_ : Type m → Term n (1 + m) → Term n m
@@ -134,6 +132,7 @@ infix 6 [_]ᵗ_
 -- unshift is just substing with a random type
 ↓ty0 : Type (1 + m) → Type m
 ↓ty0 A = [ Int ]ˢ A
+
 
 -- solved existentials (k = A) is in Γ
 infix 3 _:=_∈'_
@@ -186,6 +185,14 @@ shift-total (A `→ A₁) k with shift-total A k
 shift-total (`∀ A) k with shift-total A (#S k) 
 ... | ⟨ fst , snd ⟩ = ⟨ (`∀ fst) , (↑∀ snd) ⟩
 
+infix 3 [_/_]v_⇨_
+data [_/_]v_⇨_ : Fin (1 + m) → Type m → Fin (1 + m) → Type m → Set where
+  st-var-eq : ∀ {k} {A : Type m}
+    → [ k / A ]v k ⇨ A
+  st-var-neq : ∀ {k X} {A : Type m}
+    → (¬p : k ≢ X)
+    → [ k / A ]v X ⇨ ‶ punchOut {i = k} {j = X} ¬p
+
 infix 3 [_/_]ˢ_⇨_
 data [_/_]ˢ_⇨_ : Fin (1 + m) → Type m → Type (1 + m) → Type m → Set where
   st-int : ∀ {k} {A : Type m}
@@ -229,7 +236,7 @@ subst-unique st1 st2 = subst-unique' {k = #0} st1 st2
 data Apps : ℕ → ℕ → Set where
   nil : Apps n m
   _∷a_ : Term n m → Apps n m → Apps n m
-  _∷t_ : Type m → Apps n m → Apps n m
+--   _∷t_ : Type m → Apps n m → Apps n m
 
 data AppsType : ℕ → Set where
   nil : AppsType m
@@ -253,18 +260,30 @@ data [_/_]ˢˢ_⇨_ : Fin (1 + m) → Type m → AppsType (1 + m) → AppsType m
 [_]ˢˢ_⇨_ : Type m → AppsType (1 + m) → AppsType m → Set
 [_]ˢˢ_⇨_ = [_/_]ˢˢ_⇨_ #0
 
-
 postulate
   substs-unique : ∀ {A : Type m} {B B₁ B₂}
     → [ A ]ˢˢ B ⇨ B₁
     → [ A ]ˢˢ B ⇨ B₂
     → B₁ ≡ B₂
 
-
 up : Fin (1 + n) → Apps n m → Apps (1 + n) m
 up n nil = nil
 up n (e ∷a as) = (↑tm n e) ∷a (up n as)
-up n (A ∷t as) = A ∷t (up n as)
 
 up0 : Apps n m → Apps (1 + n) m
 up0 = up #0
+
+upty : Fin (1 + m) → Apps n m → Apps n (1 + m)
+upty k nil = nil
+upty k (e ∷a as) = ↑ty-in-tm k e ∷a upty k as
+
+upty0 : Apps n m → Apps n (1 + m)
+upty0 = upty #0
+
+uptyT : Fin (1 + m) → AppsType m → AppsType (1 + m)
+uptyT k nil = nil
+uptyT k (A ∷a As) = ↑ty k A ∷a uptyT k As
+uptyT k (`∀ As) = `∀ uptyT (#S k) As
+
+uptyT0 : AppsType m → AppsType (1 + m)
+uptyT0 = uptyT #0
