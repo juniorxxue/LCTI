@@ -47,3 +47,5 @@ live.*
 Proof/
 html/
 dist-newstyle/
+\#*\#
+.\#*

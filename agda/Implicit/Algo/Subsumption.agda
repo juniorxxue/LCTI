@@ -49,11 +49,11 @@ s-refined : ∀ {Ψ Ψ' : SEnv n m} {Σ A B}
 s-refined s-int = s-int
 s-refined (s-empty p) = s-empty p
 s-refined s-var = s-var
-s-refined (s-ex-l^ clo x-in inst) = {!!}
-s-refined s'@(s-ex-l= clo x-in s) = {!!}
-s-refined (s-ex-r^ clo x-in inst) = {!!}
-s-refined (s-ex-r= clo x-in s) = {!!}
-s-refined (s-arr s s₁) = {!!}
+s-refined (s-ex-l^ clo x-in inst) = s-refl
+s-refined s'@(s-ex-l= clo x-in s) = s-refl
+s-refined (s-ex-r^ clo x-in inst) = s-refl
+s-refined (s-ex-r= clo x-in s) = s-refl
+s-refined (s-arr s s₁) = s-refl
 s-refined (s-term-c cloA cloB ⊢e s) = s-term-c {!!} {!!} {!⊢id0-h ⊢e!} (s-refined s) -- easy
 s-refined s'@(s-term-o op ⊢e s s₁) with ≤id0 s
 ... | refl = s-term-c {!!} {!!} {!!} (s-refined s₁)

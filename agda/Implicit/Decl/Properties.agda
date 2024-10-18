@@ -3,15 +3,15 @@ module Implicit.Decl.Properties where
 open import Implicit.Common
 open import Implicit.Decl
 
-{-
+
 ⊢sub' : ∀ {Γ : Env n m} {e A B j}
   → Γ ⊢ Z # e ⦂ B
   → Γ ⊢ j # B ≤ A
-  → Γ ⊢ j # e ⦂ A -- which no longer holds for zed case
-⊢sub' {j = Z} ⊢e (s-refl ap) = {!!}
+  → Γ ⊢ j # e ⦂ A
+⊢sub' {j = Z} ⊢e s-refl = ⊢e
 ⊢sub' {j = ∞} ⊢e s = ⊢sub ⊢e s nz-∞
 ⊢sub' {j = S j} ⊢e s = ⊢sub ⊢e s nz-S
--}
+
 
 -- the needed lemmas
 -- will do later
@@ -123,6 +123,3 @@ s-trans {B = ‶ X} s1 s2 = {!!}
 s-trans {B = B `→ B₁} s1 s2 = {!!}
 s-trans {B = `∀ B} s1 s2 = {!!}
 -}
-  
-   
-  

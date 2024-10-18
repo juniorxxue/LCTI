@@ -112,7 +112,7 @@ infix 6 [_/_]ˢ_
 [ k / A ]ˢ (B `→ C) = ([ k / A ]ˢ B) `→ ([ k / A ]ˢ C)
 [ k / A ]ˢ (`∀ B)   = `∀ ([ #S k / ↑ty0 A ]ˢ B)
 
-infix 6 [_]ˢ_
+infix 7 [_]ˢ_
 [_]ˢ_ : Type m → Type (1 + m) → Type m
 [_]ˢ_ = [_/_]ˢ_ #0
 
@@ -125,14 +125,14 @@ infix 6 [_/_]ᵗ_
 [ k / A ]ᵗ (e ⦂ B) = ([ k / A ]ᵗ e) ⦂ ([ k / A ]ˢ B)
 [ k / A ]ᵗ (Λ e) = Λ [ #S k / ↑ty0 A ]ᵗ e
 
-infix 6 [_]ᵗ_
+infix 7 [_]ᵗ_
 [_]ᵗ_ : Type m → Term n (1 + m) → Term n m
 [_]ᵗ_ = [_/_]ᵗ_ #0
+
 
 -- unshift is just substing with a random type
 ↓ty0 : Type (1 + m) → Type m
 ↓ty0 A = [ Int ]ˢ A
-
 
 -- solved existentials (k = A) is in Γ
 infix 3 _:=_∈'_
@@ -287,3 +287,24 @@ uptyT k (`∀ As) = `∀ uptyT (#S k) As
 
 uptyT0 : AppsType m → AppsType (1 + m)
 uptyT0 = uptyT #0
+
+infix 5 [_/_]ᵗ_⇨_
+data [_/_]ᵗ_⇨_ : Fin (1 + m) → Type m → Term n (1 + m) → Term n m → Set where
+  st-lit : ∀ {k A i}
+    → [ k / A ]ᵗ lit i ⇨ (Term n m ∋⦂ lit i)
+  st-var : ∀ {k A x}
+    → [ k / A ]ᵗ ` x ⇨ (Term n m ∋⦂ ` x)
+  st-ƛ : ∀ {k A e e'}
+    → [ k / A ]ᵗ e ⇨ e'
+    → [ k / A ]ᵗ (ƛ e) ⇨ (Term n m ∋⦂ ƛ e')
+  st-· : ∀ {k A e₁ e₂ e₁' e₂'}
+    → [ k / A ]ᵗ e₁ ⇨ e₁'
+    → [ k / A ]ᵗ e₂ ⇨ e₂'
+    → [ k / A ]ᵗ (e₁ · e₂) ⇨ (Term n m ∋⦂ e₁' · e₂')
+  st-⦂ : ∀ {k A e B e' B'}
+    → [ k / A ]ᵗ e ⇨ e'
+    → [ k / A ]ˢ B ⇨ B'
+    → [ k / A ]ᵗ (e ⦂ B) ⇨ (Term n m ∋⦂ e' ⦂ B')
+  st-Λ : ∀ {k A e e'}
+    → [ #S k / ↑ty0 A ]ᵗ e ⇨ e'
+    → [ k / A ]ᵗ (Λ e) ⇨ (Term n m ∋⦂ Λ e')

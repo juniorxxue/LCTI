@@ -70,3 +70,4 @@ postulate
   ⊢a→⊢c-weaken : ∀ {Γ : Env n m} {Σ e A B}
     → Γ , B ⊢ Σ ⇒ e ⇒ A
     → 𝕎 Γ ⊢c A
+

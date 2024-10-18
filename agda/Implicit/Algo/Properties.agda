@@ -17,8 +17,8 @@ open import Implicit.Algo
 postulate
   ⊢c-∀-= : ∀ {Ψ : SEnv n m} {A B}
     → Ψ ⊢c `∀ B
-    → Ψ ,= A ⊢c B -- requires a lemma: if a universal varialbe in a context, you can replace it with a solution without affecting it's closedness
-
+    → Ψ ,= A ⊢c B
+    -- requires a lemma: if a universal varialbe in a context, you can replace it with a solution without affecting it's closedness
 
 ↑tyΣ-st : ∀ (Σ : Context n m) {A}
   → [ A ]ᶜ (↑tyΣ0 Σ) ≡ Σ
@@ -41,7 +41,6 @@ data Γ-like : SEnv n m → Set where
   S= : ∀ {Ψ : SEnv n m} {A}
     → Γ-like Ψ
     → Γ-like (Ψ ,= A)
-
 
 infix 3 _~~_
 data _~~_ : SEnv n m → SEnv n m → Set where
@@ -67,7 +66,7 @@ data _~~_ : SEnv n m → SEnv n m → Set where
   → Γ-like Ψ
   → Ψ ~~ Ψ'
   → Ψ ≡ Ψ'
-~~Γ-like gl base = refl
+~~Γ-like gl base = refl 
 ~~Γ-like (S∙ gl) (uvar ~~Ψ) rewrite ~~Γ-like gl ~~Ψ = refl
 ~~Γ-like (S, gl) (var ~~Ψ) rewrite ~~Γ-like gl ~~Ψ = refl
 ~~Γ-like (S= gl) (svar ~~Ψ) rewrite ~~Γ-like gl ~~Ψ = refl

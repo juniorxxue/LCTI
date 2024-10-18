@@ -10,66 +10,83 @@ open import Implicit.Algo
 --+                             Split                              +--
 ----------------------------------------------------------------------
 
-spl-weaken : ∀ {Σ Σ' : Context n m} {A e̅ A̅ A' k}
-  → ⟦ Σ , A ⟧→⟦ e̅ , Σ' , A̅ , A' ⟧
-  → ⟦ ↑Σ k Σ , A ⟧→⟦ up k e̅ , ↑Σ k Σ' , A̅ , A' ⟧
-spl-weaken = {!!}  
+postulate
+
+  spl-weaken : ∀ {Σ Σ' : Context n m} {A e̅ A̅ A' k}
+    → ⟦ Σ , A ⟧→⟦ e̅ , Σ' , A̅ , A' ⟧
+    → ⟦ ↑Σ k Σ , A ⟧→⟦ up k e̅ , ↑Σ k Σ' , A̅ , A' ⟧
 
 
-  
+
 ----------------------------------------------------------------------
 --+                             Typing                             +--
 ----------------------------------------------------------------------
 
-f : ∀ {Ψ : SEnv n m} {Ψ' A Σ A'} → (Ψ ⊢ A ≤ Σ ⊣ Ψ' ↪ A') → Counter
-f s-int = ∞
-f (s-empty p) = Z
-f s-var = ∞
-f (s-ex-l^ x x₁ x₂) = ∞
-f (s-ex-l= x x₁ s) = ∞
-f (s-ex-r^ x x₁ x₂) = ∞
-f (s-ex-r= x x₁ s) = ∞
-f (s-arr s s₁) = ∞
-f (s-term-c x x₁ s s') = f s'
-f (s-term-o x x₁ s s₁) = S (f s₁)
-f (s-∀ s) = ∞
-f (s-∀l-^ s) = f s
-f (s-∀l-eq s st₁ st₂) = f s
+-- split a Apps by index k
+data SplitApps : Apps n m → Counter → Apps n m × Apps n m → Set where
+  case-0 : ∀ {e̅ : Apps n m}
+    → SplitApps e̅ Z ⟨ nil , e̅ ⟩
+  case-S : ∀ {e̅ : Apps n m} {e j e̅₁ e̅₂}
+    → SplitApps e̅ j ⟨ e̅₁ , e̅₂ ⟩
+    → SplitApps (e ∷a e̅) (S j) ⟨ e ∷a e̅₁ , e̅₂ ⟩
 
-sound-≤ : ∀ {Ψ Ψ' : SEnv n m} {Σ A A'}
-  → (s : Ψ ⊢ A ≤ Σ ⊣ Ψ' ↪ A')
-  → (𝕄 Ψ) ⊢ (f s) # A ≤ A'
-sound-≤ s-int = s-int
-sound-≤ (s-empty p) = s-refl
-sound-≤ s-var = s-var
-sound-≤ (s-ex-l^ clo x-in inst) = {!!}
-sound-≤ (s-ex-l= clo x-in s) = {!!}
-sound-≤ (s-ex-r^ clo x-in inst) = {!!}
-sound-≤ (s-ex-r= clo x-in s) = {!!}
-sound-≤ (s-arr s s₁) = {!!}
-sound-≤ (s-term-c cloA cloB ⊢e s) = {!!}
-sound-≤ (s-term-o op ⊢e s s₁) = {!!}
-sound-≤ (s-∀ s) = {!!}
-sound-≤ (s-∀l-^ s) = {!!}
-sound-≤ (s-∀l-eq s st₁ st₂) = {!!}
-{-
+data SplitAppsType : AppsType m → Counter → AppsType m × AppsType m → Set where
+  case-0 : ∀ {A̅ : AppsType m}
+    → SplitAppsType A̅ Z ⟨ nil , A̅ ⟩
+  case-S : ∀ {A̅ : AppsType m} {A j A̅₁ A̅₂}
+    → SplitAppsType A̅ j ⟨ A̅₁ , A̅₂ ⟩
+    → SplitAppsType (A ∷a A̅) (S j) ⟨ A ∷a A̅₁ , A̅₂ ⟩
 
-app-elim : ∀ {Γ : Env n m} {A₁ Σ Ψ A e}
-  → (s : 𝕎 Γ ⊢ A₁ ≤ Σ ⊣ Ψ ↪ A)
-  → Γ ⊢ Z # e ⦂ A₁
-  → Γ ⊢ (f s) # e ⦂ A
-app-elim s-int ⊢e = {!!}
-app-elim (s-empty p) ⊢e = {!!}
-app-elim s-var ⊢e = {!!}
-app-elim (s-arr s s₁) ⊢e = {!!}
-app-elim (s-term-c x x₁ s s') ⊢e = {!!}
-app-elim (s-term-o x x₁ s s₁) ⊢e = {!!}
-app-elim (s-∀ s) ⊢e = {!!}
-app-elim (s-∀l-^ s) ⊢e = {!!}
-app-elim (s-∀l-eq s st st2) ⊢e = {!!}
-app-elim (s-ex-l= x₁ x₂ s) x = {!!}
-app-elim (s-ex-r= x₁ x₂ s) x = {!!}
--}
+infix 3 _⊢_⇇_
+infix 3 _⊢_⇉_
+
+data _⊢_⇇_ : Env n m → Apps n m → AppsType m → Set where
+  case-0 : ∀ {Γ : Env n m}
+    → Γ ⊢ nil ⇇ nil
+  case-S : ∀ {Γ : Env n m} {e̅ A e A̅}
+    → (⊢e : Γ ⊢ ∞ # e ⦂ A)
+    → Γ ⊢ e̅ ⇇ A̅
+    → Γ ⊢ e ∷a e̅ ⇇ A ∷a A̅
+
+data _⊢_⇉_ : Env n m → Apps n m → AppsType m → Set where
+  case-0 : ∀ {Γ : Env n m}
+    → Γ ⊢ nil ⇉ nil
+  case-S : ∀ {Γ : Env n m} {e̅ A e A̅}
+    → (⊢e : Γ ⊢ Z # e ⦂ A)
+    → Γ ⊢ e̅ ⇉ A̅
+    → Γ ⊢ e ∷a e̅ ⇉ A ∷a A̅
+
+data AppsCheck : Apps n m → AppsType m → Set where
+  case-0 : 
+      AppsCheck (Apps n m ∋⦂ nil) nil
+  case-S : ∀ {e : Term n m} {Γ e̅ A A̅ B}
+    → Γ ⊢ τ A ⇒ e ⇒ B
+    → AppsCheck e̅ A̅
+    → AppsCheck (e ∷a e̅) (A ∷a A̅)
+
+data FineSplits (Ψ : SEnv n m) (e̅ : Apps n m) (A̅ : AppsType m) : Set where
+  fines : ∀ {j e̅₁ e̅₂ A̅₁ A̅₂}
+    → (spl-apps : SplitApps e̅ j ⟨ e̅₁ , e̅₂ ⟩)
+    → (spl-appst : SplitAppsType A̅ j ⟨ A̅₁ , A̅₂ ⟩)
+    → (infs : 𝕄 Ψ ⊢ e̅₁ ⇉ A̅₁)
+    → (chks : 𝕄 Ψ ⊢ e̅₂ ⇇ A̅₂)
+    → FineSplits Ψ e̅ A̅
+
+
+-- e̅ ≡ e̅₁ ++ e̅₂
+
+app-elim : ∀ {Γ : Env n m} {j A̅ A' Σ A e e̅ Σ' e̅₁ e̅₂ A̅₁ A̅₂}
+  → Γ ⊢ j # e ⦂ A
+  → (spl : ⟦ Σ , A ⟧→⟦ e̅ , Σ' , A̅ , A' ⟧)
+  → (spl-apps : SplitApps e̅ j ⟨ e̅₁ , e̅₂ ⟩)
+  → (spl-appst : SplitAppsType A̅ j ⟨ A̅₁ , A̅₂ ⟩)
+  → (infs : Γ ⊢ e̅₁ ⇉ A̅₁)
+  → (chks : Γ ⊢ e̅₂ ⇇ A̅₂)
+  → Γ ⊢ Z # e ▻ e̅ ⦂ A'
+app-elim ⊢e none-□ case-0 case-0 case-0 case-0 = ⊢e
+app-elim ⊢e none-τ case-0 case-0 case-0 case-0 = ⊢e
+app-elim ⊢e (have-e spl) case-0 case-0 case-0 (case-S ⊢e' chks) = app-elim (⊢app₁ ⊢e ⊢e') spl case-0 case-0 case-0 chks
+app-elim ⊢e (have-e spl) (case-S spl-apps) (case-S spl-appst) (case-S ⊢e' infs) chks = app-elim (⊢app₂ ⊢e ⊢e') spl spl-apps spl-appst infs chks
 
 sound-i : ∀ {Γ : Env n m} {Σ e e̅ A A' A̅}
   → Γ ⊢ Σ ⇒ e ⇒ A
@@ -91,71 +108,43 @@ sound-c-0 : ∀ {Γ : Env n m} {e A B}
   → Γ ⊢ ∞ # e ⦂ B
 sound-c-0 ⊢e = sound-c ⊢e none-τ
 
+
+t-e̅ : ∀ {Ψ Ψ' : SEnv n m} {Σ A B e̅ Σ' B̅ B'}
+  → Ψ ⊢ A ≤ Σ ⊣ Ψ' ↪ B
+  → ⟦ Σ , B ⟧→⟦ e̅ , Σ' , B̅ , B' ⟧
+  → FineSplits Ψ' e̅ B̅
+  
+t-e̅ s-int none-τ = fines case-0 case-0 case-0 case-0
+t-e̅ (s-empty p) none-□ = fines case-0 case-0 case-0 case-0
+t-e̅ s-var none-τ = fines case-0 case-0 case-0 case-0
+t-e̅ (s-ex-l^ clo x-in inst) none-τ = fines case-0 case-0 case-0 case-0
+t-e̅ (s-ex-l= clo x-in s) none-τ = t-e̅ s none-τ
+t-e̅ (s-ex-r^ clo x-in inst) none-τ = fines case-0 case-0 case-0 case-0
+t-e̅ (s-ex-r= clo x-in s) none-τ = t-e̅ s none-τ
+t-e̅ (s-arr s s₁) none-τ = t-e̅ s₁ none-τ
+t-e̅ (s-term-c cloA cloB ⊢e s) (have-e spl) with t-e̅ s spl
+... | fines {j = j} spl-apps spl-appst infs chks = {!!} -- j can only be Z counter, since B is closed
+t-e̅ (s-term-o op ⊢e s s₁) (have-e spl) with t-e̅ s₁ spl
+... | fines {j = j} spl-apps spl-appst infs chks = fines {j = S j} (case-S spl-apps) (case-S spl-appst) (case-S {!!} infs) chks 
+t-e̅ (s-∀ s) none-τ = fines case-0 case-0 case-0 case-0
+t-e̅ (s-∀l-^ s) spl = {!t-e̅ s!}
+t-e̅ (s-∀l-eq s st₁ st₂) spl = {!t-e̅ s!}
+
+
 sound-i ⊢lit none-□ = ⊢lit
 sound-i (⊢var x∈Γ) none-□ = ⊢var x∈Γ
 sound-i (⊢ann ⊢e) none-□ = ⊢ann (sound-c-0 ⊢e)
 sound-i (⊢app ⊢e) spl = sound-i ⊢e (have-e spl)
 sound-i {e̅ = e ∷a e̅} (⊢lam₂ ⊢e ⊢e₁) (have-e spl) = subst e̅ (sound-i ⊢e₁ (spl-weaken spl)) (sound-i-0 ⊢e)
 
-sound-i (⊢sub ⊢e ne gc s) spl = {!!}
+sound-i (⊢sub ⊢e ne gc s) spl with t-e̅ s spl
+... | fines {j = j} spl-apps spl-appst infs chks = app-elim (⊢sub' (sound-i-0 ⊢e) {!!}) spl spl-apps spl-appst {!infs!} {!!}
 
-{- let ind-e = sound-i-0 ⊢e
-                              ind-s = sound-≤ s
-                          in {!⊢sub' ind-e ind-s!}
--}                          
 
-{-
-sound-i (⊢sub ⊢e (s-empty p)) none-□ = {!sound-i-0 ⊢e!} -- obvious
-sound-i (⊢sub ⊢e (s-term-c x x₁ s)) (have-a spl) = {!!} -- ok
-sound-i (⊢sub ⊢e (s-term-o x x₁ s s₁)) (have-a spl) = {!!}
-sound-i (⊢sub ⊢e (s-∀l-^ s)) (have-a spl) sound-i {!!}
-= (⊢sub ⊢e (s-∀l-eq s)) (have-a spl) = {!!}
-sound-i (⊢sub ⊢e (s-∀-t s)) (have-t spl) = {!!}
--}
-
--- (𝕓 Γ ⊢ A₁ ≤ Σ ⊣ Ψ ↪ A) ~ j
 sound-i (⊢tabs ⊢e) none-□ = ⊢tabs (sound-i-0 ⊢e)
 
 sound-c (⊢app ⊢e) spl = sound-c ⊢e (have-e spl)
 sound-c (⊢lam₁ ⊢e) none-τ = ⊢lam₁ (sound-c-0 ⊢e)
 sound-c {e̅ = e ∷a e̅} (⊢lam₂ ⊢e ⊢e₁) (have-e spl) = subst e̅ (sound-c ⊢e₁ (spl-weaken spl)) (sound-i-0 ⊢e)
-sound-c (⊢sub ⊢e ne gc s) spl = {!!}
-
--- j <= length Σ
-
--- f : ∀a. a -> a -> a
-
--- f 1 2
-
--- f 1 2
-
--- f => ∀a. a -> a -> a
--- ∀a. a -> a -> a <: [1] -> [2] -> [] ~> Int -> Int -> Int
--- [1] -> [2] -> [] => f => Int
-
-{-
-|- (S 0) # f => Int -> Int -> Int
-1  => Int
----------------
-f 1 => Int -> Int     2 <= Int
------------------------------------- App1
-f 1 2
--}
-
-{-
-∀a. a -> a -> a <:(S 0) Int -> Int -> Int
-
-
-1 => Int a= Int
---------------------------------------------------------
-∀a. a -> a -> a <: [1] -> [2] -> [] ~> Int -> Int -> Int
--}
-
-
-{-
-suppose I have j         -- j     App2
-suppose lengh e̅ = k      -- k - j App1 (go first)
-
-the j is related to the environments Ψ
-
--}
+sound-c (⊢sub ⊢e ne gc s) spl with t-e̅ s spl
+... | fines {j = j} spl-apps spl-appst infs chks = {!!}

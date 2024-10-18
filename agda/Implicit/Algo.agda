@@ -43,6 +43,19 @@ data NonEmpty : Context n m → Set where
 ↑tyΣ0 : Context n m → Context n (1 + m)
 ↑tyΣ0 = ↑tyΣ #0
 
+infix 3 [_/_]ᶜ_⇨_
+data [_/_]ᶜ_⇨_ : Fin (1 + m) → Type m → Context n (1 + m) → Context n m → Set where
+  empty : ∀ {k A}
+    → [ k / A ]ᶜ □ ⇨ (Context n m ∋⦂ □)
+  fulltype : ∀ {k A B B'}
+    → [ k / A ]ˢ B ⇨ B'
+    → [ k / A ]ᶜ (τ B) ⇨ (Context n m ∋⦂ (τ B'))
+  term : ∀ {k A e e' Σ Σ'}
+    → [ k / A ]ᶜ Σ ⇨ Σ'
+    → [ k / A ]ᵗ e ⇨ e'
+    → [ k / A ]ᶜ ([ e ]↝ Σ) ⇨ (Context n m ∋⦂ ([ e' ]↝ Σ'))
+
+infix 6 [_]ᶜ_
 [_]ᶜ_ : Type m → Context n (1 + m) → Context n m
 [ A ]ᶜ □ = □
 [ A ]ᶜ (τ B) = τ ([ A ]ˢ B)
