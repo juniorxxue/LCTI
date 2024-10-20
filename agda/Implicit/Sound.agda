@@ -72,8 +72,33 @@ data FineSplits (Ψ : SEnv n m) (e̅ : Apps n m) (A̅ : AppsType m) : Set where
     → (chks : 𝕄 Ψ ⊢ e̅₂ ⇇ A̅₂)
     → FineSplits Ψ e̅ A̅
 
+data JustSub (Ψ : SEnv n m) (Σ : Context n m) (A : Type m) (B : Type m) (j : Counter) : Set where
+  just : ∀ {e̅ Σ' B̅ B' B̅₁ B̅₂ e̅₁ e̅₂}
+    → ⟦ Σ , B ⟧→⟦ e̅ , Σ' , B̅ , B' ⟧
+    → (spl-apps : SplitApps e̅ j ⟨ e̅₁ , e̅₂ ⟩)
+    → (spl-appst : SplitAppsType B̅ j ⟨ B̅₁ , B̅₂ ⟩)
+    → (infs : 𝕄 Ψ ⊢ e̅₁ ⇉ B̅₁)
+    → (chks : 𝕄 Ψ ⊢ e̅₂ ⇇ B̅₂)
+    → 𝕄 Ψ ⊢ j # A ≤ B
+    → JustSub Ψ Σ A B j
 
--- e̅ ≡ e̅₁ ++ e̅₂
+sound-≤ : ∀ {Ψ Ψ' : SEnv n m} {Σ A B j}
+  → Ψ ⊢ A ≤ Σ ⊣ Ψ' ↪ B
+  → JustSub Ψ' Σ A B j
+sound-≤ s-int = just none-τ {!!} {!!} {!!} {!!} {!!}
+sound-≤ (s-empty p) = {!!}
+sound-≤ s-var = {!!}
+sound-≤ (s-ex-l^ clo x-in inst) = {!!}
+sound-≤ (s-ex-l= clo x-in s) = {!!}
+sound-≤ (s-ex-r^ clo x-in inst) = {!!}
+sound-≤ (s-ex-r= clo x-in s) = {!!}
+sound-≤ (s-arr s s₁) = {!!}
+sound-≤ (s-term-c cloA cloB ⊢e s) = {!!}
+sound-≤ (s-term-o op ⊢e s s₁) = {!!}
+sound-≤ (s-∀ s) = {!!}
+sound-≤ (s-∀l-^ s) = {!!}
+sound-≤ (s-∀l-eq s st₁ st₂) = {!!}
+
 
 app-elim : ∀ {Γ : Env n m} {j A̅ A' Σ A e e̅ Σ' e̅₁ e̅₂ A̅₁ A̅₂}
   → Γ ⊢ j # e ⦂ A
@@ -138,7 +163,8 @@ sound-i (⊢app ⊢e) spl = sound-i ⊢e (have-e spl)
 sound-i {e̅ = e ∷a e̅} (⊢lam₂ ⊢e ⊢e₁) (have-e spl) = subst e̅ (sound-i ⊢e₁ (spl-weaken spl)) (sound-i-0 ⊢e)
 
 sound-i (⊢sub ⊢e ne gc s) spl with t-e̅ s spl
-... | fines {j = j} spl-apps spl-appst infs chks = app-elim (⊢sub' (sound-i-0 ⊢e) {!!}) spl spl-apps spl-appst {!infs!} {!!}
+... | fines {j = j} spl-apps spl-appst infs chks with sound-≤ {j = j} s
+... | ind = app-elim (⊢sub' (sound-i-0 ⊢e) {!ind!}) spl spl-apps spl-appst {!infs!} {!!}
 
 
 sound-i (⊢tabs ⊢e) none-□ = ⊢tabs (sound-i-0 ⊢e)
