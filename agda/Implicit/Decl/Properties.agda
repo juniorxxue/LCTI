@@ -123,3 +123,10 @@ s-trans {B = ‶ X} s1 s2 = {!!}
 s-trans {B = B `→ B₁} s1 s2 = {!!}
 s-trans {B = `∀ B} s1 s2 = {!!}
 -}
+
+s-refl-∞ : ∀ {Γ : Env n m} {A}
+  → Γ ⊢ ∞ # A ≤ A
+s-refl-∞ {A = Int} = s-int
+s-refl-∞ {A = ‶ X} = s-var
+s-refl-∞ {A = A `→ A₁} = s-arr₁ s-refl-∞ s-refl-∞
+s-refl-∞ {A = `∀ A} = s-∀ s-refl-∞
