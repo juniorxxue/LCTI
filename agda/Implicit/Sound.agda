@@ -126,6 +126,19 @@ app-elim ⊢e none-□ case-0 case-0 mk-empty case-0 case-0 = ⊢e
 app-elim ⊢e (have-e spl) case-0 case-0 mk-empty case-0 (case-S ⊢e₁ chks) = app-elim (⊢app₁ ⊢e ⊢e₁) spl case-0 case-0 mk-empty case-0 chks
 app-elim ⊢e (have-e spl) (case-S spl-apps) (case-S spl-appst) (mk-S mk) (case-S ⊢e₁ infs) chks = app-elim (⊢app₂ ⊢e ⊢e₁) spl spl-apps spl-appst mk infs chks
 
+app-elim'' : ∀ {Γ : Env n m} {j A̅ A' Σ A e e̅ e̅₁ e̅₂ A̅₁ A̅₂ k C}
+  → Γ ⊢ j # e ⦂ A
+  → (spl : ⟦ Σ , A ⟧→⟦ e̅ , τ C , A̅ , A' ⟧)
+  → (spl-apps : SplitApps e̅ k ⟨ e̅₁ , e̅₂ ⟩)
+  → (spl-appst : SplitAppsType A̅ k ⟨ A̅₁ , A̅₂ ⟩)
+  → (mk : MakeCounter k (Context n m ∋⦂ □) j)
+  → (infs : Γ ⊢ e̅₁ ⇉ A̅₁)
+  → (chks : Γ ⊢ e̅₂ ⇇ A̅₂)
+  → Γ ⊢ ∞ # e ▻ e̅ ⦂ A'
+app-elim'' ⊢e none-τ case-0 case-0 mk-empty case-0 case-0 = ⊢sub' ⊢e s-refl-∞ 
+app-elim'' ⊢e (have-e spl) case-0 case-0 mk-empty case-0 (case-S ⊢e₁ chks) = app-elim'' (⊢app₁ ⊢e ⊢e₁) spl case-0 case-0 mk-empty case-0 chks
+app-elim'' ⊢e (have-e spl) (case-S spl-apps) (case-S spl-appst) (mk-S mk) (case-S ⊢e₁ infs) chks = app-elim'' (⊢app₂ ⊢e ⊢e₁) spl spl-apps spl-appst mk infs chks
+
 app-elim' : ∀ {Γ : Env n m} {j A̅ A' Σ A e e̅ e̅₁ e̅₂ A̅₁ A̅₂ k C}
   → Γ ⊢ j # e ⦂ A
   → (spl : ⟦ Σ , A ⟧→⟦ e̅ , τ C , A̅ , A' ⟧)
@@ -135,9 +148,14 @@ app-elim' : ∀ {Γ : Env n m} {j A̅ A' Σ A e e̅ e̅₁ e̅₂ A̅₁ A̅₂ 
   → (infs : Γ ⊢ e̅₁ ⇉ A̅₁)
   → (chks : Γ ⊢ e̅₂ ⇇ A̅₂)
   → Γ ⊢ ∞ # e ▻ e̅ ⦂ A'
+app-elim' = {!!}  
+
+{-
 app-elim' ⊢e none-τ case-0 case-0 mk-type case-0 case-0 = ⊢e
 app-elim' ⊢e (have-e spl) case-0 case-0 mk-type case-0 (case-S ⊢e₁ chks) = app-elim' {!!} spl case-0 case-0 mk-type case-0 chks
 app-elim' ⊢e (have-e spl) (case-S spl-apps) (case-S spl-appst) (mk-S mk) (case-S ⊢e₁ infs) chks = app-elim' (⊢app₂ ⊢e ⊢e₁) spl spl-apps spl-appst mk infs chks
+-}
+
 
 
 ----------------------------------------------------------------------
@@ -188,7 +206,10 @@ sound-c (⊢lam₁ ⊢e) none-τ = ⊢lam₁ (sound-c-0 ⊢e)
 sound-c {e̅ = e ∷a e̅} (⊢lam₂ ⊢e ⊢e₁) (have-e spl) = subst e̅ (sound-c ⊢e₁ (spl-weaken spl)) (sound-i-0 ⊢e)
 sound-c ⊢e'@(⊢sub ⊢e ne gc s) spl rewrite ⊢spl-τ ⊢e' spl with sound-≤ s
 ... | subs spl₁ spl-apps spl-appst mk-j infs chks sub with spl-unique spl spl₁
-... | ⟨ refl , ⟨ refl , ⟨ refl , refl ⟩ ⟩ ⟩ = ⊢sub' {!!} s-refl-∞
+... | ⟨ refl , ⟨ refl , ⟨ refl , refl ⟩ ⟩ ⟩ = ⊢sub' (app-elim {!!} {!!} {!!} {!!} {!!} {!!} {!!}) s-refl-∞
+-- app-elim'' (⊢sub' (sound-i-0 ⊢e) (s-w-m sub)) spl₁ spl-apps spl-appst {!!} (infs-w-m infs) (chks-w-m chks)
+
+-- app-elim' {!!} spl spl-apps spl-appst {!mk-j!} {!!} {!!}
 
 -- app-elim' (⊢sub' (sound-i-0 ⊢e) (s-w-m sub)) spl₁ spl-apps spl-appst mk-j (infs-w-m infs) (chks-w-m chks) -- ok
 
