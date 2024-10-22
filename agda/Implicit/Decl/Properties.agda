@@ -130,3 +130,22 @@ s-refl-∞ {A = Int} = s-int
 s-refl-∞ {A = ‶ X} = s-var
 s-refl-∞ {A = A `→ A₁} = s-arr₁ s-refl-∞ s-refl-∞
 s-refl-∞ {A = `∀ A} = s-∀ s-refl-∞
+
+
+-- a relation between counter, with same successor, but end with 0 or ∞
+data _~j_ : Counter → Counter → Set where
+  ~∞ : ∞ ~j Z
+  ~S : ∀ {j k} → j ~j k → S j ~j S k
+
+data LessCounter (Γ : Env n m) (j : Counter) (A : Type m) (B : Type m) : Set where
+  lessc : ∀ {j' C}
+    → (newj : j ~j j')
+    → (s₁ : Γ ⊢ j' # A ≤ C)
+    → (s₂ : Γ ⊢ ∞ # B ≤ C)
+    → LessCounter Γ j A B
+
+postulate
+  s~j : ∀ {Γ : Env n m} {j A B}
+    → Γ ⊢ j # A ≤ B
+    → LessCounter Γ j A B
+  
