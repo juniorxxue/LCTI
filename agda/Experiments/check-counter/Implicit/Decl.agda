@@ -111,10 +111,10 @@ data _⊢_#_≤_ : Env n m → Counter → Type m → Type m → Set where
     → Γ ⊢ ∞ # C ≤ A
     → Γ ⊢ ∞ # B ≤ D
     → Γ ⊢ ∞ # A `→ B ≤ C `→ D
-  s-arr₂ : ∀ {j A B D}
---    → Γ ⊢ ∞ # A ≤ A
+  s-arr₂ : ∀ {j A B C D}
+    → Γ ⊢ ∞ # C ≤ A
     → Γ ⊢ j # B ≤ D
-    → Γ ⊢ I j # A `→ B ≤ A `→ D
+    → Γ ⊢ I j # A `→ B ≤ C `→ D
   s-arr₃ : ∀ {j A B D}
 --    → Γ ⊢ ∞ # A ≤ A
     → Γ ⊢ j # B ≤ D
