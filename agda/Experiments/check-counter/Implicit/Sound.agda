@@ -174,11 +174,14 @@ sound-s (s-ex-r^ clo x-in inst) = subs ~∞ (s-var-r {!!} s-refl-∞) -- ok
 sound-s (s-ex-r= clo x-in s) with sound-s s
 ... | subs ~∞ s' = subs ~∞ (s-var-r {!!} s') -- ok
 sound-s (s-arr s s₁) with sound-s s | sound-s s₁
-... | subs ~∞ s₂ | subs ~∞ s₃ = subs ~∞ (s-arr₁ {!!} {!!}) -- the subtyping relation is preserved during the env extension
+... | subs ~∞ s₂ | subs ~∞ s₃ = subs ~∞ (s-arr₁ {!!} {!!}) -- ok, the subtyping relation is preserved during the env extension
 sound-s (s-term-c cloA cloB ⊢e s) with sound-s s
-... | subs j~Σ s' rewrite ⊢id0 ⊢e = subs (~C {!sound-∞ ⊢e!} j~Σ) (s-arr₃ s') -- typing is preserved during the env extension
-sound-s (s-term-o op ⊢e s s₁) with sound-s s₁
-... | subs j~Σ s' = subs (~I {!!} j~Σ) {!!}
-sound-s (s-∀ s) = {!!}
-sound-s (s-∀l-^ s) = {!!}
-sound-s (s-∀l-eq s st₁ st₂) = {!!}
+... | subs j~Σ s' rewrite ⊢id0 ⊢e = subs (~C {!sound-∞ ⊢e!} j~Σ) (s-arr₃ s') -- ok, typing is preserved during the env extension
+sound-s (s-term-o op ⊢e s s₁) with sound-s s | sound-s s₁
+... | subs ~∞ s'' | subs j~Σ s' rewrite ≤id0 s = subs (~I (sound-0 {!⊢e!}) j~Σ) (s-arr₂ {!s''!} s') -- ok, same as above
+sound-s (s-∀ s) with sound-s s
+... | subs ~∞ s' = subs ~∞ (s-∀ s')
+sound-s (s-∀l-^ s) with sound-s s
+... | subs j~Σ s' = subs {!j~Σ!} {!s'!}
+sound-s (s-∀l-eq s st₁ st₂) with sound-s s
+... | subs j~Σ s' = subs {!j~Σ!} {!!}
