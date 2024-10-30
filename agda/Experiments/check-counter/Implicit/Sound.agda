@@ -1,10 +1,10 @@
 module Implicit.Sound where
 
 open import Implicit.Common
-open import Implicit.Decl
+open import Implicit.Decl renaming (_:=_∈_ to _:=_∈d_)
 open import Implicit.Decl.Subst
 open import Implicit.Decl.Properties
-open import Implicit.Algo
+open import Implicit.Algo renaming (_:=_∈_ to _:=_∈a_)
 open import Implicit.Algo.Properties
 
 infix 3 _⊢_~_
@@ -28,22 +28,6 @@ data _⊢_~_ : Env n m → Counter × Type m → Context n m → Set where
 
 postulate
 
-{-
-  spl-weaken : ∀ {Σ Σ' : Context n m} {A e̅ A̅ A' k}
-    → ⟦ Σ , A ⟧→⟦ e̅ , Σ' , A̅ , A' ⟧
-    → ⟦ ↑Σ k Σ , A ⟧→⟦ up k e̅ , ↑Σ k Σ' , A̅ , A' ⟧
--}    
-
-  spl-unique : ∀ {Σ : Context n m} {A Σ₁' Σ₂' A̅₁ A̅₂ A₁' A₂' e̅₁ e̅₂}
-    → ⟦ Σ , A ⟧→⟦ e̅₁ , Σ₁' , A̅₁ , A₁' ⟧
-    → ⟦ Σ , A ⟧→⟦ e̅₂ , Σ₂' , A̅₂ , A₂' ⟧
-    → (e̅₁ ≡ e̅₂) × (Σ₁' ≡ Σ₂') × (A̅₁ ≡ A̅₂) × (A₁' ≡ A₂')
-
-  ⊢spl-τ : ∀ {Γ : Env n m} {Σ e A es As A' T}
-    → Γ ⊢ Σ ⇒ e ⇒ A
-    → ⟦ Σ , A ⟧→⟦ es , τ T , As , A' ⟧
-    → T ≡ A'
-
   s-w-m : ∀ {Γ : Env n m} {A B j}
     →  𝕄 (𝕎 Γ) ⊢ j # A ≤ B
     → Γ ⊢ j # A ≤ B
@@ -61,62 +45,6 @@ postulate
 --+                             Typing                             +--
 ----------------------------------------------------------------------
 
--- split a Apps by index k
-data SplitApps : Apps n m → ℕ → Apps n m × Apps n m → Set where
-  case-0 : ∀ {e̅ : Apps n m}
-    → SplitApps e̅ 0 ⟨ nil , e̅ ⟩
-  case-S : ∀ {e̅ : Apps n m} {e j e̅₁ e̅₂}
-    → SplitApps e̅ j ⟨ e̅₁ , e̅₂ ⟩
-    → SplitApps (e ∷a e̅) (suc j) ⟨ e ∷a e̅₁ , e̅₂ ⟩
-
-
--- (infs, chks)
-data SplitAppsType : AppsType m → ℕ → AppsType m × AppsType m → Set where
-  case-0 : ∀ {A̅ : AppsType m}
-    → SplitAppsType A̅ 0 ⟨ nil , A̅ ⟩
-  case-S : ∀ {A̅ : AppsType m} {A j A̅₁ A̅₂}
-    → SplitAppsType A̅ j ⟨ A̅₁ , A̅₂ ⟩
-    → SplitAppsType (A ∷a A̅) (suc j) ⟨ A ∷a A̅₁ , A̅₂ ⟩
-
-infix 3 _⊢_⇇_
-infix 3 _⊢_⇉_
-
-data _⊢_⇇_ : Env n m → Apps n m → AppsType m → Set where
-  case-0 : ∀ {Γ : Env n m}
-    → Γ ⊢ nil ⇇ nil
-  case-S : ∀ {Γ : Env n m} {e̅ A e A̅}
-    → (⊢e : Γ ⊢ ∞ # e ⦂ A)
-    → Γ ⊢ e̅ ⇇ A̅
-    → Γ ⊢ e ∷a e̅ ⇇ A ∷a A̅
-
-data _⊢_⇉_ : Env n m → Apps n m → AppsType m → Set where
-  case-0 : ∀ {Γ : Env n m}
-    → Γ ⊢ nil ⇉ nil
-  case-S : ∀ {Γ : Env n m} {e̅ A e A̅}
-    → (⊢e : Γ ⊢ Z # e ⦂ A)
-    → Γ ⊢ e̅ ⇉ A̅
-    → Γ ⊢ e ∷a e̅ ⇉ A ∷a A̅
-
-postulate
-
-  infs-w-m : ∀ {Γ : Env n m} {e̅ A̅}
-    → 𝕄 (𝕎 Γ) ⊢ e̅ ⇉ A̅
-    → Γ ⊢ e̅ ⇉ A̅
-  chks-w-m : ∀ {Γ : Env n m} {e̅ A̅}
-    → 𝕄 (𝕎 Γ) ⊢ e̅ ⇇ A̅
-    → Γ ⊢ e̅ ⇇ A̅
-
--- context can only be empty for full type, come from the split result
-data MakeCounter : ℕ → Context n m → Counter → Set where
-  mk-empty : MakeCounter 0 (Context n m ∋⦂ □) Z
-  mk-type  : ∀ {A} → MakeCounter 0 (Context n m ∋⦂ (τ A)) ∞
-  mk-S     : ∀ {Σ : Context n m} {k j}
-    → MakeCounter k Σ j
-    → MakeCounter (suc k) Σ (I j)
-
-
-    
-    
 data JustSub (Ψ : SEnv n m) (Σ : Context n m) (A : Type m) (B : Type m) : Set where
   subs : ∀ {j}
     → (j~Σ : 𝕄 Ψ ⊢ ⟨ j , B ⟩ ~ Σ)
@@ -182,6 +110,7 @@ sound-s (s-term-o op ⊢e s s₁) with sound-s s | sound-s s₁
 sound-s (s-∀ s) with sound-s s
 ... | subs ~∞ s' = subs ~∞ (s-∀ s')
 sound-s (s-∀l-^ s) with sound-s s
-... | subs j~Σ s' = subs {!j~Σ!} {!s'!}
+... | subs j~Σ s' = subs {!j~Σ!} (s-∀l {!!} {!!} {!!} {!!}) -- this is a counter example
 sound-s (s-∀l-eq s st₁ st₂) with sound-s s
-... | subs j~Σ s' = subs {!j~Σ!} {!!}
+... | subs j~Σ s' = subs {!!} (s-∀l {!s'!} {!!} st₁ st₂)
+-- subs {!j~Σ!} (s-∀l {!!} {!!} st₁ st₂)

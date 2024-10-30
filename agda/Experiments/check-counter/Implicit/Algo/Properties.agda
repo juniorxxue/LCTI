@@ -115,9 +115,7 @@ s-closed-gen (s-term-c x x₁ x₂ s) = s-closed-gen s
 s-closed-gen (s-term-o x x₁ s s₁) = ~~trans (s-closed-gen s) (s-closed-gen s₁)
 s-closed-gen (s-∀ s) with s-closed-gen s
 ... | uvar r = r
-s-closed-gen (s-∀l-^ s) with s-closed-gen s
-... | evar r = r
-s-closed-gen (s-∀l-eq s st st') with s-closed-gen s
+s-closed-gen (s-∀l s st st') with s-closed-gen s
 ... | evar-sol r = r
 
 𝕎-Γ-like : ∀ (Γ : Env n m)
@@ -269,10 +267,7 @@ spl-weaken (have-e spl) = have-e (spl-weaken spl)
 ... | case-□ spl = case-□ (have-e spl)
 ≤id (s-∀ s) with ≤id s
 ... | case-τ none-τ refl = case-τ none-τ refl
-≤id (s-∀l-^ s) with ≤id s
-... | case-τ spl refl = case-τ (spl-↑ty-case {C = Int} spl) refl
-... | case-□ spl = case-□ (spl-↑ty-case {C = Int} spl)
-≤id (s-∀l-eq {B = B} s st₁ st₂) with ≤id s
+≤id (s-∀l {B = B} s st₁ st₂) with ≤id s
 ... | case-τ spl refl rewrite sym (st-st st₁) | sym (st-st st₂) = case-τ (spl-↑ty-case' {C = B} spl) refl
 ... | case-□ spl rewrite sym (st-st st₁) | sym (st-st st₂) = case-□ (spl-↑ty-case' {C = B} spl)
 

@@ -1,3 +1,4 @@
+{-# OPTIONS --allow-unsolved-metas #-}
 module Implicit.Algo.Subsumption where
 
 open import Implicit.Common
@@ -56,10 +57,9 @@ s-refined (s-ex-r= clo x-in s) = s-refl
 s-refined (s-arr s s₁) = s-refl
 s-refined (s-term-c cloA cloB ⊢e s) = s-term-c {!!} {!!} {!⊢id0-h ⊢e!} (s-refined s) -- easy
 s-refined s'@(s-term-o op ⊢e s s₁) with ≤id0 s
-... | refl = s-term-c {!!} {!!} {!!} (s-refined s₁)
+... | refl = s-term-c {!!} {!!} (subsumption0 {!!} s-refl) (s-refined s₁)
 s-refined (s-∀ s) = s-∀ (s-refined s)
-s-refined (s-∀l-^ s) = {!s-refined s!}
-s-refined (s-∀l-eq s st₁ st₂) = {!s-refined s!} -- substituition lemma
+s-refined (s-∀l s st₁ st₂) = {!s-refined s!} -- substituition lemma
 
 ⊢to≤ ⊢lit = s-empty ⊢c-int
 ⊢to≤ ⊢e@(⊢var x∈Γ) = s-empty (⊢a→⊢c ⊢e)
