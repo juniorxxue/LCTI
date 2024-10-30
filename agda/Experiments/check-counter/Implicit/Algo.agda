@@ -156,7 +156,7 @@ data _:=_∈_ : Fin m → Type m → SEnv n m → Set where
     → k := ↓ty0 A ∈ Ψ
     → #S k := A ∈ Ψ ,∙
   S= : ∀ {k B} {A : Type (1 + m)}
-    → k := ↓ty0 A ∈ Ψ
+    → k := [ B ]ˢ A ∈ Ψ
     → #S k := A ∈ Ψ ,= B
 
 infix 5 inst_[_]⟹_
@@ -349,9 +349,9 @@ data _⊢_≤_⊣_↪_ where
     → Ψ ,∙ ⊢ A ≤ τ B ⊣ Ψ' ,∙ ↪ C
     → Ψ ⊢ `∀ A ≤ τ (`∀ B) ⊣ Ψ' ↪ `∀ C
 
-  s-∀l-^ : ∀ {A B e}
-    → Ψ ,^ ⊢ A ≤ ↑tyΣ0 ([ e ]↝ Σ) ⊣ Ψ' ,^ ↪ ↑ty0 B
-    → Ψ ⊢ `∀ A ≤ ([ e ]↝ Σ) ⊣ Ψ' ↪ B
+  s-∀l-^ : ∀ {A e C D}
+    → Ψ ,^ ⊢ A ≤ ↑tyΣ0 ([ e ]↝ Σ) ⊣ Ψ' ,^ ↪ ↑ty0 (C `→ D)
+    → Ψ ⊢ `∀ A ≤ ([ e ]↝ Σ) ⊣ Ψ' ↪ C `→ D
 
   s-∀l-eq : ∀ {A B C C' D D' e}
     → Ψ ,^ ⊢ A ≤ ↑tyΣ0 ([ e ]↝ Σ) ⊣ Ψ' ,= B ↪ (C `→ D)
