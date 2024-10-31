@@ -42,80 +42,80 @@ data Γ-like : SEnv n m → Set where
     → Γ-like Ψ
     → Γ-like (Ψ ,= A)
 
-infix 3 _~~_
-data _~~_ : SEnv n m → SEnv n m → Set where
-  base : ∅ ~~ ∅
+infix 3 _⊆_
+data _⊆_ : SEnv n m → SEnv n m → Set where
+  base : ∅ ⊆ ∅
   uvar : ∀ {Ψ Ψ' : SEnv n m}
-    → Ψ ~~ Ψ'
-    → Ψ ,∙ ~~ Ψ' ,∙
+    → Ψ ⊆ Ψ'
+    → Ψ ,∙ ⊆ Ψ' ,∙
   var : ∀ {Ψ Ψ' : SEnv n m} {A}
-    → Ψ ~~ Ψ'
-    → Ψ , A ~~ Ψ' , A
+    → Ψ ⊆ Ψ'
+    → Ψ , A ⊆ Ψ' , A
   evar : ∀ {Ψ Ψ' : SEnv n m}
-    → Ψ ~~ Ψ'
-    → Ψ ,^ ~~ Ψ' ,^
+    → Ψ ⊆ Ψ'
+    → Ψ ,^ ⊆ Ψ' ,^
   evar-sol : ∀ {Ψ Ψ' : SEnv n m} {A}
-    → Ψ ~~ Ψ'
-    → Ψ ,^ ~~ Ψ' ,= A    
+    → Ψ ⊆ Ψ'
+    → Ψ ,^ ⊆ Ψ' ,= A    
   svar : ∀ {Ψ Ψ' : SEnv n m} {A}
-    → Ψ ~~ Ψ'
-    → Ψ ,= A ~~ Ψ' ,= A
+    → Ψ ⊆ Ψ'
+    → Ψ ,= A ⊆ Ψ' ,= A
 
 
-~~Γ-like : ∀ {Ψ Ψ' : SEnv n m}
+⊆Γ-like : ∀ {Ψ Ψ' : SEnv n m}
   → Γ-like Ψ
-  → Ψ ~~ Ψ'
+  → Ψ ⊆ Ψ'
   → Ψ ≡ Ψ'
-~~Γ-like gl base = refl 
-~~Γ-like (S∙ gl) (uvar ~~Ψ) rewrite ~~Γ-like gl ~~Ψ = refl
-~~Γ-like (S, gl) (var ~~Ψ) rewrite ~~Γ-like gl ~~Ψ = refl
-~~Γ-like (S= gl) (svar ~~Ψ) rewrite ~~Γ-like gl ~~Ψ = refl
+⊆Γ-like gl base = refl 
+⊆Γ-like (S∙ gl) (uvar ⊆Ψ) rewrite ⊆Γ-like gl ⊆Ψ = refl
+⊆Γ-like (S, gl) (var ⊆Ψ) rewrite ⊆Γ-like gl ⊆Ψ = refl
+⊆Γ-like (S= gl) (svar ⊆Ψ) rewrite ⊆Γ-like gl ⊆Ψ = refl
 
-~~refl : ∀ {n m} {Ψ : SEnv n m}
-  → Ψ ~~ Ψ
-~~refl {Ψ = ∅} = base
-~~refl {Ψ = Ψ , A} = var ~~refl
-~~refl {Ψ = Ψ ,∙} = uvar ~~refl
-~~refl {Ψ = Ψ ,^} = evar ~~refl
-~~refl {Ψ = Ψ ,= A} = svar ~~refl
+⊆refl : ∀ {n m} {Ψ : SEnv n m}
+  → Ψ ⊆ Ψ
+⊆refl {Ψ = ∅} = base
+⊆refl {Ψ = Ψ , A} = var ⊆refl
+⊆refl {Ψ = Ψ ,∙} = uvar ⊆refl
+⊆refl {Ψ = Ψ ,^} = evar ⊆refl
+⊆refl {Ψ = Ψ ,= A} = svar ⊆refl
 
-~~trans : ∀ {n m} {Ψ Ψ' Ψ'' : SEnv n m}
-  → Ψ ~~ Ψ'
-  → Ψ' ~~ Ψ''
-  → Ψ ~~ Ψ''
-~~trans base base = base
-~~trans (uvar ~~1) (uvar ~~2) = uvar (~~trans ~~1 ~~2)
-~~trans (var ~~1) (var ~~2) = var (~~trans ~~1 ~~2)
-~~trans (evar ~~1) (evar ~~2) = evar (~~trans ~~1 ~~2)
-~~trans (evar ~~1) (evar-sol ~~2) = evar-sol (~~trans ~~1 ~~2)
-~~trans (evar-sol ~~1) (svar ~~2) = evar-sol (~~trans ~~1 ~~2)
-~~trans (svar ~~1) (svar ~~2) = svar (~~trans ~~1 ~~2)
+⊆trans : ∀ {n m} {Ψ Ψ' Ψ'' : SEnv n m}
+  → Ψ ⊆ Ψ'
+  → Ψ' ⊆ Ψ''
+  → Ψ ⊆ Ψ''
+⊆trans base base = base
+⊆trans (uvar ⊆1) (uvar ⊆2) = uvar (⊆trans ⊆1 ⊆2)
+⊆trans (var ⊆1) (var ⊆2) = var (⊆trans ⊆1 ⊆2)
+⊆trans (evar ⊆1) (evar ⊆2) = evar (⊆trans ⊆1 ⊆2)
+⊆trans (evar ⊆1) (evar-sol ⊆2) = evar-sol (⊆trans ⊆1 ⊆2)
+⊆trans (evar-sol ⊆1) (svar ⊆2) = evar-sol (⊆trans ⊆1 ⊆2)
+⊆trans (svar ⊆1) (svar ⊆2) = svar (⊆trans ⊆1 ⊆2)
 
 ⟹closed : ∀ {Ψ Ψ' : SEnv n m} {A X} 
   → [ A / X ] Ψ ⟹ Ψ'
-  → Ψ ~~ Ψ'
-⟹closed ⟹^0 = evar-sol ~~refl
+  → Ψ ⊆ Ψ'
+⟹closed ⟹^0 = evar-sol ⊆refl
 ⟹closed (⟹,S s) = var (⟹closed s)
 ⟹closed (⟹^S s) = evar (⟹closed s)
 ⟹closed (⟹∙S s) = uvar (⟹closed s)
 ⟹closed (⟹=S s) = svar (⟹closed s)  
 
-s-closed-gen : ∀ {Ψ Ψ' : SEnv n m} {A B Σ}
+s-⊆ : ∀ {Ψ Ψ' : SEnv n m} {A B Σ}
   → Ψ ⊢ A ≤ Σ ⊣ Ψ' ↪ B
-  → Ψ ~~ Ψ'
-s-closed-gen s-int = ~~refl
-s-closed-gen (s-empty p) = ~~refl
-s-closed-gen s-var = ~~refl
-s-closed-gen (s-ex-l^ x x₁ x₂) = ⟹closed x₂
-s-closed-gen (s-ex-l= x x₁ s) = s-closed-gen s
-s-closed-gen (s-ex-r^ x x₁ x₂) = ⟹closed x₂
-s-closed-gen (s-ex-r= x x₁ s) = s-closed-gen s
-s-closed-gen (s-arr s s₁) = ~~trans (s-closed-gen s) (s-closed-gen s₁)
-s-closed-gen (s-term-c x x₁ x₂ s) = s-closed-gen s
-s-closed-gen (s-term-o x x₁ s s₁) = ~~trans (s-closed-gen s) (s-closed-gen s₁)
-s-closed-gen (s-∀ s) with s-closed-gen s
+  → Ψ ⊆ Ψ'
+s-⊆ s-int = ⊆refl
+s-⊆ (s-empty p) = ⊆refl
+s-⊆ s-var = ⊆refl
+s-⊆ (s-ex-l^ x x₁ x₂) = ⟹closed x₂
+s-⊆ (s-ex-l= x x₁ s) = s-⊆ s
+s-⊆ (s-ex-r^ x x₁ x₂) = ⟹closed x₂
+s-⊆ (s-ex-r= x x₁ s) = s-⊆ s
+s-⊆ (s-arr s s₁) = ⊆trans (s-⊆ s) (s-⊆ s₁)
+s-⊆ (s-term-c x x₂ s) = s-⊆ s
+s-⊆ (s-term-o x s s₁) = ⊆trans (s-⊆ s) (s-⊆ s₁)
+s-⊆ (s-∀ s) with s-⊆ s
 ... | uvar r = r
-s-closed-gen (s-∀l s st st') with s-closed-gen s
+s-⊆ (s-∀l s st st') with s-⊆ s
 ... | evar-sol r = r
 
 𝕎-Γ-like : ∀ (Γ : Env n m)
@@ -128,8 +128,8 @@ s-closed-gen (s-∀l s st st') with s-closed-gen s
 s-closed : ∀ {Ψ : SEnv n m} {Γ A B Σ}
   → 𝕎 Γ ⊢ A ≤ Σ ⊣ Ψ ↪ B
   → Ψ ≡ 𝕎 Γ
-s-closed {Γ = Γ} s with s-closed-gen s
-... | r = sym (~~Γ-like (𝕎-Γ-like Γ) r)
+s-closed {Γ = Γ} s with s-⊆ s
+... | r = sym (⊆Γ-like (𝕎-Γ-like Γ) r)
 
 ----------------------------------------------------------------------
 --+                   when context is full type                    +--
@@ -259,10 +259,10 @@ spl-weaken (have-e spl) = have-e (spl-weaken spl)
 ≤id (s-ex-r^ clo x-in inst) = case-τ none-τ refl
 ≤id (s-ex-r= clo x-in s) = case-τ none-τ refl
 ≤id (s-arr s s₁) = case-τ none-τ refl
-≤id (s-term-c cloA cloB ⊢e s) with ≤id s
+≤id (s-term-c cloA ⊢e s) with ≤id s
 ... | case-τ spl eq = case-τ (have-e spl) eq
 ... | case-□ spl = case-□ (have-e spl)
-≤id (s-term-o op ⊢e s s₁) with ≤id s₁
+≤id (s-term-o ⊢e s s₁) with ≤id s₁
 ... | case-τ spl eq = case-τ (have-e spl) eq
 ... | case-□ spl = case-□ (have-e spl)
 ≤id (s-∀ s) with ≤id s

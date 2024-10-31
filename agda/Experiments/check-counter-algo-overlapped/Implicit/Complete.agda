@@ -85,10 +85,10 @@ complete-≤ (s-refl) ~Z = s-empty {!!} -- ok
 complete-≤ s-int ~∞ = s-int
 complete-≤ s-var ~∞ = s-var
 complete-≤ (s-arr₁ s s₁) ~∞ = s-arr (complete-≤-chk s) (complete-≤-chk s₁)
-complete-≤ (s-arr₂ s s₁) (~I ⊢e j~Σ) = {!!}
--- s-term-c {!!} {!!} (subsumption0 (⊢a-m-w ⊢e) {!complete-≤ s ~∞!}) (complete-≤ s₁ j~Σ) -- something wrong
-complete-≤ (s-arr₃ s) (~C ⊢e ~j) = s-term-c {!!} {!!} {!!} {!!}
+complete-≤ (s-arr₂ s s₁) (~I ⊢e j~Σ) = s-term-o (⊢a-m-w ⊢e) (complete-≤ s ~∞) (complete-≤ s₁ j~Σ)
+complete-≤ (s-arr₃ s) (~C ⊢e ~j) = s-term-c {!!} (⊢a-m-w ⊢e) (complete-≤ s ~j)
 complete-≤ (s-∀ s) ~∞ = s-∀ (complete-≤-chk s)
-complete-≤ (s-∀l s fd st₁ st₂) (~I ⊢e j~Σ) = {!!}
+complete-≤ (s-∀l s have-i fd st₁ st₂) (~I ⊢e ~j) = s-∀l {!complete-≤ s ?!} st₁ st₂
+complete-≤ (s-∀l s have-i fd st₁ st₂) (~C ⊢e ~j) = s-∀l {!!} st₁ st₂
 complete-≤ (s-var-l x s) ~∞ = s-ex-l= {!!} {!!} (complete-≤-chk s) -- ok
 complete-≤ (s-var-r x s) ~∞ = s-ex-r= {!!} {!!} (complete-≤-chk s) -- ok

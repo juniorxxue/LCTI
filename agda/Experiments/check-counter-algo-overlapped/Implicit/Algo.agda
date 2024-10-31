@@ -55,6 +55,10 @@ data [_/_]ᶜ_⇨_ : Fin (1 + m) → Type m → Context n (1 + m) → Context n 
     → [ k / A ]ᵗ e ⇨ e'
     → [ k / A ]ᶜ ([ e ]↝ Σ) ⇨ (Context n m ∋⦂ ([ e' ]↝ Σ'))
 
+infix 3 [_]ᶜ_⇨_
+[_]ᶜ_⇨_ : Type m → Context n (1 + m) → Context n m → Set
+[_]ᶜ_⇨_ = [_/_]ᶜ_⇨_ #0
+
 infix 6 [_]ᶜ_
 [_]ᶜ_ : Type m → Context n (1 + m) → Context n m
 [ A ]ᶜ □ = □
@@ -333,13 +337,11 @@ data _⊢_≤_⊣_↪_ where
 
   s-term-c : ∀ {A B A' D e}
     → (cloA : Ψ ⊢c A)
-    → (cloB : Ψ ⊢c B)
     → (⊢e : (𝕄 Ψ) ⊢ τ A ⇒ e ⇒ A')
     → Ψ ⊢ B ≤ Σ ⊣ Ψ' ↪ D
     → Ψ ⊢ (A `→ B) ≤ ([ e ]↝ Σ) ⊣ Ψ' ↪ A' `→ D
 
   s-term-o : ∀ {A A' B C D e}
-    → (op : Ψ ⊢o A)
     → (⊢e : (𝕄 Ψ) ⊢ □ ⇒ e ⇒ C)
     → Ψ ⊢ C ≤ τ A ⊣ Ψ₁ ↪ A'
     → Ψ₁ ⊢ B ≤ Σ ⊣ Ψ₂ ↪ D

@@ -6,6 +6,28 @@ open import Implicit.Decl.Subst
 open import Implicit.Decl.Properties
 open import Implicit.Algo renaming (_:=_∈_ to _:=_∈a_)
 open import Implicit.Algo.Properties
+open import Implicit.Algo.Environments
+
+postulate
+  ∈a→∈d : ∀ {Ψ : SEnv n m} {X A}
+    → X := A ∈a Ψ
+    → X := A ∈d 𝕄 Ψ
+
+  ⊆-:= : ∀ {Ψ Ψ' : SEnv n m} {X A}
+    → Ψ ⊆ Ψ'
+    → X := A ∈a Ψ
+    → X := A ∈a Ψ'
+
+  s-⊆-prv : ∀ {Ψ Ψ' : SEnv n m} {A B}
+    → Ψ ⊆ Ψ'
+    → 𝕄 Ψ ⊢ ∞ # A ≤ B
+    → 𝕄 Ψ' ⊢ ∞ # A ≤ B
+
+  ⊢d-⊆-prv : ∀ {Ψ Ψ' : SEnv n m} {A e j}
+    → Ψ ⊆ Ψ'
+    → 𝕄 Ψ ⊢ j # e ⦂ A
+    → 𝕄 Ψ' ⊢ j # e ⦂ A
+
 
 infix 3 _⊢_~_
 data _⊢_~_ : Env n m → Counter × Type m → Context n m → Set where
@@ -39,6 +61,13 @@ postulate
   ~-weaken : ∀ {Γ : Env n m} {Σ A B j}
     → Γ , A ⊢ ⟨ j , B ⟩ ~ ↑Σ0 Σ
     → Γ ⊢ ⟨ j , B ⟩ ~ Σ
+
+  ~-subst : ∀ {Γ : Env n m} {Σ A B j Σ' A'}
+    → (Γ ,= B) ⊢ ⟨ j , A ⟩ ~ Σ
+    → [ B ]ᶜ Σ ⇨ Σ'
+    → [ B ]ˢ A ⇨ A'
+    → Γ ⊢ ⟨ j , A' ⟩ ~ Σ'
+
 
 
 ----------------------------------------------------------------------
@@ -95,22 +124,20 @@ sound (⊢tabs ⊢e) with sound ⊢e
 sound-s s-int = subs ~∞ s-int
 sound-s (s-empty p) = subs ~Z s-refl
 sound-s s-var = subs ~∞ s-var
-sound-s (s-ex-l^ clo x-in inst) = subs ~∞ (s-var-l {!!} s-refl-∞) -- ok
+sound-s (s-ex-l^ clo x-in inst) = subs ~∞ (s-var-l (∈a→∈d (inst-in inst)) s-refl-∞)
 sound-s (s-ex-l= clo x-in s) with sound-s s
-... | subs ~∞ s' = subs ~∞ (s-var-l {!!} s') -- ok
-sound-s (s-ex-r^ clo x-in inst) = subs ~∞ (s-var-r {!!} s-refl-∞) -- ok
+... | subs ~∞ s' = subs ~∞ (s-var-l (∈a→∈d (⊆-:= (s-⊆ s) x-in)) s')
+sound-s (s-ex-r^ clo x-in inst) = subs ~∞ (s-var-r (∈a→∈d (inst-in inst)) s-refl-∞)
 sound-s (s-ex-r= clo x-in s) with sound-s s
-... | subs ~∞ s' = subs ~∞ (s-var-r {!!} s') -- ok
+... | subs ~∞ s' = subs ~∞ (s-var-r (∈a→∈d (⊆-:= (s-⊆ s) x-in)) s')
 sound-s (s-arr s s₁) with sound-s s | sound-s s₁
-... | subs ~∞ s₂ | subs ~∞ s₃ = subs ~∞ (s-arr₁ {!!} {!!}) -- ok, the subtyping relation is preserved during the env extension
-sound-s (s-term-c cloA cloB ⊢e s) with sound-s s
-... | subs j~Σ s' rewrite ⊢id0 ⊢e = subs (~C {!sound-∞ ⊢e!} j~Σ) (s-arr₃ s') -- ok, typing is preserved during the env extension
-sound-s (s-term-o op ⊢e s s₁) with sound-s s | sound-s s₁
-... | subs ~∞ s'' | subs j~Σ s' rewrite ≤id0 s = subs (~I (sound-0 {!⊢e!}) j~Σ) (s-arr₂ {!s''!} s') -- ok, same as above
+... | subs ~∞ s₂ | subs ~∞ s₃ = subs ~∞ (s-arr₁ (s-⊆-prv (s-⊆ s₁) s₂) s₃)
+sound-s (s-term-c cloA ⊢e s) with sound-s s
+... | subs j~Σ s' with ⊢id0 ⊢e
+...   | refl = subs (~C (⊢d-⊆-prv (s-⊆ s) (sound-∞ ⊢e)) j~Σ) (s-arr₃ s')
+sound-s (s-term-o ⊢e s s₁) with sound-s s | sound-s s₁ | sound-0 ⊢e
+... | subs ~∞ s'' | subs j~Σ s' | ⊢e' rewrite ≤id0 s = subs (~I (⊢d-⊆-prv (⊆trans (s-⊆ s) (s-⊆ s₁)) ⊢e') j~Σ) (s-arr₂ {!s''!} s') -- ok, same as above
 sound-s (s-∀ s) with sound-s s
 ... | subs ~∞ s' = subs ~∞ (s-∀ s')
-sound-s (s-∀l-^ s) with sound-s s
-... | subs j~Σ s' = subs {!j~Σ!} (s-∀l {!!} {!!} {!!} {!!}) -- this is a counter example
-sound-s (s-∀l-eq s st₁ st₂) with sound-s s
-... | subs j~Σ s' = subs {!!} (s-∀l {!s'!} {!!} st₁ st₂)
--- subs {!j~Σ!} (s-∀l {!!} {!!} st₁ st₂)
+sound-s (s-∀l s st₁ st₂) with sound-s s
+... | subs j~Σ s' = subs (~-subst j~Σ {!!} (st-arr st₁ st₂)) (s-∀l s' {!!} {!!} st₁ st₂)
