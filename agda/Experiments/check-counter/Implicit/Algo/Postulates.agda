@@ -33,12 +33,14 @@ data _⊕_:=_ : Apps n m → Context n m → Context n m → Set where
   ⊕cons-e : ∀ {Σ : Context n m} {e a̅ Σ'}
     → a̅ ⊕ Σ := Σ'
     → (e ∷a a̅) ⊕ Σ := [ e ]↝ Σ'
-    
-postulate
 
-  ⊕-weaken0 : ∀ {Σ : Context n m} {es Σ'}
-    → es ⊕ Σ' := Σ
-    → (up0 es) ⊕ (↑Σ0 Σ') := ↑Σ0 Σ
+⊕-weaken0 : ∀ {Σ : Context n m} {es Σ'}
+  → es ⊕ Σ' := Σ
+  → (up0 es) ⊕ (↑Σ0 Σ') := ↑Σ0 Σ
+⊕-weaken0 {es = nil} ⊕nil = ⊕nil
+⊕-weaken0 {es = e ∷a es} (⊕cons-e es⊕Σ′) = ⊕cons-e (⊕-weaken0 es⊕Σ′)
+
+postulate
 
   s-weaken0 : ∀ {Ψ Ψ' : SEnv n m} {Σ A B B'}
     → Ψ ⊢ B ≤ Σ ⊣ Ψ' ↪ B'
