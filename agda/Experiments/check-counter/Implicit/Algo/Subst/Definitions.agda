@@ -10,10 +10,6 @@ variable
 
 postulate
 
-  substituition-case1 : ∀ {A B}
-    → Ψ ,^ ⊢ ↑ty0 A ≤ ↑tyΣ0 Σ ⊣ Ψ' ,^ ↪ ↑ty0 B
-    → Ψ' ⊢ A ≤ Σ ⊣ Ψ ↪ B
-
   substituition-case2 : ∀ {A B C A' B'}
     → Ψ ,= C ⊢ A ≤ ↑tyΣ0 Σ ⊣ Ψ' ,= C ↪ B
     → [ C ]ˢ A ⇨ A'
