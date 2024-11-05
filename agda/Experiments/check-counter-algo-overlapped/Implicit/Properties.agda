@@ -26,6 +26,9 @@ postulate
   ↑ty-tm-st' : ∀ (e : Term n m) {C}
     → [ C ]ᵗ (↑ty0-tm e) ≡ e
 
+  ↑ty-st⇨ : ∀ {A : Type m}{ C}
+    → [ C ]ˢ (↑ty0 A) ⇨ A
+
 ty-ty-gen : ∀ {A : Type m} {A' k}
   → ty A ↑ k ⇨ A'
   → ↑ty k A ≡ A'
@@ -46,7 +49,7 @@ st-st-gen {k = k} (st-var-neq {X = X} ¬p) with  k #≟ X
 ... | no ¬p = refl
 st-st-gen (st-arr st st₁) rewrite st-st-gen st | st-st-gen st₁ = refl
 st-st-gen (st-∀ up₁ st) rewrite ty-ty-gen up₁ | st-st-gen st = refl
-
+  
 st-st : ∀ {A : Type (1 + m)} {B A'}
   → [ B ]ˢ A ⇨ A'
   → [ B ]ˢ A ≡ A'

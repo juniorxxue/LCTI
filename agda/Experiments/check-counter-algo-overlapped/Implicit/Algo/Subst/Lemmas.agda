@@ -26,10 +26,9 @@ substituition (s-ex-l= clo x-in s) env1 env2 st1 stΣ st2 = {!!}
 substituition (s-ex-r^ clo x-in inst) env1 env2 st1 stΣ st2 = {!!}
 substituition (s-ex-r= clo x-in s) env1 env2 st1 stΣ st2 = {!!}
 substituition (s-arr s s₁) env1 env2 st1 stΣ st2 = {!!}
-substituition (s-term-c cloA cloB ⊢e s) env1 env2 st1 stΣ st2 = {!!}
-substituition (s-term-o op ⊢e s s₁) env1 env2 st1 stΣ st2 = {!!}
+substituition (s-term-c cloA ⊢e s) env1 env2 st1 stΣ st2 = {!!}
+substituition (s-term-o ⊢e s s₁) env1 env2 st1 stΣ st2 = {!!}
 substituition (s-∀ s) env1 env2 st1 stΣ st2 = {!!}
-substituition (s-∀l-^ s) env1 env2 st1 stΣ st2 = {!!}
-substituition (s-∀l-eq s st₁ st₂) env1 env2 st1 stΣ st2 = {!!}
+substituition (s-∀l s st₁ st₂) env1 env2 st1 stΣ st2 = {!!}
   
 

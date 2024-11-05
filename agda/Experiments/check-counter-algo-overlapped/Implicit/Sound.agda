@@ -1,12 +1,13 @@
 module Implicit.Sound where
 
 open import Implicit.Common
-open import Implicit.Decl renaming (_:=_∈_ to _:=_∈d_)
+open import Implicit.Decl renaming (_:=_∈_ to _:=_∈d_; find to d-find; bound to d-bound)
 open import Implicit.Decl.Subst
 open import Implicit.Decl.Properties
 open import Implicit.Algo renaming (_:=_∈_ to _:=_∈a_)
 open import Implicit.Algo.Properties
 open import Implicit.Algo.Environments
+open import Implicit.Algo.Find renaming (find to a-find; bound to a-bound)
 
 postulate
   ∈a→∈d : ∀ {Ψ : SEnv n m} {X A}
@@ -68,11 +69,16 @@ postulate
     → [ B ]ˢ A ⇨ A'
     → Γ ⊢ ⟨ j , A' ⟩ ~ Σ'
 
-
-
 ----------------------------------------------------------------------
 --+                             Typing                             +--
 ----------------------------------------------------------------------
+
+e-ic : ∀ {Γ : Env n m} {j A Σ e}
+  → Γ ⊢ ⟨ j , A ⟩ ~ [ e ]↝ Σ
+  → IC j
+e-ic (~I ⊢e ~j) = ic-I
+e-ic (~C ⊢e ~j) = ic-C
+
 
 data JustSub (Ψ : SEnv n m) (Σ : Context n m) (A : Type m) (B : Type m) : Set where
   subs : ∀ {j}
@@ -86,6 +92,12 @@ data JustTyping (Γ : Env n m) (Σ : Context n m) (e : Term n m) (A : Type m) : 
     → (s : Γ ⊢ j # e ⦂ A)
     → JustTyping Γ Σ e A
 
+data JustFind (Γ : Env n m) (A : Type m) (k : Fin m) (Σ : Context n m) : Set where
+  finds : ∀ {j B}
+    → (j~Σ : Γ ⊢ ⟨ j , B ⟩ ~ Σ)
+    → d-find A k j
+    → JustFind Γ A k Σ
+
 sound : ∀ {Γ : Env n m} {Σ e A}
   → Γ ⊢ Σ ⇒ e ⇒ A
   → JustTyping Γ Σ e A
@@ -93,6 +105,15 @@ sound : ∀ {Γ : Env n m} {Σ e A}
 sound-s : ∀ {Ψ Ψ' : SEnv n m} {Σ A B}
   → Ψ ⊢ A ≤ Σ ⊣ Ψ' ↪ B
   → JustSub Ψ' Σ A B
+
+sound-find : ∀ {Γ : Env n m} {k Σ A B j}
+  → a-find Γ A k Σ
+  → Γ ⊢ ⟨ j , B ⟩ ~ Σ
+  → d-find A k j
+
+sound-find' : ∀ {Γ : Env n m} {k Σ A}
+  → a-find Γ A k Σ
+  → JustFind Γ A k Σ
 
 sound-0 : ∀ {Γ : Env n m} {e A}
   → Γ ⊢ □ ⇒ e ⇒ A
@@ -140,4 +161,16 @@ sound-s (s-term-o ⊢e s s₁) with sound-s s | sound-s s₁ | sound-0 ⊢e
 sound-s (s-∀ s) with sound-s s
 ... | subs ~∞ s' = subs ~∞ (s-∀ s')
 sound-s (s-∀l s st₁ st₂) with sound-s s
-... | subs j~Σ s' = subs (~-subst j~Σ {!!} (st-arr st₁ st₂)) (s-∀l s' {!!} {!!} st₁ st₂)
+... | subs j~Σ s' = subs (~-subst j~Σ {!!} (st-arr st₁ st₂)) (s-∀l s' (e-ic {!!}) (sound-find (s-find s) j~Σ) st₁ st₂) -- ok
+
+sound-find (f-τ bd) j~Σ = {!!}
+sound-find (f-arr-l bd ⊢e) (~I ⊢e₁ j~Σ) = {!!}
+sound-find (f-arr-l bd ⊢e) (~C ⊢e₁ j~Σ) = {!!}
+sound-find (f-arr-r fd) j~Σ = {!!}
+sound-find (f-∀ fd) j~Σ = {!!}
+
+
+sound-find' (f-τ bd) = finds ~∞ {!!}
+sound-find' (f-arr-l bd ⊢e) = finds (~I (sound-0 ⊢e) {!!}) (f-arr-I-l {!!})
+sound-find' (f-arr-r fd) = finds (~C {!!} {!!}) (f-arr-C {!!})
+sound-find' (f-∀ fd) = {!!}

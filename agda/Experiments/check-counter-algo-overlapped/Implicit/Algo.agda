@@ -149,7 +149,9 @@ data _⊢o_ : SEnv n m → Type m → Set where
 infix 3 _:=_∈_
 data _:=_∈_ : Fin m → Type m → SEnv n m → Set where
 
-  Z : ∀ {A} → #0 := A ∈ Ψ ,= ↓ty0 A
+  Z : ∀ {A A'}
+    → [ Int ]ˢ A ⇨ A'
+    → #0 := A ∈ Ψ ,= A'
   S, : ∀ {k} {A B}
     → k := A ∈ Ψ
     → k := A ∈ Ψ , B
@@ -187,8 +189,9 @@ data [_/_]_⟹_ : Type m → Fin m → SEnv n m → SEnv n m → Set where
     → [ A / k ] (Ψ , B) ⟹ Ψ' , B
 -}
     
-  ⟹^0 : ∀ {Ψ : SEnv n m} {A}
-    → [ A / #0 ] (Ψ ,^) ⟹ (Ψ ,= (↓ty0 A))
+  ⟹^0 : ∀ {Ψ : SEnv n m} {A A'}
+    → [ Int ]ˢ A ⇨ A'
+    → [ A / #0 ] (Ψ ,^) ⟹ (Ψ ,= A')
 
   ⟹^S : ∀ {Ψ Ψ' : SEnv n m} {A k}
     → [ ↓ty0 A / k ] Ψ ⟹ Ψ'

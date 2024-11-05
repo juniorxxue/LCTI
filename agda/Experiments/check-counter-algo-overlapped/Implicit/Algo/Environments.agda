@@ -7,7 +7,7 @@ open import Implicit.Algo
 inst-in : ∀ {Ψ Ψ' : SEnv n m} {A X}
   → [ A / X ] Ψ ⟹ Ψ'
   → X := A ∈ Ψ'
-inst-in ⟹^0 = Z
+inst-in (⟹^0 st) = Z st
 inst-in (⟹^S ist) = S^ (inst-in ist)
 inst-in (⟹∙S ist) = S∙ (inst-in ist)
 inst-in (⟹,S ist) = S, (inst-in ist)

@@ -19,7 +19,7 @@ postulate
     → Ψ ⊢c `∀ B
     → Ψ ,= A ⊢c B
     -- requires a lemma: if a universal varialbe in a context, you can replace it with a solution without affecting it's closedness
-
+  
 ↑tyΣ-st : ∀ (Σ : Context n m) {A}
   → [ A ]ᶜ (↑tyΣ0 Σ) ≡ Σ
 ↑tyΣ-st □ = refl
@@ -94,7 +94,7 @@ data _⊆_ : SEnv n m → SEnv n m → Set where
 ⟹closed : ∀ {Ψ Ψ' : SEnv n m} {A X} 
   → [ A / X ] Ψ ⟹ Ψ'
   → Ψ ⊆ Ψ'
-⟹closed ⟹^0 = evar-sol ⊆refl
+⟹closed (⟹^0 sf) = evar-sol ⊆refl
 ⟹closed (⟹,S s) = var (⟹closed s)
 ⟹closed (⟹^S s) = evar (⟹closed s)
 ⟹closed (⟹∙S s) = uvar (⟹closed s)
@@ -193,6 +193,7 @@ spl-deterministic : ∀ {Σ : Context n m} {A A₁ A₂ Σ₁ Σ₂}
 spl-deterministic none-□ none-□ = ⟨ refl , refl ⟩  
 spl-deterministic none-τ none-τ = ⟨ refl , refl ⟩
 spl-deterministic (have-e spl1) (have-e spl2) = spl-deterministic spl1 spl2
+
 
 spl-↑ty : ∀ {Σ : Context n (1 + m)} {B Σ' A C}
   → ⟦ Σ , B ⟧→s⟦ Σ' , A ⟧
