@@ -42,7 +42,12 @@ mutual
   ...  | refl 
       with subst-unique' st1 st2  
   ...     | refl = s-empty (c-substitution p env1 st1)
-  ≤-substituition s-var env1 env2 st1 stΣ st2 = {! !}
+  ≤-substituition s-var env1 env2 st1 (fulltype x) st2 
+    with env-remove-unique env1 env2 
+  ...  | refl 
+       with subst-unique' st1 st2 
+  ≤-substituition s-var env1 env2 st-var-eq (fulltype x) st2 | refl | refl = {!   !}
+  ≤-substituition s-var env1 env2 (st-var-neq ¬p) (fulltype x) st2 | refl | refl = {!   !}
   ≤-substituition (s-ex-l^ clo x-in inst) env1 env2 st1 stΣ st2 = {! !}
   ≤-substituition (s-ex-l= clo x-in s) env1 env2 st1 stΣ st2 = {!!}
   ≤-substituition (s-ex-r^ clo x-in inst) env1 env2 st1 stΣ st2 = {!!}
@@ -57,7 +62,7 @@ mutual
   ≤-substituition (s-term-o op ⊢e s s₁) env1 env2 st1 stΣ st2 = {! !}
   -- ↑-unique
   ≤-substituition (s-∀ s) env1 env2 (st-∀ up₂ st1) (fulltype (st-∀ up₁ x)) (st-∀ up₃ st2) = s-∀ (≤-substituition s {!   !} {!   !} {!   !} (fulltype x) {!   !})
-  ≤-substituition (s-∀l s st₁ st₂) env1 env2 st1 stΣ st2 = {! !}
+  ≤-substituition (s-∀l s st₁ st₂) env1 env2 st1 stΣ st2 = {!  !}
 
   ⇒-substitution : ∀ {Ψ k T e A A' Ψx Σ' e'}
     → 𝕄 Ψ ⊢ Σ ⇒ e ⇒ A
@@ -69,5 +74,5 @@ mutual
   ⇒-substitution = {!   !}
 
   
-  
+   
    
