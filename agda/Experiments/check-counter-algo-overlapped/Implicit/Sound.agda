@@ -19,8 +19,10 @@ postulate
     → X := A ∈a Ψ
     → X := A ∈a Ψ'
 
+{-
   s-⊆-prv : ∀ {Ψ Ψ' : SEnv n m} {A B}
     → Ψ ⊆ Ψ'
+    → side condition
     → 𝕄 Ψ ⊢ ∞ # A ≤ B
     → 𝕄 Ψ' ⊢ ∞ # A ≤ B
 
@@ -28,6 +30,7 @@ postulate
     → Ψ ⊆ Ψ'
     → 𝕄 Ψ ⊢ j # e ⦂ A
     → 𝕄 Ψ' ⊢ j # e ⦂ A
+-}    
 
 
 infix 3 _⊢_~_
@@ -86,17 +89,17 @@ data JustSub (Ψ : SEnv n m) (Σ : Context n m) (A : Type m) (B : Type m) : Set 
     → (s : 𝕄 Ψ ⊢ j # A ≤ B)
     → JustSub Ψ Σ A B
 
+data JustSub' (Γ : Env n m) (Σ : Context n m) (A : Type m) (B : Type m) : Set where
+  subs : ∀ {j}
+    → (j~Σ : Γ ⊢ ⟨ j , B ⟩ ~ Σ)
+    → (s : Γ ⊢ j # A ≤ B)
+    → JustSub' Γ Σ A B
+
 data JustTyping (Γ : Env n m) (Σ : Context n m) (e : Term n m) (A : Type m) : Set where
   typs : ∀ {j}
     → (j~Σ : Γ ⊢ ⟨ j , A ⟩ ~ Σ)
-    → (s : Γ ⊢ j # e ⦂ A)
+      → (s : Γ ⊢ j # e ⦂ A)
     → JustTyping Γ Σ e A
-
-data JustFind (Γ : Env n m) (A : Type m) (k : Fin m) (Σ : Context n m) : Set where
-  finds : ∀ {j B}
-    → (j~Σ : Γ ⊢ ⟨ j , B ⟩ ~ Σ)
-    → d-find A k j
-    → JustFind Γ A k Σ
 
 sound : ∀ {Γ : Env n m} {Σ e A}
   → Γ ⊢ Σ ⇒ e ⇒ A
@@ -106,14 +109,14 @@ sound-s : ∀ {Ψ Ψ' : SEnv n m} {Σ A B}
   → Ψ ⊢ A ≤ Σ ⊣ Ψ' ↪ B
   → JustSub Ψ' Σ A B
 
+sound-s' : ∀ {Γ Γ' : Env n m} {Σ A B}
+  → 𝕎 Γ ⊢ A ≤ Σ ⊣ 𝕎 Γ' ↪ B
+  → JustSub' Γ Σ A B
+
 sound-find : ∀ {Γ : Env n m} {k Σ A B j}
   → a-find Γ A k Σ
   → Γ ⊢ ⟨ j , B ⟩ ~ Σ
   → d-find A k j
-
-sound-find' : ∀ {Γ : Env n m} {k Σ A}
-  → a-find Γ A k Σ
-  → JustFind Γ A k Σ
 
 sound-0 : ∀ {Γ : Env n m} {e A}
   → Γ ⊢ □ ⇒ e ⇒ A
@@ -138,7 +141,8 @@ sound (⊢lam₁ ⊢e) with sound ⊢e
 sound (⊢lam₂ ⊢e ⊢e₁) with sound ⊢e₁
 ... | typs j ⊢e' = typs (~I (sound-0 ⊢e) (~-weaken j)) (⊢lam₂ ⊢e')
 sound (⊢sub ⊢e ne gc s) with sound-s s
-... | subs j~Σ s₁ = typs (~-w-m j~Σ) (⊢sub' (sound-0 ⊢e) (s-w-m s₁))
+... | subs j~Σ s₁ = {!!}
+-- typs (~-w-m j~Σ) (⊢sub' (sound-0 ⊢e) (s-w-m s₁))
 sound (⊢tabs ⊢e) with sound ⊢e
 ... | typs ~Z s = typs ~Z (⊢tabs s)
 
@@ -152,12 +156,12 @@ sound-s (s-ex-r^ clo x-in inst) = subs ~∞ (s-var-r (∈a→∈d (inst-in inst)
 sound-s (s-ex-r= clo x-in s) with sound-s s
 ... | subs ~∞ s' = subs ~∞ (s-var-r (∈a→∈d (⊆-:= (s-⊆ s) x-in)) s')
 sound-s (s-arr s s₁) with sound-s s | sound-s s₁
-... | subs ~∞ s₂ | subs ~∞ s₃ = subs ~∞ (s-arr₁ (s-⊆-prv (s-⊆ s₁) s₂) s₃)
+... | subs ~∞ s₂ | subs ~∞ s₃ = subs ~∞ (s-arr₁ {!!} s₃)
 sound-s (s-term-c cloA ⊢e s) with sound-s s
 ... | subs j~Σ s' with ⊢id0 ⊢e
-...   | refl = subs (~C (⊢d-⊆-prv (s-⊆ s) (sound-∞ ⊢e)) j~Σ) (s-arr₃ s')
+...   | refl = subs (~C {!!} j~Σ) (s-arr₃ s')
 sound-s (s-term-o ⊢e s s₁) with sound-s s | sound-s s₁ | sound-0 ⊢e
-... | subs ~∞ s'' | subs j~Σ s' | ⊢e' rewrite ≤id0 s = subs (~I (⊢d-⊆-prv (⊆trans (s-⊆ s) (s-⊆ s₁)) ⊢e') j~Σ) (s-arr₂ {!s''!} s') -- ok, same as above
+... | subs ~∞ s'' | subs j~Σ s' | ⊢e' rewrite ≤id0 s = subs (~I {!!} j~Σ) (s-arr₂ {!s''!} s') -- ok, same as above
 sound-s (s-∀ s) with sound-s s
 ... | subs ~∞ s' = subs ~∞ (s-∀ s')
 sound-s (s-∀l s st₁ st₂) with sound-s s
@@ -169,8 +173,4 @@ sound-find (f-arr-l bd ⊢e) (~C ⊢e₁ j~Σ) = {!!}
 sound-find (f-arr-r fd) j~Σ = {!!}
 sound-find (f-∀ fd) j~Σ = {!!}
 
-
-sound-find' (f-τ bd) = finds ~∞ {!!}
-sound-find' (f-arr-l bd ⊢e) = finds (~I (sound-0 ⊢e) {!!}) (f-arr-I-l {!!})
-sound-find' (f-arr-r fd) = finds (~C {!!} {!!}) (f-arr-C {!!})
-sound-find' (f-∀ fd) = {!!}
+sound-s' s = {!s!}

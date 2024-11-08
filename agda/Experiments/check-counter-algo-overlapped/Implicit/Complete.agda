@@ -3,6 +3,7 @@ module Implicit.Complete where
 open import Implicit.Common
 open import Implicit.Decl renaming (_:=_∈_ to _:=_∈d_)
 open import Implicit.Algo renaming (_:=_∈_ to _:=_∈a_)
+open import Implicit.Algo.Properties
 open import Implicit.Algo.Subsumption
 open import Implicit.Algo.Postulates
 
@@ -41,6 +42,58 @@ postulate
     → Γ ⊢ j # e ⦂ A
     → 𝕄 (𝕎 Γ) ⊢ j # e ⦂ A
 
+infix 3 _⊢_≊_
+data _⊢_≊_ : SEnv n m → Type m → Type m → Set where
+
+  ≊-int : ∀ {Ψ : SEnv n m} {A}
+    → Ψ ⊢ Int ≊ Int
+
+  ≊-var : ∀ {Ψ : SEnv n m} {X}
+    → Ψ ⊢ ‶ X ≊ ‶ X
+
+  ≊-left : ∀ {Ψ : SEnv n m} {X A}
+    → X := A ∈a Ψ
+    → Ψ ⊢ ‶ X ≊ A
+    
+  ≊-right : ∀ {Ψ : SEnv n m} {X A}
+    → X := A ∈a Ψ
+    → Ψ ⊢ A ≊ ‶ X
+
+  ≊-arr : ∀ {Ψ : SEnv n m} {A B A' B'}
+    → Ψ ⊢ A ≊ A'
+    → Ψ ⊢ B ≊ B'
+    → Ψ ⊢ A `→ B ≊ A' `→ B'
+
+  ≊-∀ : ∀ {Ψ : SEnv n m} {A B}
+    → Ψ ,∙ ⊢ A ≊ B
+    → Ψ ⊢ `∀ A ≊ `∀ B
+
+≊-refl : ∀ {Ψ : SEnv n m} {A}
+  → Ψ ⊢ A ≊ A
+≊-refl {A = Int} = ≊-int
+≊-refl {A = ‶ X} = ≊-var
+≊-refl {A = A `→ A₁} = ≊-arr ≊-refl ≊-refl
+≊-refl {A = `∀ A} = ≊-∀ ≊-refl
+
+data JustTyp (Γ : Env n m) (Σ : Context n m) (e : Term n m) (A : Type m) : Set where
+  typs : ∀ {B}
+    → (⊢e : Γ ⊢ Σ ⇒ e ⇒ B)
+    → (sim : 𝕎 Γ ⊢ A ≊ B)
+    → JustTyp Γ Σ e A
+
+data JustSub (Ψ' : SEnv n m) (Σ : Context n m) (A : Type m) : Set where
+  subs : ∀ {Ψ B}
+    → (ext : Ψ ⊆ Ψ')
+    → (sub : Ψ ⊢ A ≤ Σ ⊣ Ψ' ↪ B)
+    → (sim : Ψ ⊢ A ≊ B)
+    → JustSub Ψ' Σ A
+
+
+complete' : ∀ {Γ : Env n m} {Σ j e A}
+  → Γ ⊢ j # e ⦂ A
+  → Γ ⊢ ⟨ j , A ⟩ ~ Σ
+  → JustTyp Γ Σ e A
+
 complete : ∀ {Γ : Env n m} {Σ j e A}
   → Γ ⊢ j # e ⦂ A
   → Γ ⊢ ⟨ j , A ⟩ ~ Σ
@@ -54,6 +107,7 @@ complete-≤ : ∀ {Γ : Env n m} {Σ j A B}
 complete-≤' : ∀ {Γ : Env n m} {Ψ Σ j A B}
   → Γ ⊢ j # B ≤ A
   → Γ ⊢ ⟨ j , A ⟩ ~ Σ
+--  → Psi ⊂ Γ
   → Ψ ⊢ B ≤ Σ ⊣ 𝕎 Γ ↪ A -- this is too loose, abtrary Ψ cannot prove simple cases
   
 complete-inf : ∀ {Γ : Env n m} {e A}
@@ -85,10 +139,23 @@ complete-≤ (s-refl) ~Z = s-empty {!!} -- ok
 complete-≤ s-int ~∞ = s-int
 complete-≤ s-var ~∞ = s-var
 complete-≤ (s-arr₁ s s₁) ~∞ = s-arr (complete-≤-chk s) (complete-≤-chk s₁)
-complete-≤ (s-arr₂ s s₁) (~I ⊢e j~Σ) = s-term-o (⊢a-m-w ⊢e) (complete-≤ s ~∞) (complete-≤ s₁ j~Σ)
+complete-≤ (s-arr₂ s s₁) (~I ⊢e j~Σ) = {!!}
 complete-≤ (s-arr₃ s) (~C ⊢e ~j) = s-term-c {!!} (⊢a-m-w ⊢e) (complete-≤ s ~j)
 complete-≤ (s-∀ s) ~∞ = s-∀ (complete-≤-chk s)
 complete-≤ (s-∀l s have-i fd st₁ st₂) (~I ⊢e ~j) = s-∀l {!complete-≤ s ?!} st₁ st₂
 complete-≤ (s-∀l s have-i fd st₁ st₂) (~C ⊢e ~j) = s-∀l {!!} st₁ st₂
 complete-≤ (s-var-l x s) ~∞ = s-ex-l= {!!} {!!} (complete-≤-chk s) -- ok
 complete-≤ (s-var-r x s) ~∞ = s-ex-r= {!!} {!!} (complete-≤-chk s) -- ok
+
+
+complete' ⊢lit ~Z = typs ⊢lit ≊-int
+complete' (⊢var x) ~Z = typs (⊢var x) ≊-refl
+complete' (⊢ann ⊢e) ~Z = typs (complete' {!!}) {!!}
+complete' ⊢ann (⊢lam₁ ⊢e) ~∞ with complete' ⊢e ~∞
+... | typs ⊢e₁ sim = typs (⊢lam₁ ⊢e₁) {!!}
+complete' (⊢lam₂ ⊢e) ~j = {!!}
+complete' (⊢app₁ ⊢e ⊢e₁) ~j with complete' ⊢e (~C {!!} ~j) | complete' ⊢e₁ ~∞
+... | typs ⊢e₂ sim | typs ⊢e₃ sim₁ = typs (⊢app {!sim!}) {!!}
+complete' (⊢app₂ ⊢e ⊢e₁) ~j = {!!}
+complete' (⊢sub ⊢e B≤A j≢Z) ~j = {!!}
+complete' (⊢tabs ⊢e) ~j = {!!}
