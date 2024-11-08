@@ -1,11 +1,37 @@
 module Implicit.Sound where
 
 open import Implicit.Common
-open import Implicit.Decl renaming (_:=_∈_ to _:=_∈d_)
+open import Implicit.Decl renaming (_:=_∈_ to _:=_∈d_; find to d-find; bound to d-bound)
 open import Implicit.Decl.Subst
 open import Implicit.Decl.Properties
 open import Implicit.Algo renaming (_:=_∈_ to _:=_∈a_)
 open import Implicit.Algo.Properties
+open import Implicit.Algo.Environments
+open import Implicit.Algo.Find renaming (find to a-find; bound to a-bound)
+
+postulate
+  ∈a→∈d : ∀ {Ψ : SEnv n m} {X A}
+    → X := A ∈a Ψ
+    → X := A ∈d 𝕄 Ψ
+
+  ⊆-:= : ∀ {Ψ Ψ' : SEnv n m} {X A}
+    → Ψ ⊆ Ψ'
+    → X := A ∈a Ψ
+    → X := A ∈a Ψ'
+
+{-
+  s-⊆-prv : ∀ {Ψ Ψ' : SEnv n m} {A B}
+    → Ψ ⊆ Ψ'
+    → side condition
+    → 𝕄 Ψ ⊢ ∞ # A ≤ B
+    → 𝕄 Ψ' ⊢ ∞ # A ≤ B
+
+  ⊢d-⊆-prv : ∀ {Ψ Ψ' : SEnv n m} {A e j}
+    → Ψ ⊆ Ψ'
+    → 𝕄 Ψ ⊢ j # e ⦂ A
+    → 𝕄 Ψ' ⊢ j # e ⦂ A
+-}    
+
 
 infix 3 _⊢_~_
 data _⊢_~_ : Env n m → Counter × Type m → Context n m → Set where
@@ -40,10 +66,22 @@ postulate
     → Γ , A ⊢ ⟨ j , B ⟩ ~ ↑Σ0 Σ
     → Γ ⊢ ⟨ j , B ⟩ ~ Σ
 
+  ~-subst : ∀ {Γ : Env n m} {Σ A B j Σ' A'}
+    → (Γ ,= B) ⊢ ⟨ j , A ⟩ ~ Σ
+    → [ B ]ᶜ Σ ⇨ Σ'
+    → [ B ]ˢ A ⇨ A'
+    → Γ ⊢ ⟨ j , A' ⟩ ~ Σ'
 
 ----------------------------------------------------------------------
 --+                             Typing                             +--
 ----------------------------------------------------------------------
+
+e-ic : ∀ {Γ : Env n m} {j A Σ e}
+  → Γ ⊢ ⟨ j , A ⟩ ~ [ e ]↝ Σ
+  → IC j
+e-ic (~I ⊢e ~j) = ic-I
+e-ic (~C ⊢e ~j) = ic-C
+
 
 data JustSub (Ψ : SEnv n m) (Σ : Context n m) (A : Type m) (B : Type m) : Set where
   subs : ∀ {j}
@@ -51,10 +89,16 @@ data JustSub (Ψ : SEnv n m) (Σ : Context n m) (A : Type m) (B : Type m) : Set 
     → (s : 𝕄 Ψ ⊢ j # A ≤ B)
     → JustSub Ψ Σ A B
 
+data JustSub' (Γ : Env n m) (Σ : Context n m) (A : Type m) (B : Type m) : Set where
+  subs : ∀ {j}
+    → (j~Σ : Γ ⊢ ⟨ j , B ⟩ ~ Σ)
+    → (s : Γ ⊢ j # A ≤ B)
+    → JustSub' Γ Σ A B
+
 data JustTyping (Γ : Env n m) (Σ : Context n m) (e : Term n m) (A : Type m) : Set where
   typs : ∀ {j}
     → (j~Σ : Γ ⊢ ⟨ j , A ⟩ ~ Σ)
-    → (s : Γ ⊢ j # e ⦂ A)
+      → (s : Γ ⊢ j # e ⦂ A)
     → JustTyping Γ Σ e A
 
 sound : ∀ {Γ : Env n m} {Σ e A}
@@ -64,6 +108,15 @@ sound : ∀ {Γ : Env n m} {Σ e A}
 sound-s : ∀ {Ψ Ψ' : SEnv n m} {Σ A B}
   → Ψ ⊢ A ≤ Σ ⊣ Ψ' ↪ B
   → JustSub Ψ' Σ A B
+
+sound-s' : ∀ {Γ Γ' : Env n m} {Σ A B}
+  → 𝕎 Γ ⊢ A ≤ Σ ⊣ 𝕎 Γ' ↪ B
+  → JustSub' Γ Σ A B
+
+sound-find : ∀ {Γ : Env n m} {k Σ A B j}
+  → a-find Γ A k Σ
+  → Γ ⊢ ⟨ j , B ⟩ ~ Σ
+  → d-find A k j
 
 sound-0 : ∀ {Γ : Env n m} {e A}
   → Γ ⊢ □ ⇒ e ⇒ A
@@ -88,29 +141,36 @@ sound (⊢lam₁ ⊢e) with sound ⊢e
 sound (⊢lam₂ ⊢e ⊢e₁) with sound ⊢e₁
 ... | typs j ⊢e' = typs (~I (sound-0 ⊢e) (~-weaken j)) (⊢lam₂ ⊢e')
 sound (⊢sub ⊢e ne gc s) with sound-s s
-... | subs j~Σ s₁ = typs (~-w-m j~Σ) (⊢sub' (sound-0 ⊢e) (s-w-m s₁))
+... | subs j~Σ s₁ = {!!}
+-- typs (~-w-m j~Σ) (⊢sub' (sound-0 ⊢e) (s-w-m s₁))
 sound (⊢tabs ⊢e) with sound ⊢e
 ... | typs ~Z s = typs ~Z (⊢tabs s)
 
 sound-s s-int = subs ~∞ s-int
 sound-s (s-empty p) = subs ~Z s-refl
 sound-s s-var = subs ~∞ s-var
-sound-s (s-ex-l^ clo x-in inst) = subs ~∞ (s-var-l {!!} s-refl-∞) -- ok
+sound-s (s-ex-l^ clo x-in inst) = subs ~∞ (s-var-l (∈a→∈d (inst-in inst)) s-refl-∞)
 sound-s (s-ex-l= clo x-in s) with sound-s s
-... | subs ~∞ s' = subs ~∞ (s-var-l {!!} s') -- ok
-sound-s (s-ex-r^ clo x-in inst) = subs ~∞ (s-var-r {!!} s-refl-∞) -- ok
+... | subs ~∞ s' = subs ~∞ (s-var-l (∈a→∈d (⊆-:= (s-⊆ s) x-in)) s')
+sound-s (s-ex-r^ clo x-in inst) = subs ~∞ (s-var-r (∈a→∈d (inst-in inst)) s-refl-∞)
 sound-s (s-ex-r= clo x-in s) with sound-s s
-... | subs ~∞ s' = subs ~∞ (s-var-r {!!} s') -- ok
+... | subs ~∞ s' = subs ~∞ (s-var-r (∈a→∈d (⊆-:= (s-⊆ s) x-in)) s')
 sound-s (s-arr s s₁) with sound-s s | sound-s s₁
-... | subs ~∞ s₂ | subs ~∞ s₃ = subs ~∞ (s-arr₁ {!!} {!!}) -- ok, the subtyping relation is preserved during the env extension
-sound-s (s-term-c cloA cloB ⊢e s) with sound-s s
-... | subs j~Σ s' rewrite ⊢id0 ⊢e = subs (~C {!sound-∞ ⊢e!} j~Σ) (s-arr₃ s') -- ok, typing is preserved during the env extension
-sound-s (s-term-o op ⊢e s s₁) with sound-s s | sound-s s₁
-... | subs ~∞ s'' | subs j~Σ s' rewrite ≤id0 s = subs (~I (sound-0 {!⊢e!}) j~Σ) (s-arr₂ {!s''!} s') -- ok, same as above
+... | subs ~∞ s₂ | subs ~∞ s₃ = subs ~∞ (s-arr₁ {!!} s₃)
+sound-s (s-term-c cloA ⊢e s) with sound-s s
+... | subs j~Σ s' with ⊢id0 ⊢e
+...   | refl = subs (~C {!!} j~Σ) (s-arr₃ s')
+sound-s (s-term-o ⊢e s s₁) with sound-s s | sound-s s₁ | sound-0 ⊢e
+... | subs ~∞ s'' | subs j~Σ s' | ⊢e' rewrite ≤id0 s = subs (~I {!!} j~Σ) (s-arr₂ {!s''!} s') -- ok, same as above
 sound-s (s-∀ s) with sound-s s
 ... | subs ~∞ s' = subs ~∞ (s-∀ s')
-sound-s (s-∀l-^ s) with sound-s s
-... | subs j~Σ s' = subs {!j~Σ!} (s-∀l {!!} {!!} {!!} {!!}) -- this is a counter example
-sound-s (s-∀l-eq s st₁ st₂) with sound-s s
-... | subs j~Σ s' = subs {!!} (s-∀l {!s'!} {!!} st₁ st₂)
--- subs {!j~Σ!} (s-∀l {!!} {!!} st₁ st₂)
+sound-s (s-∀l s st₁ st₂) with sound-s s
+... | subs j~Σ s' = subs (~-subst j~Σ {!!} (st-arr st₁ st₂)) (s-∀l s' (e-ic {!!}) (sound-find (s-find s) j~Σ) st₁ st₂) -- ok
+
+sound-find (f-τ bd) j~Σ = {!!}
+sound-find (f-arr-l bd ⊢e) (~I ⊢e₁ j~Σ) = {!!}
+sound-find (f-arr-l bd ⊢e) (~C ⊢e₁ j~Σ) = {!!}
+sound-find (f-arr-r fd) j~Σ = {!!}
+sound-find (f-∀ fd) j~Σ = {!!}
+
+sound-s' s = {!s!}

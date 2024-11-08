@@ -58,7 +58,7 @@ mutual
       with subst-unique' x st2 
   -- exists a result?
   ...    | refl = s-arr (≤-substituition s env1 {!   !} st2 (fulltype st1) {!   !}) (≤-substituition s₁ {!   !} env2 st3 (fulltype st4) {!   !})
-  ≤-substituition (s-term-c cloA cloB ⊢e s) env1 env2 (st-arr st1 st3) (term stΣ ste) (st-arr st2 st4) = s-term-c (c-substitution cloA env1 st1) (c-substitution cloB env1 st3) (⇒-substitution ⊢e env1 (fulltype st1) st2 ste) (≤-substituition s env1 env2 st3 stΣ st4)
+  ≤-substituition (s-term-c cloA ⊢e s) env1 env2 (st-arr st1 st3) (term stΣ ste) (st-arr st2 st4) = s-term-c (c-substitution cloA env1 st1) (⇒-substitution ⊢e env1 (fulltype st1) st2 ste) (≤-substituition s env1 env2 st3 stΣ st4)
   ≤-substituition (s-term-o op ⊢e s s₁) env1 env2 st1 stΣ st2 = {! !}
   -- ↑-unique
   ≤-substituition (s-∀ s) env1 env2 (st-∀ up₂ st1) (fulltype (st-∀ up₁ x)) (st-∀ up₃ st2) = s-∀ (≤-substituition s {!   !} {!   !} {!   !} (fulltype x) {!   !})

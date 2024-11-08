@@ -55,6 +55,10 @@ data [_/_]ᶜ_⇨_ : Fin (1 + m) → Type m → Context n (1 + m) → Context n 
     → [ k / A ]ᵗ e ⇨ e'
     → [ k / A ]ᶜ ([ e ]↝ Σ) ⇨ (Context n m ∋⦂ ([ e' ]↝ Σ'))
 
+infix 3 [_]ᶜ_⇨_
+[_]ᶜ_⇨_ : Type m → Context n (1 + m) → Context n m → Set
+[_]ᶜ_⇨_ = [_/_]ᶜ_⇨_ #0
+
 infix 6 [_]ᶜ_
 [_]ᶜ_ : Type m → Context n (1 + m) → Context n m
 [ A ]ᶜ □ = □
@@ -145,7 +149,9 @@ data _⊢o_ : SEnv n m → Type m → Set where
 infix 3 _:=_∈_
 data _:=_∈_ : Fin m → Type m → SEnv n m → Set where
 
-  Z : ∀ {A} → #0 := A ∈ Ψ ,= ↓ty0 A
+  Z : ∀ {A A'}
+    → [ Int ]ˢ A ⇨ A'
+    → #0 := A ∈ Ψ ,= A'
   S, : ∀ {k} {A B}
     → k := A ∈ Ψ
     → k := A ∈ Ψ , B
@@ -183,8 +189,9 @@ data [_/_]_⟹_ : Type m → Fin m → SEnv n m → SEnv n m → Set where
     → [ A / k ] (Ψ , B) ⟹ Ψ' , B
 -}
     
-  ⟹^0 : ∀ {Ψ : SEnv n m} {A}
-    → [ A / #0 ] (Ψ ,^) ⟹ (Ψ ,= (↓ty0 A))
+  ⟹^0 : ∀ {Ψ : SEnv n m} {A A'}
+    → [ Int ]ˢ A ⇨ A'
+    → [ A / #0 ] (Ψ ,^) ⟹ (Ψ ,= A')
 
   ⟹^S : ∀ {Ψ Ψ' : SEnv n m} {A k}
     → [ ↓ty0 A / k ] Ψ ⟹ Ψ'
@@ -333,13 +340,12 @@ data _⊢_≤_⊣_↪_ where
 
   s-term-c : ∀ {A B A' D e}
     → (cloA : Ψ ⊢c A)
-    → (cloB : Ψ ⊢c B)
     → (⊢e : (𝕄 Ψ) ⊢ τ A ⇒ e ⇒ A')
     → Ψ ⊢ B ≤ Σ ⊣ Ψ' ↪ D
     → Ψ ⊢ (A `→ B) ≤ ([ e ]↝ Σ) ⊣ Ψ' ↪ A' `→ D
 
   s-term-o : ∀ {A A' B C D e}
-    → (op : Ψ ⊢o A)
+    → (opnA : Ψ ⊢o A)
     → (⊢e : (𝕄 Ψ) ⊢ □ ⇒ e ⇒ C)
     → Ψ ⊢ C ≤ τ A ⊣ Ψ₁ ↪ A'
     → Ψ₁ ⊢ B ≤ Σ ⊣ Ψ₂ ↪ D

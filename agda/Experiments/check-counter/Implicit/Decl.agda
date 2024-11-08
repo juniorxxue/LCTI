@@ -14,6 +14,10 @@ data NonZ : Counter → Set where
   nz-I : ∀ {j} → NonZ (I j)
   nz-C : ∀ {j} → NonZ (C j)
 
+data IC : Counter → Set where
+  ic-I : ∀ {j} → IC (I j)
+  ic-C : ∀ {j} → IC (C j)
+
 private
   variable
     Γ : Env n m
@@ -72,32 +76,31 @@ data _⟦_⟧⟹_ : Env n m → Type m → Type m → Set where
     → (Γ ,∙) ⟦ A ⟧⟹ A'
     → Γ ⟦ `∀ A ⟧⟹ `∀ A'
 
-data bound : Type (1 + m) → Fin (1 + m) → Set where
-  b-var : ∀ {k} → bound (Type (1 + m) ∋⦂ ‶ k) k
-  b-arr₁ : ∀ {A : Type (1 + m)} {B k} → bound A k → bound (A `→ B) k
-  b-arr₂ : ∀ {A : Type (1 + m)} {B k} → bound B k → bound (A `→ B) k
-  b-∀ : ∀ {A : Type (2 + m)} {k} → bound A (#S k) → bound (`∀ A) k
+data bound : Type m → Fin m → Set where
+  b-var : ∀ {k : Fin m} → bound (‶ k) k
+  b-arr₁ : ∀ {A : Type m} {B k} → bound A k → bound (A `→ B) k
+  b-arr₂ : ∀ {A : Type m} {B k} → bound B k → bound (A `→ B) k
+  b-∀ : ∀ {A : Type (1 + m)} {k} → bound A (#S k) → bound (`∀ A) k
 
 -- find A k j
 -- at j-th position of A type, should have a bound variable, example: |-1 forall a. a -> a <: Int -> Int
-data find : Type (1 + m) → Fin (1 + m) → Counter → Set where
-  f-∞ : ∀ {A : Type (1 + m)} {k} → find A k ∞ -- not sure
-  f-Z : ∀ {A : Type (1 + m)} {k} → bound A k → find A k Z
-  f-S₁ : ∀ {A : Type (1 + m)} {B k j}
+data find : Type m → Fin m → Counter → Set where
+  f-∞ : ∀ {A : Type m} {k}
+    → bound A k
+    → find A k ∞
+  f-arr-I-l : ∀ {A : Type m} {B k j}
     → bound A k
     → find (A `→ B) k (I j)
-  f-S₂ : ∀ {A : Type (1 + m)} {B k j}
+  f-arr-I-r : ∀ {A : Type m} {B k j}
     → find B k j
     → find (A `→ B) k (I j)
-  f-S₃ :  ∀ {A : Type (2 + m)} {k j}
-    → find A (#S k) (I j)
-    → find (`∀ A) k (I j)
-{-    
-  f-T : ∀ {A : Type (2 + m)} {k j}
+  f-arr-C : ∀ {A : Type m} {B k j}
+    → find B k j
+    → find (A `→ B) k (C j)    
+  f-∀ :  ∀ {A : Type (1 + m)} {k j}
     → find A (#S k) j
-    → find (`∀ A) k (T j)
--}
-  
+    → find (`∀ A) k j
+    
 infix 3 _⊢_#_≤_
 data _⊢_#_≤_ : Env n m → Counter → Type m → Type m → Set where
   s-refl : ∀ {A}
@@ -123,13 +126,14 @@ data _⊢_#_≤_ : Env n m → Counter → Type m → Type m → Set where
     → Γ ,∙ ⊢ ∞ # A ≤ B
     → Γ ⊢ ∞ # `∀ A ≤ `∀ B
   s-∀l : ∀ {j A B C D C' D'}
-    → Γ ,= B ⊢ I j # A ≤ C `→ D
+    → Γ ,= B ⊢ j # A ≤ C `→ D
 -- we guess a solution of B here, we must make sure this B is provided from the counter
 -- what we does is to make sure the all inputs matching the counter should at least have the quantifer contained
-    → (fd : find A #0 (I j))
+    → (IC j)
+    → (fd : find A #0 j)
     → (st₁ : [ B ]ˢ C ⇨ C')
     → (st₂ : [ B ]ˢ D ⇨ D')
-    → Γ ⊢ I j # `∀ A ≤ C' `→ D'
+    → Γ ⊢ j # `∀ A ≤ C' `→ D'
   -- two atomic rules, not sure where to use them
   s-var-l : ∀ {X A B}
     → X := B ∈ Γ
