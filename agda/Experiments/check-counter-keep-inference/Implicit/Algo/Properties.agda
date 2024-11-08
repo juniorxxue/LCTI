@@ -112,7 +112,7 @@ s-⊆ (s-ex-r^ x x₁ x₂) = ⟹closed x₂
 s-⊆ (s-ex-r= x x₁ s) = s-⊆ s
 s-⊆ (s-arr s s₁) = ⊆trans (s-⊆ s) (s-⊆ s₁)
 s-⊆ (s-term-c x x₂ s) = s-⊆ s
-s-⊆ (s-term-o x s s₁) = ⊆trans (s-⊆ s) (s-⊆ s₁)
+s-⊆ (s-term-o op x s s₁) = ⊆trans (s-⊆ s) (s-⊆ s₁)
 s-⊆ (s-∀ s) with s-⊆ s
 ... | uvar r = r
 s-⊆ (s-∀l s st st') with s-⊆ s
@@ -227,67 +227,3 @@ spl-weaken : ∀ {Σ Σ' : Context n m} {A es As A' k}
 spl-weaken none-□ = none-□
 spl-weaken none-τ = none-τ
 spl-weaken (have-e spl) = have-e (spl-weaken spl)
-  
-⊢id : ∀ {Γ : Env n m } {Σ e A A' T es As}
-  → Γ ⊢ Σ ⇒ e ⇒ A
-  → ⟦ Σ , A ⟧→⟦ es , τ T , As , A' ⟧
-  → T ≡ A'
-
-≤id : ∀ {Ψ Ψ' : SEnv n m} {Σ A B}
-  → Ψ ⊢ A ≤ Σ ⊣ Ψ' ↪ B
-  → Split Σ B
-
-≤id' : ∀ {Ψ Ψ' : SEnv n m} {Σ A B T B'}
-  → Ψ ⊢ A ≤ Σ ⊣ Ψ' ↪ B
-  → ⟦ Σ , B ⟧→s⟦ τ T , B' ⟧
-  → T ≡ B'
-≤id' s spl with ≤id s
-... | case-τ spl' refl with spl-deterministic spl spl'
-... | ⟨ refl , refl ⟩ = refl
-≤id' s spl | case-□ spl' with spl-deterministic spl spl'
-... | ()
-
-⊢id (⊢app ⊢e) spl = ⊢id ⊢e (have-e spl)
-⊢id (⊢lam₁ ⊢e) none-τ rewrite ⊢id ⊢e none-τ = refl
-⊢id (⊢lam₂ ⊢e ⊢e₁) (have-e spl) = ⊢id ⊢e₁ (spl-weaken spl)
-⊢id (⊢sub ⊢e ne gc s) spl = ≤id' s (spl-implies-simple spl)
-
-≤id s-int = case-τ none-τ refl
-≤id (s-empty p) = case-□ none-□
-≤id s-var = case-τ none-τ refl
-≤id (s-ex-l^ clo x-in inst) = case-τ none-τ refl
-≤id (s-ex-l= clo x-in s) = case-τ none-τ refl
-≤id (s-ex-r^ clo x-in inst) = case-τ none-τ refl
-≤id (s-ex-r= clo x-in s) = case-τ none-τ refl
-≤id (s-arr s s₁) = case-τ none-τ refl
-≤id (s-term-c cloA ⊢e s) with ≤id s
-... | case-τ spl eq = case-τ (have-e spl) eq
-... | case-□ spl = case-□ (have-e spl)
-≤id (s-term-o ⊢e s s₁) with ≤id s₁
-... | case-τ spl eq = case-τ (have-e spl) eq
-... | case-□ spl = case-□ (have-e spl)
-≤id (s-∀ s) with ≤id s
-... | case-τ none-τ refl = case-τ none-τ refl
-≤id (s-∀l {B = B} s st₁ st₂) with ≤id s
-... | case-τ spl refl rewrite sym (st-st st₁) | sym (st-st st₂) = case-τ (spl-↑ty-case' {C = B} spl) refl
-... | case-□ spl rewrite sym (st-st st₁) | sym (st-st st₂) = case-□ (spl-↑ty-case' {C = B} spl)
-
-
--- corollaries
-⊢id0 : ∀ {Γ : Env n m} {e A B}
-  → Γ ⊢ τ B ⇒ e ⇒ A
-  → B ≡ A
-⊢id0 ⊢e = ⊢id ⊢e none-τ
-
-≤id0 : ∀ {Ψ Ψ' : SEnv n m} {A B C}
-  → Ψ ⊢ A ≤ τ B ⊣ Ψ' ↪ C
-  → B ≡ C
-≤id0 s = ≤id' s none-τ  
-
--- aux lemmas
-
-⊢id0-h : ∀ {Γ : Env n m} {e A B}
-  → Γ ⊢ τ B ⇒ e ⇒ A
-  → Γ ⊢ τ A ⇒ e ⇒ A
-⊢id0-h ⊢e with ⊢id0 ⊢e
-... | refl = ⊢e

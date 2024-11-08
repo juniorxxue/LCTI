@@ -310,19 +310,19 @@ data _⊢_≤_⊣_↪_ where
     → (clo : Ψ ⊢c A)
     → (x-in : X ^∈ Ψ)
     → (inst : [ A / X ] Ψ ⟹ Ψ')
-    → Ψ ⊢ ‶ X ≤ τ A ⊣ Ψ' ↪ A
+    → Ψ ⊢ ‶ X ≤ τ A ⊣ Ψ' ↪ ‶ X
  
   s-ex-l= : ∀ {A B X A'}
     → (clo : Ψ ⊢c A)
     → (x-in : X := B ∈ Ψ)
     → Ψ ⊢ B ≤ τ A ⊣ Ψ' ↪ A'
-    → Ψ ⊢ ‶ X ≤ τ A ⊣ Ψ' ↪ A
+    → Ψ ⊢ ‶ X ≤ τ A ⊣ Ψ' ↪ ‶ X
 
   s-ex-r^ : ∀ {A X}
     → (clo : Ψ ⊢c A)
     → (x-in : X ^∈ Ψ)
     → (inst : [ A / X ] Ψ ⟹ Ψ')
-    → Ψ ⊢ A ≤ τ (‶ X) ⊣ Ψ' ↪ ‶ X
+    → Ψ ⊢ A ≤ τ (‶ X) ⊣ Ψ' ↪ A
 
   -- this rule attempts to break the property "if context is a full type, the result should be same"
   -- but the definition of full type is whether contain a solved existetial variable
@@ -331,12 +331,12 @@ data _⊢_≤_⊣_↪_ where
     → (clo : Ψ ⊢c A)
     → (x-in : X := B ∈ Ψ)
     → Ψ ⊢ A ≤ τ B ⊣ Ψ' ↪ A₂
-    → Ψ ⊢ A ≤ τ (‶ X) ⊣ Ψ' ↪ (‶ X)
+    → Ψ ⊢ A ≤ τ (‶ X) ⊣ Ψ' ↪ A
 
   s-arr : ∀ {A B C D A' D'}
     → Ψ₁ ⊢ C ≤ τ A ⊣ Ψ₂ ↪ A'
     → Ψ₂ ⊢ B ≤ τ D ⊣ Ψ₃ ↪ D'
-    → Ψ₁ ⊢ A `→ B ≤ τ (C `→ D) ⊣ Ψ₃ ↪ (C `→ D)
+    → Ψ₁ ⊢ A `→ B ≤ τ (C `→ D) ⊣ Ψ₃ ↪ A `→ B
 
   s-term-c : ∀ {A B A' D e}
     → (cloA : Ψ ⊢c A)
@@ -345,6 +345,7 @@ data _⊢_≤_⊣_↪_ where
     → Ψ ⊢ (A `→ B) ≤ ([ e ]↝ Σ) ⊣ Ψ' ↪ A' `→ D
 
   s-term-o : ∀ {A A' B C D e}
+    → (op : Ψ ⊢o A)
     → (⊢e : (𝕄 Ψ) ⊢ □ ⇒ e ⇒ C)
     → Ψ ⊢ C ≤ τ A ⊣ Ψ₁ ↪ A'
     → Ψ₁ ⊢ B ≤ Σ ⊣ Ψ₂ ↪ D
@@ -352,7 +353,7 @@ data _⊢_≤_⊣_↪_ where
 
   s-∀ : ∀ {A B C}
     → Ψ ,∙ ⊢ A ≤ τ B ⊣ Ψ' ,∙ ↪ C
-    → Ψ ⊢ `∀ A ≤ τ (`∀ B) ⊣ Ψ' ↪ `∀ C
+    → Ψ ⊢ `∀ A ≤ τ (`∀ B) ⊣ Ψ' ↪ `∀ A
 
   s-∀l : ∀ {A B C C' D D' e}
     → Ψ ,^ ⊢ A ≤ ↑tyΣ0 ([ e ]↝ Σ) ⊣ Ψ' ,= B ↪ (C `→ D)
