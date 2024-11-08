@@ -231,6 +231,24 @@ data _^∈_ : Fin m → SEnv n m → Set where
     → k ^∈ Ψ
     → #S k ^∈ Ψ ,= A
 
+infix 3 _∙∈_
+data _∙∈_ : Fin m → SEnv n m → Set where
+  
+  Z : #0 ∙∈ Ψ ,∙
+  S^ : ∀ {k}
+    → k ∙∈ Ψ
+    → #S k ∙∈ Ψ ,^
+  S∙ : ∀ {k}
+    → k ∙∈ Ψ
+    → #S k ∙∈ Ψ ,∙
+  S, : ∀ {k A}
+    → k ∙∈ Ψ
+    → k ∙∈ Ψ , A
+  S= : ∀ {k A}
+    → k ∙∈ Ψ
+    → #S k ∙∈ Ψ ,= A
+ 
+
 infix 8 𝕎 𝕄
 
 𝕎 : Env n m → SEnv n m
@@ -304,7 +322,8 @@ data _⊢_≤_⊣_↪_ where
     → Ψ ⊢ A ≤ □ ⊣ Ψ ↪ A
 
   s-var : ∀ {X}
-    → Ψ ⊢ ‶ X ≤ τ (‶ X) ⊣ Ψ ↪ ‶ X
+    → X ∙∈ Ψ
+    → Ψ ⊢ ‶ X ≤ τ (‶ X) ⊣ Ψ ↪ ‶ X -- reconsider this rule, should it be restricted to noly univseral variable?
 
   s-ex-l^ : ∀ {A X}
     → (clo : Ψ ⊢c A)

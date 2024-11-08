@@ -105,14 +105,14 @@ s-⊆ : ∀ {Ψ Ψ' : SEnv n m} {A B Σ}
   → Ψ ⊆ Ψ'
 s-⊆ s-int = ⊆refl
 s-⊆ (s-empty p) = ⊆refl
-s-⊆ s-var = ⊆refl
+s-⊆ (s-var is-uni) = ⊆refl
 s-⊆ (s-ex-l^ x x₁ x₂) = ⟹closed x₂
 s-⊆ (s-ex-l= x x₁ s) = s-⊆ s
 s-⊆ (s-ex-r^ x x₁ x₂) = ⟹closed x₂
 s-⊆ (s-ex-r= x x₁ s) = s-⊆ s
 s-⊆ (s-arr s s₁) = ⊆trans (s-⊆ s) (s-⊆ s₁)
 s-⊆ (s-term-c x x₂ s) = s-⊆ s
-s-⊆ (s-term-o x s s₁) = ⊆trans (s-⊆ s) (s-⊆ s₁)
+s-⊆ (s-term-o op x s s₁) = ⊆trans (s-⊆ s) (s-⊆ s₁)
 s-⊆ (s-∀ s) with s-⊆ s
 ... | uvar r = r
 s-⊆ (s-∀l s st st') with s-⊆ s
@@ -254,7 +254,7 @@ spl-weaken (have-e spl) = have-e (spl-weaken spl)
 
 ≤id s-int = case-τ none-τ refl
 ≤id (s-empty p) = case-□ none-□
-≤id s-var = case-τ none-τ refl
+≤id (s-var is-uni) = case-τ none-τ refl
 ≤id (s-ex-l^ clo x-in inst) = case-τ none-τ refl
 ≤id (s-ex-l= clo x-in s) = case-τ none-τ refl
 ≤id (s-ex-r^ clo x-in inst) = case-τ none-τ refl
@@ -263,7 +263,7 @@ spl-weaken (have-e spl) = have-e (spl-weaken spl)
 ≤id (s-term-c cloA ⊢e s) with ≤id s
 ... | case-τ spl eq = case-τ (have-e spl) eq
 ... | case-□ spl = case-□ (have-e spl)
-≤id (s-term-o ⊢e s s₁) with ≤id s₁
+≤id (s-term-o op ⊢e s s₁) with ≤id s₁
 ... | case-τ spl eq = case-τ (have-e spl) eq
 ... | case-□ spl = case-□ (have-e spl)
 ≤id (s-∀ s) with ≤id s
