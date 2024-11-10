@@ -149,21 +149,39 @@ data _⊢o_ : SEnv n m → Type m → Set where
 infix 3 _:=_∈_
 data _:=_∈_ : Fin m → Type m → SEnv n m → Set where
 
-  Z : ∀ {A A'}
-    → [ Int ]ˢ A ⇨ A'
-    → #0 := A ∈ Ψ ,= A'
+  Z : ∀ {A : Type m} {A'}
+    → ↑ty0 A ⇨ A'
+    → #0 := A' ∈ Ψ ,= A
   S, : ∀ {k} {A B}
     → k := A ∈ Ψ
     → k := A ∈ Ψ , B
-  S^ : ∀ {k} {A : Type (1 + m)}
-    → k := ↓ty0 A ∈ Ψ
-    → #S k := A ∈ Ψ ,^
-  S∙ : ∀ {k} {A : Type (1 + m)}
-    → k := ↓ty0 A ∈ Ψ
-    → #S k := A ∈ Ψ ,∙
+  S^ : ∀ {k} {A : Type m} {A'}
+    → k := A ∈ Ψ
+    → ↑ty0 A ⇨ A'
+    → #S k := A' ∈ Ψ ,^
+  S∙ : ∀ {k} {A : Type m} {A'}
+    → k := A ∈ Ψ
+    → ↑ty0 A ⇨ A'
+    → #S k := A' ∈ Ψ ,∙
   S= : ∀ {k B} {A : Type (1 + m)}
     → k := [ B ]ˢ A ∈ Ψ
     → #S k := A ∈ Ψ ,= B
+
+-- the above is an version that extract the type out of the context
+-- try to define a version with the exact type
+
+{-
+infix 3 _:=_∈/_
+data _:=_∈/_ :  Fin m' → Type m' → SEnv n m → Set where
+  Z : ∀ {A}
+    → #0 := A ∈/ Ψ ,= A
+  S, : ∀ {k : Fin m'} {A B}
+    → k := A ∈/ Ψ
+    → k := A ∈/ Ψ , B
+  S^ : ∀ {k : Fin m'} {A}
+    → k := A ∈/ Ψ
+    → #S k := A ∈/ Ψ ,^ -- not okay here
+-}    
 
 infix 5 inst_[_]⟹_
 data inst_[_]⟹_ : SEnv n m → Type m → Type m → Set where
@@ -190,21 +208,23 @@ data [_/_]_⟹_ : Type m → Fin m → SEnv n m → SEnv n m → Set where
 -}
     
   ⟹^0 : ∀ {Ψ : SEnv n m} {A A'}
-    → [ Int ]ˢ A ⇨ A'
-    → [ A / #0 ] (Ψ ,^) ⟹ (Ψ ,= A')
+    → ↑ty0 A ⇨ A'
+    → [ A' / #0 ] (Ψ ,^) ⟹ (Ψ ,= A)
 
-  ⟹^S : ∀ {Ψ Ψ' : SEnv n m} {A k}
-    → [ ↓ty0 A / k ] Ψ ⟹ Ψ'
-    → [ A / #S k ] (Ψ ,^) ⟹ Ψ' ,^
+  ⟹^S : ∀ {Ψ Ψ' : SEnv n m} {A k A'}
+    → [ A / k ] Ψ ⟹ Ψ'
+    → ↑ty0 A ⇨ A'
+    → [ A' / #S k ] (Ψ ,^) ⟹ Ψ' ,^
 
 {-
   ⟹=0 : ∀ {Ψ : SEnv n m} {A B}
     → [ A / #0 ] (Ψ ,= B) ⟹ Ψ ,= B -- this is wrong, should be some equivlent reasoning
 -}
 
-  ⟹∙S : ∀ {Ψ Ψ' : SEnv n m} {A k}
-    → [ ↓ty0 A / k ] Ψ ⟹ Ψ'
-    → [ A / #S k ] (Ψ ,∙) ⟹ (Ψ' ,∙)
+  ⟹∙S : ∀ {Ψ Ψ' : SEnv n m} {A k A'}
+    → [ A / k ] Ψ ⟹ Ψ'
+    → ↑ty0 A ⇨ A'
+    → [ A' / #S k ] (Ψ ,∙) ⟹ (Ψ' ,∙)
 
   ⟹,S : ∀ {Ψ Ψ' : SEnv n m} {A k B}
     → [ A / k ] Ψ ⟹ Ψ'
@@ -322,7 +342,7 @@ data _⊢_≤_⊣_↪_ where
     → Ψ ⊢ A ≤ □ ⊣ Ψ ↪ A
 
   s-var : ∀ {X}
-    → X ∙∈ Ψ
+    → (is-∙ : X ∙∈ Ψ)
     → Ψ ⊢ ‶ X ≤ τ (‶ X) ⊣ Ψ ↪ ‶ X -- reconsider this rule, should it be restricted to noly univseral variable?
 
   s-ex-l^ : ∀ {A X}
@@ -407,3 +427,23 @@ data ⟦_,_⟧→s⟦_,_⟧ : Context n m → Type m → Context n m → Type m 
   have-e : ∀ {Σ : Context n m} {e A B Σ' B'}
     → ⟦ Σ , B ⟧→s⟦ Σ' , B' ⟧
     → ⟦ ([ e ]↝ Σ) , A `→ B ⟧→s⟦ Σ' , B' ⟧
+
+
+infix 3 _⊆_
+data _⊆_ : SEnv n m → SEnv n m → Set where
+  base : ∅ ⊆ ∅
+  uvar : ∀ {Ψ Ψ' : SEnv n m}
+    → Ψ ⊆ Ψ'
+    → Ψ ,∙ ⊆ Ψ' ,∙
+  var : ∀ {Ψ Ψ' : SEnv n m} {A}
+    → Ψ ⊆ Ψ'
+    → Ψ , A ⊆ Ψ' , A
+  evar : ∀ {Ψ Ψ' : SEnv n m}
+    → Ψ ⊆ Ψ'
+    → Ψ ,^ ⊆ Ψ' ,^
+  evar-sol : ∀ {Ψ Ψ' : SEnv n m} {A}
+    → Ψ ⊆ Ψ'
+    → Ψ ,^ ⊆ Ψ' ,= A    
+  svar : ∀ {Ψ Ψ' : SEnv n m} {A}
+    → Ψ ⊆ Ψ'
+    → Ψ ,= A ⊆ Ψ' ,= A

@@ -26,8 +26,12 @@ postulate
   ↑ty-tm-st' : ∀ (e : Term n m) {C}
     → [ C ]ᵗ (↑ty0-tm e) ≡ e
 
-  ↑ty-st⇨ : ∀ {A : Type m}{ C}
+  ↑ty-st⇨ : ∀ {A : Type m}{C}
     → [ C ]ˢ (↑ty0 A) ⇨ A
+
+  ↑ty⇨-st : ∀ {A : Type m}{A' C}
+    → ↑ty0 A ⇨ A'
+    → [ C ]ˢ A' ≡ A
 
 ty-ty-gen : ∀ {A : Type m} {A' k}
   → ty A ↑ k ⇨ A'

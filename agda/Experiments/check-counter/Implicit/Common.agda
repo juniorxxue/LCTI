@@ -165,6 +165,9 @@ data ty_↑_⇨_ : Type m → Fin (1 + m) → Type (1 + m) → Set where
     → ty A ↑ #S k ⇨ A'
     → ty (`∀ A) ↑ k ⇨ `∀ A'
 
+↑ty0_⇨_ : Type m → Type (1 + m) → Set
+↑ty0_⇨_ A A' = ty_↑_⇨_ A #0 A'
+
 -- shift is unique
 shift-unique : ∀ {A : Type m} {k A₁ A₂}
   → ty A ↑ k ⇨ A₁

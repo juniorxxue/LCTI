@@ -148,8 +148,8 @@ sound (⊢tabs ⊢e) with sound ⊢e
 
 sound-s s-int = subs ~∞ s-int
 sound-s (s-empty p) = subs ~Z s-refl
-sound-s s-var = subs ~∞ s-var
-sound-s (s-ex-l^ clo x-in inst) = subs ~∞ (s-var-l (∈a→∈d (inst-in inst)) s-refl-∞)
+sound-s (s-var is-∙) = subs ~∞ s-var
+sound-s (s-ex-l^ clo x-in inst) = subs ~∞ {!!}
 sound-s (s-ex-l= clo x-in s) with sound-s s
 ... | subs ~∞ s' = subs ~∞ (s-var-l (∈a→∈d (⊆-:= (s-⊆ s) x-in)) s')
 sound-s (s-ex-r^ clo x-in inst) = subs ~∞ (s-var-r (∈a→∈d (inst-in inst)) s-refl-∞)
@@ -160,7 +160,7 @@ sound-s (s-arr s s₁) with sound-s s | sound-s s₁
 sound-s (s-term-c cloA ⊢e s) with sound-s s
 ... | subs j~Σ s' with ⊢id0 ⊢e
 ...   | refl = subs (~C {!!} j~Σ) (s-arr₃ s')
-sound-s (s-term-o ⊢e s s₁) with sound-s s | sound-s s₁ | sound-0 ⊢e
+sound-s (s-term-o op ⊢e s s₁) with sound-s s | sound-s s₁ | sound-0 ⊢e
 ... | subs ~∞ s'' | subs j~Σ s' | ⊢e' rewrite ≤id0 s = subs (~I {!!} j~Σ) (s-arr₂ {!s''!} s') -- ok, same as above
 sound-s (s-∀ s) with sound-s s
 ... | subs ~∞ s' = subs ~∞ (s-∀ s')
