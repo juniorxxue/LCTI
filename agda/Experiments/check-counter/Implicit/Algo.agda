@@ -43,21 +43,21 @@ data NonEmpty : Context n m → Set where
 ↑tyΣ0 : Context n m → Context n (1 + m)
 ↑tyΣ0 = ↑tyΣ #0
 
-infix 3 [_/_]ᶜ_⇨_
-data [_/_]ᶜ_⇨_ : Fin (1 + m) → Type m → Context n (1 + m) → Context n m → Set where
+infix 3 [_/_]ᶜ_⇘_
+data [_/_]ᶜ_⇘_ : Fin (1 + m) → Type m → Context n (1 + m) → Context n m → Set where
   empty : ∀ {k A}
-    → [ k / A ]ᶜ □ ⇨ (Context n m ∋⦂ □)
+    → [ k / A ]ᶜ □ ⇘ (Context n m ∋⦂ □)
   fulltype : ∀ {k A B B'}
-    → [ k / A ]ˢ B ⇨ B'
-    → [ k / A ]ᶜ (τ B) ⇨ (Context n m ∋⦂ (τ B'))
+    → [ k / A ]ˢ B ⇘ B'
+    → [ k / A ]ᶜ (τ B) ⇘ (Context n m ∋⦂ (τ B'))
   term : ∀ {k A e e' Σ Σ'}
-    → [ k / A ]ᶜ Σ ⇨ Σ'
-    → [ k / A ]ᵗ e ⇨ e'
-    → [ k / A ]ᶜ ([ e ]↝ Σ) ⇨ (Context n m ∋⦂ ([ e' ]↝ Σ'))
+    → [ k / A ]ᶜ Σ ⇘ Σ'
+    → [ k / A ]ᵗ e ⇘ e'
+    → [ k / A ]ᶜ ([ e ]↝ Σ) ⇘ (Context n m ∋⦂ ([ e' ]↝ Σ'))
 
-infix 3 [_]ᶜ_⇨_
-[_]ᶜ_⇨_ : Type m → Context n (1 + m) → Context n m → Set
-[_]ᶜ_⇨_ = [_/_]ᶜ_⇨_ #0
+infix 3 [_]ᶜ_⇘_
+[_]ᶜ_⇘_ : Type m → Context n (1 + m) → Context n m → Set
+[_]ᶜ_⇘_ = [_/_]ᶜ_⇘_ #0
 
 infix 6 [_]ᶜ_
 [_]ᶜ_ : Type m → Context n (1 + m) → Context n m
@@ -150,18 +150,18 @@ infix 3 _:=_∈_
 data _:=_∈_ : Fin m → Type m → SEnv n m → Set where
 
   Z : ∀ {A : Type m} {A'}
-    → ↑ty0 A ⇨ A'
+    → ↑ty0 A ⇘ A'
     → #0 := A' ∈ Ψ ,= A
   S, : ∀ {k} {A B}
     → k := A ∈ Ψ
     → k := A ∈ Ψ , B
   S^ : ∀ {k} {A : Type m} {A'}
     → k := A ∈ Ψ
-    → ↑ty0 A ⇨ A'
+    → ↑ty0 A ⇘ A'
     → #S k := A' ∈ Ψ ,^
   S∙ : ∀ {k} {A : Type m} {A'}
     → k := A ∈ Ψ
-    → ↑ty0 A ⇨ A'
+    → ↑ty0 A ⇘ A'
     → #S k := A' ∈ Ψ ,∙
   S= : ∀ {k B} {A : Type (1 + m)}
     → k := [ B ]ˢ A ∈ Ψ
@@ -208,12 +208,12 @@ data [_/_]_⟹_ : Type m → Fin m → SEnv n m → SEnv n m → Set where
 -}
     
   ⟹^0 : ∀ {Ψ : SEnv n m} {A A'}
-    → ↑ty0 A ⇨ A'
+    → ↑ty0 A ⇘ A'
     → [ A' / #0 ] (Ψ ,^) ⟹ (Ψ ,= A)
 
   ⟹^S : ∀ {Ψ Ψ' : SEnv n m} {A k A'}
     → [ A / k ] Ψ ⟹ Ψ'
-    → ↑ty0 A ⇨ A'
+    → ↑ty0 A ⇘ A'
     → [ A' / #S k ] (Ψ ,^) ⟹ Ψ' ,^
 
 {-
@@ -223,7 +223,7 @@ data [_/_]_⟹_ : Type m → Fin m → SEnv n m → SEnv n m → Set where
 
   ⟹∙S : ∀ {Ψ Ψ' : SEnv n m} {A k A'}
     → [ A / k ] Ψ ⟹ Ψ'
-    → ↑ty0 A ⇨ A'
+    → ↑ty0 A ⇘ A'
     → [ A' / #S k ] (Ψ ,∙) ⟹ (Ψ' ,∙)
 
   ⟹,S : ∀ {Ψ Ψ' : SEnv n m} {A k B}
@@ -396,8 +396,8 @@ data _⊢_≤_⊣_↪_ where
 
   s-∀l : ∀ {A B C C' D D' e}
     → Ψ ,^ ⊢ A ≤ ↑tyΣ0 ([ e ]↝ Σ) ⊣ Ψ' ,= B ↪ (C `→ D)
-    → (st₁ : [ B ]ˢ C ⇨ C')
-    → (st₂ : [ B ]ˢ D ⇨ D')
+    → (st₁ : [ B ]ˢ C ⇘ C')
+    → (st₂ : [ B ]ˢ D ⇘ D')
     → Ψ ⊢ `∀ A ≤ ([ e ]↝ Σ) ⊣ Ψ' ↪ C' `→ D'
 
 
