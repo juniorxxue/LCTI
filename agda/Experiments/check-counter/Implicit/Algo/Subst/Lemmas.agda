@@ -6,14 +6,14 @@ open import Implicit.Algo.Subst.Definitions
 
 postulate
   env-remove-unique : ∀ {Ψ : SEnv n (1 + m)} {Ψ₁ Ψ₂ k T}
-    → Ψ / k ⦂ T ⇨ Ψ₁
-    → Ψ / k ⦂ T ⇨ Ψ₂
+    → Ψ / k ⦂ T ⇘ Ψ₁
+    → Ψ / k ⦂ T ⇘ Ψ₂
     → Ψ₁ ≡ Ψ₂
 
 c-substitution : ∀ {Ψ : SEnv n (1 + m)} { Ψx k T A A'}
   → Ψ ⊢c A
-  → Ψ / k ⦂ T ⇨ Ψx 
-  → [ k / T ]ˢ A ⇨ A'
+  → Ψ / k ⦂ T ⇘ Ψx 
+  → [ k / T ]ˢ A ⇘ A'
   → Ψx ⊢c A'
 c-substitution ⊢c-int env st-int = ⊢c-int
 c-substitution ⊢c-var∙0 env (st-var-neq ¬p) = {!   !}
@@ -30,11 +30,11 @@ c-substitution (⊢c-∀ ⊢cA) env (st-∀ up₁ st) = ⊢c-∀ (c-substitution
 mutual
   ≤-substituition : ∀ {Ψ Ψ' k T A B A' Ψx Ψx' Σ' B'}
     → Ψ ⊢ A ≤ Σ ⊣ Ψ' ↪ B
-    → Ψ / k ⦂ T ⇨ Ψx
-    → Ψ' / k ⦂ T ⇨ Ψx'
-    → [ k / T ]ˢ A ⇨ A'
-    → [ k / T ]ᶜ Σ ⇨ Σ'
-    → [ k / T ]ˢ B ⇨ B'
+    → Ψ / k ⦂ T ⇘ Ψx
+    → Ψ' / k ⦂ T ⇘ Ψx'
+    → [ k / T ]ˢ A ⇘ A'
+    → [ k / T ]ᶜ Σ ⇘ Σ'
+    → [ k / T ]ˢ B ⇘ B'
     → Ψx ⊢ A' ≤ Σ' ⊣ Ψx' ↪ B'
   ≤-substituition s-int env1 env2 st-int (fulltype st-int) st-int rewrite env-remove-unique env1 env2 = s-int
   ≤-substituition (s-empty p) env1 env2 st1 empty st2 
@@ -66,10 +66,10 @@ mutual
 
   ⇒-substitution : ∀ {Ψ k T e A A' Ψx Σ' e'}
     → 𝕄 Ψ ⊢ Σ ⇒ e ⇒ A
-    → Ψ / k ⦂ T ⇨ Ψx
-    → [ k / T ]ᶜ Σ ⇨ Σ'
-    → [ k / T ]ˢ A ⇨ A'
-    → [ k / T ]ᵗ e ⇨ e'
+    → Ψ / k ⦂ T ⇘ Ψx
+    → [ k / T ]ᶜ Σ ⇘ Σ'
+    → [ k / T ]ˢ A ⇘ A'
+    → [ k / T ]ᵗ e ⇘ e'
     → 𝕄 Ψx ⊢ Σ' ⇒ e' ⇒ A'
   ⇒-substitution = {!   !}
 

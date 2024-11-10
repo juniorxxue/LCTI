@@ -94,7 +94,7 @@ data _⊢_^∈ᶜ_ : SEnv n m → Fin m → Context n m → Set where
 ⊆-in= (Z x) (svar ss) = Z x
 ⊆-in= (S, inΨ) (var ss) = S, (⊆-in= inΨ ss)
 ⊆-in= (S^ inΨ x) (evar ss) = S^ (⊆-in= inΨ ss) x
-⊆-in= (S^ inΨ x) (evar-sol {A = A} ss) rewrite sym (↑ty⇨-st {C = A} x) = S= (⊆-in= inΨ ss)
+⊆-in= (S^ inΨ x) (evar-sol {A = A} ss) rewrite sym (↑ty⇘-st {C = A} x) = S= (⊆-in= inΨ ss)
 ⊆-in= (S∙ inΨ x) (uvar ss) = S∙ (⊆-in= inΨ ss) x
 ⊆-in= (S= inΨ) (svar ss) = S= (⊆-in= inΨ ss)
 

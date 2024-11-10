@@ -45,4 +45,4 @@ postulate
 s-find : ∀ {Ψ Ψ' : SEnv n m} {Σ A B C}
   → Ψ ,^ ⊢ A ≤ Σ ⊣ Ψ' ,= B ↪ C
   → find (𝕄 Ψ' ,= B) A #0 Σ
-s-find {B = B} s = s-find-gen {C = ↑ty0 B} Z (Z ↑ty-st⇨) s
+s-find {B = B} s = s-find-gen {C = ↑ty0 B} Z (Z ↑ty-st⇘) s
