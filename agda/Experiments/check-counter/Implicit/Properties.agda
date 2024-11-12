@@ -7,9 +7,9 @@ postulate
   ↑ty-st-var : ∀ {k : Fin (1 + m)} {X B C}
     → [ k / C ]ˢ ‶ punchIn k X ⇘ B
     → ‶ X ≡ B
--- ↑ty-st-var {k = #0} {X} (st-var-neq ¬p) = refl
--- ↑ty-st-var {k = #S k} {#0} (st-var-neq ¬p) = refl
--- ↑ty-st-var {k = #S k} {#S X} st = {!!}
+
+  punchIn-≢ : ∀ {k : Fin (1 + m)} {X}
+    → punchIn k X ≢ k
 
 ↑ty-st : ∀ {A : Type m} {k C B}
   → [ k / C ]ˢ (↑ty k A) ⇘ B
@@ -58,3 +58,18 @@ st-st : ∀ {A : Type (1 + m)} {B A'}
   → [ B ]ˢ A ⇘ A'
   → [ B ]ˢ A ≡ A'
 st-st st = st-st-gen st
+
+data Shifted : Type m → Fin m → Set where
+  sfd-int : ∀ {b} → Shifted (Type m ∋⦂ Int) b
+  sfd-var : ∀ {k : Fin m} {b} → k ≢ b → Shifted (‶ k) b
+  sfd-arr : ∀ {A B : Type m} {b} → Shifted A b → Shifted B b → Shifted (A `→ B) b
+  sfd-∀ : ∀ {A : Type (1 + m)} {b} → Shifted A (#S b) → Shifted (`∀ A) b
+
+
+↑ty-shifted : ∀ {A : Type m} {A' k}
+  → ty A ↑ k ⇘ A'
+  → Shifted A' k
+↑ty-shifted ↑int = sfd-int
+↑ty-shifted ↑var = sfd-var punchIn-≢
+↑ty-shifted (↑arr up₁ up₂) = sfd-arr (↑ty-shifted up₁) (↑ty-shifted up₂)
+↑ty-shifted (↑∀ up₁) = sfd-∀ (↑ty-shifted up₁)

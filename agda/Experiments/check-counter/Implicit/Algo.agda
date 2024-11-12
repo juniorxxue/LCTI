@@ -150,18 +150,18 @@ infix 3 _:=_∈_
 data _:=_∈_ : Fin m → Type m → SEnv n m → Set where
 
   Z : ∀ {A : Type m} {A'}
-    → ↑ty0 A ⇘ A'
+    → (up : ↑ty0 A ⇘ A')
     → #0 := A' ∈ Ψ ,= A
   S, : ∀ {k} {A B}
     → k := A ∈ Ψ
     → k := A ∈ Ψ , B
   S^ : ∀ {k} {A : Type m} {A'}
     → k := A ∈ Ψ
-    → ↑ty0 A ⇘ A'
+    → (up : ↑ty0 A ⇘ A')
     → #S k := A' ∈ Ψ ,^
   S∙ : ∀ {k} {A : Type m} {A'}
     → k := A ∈ Ψ
-    → ↑ty0 A ⇘ A'
+    → (up : ↑ty0 A ⇘ A')
     → #S k := A' ∈ Ψ ,∙
   S= : ∀ {k B} {A : Type (1 + m)}
     → k := [ B ]ˢ A ∈ Ψ

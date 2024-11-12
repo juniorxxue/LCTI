@@ -103,6 +103,21 @@ data ExSol (Ψ : SEnv n m) (k : Fin m) (A : Type m) : Set where
   case-ex : (inΨ : Ψ ⊢ k ^∈ A) → ExSol Ψ k A
   case-sol : ∀ {B} → (inΨ : Ψ ⊢ k := B ∈ A) → ExSol Ψ k A
 
+
+punchIn-∃ : ∀ (X : Fin (1 + m))
+  → ∃[ Y ](punchIn #0 Y) ≡ X
+punchIn-∃ #0 = {!!}
+punchIn-∃ (#S X) = {!!}
+
+
+↑ty0-∃ : ∀ (A' : Type (1 + m))
+  → ∃[ A ](↑ty0 A ⇘ A')
+↑ty0-∃ Int = ⟨ Int , ↑int ⟩
+↑ty0-∃ (‶ X) = ⟨ {!!} , {!!} ⟩
+↑ty0-∃ (A' `→ A'') = ⟨ ↑ty0-∃ A' .proj₁ `→ ↑ty0-∃ A'' .proj₁ ,
+                      ↑arr (↑ty0-∃ A' .proj₂) (↑ty0-∃ A'' .proj₂) ⟩
+↑ty0-∃ (`∀ A') = {!!}
+
 ⊆-in^ : Ψ ⊢ k ^∈ A
       → Ψ ⊆ Ψ'
       → ExSol Ψ' k A
@@ -115,14 +130,51 @@ data ExSol (Ψ : SEnv n m) (k : Fin m) (A : Type m) : Set where
 ... | case-sol x = case-sol (^:=-arr-r x)
 ⊆-in^ (^in-∀ inΨ) ss with ⊆-in^ inΨ (uvar ss)
 ... | case-ex inΨ₁ = case-ex (^in-∀ inΨ₁)
-... | case-sol inΨ₁ = case-sol (^:=-∀ inΨ₁ {!!})
-
-
+... | case-sol inΨ₁ = case-sol (^:=-∀ inΨ₁ {!⊆-in^!})
 
 data SolEnv (k : Fin m) (Ψ : SEnv n m) : Set where
   sols : ∀ {C}
     → (inΨ : k := C ∈ Ψ)
     → SolEnv k Ψ
+
+-- data AccessM (Ψ : SEnv n m) (A : Type m) : ℕ → Set where
+
+accessM : (Ψ : SEnv n m) → (k : Fin m) → (A : Type m) → (k := A ∈ Ψ) → ℕ
+accessM (Ψ , A₁) k A (S, p) = accessM Ψ k A p
+accessM (Ψ ,∙) (#S k) A (S∙ {A = B} p up) = accessM Ψ k B p
+accessM (Ψ ,^) (#S k) A (S^ {A = B} p x) = accessM Ψ k B p
+accessM (_,=_ {m = m} Ψ B) #0 A (Z x) = m
+accessM (Ψ ,= B) (#S k) A (S= p) = accessM Ψ k ([ B ]ˢ A) p
+
+-- all variables in type A cannot access indices lower than b (boundary)
+data NonAccess : Type m → Fin m → Set where
+  na-int : ∀ {b} → NonAccess (Type m ∋⦂ Int) b
+  na-var : ∀ {k : Fin m} {b} → b #< k → NonAccess (‶ k) b
+  na-arr : ∀ {A B : Type m} {b} → NonAccess A b → NonAccess B b → NonAccess (A `→ B) b
+  na-∀ : ∀ {A : Type (1 + m)} {b} → NonAccess A (#S b) → NonAccess (`∀ A) b
+
+shifted→no-access : ∀ {A : Type (1 + m)}
+  → Shifted A #0
+  → NonAccess A #0
+shifted→no-access sfd-int = {!!}
+shifted→no-access (sfd-var x) = {!!}
+shifted→no-access (sfd-arr sd sd₁) = {!!}
+shifted→no-access (sfd-∀ sd) = na-∀ {!shifted→no-access sd!}
+
+-- this is a wrong lemma, not consider forall type
+↑-no-access : ∀ {A : Type m} {A'}
+  → ↑ty0 A ⇘ A'
+  → NonAccess A' #0
+
+sol-no-access :
+    k := A ∈ Ψ
+  → NonAccess A k
+sol-no-access (Z up) = {!!}
+sol-no-access (S, inΨ) = sol-no-access inΨ
+sol-no-access (S^ inΨ up) = {!sol-no-access inΨ!}
+sol-no-access (S∙ inΨ up₁) = {!!}
+sol-no-access (S= inΨ) = {!!}
+
 
 ^in^=out-l : ∀ {Ψ : SEnv n (1 + m)}
   → Ψ ⊢ A ≤ Σ ⊣ Ψ' ↪ B
@@ -142,7 +194,7 @@ data SolEnv (k : Fin m) (Ψ : SEnv n m) : Set where
 ^in^=out-l (s-ex-r= clo x-in s) ^inA = ^in^=out-l s ^inA
 ^in^=out-l (s-arr s s₁) (^in-arr-l ^inA) with ^in^=out-r s (^∈-type ^inA)
 ... | sols inΨ = sols (⊆-in= inΨ (s-⊆ s₁))
-^in^=out-l (s-arr s s₁) (^in-arr-r ^inA) = {! !} -- require a aux: k appear in Ψ₂, in either ^ or ^=
+^in^=out-l (s-arr s s₁) (^in-arr-r ^inA) = {!!} -- require a aux: k appear in Ψ₂, in either ^ or ^=
 ^in^=out-l (s-term-c cloA ⊢e s) (^in-arr-l ^inA) = {!!} -- false elim
 ^in^=out-l (s-term-c cloA ⊢e s) (^in-arr-r ^inA) = ^in^=out-l s ^inA
 ^in^=out-l (s-term-o opnA ⊢e s s₁) (^in-arr-l ^inA) = {!!}
