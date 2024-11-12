@@ -103,21 +103,6 @@ data ExSol (Ψ : SEnv n m) (k : Fin m) (A : Type m) : Set where
   case-ex : (inΨ : Ψ ⊢ k ^∈ A) → ExSol Ψ k A
   case-sol : ∀ {B} → (inΨ : Ψ ⊢ k := B ∈ A) → ExSol Ψ k A
 
-
-punchIn-∃ : ∀ (X : Fin (1 + m))
-  → ∃[ Y ](punchIn #0 Y) ≡ X
-punchIn-∃ #0 = {!!}
-punchIn-∃ (#S X) = {!!}
-
-
-↑ty0-∃ : ∀ (A' : Type (1 + m))
-  → ∃[ A ](↑ty0 A ⇘ A')
-↑ty0-∃ Int = ⟨ Int , ↑int ⟩
-↑ty0-∃ (‶ X) = ⟨ {!!} , {!!} ⟩
-↑ty0-∃ (A' `→ A'') = ⟨ ↑ty0-∃ A' .proj₁ `→ ↑ty0-∃ A'' .proj₁ ,
-                      ↑arr (↑ty0-∃ A' .proj₂) (↑ty0-∃ A'' .proj₂) ⟩
-↑ty0-∃ (`∀ A') = {!!}
-
 ⊆-in^ : Ψ ⊢ k ^∈ A
       → Ψ ⊆ Ψ'
       → ExSol Ψ' k A
@@ -147,34 +132,31 @@ accessM (_,=_ {m = m} Ψ B) #0 A (Z x) = m
 accessM (Ψ ,= B) (#S k) A (S= p) = accessM Ψ k ([ B ]ˢ A) p
 
 -- all variables in type A cannot access indices lower than b (boundary)
+-- NonAccess is very strict, probably say shifted over 1..b is more apporiate
 data NonAccess : Type m → Fin m → Set where
-  na-int : ∀ {b} → NonAccess (Type m ∋⦂ Int) b
-  na-var : ∀ {k : Fin m} {b} → b #< k → NonAccess (‶ k) b
-  na-arr : ∀ {A B : Type m} {b} → NonAccess A b → NonAccess B b → NonAccess (A `→ B) b
-  na-∀ : ∀ {A : Type (1 + m)} {b} → NonAccess A (#S b) → NonAccess (`∀ A) b
+  na-z : Shifted A #0 → NonAccess A #0
+  na-s : ∀ {k : Fin m}
+    → NonAccess A (#pred k)
+    → Shifted A k
+    → NonAccess A k
 
-shifted→no-access : ∀ {A : Type (1 + m)}
-  → Shifted A #0
-  → NonAccess A #0
-shifted→no-access sfd-int = {!!}
-shifted→no-access (sfd-var x) = {!!}
-shifted→no-access (sfd-arr sd sd₁) = {!!}
-shifted→no-access (sfd-∀ sd) = na-∀ {!shifted→no-access sd!}
-
--- this is a wrong lemma, not consider forall type
-↑-no-access : ∀ {A : Type m} {A'}
-  → ↑ty0 A ⇘ A'
-  → NonAccess A' #0
+NonAccessSpec : Type m → Fin m → Set
+NonAccessSpec A b = ∀ {k} → k #≤ b → Shifted A k
 
 sol-no-access :
     k := A ∈ Ψ
   → NonAccess A k
-sol-no-access (Z up) = {!!}
-sol-no-access (S, inΨ) = sol-no-access inΨ
-sol-no-access (S^ inΨ up) = {!sol-no-access inΨ!}
-sol-no-access (S∙ inΨ up₁) = {!!}
-sol-no-access (S= inΨ) = {!!}
+sol-no-access (Z up₁) = na-z (↑ty-shifted up₁)
+sol-no-access (S, s) = sol-no-access s
+sol-no-access (S^ s up₁) with sol-no-access s
+... | na-z x = na-s {!!} {!!}
+... | na-s ind x = na-s {!ind!} {!!}
+sol-no-access (S∙ s up₁) = {!!}
+sol-no-access (S= s) = {!!}
 
+----------------------------------------------------------------------
+--+ Invariant: appearing existentials must be solved in output env +--
+----------------------------------------------------------------------
 
 ^in^=out-l : ∀ {Ψ : SEnv n (1 + m)}
   → Ψ ⊢ A ≤ Σ ⊣ Ψ' ↪ B
