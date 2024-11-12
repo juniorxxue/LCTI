@@ -37,7 +37,19 @@ data _⊢_^∈_ : SEnv n m → Fin m → Type m → Set where
   ^in-∀ :
       Ψ ,∙ ⊢ #S k ^∈ A
     → Ψ ⊢ k ^∈ `∀ A
+{-    
+  ^in-∀^ :
+      Ψ ,^ ⊢ #S k ^∈ A
+    → Ψ ⊢ k ^∈ `∀ A
+-}    
 
+to^∈Ψ : Ψ ⊢ k ^∈ A
+      → k ^∈ Ψ
+to^∈Ψ (^in-var is-^) = is-^
+to^∈Ψ (^in-arr-l inA) = to^∈Ψ inA
+to^∈Ψ (^in-arr-r inA) = to^∈Ψ inA
+to^∈Ψ (^in-∀ inA) with to^∈Ψ inA
+... | S∙ ind = ind
 
 ⊢c-^∈-false' :
   k ^∈ Ψ → Ψ ⊢c ‶ k → ⊥
@@ -64,6 +76,15 @@ data _⊢_^∈_ : SEnv n m → Fin m → Type m → Set where
 ^∈-∙∈-false (S, ^in) (S, ∙in) = ^∈-∙∈-false ^in ∙in
 ^∈-∙∈-false (S= ^in) (S= ∙in) = ^∈-∙∈-false ^in ∙in
 
+^∈-=∈-false :
+    k ^∈ Ψ
+  → k := A ∈ Ψ
+  → ⊥
+^∈-=∈-false (S^ in1) (S^ in2 up₁) = ^∈-=∈-false in1 in2
+^∈-=∈-false (S∙ in1) (S∙ in2 up₁) = ^∈-=∈-false in1 in2
+^∈-=∈-false (S, in1) (S, in2) = ^∈-=∈-false in1 in2
+^∈-=∈-false (S= in1) (S= in2) = ^∈-=∈-false in1 in2
+
 infix 3 _⊢_:=_∈_
 data _⊢_:=_∈_ : SEnv n m → Fin m → Type m → Type m → Set where
   ^:=-var :
@@ -77,8 +98,20 @@ data _⊢_:=_∈_ : SEnv n m → Fin m → Type m → Type m → Set where
     → Ψ ⊢ k := C ∈ A `→ B
   ^:=-∀ : ∀ {C'}
     → Ψ ,∙ ⊢ #S k := C' ∈ A
-    → ↑ty0 C ⇘ C'
+    → (up : ↑ty0 C ⇘ C')
     → Ψ ⊢ k := C ∈ `∀ A
+
+postulate
+  ↑ty0-pred : ∀ {A₁ : Type m} {A₂ A'} → ↑ty0 A₁ ⇘ A' → ↑ty0 A₂ ⇘ A' → A₁ ≡ A₂
+
+to=∈Ψ : Ψ ⊢ k := A ∈ B
+      → k := A ∈ Ψ
+to=∈Ψ (^:=-var x) = x
+to=∈Ψ (^:=-arr-l inΨ) = to=∈Ψ inΨ
+to=∈Ψ (^:=-arr-r inΨ) = to=∈Ψ inΨ
+to=∈Ψ (^:=-∀ inΨ up) with to=∈Ψ inΨ
+... | S∙ ind up₁ rewrite ↑ty0-pred up up₁ = ind
+  
 
 infix 3 _⊢_^∈ᶜ_
 data _⊢_^∈ᶜ_ : SEnv n m → Fin m → Context n m → Set where
@@ -98,14 +131,37 @@ data _⊢_^∈ᶜ_ : SEnv n m → Fin m → Context n m → Set where
 ⊆-in= (S∙ inΨ x) (uvar ss) = S∙ (⊆-in= inΨ ss) x
 ⊆-in= (S= inΨ) (svar ss) = S= (⊆-in= inΨ ss)
 
-data ExSol (Ψ : SEnv n m) (k : Fin m) (A : Type m) : Set where
+data ExSol (Ψ : SEnv n m) (k : Fin m) : Set where
+  case-ex : (inΨ : k ^∈ Ψ) → ExSol Ψ k
+  case-sol : ∀ {A} → (inΨ : k := A ∈ Ψ) → ExSol Ψ k
 
-  case-ex : (inΨ : Ψ ⊢ k ^∈ A) → ExSol Ψ k A
-  case-sol : ∀ {B} → (inΨ : Ψ ⊢ k := B ∈ A) → ExSol Ψ k A
+data ExSolType (Ψ : SEnv n m) (k : Fin m) (A : Type m) : Set where
+
+  case-ex : (inΨ : Ψ ⊢ k ^∈ A) → ExSolType Ψ k A
+  case-sol : ∀ {B} → (inΨ : Ψ ⊢ k := B ∈ A) → ExSolType Ψ k A
+
+⊆-in^' : k ^∈ Ψ
+       → Ψ ⊆ Ψ'
+       → ExSol Ψ' k
+⊆-in^' Z (evar ss) = case-ex Z
+⊆-in^' Z (evar-sol ss) = case-sol (Z {!!})
+⊆-in^' (S^ inΨ) (evar ss) with ⊆-in^' inΨ ss
+... | case-ex inΨ₁ = case-ex (S^ inΨ₁)
+... | case-sol inΨ₁ = case-sol (S^ inΨ₁ {!!})
+⊆-in^' (S^ inΨ) (evar-sol ss) with ⊆-in^' inΨ ss
+... | case-ex inΨ₁ = case-ex (S= inΨ₁)
+... | case-sol inΨ₁ = case-sol (S= {!!})
+⊆-in^' (S∙ inΨ) (uvar ss) with ⊆-in^' inΨ ss
+... | case-ex inΨ₁ = case-ex (S∙ inΨ₁)
+... | case-sol inΨ₁ = case-sol (S∙ inΨ₁ {!!})
+⊆-in^' (S, inΨ) (var ss) with ⊆-in^' inΨ ss
+... | case-ex inΨ₁ = case-ex (S, inΨ₁)
+... | case-sol inΨ₁ = case-sol (S, inΨ₁)
+⊆-in^' (S= inΨ) ss = {!!}
 
 ⊆-in^ : Ψ ⊢ k ^∈ A
       → Ψ ⊆ Ψ'
-      → ExSol Ψ' k A
+      → ExSolType Ψ' k A
 ⊆-in^ (^in-var is-^) ss = {!!}
 ⊆-in^ (^in-arr-l inΨ) ss with ⊆-in^ inΨ ss
 ... | case-ex x = case-ex (^in-arr-l x)
@@ -122,37 +178,8 @@ data SolEnv (k : Fin m) (Ψ : SEnv n m) : Set where
     → (inΨ : k := C ∈ Ψ)
     → SolEnv k Ψ
 
--- data AccessM (Ψ : SEnv n m) (A : Type m) : ℕ → Set where
-
-accessM : (Ψ : SEnv n m) → (k : Fin m) → (A : Type m) → (k := A ∈ Ψ) → ℕ
-accessM (Ψ , A₁) k A (S, p) = accessM Ψ k A p
-accessM (Ψ ,∙) (#S k) A (S∙ {A = B} p up) = accessM Ψ k B p
-accessM (Ψ ,^) (#S k) A (S^ {A = B} p x) = accessM Ψ k B p
-accessM (_,=_ {m = m} Ψ B) #0 A (Z x) = m
-accessM (Ψ ,= B) (#S k) A (S= p) = accessM Ψ k ([ B ]ˢ A) p
-
--- all variables in type A cannot access indices lower than b (boundary)
--- NonAccess is very strict, probably say shifted over 1..b is more apporiate
-data NonAccess : Type m → Fin m → Set where
-  na-z : Shifted A #0 → NonAccess A #0
-  na-s : ∀ {k : Fin m}
-    → NonAccess A (#pred k)
-    → Shifted A k
-    → NonAccess A k
-
-NonAccessSpec : Type m → Fin m → Set
-NonAccessSpec A b = ∀ {k} → k #≤ b → Shifted A k
-
-sol-no-access :
-    k := A ∈ Ψ
-  → NonAccess A k
-sol-no-access (Z up₁) = na-z (↑ty-shifted up₁)
-sol-no-access (S, s) = sol-no-access s
-sol-no-access (S^ s up₁) with sol-no-access s
-... | na-z x = na-s {!!} {!!}
-... | na-s ind x = na-s {!ind!} {!!}
-sol-no-access (S∙ s up₁) = {!!}
-sol-no-access (S= s) = {!!}
+^∈-∀-ext : Ψ ⊢ k ^∈ `∀ A
+         → (Ψ ,^) ⊢ #S k ^∈ A
 
 ----------------------------------------------------------------------
 --+ Invariant: appearing existentials must be solved in output env +--
@@ -176,24 +203,30 @@ sol-no-access (S= s) = {!!}
 ^in^=out-l (s-ex-r= clo x-in s) ^inA = ^in^=out-l s ^inA
 ^in^=out-l (s-arr s s₁) (^in-arr-l ^inA) with ^in^=out-r s (^∈-type ^inA)
 ... | sols inΨ = sols (⊆-in= inΨ (s-⊆ s₁))
-^in^=out-l (s-arr s s₁) (^in-arr-r ^inA) = {!!} -- require a aux: k appear in Ψ₂, in either ^ or ^=
-^in^=out-l (s-term-c cloA ⊢e s) (^in-arr-l ^inA) = {!!} -- false elim
+^in^=out-l (s-arr s s₁) (^in-arr-r ^inA) with ⊆-in^ ^inA (s-⊆ s)
+... | case-ex inΨ = ^in^=out-l s₁ inΨ
+... | case-sol inΨ = sols (⊆-in= (to=∈Ψ inΨ) (s-⊆ s₁))
+^in^=out-l (s-term-c cloA ⊢e s) (^in-arr-l ^inA) = ⊥-elim (⊢c-^∈-false cloA ^inA)
 ^in^=out-l (s-term-c cloA ⊢e s) (^in-arr-r ^inA) = ^in^=out-l s ^inA
-^in^=out-l (s-term-o opnA ⊢e s s₁) (^in-arr-l ^inA) = {!!}
-^in^=out-l (s-term-o opnA ⊢e s s₁) (^in-arr-r ^inA) = {!!}
-^in^=out-l (s-∀ s) ^inA = {!!}
-^in^=out-l (s-∀l s st₁ st₂) ^inA = {!!}
+^in^=out-l (s-term-o opnA ⊢e s s₁) (^in-arr-l ^inA) with ^in^=out-r s (^∈-type ^inA)
+... | sols inΨ = sols (⊆-in= inΨ (s-⊆ s₁))
+^in^=out-l (s-term-o opnA ⊢e s s₁) (^in-arr-r ^inA) with ⊆-in^ ^inA (s-⊆ s)
+... | case-ex inΨ = ^in^=out-l s₁ inΨ
+... | case-sol inΨ = sols (⊆-in= (to=∈Ψ inΨ) (s-⊆ s₁))
+^in^=out-l (s-∀ s) (^in-∀ ^inA) with ^in^=out-l s ^inA
+... | sols (S∙ inΨ up₁) = sols inΨ
+^in^=out-l (s-∀l s st₁ st₂) ^inA'@(^in-∀ ^inA) = {!^in^=out-l s !}
 
 ^in^=out-r s-int (^∈-type ())
 ^in^=out-r (s-empty p) ()
-^in^=out-r (s-var is-∙) ^inΣ = {!!}
-^in^=out-r (s-ex-l^ clo x-in inst) ^inΣ = {!!}
+^in^=out-r (s-var is-∙) (^∈-type (^in-var is-^)) = ⊥-elim (^∈-∙∈-false is-^ is-∙)
+^in^=out-r (s-ex-l^ clo x-in inst) (^∈-type x) = ⊥-elim (⊢c-^∈-false clo x)
 ^in^=out-r (s-ex-l= clo x-in s) ^inΣ = ^in^=out-r s ^inΣ
-^in^=out-r (s-ex-r^ clo x-in inst) ^inΣ = {!!}
-^in^=out-r (s-ex-r= clo x-in s) ^inΣ = {!!}
+^in^=out-r (s-ex-r^ clo x-in inst) (^∈-type (^in-var is-^)) = sols (inst-in inst)
+^in^=out-r (s-ex-r= clo x-in s) (^∈-type (^in-var is-^)) = ⊥-elim (^∈-=∈-false is-^ x-in)
 ^in^=out-r (s-arr s s₁) ^inΣ = {!!}
-^in^=out-r (s-term-c cloA ⊢e s) ^inΣ = {!!}
-^in^=out-r (s-term-o opnA ⊢e s s₁) ^inΣ = {!!}
+^in^=out-r (s-term-c cloA ⊢e s) (^∈-term ^inΣ) = ^in^=out-r s ^inΣ
+^in^=out-r (s-term-o opnA ⊢e s s₁) (^∈-term ^inΣ) = {!!}
 ^in^=out-r (s-∀ s) ^inΣ = {!!}
 ^in^=out-r (s-∀l s st₁ st₂) ^inΣ = {!!}
 
