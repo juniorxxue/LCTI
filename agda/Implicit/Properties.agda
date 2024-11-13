@@ -5,14 +5,14 @@ open import Implicit.Common
 
 postulate
   ↑ty-st-var : ∀ {k : Fin (1 + m)} {X B C}
-    → [ k / C ]ˢ ‶ punchIn k X ⇨ B
+    → [ k / C ]ˢ ‶ punchIn k X ⇘ B
     → ‶ X ≡ B
--- ↑ty-st-var {k = #0} {X} (st-var-neq ¬p) = refl
--- ↑ty-st-var {k = #S k} {#0} (st-var-neq ¬p) = refl
--- ↑ty-st-var {k = #S k} {#S X} st = {!!}
+
+  punchIn-≢ : ∀ {k : Fin (1 + m)} {X}
+    → punchIn k X ≢ k
 
 ↑ty-st : ∀ {A : Type m} {k C B}
-  → [ k / C ]ˢ (↑ty k A) ⇨ B
+  → [ k / C ]ˢ (↑ty k A) ⇘ B
   → A ≡ B
 ↑ty-st {A = Int} st-int = refl
 ↑ty-st {A = ‶ X} {k} st = ↑ty-st-var st
@@ -26,8 +26,15 @@ postulate
   ↑ty-tm-st' : ∀ (e : Term n m) {C}
     → [ C ]ᵗ (↑ty0-tm e) ≡ e
 
+  ↑ty-st⇘ : ∀ {A : Type m}{C}
+    → [ C ]ˢ (↑ty0 A) ⇘ A
+
+  ↑ty⇘-st : ∀ {A : Type m}{A' C}
+    → ↑ty0 A ⇘ A'
+    → [ C ]ˢ A' ≡ A
+
 ty-ty-gen : ∀ {A : Type m} {A' k}
-  → ty A ↑ k ⇨ A'
+  → ty A ↑ k ⇘ A'
   → ↑ty k A ≡ A'
 ty-ty-gen ↑int = refl
 ty-ty-gen ↑var = refl
@@ -35,7 +42,7 @@ ty-ty-gen (↑arr sf sf₁) rewrite ty-ty-gen sf | ty-ty-gen sf₁ = refl
 ty-ty-gen (↑∀ sf) rewrite ty-ty-gen sf = refl
 
 st-st-gen : ∀ {A : Type (1 + m)} {B A' k}
-  → [ k / B ]ˢ A ⇨ A'
+  → [ k / B ]ˢ A ⇘ A'
   → [ k / B ]ˢ A ≡ A'
 st-st-gen st-int = refl
 st-st-gen {k = k} st-var-eq with k #≟ k
@@ -46,8 +53,23 @@ st-st-gen {k = k} (st-var-neq {X = X} ¬p) with  k #≟ X
 ... | no ¬p = refl
 st-st-gen (st-arr st st₁) rewrite st-st-gen st | st-st-gen st₁ = refl
 st-st-gen (st-∀ up₁ st) rewrite ty-ty-gen up₁ | st-st-gen st = refl
-
+  
 st-st : ∀ {A : Type (1 + m)} {B A'}
-  → [ B ]ˢ A ⇨ A'
+  → [ B ]ˢ A ⇘ A'
   → [ B ]ˢ A ≡ A'
 st-st st = st-st-gen st
+
+data Shifted : Type m → Fin m → Set where
+  sfd-int : ∀ {b} → Shifted (Type m ∋⦂ Int) b
+  sfd-var : ∀ {k : Fin m} {b} → k ≢ b → Shifted (‶ k) b
+  sfd-arr : ∀ {A B : Type m} {b} → Shifted A b → Shifted B b → Shifted (A `→ B) b
+  sfd-∀ : ∀ {A : Type (1 + m)} {b} → Shifted A (#S b) → Shifted (`∀ A) b
+
+
+↑ty-shifted : ∀ {A : Type m} {A' k}
+  → ty A ↑ k ⇘ A'
+  → Shifted A' k
+↑ty-shifted ↑int = sfd-int
+↑ty-shifted ↑var = sfd-var punchIn-≢
+↑ty-shifted (↑arr up₁ up₂) = sfd-arr (↑ty-shifted up₁) (↑ty-shifted up₂)
+↑ty-shifted (↑∀ up₁) = sfd-∀ (↑ty-shifted up₁)

@@ -10,7 +10,8 @@ open import Implicit.Decl
   → Γ ⊢ j # e ⦂ A
 ⊢sub' {j = Z} ⊢e s-refl = ⊢e
 ⊢sub' {j = ∞} ⊢e s = ⊢sub ⊢e s nz-∞
-⊢sub' {j = S j} ⊢e s = ⊢sub ⊢e s nz-S
+⊢sub' {j = I j} ⊢e s = ⊢sub ⊢e s nz-I
+⊢sub' {j = C j} ⊢e s = ⊢sub ⊢e s nz-C
 
 
 -- the needed lemmas
@@ -86,8 +87,9 @@ s-weaken s-int = s-int
 s-weaken s-var = s-var
 s-weaken (s-arr₁ C≤A B≤D) = s-arr₁ (s-weaken C≤A) (s-weaken B≤D)
 s-weaken (s-arr₂ C≤A B≤D) = s-arr₂ (s-weaken C≤A) (s-weaken B≤D)
+s-weaken (s-arr₃ B≤D) = s-arr₃ (s-weaken B≤D)
 s-weaken (s-∀ A≤B) = s-∀ (s-weaken A≤B)
-s-weaken (s-∀l A≤B fd st1 st2) = s-∀l (s-weaken A≤B) fd st1 st2
+s-weaken (s-∀l A≤B have-i fd st1 st2) = s-∀l (s-weaken A≤B) have-i fd st1 st2
 s-weaken (s-var-l x A≤B) = s-var-l (∈-weaken x) (s-weaken A≤B)
 s-weaken (s-var-r x A≤B) = s-var-r (∈-weaken x) (s-weaken A≤B)
 

@@ -43,17 +43,21 @@ data NonEmpty : Context n m → Set where
 ↑tyΣ0 : Context n m → Context n (1 + m)
 ↑tyΣ0 = ↑tyΣ #0
 
-infix 3 [_/_]ᶜ_⇨_
-data [_/_]ᶜ_⇨_ : Fin (1 + m) → Type m → Context n (1 + m) → Context n m → Set where
+infix 3 [_/_]ᶜ_⇘_
+data [_/_]ᶜ_⇘_ : Fin (1 + m) → Type m → Context n (1 + m) → Context n m → Set where
   empty : ∀ {k A}
-    → [ k / A ]ᶜ □ ⇨ (Context n m ∋⦂ □)
+    → [ k / A ]ᶜ □ ⇘ (Context n m ∋⦂ □)
   fulltype : ∀ {k A B B'}
-    → [ k / A ]ˢ B ⇨ B'
-    → [ k / A ]ᶜ (τ B) ⇨ (Context n m ∋⦂ (τ B'))
+    → [ k / A ]ˢ B ⇘ B'
+    → [ k / A ]ᶜ (τ B) ⇘ (Context n m ∋⦂ (τ B'))
   term : ∀ {k A e e' Σ Σ'}
-    → [ k / A ]ᶜ Σ ⇨ Σ'
-    → [ k / A ]ᵗ e ⇨ e'
-    → [ k / A ]ᶜ ([ e ]↝ Σ) ⇨ (Context n m ∋⦂ ([ e' ]↝ Σ'))
+    → [ k / A ]ᶜ Σ ⇘ Σ'
+    → [ k / A ]ᵗ e ⇘ e'
+    → [ k / A ]ᶜ ([ e ]↝ Σ) ⇘ (Context n m ∋⦂ ([ e' ]↝ Σ'))
+
+infix 3 [_]ᶜ_⇘_
+[_]ᶜ_⇘_ : Type m → Context n (1 + m) → Context n m → Set
+[_]ᶜ_⇘_ = [_/_]ᶜ_⇘_ #0
 
 infix 6 [_]ᶜ_
 [_]ᶜ_ : Type m → Context n (1 + m) → Context n m
@@ -145,19 +149,39 @@ data _⊢o_ : SEnv n m → Type m → Set where
 infix 3 _:=_∈_
 data _:=_∈_ : Fin m → Type m → SEnv n m → Set where
 
-  Z : ∀ {A} → #0 := A ∈ Ψ ,= ↓ty0 A
+  Z : ∀ {A : Type m} {A'}
+    → (up : ↑ty0 A ⇘ A')
+    → #0 := A' ∈ Ψ ,= A
   S, : ∀ {k} {A B}
     → k := A ∈ Ψ
     → k := A ∈ Ψ , B
-  S^ : ∀ {k} {A : Type (1 + m)}
-    → k := ↓ty0 A ∈ Ψ
-    → #S k := A ∈ Ψ ,^
-  S∙ : ∀ {k} {A : Type (1 + m)}
-    → k := ↓ty0 A ∈ Ψ
-    → #S k := A ∈ Ψ ,∙
+  S^ : ∀ {k} {A : Type m} {A'}
+    → k := A ∈ Ψ
+    → (up : ↑ty0 A ⇘ A')
+    → #S k := A' ∈ Ψ ,^
+  S∙ : ∀ {k} {A : Type m} {A'}
+    → k := A ∈ Ψ
+    → (up : ↑ty0 A ⇘ A')
+    → #S k := A' ∈ Ψ ,∙
   S= : ∀ {k B} {A : Type (1 + m)}
-    → k := ↓ty0 A ∈ Ψ
+    → k := [ B ]ˢ A ∈ Ψ
     → #S k := A ∈ Ψ ,= B
+
+-- the above is an version that extract the type out of the context
+-- try to define a version with the exact type
+
+{-
+infix 3 _:=_∈/_
+data _:=_∈/_ :  Fin m' → Type m' → SEnv n m → Set where
+  Z : ∀ {A}
+    → #0 := A ∈/ Ψ ,= A
+  S, : ∀ {k : Fin m'} {A B}
+    → k := A ∈/ Ψ
+    → k := A ∈/ Ψ , B
+  S^ : ∀ {k : Fin m'} {A}
+    → k := A ∈/ Ψ
+    → #S k := A ∈/ Ψ ,^ -- not okay here
+-}    
 
 infix 5 inst_[_]⟹_
 data inst_[_]⟹_ : SEnv n m → Type m → Type m → Set where
@@ -183,21 +207,24 @@ data [_/_]_⟹_ : Type m → Fin m → SEnv n m → SEnv n m → Set where
     → [ A / k ] (Ψ , B) ⟹ Ψ' , B
 -}
     
-  ⟹^0 : ∀ {Ψ : SEnv n m} {A}
-    → [ A / #0 ] (Ψ ,^) ⟹ (Ψ ,= (↓ty0 A))
+  ⟹^0 : ∀ {Ψ : SEnv n m} {A A'}
+    → ↑ty0 A ⇘ A'
+    → [ A' / #0 ] (Ψ ,^) ⟹ (Ψ ,= A)
 
-  ⟹^S : ∀ {Ψ Ψ' : SEnv n m} {A k}
-    → [ ↓ty0 A / k ] Ψ ⟹ Ψ'
-    → [ A / #S k ] (Ψ ,^) ⟹ Ψ' ,^
+  ⟹^S : ∀ {Ψ Ψ' : SEnv n m} {A k A'}
+    → [ A / k ] Ψ ⟹ Ψ'
+    → ↑ty0 A ⇘ A'
+    → [ A' / #S k ] (Ψ ,^) ⟹ Ψ' ,^
 
 {-
   ⟹=0 : ∀ {Ψ : SEnv n m} {A B}
     → [ A / #0 ] (Ψ ,= B) ⟹ Ψ ,= B -- this is wrong, should be some equivlent reasoning
 -}
 
-  ⟹∙S : ∀ {Ψ Ψ' : SEnv n m} {A k}
-    → [ ↓ty0 A / k ] Ψ ⟹ Ψ'
-    → [ A / #S k ] (Ψ ,∙) ⟹ (Ψ' ,∙)
+  ⟹∙S : ∀ {Ψ Ψ' : SEnv n m} {A k A'}
+    → [ A / k ] Ψ ⟹ Ψ'
+    → ↑ty0 A ⇘ A'
+    → [ A' / #S k ] (Ψ ,∙) ⟹ (Ψ' ,∙)
 
   ⟹,S : ∀ {Ψ Ψ' : SEnv n m} {A k B}
     → [ A / k ] Ψ ⟹ Ψ'
@@ -223,6 +250,24 @@ data _^∈_ : Fin m → SEnv n m → Set where
   S= : ∀ {k A}
     → k ^∈ Ψ
     → #S k ^∈ Ψ ,= A
+
+infix 3 _∙∈_
+data _∙∈_ : Fin m → SEnv n m → Set where
+  
+  Z : #0 ∙∈ Ψ ,∙
+  S^ : ∀ {k}
+    → k ∙∈ Ψ
+    → #S k ∙∈ Ψ ,^
+  S∙ : ∀ {k}
+    → k ∙∈ Ψ
+    → #S k ∙∈ Ψ ,∙
+  S, : ∀ {k A}
+    → k ∙∈ Ψ
+    → k ∙∈ Ψ , A
+  S= : ∀ {k A}
+    → k ∙∈ Ψ
+    → #S k ∙∈ Ψ ,= A
+ 
 
 infix 8 𝕎 𝕄
 
@@ -297,7 +342,8 @@ data _⊢_≤_⊣_↪_ where
     → Ψ ⊢ A ≤ □ ⊣ Ψ ↪ A
 
   s-var : ∀ {X}
-    → Ψ ⊢ ‶ X ≤ τ (‶ X) ⊣ Ψ ↪ ‶ X
+    → (is-∙ : X ∙∈ Ψ)
+    → Ψ ⊢ ‶ X ≤ τ (‶ X) ⊣ Ψ ↪ ‶ X -- reconsider this rule, should it be restricted to noly univseral variable?
 
   s-ex-l^ : ∀ {A X}
     → (clo : Ψ ⊢c A)
@@ -333,30 +379,25 @@ data _⊢_≤_⊣_↪_ where
 
   s-term-c : ∀ {A B A' D e}
     → (cloA : Ψ ⊢c A)
-    → (cloB : Ψ ⊢c B)
     → (⊢e : (𝕄 Ψ) ⊢ τ A ⇒ e ⇒ A')
     → Ψ ⊢ B ≤ Σ ⊣ Ψ' ↪ D
     → Ψ ⊢ (A `→ B) ≤ ([ e ]↝ Σ) ⊣ Ψ' ↪ A' `→ D
 
   s-term-o : ∀ {A A' B C D e}
-    → (op : Ψ ⊢o A)
+    → (opnA : Ψ ⊢o A)
     → (⊢e : (𝕄 Ψ) ⊢ □ ⇒ e ⇒ C)
     → Ψ ⊢ C ≤ τ A ⊣ Ψ₁ ↪ A'
     → Ψ₁ ⊢ B ≤ Σ ⊣ Ψ₂ ↪ D
-    → Ψ ⊢ A `→ B ≤ ([ e ]↝ Σ) ⊣ Ψ₂ ↪ A' `→ D
+    → Ψ ⊢ A `→ B ≤ ([ e ]↝ Σ) ⊣ Ψ₂ ↪ C `→ D
 
   s-∀ : ∀ {A B C}
     → Ψ ,∙ ⊢ A ≤ τ B ⊣ Ψ' ,∙ ↪ C
     → Ψ ⊢ `∀ A ≤ τ (`∀ B) ⊣ Ψ' ↪ `∀ C
 
-  s-∀l-^ : ∀ {A B e}
-    → Ψ ,^ ⊢ A ≤ ↑tyΣ0 ([ e ]↝ Σ) ⊣ Ψ' ,^ ↪ ↑ty0 B
-    → Ψ ⊢ `∀ A ≤ ([ e ]↝ Σ) ⊣ Ψ' ↪ B
-
-  s-∀l-eq : ∀ {A B C C' D D' e}
+  s-∀l : ∀ {A B C C' D D' e}
     → Ψ ,^ ⊢ A ≤ ↑tyΣ0 ([ e ]↝ Σ) ⊣ Ψ' ,= B ↪ (C `→ D)
-    → (st₁ : [ B ]ˢ C ⇨ C')
-    → (st₂ : [ B ]ˢ D ⇨ D')
+    → (st₁ : [ B ]ˢ C ⇘ C')
+    → (st₂ : [ B ]ˢ D ⇘ D')
     → Ψ ⊢ `∀ A ≤ ([ e ]↝ Σ) ⊣ Ψ' ↪ C' `→ D'
 
 
@@ -386,3 +427,23 @@ data ⟦_,_⟧→s⟦_,_⟧ : Context n m → Type m → Context n m → Type m 
   have-e : ∀ {Σ : Context n m} {e A B Σ' B'}
     → ⟦ Σ , B ⟧→s⟦ Σ' , B' ⟧
     → ⟦ ([ e ]↝ Σ) , A `→ B ⟧→s⟦ Σ' , B' ⟧
+
+
+infix 3 _⊆_
+data _⊆_ : SEnv n m → SEnv n m → Set where
+  base : ∅ ⊆ ∅
+  uvar : ∀ {Ψ Ψ' : SEnv n m}
+    → Ψ ⊆ Ψ'
+    → Ψ ,∙ ⊆ Ψ' ,∙
+  var : ∀ {Ψ Ψ' : SEnv n m} {A}
+    → Ψ ⊆ Ψ'
+    → Ψ , A ⊆ Ψ' , A
+  evar : ∀ {Ψ Ψ' : SEnv n m}
+    → Ψ ⊆ Ψ'
+    → Ψ ,^ ⊆ Ψ' ,^
+  evar-sol : ∀ {Ψ Ψ' : SEnv n m} {A}
+    → Ψ ⊆ Ψ'
+    → Ψ ,^ ⊆ Ψ' ,= A    
+  svar : ∀ {Ψ Ψ' : SEnv n m} {A}
+    → Ψ ⊆ Ψ'
+    → Ψ ,= A ⊆ Ψ' ,= A
