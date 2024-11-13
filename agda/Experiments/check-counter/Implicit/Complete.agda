@@ -45,7 +45,7 @@ postulate
 infix 3 _⊢_≊_
 data _⊢_≊_ : SEnv n m → Type m → Type m → Set where
 
-  ≊-int : ∀ {Ψ : SEnv n m} {A}
+  ≊-int : ∀ {Ψ : SEnv n m}
     → Ψ ⊢ Int ≊ Int
 
   ≊-var : ∀ {Ψ : SEnv n m} {X}
@@ -87,7 +87,6 @@ data JustSub (Ψ' : SEnv n m) (Σ : Context n m) (A : Type m) : Set where
     → (sub : Ψ ⊢ A ≤ Σ ⊣ Ψ' ↪ B)
     → (sim : Ψ ⊢ A ≊ B)
     → JustSub Ψ' Σ A
-
 
 complete' : ∀ {Γ : Env n m} {Σ j e A}
   → Γ ⊢ j # e ⦂ A
@@ -137,7 +136,7 @@ complete (⊢tabs ⊢e) ~Z = ⊢tabs (complete-inf ⊢e)
 
 complete-≤ (s-refl) ~Z = s-empty {!!} -- ok
 complete-≤ s-int ~∞ = s-int
-complete-≤ s-var ~∞ = s-var
+complete-≤ s-var ~∞ = s-var {!!}
 complete-≤ (s-arr₁ s s₁) ~∞ = s-arr (complete-≤-chk s) (complete-≤-chk s₁)
 complete-≤ (s-arr₂ s s₁) (~I ⊢e j~Σ) = {!!}
 complete-≤ (s-arr₃ s) (~C ⊢e ~j) = s-term-c {!!} (⊢a-m-w ⊢e) (complete-≤ s ~j)
@@ -146,15 +145,3 @@ complete-≤ (s-∀l s have-i fd st₁ st₂) (~I ⊢e ~j) = s-∀l {!complete-�
 complete-≤ (s-∀l s have-i fd st₁ st₂) (~C ⊢e ~j) = s-∀l {!!} st₁ st₂
 complete-≤ (s-var-l x s) ~∞ = s-ex-l= {!!} {!!} (complete-≤-chk s) -- ok
 complete-≤ (s-var-r x s) ~∞ = s-ex-r= {!!} {!!} (complete-≤-chk s) -- ok
-
-
-complete' ⊢lit ~Z = typs ⊢lit ≊-int
-complete' (⊢var x) ~Z = typs (⊢var x) ≊-refl
-complete' (⊢ann ⊢e) ~Z = typs (complete' {!!}) {!!}
-... | typs ⊢e₁ sim = typs (⊢lam₁ ⊢e₁) {!!}
-complete' (⊢lam₂ ⊢e) ~j = {!!}
-complete' (⊢app₁ ⊢e ⊢e₁) ~j with complete' ⊢e (~C {!!} ~j) | complete' ⊢e₁ ~∞
-... | typs ⊢e₂ sim | typs ⊢e₃ sim₁ = typs (⊢app {!sim!}) {!!}
-complete' (⊢app₂ ⊢e ⊢e₁) ~j = {!!}
-complete' (⊢sub ⊢e B≤A j≢Z) ~j = {!!}
-complete' (⊢tabs ⊢e) ~j = {!!}

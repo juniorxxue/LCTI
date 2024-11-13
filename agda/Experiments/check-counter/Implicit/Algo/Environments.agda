@@ -73,6 +73,29 @@ data _ε_ : Fin m → Type m → Set where
 postulate
   ↑ty0-pred : ∀ {A₁ : Type m} {A₂ A'} → ↑ty0 A₁ ⇘ A' → ↑ty0 A₂ ⇘ A' → A₁ ≡ A₂
 
+
+punchIn-≤ : ∀ {k₁ : Fin m} {k₂}
+  → k₂ #≤ k₁
+  → punchIn k₂ k₁ ≡ #S k₁
+punchIn-≤ {k₁ = k₁} {k₂ = #0} sm = refl
+punchIn-≤ {k₁ = #S k₁} {k₂ = #S k₂} (s≤s sm) = cong #S (punchIn-≤ sm)
+
+ε-up : ∀ {A' k₁ k₂}
+     → k₁ ε A
+     → ty A ↑ k₂ ⇘ A'
+     → k₂ #≤ k₁
+     → #S k₁ ε A'
+ε-up ^in-var ↑var sm rewrite punchIn-≤ sm = ^in-var
+ε-up (^in-arr-l inA) (↑arr up₁ up₂) sm = ^in-arr-l (ε-up inA up₁ sm)
+ε-up (^in-arr-r inA) (↑arr up₁ up₂) sm = ^in-arr-r (ε-up inA up₂ sm)
+ε-up (^in-∀ inA) (↑∀ up₁) sm = ^in-∀ (ε-up inA up₁ (s≤s sm))
+
+ε-up0 : ∀ {A'}
+  → k ε A
+  → ↑ty0 A ⇘ A'
+  → #S k ε A'
+ε-up0 inA up = ε-up inA up z≤n  
+
 infix 3 _εᶜ_
 data _εᶜ_ : Fin m → Context n m → Set where
   ^∈-type  : (inA : k ε A)
@@ -137,7 +160,6 @@ data SolEnv (k : Fin m) (Ψ : SEnv n m) : Set where
   → k ^∈ Ψ
   → SolEnv k Ψ'
 
-
 ^in^=out-l (s-empty p) inA inΨ = ⊥-elim (⊢c-^∈-false inA inΨ p)
 ^in^=out-l (s-var is-∙) ^in-var inΨ = ⊥-elim (^∈-∙∈-false inΨ is-∙)
 ^in^=out-l (s-ex-l^ clo x-in inst) ^in-var inΨ = sols (inst-in inst)
@@ -180,3 +202,5 @@ data SolEnv (k : Fin m) (Ψ : SEnv n m) : Set where
 ... | sols (S∙ inΨ₁ up₁) = sols inΨ₁
 ^in^=out-r {k = k} (s-∀l s st₁ st₂) (^∈-term inΣ) inΨ with ^in^=out-r {k = #S k} s {!!} (S^ inΨ)
 ... | sols (S= inΨ₁) = sols inΨ₁
+
+
