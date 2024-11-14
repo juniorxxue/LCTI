@@ -12,14 +12,10 @@ private variable
   Σ : Context n m
   e : Term n m
 
-inst-in : ∀ {X}
-  → [ A / X ] Ψ ⟹ Ψ'
-  → X := A ∈ Ψ'
-inst-in (⟹^0 x) = Z x
-inst-in (⟹^S st x) = S^ (inst-in st) x
-inst-in (⟹∙S st x) = S∙ (inst-in st) x
-inst-in (⟹,S st) = S, (inst-in st)
-inst-in (⟹=S st) = S= (inst-in st)
+----------------------------------------------------------------------
+--+                          Definitions                           +--
+----------------------------------------------------------------------
+
 
 infix 3 _ε_
 data _ε_ : Fin m → Type m → Set where
@@ -34,6 +30,30 @@ data _ε_ : Fin m → Type m → Set where
   ^in-∀ :
       #S k ε A
     → k ε `∀ A
+
+
+infix 3 _εᶜ_
+data _εᶜ_ : Fin m → Context n m → Set where
+  ^∈-type  : (inA : k ε A)
+           → k εᶜ (Context n m ∋⦂ (τ A))
+           
+  ^∈-term  : k εᶜ Σ
+           → k εᶜ ([ e ]↝ Σ)
+
+
+----------------------------------------------------------------------
+--+                          Small Lemmas                          +--
+----------------------------------------------------------------------
+
+
+inst-in : ∀ {X}
+  → [ A / X ] Ψ ⟹ Ψ'
+  → X := A ∈ Ψ'
+inst-in (⟹^0 x) = Z x
+inst-in (⟹^S st x) = S^ (inst-in st) x
+inst-in (⟹∙S st x) = S∙ (inst-in st) x
+inst-in (⟹,S st) = S, (inst-in st)
+inst-in (⟹=S st) = S= (inst-in st)
 
 ⊢c-^∈-false' :
   k ^∈ Ψ → Ψ ⊢c ‶ k → ⊥
@@ -69,16 +89,8 @@ data _ε_ : Fin m → Type m → Set where
 ^∈-=∈-false (S, in1) (S, in2) = ^∈-=∈-false in1 in2
 ^∈-=∈-false (S= in1) (S= in2) = ^∈-=∈-false in1 in2
 
-
 postulate
   ↑ty0-pred : ∀ {A₁ : Type m} {A₂ A'} → ↑ty0 A₁ ⇘ A' → ↑ty0 A₂ ⇘ A' → A₁ ≡ A₂
-
-
-punchIn-≤ : ∀ {k₁ : Fin m} {k₂}
-  → k₂ #≤ k₁
-  → punchIn k₂ k₁ ≡ #S k₁
-punchIn-≤ {k₁ = k₁} {k₂ = #0} sm = refl
-punchIn-≤ {k₁ = #S k₁} {k₂ = #S k₂} (s≤s sm) = cong #S (punchIn-≤ sm)
 
 ε-up : ∀ {A' k₁ k₂}
      → k₁ ε A
@@ -94,15 +106,12 @@ punchIn-≤ {k₁ = #S k₁} {k₂ = #S k₂} (s≤s sm) = cong #S (punchIn-≤ 
   → k ε A
   → ↑ty0 A ⇘ A'
   → #S k ε A'
-ε-up0 inA up = ε-up inA up z≤n  
+ε-up0 inA up = ε-up inA up z≤n
 
-infix 3 _εᶜ_
-data _εᶜ_ : Fin m → Context n m → Set where
-  ^∈-type  : (inA : k ε A)
-           → k εᶜ (Context n m ∋⦂ (τ A))
-           
-  ^∈-term  : k εᶜ Σ
-           → k εᶜ ([ e ]↝ Σ)
+
+----------------------------------------------------------------------
+--+                   Lemmas around env extension                  +--
+----------------------------------------------------------------------
 
 ⊆-in= : k := C ∈ Ψ
       → Ψ ⊆ Ψ'

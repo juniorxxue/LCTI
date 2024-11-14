@@ -14,7 +14,7 @@ open import Data.List using (List; []; _∷_; _++_; reverse; map; foldr; downFro
 open import Data.List.Properties using (map-++) public
 open import Data.Maybe using (Maybe; just; nothing) renaming (map to mmap) public
 open import Data.Fin using (Fin; punchIn; punchOut; toℕ) renaming (zero to #0; suc to #S; pred to #pred; _≤_ to _#≤_) public
-open import Data.Fin.Properties using () renaming (<-cmp to #<-cmp; _≟_ to _#≟_) public
+open import Data.Fin.Properties using (punchInᵢ≢i; punchOut-punchIn) renaming (<-cmp to #<-cmp; _≟_ to _#≟_) public
 open import Function renaming (_∋_ to _∋⦂_) public
 
 m+1≤n→m≤n : ∀ {m n}
@@ -72,3 +72,25 @@ m+n<o⇒n<o : ∀ {m n o}
   → m + n < o
   → n < o
 m+n<o⇒n<o {m} {n} {o} m+n<o = ≤-trans (s≤s (m≤n+m n m)) m+n<o
+
+
+
+----------------------------------------------------------------------
+--+                              Fin                               +--
+----------------------------------------------------------------------
+
+≢-pred : ∀ {n} {x y : Fin n}
+  → #S x ≢ #S y
+  → x ≢ y
+≢-pred neq eq = neq (cong #S eq)
+
+≢-suc : ∀ {n} {x y : Fin n}
+  → x ≢ y
+  → #S x ≢ #S y
+≢-suc eq refl = ⊥-elim (eq refl)
+
+punchIn-≤ : ∀ {m} {k₁ : Fin m} {k₂}
+  → k₂ #≤ k₁
+  → punchIn k₂ k₁ ≡ #S k₁
+punchIn-≤ {k₁ = k₁} {k₂ = #0} sm = refl
+punchIn-≤ {k₁ = #S k₁} {k₂ = #S k₂} (s≤s sm) = cong #S (punchIn-≤ sm)

@@ -64,6 +64,10 @@ data Env : ℕ → ℕ → Set where
 
 private variable
   Γ : Env n m
+  k : Fin m
+  x : Fin n
+  A B C D : Type m
+  e e₁ e₂ : Term n m
 
 -- the n ensures we can find the type
 lookup : Env n m → Fin n → Type m
@@ -135,23 +139,24 @@ infix 7 [_]ᵗ_
 ↓ty0 A = [ Int ]ˢ A
 
 -- solved existentials (k = A) is in Γ
-infix 3 _:=_∈'_
-data _:=_∈'_ : Fin m → Type m → Env n m → Set where
-  Z  : ∀ {A} → #0 := A ∈' Γ ,= ↓ty0 A
-  S∙ : ∀ {k} {A}
-    → k := ↓ty0 A ∈' Γ
-    → #S k := A ∈' Γ ,∙
-  S= : ∀ {k A B}
-    → k := ↓ty0 A ∈' Γ
-    → #S k := A ∈' Γ ,= B
-  k, : ∀ {k A B}
-    → k := A ∈' Γ
-    → k := A ∈' Γ , B 
+infix 3 _:=_∈_
+data _:=_∈_ : Fin m → Type m → Env n m → Set where
+  Z  : #0 := A ∈ Γ ,= ↓ty0 A
+  S∙ :
+      k := ↓ty0 A ∈ Γ
+    → #S k := A ∈ Γ ,∙
+  S= :
+      k := ↓ty0 A ∈ Γ
+    → #S k := A ∈ Γ ,= B
+  k, : 
+      k := A ∈ Γ
+    → k := A ∈ Γ , B 
 
 
 ----------------------------------------------------------------------
 --+                            Structs                             +--
 ----------------------------------------------------------------------
+
 infix 3 ty_↑_⇘_
 
 data ty_↑_⇘_ : Type m → Fin (1 + m) → Type (1 + m) → Set where
@@ -239,7 +244,6 @@ subst-unique st1 st2 = subst-unique' {k = #0} st1 st2
 data Apps : ℕ → ℕ → Set where
   nil : Apps n m
   _∷a_ : Term n m → Apps n m → Apps n m
---   _∷t_ : Type m → Apps n m → Apps n m
 
 data AppsType : ℕ → Set where
   nil : AppsType m
