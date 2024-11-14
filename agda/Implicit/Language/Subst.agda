@@ -4,7 +4,8 @@ open import Implicit.Language.Subst.Base public
 open import Implicit.Language.Subst.Properties using
   (
   st-unique;
-  st0-unique
+  st0-unique;
+  ↑ty-st-eq
   )
   public
 

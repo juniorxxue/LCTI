@@ -61,3 +61,14 @@ data _↑ty_⇘_ : Type m → Fin (1 + m) → Type (1 + m) → Set where
 
 ↑ty0_⇘_ : Type m → Type (1 + m) → Set
 ↑ty0_⇘_ A A' = _↑ty_⇘_ A #0 A'
+
+----------------------------------------------------------------------
+--+                            Shifted                             +--
+----------------------------------------------------------------------
+
+data Shifted : Type m → Fin m → Set where
+  sfd-int : ∀ {b} → Shifted (Type m ∋⦂ Int) b
+  sfd-var : ∀ {k : Fin m} {b} → k ≢ b → Shifted (‶ k) b
+  sfd-arr : ∀ {A B : Type m} {b} → Shifted A b → Shifted B b → Shifted (A `→ B) b
+  sfd-∀ : ∀ {A : Type (1 + m)} {b} → Shifted A (#S b) → Shifted (`∀ A) b
+

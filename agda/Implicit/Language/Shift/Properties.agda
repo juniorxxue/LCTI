@@ -27,5 +27,14 @@ private variable
                          ↑ty-arr (↑ty-total A k .proj₂) (↑ty-total A₁ k .proj₂) ⟩
 ↑ty-total (`∀ A) k = ⟨ `∀ ↑ty-total A (#S k) .proj₁ , ↑ty-∀ (↑ty-total A (#S k) .proj₂)⟩
 
+-- shifted
+↑ty-shifted : ∀ {A : Type m} {A' k}
+  → A ↑ty k ⇘ A'
+  → Shifted A' k
+↑ty-shifted ↑ty-int = sfd-int
+↑ty-shifted {k = k} (↑ty-var {X = X}) = sfd-var (punchInᵢ≢i k X)
+↑ty-shifted (↑ty-arr up up₁) = sfd-arr (↑ty-shifted up) (↑ty-shifted up₁)
+↑ty-shifted (↑ty-∀ up) = sfd-∀ (↑ty-shifted up)
+
 
   

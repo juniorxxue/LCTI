@@ -94,3 +94,9 @@ punchIn-≤ : ∀ {m} {k₁ : Fin m} {k₂}
   → punchIn k₂ k₁ ≡ #S k₁
 punchIn-≤ {k₁ = k₁} {k₂ = #0} sm = refl
 punchIn-≤ {k₁ = #S k₁} {k₂ = #S k₂} (s≤s sm) = cong #S (punchIn-≤ sm)
+
+#1 : ∀ {m} → Fin (2 + m)
+#1 = #S #0
+
+#2 : ∀ {m} → Fin (3 + m)
+#2 = #S #1
