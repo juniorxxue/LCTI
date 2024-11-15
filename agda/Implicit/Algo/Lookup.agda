@@ -7,6 +7,8 @@ private variable
   Ψ : SEnv n m
   k : Fin m
   A A' B : Type m
+  Σ : Context n m
+  e : Term n m
 
 -- k is existential variable in Ψ
 infix 3 _^∈_
@@ -85,4 +87,13 @@ data _=∈_ : Fin m → SEnv n m → Set where
   S= :
       k =∈ Ψ
     → #S k =∈ Ψ ,= B
+
+
+infix 3 _εᶜ_
+data _εᶜ_ : Fin m → Context n m → Set where
+  ^∈-type  : (inA : k ε A)
+           → k εᶜ (Context n m ∋⦂ (τ A))
+           
+  ^∈-term  : k εᶜ Σ
+           → k εᶜ ([ e ]↝ Σ)
 

@@ -40,15 +40,15 @@ data _∋_:=_ : Env n m → Fin m → Type m → Set where
 -- lookup a variable (can represent three kinds of entries), in a type
 infix 3 _ε_
 data _ε_ : Fin m → Type m → Set where
-  ^in-var :
+  ε-var :
       k ε (‶ k)
-  ^in-arr-l :
+  ε-arr-l :
       k ε A
     → k ε A `→ B
-  ^in-arr-r :
+  ε-arr-r :
       k ε B
     → k ε A `→ B
-  ^in-∀ :
+  ε-∀ :
       #S k ε A
     → k ε `∀ A
 
