@@ -15,11 +15,11 @@ data ⟦_/_⟧ᶜ_⇘_ : Fin (1 + m) → Type m → Context n (1 + m) → Contex
   empty :
       ⟦ k / A ⟧ᶜ □ ⇘ (Context n m ∋⦂ □)
   fulltype :
-      ⟦ k / A ⟧ B ⇘ B'
+      (st : ⟦ k / A ⟧ B ⇘ B')
     → ⟦ k / A ⟧ᶜ (τ B) ⇘ (Context n m ∋⦂ (τ B'))
   term :
       ⟦ k / A ⟧ᶜ Σ ⇘ Σ'
-    → ⟦ k / A ⟧ᵉ e ⇘ e'
+    → (ste : ⟦ k / A ⟧ᵉ e ⇘ e')
     → ⟦ k / A ⟧ᶜ ([ e ]↝ Σ) ⇘ (Context n m ∋⦂ ([ e' ]↝ Σ'))
 
 infix 3 ⟦_⟧ᶜ_⇘_

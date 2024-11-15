@@ -67,4 +67,22 @@ data _:=_∈_ : Fin m → Type m → SEnv n m → Set where
       k := ⟦ B ⟧ A ∈ Ψ
     → #S k := A ∈ Ψ ,= B
 
+-- a simple version of _:=_∈_ to check
+infix 3 _=∈_
+data _=∈_ : Fin m → SEnv n m → Set where
+
+  Z :
+      #0 =∈ Ψ ,= A
+  S, :
+      k =∈ Ψ
+    → k =∈ Ψ , B
+  S^ :
+      k =∈ Ψ
+    → #S k =∈ Ψ ,^
+  S∙ :
+      k =∈ Ψ
+    → #S k =∈ Ψ ,∙
+  S= :
+      k =∈ Ψ
+    → #S k =∈ Ψ ,= B
 

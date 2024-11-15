@@ -2,6 +2,7 @@ module Implicit.Algo.Properties.Id where
 
 open import Implicit.Language
 open import Implicit.Algo.Base
+open import Implicit.Algo.Properties.Split
 
 data Split : (Σ : Context n m) → (B : Type m) → Set where
   case-τ : ∀ {Σ : Context n m} {B T B'}
@@ -27,16 +28,15 @@ data Split : (Σ : Context n m) → (B : Type m) → Set where
   → ⟦ Σ , B ⟧→s⟦ τ T , B' ⟧
   → T ≡ B'
 ≤id' s spl with ≤id s
-... | case-τ spl' refl with spl-deterministic spl spl'
+... | case-τ spl' refl with sspl-unique spl spl'
 ... | ⟨ refl , refl ⟩ = refl
-≤id' s spl | case-□ spl' with spl-deterministic spl spl'
+≤id' s spl | case-□ spl' with sspl-unique spl spl'
 ... | ()
 
 ⊢id (⊢app ⊢e) spl = ⊢id ⊢e (have-e spl)
 ⊢id (⊢lam₁ ⊢e) none-τ rewrite ⊢id ⊢e none-τ = refl
-⊢id (⊢lam₂ ⊢e ⊢e₁) (have-e spl) = ⊢id ⊢e₁ (spl-weaken spl)
-⊢id (⊢sub ⊢e ne gc s) spl = ≤id' s (spl-implies-simple spl)
-
+⊢id (⊢lam₂ ⊢e upc ⊢e₁) (have-e spl) = ⊢id ⊢e₁ {!!}
+⊢id (⊢sub ⊢e ne gc s) spl = ≤id' s (spl→sspl spl)
 
 ≤id s-int = case-τ none-τ refl
 ≤id (s-empty p) = case-□ none-□
@@ -54,8 +54,17 @@ data Split : (Σ : Context n m) → (B : Type m) → Set where
 ... | case-□ spl = case-□ (have-e spl)
 ≤id (s-∀ s) with ≤id s
 ... | case-τ none-τ refl = case-τ none-τ refl
-≤id (s-∀l {B = B} s st₁ st₂) with ≤id s
-... | case-τ spl refl rewrite sym (st-st st₁) | sym (st-st st₂) = case-τ (spl-↑ty-case' {C = B} spl) refl
-... | case-□ spl rewrite sym (st-st st₁) | sym (st-st st₂) = case-□ (spl-↑ty-case' {C = B} spl)
+≤id (s-∀l {B = B} s st₁ st₂ upc upe) with ≤id s
+... | case-τ spl refl = case-τ (sspl-↑-st spl {!!} {!!} (st-arr upc upe) {!!}) refl
+... | case-□ spl = {!!}
 
+-- corollaries
+⊢id0 : ∀ {Γ : Env n m} {e A B}
+  → Γ ⊢ τ B ⇒ e ⇒ A
+  → B ≡ A
+⊢id0 ⊢e = ⊢id ⊢e none-τ
 
+≤id0 : ∀ {Ψ Ψ' : SEnv n m} {A B C}
+  → Ψ ⊢ A ≤ τ B ⊣ Ψ' ↪ C
+  → B ≡ C
+≤id0 s = ≤id' s none-τ  

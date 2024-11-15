@@ -2,6 +2,7 @@ module Implicit.Algo.OpenClose where
 
 open import Implicit.Language
 open import Implicit.Algo.Syntax
+open import Implicit.Algo.Lookup
 
 -- an algorithmic version to define closedness and openness
 -- however, it could work for defining a specification around k ε A and and Ψ ⊢^ k
@@ -41,7 +42,6 @@ data _⊢o_ : SEnv n m → Type m → Set where
       Ψ ,∙ ⊢o A
     → Ψ ⊢o `∀ A
 
--- closed: no free existential variables
 data _⊢c_ : SEnv n m → Type m → Set where
   ⊢c-int :
       Ψ ⊢c Int
