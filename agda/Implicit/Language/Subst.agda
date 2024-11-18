@@ -5,7 +5,12 @@ open import Implicit.Language.Subst.Properties using
   (
   st-unique;
   st0-unique;
-  ↑ty-st-eq
+  st-total;
+  st0-total;
+  ↑ty-st-eq;
+  ↑ty-st;
+  ↑tyᵉ-st-eq;
+  ↑tyᵉ-st
   )
   public
 

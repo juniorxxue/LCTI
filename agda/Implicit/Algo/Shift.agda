@@ -16,7 +16,7 @@ infix 3 _↑tmᶜ_⇘_
 data _↑tmᶜ_⇘_ : Context n m → Fin (1 + n) → Context (1 + n) m → Set where
   ↑tmᶜ-□ : (Context n m ∋⦂ □) ↑tmᶜ x ⇘ □
   ↑tmᶜ-τ : (Context n m ∋⦂ τ A) ↑tmᶜ x ⇘ (τ A)
-  ↑tmᶜ-e : e ↑tm x ⇘ e'
+  ↑tmᶜ-e : (up-e : e ↑tm x ⇘ e')
          → Σ ↑tmᶜ x ⇘ Σ'
          → [ e ]↝ Σ ↑tmᶜ x ⇘ [ e' ]↝ Σ'
 
@@ -27,11 +27,11 @@ infix 3 ↑tmᶜ0_⇘_
 infix 3 _↑tyᶜ_⇘_
 data _↑tyᶜ_⇘_ : Context n m → Fin (1 + m) → Context n (1 + m) → Set where
   ↑tyᶜ-□ : (Context n m ∋⦂ □) ↑tyᶜ k ⇘ □
-  ↑tyᶜ-τ : A ↑ty k ⇘ A'
-         → (Context n m ∋⦂ τ A) ↑tyᶜ x ⇘ (τ A')
-  ↑tyᶜ-e : e ↑tyᵉ k ⇘ e'
+  ↑tyᶜ-τ : (up-t : A ↑ty k ⇘ A')
+         → (Context n m ∋⦂ τ A) ↑tyᶜ k ⇘ (τ A')
+  ↑tyᶜ-e : (up-e : e ↑tyᵉ k ⇘ e')
          → Σ ↑tyᶜ k ⇘ Σ'
-         → [ e ]↝ Σ ↑tyᶜ x ⇘ [ e' ]↝ Σ'
+         → [ e ]↝ Σ ↑tyᶜ k ⇘ [ e' ]↝ Σ'
 
 infix 3 ↑tyᶜ0_⇘_
 ↑tyᶜ0_⇘_ : Context n m → Context n (1 + m) → Set

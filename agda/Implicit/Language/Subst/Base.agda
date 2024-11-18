@@ -93,7 +93,7 @@ data ⟦_/_⟧ᵉ_⇘_ : Fin (1 + m) → Type m → Term n (1 + m) → Term n m 
     → ⟦ k / A ⟧ᵉ (e₁ · e₂) ⇘ (Term n m ∋⦂ e₁' · e₂')
   st-⦂ :
       ⟦ k / A ⟧ᵉ e ⇘ e'
-    → ⟦ k / A ⟧ B ⇘ B'
+    → (st : ⟦ k / A ⟧ B ⇘ B')
     → ⟦ k / A ⟧ᵉ (e ⦂ B) ⇘ (Term n m ∋⦂ e' ⦂ B')
   st-Λ :
       ⟦ #S k / ↑ty0 A ⟧ᵉ e ⇘ e'

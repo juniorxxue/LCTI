@@ -102,7 +102,7 @@ data _↑tyᵉ_⇘_ : Term n m → Fin (1 + m) → Term n (1 + m) → Set where
     → (e₁ · e₂) ↑tyᵉ k ⇘ e₁' · e₂'
   ↑tyᵉ-⦂ :
       e ↑tyᵉ k ⇘ e'
-    → A ↑ty k ⇘ A'
+    → (up : A ↑ty k ⇘ A')
     → (e ⦂ A) ↑tyᵉ k ⇘ e' ⦂ A'
   ↑tyᵉ-Λ :
       e ↑tyᵉ #S k ⇘ e'

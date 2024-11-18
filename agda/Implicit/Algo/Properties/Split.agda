@@ -34,5 +34,17 @@ sspl-↑-st :
 sspl-↑-st none-□ empty empty st3 st4 rewrite st0-unique st3 st4 = none-□
 sspl-↑-st none-τ (fulltype st1) (fulltype st2) st3 st4 rewrite st0-unique st1 st2 | st0-unique st3 st4 = none-τ
 sspl-↑-st (have-e spl) (term st1 ste) st2 (st-arr st3 st5) st4 = have-e (sspl-↑-st spl st1 st2 st5 st4)
+
+-- proof is generated
+spl-↑tm :
+    ⟦ Σ , A ⟧→⟦ e̅ , τ T , A̅ , A' ⟧
+  → ↑tmᶜ0 Σ ⇘ Σ'
+  → ∃[ e̅' ](⟦ Σ' , A ⟧→⟦ e̅' , τ T , A̅ , A' ⟧ × (↑tmᵃ0 e̅ ⇘ e̅'))
+spl-↑tm none-τ ↑tmᶜ-τ = ⟨ nil , ⟨ none-τ , nil ⟩ ⟩
+spl-↑tm (have-e spl) (↑tmᶜ-e {e' = e'} up-e up-c) = ⟨ e' ∷a spl-↑tm spl up-c .proj₁ ,
+                                           ⟨ have-e (spl-↑tm spl up-c .proj₂ .proj₁) ,
+                                           up-e ∷a spl-↑tm spl up-c .proj₂ .proj₂ ⟩
+                                           ⟩
+
   
   
