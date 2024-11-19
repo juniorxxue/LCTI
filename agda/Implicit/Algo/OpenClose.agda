@@ -12,6 +12,8 @@ private
     Ψ : SEnv n m
     X : Fin m
     A B : Type m
+    Σ : Context n m
+    e : Term n m
 
 infix 3 _⊢c_
 infix 3 _⊢o_
@@ -69,3 +71,9 @@ data _⊢c_ : SEnv n m → Type m → Set where
       Ψ ,∙ ⊢c A
     → Ψ ⊢c `∀ A
 
+
+infix 3 _⊢cᶜ_
+data _⊢cᶜ_ : SEnv n m → Context n m → Set where
+  ⊢c-empty : Ψ ⊢cᶜ □
+  ⊢c-τ : Ψ ⊢c A → Ψ ⊢cᶜ (τ A)
+  ⊢c-term : Ψ ⊢cᶜ Σ → Ψ ⊢cᶜ [ e ]↝ Σ -- we may add conditions onto `e` later
