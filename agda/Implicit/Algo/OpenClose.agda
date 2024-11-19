@@ -77,3 +77,8 @@ data _⊢cᶜ_ : SEnv n m → Context n m → Set where
   ⊢c-empty : Ψ ⊢cᶜ □
   ⊢c-τ : Ψ ⊢c A → Ψ ⊢cᶜ (τ A)
   ⊢c-term : Ψ ⊢cᶜ Σ → Ψ ⊢cᶜ [ e ]↝ Σ -- we may add conditions onto `e` later
+
+infix 3 _⊢oᶜ_
+data _⊢oᶜ_ : SEnv n m → Context n m → Set where
+  ⊢o-τ : Ψ ⊢o A → Ψ ⊢oᶜ (τ A)
+  ⊢o-term : Ψ ⊢oᶜ Σ → Ψ ⊢oᶜ [ e ]↝ Σ -- we may add conditions onto `e` later

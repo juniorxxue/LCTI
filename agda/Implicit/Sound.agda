@@ -1,23 +1,18 @@
 module Implicit.Sound where
 
-open import Implicit.Common
-open import Implicit.Decl renaming (_:=_∈_ to _:=_∈d_; find to d-find; bound to d-bound)
-open import Implicit.Decl.Subst
-open import Implicit.Decl.Properties
-open import Implicit.Algo renaming (_:=_∈_ to _:=_∈a_)
-open import Implicit.Algo.Properties
-open import Implicit.Algo.Environments
-open import Implicit.Algo.Find renaming (find to a-find; bound to a-bound)
+open import Implicit.Language
+open import Implicit.Decl
+open import Implicit.Algo
 
 postulate
   ∈a→∈d : ∀ {Ψ : SEnv n m} {X A}
-    → X := A ∈a Ψ
-    → X := A ∈d 𝕄 Ψ
+    → X := A ∈ Ψ
+    → 𝕄 Ψ ∋ X := A
 
   ⊆-:= : ∀ {Ψ Ψ' : SEnv n m} {X A}
     → Ψ ⊆ Ψ'
-    → X := A ∈a Ψ
-    → X := A ∈a Ψ'
+    → X := A ∈ Ψ
+    → X := A ∈ Ψ'
 
 {-
   s-⊆-prv : ∀ {Ψ Ψ' : SEnv n m} {A B}
@@ -45,12 +40,12 @@ data _⊢_~_ : Env n m → Counter × Type m → Context n m → Set where
   ~I : ∀ {Γ : Env n m} {j A B Σ e}
     → (⊢e : Γ ⊢ Z # e ⦂ A) -- is A or not
     → Γ ⊢ ⟨ j , B ⟩ ~ Σ
-    → Γ ⊢ ⟨ I j , A `→ B ⟩ ~ ([ e ]↝ Σ)
+    → Γ ⊢ ⟨ 𝕚 j , A `→ B ⟩ ~ ([ e ]↝ Σ)
 
   ~C : ∀ {Γ : Env n m} {j A B Σ e}
     → (⊢e : Γ ⊢ ∞ # e ⦂ A)
     → Γ ⊢ ⟨ j , B ⟩ ~ Σ
-    → Γ ⊢ ⟨ C j , A `→ B ⟩ ~ ([ e ]↝ Σ)
+    → Γ ⊢ ⟨ 𝕔 j , A `→ B ⟩ ~ ([ e ]↝ Σ)
 
 postulate
 
@@ -62,14 +57,10 @@ postulate
     → 𝕄 (𝕎 Γ) ⊢ ⟨ j , A ⟩ ~ Σ
     → Γ ⊢ ⟨ j , A ⟩ ~ Σ
 
-  ~-weaken : ∀ {Γ : Env n m} {Σ A B j}
-    → Γ , A ⊢ ⟨ j , B ⟩ ~ ↑Σ0 Σ
-    → Γ ⊢ ⟨ j , B ⟩ ~ Σ
-
   ~-subst : ∀ {Γ : Env n m} {Σ A B j Σ' A'}
     → (Γ ,= B) ⊢ ⟨ j , A ⟩ ~ Σ
-    → [ B ]ᶜ Σ ⇘ Σ'
-    → [ B ]ˢ A ⇘ A'
+    → ⟦ B ⟧ᶜ Σ ⇘ Σ'
+    → ⟦ B ⟧ A ⇘ A'
     → Γ ⊢ ⟨ j , A' ⟩ ~ Σ'
 
 ----------------------------------------------------------------------
@@ -78,9 +69,9 @@ postulate
 
 e-ic : ∀ {Γ : Env n m} {j A Σ e}
   → Γ ⊢ ⟨ j , A ⟩ ~ [ e ]↝ Σ
-  → IC j
-e-ic (~I ⊢e ~j) = ic-I
-e-ic (~C ⊢e ~j) = ic-C
+  → 𝕚𝕔 j
+e-ic (~I ⊢e ~j) = ?
+e-ic (~C ⊢e ~j) = ?
 
 
 data JustSub (Ψ : SEnv n m) (Σ : Context n m) (A : Type m) (B : Type m) : Set where
@@ -113,10 +104,6 @@ sound-s' : ∀ {Γ Γ' : Env n m} {Σ A B}
   → 𝕎 Γ ⊢ A ≤ Σ ⊣ 𝕎 Γ' ↪ B
   → JustSub' Γ Σ A B
 
-sound-find : ∀ {Γ : Env n m} {k Σ A B j}
-  → a-find Γ A k Σ
-  → Γ ⊢ ⟨ j , B ⟩ ~ Σ
-  → d-find A k j
 
 sound-0 : ∀ {Γ : Env n m} {e A}
   → Γ ⊢ □ ⇒ e ⇒ A
@@ -139,7 +126,7 @@ sound (⊢app ⊢e) with sound ⊢e
 sound (⊢lam₁ ⊢e) with sound ⊢e
 ... | typs ~∞ s = typs ~∞ (⊢lam₁ s)
 sound (⊢lam₂ ⊢e ⊢e₁) with sound ⊢e₁
-... | typs j ⊢e' = typs (~I (sound-0 ⊢e) (~-weaken j)) (⊢lam₂ ⊢e')
+... | typs j ⊢e' = typs (~I (sound-0 ⊢e) ?) (⊢lam₂ ⊢e')
 sound (⊢sub ⊢e ne gc s) with sound-s s
 ... | subs j~Σ s₁ = {!!}
 -- typs (~-w-m j~Σ) (⊢sub' (sound-0 ⊢e) (s-w-m s₁))

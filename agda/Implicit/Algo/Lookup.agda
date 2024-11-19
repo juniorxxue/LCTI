@@ -66,7 +66,8 @@ data _:=_∈_ : Fin m → Type m → SEnv n m → Set where
     → (up : ↑ty0 A ⇘ A')
     → #S k := A' ∈ Ψ ,∙
   S= :
-      k := ⟦ B ⟧ A ∈ Ψ
+      k := A' ∈ Ψ
+    → (st : ⟦ B ⟧ A ⇘ A')
     → #S k := A ∈ Ψ ,= B
 
 -- a simple version of _:=_∈_ to check

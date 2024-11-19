@@ -27,6 +27,11 @@ private variable
                          ↑ty-arr (↑ty-total A k .proj₂) (↑ty-total A₁ k .proj₂) ⟩
 ↑ty-total (`∀ A) k = ⟨ `∀ ↑ty-total A (#S k) .proj₁ , ↑ty-∀ (↑ty-total A (#S k) .proj₂)⟩
 
+↑ty0-total : ∀ (A : Type m)
+  → ∃ λ A'
+  → ↑ty0 A ⇘ A'
+↑ty0-total A = ↑ty-total A #0
+
 -- shifted
 ↑ty-shifted : ∀ {A : Type m} {A' k}
   → A ↑ty k ⇘ A'

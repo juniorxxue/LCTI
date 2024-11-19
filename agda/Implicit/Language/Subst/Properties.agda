@@ -74,3 +74,8 @@ st0-unique st1 st2 = st-unique st1 st2
 ↑tyᵉ-st (↑tyᵉ-⦂ up up₁) = st-⦂ (↑tyᵉ-st up) (↑ty-st up₁)
 ↑tyᵉ-st (↑tyᵉ-Λ up) = st-Λ (↑tyᵉ-st up)
 
+st-total-rev : ∀ k B → ∃[ A ](⟦ k / T ⟧ A ⇘ B)
+st-total-rev k B = let ⟨ B* , up ⟩ = ↑ty-total B k in ⟨ B* , ↑ty-st up ⟩
+
+st0-total-rev : ∀ B → ∃[ A ](⟦ T ⟧ A ⇘ B)
+st0-total-rev = st-total-rev #0

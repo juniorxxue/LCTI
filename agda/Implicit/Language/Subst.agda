@@ -10,7 +10,9 @@ open import Implicit.Language.Subst.Properties using
   ↑ty-st-eq;
   ↑ty-st;
   ↑tyᵉ-st-eq;
-  ↑tyᵉ-st
+  ↑tyᵉ-st;
+  st-total-rev;
+  st0-total-rev
   )
   public
 

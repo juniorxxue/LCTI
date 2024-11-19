@@ -49,13 +49,31 @@ subsumption0 : ∀ {Γ : Env n m} {Ψ Σ e A A'}
   → Γ ⊢ Σ ⇒ e ⇒ A'
 subsumption0 ⊢e s = subsumption ⊢e none-□ ⊕nil s
 
+s-refined-c : ∀ {Ψ Ψ' : SEnv n m} {Σ A B}
+  → Ψ ⊢ A ≤ Σ ⊣ Ψ' ↪ B
+  → Ψ ⊢c A
+  → Ψ ⊢cᶜ Σ
+  → Ψ' ⊢ B ≤ Σ ⊣ Ψ' ↪ B
+s-refined-c s-int cloA cloΣ = s-int
+s-refined-c (s-empty p) cloA cloΣ = s-empty p
+s-refined-c (s-var clo) cloA cloΣ = s-var clo
+s-refined-c (s-ex-l^ clo x-in inst) cloA cloΣ = s-refl {!!}
+s-refined-c (s-ex-l= clo x-in s) cloA cloΣ = s-refl {!!}
+s-refined-c (s-ex-r^ clo x-in inst) cloA cloΣ = s-refl {!!}
+s-refined-c (s-ex-r= clo x-in s) cloA cloΣ = s-refl {!!}
+s-refined-c (s-arr s s₁) cloA cloΣ = s-refl {!cloΣ!}
+s-refined-c (s-term-c cloA₁ ⊢e s) cloA cloΣ = {!!}
+s-refined-c (s-term-o opnA ⊢e s s₁) cloA cloΣ = {!!}
+s-refined-c (s-∀ s) cloA cloΣ = {!!}
+s-refined-c (s-∀l s upᶜ upᵉ st₁ st₂) cloA cloΣ = {!!}
+
 s-refined : ∀ {Ψ Ψ' : SEnv n m} {Σ A B}
   → Ψ ⊢ A ≤ Σ ⊣ Ψ' ↪ B
   → Ψ' ⊢ B ≤ Σ ⊣ Ψ' ↪ B
 
 s-refined s-int = s-int
 s-refined (s-empty p) = s-empty p
-s-refined (s-var is∙) = {!!}
+s-refined (s-var is∙) = s-var is∙
 s-refined (s-ex-l^ clo x-in inst) = s-refl {!!}
 s-refined s'@(s-ex-l= clo x-in s) = s-refl {!!}
 s-refined (s-ex-r^ clo x-in inst) = s-refl {!!}
