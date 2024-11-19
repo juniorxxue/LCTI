@@ -32,6 +32,8 @@ postulate
 
   ⊢c-⊢o-⊥ : Ψ ⊢c A → Ψ ⊢o A → ⊥
 
+  ⊢c-, : Ψ ⊢c A → Ψ , B ⊢c A
+
 
 {-
 data OneSide (Ψ : SEnv n m) (A : Type m) (Σ : Context n m) : Set where

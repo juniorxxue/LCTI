@@ -22,5 +22,4 @@ private variable
 ↑tyᶜ-st ↑tyᶜ-□ = empty
 ↑tyᶜ-st (↑tyᶜ-τ up-t) = fulltype (↑ty-st up-t)
 ↑tyᶜ-st (↑tyᶜ-e up-e up) = term (↑tyᶜ-st up) (↑tyᵉ-st up-e)
-  
 

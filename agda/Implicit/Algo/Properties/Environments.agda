@@ -76,6 +76,10 @@ data SolEnv (k : Fin m) (Ψ : SEnv n m) : Set where
 --+ Invariant: appearing existentials must be solved in output env +--
 ----------------------------------------------------------------------
 
+-- I realise that I probably want to show that A and Σ is closed under Ψ'
+-- I think it should be a corollary of the following lemma
+-- but not sure, whether directly prove this lemma is easier
+
 ^in^=out-l : ∀ {Ψ : SEnv n (1 + m)}
   → Ψ ⊢ A ≤ Σ ⊣ Ψ' ↪ B
   → k ε A

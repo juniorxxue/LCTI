@@ -50,7 +50,7 @@ data _⊢_~_ : Env n m → Counter × Type m → Context n m → Set where
 postulate
 
   s-w-m : ∀ {Γ : Env n m} {A B j}
-    →  𝕄 (𝕎 Γ) ⊢ j # A ≤ B
+    → 𝕄 (𝕎 Γ) ⊢ j # A ≤ B
     → Γ ⊢ j # A ≤ B
 
   ~-w-m : ∀ {Γ : Env n m} {j A Σ}
@@ -70,8 +70,8 @@ postulate
 e-ic : ∀ {Γ : Env n m} {j A Σ e}
   → Γ ⊢ ⟨ j , A ⟩ ~ [ e ]↝ Σ
   → 𝕚𝕔 j
-e-ic (~I ⊢e ~j) = ?
-e-ic (~C ⊢e ~j) = ?
+e-ic (~I ⊢e ~j) = case-𝕚
+e-ic (~C ⊢e ~j) = case-𝕔
 
 
 data JustSub (Ψ : SEnv n m) (Σ : Context n m) (A : Type m) (B : Type m) : Set where
@@ -100,11 +100,6 @@ sound-s : ∀ {Ψ Ψ' : SEnv n m} {Σ A B}
   → Ψ ⊢ A ≤ Σ ⊣ Ψ' ↪ B
   → JustSub Ψ' Σ A B
 
-sound-s' : ∀ {Γ Γ' : Env n m} {Σ A B}
-  → 𝕎 Γ ⊢ A ≤ Σ ⊣ 𝕎 Γ' ↪ B
-  → JustSub' Γ Σ A B
-
-
 sound-0 : ∀ {Γ : Env n m} {e A}
   → Γ ⊢ □ ⇒ e ⇒ A
   → Γ ⊢ Z # e ⦂ A
@@ -125,18 +120,17 @@ sound (⊢app ⊢e) with sound ⊢e
 ... | typs (~C ⊢e₁ j~Σ) ⊢e = typs j~Σ (⊢app₁ ⊢e ⊢e₁)
 sound (⊢lam₁ ⊢e) with sound ⊢e
 ... | typs ~∞ s = typs ~∞ (⊢lam₁ s)
-sound (⊢lam₂ ⊢e ⊢e₁) with sound ⊢e₁
-... | typs j ⊢e' = typs (~I (sound-0 ⊢e) ?) (⊢lam₂ ⊢e')
+sound (⊢lam₂ ⊢e up-c ⊢e₁) with sound ⊢e₁
+... | typs j ⊢e' = typs (~I (sound-0 ⊢e) {!!}) (⊢lam₂ ⊢e') -- weaken
 sound (⊢sub ⊢e ne gc s) with sound-s s
-... | subs j~Σ s₁ = {!!}
--- typs (~-w-m j~Σ) (⊢sub' (sound-0 ⊢e) (s-w-m s₁))
+... | subs j~Σ s₁ = typs {!!} (⊢sub' (sound-0 ⊢e) (s-w-m s₁))
 sound (⊢tabs ⊢e) with sound ⊢e
 ... | typs ~Z s = typs ~Z (⊢tabs s)
 
 sound-s s-int = subs ~∞ s-int
 sound-s (s-empty p) = subs ~Z s-refl
 sound-s (s-var is-∙) = subs ~∞ s-var
-sound-s (s-ex-l^ clo x-in inst) = subs ~∞ {!!}
+sound-s (s-ex-l^ clo x-in inst) = subs ~∞ (s-var-l {!!} s-refl-∞)
 sound-s (s-ex-l= clo x-in s) with sound-s s
 ... | subs ~∞ s' = subs ~∞ (s-var-l (∈a→∈d (⊆-:= (s-⊆ s) x-in)) s')
 sound-s (s-ex-r^ clo x-in inst) = subs ~∞ (s-var-r (∈a→∈d (inst-in inst)) s-refl-∞)
@@ -146,18 +140,10 @@ sound-s (s-arr s s₁) with sound-s s | sound-s s₁
 ... | subs ~∞ s₂ | subs ~∞ s₃ = subs ~∞ (s-arr₁ {!!} s₃)
 sound-s (s-term-c cloA ⊢e s) with sound-s s
 ... | subs j~Σ s' with ⊢id0 ⊢e
-...   | refl = subs (~C {!!} j~Σ) (s-arr₃ s')
+...   | refl = subs (~C {!sound-∞ ⊢e!} j~Σ) (s-arr₃ s')
 sound-s (s-term-o op ⊢e s s₁) with sound-s s | sound-s s₁ | sound-0 ⊢e
 ... | subs ~∞ s'' | subs j~Σ s' | ⊢e' rewrite ≤id0 s = subs (~I {!!} j~Σ) (s-arr₂ {!s''!} s') -- ok, same as above
 sound-s (s-∀ s) with sound-s s
 ... | subs ~∞ s' = subs ~∞ (s-∀ s')
-sound-s (s-∀l s st₁ st₂) with sound-s s
-... | subs j~Σ s' = subs (~-subst j~Σ {!!} (st-arr st₁ st₂)) (s-∀l s' (e-ic {!!}) (sound-find (s-find s) j~Σ) st₁ st₂) -- ok
-
-sound-find (f-τ bd) j~Σ = {!!}
-sound-find (f-arr-l bd ⊢e) (~I ⊢e₁ j~Σ) = {!!}
-sound-find (f-arr-l bd ⊢e) (~C ⊢e₁ j~Σ) = {!!}
-sound-find (f-arr-r fd) j~Σ = {!!}
-sound-find (f-∀ fd) j~Σ = {!!}
-
-sound-s' s = {!s!}
+sound-s (s-∀l s upc upe st₁ st₂) with sound-s s
+... | subs j~Σ s' = subs (~-subst j~Σ (term (↑tyᶜ-st upc) (↑tyᵉ-st upe)) (st-arr st₁ st₂)) (s-∀l s' {!!} {!!} st₁ st₂)
