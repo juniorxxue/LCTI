@@ -16,3 +16,6 @@ open import Implicit.Algo.Properties.Subst
 
 open import Implicit.Algo.Properties.OpenClose
   using (⊢c-,) public
+
+open import Implicit.Algo.Properties.Find
+  using (find) public

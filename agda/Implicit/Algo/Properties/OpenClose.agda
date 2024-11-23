@@ -35,7 +35,6 @@ postulate
   ⊢c-, : Ψ ⊢c A → Ψ , B ⊢c A
 
 
-{-
 data OneSide (Ψ : SEnv n m) (A : Type m) (Σ : Context n m) : Set where
   left  : (opn : Ψ ⊢o A)
         → (clo : Ψ ⊢cᶜ Σ)
@@ -46,24 +45,6 @@ data OneSide (Ψ : SEnv n m) (A : Type m) (Σ : Context n m) : Set where
   none  : (clo₁ : Ψ ⊢c A)
         → (clo₂ : Ψ ⊢cᶜ Σ)
         → OneSide Ψ A Σ
-
-ex-one-side :
-    Ψ ⊢ A ≤ Σ ⊣ Ψ' ↪ B
-  → OneSide Ψ A Σ
-ex-one-side s-int = none ⊢c-int (⊢c-τ ⊢c-int)
-ex-one-side (s-empty p) = none p ⊢c-empty
-ex-one-side (s-var clo) = none clo (⊢c-τ clo)
-ex-one-side (s-ex-l^ clo x-in inst) = left {!!} (⊢c-τ clo)
-ex-one-side (s-ex-l= clo x-in s) = {!!}
-ex-one-side (s-ex-r^ clo x-in inst) = {!!}
-ex-one-side (s-ex-r= clo x-in s) = {!!}
-
-ex-one-side (s-arr s s₁) = {!!}
-ex-one-side (s-term-c cloA ⊢e s) = {!!}
-ex-one-side (s-term-o opnA ⊢e s s₁) = {!!}
-ex-one-side (s-∀ s) = {!!}
-ex-one-side (s-∀l s upᶜ upᵉ st₁ st₂) = {!!}
--}
 
 
 

@@ -8,7 +8,7 @@ private variable
   Γ : Env n m
   A A' B C D : Type m
   i : Fin n
-  k : Fin m
+  k k' : Fin m
 
 -- lookup an entry: term variable
 infix 3 _∋_⦂_
@@ -51,6 +51,22 @@ data _ε_ : Fin m → Type m → Set where
   ε-∀ :
       #S k ε A
     → k ε `∀ A
+
+-- a neg definition of ε
+infix 3 _¬ε_
+data _¬ε_ : Fin m → Type m → Set where
+  ¬ε-int :
+      k ¬ε Int
+  ¬ε-var :
+      k ≢ k'
+    → k ¬ε (‶ k')
+  ¬ε-arr :
+      k ¬ε A
+    → k ¬ε B
+    → k ¬ε A `→ B
+  ¬ε-∀ :
+      #S k ¬ε A
+    → k ¬ε `∀ A
 
 -- remove k-th entry (term binding) from environment
 _/,/_ : Env (1 + n) m → Fin (1 + n) → Env n m

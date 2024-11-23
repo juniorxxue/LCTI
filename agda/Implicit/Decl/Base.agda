@@ -32,9 +32,13 @@ data find : Type m → Fin m → Counter → Set where
             → find A k ∞
   f-arr-𝕚-l : k ε A
             → find (A `→ B) k (𝕚 j)
-  f-arr-𝕚-r : find B k j
+{-            
+  f-arr-𝕚-r : k ¬ε A
+            → find B k j
             → find (A `→ B) k (𝕚 j)
-  f-arr-𝕔   : find B k j
+-}            
+  f-arr-𝕔   : k ¬ε A
+            → find B k j -- can not in okay??????? issue need ot be discussed, it's important
             → find (A `→ B) k (𝕔 j)    
   f-∀       : find A (#S k) j
             → find (`∀ A) k j

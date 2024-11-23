@@ -13,13 +13,16 @@ data find : Env n m → Type m → Fin m → Context n m → Set where
     → (bd : k ε A)
     → (⊢e : Γ ⊢ □ ⇒ e ⇒ C)
     → find Γ (A `→ B) k ([ e ]↝ Σ)
-  f-arr-r : ∀ {Γ : Env n m} {A B k e Σ}
+  f-arr-r : ∀ {Γ : Env n m} {A B C k e Σ} -- maybe here we can make it be syntax directed, say k not in A
+    → k ¬ε A
+    → (⊢e : Γ ⊢ τ A ⇒ e ⇒ C)
     → find Γ B k Σ
     → find Γ (A `→ B) k ([ e ]↝ Σ)
   f-∀ : ∀ {Σ : Context n m} {Σ' Γ A k}
     → find (Γ ,∙) A (#S k) Σ'
     → ↑tyᶜ0 Σ ⇘ Σ'
     → find Γ (`∀ A) k Σ
+-- this find backtracks    
 
 postulate
   s-find-gen : ∀ {Ψ Ψ' : SEnv n (1 + m)} {k Σ A B C}

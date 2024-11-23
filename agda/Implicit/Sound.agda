@@ -1,8 +1,8 @@
 module Implicit.Sound where
 
 open import Implicit.Language
-open import Implicit.Decl
-open import Implicit.Algo
+open import Implicit.Decl renaming (find to d-find)
+open import Implicit.Algo renaming (find to a-find)
 
 postulate
   ∈a→∈d : ∀ {Ψ : SEnv n m} {X A}
@@ -89,12 +89,17 @@ data JustSub' (Γ : Env n m) (Σ : Context n m) (A : Type m) (B : Type m) : Set 
 data JustTyping (Γ : Env n m) (Σ : Context n m) (e : Term n m) (A : Type m) : Set where
   typs : ∀ {j}
     → (j~Σ : Γ ⊢ ⟨ j , A ⟩ ~ Σ)
-      → (s : Γ ⊢ j # e ⦂ A)
+    → (s : Γ ⊢ j # e ⦂ A)
     → JustTyping Γ Σ e A
 
 sound : ∀ {Γ : Env n m} {Σ e A}
   → Γ ⊢ Σ ⇒ e ⇒ A
   → JustTyping Γ Σ e A
+
+sound-find : ∀ {Γ : Env n m} {k Σ A B j}
+  → a-find Γ A k Σ
+  → Γ ⊢ ⟨ j , B ⟩ ~ Σ
+  → d-find A k j
 
 sound-s : ∀ {Ψ Ψ' : SEnv n m} {Σ A B}
   → Ψ ⊢ A ≤ Σ ⊣ Ψ' ↪ B
@@ -147,3 +152,9 @@ sound-s (s-∀ s) with sound-s s
 ... | subs ~∞ s' = subs ~∞ (s-∀ s')
 sound-s (s-∀l s upc upe st₁ st₂) with sound-s s
 ... | subs j~Σ s' = subs (~-subst j~Σ (term (↑tyᶜ-st upc) (↑tyᵉ-st upe)) (st-arr st₁ st₂)) (s-∀l s' {!!} {!!} st₁ st₂)
+
+sound-find {Σ = □} fd j~Σ = {!!}
+sound-find {Σ = τ A} fd j~Σ = {!!}
+sound-find {Σ = [ e ]↝ Σ} (a-find.f-arr-l bd ⊢e) j~Σ = {!!}
+sound-find {Σ = [ e ]↝ Σ} (a-find.f-arr-r x ⊢e fd) j~Σ = {!!}
+sound-find {Σ = [ e ]↝ Σ} (a-find.f-∀ fd x) j~Σ = {!!}
