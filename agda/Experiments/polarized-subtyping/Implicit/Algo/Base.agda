@@ -10,6 +10,13 @@ open import Implicit.Algo.Lookup public
 open import Implicit.Algo.Extension public
 open import Implicit.Algo.Split public
 
+data Polar : Set where
+  ≤⁺ ≤⁻ : Polar
+
+⋆ : Polar → Polar
+⋆ ≤⁺ = ≤⁻
+⋆ ≤⁻ = ≤⁺
+
 private variable
   Ψ Ψ' Ψ₁ Ψ₂ Ψ₃ : SEnv n m
   Γ : Env n m
@@ -18,6 +25,7 @@ private variable
   A B C D A' C' D' : Type m
   x : Fin n
   X k : Fin m
+  ≤ : Polar
 
 infix 8 𝕎 𝕄
 
@@ -35,10 +43,10 @@ infix 8 𝕎 𝕄
 𝕄 (Ψ ,= A) = 𝕄 Ψ ,= A
 
 infix 3 _⊢_⇒_⇒_
-infix 3 _⊢_≤_⊣_↪_
+infix 3 _⊢_⌞_⌝_⊣_↪_
 
 data _⊢_⇒_⇒_ : Env n m → Context n m → Term n m → Type m → Set
-data _⊢_≤_⊣_↪_ : SEnv n m → Type m → Context n m → SEnv n m → Type m → Set
+data _⊢_⌞_⌝_⊣_↪_ : SEnv n m → Type m → Polar → Context n m → SEnv n m → Type m → Set
 
 data _⊢_⇒_⇒_ where
 
@@ -71,75 +79,75 @@ data _⊢_⇒_⇒_ where
       Γ ⊢ □ ⇒ g ⇒ A
     → (ne : NonEmpty Σ)
     → (gc : GenericConsumer g)
-    → (s : 𝕎 Γ ⊢ A ≤ Σ ⊣ 𝕎 Γ ↪ B)
+    → (s : 𝕎 Γ ⊢ A ⌞ ≤⁺ ⌝ Σ ⊣ 𝕎 Γ ↪ B)
     → Γ ⊢ Σ ⇒ g ⇒ B
     
   ⊢tabs :
       Γ ,∙ ⊢ □ ⇒ e ⇒ A
     → Γ ⊢ □ ⇒ Λ e ⇒ `∀ A
 
-data _⊢_≤_⊣_↪_ where
+data _⊢_⌞_⌝_⊣_↪_ where
   s-int :
-      Ψ ⊢ Int ≤ τ Int ⊣ Ψ ↪ Int
+      Ψ ⊢ Int ⌞ ≤ ⌝ τ Int ⊣ Ψ ↪ Int
 
   s-empty :
       (p : Ψ ⊢c A)
-    → Ψ ⊢ A ≤ □ ⊣ Ψ ↪ A
+    → Ψ ⊢ A ⌞ ≤ ⌝ □ ⊣ Ψ ↪ A
 
   s-var :
       (clo : Ψ ⊢c (‶ X))
-    → Ψ ⊢ ‶ X ≤ τ (‶ X) ⊣ Ψ ↪ ‶ X
+    → Ψ ⊢ (‶ X) ⌞ ≤ ⌝ τ (‶ X) ⊣ Ψ ↪ ‶ X
 
   s-ex-l^ :
       (clo : Ψ ⊢c A)
     → (x-in : X ^∈ Ψ)
     → (inst : [ A / X ] Ψ ⟹ Ψ')
-    → Ψ ⊢ ‶ X ≤ τ A ⊣ Ψ' ↪ A
+    → Ψ ⊢ ‶ X ⌞ ≤⁺ ⌝ τ A ⊣ Ψ' ↪ A
  
   s-ex-l= :
       (clo : Ψ ⊢c A)
     → (x-in : X := B ∈ Ψ)
-    → Ψ ⊢ B ≤ τ A ⊣ Ψ' ↪ A'
-    → Ψ ⊢ ‶ X ≤ τ A ⊣ Ψ' ↪ A
+    → Ψ ⊢ B ⌞ ≤ ⌝ τ A ⊣ Ψ' ↪ A'
+    → Ψ ⊢ ‶ X ⌞ ≤ ⌝ τ A ⊣ Ψ' ↪ A
 
   s-ex-r^ :
       (clo : Ψ ⊢c A)
     → (x-in : X ^∈ Ψ)
     → (inst : [ A / X ] Ψ ⟹ Ψ')
-    → Ψ ⊢ A ≤ τ (‶ X) ⊣ Ψ' ↪ ‶ X
+    → Ψ ⊢ A ⌞ ≤⁻ ⌝ τ (‶ X) ⊣ Ψ' ↪ ‶ X
 
   s-ex-r= :
       (clo : Ψ ⊢c A)
     → (x-in : X := B ∈ Ψ)
-    → Ψ ⊢ A ≤ τ B ⊣ Ψ' ↪ A'
-    → Ψ ⊢ A ≤ τ (‶ X) ⊣ Ψ' ↪ (‶ X)
+    → Ψ ⊢ A ⌞ ≤ ⌝ τ B ⊣ Ψ' ↪ A'
+    → Ψ ⊢ A ⌞ ≤ ⌝ τ (‶ X) ⊣ Ψ' ↪ (‶ X)
 
   s-arr :
-      Ψ₁ ⊢ C ≤ τ A ⊣ Ψ₂ ↪ A'
-    → Ψ₂ ⊢ B ≤ τ D ⊣ Ψ₃ ↪ D'
-    → Ψ₁ ⊢ A `→ B ≤ τ (C `→ D) ⊣ Ψ₃ ↪ (C `→ D)
+      Ψ₁ ⊢ C ⌞ ⋆ ≤ ⌝ τ A ⊣ Ψ₂ ↪ A'
+    → Ψ₂ ⊢ B ⌞ ≤ ⌝ τ D ⊣ Ψ₃ ↪ D'
+    → Ψ₁ ⊢ A `→ B ⌞ ≤ ⌝ τ (C `→ D) ⊣ Ψ₃ ↪ (C `→ D)
 
   s-term-c :
       (cloA : Ψ ⊢c A)
     → (⊢e : (𝕄 Ψ) ⊢ τ A ⇒ e ⇒ A')
-    → Ψ ⊢ B ≤ Σ ⊣ Ψ' ↪ D
-    → Ψ ⊢ (A `→ B) ≤ ([ e ]↝ Σ) ⊣ Ψ' ↪ A' `→ D
+    → Ψ ⊢ B ⌞ ≤⁺ ⌝ Σ ⊣ Ψ' ↪ D
+    → Ψ ⊢ (A `→ B) ⌞ ≤⁺ ⌝ ([ e ]↝ Σ) ⊣ Ψ' ↪ A' `→ D
 
   s-term-o :
       (opnA : Ψ ⊢o A)
     → (⊢e : (𝕄 Ψ) ⊢ □ ⇒ e ⇒ C)
-    → Ψ ⊢ C ≤ τ A ⊣ Ψ₁ ↪ A'
-    → Ψ₁ ⊢ B ≤ Σ ⊣ Ψ₂ ↪ D
-    → Ψ ⊢ A `→ B ≤ ([ e ]↝ Σ) ⊣ Ψ₂ ↪ C `→ D
+    → Ψ ⊢ C ⌞ ≤⁻ ⌝ τ A ⊣ Ψ₁ ↪ A'
+    → Ψ₁ ⊢ B ⌞ ≤⁺ ⌝ Σ ⊣ Ψ₂ ↪ D
+    → Ψ ⊢ A `→ B ⌞ ≤⁺ ⌝ ([ e ]↝ Σ) ⊣ Ψ₂ ↪ C `→ D
 
   s-∀ :
-      Ψ ,∙ ⊢ A ≤ τ B ⊣ Ψ' ,∙ ↪ C
-    → Ψ ⊢ `∀ A ≤ τ (`∀ B) ⊣ Ψ' ↪ `∀ C
+      Ψ ,∙ ⊢ A ⌞ ≤ ⌝ τ B ⊣ Ψ' ,∙ ↪ C
+    → Ψ ⊢ `∀ A ⌞ ≤ ⌝ τ (`∀ B) ⊣ Ψ' ↪ `∀ C
 
   s-∀l :
-      Ψ ,^ ⊢ A ≤ ([ e' ]↝ Σ') ⊣ Ψ' ,= B ↪ (C `→ D)
+      Ψ ,^ ⊢ A ⌞ ≤⁺ ⌝ ([ e' ]↝ Σ') ⊣ Ψ' ,= B ↪ (C `→ D)
     → (upᶜ : ↑tyᶜ0 Σ ⇘ Σ')
     → (upᵉ : ↑tyᵉ0 e ⇘ e')
     → (st₁ : ⟦ B ⟧ C ⇘ C')
     → (st₂ : ⟦ B ⟧ D ⇘ D')
-    → Ψ ⊢ `∀ A ≤ ([ e ]↝ Σ) ⊣ Ψ' ↪ C' `→ D'
+    → Ψ ⊢ `∀ A ⌞ ≤⁺ ⌝ ([ e ]↝ Σ) ⊣ Ψ' ↪ C' `→ D'
