@@ -20,20 +20,9 @@ infix 3 _⊢o_
 
 -- open: have free existential variables
 data _⊢o_ : SEnv n m → Type m → Set where
-  ⊢o-var^0 :
-      Ψ ,^ ⊢o ‶ #0
-  ⊢o-var∙S :
-      Ψ ⊢o ‶ X
-    → Ψ ,∙ ⊢o ‶ #S X
-  ⊢o-var,S :
-      Ψ ⊢o ‶ X
-    → Ψ , A ⊢o ‶ X
-  ⊢o-var^S :
-      Ψ ⊢o ‶ X
-    → Ψ ,^ ⊢o ‶ #S X
-  ⊢o-var=S :
-      Ψ ⊢o ‶ X
-    → Ψ ,= A ⊢o ‶ #S X
+  ⊢o-var-^ :
+      X ^∈ Ψ
+    → Ψ ⊢o ‶ X
   ⊢o-arr-l :
       Ψ ⊢o A
     → Ψ ⊢o (A `→ B)
@@ -47,22 +36,12 @@ data _⊢o_ : SEnv n m → Type m → Set where
 data _⊢c_ : SEnv n m → Type m → Set where
   ⊢c-int :
       Ψ ⊢c Int
-  ⊢c-var∙0 :
-      Ψ ,∙ ⊢c ‶ #0
-  ⊢c-var=0 :
-      Ψ ,= A ⊢c ‶ #0
-  ⊢c-var,S :
-      Ψ ⊢c ‶ X
-    → Ψ , A ⊢c ‶ X
-  ⊢c-var∙S :
-      Ψ ⊢c ‶ X
-    → Ψ ,∙ ⊢c ‶ #S X
-  ⊢c-var^S :
-      Ψ ⊢c ‶ X
-    → Ψ ,^ ⊢c ‶ #S X
-  ⊢c-var=S :
-      Ψ ⊢c ‶ X
-    → Ψ ,= A ⊢c ‶ #S X
+  ⊢c-var-∙ :
+      X ∙∈ Ψ
+    → Ψ ⊢c ‶ X
+  ⊢c-var-= :
+      X := A ∈ Ψ
+    → Ψ ⊢c ‶ X
   ⊢c-arr :
        Ψ ⊢c A
     → Ψ ⊢c B
@@ -70,7 +49,6 @@ data _⊢c_ : SEnv n m → Type m → Set where
   ⊢c-∀ :
       Ψ ,∙ ⊢c A
     → Ψ ⊢c `∀ A
-
 
 infix 3 _⊢cᶜ_
 data _⊢cᶜ_ : SEnv n m → Context n m → Set where
