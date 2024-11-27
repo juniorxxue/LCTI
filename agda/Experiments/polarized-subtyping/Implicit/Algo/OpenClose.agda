@@ -53,7 +53,7 @@ data _⊢c_ : SEnv n m → Type m → Set where
 infix 3 _⊢cᶜ_
 data _⊢cᶜ_ : SEnv n m → Context n m → Set where
   ⊢c-empty : Ψ ⊢cᶜ □
-  ⊢c-τ : Ψ ⊢c A → Ψ ⊢cᶜ (τ A)
+  ⊢c-τ : (cloA : Ψ ⊢c A) → Ψ ⊢cᶜ (τ A)
   ⊢c-term : Ψ ⊢cᶜ Σ → Ψ ⊢cᶜ [ e ]↝ Σ -- we may add conditions onto `e` later
 
 infix 3 _⊢oᶜ_

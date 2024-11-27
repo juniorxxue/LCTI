@@ -65,8 +65,8 @@ polarity⁺ (s-ex-l= clo x-in s) = polarity⁺ s
 polarity⁺ (s-ex-r= clo x-in s) = ⊢c-τ (⊢c-var-= x-in)
 polarity⁺ (s-arr s s₁) with polarity⁻ s | polarity⁺ s₁
 ... | ind1 | ⊢c-τ x = ⊢c-τ (⊢c-arr ind1 {!!})
-polarity⁺ (s-term-c cloA ⊢e s) = {!!}
-polarity⁺ (s-term-o opnA ⊢e s s₁) = {!!}
+polarity⁺ (s-term-c cloA ⊢e s) = ⊢c-term (polarity⁺ s)
+polarity⁺ (s-term-o opnA ⊢e s s₁) = ⊢c-term {!polarity⁺ s₁!}
 polarity⁺ (s-∀ s) = {!!}
 polarity⁺ (s-∀l s upᶜ upᵉ st₁ st₂) = {!!}
 
