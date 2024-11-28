@@ -86,35 +86,35 @@ data _⊢_≤⁺_⊣_↪_ where
       Ψ ⊢ Int ≤⁺ τ Int ⊣ Ψ ↪ Int
 
   s+-empty :
-      (p : Ψ ⊢c A)
+      (cloA : Ψ ⊢c A)
     → Ψ ⊢ A ≤⁺ □ ⊣ Ψ ↪ A
 
   s+-var :
-      (clo : Ψ ⊢c (‶ X))
+      (cloX : Ψ ⊢c (‶ X))
     → Ψ ⊢ (‶ X) ≤⁺ τ (‶ X) ⊣ Ψ ↪ ‶ X
 
   s+-ex-l^ :
-      (clo : Ψ ⊢c A)
+      (cloA : Ψ ⊢c A)
     → (x-in : X ^∈ Ψ)
     → (inst : [ A / X ] Ψ ⟹ Ψ')
     → Ψ ⊢ ‶ X ≤⁺ τ A ⊣ Ψ' ↪ A
  
   s+-ex-l= :
-      (clo : Ψ ⊢c A)
+      (cloA : Ψ ⊢c A)
     → (x-in : X := B ∈ Ψ)
     → Ψ ⊢ B ≤⁺ τ A ⊣ Ψ' ↪ A'
     → Ψ ⊢ ‶ X ≤⁺ τ A ⊣ Ψ' ↪ A
 
   s+-ex-r= :
-      (clo : Ψ ⊢c A)
+      (cloA : Ψ ⊢c A)
     → (x-in : X := B ∈ Ψ)
     → Ψ ⊢ A ≤⁺ τ B ⊣ Ψ' ↪ A'
     → Ψ ⊢ A ≤⁺ τ (‶ X) ⊣ Ψ' ↪ (‶ X)
 
   s+-arr :
-      (cloC : Ψ ⊢c C)
-    → (cloD : Ψ ⊢c D)
-    → Ψ₁ ⊢ C ≤⁻ τ A ⊣ Ψ₂ ↪ A'
+      (cloC : Ψ₁ ⊢c C)
+    → (cloD : Ψ₁ ⊢c D)
+    → (s : Ψ₁ ⊢ C ≤⁻ τ A ⊣ Ψ₂ ↪ A')
     → Ψ₂ ⊢ B ≤⁺ τ D ⊣ Ψ₃ ↪ D'
     → Ψ₁ ⊢ A `→ B ≤⁺ τ (C `→ D) ⊣ Ψ₃ ↪ (C `→ D)
 
@@ -129,7 +129,7 @@ data _⊢_≤⁺_⊣_↪_ where
       (opnA : Ψ ⊢o A)
     → (cloΣ : Ψ ⊢cᶜ Σ)    
     → (⊢e : (𝕄 Ψ) ⊢ □ ⇒ e ⇒ C)
-    → Ψ ⊢ C ≤⁻ τ A ⊣ Ψ₁ ↪ A'
+    → (s : Ψ ⊢ C ≤⁻ τ A ⊣ Ψ₁ ↪ A')
     → Ψ₁ ⊢ B ≤⁺ Σ ⊣ Ψ₂ ↪ D
     → Ψ ⊢ A `→ B ≤⁺ ([ e ]↝ Σ) ⊣ Ψ₂ ↪ C `→ D
 
@@ -149,35 +149,35 @@ data _⊢_≤⁺_⊣_↪_ where
 
 
 data _⊢_≤⁻_⊣_↪_ where
-  s+-int :
+  s--int :
       Ψ ⊢ Int ≤⁻ τ Int ⊣ Ψ ↪ Int
 
   s--var :
-      (clo : Ψ ⊢c (‶ X))
+      (cloX : Ψ ⊢c (‶ X))
     → Ψ ⊢ (‶ X) ≤⁻ τ (‶ X) ⊣ Ψ ↪ ‶ X
 
   s--ex-r^ :
-      (clo : Ψ ⊢c A)
+      (cloA : Ψ ⊢c A)
     → (x-in : X ^∈ Ψ)
     → (inst : [ A / X ] Ψ ⟹ Ψ')
     → Ψ ⊢ A ≤⁻ τ (‶ X) ⊣ Ψ' ↪ ‶ X
 
   s--ex-l= :
-      (clo : Ψ ⊢c A)
+      (cloA : Ψ ⊢c A)
     → (x-in : X := B ∈ Ψ)
     → Ψ ⊢ B ≤⁻ τ A ⊣ Ψ' ↪ A'
     → Ψ ⊢ ‶ X ≤⁻ τ A ⊣ Ψ' ↪ A
 
   s--ex-r= :
-      (clo : Ψ ⊢c A)
+      (cloA : Ψ ⊢c A)
     → (x-in : X := B ∈ Ψ)
     → Ψ ⊢ A ≤⁻ τ B ⊣ Ψ' ↪ A'
     → Ψ ⊢ A ≤⁻ τ (‶ X) ⊣ Ψ' ↪ (‶ X)
 
   s--arr :
-      (cloA : Ψ ⊢c A)
-    → (cloB : Ψ ⊢c B)
-    → Ψ₁ ⊢ C ≤⁺ τ A ⊣ Ψ₂ ↪ A'
+      (cloA : Ψ₁ ⊢c A)
+    → (cloB : Ψ₁ ⊢c B)
+    → (s : Ψ₁ ⊢ C ≤⁺ τ A ⊣ Ψ₂ ↪ A')
     → Ψ₂ ⊢ B ≤⁻ τ D ⊣ Ψ₃ ↪ D'
     → Ψ₁ ⊢ A `→ B ≤⁻ τ (C `→ D) ⊣ Ψ₃ ↪ (C `→ D)
 

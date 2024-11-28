@@ -41,9 +41,11 @@ private variable
 ≤unique-out (s-ex-l= clo x-in s1) s2 = {!!}
 ≤unique-out (s-ex-r^ clo x-in inst) s2 = {!!}
 ≤unique-out (s-ex-r= clo x-in s1) s2 = {!!}
-≤unique-out (s-arr s1 s3) s2 = {!!}
-≤unique-out (s-term-c cloA ⊢e s1) s2 = {!!}
-≤unique-out (s-term-o opnA ⊢e s1 s3) s2 = {!!}
+≤unique-out (s-arr s1 s3) (s-arr s2 s4) = {!!}
+≤unique-out (s-term-c cloA ⊢e s1) (s-term-c cloA₁ ⊢e₁ s2) = ≤unique-out s1 s2
+≤unique-out (s-term-c cloA ⊢e s1) (s-term-o opnA ⊢e₁ s2 s3) = {!!}
+≤unique-out (s-term-o opnA ⊢e s1 s3) (s-term-c cloA ⊢e₁ s2) = {!!}
+≤unique-out (s-term-o opnA ⊢e s1 s3) (s-term-o opnA₁ ⊢e₁ s2 s4) = {!!}
 ≤unique-out (s-∀ s1) (s-∀ s2) with ≤unique-out s1 s2
 ... | refl = refl
 ≤unique-out (s-∀l s1 upᶜ upᵉ st₁ st₂) (s-∀l s2 upᶜ₁ upᵉ₁ st₃ st₄) = {!!}

@@ -8,7 +8,6 @@ private variable
   A B : Type m
   Σ : Context n m
   k : Fin m
-  ≤ : Polar
 
 postulate
   ⊢a→⊢c : ∀ {Γ : Env n m} {Σ e A}
@@ -50,39 +49,37 @@ data OneSide (Ψ : SEnv n m) (A : Type m) (Σ : Context n m) : Set where
         → OneSide Ψ A Σ
 
 polarity⁺ :
-    Ψ ⊢ A ⌞ ≤⁺ ⌝ Σ ⊣ Ψ' ↪ B
+    Ψ ⊢ A ≤⁺ Σ ⊣ Ψ' ↪ B
   → Ψ ⊢cᶜ Σ
 
 polarity⁻ :
-    Ψ ⊢ A ⌞ ≤⁻ ⌝ Σ ⊣ Ψ' ↪ B
+    Ψ ⊢ A ≤⁻ Σ ⊣ Ψ' ↪ B
   → Ψ ⊢c A
 
-polarity⁺ s-int = ⊢c-τ ⊢c-int
-polarity⁺ (s-empty p) = ⊢c-empty
-polarity⁺ (s-var clo) = ⊢c-τ clo
-polarity⁺ (s-ex-l^ clo x-in inst) = ⊢c-τ clo
-polarity⁺ (s-ex-l= clo x-in s) = polarity⁺ s
-polarity⁺ (s-ex-r= clo x-in s) = ⊢c-τ (⊢c-var-= x-in)
-polarity⁺ (s-arr s s₁) with polarity⁻ s | polarity⁺ s₁
-... | ind1 | ⊢c-τ x = ⊢c-τ (⊢c-arr ind1 {!!})
-polarity⁺ (s-term-c cloA ⊢e s) = ⊢c-term (polarity⁺ s)
-polarity⁺ (s-term-o opnA ⊢e s s₁) = ⊢c-term {!polarity⁺ s₁!}
-polarity⁺ (s-∀ s) = {!!}
-polarity⁺ (s-∀l s upᶜ upᵉ st₁ st₂) = {!!}
+polarity⁺ s+-int = ⊢c-τ ⊢c-int
+polarity⁺ (s+-empty p) = ⊢c-empty
+polarity⁺ (s+-var clo) = ⊢c-τ clo
+polarity⁺ (s+-ex-l^ clo x-in inst) = ⊢c-τ clo
+polarity⁺ (s+-ex-l= clo x-in s) = polarity⁺ s
+polarity⁺ (s+-ex-r= clo x-in s) = ⊢c-τ (⊢c-var-= x-in)
+polarity⁺ (s+-arr cloC cloD x s) = ⊢c-τ (⊢c-arr cloC cloD)
+polarity⁺ (s+-term-c cloA cloΣ ⊢e s) = ⊢c-term (polarity⁺ s)
+polarity⁺ (s+-term-o opnA cloΣ ⊢e x s) = ⊢c-term cloΣ
+polarity⁺ (s+-∀ cloB s) = ⊢c-τ cloB
+polarity⁺ (s+-∀l cloΣ s upᶜ upᵉ st₁ st₂) = ⊢c-term cloΣ
 
-polarity⁻ s-int = {!!}
-polarity⁻ (s-empty p) = {!!}
-polarity⁻ (s-var clo) = {!!}
-polarity⁻ (s-ex-l= clo x-in s) = {!!}
-polarity⁻ (s-ex-r^ clo x-in inst) = {!!}
-polarity⁻ (s-ex-r= clo x-in s) = {!!}
-polarity⁻ (s-arr s s₁) = {!!}
-polarity⁻ (s-∀ s) = {!!}
+polarity⁻ s--int = ⊢c-int
+polarity⁻ (s--var clo) = clo
+polarity⁻ (s--ex-r^ clo x-in inst) = clo
+polarity⁻ (s--ex-l= clo x-in s) = ⊢c-var-= x-in
+polarity⁻ (s--ex-r= clo x-in s) = clo
+polarity⁻ (s--arr cloA cloB x s) = ⊢c-arr cloA cloB
+polarity⁻ (s--∀ cloA s) = cloA
 
 
-ex-one-side :
-    Ψ ⊢ A ⌞ ≤ ⌝ Σ ⊣ Ψ' ↪ B
-  → OneSide Ψ A Σ
+----------------------------------------------------------------------
+--+                        Inversion Lemmas                        +--
+----------------------------------------------------------------------
 
 
 ^∈-∙∈-false :

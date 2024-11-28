@@ -43,7 +43,7 @@ data _⊢c_ : SEnv n m → Type m → Set where
       X := A ∈ Ψ
     → Ψ ⊢c ‶ X
   ⊢c-arr :
-       Ψ ⊢c A
+      Ψ ⊢c A
     → Ψ ⊢c B
     → Ψ ⊢c (A `→ B)
   ⊢c-∀ :

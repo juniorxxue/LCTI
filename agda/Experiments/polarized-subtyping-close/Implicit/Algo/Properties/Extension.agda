@@ -32,21 +32,33 @@ open import Implicit.Algo.Base
 ⟹-⊆ (⟹∙S x s) = uvar (⟹-⊆ x)
 ⟹-⊆ (⟹=S up s) = svar (⟹-⊆ s)  
 
-s-⊆ : ∀ {Ψ Ψ' : SEnv n m} {A B Σ}
-  → Ψ ⊢ A ≤ Σ ⊣ Ψ' ↪ B
+s+-⊆ : ∀ {Ψ Ψ' : SEnv n m} {A B Σ}
+  → Ψ ⊢ A ≤⁺ Σ ⊣ Ψ' ↪ B
   → Ψ ⊆ Ψ'
-s-⊆ s-int = ⊆-refl
-s-⊆ (s-empty p) = ⊆-refl
-s-⊆ (s-var is-uni) = ⊆-refl
-s-⊆ (s-ex-l^ x x₁ x₂) = ⟹-⊆ x₂
-s-⊆ (s-ex-l= x x₁ s) = s-⊆ s
-s-⊆ (s-ex-r^ x x₁ x₂) = ⟹-⊆ x₂
-s-⊆ (s-ex-r= x x₁ s) = s-⊆ s
-s-⊆ (s-arr s s₁) = ⊆-trans (s-⊆ s) (s-⊆ s₁)
-s-⊆ (s-term-c x x₂ s) = s-⊆ s
-s-⊆ (s-term-o op x s s₁) = ⊆-trans (s-⊆ s) (s-⊆ s₁)
-s-⊆ (s-∀ s) with s-⊆ s
+s--⊆ : ∀ {Ψ Ψ' : SEnv n m} {A B Σ}
+  → Ψ ⊢ A ≤⁻ Σ ⊣ Ψ' ↪ B
+  → Ψ ⊆ Ψ'
+
+s+-⊆ s+-int = ⊆-refl
+s+-⊆ (s+-empty cloA) = ⊆-refl
+s+-⊆ (s+-var cloX) = ⊆-refl
+s+-⊆ (s+-ex-l^ cloA x-in inst) = ⟹-⊆ inst
+s+-⊆ (s+-ex-l= cloA x-in s) = s+-⊆ s
+s+-⊆ (s+-ex-r= cloA x-in s) = s+-⊆ s
+s+-⊆ (s+-arr cloC cloD s s₁) = ⊆-trans (s--⊆ s) (s+-⊆ s₁)
+s+-⊆ (s+-term-c cloA cloΣ ⊢e s) = s+-⊆ s
+s+-⊆ (s+-term-o opnA cloΣ ⊢e s s₁) = ⊆-trans (s--⊆ s) (s+-⊆ s₁)
+s+-⊆ (s+-∀ cloB s) with s+-⊆ s
 ... | uvar r = r
-s-⊆ (s-∀l s up1 up2 st st') with s-⊆ s
+s+-⊆ (s+-∀l cloΣ s upᶜ upᵉ st₁ st₂) with s+-⊆ s
 ... | evar-sol r = r
+
+s--⊆ s--int = ⊆-refl
+s--⊆ (s--var cloX) = ⊆-refl
+s--⊆ (s--ex-r^ cloA x-in inst) = ⟹-⊆ inst
+s--⊆ (s--ex-l= cloA x-in s) = s--⊆ s
+s--⊆ (s--ex-r= cloA x-in s) = s--⊆ s
+s--⊆ (s--arr cloA cloB s s₁) = ⊆-trans (s+-⊆ s) (s--⊆ s₁)
+s--⊆ (s--∀ cloA s) with s--⊆ s
+... | uvar r = r
 
