@@ -20,8 +20,6 @@ s-refl : ∀ {Ψ : SEnv n m} {A}
   → Ψ ⊢c A
   → Ψ ⊢ A ≤ τ A ⊣ Ψ ↪ A -- the output context shouldn't be affected
 s-refl clo = {!!}
-
-
 m-w-eq : ∀ (Γ : Env n m)
   → 𝕄 (𝕎 Γ) ≡ Γ
 m-w-eq ∅ = refl

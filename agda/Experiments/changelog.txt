@@ -1,1 +1,3 @@
 2024-11-23 Create a system to experiment with polarized subtyping
+
+2024-11-27 add a new polarized system, with closeness defined in several rules
