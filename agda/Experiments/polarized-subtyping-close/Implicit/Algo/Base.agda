@@ -82,50 +82,50 @@ data _⊢_⇒_⇒_ where
 
 data _⊢_≤⁺_⊣_↪_ where
 
-  s+-int :
+  s⁺-int :
       Ψ ⊢ Int ≤⁺ τ Int ⊣ Ψ ↪ Int
 
-  s+-empty :
+  s⁺-empty :
       (cloA : Ψ ⊢c A)
     → Ψ ⊢ A ≤⁺ □ ⊣ Ψ ↪ A
 
-  s+-var :
+  s⁺-var :
       (cloX : Ψ ⊢c (‶ X))
     → Ψ ⊢ (‶ X) ≤⁺ τ (‶ X) ⊣ Ψ ↪ ‶ X
 
-  s+-ex-l^ :
+  s⁺-ex-l^ :
       (cloA : Ψ ⊢c A)
     → (x-in : X ^∈ Ψ)
     → (inst : [ A / X ] Ψ ⟹ Ψ')
     → Ψ ⊢ ‶ X ≤⁺ τ A ⊣ Ψ' ↪ A
  
-  s+-ex-l= :
+  s⁺-ex-l= :
       (cloA : Ψ ⊢c A)
     → (x-in : X := B ∈ Ψ)
     → Ψ ⊢ B ≤⁺ τ A ⊣ Ψ' ↪ A'
     → Ψ ⊢ ‶ X ≤⁺ τ A ⊣ Ψ' ↪ A
 
-  s+-ex-r= :
+  s⁺-ex-r= :
       (cloA : Ψ ⊢c A)
     → (x-in : X := B ∈ Ψ)
     → Ψ ⊢ A ≤⁺ τ B ⊣ Ψ' ↪ A'
     → Ψ ⊢ A ≤⁺ τ (‶ X) ⊣ Ψ' ↪ (‶ X)
 
-  s+-arr :
+  s⁺-arr :
       (cloC : Ψ₁ ⊢c C)
     → (cloD : Ψ₁ ⊢c D)
     → (s : Ψ₁ ⊢ C ≤⁻ τ A ⊣ Ψ₂ ↪ A')
     → Ψ₂ ⊢ B ≤⁺ τ D ⊣ Ψ₃ ↪ D'
     → Ψ₁ ⊢ A `→ B ≤⁺ τ (C `→ D) ⊣ Ψ₃ ↪ (C `→ D)
 
-  s+-term-c :
+  s⁺-term-c :
       (cloA : Ψ ⊢c A)
     → (cloΣ : Ψ ⊢cᶜ Σ)
     → (⊢e : (𝕄 Ψ) ⊢ τ A ⇒ e ⇒ A')
     → Ψ ⊢ B ≤⁺ Σ ⊣ Ψ' ↪ D
     → Ψ ⊢ (A `→ B) ≤⁺ ([ e ]↝ Σ) ⊣ Ψ' ↪ A' `→ D
 
-  s+-term-o :
+  s⁺-term-o :
       (opnA : Ψ ⊢o A)
     → (cloΣ : Ψ ⊢cᶜ Σ)    
     → (⊢e : (𝕄 Ψ) ⊢ □ ⇒ e ⇒ C)
@@ -133,12 +133,12 @@ data _⊢_≤⁺_⊣_↪_ where
     → Ψ₁ ⊢ B ≤⁺ Σ ⊣ Ψ₂ ↪ D
     → Ψ ⊢ A `→ B ≤⁺ ([ e ]↝ Σ) ⊣ Ψ₂ ↪ C `→ D
 
-  s+-∀ :
+  s⁺-∀ :
       (cloB : Ψ ⊢c `∀ B)
     → Ψ ,∙ ⊢ A ≤⁺ τ B ⊣ Ψ' ,∙ ↪ C
     → Ψ ⊢ `∀ A ≤⁺ τ (`∀ B) ⊣ Ψ' ↪ `∀ C
 
-  s+-∀l :
+  s⁺-∀l :
       (cloΣ : Ψ ⊢cᶜ Σ)
     → Ψ ,^ ⊢ A ≤⁺ ([ e' ]↝ Σ') ⊣ Ψ' ,= B ↪ (C `→ D)
     → (upᶜ : ↑tyᶜ0 Σ ⇘ Σ')
@@ -149,39 +149,39 @@ data _⊢_≤⁺_⊣_↪_ where
 
 
 data _⊢_≤⁻_⊣_↪_ where
-  s--int :
+  s⁻-int :
       Ψ ⊢ Int ≤⁻ τ Int ⊣ Ψ ↪ Int
 
-  s--var :
+  s⁻-var :
       (cloX : Ψ ⊢c (‶ X))
     → Ψ ⊢ (‶ X) ≤⁻ τ (‶ X) ⊣ Ψ ↪ ‶ X
 
-  s--ex-r^ :
+  s⁻-ex-r^ :
       (cloA : Ψ ⊢c A)
     → (x-in : X ^∈ Ψ)
     → (inst : [ A / X ] Ψ ⟹ Ψ')
     → Ψ ⊢ A ≤⁻ τ (‶ X) ⊣ Ψ' ↪ ‶ X
 
-  s--ex-l= :
+  s⁻-ex-l= :
       (cloA : Ψ ⊢c A)
     → (x-in : X := B ∈ Ψ)
     → Ψ ⊢ B ≤⁻ τ A ⊣ Ψ' ↪ A'
     → Ψ ⊢ ‶ X ≤⁻ τ A ⊣ Ψ' ↪ A
 
-  s--ex-r= :
+  s⁻-ex-r= :
       (cloA : Ψ ⊢c A)
     → (x-in : X := B ∈ Ψ)
     → Ψ ⊢ A ≤⁻ τ B ⊣ Ψ' ↪ A'
     → Ψ ⊢ A ≤⁻ τ (‶ X) ⊣ Ψ' ↪ (‶ X)
 
-  s--arr :
+  s⁻-arr :
       (cloA : Ψ₁ ⊢c A)
     → (cloB : Ψ₁ ⊢c B)
     → (s : Ψ₁ ⊢ C ≤⁺ τ A ⊣ Ψ₂ ↪ A')
     → Ψ₂ ⊢ B ≤⁻ τ D ⊣ Ψ₃ ↪ D'
     → Ψ₁ ⊢ A `→ B ≤⁻ τ (C `→ D) ⊣ Ψ₃ ↪ (C `→ D)
 
-  s--∀ :
+  s⁻-∀ :
       (cloA : Ψ ⊢c `∀ A)
     → Ψ ,∙ ⊢ A ≤⁻ τ B ⊣ Ψ' ,∙ ↪ C
     → Ψ ⊢ `∀ A ≤⁻ τ (`∀ B) ⊣ Ψ' ↪ `∀ C

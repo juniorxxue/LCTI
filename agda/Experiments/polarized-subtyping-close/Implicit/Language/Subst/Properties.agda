@@ -53,6 +53,16 @@ st0-unique st1 st2 = st-unique st1 st2
 ↑ty-st {T = T} (↑ty-∀ up) with ↑ty-total T #0
 ... | ⟨ _ , up' ⟩ = st-∀ up' (↑ty-st up)
 
+{-
+-- this is a wrong lemma, T is Int, k is 0, A' is 0
+st-↑ty : ⟦ k / T ⟧ A' ⇘ A
+       → A ↑ty k ⇘ A'
+st-↑ty st-int = ↑ty-int
+st-↑ty {k = k} {T = T} (st-var {X = X}) = {!!}
+st-↑ty (st-arr st st₁) = ↑ty-arr (st-↑ty st) (st-↑ty st₁)
+st-↑ty (st-∀ up st) = ↑ty-∀ (st-↑ty st)
+-}
+
 ↑tyᵉ-st-eq :
     e ↑tyᵉ k ⇘ e'
   → ⟦ k / T ⟧ᵉ e' ⇘ e*

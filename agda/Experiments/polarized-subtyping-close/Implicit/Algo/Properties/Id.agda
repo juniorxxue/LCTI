@@ -49,22 +49,22 @@ data Split : (Σ : Context n m) → (A : Type m) → Set where
                                       in ⊢id ⊢e₁ spl'
 ⊢id (⊢sub ⊢e ne gc s) spl = ≤id' s (spl→sspl spl)
 
-≤id s+-int = case-τ none-τ refl
-≤id (s+-empty cloA) = case-□ none-□
-≤id (s+-var cloX) = case-τ none-τ refl
-≤id (s+-ex-l^ cloA x-in inst) = case-τ none-τ refl
-≤id (s+-ex-l= cloA x-in s) = case-τ none-τ refl
-≤id (s+-ex-r= cloA x-in s) = case-τ none-τ refl
-≤id (s+-arr cloC cloD x s) = case-τ none-τ refl
-≤id (s+-term-c cloA cloΣ ⊢e s) with ≤id s
+≤id s⁺-int = case-τ none-τ refl
+≤id (s⁺-empty cloA) = case-□ none-□
+≤id (s⁺-var cloX) = case-τ none-τ refl
+≤id (s⁺-ex-l^ cloA x-in inst) = case-τ none-τ refl
+≤id (s⁺-ex-l= cloA x-in s) = case-τ none-τ refl
+≤id (s⁺-ex-r= cloA x-in s) = case-τ none-τ refl
+≤id (s⁺-arr cloC cloD x s) = case-τ none-τ refl
+≤id (s⁺-term-c cloA cloΣ ⊢e s) with ≤id s
 ... | case-τ spl eq = case-τ (have-e spl) eq
 ... | case-□ spl = case-□ (have-e spl)
-≤id (s+-term-o opnA cloΣ ⊢e s s₁) with ≤id s₁
+≤id (s⁺-term-o opnA cloΣ ⊢e s s₁) with ≤id s₁
 ... | case-τ spl eq = case-τ (have-e spl) eq
 ... | case-□ spl = case-□ (have-e spl)
-≤id (s+-∀ cloB s) with ≤id s
+≤id (s⁺-∀ cloB s) with ≤id s
 ... | case-τ none-τ refl = case-τ none-τ refl
-≤id (s+-∀l {B = B} cloΣ s upᶜ upᵉ st₁ st₂) with ≤id s
+≤id (s⁺-∀l {B = B} cloΣ s upᶜ upᵉ st₁ st₂) with ≤id s
 ... | case-τ {T = T} spl refl = let ⟨ _ , st' ⟩ = st0-total B T
                                 in case-τ (sspl-↑-st spl (term (↑tyᶜ-st upᶜ) (↑tyᵉ-st upᵉ)) (fulltype st') (st-arr st₁ st₂) st') refl
 ... | case-□ {A' = A'} spl = let ⟨ _ , st' ⟩ = st0-total B A'

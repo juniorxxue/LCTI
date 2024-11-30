@@ -16,10 +16,25 @@ postulate
     → 𝕄 (𝕎 Γ) ⊢ Σ ⇒ e ⇒ A
     → Γ ⊢ Σ ⇒ e ⇒ A
 
-s-refl : ∀ {Ψ : SEnv n m} {A}
+s⁺-refl : ∀ {Ψ : SEnv n m} {A}
   → Ψ ⊢c A
-  → Ψ ⊢ A ≤ τ A ⊣ Ψ ↪ A -- the output context shouldn't be affected
-s-refl clo = {!!}
+  → Ψ ⊢ A ≤⁺ τ A ⊣ Ψ ↪ A -- the output context shouldn't be affected  
+s⁻-refl : ∀ {Ψ : SEnv n m} {A}
+  → Ψ ⊢c A
+  → Ψ ⊢ A ≤⁻ τ A ⊣ Ψ ↪ A
+  
+s⁺-refl ⊢c-int = s⁺-int
+s⁺-refl (⊢c-var-∙ x) = s⁺-var (⊢c-var-∙ x)
+s⁺-refl (⊢c-var-= x) = s⁺-var (⊢c-var-= x)
+s⁺-refl (⊢c-arr cloA cloA₁) = s⁺-arr cloA cloA₁ (s⁻-refl cloA) (s⁺-refl cloA₁)
+s⁺-refl (⊢c-∀ cloA) = s⁺-∀ (⊢c-∀ cloA) (s⁺-refl cloA)
+
+s⁻-refl ⊢c-int = s⁻-int
+s⁻-refl (⊢c-var-∙ x) = s⁻-var (⊢c-var-∙ x)
+s⁻-refl (⊢c-var-= x) = s⁻-var (⊢c-var-= x)
+s⁻-refl (⊢c-arr cloA cloA₁) = s⁻-arr cloA cloA₁ (s⁺-refl cloA) (s⁻-refl cloA₁)
+s⁻-refl (⊢c-∀ cloA) = s⁻-∀ (⊢c-∀ cloA) (s⁻-refl cloA)
+  
 m-w-eq : ∀ (Γ : Env n m)
   → 𝕄 (𝕎 Γ) ≡ Γ
 m-w-eq ∅ = refl
@@ -34,43 +49,44 @@ m-w-eq (Γ ,= A) rewrite m-w-eq Γ = refl
 
 ⊢to≤ : ∀ {Γ : Env n m} {e Σ A}
   → Γ ⊢ Σ ⇒ e ⇒ A
-  → 𝕎 Γ ⊢ A ≤ Σ ⊣ 𝕎 Γ ↪ A
+  → 𝕎 Γ ⊢ A ≤⁺ Σ ⊣ 𝕎 Γ ↪ A
 
 subsumption : ∀ {Γ : Env n m} {Σ Σ' Σ'' Ψ e A A' a̅}
   → Γ ⊢ Σ ⇒ e ⇒ A
   → ⟦ Σ ⟧⇒⟦ a̅ , □ ⟧
   → a̅ ⊕ Σ'' := Σ'
-  → 𝕎 Γ ⊢ A ≤ Σ' ⊣ Ψ ↪ A'
+  → 𝕎 Γ ⊢ A ≤⁺ Σ' ⊣ Ψ ↪ A'
   → Γ ⊢ Σ' ⇒ e ⇒ A'
 
 subsumption0 : ∀ {Γ : Env n m} {Ψ Σ e A A'}
   → Γ ⊢ □ ⇒ e ⇒ A
-  → 𝕎 Γ ⊢ A ≤ Σ ⊣ Ψ ↪ A'
+  → 𝕎 Γ ⊢ A ≤⁺ Σ ⊣ Ψ ↪ A'
   → Γ ⊢ Σ ⇒ e ⇒ A'
 subsumption0 ⊢e s = subsumption ⊢e none-□ ⊕nil s
 
 s-refined-c : ∀ {Ψ Ψ' : SEnv n m} {Σ A B}
-  → Ψ ⊢ A ≤ Σ ⊣ Ψ' ↪ B
+  → Ψ ⊢ A ≤⁺ Σ ⊣ Ψ' ↪ B
   → Ψ ⊢c A
   → Ψ ⊢cᶜ Σ
-  → Ψ' ⊢ B ≤ Σ ⊣ Ψ' ↪ B
-s-refined-c s-int cloA cloΣ = s-int
-s-refined-c (s-empty p) cloA cloΣ = s-empty p
-s-refined-c (s-var clo) cloA cloΣ = s-var clo
-s-refined-c (s-ex-l^ clo x-in inst) cloA cloΣ = s-refl {!!}
-s-refined-c (s-ex-l= clo x-in s) cloA cloΣ = s-refl {!!}
-s-refined-c (s-ex-r^ clo x-in inst) cloA cloΣ = s-refl {!!}
-s-refined-c (s-ex-r= clo x-in s) cloA cloΣ = s-refl {!!}
-s-refined-c (s-arr s s₁) cloA cloΣ = s-refl {!cloΣ!}
-s-refined-c (s-term-c cloA₁ ⊢e s) cloA cloΣ = {!!}
-s-refined-c (s-term-o opnA ⊢e s s₁) cloA cloΣ = {!!}
-s-refined-c (s-∀ s) cloA cloΣ = {!!}
-s-refined-c (s-∀l s upᶜ upᵉ st₁ st₂) cloA cloΣ = {!!}
+  → Ψ' ⊢ B ≤⁺ Σ ⊣ Ψ' ↪ B
+s-refined-c s = {!!}
 
 s-refined : ∀ {Ψ Ψ' : SEnv n m} {Σ A B}
-  → Ψ ⊢ A ≤ Σ ⊣ Ψ' ↪ B
-  → Ψ' ⊢ B ≤ Σ ⊣ Ψ' ↪ B
+  → Ψ ⊢ A ≤⁺ Σ ⊣ Ψ' ↪ B
+  → Ψ' ⊢ B ≤⁺ Σ ⊣ Ψ' ↪ B
+s-refined s⁺-int = s⁺-int
+s-refined (s⁺-empty cloA) = s⁺-empty cloA
+s-refined (s⁺-var cloX) = s⁺-var cloX
+s-refined (s⁺-ex-l^ cloA x-in inst) = s⁺-refl {!!}
+s-refined (s⁺-ex-l= cloA x-in s) = s⁺-refl {!!}
+s-refined (s⁺-ex-r= cloA x-in s) = {!!}
+s-refined (s⁺-arr cloC cloD s s₁) = s⁺-refl {!!}
+s-refined (s⁺-term-c cloA cloΣ ⊢e s) = {!!}
+s-refined (s⁺-term-o opnA cloΣ ⊢e s s₁) = {!!}
+s-refined (s⁺-∀ cloB s) = s⁺-∀ {!!} (s-refined s)
+s-refined (s⁺-∀l cloΣ s upᶜ upᵉ st₁ st₂) = {!s-refined s!}
 
+{-
 s-refined s-int = s-int
 s-refined (s-empty p) = s-empty p
 s-refined (s-var is∙) = s-var is∙
@@ -121,5 +137,6 @@ subsumption {Σ' = [ e ]↝ Σ'} (⊢lam₂ ⊢e up-c ⊢e₁) (have-e spl) (⊕
   ⊢lam₂ (⊢a-m-w' ⊢e₂) {!!} (subsumption ⊢e₁ {!!} {!!} {!s-weaken0 s₁!})
 subsumption {Σ' = [ e ]↝ Σ'} (⊢sub ⊢e ne gc s₁) spl ch s = ⊢sub ⊢e ne-app gc {!!}
 subsumption {Σ' = [ e ]↝ Σ'} (⊢tabs ⊢e) none-□ ch s = ⊢sub (⊢tabs ⊢e) ne-app gc-tlam (s-closed-r s)
+-}
 
 

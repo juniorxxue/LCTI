@@ -37,10 +37,10 @@ data _⊢c_ : SEnv n m → Type m → Set where
   ⊢c-int :
       Ψ ⊢c Int
   ⊢c-var-∙ :
-      X ∙∈ Ψ
+      (inΨ : X ∙∈ Ψ)
     → Ψ ⊢c ‶ X
   ⊢c-var-= :
-      X := A ∈ Ψ
+      (inΨ : X := A ∈ Ψ)
     → Ψ ⊢c ‶ X
   ⊢c-arr :
       Ψ ⊢c A
