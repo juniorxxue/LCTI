@@ -9,6 +9,7 @@ open import Implicit.Algo.OpenClose public
 open import Implicit.Algo.Lookup public
 open import Implicit.Algo.Extension public
 open import Implicit.Algo.Split public
+open import Implicit.Algo.GammaLike public
 
 private variable
   Ψ Ψ' Ψ₁ Ψ₂ Ψ₃ : SEnv n m

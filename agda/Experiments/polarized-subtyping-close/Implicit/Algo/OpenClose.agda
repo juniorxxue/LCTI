@@ -13,7 +13,8 @@ private
     X : Fin m
     A B : Type m
     Σ : Context n m
-    e : Term n m
+    e e₁ e₂ : Term n m
+    x : Fin n
 
 infix 3 _⊢c_
 infix 3 _⊢o_
@@ -49,6 +50,16 @@ data _⊢c_ : SEnv n m → Type m → Set where
   ⊢c-∀ :
       Ψ ,∙ ⊢c A
     → Ψ ⊢c `∀ A
+
+infix 3 _⊢cᵉ_
+data _⊢cᵉ_ : SEnv n m → Term n m → Set where
+  ⊢c-lit : ∀ {num} → Ψ ⊢cᵉ (lit num)
+  ⊢c-var : Ψ ⊢cᵉ (` x)
+  ⊢c-lam : Ψ , A ⊢cᵉ e
+         → Ψ ⊢cᵉ (ƛ e)
+  ⊢c-app : Ψ ⊢cᵉ e₁ → Ψ ⊢cᵉ e₂ → Ψ ⊢cᵉ (e₁ · e₂)
+  ⊢c-ann : Ψ ⊢c A → Ψ ⊢cᵉ e → Ψ ⊢cᵉ (e ⦂ A)
+  ⊢c-tlam : Ψ ,∙ ⊢cᵉ e → Ψ ⊢cᵉ (Λ e)
 
 infix 3 _⊢cᶜ_
 data _⊢cᶜ_ : SEnv n m → Context n m → Set where

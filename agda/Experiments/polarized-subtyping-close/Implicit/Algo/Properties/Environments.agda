@@ -29,7 +29,7 @@ inst-in (⟹=S up inst) = S= (inst-in inst)
 -- a correct version
 postulate
   inst-s : [ A / X ] Ψ ⟹ Ψ'
-         → Ψ' ⊢ A ≤⁺ τ (‶ X) ⊣ Ψ' ↪ (‶ X)
+         → Ψ' ⊢ ‶ X ≤⁺ τ A ⊣ Ψ' ↪ A
 
 ----------------------------------------------------------------------
 --+                   Lemmas around env extension                  +--
