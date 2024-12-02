@@ -31,17 +31,17 @@ infix 3 ⟦_⟧ᶜ_⇘_
 infix 3 [_/_]_⟹_
 data [_/_]_⟹_ : Type m → Fin m → SEnv n m → SEnv n m → Set where
   ⟹^0 : ∀ {Ψ : SEnv n m} {A A'}
-    → ↑ty0 A ⇘ A'
+    → (up : ↑ty0 A ⇘ A')
     → [ A' / #0 ] (Ψ ,^) ⟹ (Ψ ,= A)
 
   ⟹^S : ∀ {Ψ Ψ' : SEnv n m} {A k A'}
     → [ A / k ] Ψ ⟹ Ψ'
-    → ↑ty0 A ⇘ A'
+    → (up : ↑ty0 A ⇘ A')
     → [ A' / #S k ] (Ψ ,^) ⟹ Ψ' ,^
 
   ⟹∙S : ∀ {Ψ Ψ' : SEnv n m} {A k A'}
     → [ A / k ] Ψ ⟹ Ψ'
-    → ↑ty0 A ⇘ A'
+    → (up : ↑ty0 A ⇘ A')
     → [ A' / #S k ] (Ψ ,∙) ⟹ (Ψ' ,∙)
 
   ⟹,S : ∀ {Ψ Ψ' : SEnv n m} {A k B}

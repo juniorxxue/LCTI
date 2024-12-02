@@ -9,36 +9,51 @@ open import Implicit.Algo.Properties.Lookup
 private variable
   Ψ Ψ' : SEnv n m
   A B C : Type m
-  k : Fin m
+  k X : Fin m
   Σ : Context n m
   e : Term n m
 
 ----------------------------------------------------------------------
 --+                          Small Lemmas                          +--
 ----------------------------------------------------------------------
-
 inst-in : ∀ {X}
   → [ A / X ] Ψ ⟹ Ψ'
-  → X := A ∈ Ψ'
-inst-in (⟹^0 x) = Z x
-inst-in (⟹^S st x) = S^ (inst-in st) x
-inst-in (⟹∙S st x) = S∙ (inst-in st) x
-inst-in (⟹,S st) = S, (inst-in st)
-inst-in (⟹=S up st) = S= (inst-in st) up
+  → X =∈ Ψ'
+inst-in (⟹^0 up) = Z
+inst-in (⟹^S inst up) = S^ (inst-in inst)
+inst-in (⟹∙S inst up) = S∙ (inst-in inst)
+inst-in (⟹,S inst) = S, (inst-in inst)
+inst-in (⟹=S up inst) = S= (inst-in inst)
+
+
+-- a correct version
+postulate
+  inst-s : [ A / X ] Ψ ⟹ Ψ'
+         → Ψ' ⊢ A ≤⁺ τ (‶ X) ⊣ Ψ' ↪ (‶ X)
 
 ----------------------------------------------------------------------
 --+                   Lemmas around env extension                  +--
 ----------------------------------------------------------------------
 
-⊆-in= : k := C ∈ Ψ
+⊆-in:= : k := C ∈ Ψ
       → Ψ ⊆ Ψ'
       → k := C ∈ Ψ'
-⊆-in= (Z x) (svar ss) = Z x
+⊆-in:= (Z x) (svar ss) = Z x
+⊆-in:= (S, inΨ) (var ss) = S, (⊆-in:= inΨ ss)
+⊆-in:= (S^ inΨ x) (evar ss) = S^ (⊆-in:= inΨ ss) x
+⊆-in:= (S^ inΨ x) (evar-sol {A = A} ss) = S= (⊆-in:= inΨ ss) x
+⊆-in:= (S∙ inΨ x) (uvar ss) = S∙ (⊆-in:= inΨ ss) x
+⊆-in:= (S= inΨ st) (svar ss) = S= (⊆-in:= inΨ ss) st
+
+⊆-in= : k =∈ Ψ
+      → Ψ ⊆ Ψ'
+      → k =∈ Ψ'
+⊆-in= Z (svar ss) = Z
 ⊆-in= (S, inΨ) (var ss) = S, (⊆-in= inΨ ss)
-⊆-in= (S^ inΨ x) (evar ss) = S^ (⊆-in= inΨ ss) x
-⊆-in= (S^ inΨ x) (evar-sol {A = A} ss) = S= (⊆-in= inΨ ss) (↑ty-st x)
-⊆-in= (S∙ inΨ x) (uvar ss) = S∙ (⊆-in= inΨ ss) x
-⊆-in= (S= inΨ st) (svar ss) = S= (⊆-in= inΨ ss) st
+⊆-in= (S^ inΨ) (evar ss) = S^ (⊆-in= inΨ ss)
+⊆-in= (S^ inΨ) (evar-sol ss) = S= (⊆-in= inΨ ss)
+⊆-in= (S∙ inΨ) (uvar ss) = S∙ (⊆-in= inΨ ss)
+⊆-in= (S= inΨ) (svar ss) = S= (⊆-in= inΨ ss)
 
 ⊆-in∙ : k ∙∈ Ψ
       → Ψ ⊆ Ψ'
@@ -93,7 +108,7 @@ s⁺-out-closed-l s⁺-int = ⊢c-int
 s⁺-out-closed-l (s⁺-empty cloA) = cloA
 s⁺-out-closed-l (s⁺-var cloX) = cloX
 s⁺-out-closed-l (s⁺-ex-l^ cloA x-in inst) = ⊢c-var-= (inst-in inst)
-s⁺-out-closed-l (s⁺-ex-l= cloA x-in s) = ⊆-closed (⊢c-var-= x-in) (s⁺-⊆ s)
+s⁺-out-closed-l (s⁺-ex-l= cloA x-in s) = ⊆-closed (⊢c-var-= (:=to= x-in)) (s⁺-⊆ s)
 s⁺-out-closed-l (s⁺-ex-r= cloA x-in s) = s⁺-out-closed-l s
 s⁺-out-closed-l (s⁺-arr cloC cloD s s₁) with s⁻-out-closed-r s
 ... | ⊢c-τ cloA = ⊢c-arr (⊆-closed cloA (s⁺-⊆ s₁)) (s⁺-out-closed-l s₁)
@@ -102,7 +117,15 @@ s⁺-out-closed-l (s⁺-term-o opnA cloΣ ⊢e s s₁) with s⁻-out-closed-r s
 ... | ⊢c-τ cloA = ⊢c-arr (⊆-closed cloA (s⁺-⊆ s₁)) (s⁺-out-closed-l s₁)
 s⁺-out-closed-l (s⁺-∀ cloB s) = ⊢c-∀ (s⁺-out-closed-l s)
 s⁺-out-closed-l (s⁺-∀l cloΣ s upᶜ upᵉ st₁ st₂) with s⁺-out-closed-l s
-... | r = {!!}
+... | r = ⊢c-∀ (⊢c-◆0 r)
 
-s⁻-out-closed-r s = {!!}
+s⁻-out-closed-r s⁻-int = ⊢c-τ ⊢c-int
+s⁻-out-closed-r (s⁻-var cloX) = ⊢c-τ cloX
+s⁻-out-closed-r (s⁻-ex-r^ cloA x-in inst) = ⊢c-τ (⊢c-var-= (inst-in inst))
+s⁻-out-closed-r (s⁻-ex-l= cloA x-in s) = s⁻-out-closed-r s
+s⁻-out-closed-r (s⁻-ex-r= cloA x-in s) = ⊢c-τ (⊆-closed (⊢c-var-= (:=to= x-in)) (s⁻-⊆ s))
+s⁻-out-closed-r (s⁻-arr cloA cloB s s₁) with s⁺-out-closed-l s | s⁻-out-closed-r s₁
+... | ind | ⊢c-τ cloA₁ = ⊢c-τ (⊢c-arr (⊆-closed ind (s⁻-⊆ s₁)) cloA₁)
+s⁻-out-closed-r (s⁻-∀ cloA s) with s⁻-out-closed-r s
+... | ⊢c-τ cloA₁ = ⊢c-τ (⊢c-∀ cloA₁)
 

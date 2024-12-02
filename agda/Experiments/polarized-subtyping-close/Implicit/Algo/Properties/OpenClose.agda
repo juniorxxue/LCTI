@@ -2,6 +2,7 @@ module Implicit.Algo.Properties.OpenClose where
 
 open import Implicit.Language
 open import Implicit.Algo.Base
+open import Implicit.Algo.Properties.Lookup
 
 private variable
   Ψ Ψ' : SEnv n m
@@ -50,7 +51,7 @@ polarity⁺ (s⁺-empty p) = ⊢c-empty
 polarity⁺ (s⁺-var clo) = ⊢c-τ clo
 polarity⁺ (s⁺-ex-l^ clo x-in inst) = ⊢c-τ clo
 polarity⁺ (s⁺-ex-l= clo x-in s) = polarity⁺ s
-polarity⁺ (s⁺-ex-r= clo x-in s) = ⊢c-τ (⊢c-var-= x-in)
+polarity⁺ (s⁺-ex-r= clo x-in s) = ⊢c-τ (⊢c-var-= (:=to= x-in))
 polarity⁺ (s⁺-arr cloC cloD x s) = ⊢c-τ (⊢c-arr cloC cloD)
 polarity⁺ (s⁺-term-c cloA cloΣ ⊢e s) = ⊢c-term (polarity⁺ s)
 polarity⁺ (s⁺-term-o opnA cloΣ ⊢e x s) = ⊢c-term cloΣ
@@ -60,7 +61,7 @@ polarity⁺ (s⁺-∀l cloΣ s upᶜ upᵉ st₁ st₂) = ⊢c-term cloΣ
 polarity⁻ s⁻-int = ⊢c-int
 polarity⁻ (s⁻-var clo) = clo
 polarity⁻ (s⁻-ex-r^ clo x-in inst) = clo
-polarity⁻ (s⁻-ex-l= clo x-in s) = ⊢c-var-= x-in
+polarity⁻ (s⁻-ex-l= clo x-in s) = ⊢c-var-= (:=to= x-in)
 polarity⁻ (s⁻-ex-r= clo x-in s) = clo
 polarity⁻ (s⁻-arr cloA cloB x s) = ⊢c-arr cloA cloB
 polarity⁻ (s⁻-∀ cloA s) = cloA
@@ -82,12 +83,12 @@ polarity⁻ (s⁻-∀ cloA s) = cloA
 
 ^∈-=∈-false :
     k ^∈ Ψ
-  → k := A ∈ Ψ
+  → k =∈ Ψ
   → ⊥
-^∈-=∈-false (S^ in1) (S^ in2 up₁) = ^∈-=∈-false in1 in2
-^∈-=∈-false (S∙ in1) (S∙ in2 up₁) = ^∈-=∈-false in1 in2
+^∈-=∈-false (S^ in1) (S^ in2) = ^∈-=∈-false in1 in2
+^∈-=∈-false (S∙ in1) (S∙ in2) = ^∈-=∈-false in1 in2
 ^∈-=∈-false (S, in1) (S, in2) = ^∈-=∈-false in1 in2
-^∈-=∈-false (S= in1) (S= in2 st) = ^∈-=∈-false in1 in2
+^∈-=∈-false (S= in1) (S= in2) = ^∈-=∈-false in1 in2
 
     
 ⊢c-^∈-false : k ε A
@@ -128,23 +129,39 @@ data _◆_⇘_ : SEnv n m → Fin m → SEnv n m → Set where
 ◆-∙∈ (S= inΨ) (◆S= ◆Ψ) = S= (◆-∙∈ inΨ ◆Ψ)
 ◆-∙∈ (S^ inΨ) (◆S^ ◆Ψ) = S^ (◆-∙∈ inΨ ◆Ψ)
 
-◆-=∈-≢ : X := A ∈ Ψ
+-- should this A exposed to the outside?
+◆-=∈-≢ : X =∈ Ψ
      → Ψ ◆ k ⇘ Ψ'
      → k ≢ X
-     → X := A ∈ Ψ'
-◆-=∈-≢ (Z up) ◆Z neq = ⊥-elim (neq refl)
-◆-=∈-≢ (Z up) (◆S= ◆Ψ) neq = Z up
+     → X =∈ Ψ'
+◆-=∈-≢ Z ◆Z neq = ⊥-elim (neq refl)
+◆-=∈-≢ Z (◆S= ◆Ψ) neq = Z
 ◆-=∈-≢ (S, inΨ) (◆S, ◆Ψ) neq = S, (◆-=∈-≢ inΨ ◆Ψ neq)
-◆-=∈-≢ (S^ inΨ up) (◆S^ ◆Ψ) neq = S^ (◆-=∈-≢ inΨ ◆Ψ (≢-pred neq)) up
-◆-=∈-≢ (S∙ inΨ up) (◆S∙ ◆Ψ) neq = S∙ (◆-=∈-≢ inΨ ◆Ψ (≢-pred neq)) up
-◆-=∈-≢ (S= inΨ st) ◆Z neq = ?
-◆-=∈-≢ (S= inΨ st) (◆S= ◆Ψ) neq = S= (◆-=∈-≢ inΨ ◆Ψ (≢-pred neq)) st
+◆-=∈-≢ (S^ inΨ) (◆S^ ◆Ψ) neq = S^ (◆-=∈-≢ inΨ ◆Ψ (≢-pred neq))
+◆-=∈-≢ (S∙ inΨ) (◆S∙ ◆Ψ) neq = S∙ (◆-=∈-≢ inΨ ◆Ψ (≢-pred neq))
+◆-=∈-≢ (S= inΨ) ◆Z neq = S∙ inΨ
+◆-=∈-≢ (S= inΨ) (◆S= ◆Ψ) neq = S= (◆-=∈-≢ inΨ ◆Ψ (≢-pred neq))
+
+◆-=∈-≡ : k =∈ Ψ
+     → Ψ ◆ k ⇘ Ψ'
+     → k ∙∈ Ψ'
+◆-=∈-≡ Z ◆Z = Z
+◆-=∈-≡ (S, inΨ) (◆S, ◆Ψ) = S, (◆-=∈-≡ inΨ ◆Ψ)
+◆-=∈-≡ (S^ inΨ) (◆S^ ◆Ψ) = S^ (◆-=∈-≡ inΨ ◆Ψ)
+◆-=∈-≡ (S∙ inΨ) (◆S∙ ◆Ψ) = S∙ (◆-=∈-≡ inΨ ◆Ψ)
+◆-=∈-≡ (S= inΨ) (◆S= ◆Ψ) = S= (◆-=∈-≡ inΨ ◆Ψ)
 
 ⊢c-◆ : Ψ ⊢c A
      → Ψ ◆ k ⇘ Ψ'
      → Ψ' ⊢c A
 ⊢c-◆ ⊢c-int ◆Ψ = ⊢c-int
 ⊢c-◆ (⊢c-var-∙ inΨ) ◆Ψ = ⊢c-var-∙ (◆-∙∈ inΨ ◆Ψ)
-⊢c-◆ (⊢c-var-= inΨ) ◆Ψ = {!!}
+⊢c-◆ {k = k} (⊢c-var-= {X = X} inΨ) ◆Ψ with k #≟ X
+... | yes refl = ⊢c-var-∙ (◆-=∈-≡ inΨ ◆Ψ)
+... | no ¬p = ⊢c-var-= (◆-=∈-≢ inΨ ◆Ψ ¬p)
 ⊢c-◆ (⊢c-arr clo clo₁) ◆Ψ = ⊢c-arr (⊢c-◆ clo ◆Ψ) (⊢c-◆ clo₁ ◆Ψ)
 ⊢c-◆ (⊢c-∀ clo) ◆Ψ = ⊢c-∀ (⊢c-◆ clo (◆S∙ ◆Ψ))
+
+⊢c-◆0 : Ψ ,= B ⊢c A
+      → Ψ ,∙ ⊢c A
+⊢c-◆0 clo = ⊢c-◆ clo ◆Z      
