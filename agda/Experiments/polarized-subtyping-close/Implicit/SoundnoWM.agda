@@ -1,4 +1,4 @@
-module Implicit.Sound where
+module Implicit.SoundnoWM where
 
 open import Implicit.Language
 open import Implicit.Decl renaming (find to d-find)
@@ -7,25 +7,7 @@ open import Implicit.Algo renaming (find to a-find)
 private variable
   Ψ Ψ' : SEnv n m
   A B C : Type m
-
-postulate
-  ∈a→∈d : ∀ {Ψ : SEnv n m} {X A}
-    → X := A ∈ Ψ
-    → 𝕄 Ψ ∋ X := A
-
-{-
-  s-⊆-prv : ∀ {Ψ Ψ' : SEnv n m} {A B}
-    → Ψ ⊆ Ψ'
-    → side condition
-    → 𝕄 Ψ ⊢ ∞ # A ≤ B
-    → 𝕄 Ψ' ⊢ ∞ # A ≤ B
-
-  ⊢d-⊆-prv : ∀ {Ψ Ψ' : SEnv n m} {A e j}
-    → Ψ ⊆ Ψ'
-    → 𝕄 Ψ ⊢ j # e ⦂ A
-    → 𝕄 Ψ' ⊢ j # e ⦂ A
--}    
-
+  Γ Γ' : Env n m
 
 infix 3 _⊢_~_
 data _⊢_~_ : Env n m → Counter × Type m → Context n m → Set where
@@ -72,12 +54,29 @@ e-ic : ∀ {Γ : Env n m} {j A Σ e}
 e-ic (~I ⊢e ~j) = case-𝕚
 e-ic (~C ⊢e ~j) = case-𝕔
 
+infix 3 _⇌_
+data _⇌_ : SEnv n m → Env n m → Set where
+  ⇌∅ : ∅ ⇌ ∅
+  ⇌, : Ψ ⇌ Γ
+     → Ψ , A ⇌ Γ , A
+  ⇌∙ : Ψ ⇌ Γ
+     → Ψ ,∙ ⇌ Γ ,∙
+  ⇌= : Ψ ⇌ Γ
+     → Ψ ,= A ⇌ Γ ,= A
 
-data JustSub (Ψ : SEnv n m) (Σ : Context n m) (A : Type m) (B : Type m) : Set where
+
+𝕎⇌Γ : 𝕎 Γ ⇌ Γ
+𝕎⇌Γ {Γ = ∅} = ⇌∅
+𝕎⇌Γ {Γ = Γ , A} = ⇌, 𝕎⇌Γ
+𝕎⇌Γ {Γ = Γ ,∙} = ⇌∙ 𝕎⇌Γ
+𝕎⇌Γ {Γ = Γ ,= A} = ⇌= 𝕎⇌Γ
+
+
+data JustSub (Γ : Env n m) (Σ : Context n m) (A : Type m) (B : Type m) : Set where
   subs : ∀ {j}
-    → (j~Σ : 𝕄 Ψ ⊢ ⟨ j , B ⟩ ~ Σ)
-    → (s : 𝕄 Ψ ⊢ j # A ≤ B)
-    → JustSub Ψ Σ A B
+    → (j~Σ : Γ ⊢ ⟨ j , B ⟩ ~ Σ)
+    → (s : Γ ⊢ j # A ≤ B)
+    → JustSub Γ Σ A B
 
 data JustSub' (Γ : Env n m) (Σ : Context n m) (A : Type m) (B : Type m) : Set where
   subs : ∀ {j}
@@ -102,7 +101,8 @@ sound-find : ∀ {Γ : Env n m} {k Σ A B j}
 
 sound-s⁺ : ∀ {Ψ Ψ' : SEnv n m} {Σ A B}
   → Ψ ⊢ A ≤⁺ Σ ⊣ Ψ' ↪ B
-  → JustSub Ψ' Σ A B
+  → Ψ' ⇌ Γ
+  → JustSub Γ Σ A B
 
 sound-0 : ∀ {Γ : Env n m} {e A}
   → Γ ⊢ □ ⇒ e ⇒ A
@@ -126,23 +126,24 @@ sound (⊢lam₁ ⊢e) with sound ⊢e
 ... | typs ~∞ s = typs ~∞ (⊢lam₁ s)
 sound (⊢lam₂ ⊢e up-c ⊢e₁) with sound ⊢e₁
 ... | typs j ⊢e' = typs (~I (sound-0 ⊢e) {!!}) (⊢lam₂ ⊢e') -- weaken
-sound (⊢sub ⊢e ne gc s) with sound-s⁺ s
-... | subs j~Σ s₁ = typs {!!} (⊢sub' (sound-0 ⊢e) (s-w-m s₁)) -- trivial
+sound (⊢sub ⊢e ne gc s) with sound-s⁺ s 𝕎⇌Γ
+... | subs j~Σ s₁ = typs j~Σ (⊢sub' (sound-0 ⊢e) s₁)
 sound (⊢tabs ⊢e) with sound ⊢e
 ... | typs ~Z s = typs ~Z (⊢tabs s)
 
-sound-s⁺ s⁺-int = subs ~∞ s-int
-sound-s⁺ (s⁺-empty cloA) = subs ~Z s-refl
-sound-s⁺ (s⁺-var cloX) = subs ~∞ s-var
-sound-s⁺ (s⁺-ex-l^ cloA x-in inst) = subs ~∞ {!!} -- discussion needed
-sound-s⁺ (s⁺-ex-l= cloA x-in s) with sound-s⁺ s
-... | subs ~∞ s₁ = subs ~∞ (s-var-l {!!} s₁) -- ok
-sound-s⁺ (s⁺-ex-r= cloA x-in s) = {!!}
-sound-s⁺ (s⁺-arr cloC cloD s s₁) = {!!}
-sound-s⁺ (s⁺-term-c cloA cloΣ ⊢e s) = subs (~C {!sound-∞ ⊢e!} {!!}) {!!}
-sound-s⁺ (s⁺-term-o opnA cloΣ ⊢e s s₁) = {!!}
-sound-s⁺ (s⁺-∀ cloB s) = {!!}
-sound-s⁺ (s⁺-∀l cloΣ s upᶜ upᵉ st₁ st₂) = {!!}
+sound-s⁺ s⁺-int toΓ = subs ~∞ s-int
+sound-s⁺ (s⁺-empty cloA) toΓ = subs ~Z s-refl
+sound-s⁺ (s⁺-var cloX) toΓ = subs ~∞ s-var
+sound-s⁺ (s⁺-ex-l^ cloA x-in inst) toΓ = subs ~∞ {!!}
+sound-s⁺ (s⁺-ex-l= cloA x-in s) toΓ = {!!}
+sound-s⁺ (s⁺-ex-r= cloA x-in s) toΓ = {!!}
+sound-s⁺ (s⁺-arr cloC cloD s s₁) toΓ = {!!}
+sound-s⁺ (s⁺-term-c cloA cloΣ ⊢e s) toΓ with sound-s⁺ s toΓ
+... | subs j~Σ s₁ with ⊢id0 ⊢e
+...   | refl = subs (~C {!sound-∞ ⊢e!} j~Σ) (s-arr₃ s₁)
+sound-s⁺ (s⁺-term-o opnA cloΣ ⊢e s s₁) toΓ = {!!}
+sound-s⁺ (s⁺-∀ cloB s) toΓ = {!!}
+sound-s⁺ (s⁺-∀l cloΣ s upᶜ upᵉ st₁ st₂) toΓ = {!!}
 
 sound-find {Σ = □} fd j~Σ = {!!}
 sound-find {Σ = τ A} fd j~Σ = {!!}
