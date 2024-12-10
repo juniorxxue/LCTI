@@ -165,6 +165,11 @@ polar-arr-r : Polarity Ψ (A `→ B) (τ (C `→ D)) ≤
 polar-arr-r (polar-l (⊢c-arr cloA cloA₁)) = polar-l cloA₁
 polar-arr-r (polar-r (⊢c-τ (⊢c-arr cloA cloA₁))) = polar-r (⊢c-τ cloA₁)
 
+polar-∀ : Polarity Ψ (`∀ A) (τ (`∀ B)) ≤
+        → Polarity (Ψ ,∙) A (τ B) ≤
+polar-∀ (polar-l (⊢c-∀ cloA)) = polar-l cloA
+polar-∀ (polar-r (⊢c-τ (⊢c-∀ cloA))) = polar-r (⊢c-τ cloA)
+
 polar-⊆ : Polarity Ψ A Σ ≤
         → Ψ ⊆ Ψ'
         → Polarity Ψ' A Σ ≤

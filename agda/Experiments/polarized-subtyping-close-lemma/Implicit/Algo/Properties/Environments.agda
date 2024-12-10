@@ -26,20 +26,6 @@ inst-in (⟹∙S inst up) = S∙ (inst-in inst)
 inst-in (⟹,S inst) = S, (inst-in inst)
 inst-in (⟹=S up inst) = S= (inst-in inst)
 
-
--- a correct version
-postulate
-  inst-s : [ A / X ] Ψ ⟹ Ψ'
-         → Ψ' ⊢ ‶ X ⌞ ≤ ⌝ τ A ⊣ Ψ' ↪ A
-
-----------------------------------------------------------------------
---+                   Lemmas around env extension                  +--
-----------------------------------------------------------------------
-
-
-
-
-
 ----------------------------------------------------------------------
 --+ Invariant: appearing existentials must be solved in output env +--
 ----------------------------------------------------------------------
@@ -51,18 +37,21 @@ s-out-closed-l : Ψ ⊢ A ⌞ ≤ ⌝ Σ ⊣ Ψ' ↪ B
 s-out-closed-r : Ψ ⊢ A ⌞ ≤ ⌝ Σ ⊣ Ψ' ↪ B
                → Polarity Ψ A Σ ≤
                → Ψ' ⊢cᶜ Σ
+
+s-out-closed-r s pr = {!!}
                
 s-out-closed-l s-int pr = ⊢c-int
 s-out-closed-l (s-empty p) pr = p
 s-out-closed-l (s-var clo) pr = clo
-s-out-closed-l (s-ex-l^ clo x-in inst) pr = {!!}
-s-out-closed-l (s-ex-l= clo x-in s) pr = {!!}
-s-out-closed-l (s-ex-r^ clo x-in inst) pr = {!!}
-s-out-closed-l (s-ex-r= clo x-in s) pr = {!!}
+s-out-closed-l (s-ex-l^ clo x-in inst) pr = ⊢c-var-= (inst-in inst)
+s-out-closed-l (s-ex-l= clo x-in s) pr = ⊆-closed (⊢c-var-= (:=to= x-in)) (s-⊆ s)
+s-out-closed-l s'@(s-ex-r^ clo x-in inst) (polar-l cloA) = ⊆-closed clo (s-⊆ s')
+s-out-closed-l (s-ex-r= clo x-in s) pr = ⊆-closed clo (s-⊆ s)
 s-out-closed-l (s-arr s s₁) pr with s-out-closed-r s (polar-arr-l pr)
-... | ⊢c-τ cloA = ⊢c-arr {!!} (s-out-closed-l s₁ (polar-arr-r {!!}))
-s-out-closed-l (s-term-c cloA ⊢e s) pr = {!!}
-s-out-closed-l (s-term-o opnA ⊢e s s₁) pr = {!!}
-s-out-closed-l (s-∀ s) pr = {!!}
-s-out-closed-l (s-∀l s upᶜ upᵉ st₁ st₂) pr = {!!}
+... | ⊢c-τ cloA = ⊢c-arr (⊆-closed cloA (s-⊆ s₁)) (s-out-closed-l s₁ (polar-arr-r (polar-⊆ pr (s-⊆ s))))
+s-out-closed-l (s-term-c cloA ⊢e s) (polar-r (⊢c-term cloA₁)) = ⊢c-arr (⊆-closed cloA (s-⊆ s)) (s-out-closed-l s (polar-r cloA₁))
+s-out-closed-l (s-term-o opnA ⊢e s s₁) (polar-r (⊢c-term cloA)) with s-out-closed-r s (polar-l {!!})
+... | ⊢c-τ cloA₁ = ⊢c-arr (⊆-closed cloA₁ (s-⊆ s₁)) (s-out-closed-l s₁ (polar-r (⊆-closedᶜ cloA (s-⊆ s))))
+s-out-closed-l (s-∀ s) pr = ⊢c-∀ (s-out-closed-l s (polar-∀ pr))
+s-out-closed-l (s-∀l s upᶜ upᵉ st₁ st₂) (polar-r cloA) = ⊢c-∀ (⊢c-◆0 (s-out-closed-l s (polar-r {!!})))
 
