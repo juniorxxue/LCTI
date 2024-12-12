@@ -19,6 +19,9 @@ data _∋_⦂_ : Env n m → Fin n → Type m → Set where
   S∙ : Γ ∋ i ⦂ A
      → ↑ty0 A ⇘ A'
      → Γ ,∙ ∋ i ⦂ A'
+  S^ : Γ ∋ i ⦂ A
+     → ↑ty0 A ⇘ A'
+     → Γ ,^ ∋ i ⦂ A'     
   S= : Γ ∋ i ⦂ A
      → ↑ty0 A ⇘ A'
      → Γ ,= B ∋ i ⦂ A'
@@ -33,9 +36,51 @@ data _∋_:=_ : Env n m → Fin m → Type m → Set where
   S∙ : Γ ∋ k := A
      → (up : ↑ty0 A ⇘ A')
      → Γ ,∙ ∋ #S k := A'
-  S= : Γ ∋ k := A'
-     → (st : ⟦ B ⟧ A ⇘ A')
-     → Γ ,= B ∋ #S k := A
+  S^ : Γ ∋ k := A
+     → (up : ↑ty0 A ⇘ A')
+     → Γ ,^ ∋ #S k := A'     
+  S= : Γ ∋ k := A
+     → (up : ↑ty0 A ⇘ A')
+     → Γ ,= B ∋ #S k := A'
+
+-- lookup an entry: solution (simpler ver.)
+infix 3 _∋=_
+data _∋=_ : Env n m → Fin m → Set where
+  Z  : Γ ,= A ∋= #0
+  S, : Γ ∋= k
+     → Γ , B ∋= k
+  S∙ : Γ ∋= k
+     → Γ ,∙ ∋= #S k
+  S^ : Γ ∋= k
+     → Γ ,^ ∋= #S k
+  S= : Γ ∋= k
+     → Γ ,= B ∋= #S k
+
+-- lookup an entry: (unsolved) existential variable
+infix 3 _∋^_
+data _∋^_ : Env n m → Fin m → Set where
+  Z  : Γ ,^ ∋^ #0
+  S, : Γ ∋^ k
+     → Γ , A ∋^ k
+  S∙ : Γ ∋^ k
+     → Γ ,∙ ∋^ #S k
+  S= : Γ ∋^ k
+     → Γ ,= B ∋^ #S k
+  S^ : Γ ∋^ k
+     → Γ ,^ ∋^ #S k
+
+-- lookup an entry: universal variable
+infix 3 _∋∙_
+data _∋∙_ : Env n m → Fin m → Set where
+  Z  : Γ ,∙ ∋∙ #0
+  S, : Γ ∋∙ k
+     → Γ , A ∋∙ k
+  S∙ : Γ ∋∙ k
+     → Γ ,∙ ∋∙ #S k
+  S= : Γ ∋∙ k
+     → Γ ,= B ∋∙ #S k
+  S^ : Γ ∋∙ k
+     → Γ ,^ ∋∙ #S k
 
 -- lookup a variable (can represent three kinds of entries), in a type
 infix 3 _ε_
@@ -73,6 +118,7 @@ _/,/_ : Env (1 + n) m → Fin (1 + n) → Env n m
 (Γ , A) /,/ #0 = Γ
 _/,/_ {suc n} (Γ , A) (#S k) = (Γ /,/ k) , A
 (Γ ,∙) /,/ k = (Γ /,/ k) ,∙
+(Γ ,^) /,/ k = (Γ /,/ k) ,^
 (Γ ,= A) /,/ k = (Γ /,/ k) ,= A
 
 

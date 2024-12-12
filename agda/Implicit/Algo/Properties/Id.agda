@@ -13,6 +13,7 @@ private variable
   e : Term n m
   e̅ : Apps n m
   A̅ : AppsType m
+  ≤ : Polar
 
 data Split : (Σ : Context n m) → (A : Type m) → Set where
   case-τ :
@@ -30,11 +31,11 @@ data Split : (Σ : Context n m) → (A : Type m) → Set where
   → T ≡ A'
 
 ≤id :
-    Ψ ⊢ A ≤ Σ ⊣ Ψ' ↪ B
+    Ψ ⊢ A ⌞ ≤ ⌝ Σ ⊣ Ψ' ↪ B
   → Split Σ B
 
 ≤id' :
-    Ψ ⊢ A ≤ Σ ⊣ Ψ' ↪ B
+    Ψ ⊢ A ⌞ ≤ ⌝ Σ ⊣ Ψ' ↪ B
   → ⟦ Σ , B ⟧→s⟦ τ T , B' ⟧
   → T ≡ B'
 ≤id' s spl with ≤id s
@@ -51,7 +52,7 @@ data Split : (Σ : Context n m) → (A : Type m) → Set where
 
 ≤id s-int = case-τ none-τ refl
 ≤id (s-empty p) = case-□ none-□
-≤id (s-var is-uni) = case-τ none-τ refl
+≤id (s-var clo) = case-τ none-τ refl
 ≤id (s-ex-l^ clo x-in inst) = case-τ none-τ refl
 ≤id (s-ex-l= clo x-in s) = case-τ none-τ refl
 ≤id (s-ex-r^ clo x-in inst) = case-τ none-τ refl
@@ -60,16 +61,16 @@ data Split : (Σ : Context n m) → (A : Type m) → Set where
 ≤id (s-term-c cloA ⊢e s) with ≤id s
 ... | case-τ spl eq = case-τ (have-e spl) eq
 ... | case-□ spl = case-□ (have-e spl)
-≤id (s-term-o op ⊢e s s₁) with ≤id s₁
+≤id (s-term-o opnA ⊢e s s₁) with ≤id s₁
 ... | case-τ spl eq = case-τ (have-e spl) eq
 ... | case-□ spl = case-□ (have-e spl)
 ≤id (s-∀ s) with ≤id s
 ... | case-τ none-τ refl = case-τ none-τ refl
-≤id (s-∀l {B = B} s upc upe st₁ st₂) with ≤id s
+≤id (s-∀l {B = B} s upᶜ upᵉ st₁ st₂) with ≤id s
 ... | case-τ {T = T} spl refl = let ⟨ _ , st' ⟩ = st0-total B T
-                                in case-τ (sspl-↑-st spl (term (↑tyᶜ-st upc) (↑tyᵉ-st upe)) (fulltype st') (st-arr st₁ st₂) st') refl
+                                in case-τ (sspl-↑-st spl (term (↑tyᶜ-st upᶜ) (↑tyᵉ-st upᵉ)) (fulltype st') (st-arr st₁ st₂) st') refl
 ... | case-□ {A' = A'} spl = let ⟨ _ , st' ⟩ = st0-total B A'
-                             in case-□ (sspl-↑-st spl (term (↑tyᶜ-st upc) (↑tyᵉ-st upe)) empty (st-arr st₁ st₂) st')
+                             in case-□ (sspl-↑-st spl (term (↑tyᶜ-st upᶜ) (↑tyᵉ-st upᵉ)) empty (st-arr st₁ st₂) st')
 
 -- corollaries
 ⊢id0 : ∀ {Γ : Env n m} {e A B}
@@ -78,6 +79,6 @@ data Split : (Σ : Context n m) → (A : Type m) → Set where
 ⊢id0 ⊢e = ⊢id ⊢e none-τ
 
 ≤id0 : ∀ {Ψ Ψ' : SEnv n m} {A B C}
-  → Ψ ⊢ A ≤ τ B ⊣ Ψ' ↪ C
+  → Ψ ⊢ A ⌞ ≤ ⌝ τ B ⊣ Ψ' ↪ C
   → B ≡ C
 ≤id0 s = ≤id' s none-τ  

@@ -12,18 +12,33 @@ private variable
   j : Counter
   A : Type m
   e : Term n m
+
+
+⊢cᵉto⊢c : 𝕄 Ψ ⊢ j # e ⦂ A
+        → Ψ ⊢cᵉ e
+        → Ψ ⊢c A
+⊢cᵉto⊢c ⊢lit clo = ⊢c-int
+⊢cᵉto⊢c (⊢var x) ⊢c-var = {!!}
+⊢cᵉto⊢c (⊢ann ⊢e) clo = {!!}
+⊢cᵉto⊢c (⊢lam₁ ⊢e) clo = {!!}
+⊢cᵉto⊢c (⊢lam₂ ⊢e) clo = {!!}
+⊢cᵉto⊢c (⊢app₁ ⊢e ⊢e₁) clo = {!!}
+⊢cᵉto⊢c (⊢app₂ ⊢e ⊢e₁) clo = {!!}
+⊢cᵉto⊢c (⊢sub ⊢e B≤A j≢Z) clo = {!!}
+⊢cᵉto⊢c (⊢tabs ⊢e) (⊢c-tlam clo) = ⊢c-∀ (⊢cᵉto⊢c ⊢e clo)
+
   
 ⊢clo-prv :
     𝕄 Ψ ⊢ j # e ⦂ A
-  → Ψ ⊢c e
+  → Ψ ⊢cᵉ e
   → Ψ ⊆ Ψ'
   → 𝕄 Ψ' ⊢ j # e ⦂ A
 ⊢clo-prv ⊢lit clo ss = ⊢lit
 ⊢clo-prv (⊢var x) clo ss = ⊢var {!!}
-⊢clo-prv (⊢ann ⊢e) clo ss = ⊢ann (⊢clo-prv ⊢e clo ss) 
-⊢clo-prv (⊢lam₁ ⊢e) (⊢c-arr clo clo₁) ss = ⊢lam₁ (⊢clo-prv ⊢e (⊢c-, clo₁) (var ss))
-⊢clo-prv (⊢lam₂ ⊢e) (⊢c-arr clo clo₁) ss = ⊢lam₂ (⊢clo-prv ⊢e (⊢c-, clo₁) (var ss))
-⊢clo-prv (⊢app₁ ⊢e ⊢e₁) clo ss = ⊢app₁ {!!} {!!}
-⊢clo-prv (⊢app₂ ⊢e ⊢e₁) clo ss = {!!}
-⊢clo-prv (⊢sub ⊢e B≤A j≢Z) clo ss = {!!}
-⊢clo-prv (⊢tabs ⊢e) clo ss = {!!}
+⊢clo-prv (⊢ann ⊢e) (⊢c-ann x clo) ss = ⊢ann (⊢clo-prv ⊢e clo ss)
+⊢clo-prv (⊢lam₁ ⊢e) (⊢c-lam clo) ss = ⊢lam₁ (⊢clo-prv ⊢e {!!} (var ss))
+⊢clo-prv (⊢lam₂ ⊢e) (⊢c-lam clo) ss = ⊢lam₂ (⊢clo-prv ⊢e {!!} (var ss))
+⊢clo-prv (⊢app₁ ⊢e ⊢e₁) (⊢c-app clo clo₁) ss = ⊢app₁ (⊢clo-prv ⊢e clo ss) (⊢clo-prv ⊢e₁ clo₁ ss)
+⊢clo-prv (⊢app₂ ⊢e ⊢e₁) (⊢c-app clo clo₁) ss = ⊢app₂ (⊢clo-prv ⊢e clo ss) (⊢clo-prv ⊢e₁ clo₁ ss)
+⊢clo-prv (⊢sub ⊢e B≤A j≢Z) clo ss = ⊢sub (⊢clo-prv ⊢e clo ss) {!!} j≢Z
+⊢clo-prv (⊢tabs ⊢e) (⊢c-tlam clo) ss = ⊢tabs (⊢clo-prv ⊢e clo (uvar ss))
