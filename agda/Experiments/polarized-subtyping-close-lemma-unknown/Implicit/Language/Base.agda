@@ -36,9 +36,11 @@ data Term : ℕ → ℕ → Set where
 infixl 4 _,_
 infixl 4 _,∙
 infixl 4 _,=_
+infixl 4 _,=▰
 
 data Env : ℕ → ℕ → Set where
   ∅     : Env 0 0
   _,_   : Env n m → (A : Type m) → Env (1 + n) m
   _,∙   : Env n m → Env n (1 + m)
   _,=_  : Env n m → (A : Type m) → Env n (1 + m)
+  _,=▰  : Env n m → Env n (1 + m)

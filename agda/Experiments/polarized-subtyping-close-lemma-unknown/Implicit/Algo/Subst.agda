@@ -58,9 +58,12 @@ data [_/_]_⟹_ : Type m → Fin m → SEnv n m → SEnv n m → Set where
 -- Ψ₁ , k=A', Ψ₂
 -- A' = Ψ₂(A)
 
+{-
+
 infix 3 _◈_/_⇘_
 data _◈_/_⇘_ : SEnv n m → Type m → Fin m → Type m → Set where
   ◈Z : Ψ ,^ ◈ A / #0 ⇘ A
   ◈S^ : ∀ {Ψ A k B}
     → Ψ ◈ A / k ⇘ B
-    → Ψ ,^ ◈ A / #S k ⇘ B  
+    → Ψ ,^ ◈ A / #S k ⇘ B
+-}    

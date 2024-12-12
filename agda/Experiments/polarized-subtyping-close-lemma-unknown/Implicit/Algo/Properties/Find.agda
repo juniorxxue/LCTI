@@ -28,7 +28,7 @@ postulate
   s-find-gen : ∀ {Ψ Ψ' : SEnv n (1 + m)} {k Σ A B C}
     → k ^∈ Ψ
     → k := C ∈ Ψ'
-    → Ψ ⊢ A ≤⁺ Σ ⊣ Ψ' ↪ B
+    → Ψ ⊢ A ⌞ ≤ ⌝ Σ ⊣ Ψ' ↪ B
     → find (𝕄 Ψ') A k Σ
 
 s-find : ∀ {Ψ Ψ' : SEnv n m} {Σ A B C}
