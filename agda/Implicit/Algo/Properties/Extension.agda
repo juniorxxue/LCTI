@@ -5,23 +5,22 @@ open import Implicit.Algo.Base
 
 private variable
   ≤ : Polar
-  Ψ Ψ' : SEnv n m
+  Γ Γ' Γ'' : Env n m
   A B : Type m
   Σ : Context n m
+  X : Fin m
   
 
-⊆-refl : ∀ {n m} {Ψ : SEnv n m}
-  → Ψ ⊆ Ψ
-⊆-refl {Ψ = ∅} = base
-⊆-refl {Ψ = Ψ , A} = var ⊆-refl
-⊆-refl {Ψ = Ψ ,∙} = uvar ⊆-refl
-⊆-refl {Ψ = Ψ ,^} = evar ⊆-refl
-⊆-refl {Ψ = Ψ ,= A} = svar ⊆-refl
+⊆-refl : Γ ⊆ Γ
+⊆-refl {Γ = ∅} = base
+⊆-refl {Γ = Γ , A} = var ⊆-refl
+⊆-refl {Γ = Γ ,∙} = uvar ⊆-refl
+⊆-refl {Γ = Γ ,^} = evar ⊆-refl
+⊆-refl {Γ = Γ ,= A} = svar ⊆-refl
 
-⊆-trans : ∀ {n m} {Ψ Ψ' Ψ'' : SEnv n m}
-  → Ψ ⊆ Ψ'
-  → Ψ' ⊆ Ψ''
-  → Ψ ⊆ Ψ''
+⊆-trans : Γ ⊆ Γ'
+        → Γ' ⊆ Γ''
+        → Γ ⊆ Γ''
 ⊆-trans base base = base
 ⊆-trans (uvar ⊆1) (uvar ⊆2) = uvar (⊆-trans ⊆1 ⊆2)
 ⊆-trans (var ⊆1) (var ⊆2) = var (⊆-trans ⊆1 ⊆2)
@@ -30,17 +29,16 @@ private variable
 ⊆-trans (evar-sol ⊆1) (svar ⊆2) = evar-sol (⊆-trans ⊆1 ⊆2)
 ⊆-trans (svar ⊆1) (svar ⊆2) = svar (⊆-trans ⊆1 ⊆2)
 
-⟹-⊆ : ∀ {Ψ Ψ' : SEnv n m} {A X} 
-  → [ A / X ] Ψ ⟹ Ψ'
-  → Ψ ⊆ Ψ'
+⟹-⊆ : [ A / X ] Γ ⟹ Γ'
+     → Γ ⊆ Γ'
 ⟹-⊆ (⟹^0 sf) = evar-sol ⊆-refl
 ⟹-⊆ (⟹,S s) = var (⟹-⊆ s)
 ⟹-⊆ (⟹^S x s) = evar (⟹-⊆ x)
 ⟹-⊆ (⟹∙S x s) = uvar (⟹-⊆ x)
 ⟹-⊆ (⟹=S up s) = svar (⟹-⊆ s)  
 
-s-⊆ : Ψ ⊢ A ⌞ ≤ ⌝ Σ ⊣ Ψ' ↪ B
-    → Ψ ⊆ Ψ'
+s-⊆ : Γ ⊢ A ⌞ ≤ ⌝ Σ ⊣ Γ' ↪ B
+    → Γ ⊆ Γ'
 s-⊆ s-int = ⊆-refl
 s-⊆ (s-empty p) = ⊆-refl
 s-⊆ (s-var clo) = ⊆-refl

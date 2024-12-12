@@ -5,10 +5,10 @@ open import Implicit.Algo.Syntax
 
 private variable
   k : Fin m
-  A B B' C D : Type m
+  A A' B B' C D : Type m
   Σ Σ' : Context n m
   e e' : Term n m
-  Ψ Ψ' : SEnv n m
+  Γ Γ' : Env n m
 
 -- subst a type in context
 infix 3 ⟦_/_⟧ᶜ_⇘_
@@ -30,40 +30,21 @@ infix 3 ⟦_⟧ᶜ_⇘_
 
 -- replace entry ^a with a solution ^a=A in an environment
 infix 3 [_/_]_⟹_
-data [_/_]_⟹_ : Type m → Fin m → SEnv n m → SEnv n m → Set where
-  ⟹^0 : ∀ {Ψ : SEnv n m} {A A'}
-    → (up : ↑ty0 A ⇘ A')
-    → [ A' / #0 ] (Ψ ,^) ⟹ (Ψ ,= A)
+data [_/_]_⟹_ : Type m → Fin m → Env n m → Env n m → Set where
+  ⟹^0 : (up : ↑ty0 A ⇘ A')
+      → [ A' / #0 ] (Γ ,^) ⟹ (Γ ,= A)
 
-  ⟹^S : ∀ {Ψ Ψ' : SEnv n m} {A k A'}
-    → [ A / k ] Ψ ⟹ Ψ'
-    → (up : ↑ty0 A ⇘ A')
-    → [ A' / #S k ] (Ψ ,^) ⟹ Ψ' ,^
+  ⟹^S : [ A / k ] Γ ⟹ Γ'
+      → (up : ↑ty0 A ⇘ A')
+      → [ A' / #S k ] (Γ ,^) ⟹ Γ' ,^
 
-  ⟹∙S : ∀ {Ψ Ψ' : SEnv n m} {A k A'}
-    → [ A / k ] Ψ ⟹ Ψ'
-    → (up : ↑ty0 A ⇘ A')
-    → [ A' / #S k ] (Ψ ,∙) ⟹ (Ψ' ,∙)
+  ⟹∙S : [ A / k ] Γ ⟹ Γ'
+      → (up : ↑ty0 A ⇘ A')
+      → [ A' / #S k ] (Γ ,∙) ⟹ (Γ' ,∙)
 
-  ⟹,S : ∀ {Ψ Ψ' : SEnv n m} {A k B}
-    → [ A / k ] Ψ ⟹ Ψ'
-    → [ A / k ] (Ψ , B) ⟹ (Ψ' , B)
+  ⟹,S : [ A / k ] Γ ⟹ Γ'
+      → [ A / k ] (Γ , B) ⟹ (Γ' , B)
 
-  ⟹=S : ∀ {Ψ Ψ' : SEnv n m} {A A' B k}
-    → (up : ⟦ B ⟧ A ⇘ A')
-    → [ A' / k ] Ψ ⟹ Ψ'
-    → [ A / #S k ] (Ψ ,= B) ⟹ (Ψ' ,= B)
-
--- a aux judgment, that captures the value of the entry in the resulting environment
--- Ψ₁ , k=A', Ψ₂
--- A' = Ψ₂(A)
-
-{-
-
-infix 3 _◈_/_⇘_
-data _◈_/_⇘_ : SEnv n m → Type m → Fin m → Type m → Set where
-  ◈Z : Ψ ,^ ◈ A / #0 ⇘ A
-  ◈S^ : ∀ {Ψ A k B}
-    → Ψ ◈ A / k ⇘ B
-    → Ψ ,^ ◈ A / #S k ⇘ B
--}    
+  ⟹=S : (up : ⟦ B ⟧ A ⇘ A')
+      → [ A' / k ] Γ ⟹ Γ'
+      → [ A / #S k ] (Γ ,= B) ⟹ (Γ' ,= B)

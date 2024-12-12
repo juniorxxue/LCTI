@@ -17,10 +17,10 @@ data _∋_⦂_ : Env n m → Fin n → Type m → Set where
   S, : Γ ∋ i ⦂ A
      → Γ , B ∋ #S i ⦂ A
   S∙ : Γ ∋ i ⦂ A
-     → ↑ty0 A ⇘ A'
+     → (up : ↑ty0 A ⇘ A')
      → Γ ,∙ ∋ i ⦂ A'
   S^ : Γ ∋ i ⦂ A
-     → ↑ty0 A ⇘ A'
+     → (up : ↑ty0 A ⇘ A')
      → Γ ,^ ∋ i ⦂ A'     
   S= : Γ ∋ i ⦂ A
      → ↑ty0 A ⇘ A'

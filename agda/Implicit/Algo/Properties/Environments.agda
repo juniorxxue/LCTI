@@ -7,7 +7,7 @@ open import Implicit.Algo.Properties.OpenClose
 open import Implicit.Algo.Properties.Lookup
 
 private variable
-  Ψ Ψ' : SEnv n m
+  Γ Γ' : Env n m
   A B C D : Type m
   k X : Fin m
   Σ : Context n m
@@ -18,8 +18,8 @@ private variable
 --+                          Small Lemmas                          +--
 ----------------------------------------------------------------------
 inst-in : ∀ {X}
-  → [ A / X ] Ψ ⟹ Ψ'
-  → X =∈ Ψ'
+  → [ A / X ] Γ ⟹ Γ'
+  → Γ' ∋= X
 inst-in (⟹^0 up) = Z
 inst-in (⟹^S inst up) = S^ (inst-in inst)
 inst-in (⟹∙S inst up) = S∙ (inst-in inst)
@@ -30,13 +30,13 @@ inst-in (⟹=S up inst) = S= (inst-in inst)
 --+ Invariant: appearing existentials must be solved in output env +--
 ----------------------------------------------------------------------
 
-s-out-closed-l : Ψ ⊢ A ⌞ ≤ ⌝ Σ ⊣ Ψ' ↪ B
-               → Polarity Ψ A Σ ≤
-               → Ψ' ⊢c A
+s-out-closed-l : Γ ⊢ A ⌞ ≤ ⌝ Σ ⊣ Γ' ↪ B
+               → Polarity Γ A Σ ≤
+               → Γ' ⊢c A
 
-s-out-closed-r : Ψ ⊢ A ⌞ ≤ ⌝ Σ ⊣ Ψ' ↪ B
-               → Polarity Ψ A Σ ≤
-               → Ψ' ⊢cᶜ Σ
+s-out-closed-r : Γ ⊢ A ⌞ ≤ ⌝ Σ ⊣ Γ' ↪ B
+               → Polarity Γ A Σ ≤
+               → Γ' ⊢cᶜ Σ
 
 s-out-closed-r s pr = {!!}
                

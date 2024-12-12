@@ -7,7 +7,7 @@ private variable
   A A' B C : Type m
   k k₁ k₂ : Fin m
   Σ Σ' : Context n m
-  Ψ Ψ' : SEnv n m
+  Γ Γ' : Env n m
 
 ε-↑ty : k₁ ε A
       → A ↑ty k₂ ⇘ A'
@@ -36,45 +36,45 @@ private variable
         → #S k εᶜ Σ'
 εᶜ-↑tyᶜ0 k-in up-c = εᶜ-↑tyᶜ k-in up-c z≤n
 
-:=to= : k := A ∈ Ψ
-        → k =∈ Ψ
+:=to= : Γ ∋ k := A
+      → Γ ∋= k
 :=to= (Z up) = Z
-:=to= (S, inΨ) = S, (:=to= inΨ)
-:=to= (S^ inΨ up) = S^ (:=to= inΨ)
-:=to= (S∙ inΨ up) = S∙ (:=to= inΨ)
-:=to= (S= inΨ up) = S= (:=to= inΨ)
+:=to= (S, inΓ) = S, (:=to= inΓ)
+:=to= (S^ inΓ up) = S^ (:=to= inΓ)
+:=to= (S∙ inΓ up) = S∙ (:=to= inΓ)
+:=to= (S= inΓ up) = S= (:=to= inΓ)
 
 
 ----------------------------------------------------------------------
 --+                           Extension                            +--
 ----------------------------------------------------------------------
 
-⊆-in:= : k := C ∈ Ψ
-       → Ψ ⊆ Ψ'
-       → k := C ∈ Ψ'
+⊆-in:= : Γ ∋ k := C
+       → Γ ⊆ Γ'
+       → Γ' ∋ k := C
 ⊆-in:= (Z x) (svar ss) = Z x
-⊆-in:= (S, inΨ) (var ss) = S, (⊆-in:= inΨ ss)
-⊆-in:= (S^ inΨ x) (evar ss) = S^ (⊆-in:= inΨ ss) x
-⊆-in:= (S^ inΨ x) (evar-sol {A = A} ss) = S= (⊆-in:= inΨ ss) x
-⊆-in:= (S∙ inΨ x) (uvar ss) = S∙ (⊆-in:= inΨ ss) x
-⊆-in:= (S= inΨ st) (svar ss) = S= (⊆-in:= inΨ ss) st
+⊆-in:= (S, inΓ) (var ss) = S, (⊆-in:= inΓ ss)
+⊆-in:= (S^ inΓ x) (evar ss) = S^ (⊆-in:= inΓ ss) x
+⊆-in:= (S^ inΓ x) (evar-sol {A = A} ss) = S= (⊆-in:= inΓ ss) x
+⊆-in:= (S∙ inΓ x) (uvar ss) = S∙ (⊆-in:= inΓ ss) x
+⊆-in:= (S= inΓ st) (svar ss) = S= (⊆-in:= inΓ ss) st
 
-⊆-in= : k =∈ Ψ
-      → Ψ ⊆ Ψ'
-      → k =∈ Ψ'
+⊆-in= : Γ ∋= k
+      → Γ ⊆ Γ'
+      → Γ' ∋= k
 ⊆-in= Z (svar ss) = Z
-⊆-in= (S, inΨ) (var ss) = S, (⊆-in= inΨ ss)
-⊆-in= (S^ inΨ) (evar ss) = S^ (⊆-in= inΨ ss)
-⊆-in= (S^ inΨ) (evar-sol ss) = S= (⊆-in= inΨ ss)
-⊆-in= (S∙ inΨ) (uvar ss) = S∙ (⊆-in= inΨ ss)
-⊆-in= (S= inΨ) (svar ss) = S= (⊆-in= inΨ ss)
+⊆-in= (S, inΓ) (var ss) = S, (⊆-in= inΓ ss)
+⊆-in= (S^ inΓ) (evar ss) = S^ (⊆-in= inΓ ss)
+⊆-in= (S^ inΓ) (evar-sol ss) = S= (⊆-in= inΓ ss)
+⊆-in= (S∙ inΓ) (uvar ss) = S∙ (⊆-in= inΓ ss)
+⊆-in= (S= inΓ) (svar ss) = S= (⊆-in= inΓ ss)
 
-⊆-in∙ : k ∙∈ Ψ
-      → Ψ ⊆ Ψ'
-      → k ∙∈ Ψ'
+⊆-in∙ : Γ ∋∙ k
+      → Γ ⊆ Γ'
+      → Γ' ∋∙ k
 ⊆-in∙ Z (uvar ss) = Z
-⊆-in∙ (S^ inΨ) (evar ss) = S^ (⊆-in∙ inΨ ss)
-⊆-in∙ (S^ inΨ) (evar-sol ss) = S= (⊆-in∙ inΨ ss)
-⊆-in∙ (S∙ inΨ) (uvar ss) = S∙ (⊆-in∙ inΨ ss)
-⊆-in∙ (S, inΨ) (var ss) = S, (⊆-in∙ inΨ ss)
-⊆-in∙ (S= inΨ) (svar ss) = S= (⊆-in∙ inΨ ss)
+⊆-in∙ (S^ inΓ) (evar ss) = S^ (⊆-in∙ inΓ ss)
+⊆-in∙ (S^ inΓ) (evar-sol ss) = S= (⊆-in∙ inΓ ss)
+⊆-in∙ (S∙ inΓ) (uvar ss) = S∙ (⊆-in∙ inΓ ss)
+⊆-in∙ (S, inΓ) (var ss) = S, (⊆-in∙ inΓ ss)
+⊆-in∙ (S= inΓ) (svar ss) = S= (⊆-in∙ inΓ ss)

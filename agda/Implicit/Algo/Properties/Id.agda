@@ -6,8 +6,7 @@ open import Implicit.Algo.Properties.Split
 open import Implicit.Algo.Properties.Subst
 
 private variable
-  Γ : Env n m
-  Ψ Ψ' : SEnv n m
+  Γ Γ' : Env n m
   Σ : Context n m
   A A' B B' C D T : Type m
   e : Term n m
@@ -31,11 +30,11 @@ data Split : (Σ : Context n m) → (A : Type m) → Set where
   → T ≡ A'
 
 ≤id :
-    Ψ ⊢ A ⌞ ≤ ⌝ Σ ⊣ Ψ' ↪ B
+    Γ ⊢ A ⌞ ≤ ⌝ Σ ⊣ Γ' ↪ B
   → Split Σ B
 
 ≤id' :
-    Ψ ⊢ A ⌞ ≤ ⌝ Σ ⊣ Ψ' ↪ B
+    Γ ⊢ A ⌞ ≤ ⌝ Σ ⊣ Γ' ↪ B
   → ⟦ Σ , B ⟧→s⟦ τ T , B' ⟧
   → T ≡ B'
 ≤id' s spl with ≤id s
@@ -73,12 +72,10 @@ data Split : (Σ : Context n m) → (A : Type m) → Set where
                              in case-□ (sspl-↑-st spl (term (↑tyᶜ-st upᶜ) (↑tyᵉ-st upᵉ)) empty (st-arr st₁ st₂) st')
 
 -- corollaries
-⊢id0 : ∀ {Γ : Env n m} {e A B}
-  → Γ ⊢ τ B ⇒ e ⇒ A
-  → B ≡ A
+⊢id0 : Γ ⊢ τ B ⇒ e ⇒ A
+     → B ≡ A
 ⊢id0 ⊢e = ⊢id ⊢e none-τ
 
-≤id0 : ∀ {Ψ Ψ' : SEnv n m} {A B C}
-  → Ψ ⊢ A ⌞ ≤ ⌝ τ B ⊣ Ψ' ↪ C
-  → B ≡ C
+≤id0 : Γ ⊢ A ⌞ ≤ ⌝ τ B ⊣ Γ' ↪ C
+     → B ≡ C
 ≤id0 s = ≤id' s none-τ  

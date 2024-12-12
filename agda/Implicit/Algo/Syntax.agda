@@ -2,16 +2,6 @@ module Implicit.Algo.Syntax where
 
 open import Implicit.Language
 
-infixl 4 _,^
-
--- Env for algorithmic subtyping
-data SEnv : ℕ → ℕ → Set where
-  ∅     : SEnv 0 0
-  _,_   : SEnv n m → (A : Type m) → SEnv (1 + n) m
-  _,∙   : SEnv n m → SEnv n (1 + m) -- universal variable
-  _,^   : SEnv n m → SEnv n (1 + m) -- existential variable
-  _,=_  : SEnv n m → (A : Type m) → SEnv n (1 + m) -- solved equation
-
 infixr 7 [_]↝_
 
 data Context : ℕ → ℕ → Set where

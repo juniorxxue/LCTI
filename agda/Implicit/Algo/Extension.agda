@@ -4,24 +4,24 @@ open import Implicit.Language
 open import Implicit.Algo.Syntax
 
 private variable
-  Ψ Ψ' : SEnv n m
+  Γ Γ' : Env n m
   A : Type m
 
 infix 3 _⊆_
-data _⊆_ : SEnv n m → SEnv n m → Set where
+data _⊆_ : Env n m → Env n m → Set where
   base : ∅ ⊆ ∅
   uvar :
-      Ψ ⊆ Ψ'
-    → Ψ ,∙ ⊆ Ψ' ,∙
+      Γ ⊆ Γ'
+    → Γ ,∙ ⊆ Γ' ,∙
   var :
-      Ψ ⊆ Ψ'
-    → Ψ , A ⊆ Ψ' , A
+      Γ ⊆ Γ'
+    → Γ , A ⊆ Γ' , A
   evar :
-      Ψ ⊆ Ψ'
-    → Ψ ,^ ⊆ Ψ' ,^
+      Γ ⊆ Γ'
+    → Γ ,^ ⊆ Γ' ,^
   evar-sol :
-      Ψ ⊆ Ψ'
-    → Ψ ,^ ⊆ Ψ' ,= A    
+      Γ ⊆ Γ'
+    → Γ ,^ ⊆ Γ' ,= A    
   svar :
-      Ψ ⊆ Ψ'
-    → Ψ ,= A ⊆ Ψ' ,= A
+      Γ ⊆ Γ'
+    → Γ ,= A ⊆ Γ' ,= A
