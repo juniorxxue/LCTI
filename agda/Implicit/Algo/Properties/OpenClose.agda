@@ -182,7 +182,7 @@ result-closed (⊢var x∈Γ) cloΣ (⊢c-var inΓ clo) rewrite ∋⦂-unique x�
 result-closed (⊢ann ⊢e) cloΣ (⊢c-ann cloA cloe) = cloA
 result-closed (⊢app ⊢e) cloΣ (⊢c-app cloe cloe₁) with result-closed ⊢e (⊢c-term cloe₁ cloΣ) cloe
 ... | ⊢c-arr ind ind₁ = ind₁
-result-closed (⊢lam₁ ⊢e) (⊢c-τ (⊢c-arr cloA cloA₁)) cloe = ⊢c-arr cloA {!!}
+result-closed (⊢lam₁ ⊢e) (⊢c-τ (⊢c-arr cloA cloA₁)) (⊢c-lam cloe) = ⊢c-arr cloA (⊢c-weaken0 (result-closed ⊢e (⊢c-τ (⊢c-strengthen0 cloA₁)) {!!}))
 result-closed (⊢lam₂ ⊢e up-c ⊢e₁) cloΣ cloe = {!!}
 result-closed (⊢sub ⊢e ne gc s) cloΣ cloe = {!!}
 result-closed (⊢tabs ⊢e) cloΣ cloe = {!!}

@@ -5,28 +5,10 @@ open import Implicit.Decl renaming (find to d-find)
 open import Implicit.Algo renaming (find to a-find)
 
 private variable
-  Ψ Ψ' : SEnv n m
+  Γ Γ' : Env n m
   A B C : Type m
-
-postulate
-  ∈a→∈d : ∀ {Ψ : SEnv n m} {X A}
-    → X := A ∈ Ψ
-    → 𝕄 Ψ ∋ X := A
-
-{-
-  s-⊆-prv : ∀ {Ψ Ψ' : SEnv n m} {A B}
-    → Ψ ⊆ Ψ'
-    → side condition
-    → 𝕄 Ψ ⊢ ∞ # A ≤ B
-    → 𝕄 Ψ' ⊢ ∞ # A ≤ B
-
-  ⊢d-⊆-prv : ∀ {Ψ Ψ' : SEnv n m} {A e j}
-    → Ψ ⊆ Ψ'
-    → 𝕄 Ψ ⊢ j # e ⦂ A
-    → 𝕄 Ψ' ⊢ j # e ⦂ A
--}    
-
-
+  ≤ : Polar
+ 
 infix 3 _⊢_~_
 data _⊢_~_ : Env n m → Counter × Type m → Context n m → Set where
 
@@ -48,14 +30,6 @@ data _⊢_~_ : Env n m → Counter × Type m → Context n m → Set where
 
 postulate
 
-  s-w-m : ∀ {Γ : Env n m} {A B j}
-    → 𝕄 (𝕎 Γ) ⊢ j # A ≤ B
-    → Γ ⊢ j # A ≤ B
-
-  ~-w-m : ∀ {Γ : Env n m} {j A Σ}
-    → 𝕄 (𝕎 Γ) ⊢ ⟨ j , A ⟩ ~ Σ
-    → Γ ⊢ ⟨ j , A ⟩ ~ Σ
-
   ~-subst : ∀ {Γ : Env n m} {Σ A B j Σ' A'}
     → (Γ ,= B) ⊢ ⟨ j , A ⟩ ~ Σ
     → ⟦ B ⟧ᶜ Σ ⇘ Σ'
@@ -73,11 +47,11 @@ e-ic (~I ⊢e ~j) = case-𝕚
 e-ic (~C ⊢e ~j) = case-𝕔
 
 
-data JustSub (Ψ : SEnv n m) (Σ : Context n m) (A : Type m) (B : Type m) : Set where
+data JustSub (Γ : Env n m) (Σ : Context n m) (A : Type m) (B : Type m) : Set where
   subs : ∀ {j}
-    → (j~Σ : 𝕄 Ψ ⊢ ⟨ j , B ⟩ ~ Σ)
-    → (s : 𝕄 Ψ ⊢ j # A ≤ B)
-    → JustSub Ψ Σ A B
+    → (j~Σ : Γ ⊢ ⟨ j , B ⟩ ~ Σ)
+    → (s : Γ ⊢ j # A ≤ B)
+    → JustSub Γ Σ A B
 
 data JustSub' (Γ : Env n m) (Σ : Context n m) (A : Type m) (B : Type m) : Set where
   subs : ∀ {j}
@@ -95,14 +69,9 @@ sound : ∀ {Γ : Env n m} {Σ e A}
   → Γ ⊢ Σ ⇒ e ⇒ A
   → JustTyping Γ Σ e A
 
-sound-find : ∀ {Γ : Env n m} {k Σ A B j}
-  → a-find Γ A k Σ
-  → Γ ⊢ ⟨ j , B ⟩ ~ Σ
-  → d-find A k j
-
-sound-s⁺ : ∀ {Ψ Ψ' : SEnv n m} {Σ A B}
-  → Ψ ⊢ A ≤⁺ Σ ⊣ Ψ' ↪ B
-  → JustSub Ψ' Σ A B
+sound-s : ∀ {Γ Γ' : Env n m} {Σ A B}
+  → Γ ⊢ A ⌞ ≤ ⌝ Σ ⊣ Γ' ↪ B
+  → JustSub Γ' Σ A B
 
 sound-0 : ∀ {Γ : Env n m} {e A}
   → Γ ⊢ □ ⇒ e ⇒ A
@@ -126,26 +95,27 @@ sound (⊢lam₁ ⊢e) with sound ⊢e
 ... | typs ~∞ s = typs ~∞ (⊢lam₁ s)
 sound (⊢lam₂ ⊢e up-c ⊢e₁) with sound ⊢e₁
 ... | typs j ⊢e' = typs (~I (sound-0 ⊢e) {!!}) (⊢lam₂ ⊢e') -- weaken
-sound (⊢sub ⊢e ne gc s) with sound-s⁺ s
-... | subs j~Σ s₁ = typs {!!} (⊢sub' (sound-0 ⊢e) (s-w-m s₁)) -- trivial
+sound (⊢sub ⊢e ne gc s) with sound-s s
+... | subs j~Σ s₁ = typs j~Σ (⊢sub' (sound-0 ⊢e) s₁) -- trivial
 sound (⊢tabs ⊢e) with sound ⊢e
 ... | typs ~Z s = typs ~Z (⊢tabs s)
 
-sound-s⁺ s⁺-int = subs ~∞ s-int
-sound-s⁺ (s⁺-empty cloA) = subs ~Z s-refl
-sound-s⁺ (s⁺-var cloX) = subs ~∞ s-var
-sound-s⁺ (s⁺-ex-l^ cloA x-in inst) = subs ~∞ {!!} -- discussion needed
-sound-s⁺ (s⁺-ex-l= cloA x-in s) with sound-s⁺ s
-... | subs ~∞ s₁ = subs ~∞ (s-var-l {!!} s₁) -- ok
-sound-s⁺ (s⁺-ex-r= cloA x-in s) = {!!}
-sound-s⁺ (s⁺-arr cloC cloD s s₁) = {!!}
-sound-s⁺ (s⁺-term-c cloA cloΣ ⊢e s) = subs (~C {!sound-∞ ⊢e!} {!!}) {!!}
-sound-s⁺ (s⁺-term-o opnA cloΣ ⊢e s s₁) = {!!}
-sound-s⁺ (s⁺-∀ cloB s) = {!!}
-sound-s⁺ (s⁺-∀l cloΣ s upᶜ upᵉ st₁ st₂) = {!!}
-
-sound-find {Σ = □} fd j~Σ = {!!}
-sound-find {Σ = τ A} fd j~Σ = {!!}
-sound-find {Σ = [ e ]↝ Σ} (a-find.f-arr-l bd ⊢e) j~Σ = {!!}
-sound-find {Σ = [ e ]↝ Σ} (a-find.f-arr-r x ⊢e fd) j~Σ = {!!}
-sound-find {Σ = [ e ]↝ Σ} (a-find.f-∀ fd x) j~Σ = {!!}
+sound-s s-int = subs ~∞ s-int
+sound-s (s-empty p) = subs ~Z s-refl
+sound-s (s-var clo) = subs ~∞ s-var
+sound-s (s-ex-l^ clo x-in inst) = subs ~∞ {!!}
+sound-s (s-ex-l= clo x-in s) with sound-s s
+... | subs ~∞ s₁ = subs ~∞ (s-var-l {!!} s₁)
+sound-s (s-ex-r^ clo x-in inst) = subs ~∞ {!!}
+sound-s (s-ex-r= clo x-in s) with sound-s s
+... | subs ~∞ s₁ = subs ~∞ (s-var-r {!!} s₁)
+sound-s (s-arr s s₁) with sound-s s | sound-s s₁
+... | subs ~∞ s₂ | subs ~∞ s₃ = subs ~∞ (s-arr₁ {!!} s₃)
+sound-s (s-term-c cloA ⊢e s) with sound-s s
+... | subs j~Σ s₁ rewrite sym (⊢id0 ⊢e) = subs (~C {!sound-∞ ⊢e!} j~Σ) (s-arr₃ s₁)
+sound-s (s-term-o opnA ⊢e s s₁) with sound-s s | sound-s s₁
+... | subs ~∞ s₂ | subs j~Σ s₃ = subs (~I {!sound-0 ⊢e!} j~Σ) (s-arr₂ {!s₂!} s₃)
+sound-s (s-∀ s) with sound-s s
+... | subs ~∞ s₁ = subs ~∞ (s-∀ s₁)
+sound-s (s-∀l s upᶜ upᵉ st₁ st₂) with sound-s s
+... | subs j~Σ s₁ = subs {!j~Σ!} (s-∀l s₁ {!!} {!!} st₁ st₂)
