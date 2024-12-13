@@ -6,7 +6,7 @@ open import Implicit.Language.Subst
 
 private variable
   Γ Γ' : Env n m
-  A A' B C D : Type m
+  A A' B B' C C' D : Type m
   i : Fin n
   k k' : Fin m
 
@@ -122,24 +122,27 @@ _/,/_ {suc n} (Γ , A) (#S k) = (Γ /,/ k) , A
 (Γ ,= A) /,/ k = (Γ /,/ k) ,= A
 
 -- replace entry ^a with a solution ^a=A in an environment
-infix 3 [_/_]_⟹_
-data [_/_]_⟹_ : Type m → Fin m → Env n m → Env n m → Set where
+infix 3 [_/_]_⟹_↪_
+data [_/_]_⟹_↪_ : Type m → Fin m → Env n m → Env n m → Type m → Set where
   ⟹^0 : (up : ↑ty0 A ⇘ A')
-      → [ A' / #0 ] (Γ ,^) ⟹ (Γ ,= A)
+      → [ A' / #0 ] (Γ ,^) ⟹ (Γ ,= A) ↪ A'
 
-  ⟹^S : [ A / k ] Γ ⟹ Γ'
-      → (up : ↑ty0 A ⇘ A')
-      → [ A' / #S k ] (Γ ,^) ⟹ Γ' ,^
+  ⟹^S : [ A / k ] Γ ⟹ Γ' ↪ B
+      → (up1 : ↑ty0 A ⇘ A')
+      → (up2 : ↑ty0 B ⇘ B')
+      → [ A' / #S k ] (Γ ,^) ⟹ Γ' ,^ ↪ B'
 
-  ⟹∙S : [ A / k ] Γ ⟹ Γ'
-      → (up : ↑ty0 A ⇘ A')
-      → [ A' / #S k ] (Γ ,∙) ⟹ (Γ' ,∙)
+  ⟹∙S : [ A / k ] Γ ⟹ Γ' ↪ B
+      → (up1 : ↑ty0 A ⇘ A')
+      → (up2 : ↑ty0 B ⇘ B')
+      → [ A' / #S k ] (Γ ,∙) ⟹ (Γ' ,∙) ↪ B'
 
-  ⟹,S : [ A / k ] Γ ⟹ Γ'
-      → [ A / k ] (Γ , B) ⟹ (Γ' , B)
+  ⟹,S : [ A / k ] Γ ⟹ Γ' ↪ C
+       → [ A / k ] (Γ , B) ⟹ (Γ' , B) ↪ C
 
-  ⟹=S : (up : ⟦ B ⟧ A ⇘ A')
-      → [ A' / k ] Γ ⟹ Γ'
-      → [ A / #S k ] (Γ ,= B) ⟹ (Γ' ,= B)
+  ⟹=S : [ A' / k ] Γ ⟹ Γ' ↪ C
+       → (up1 : ⟦ B ⟧ A ⇘ A')
+       → (up2 : ↑ty0 C ⇘ C')
+       → [ A / #S k ] (Γ ,= B) ⟹ (Γ' ,= B) ↪ C'
 
 

@@ -30,13 +30,13 @@ private variable
 ⊆-trans (evar-sol ⊆1) (svar ⊆2) = evar-sol (⊆-trans ⊆1 ⊆2)
 ⊆-trans (svar ⊆1) (svar ⊆2) = svar (⊆-trans ⊆1 ⊆2)
 
-⟹-⊆ : [ A / X ] Γ ⟹ Γ'
+⟹-⊆ : [ A / X ] Γ ⟹ Γ' ↪ B
      → Γ ⊆ Γ'
 ⟹-⊆ (⟹^0 sf) = evar-sol ⊆-refl
 ⟹-⊆ (⟹,S s) = var (⟹-⊆ s)
-⟹-⊆ (⟹^S x s) = evar (⟹-⊆ x)
-⟹-⊆ (⟹∙S x s) = uvar (⟹-⊆ x)
-⟹-⊆ (⟹=S up s) = svar (⟹-⊆ s)
+⟹-⊆ (⟹^S s up1 up2) = evar (⟹-⊆ s)
+⟹-⊆ (⟹∙S s up1 up2) = uvar (⟹-⊆ s)
+⟹-⊆ (⟹=S s up1 up2) = svar (⟹-⊆ s)
 
 ----------------------------------------------------------------------
 --+                             Lookup                             +--

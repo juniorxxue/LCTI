@@ -78,7 +78,7 @@ data _⊢_⌞_⌝_⊣_↪_ where
   s-ex-l^ :
       (clo : Γ ⊢c A)
     → (x-in : Γ ∋^ X)
-    → (inst : [ A / X ] Γ ⟹ Γ')
+    → (inst : [ A / X ] Γ ⟹ Γ' ↪ B)
     → Γ ⊢ ‶ X ⌞ ≤⁺ ⌝ τ A ⊣ Γ' ↪ A
  
   s-ex-l= :
@@ -90,7 +90,7 @@ data _⊢_⌞_⌝_⊣_↪_ where
   s-ex-r^ :
       (clo : Γ ⊢c A)
     → (x-in : Γ ∋^ X)
-    → (inst : [ A / X ] Γ ⟹ Γ')
+    → (inst : [ A / X ] Γ ⟹ Γ' ↪ B)
     → Γ ⊢ A ⌞ ≤⁻ ⌝ τ (‶ X) ⊣ Γ' ↪ ‶ X
 
   s-ex-r= :
