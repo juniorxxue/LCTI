@@ -98,7 +98,7 @@ data _⊢_#_⦂_ : Env n m → Counter → Term n m → Type m → Set where
   ⊢lit : ∀ {num : ℕ}
     → Γ ⊢ Z # (lit num) ⦂ Int
   ⊢var :
-      Γ ∋ x ⦂ A
+      (x∈Γ : Γ ∋ x ⦂ A)
     → Γ ⊢ Z # ` x ⦂ A
   ⊢ann :
       Γ ⊢ ∞ # e ⦂ A

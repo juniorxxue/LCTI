@@ -2,12 +2,14 @@ module Implicit.Sound where
 
 open import Implicit.Language
 open import Implicit.Decl renaming (find to d-find)
-open import Implicit.Algo renaming (find to a-find)
+open import Implicit.Algo
 
 private variable
   Γ Γ' : Env n m
   A B C : Type m
   ≤ : Polar
+  j : Counter
+  Σ Σ' : Context n m
  
 infix 3 _⊢_~_
 data _⊢_~_ : Env n m → Counter × Type m → Context n m → Set where
@@ -35,6 +37,10 @@ postulate
     → ⟦ B ⟧ᶜ Σ ⇘ Σ'
     → ⟦ B ⟧ A ⇘ A'
     → Γ ⊢ ⟨ j , A' ⟩ ~ Σ'
+
+  ~-weaken0 : Γ , A ⊢ ⟨ j , B ⟩ ~ Σ'
+            → ↑tmᶜ0 Σ ⇘ Σ'
+            → Γ ⊢ ⟨ j , B ⟩ ~ Σ
 
 ----------------------------------------------------------------------
 --+                             Typing                             +--
@@ -94,9 +100,9 @@ sound (⊢app ⊢e) with sound ⊢e
 sound (⊢lam₁ ⊢e) with sound ⊢e
 ... | typs ~∞ s = typs ~∞ (⊢lam₁ s)
 sound (⊢lam₂ ⊢e up-c ⊢e₁) with sound ⊢e₁
-... | typs j ⊢e' = typs (~I (sound-0 ⊢e) {!!}) (⊢lam₂ ⊢e') -- weaken
+... | typs j ⊢e' = typs (~I (sound-0 ⊢e) (~-weaken0 j up-c)) (⊢lam₂ ⊢e')
 sound (⊢sub ⊢e ne gc s) with sound-s s
-... | subs j~Σ s₁ = typs j~Σ (⊢sub' (sound-0 ⊢e) s₁) -- trivial
+... | subs j~Σ s₁ = typs j~Σ (⊢sub' (sound-0 ⊢e) s₁)
 sound (⊢tabs ⊢e) with sound ⊢e
 ... | typs ~Z s = typs ~Z (⊢tabs s)
 
@@ -105,17 +111,17 @@ sound-s (s-empty p) = subs ~Z s-refl
 sound-s (s-var clo) = subs ~∞ s-var
 sound-s (s-ex-l^ clo x-in inst) = subs ~∞ {!!}
 sound-s (s-ex-l= clo x-in s) with sound-s s
-... | subs ~∞ s₁ = subs ~∞ (s-var-l {!!} s₁)
+... | subs ~∞ s₁ = subs ~∞ (s-var-l (⊆-in:= x-in (s-⊆ s)) s₁)
 sound-s (s-ex-r^ clo x-in inst) = subs ~∞ {!!}
 sound-s (s-ex-r= clo x-in s) with sound-s s
-... | subs ~∞ s₁ = subs ~∞ (s-var-r {!!} s₁)
-sound-s (s-arr s s₁) with sound-s s | sound-s s₁
-... | subs ~∞ s₂ | subs ~∞ s₃ = subs ~∞ (s-arr₁ {!!} s₃)
+... | subs ~∞ s₁ = subs ~∞ (s-var-r (⊆-in:= x-in (s-⊆ s)) s₁)
+sound-s s'@(s-arr s s₁) with sound-s s | sound-s s₁
+... | subs ~∞ s₂ | subs ~∞ s₃ = subs ~∞ (s-arr₁ (s-⊆-prv s₂ (s-⊆ s₁)) s₃)
 sound-s (s-term-c cloA ⊢e s) with sound-s s
-... | subs j~Σ s₁ rewrite sym (⊢id0 ⊢e) = subs (~C {!sound-∞ ⊢e!} j~Σ) (s-arr₃ s₁)
-sound-s (s-term-o opnA ⊢e s s₁) with sound-s s | sound-s s₁
-... | subs ~∞ s₂ | subs j~Σ s₃ = subs (~I {!sound-0 ⊢e!} j~Σ) (s-arr₂ {!s₂!} s₃)
+... | subs j~Σ s₁ rewrite sym (⊢id0 ⊢e) = subs (~C (t-⊆-prv (sound-∞ ⊢e) (s-⊆ s)) j~Σ) (s-arr₃ s₁)
+sound-s s'@(s-term-o opnA ⊢e s s₁) with sound-s s | sound-s s₁
+... | subs ~∞ s₂ | subs j~Σ s₃ = subs (~I (t-⊆-prv (sound-0 ⊢e) (s-⊆ s')) j~Σ) (s-arr₂ (s-⊆-prv s₂ (s-⊆ s₁)) s₃)
 sound-s (s-∀ s) with sound-s s
 ... | subs ~∞ s₁ = subs ~∞ (s-∀ s₁)
 sound-s (s-∀l s upᶜ upᵉ st₁ st₂) with sound-s s
-... | subs j~Σ s₁ = subs {!j~Σ!} (s-∀l s₁ {!!} {!!} st₁ st₂)
+... | subs j~Σ s₁ = subs (~-subst j~Σ {!!} (st-arr st₁ st₂)) (s-∀l s₁ {!!} {!!} st₁ st₂)

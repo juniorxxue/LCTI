@@ -28,23 +28,3 @@ infix 3 ⟦_⟧ᶜ_⇘_
 ⟦_⟧ᶜ_⇘_ = ⟦_/_⟧ᶜ_⇘_ #0
 
 
--- replace entry ^a with a solution ^a=A in an environment
-infix 3 [_/_]_⟹_
-data [_/_]_⟹_ : Type m → Fin m → Env n m → Env n m → Set where
-  ⟹^0 : (up : ↑ty0 A ⇘ A')
-      → [ A' / #0 ] (Γ ,^) ⟹ (Γ ,= A)
-
-  ⟹^S : [ A / k ] Γ ⟹ Γ'
-      → (up : ↑ty0 A ⇘ A')
-      → [ A' / #S k ] (Γ ,^) ⟹ Γ' ,^
-
-  ⟹∙S : [ A / k ] Γ ⟹ Γ'
-      → (up : ↑ty0 A ⇘ A')
-      → [ A' / #S k ] (Γ ,∙) ⟹ (Γ' ,∙)
-
-  ⟹,S : [ A / k ] Γ ⟹ Γ'
-      → [ A / k ] (Γ , B) ⟹ (Γ' , B)
-
-  ⟹=S : (up : ⟦ B ⟧ A ⇘ A')
-      → [ A' / k ] Γ ⟹ Γ'
-      → [ A / #S k ] (Γ ,= B) ⟹ (Γ' ,= B)

@@ -7,7 +7,6 @@ open import Implicit.Algo.Shift public
 open import Implicit.Algo.Subst public
 open import Implicit.Algo.OpenClose public
 open import Implicit.Algo.Lookup public
-open import Implicit.Algo.Extension public
 open import Implicit.Algo.Split public
 
 private variable

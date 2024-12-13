@@ -1,7 +1,6 @@
-module Implicit.Algo.Extension where
+module Implicit.Language.Extension.Base where
 
-open import Implicit.Language
-open import Implicit.Algo.Syntax
+open import Implicit.Language.Base
 
 private variable
   Γ Γ' : Env n m
