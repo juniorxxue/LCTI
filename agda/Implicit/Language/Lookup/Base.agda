@@ -6,7 +6,7 @@ open import Implicit.Language.Subst
 
 private variable
   Γ Γ' : Env n m
-  A A' B B' C C' D : Type m
+  A A' A* B B' C C' D : Type m
   i : Fin n
   k k' : Fin m
 
@@ -118,6 +118,7 @@ data _¬ε_ : Fin m → Type m → Set where
 ----------------------------------------------------------------------
 
 -- remove k-th entry (term binding) from environment
+infix 5 _∤,∤_
 _∤,∤_ : Env (1 + n) m → Fin (1 + n) → Env n m
 (Γ , A) ∤,∤ #0 = Γ
 _∤,∤_ {suc n} (Γ , A) (#S k) = (Γ ∤,∤ k) , A
@@ -128,8 +129,10 @@ _∤,∤_ {suc n} (Γ , A) (#S k) = (Γ ∤,∤ k) , A
 ----------------------------------------------------------------------
 --+                         Entry Addition                         +--
 ----------------------------------------------------------------------
-
-
+{-
+infix 3 _▶_,_
+_▶_,_ : Env n m → Fin m → Type m → Env (1 + n) m
+-}
 
 
 ----------------------------------------------------------------------
@@ -155,8 +158,8 @@ data [_/_]_⟹_↪_ : Type m → Fin m → Env n m → Env n m → Type m → Se
   ⟹,S : [ A / k ] Γ ⟹ Γ' ↪ C
        → [ A / k ] (Γ , B) ⟹ (Γ' , B) ↪ C
 
-  ⟹=S : [ A' / k ] Γ ⟹ Γ' ↪ C
-       → (up1 : ⟦ B ⟧ A ⇘ A')
+  ⟹=S : [ A* / k ] Γ ⟹ Γ' ↪ C
+       → (up1 : ⟦ B ⟧ A ⇘ A*)
        → (up2 : ↑ty0 C ⇘ C')
        → [ A / #S k ] (Γ ,= B) ⟹ (Γ' ,= B) ↪ C'
 

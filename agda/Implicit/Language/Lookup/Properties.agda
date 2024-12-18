@@ -11,15 +11,6 @@ private variable
   A B : Type m
   
 
-postulate
-
-  -- remove a term binding from the environment
-  -- the solution is expected to hold, with the same type
-  ∋,-weaken-sol :
-      (Γ /,/ k) ∋ x := A
-    → Γ ∋ x := A
-
-
 ∋⦂-unique : Γ ∋ x ⦂ A
           → Γ ∋ x ⦂ B
           → A ≡ B
