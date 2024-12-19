@@ -4,9 +4,8 @@ open import Implicit.Language.Base
 open import Implicit.Language.Shift.Base
 
 private variable
-  A : Type m
-  k : Fin m
-  A₁ A₂ : Type (1 + m)
+  k k₁ k₂ : Fin m
+  A A₁ A₂ B C D E : Type m
 
 ↑ty-unique :
     A ↑ty k ⇘ A₁
@@ -41,5 +40,20 @@ private variable
 ↑ty-shifted (↑ty-arr up up₁) = sfd-arr (↑ty-shifted up) (↑ty-shifted up₁)
 ↑ty-shifted (↑ty-∀ up) = sfd-∀ (↑ty-shifted up)
 
+postulate
+  ↑ty-comm : k₁ #≤ k₂
+           → A ↑ty k₁ ⇘ B
+           → B ↑ty #S k₂ ⇘ C
+           → A ↑ty k₂ ⇘ D
+           → D ↑ty (inject₁ k₁) ⇘ C         
+
+private variable
+  A₀ Aₖ Aₖ₊₁ : Type m
+
+↑ty-comm0 : ↑ty0 A ⇘ A₀
+          → A₀ ↑ty #S k ⇘ Aₖ₊₁
+          → A ↑ty k ⇘ Aₖ
+          → ↑ty0 Aₖ ⇘ Aₖ₊₁
+↑ty-comm0 up1 up2 up3 = ↑ty-comm {k₁ = #0} z≤n up1 up2 up3
 
   

@@ -5,8 +5,8 @@ open import Implicit.Language.Subst.Base
 open import Implicit.Language.Shift
 
 private variable
-  k X : Fin m
-  A T A' B B₁ B₂ B* : Type m
+  k k₁ k₂ X : Fin m
+  A A* A*' T T' A' B B₁ B₂ B' B* C C' C* C*' : Type m
   e e' e* : Term n m
 
 st-unique :
@@ -89,3 +89,35 @@ st-total-rev k B = let ⟨ B* , up ⟩ = ↑ty-total B k in ⟨ B* , ↑ty-st up
 
 st0-total-rev : ∀ B → ∃[ A ](⟦ T ⟧ A ⇘ B)
 st0-total-rev = st-total-rev #0
+
+
+
+
+-- a corollary of ↑ty-comm and ↑ty-st
+{-
+↑ty-st-comm : k₂ #≤ k₁
+            → A ↑ty (inject₁ k₁) ⇘ A'
+            → T ↑ty k₁ ⇘ T'
+            → ⟦ #S k₂ / T' ⟧ A' ⇘ A*'
+            ---------------            
+            → A* ↑ty k₁ ⇘ A*'
+            → ⟦ k₂ / T ⟧ A ⇘ A*
+-}
+postulate
+
+  ↑ty-st-comm : k₁ #≤ k₂
+              → ⟦ k₁ / B ⟧ A ⇘ A*
+              → A ↑ty (#S k₂) ⇘ A'
+              → B ↑ty k₂ ⇘ B'
+              → A* ↑ty k₂ ⇘ A*'
+              → ⟦ (inject₁ k₁) / B' ⟧ A' ⇘ A*'
+
+↑ty-st-comm0 : ⟦ B ⟧ C ⇘ C*
+             → B ↑ty k ⇘ B'
+             → C ↑ty #S k ⇘ C'
+             → C* ↑ty k ⇘ C*'
+             → ⟦ B' ⟧ C' ⇘ C*'
+↑ty-st-comm0 up1 st1 up2 up3 = ↑ty-st-comm {k₁ = #0} z≤n up1 up2 st1 up3
+
+
+

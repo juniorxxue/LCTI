@@ -27,3 +27,5 @@ inst-s-r (⟹^S inst up1 up2) = s-weaken^0 (inst-s-r inst) up2 up1
 inst-s-r (⟹∙S inst up1 up2) = s-weaken∙0 (inst-s-r inst) up2 up1
 inst-s-r (⟹,S inst) = s-weaken,0 (inst-s-r inst)
 inst-s-r (⟹=S inst up1 up2) = s-weaken=0 (inst-s-r inst) (↑ty-st up2) up1
+
+
