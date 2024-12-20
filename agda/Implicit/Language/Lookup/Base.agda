@@ -213,9 +213,9 @@ data [_/_]_⟹_↪_ : Type m → Fin m → Env n m → Env n m → Type m → Se
   ⟹,S : [ A / k ] Γ ⟹ Γ' ↪ C
        → [ A / k ] (Γ , B) ⟹ (Γ' , B) ↪ C
 
-  ⟹=S : [ A* / k ] Γ ⟹ Γ' ↪ C
-       → (up1 : ⟦ B ⟧ A ⇘ A*)
+  ⟹=S : [ A / k ] Γ ⟹ Γ' ↪ C
+       → (up1 : ↑ty0 A ⇘ A')
        → (up2 : ↑ty0 C ⇘ C')
-       → [ A / #S k ] (Γ ,= B) ⟹ (Γ' ,= B) ↪ C'
+       → [ A' / #S k ] (Γ ,= B) ⟹ (Γ' ,= B) ↪ C'
 
 
