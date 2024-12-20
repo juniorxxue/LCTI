@@ -20,7 +20,8 @@ inst-s-l (⟹^0 up) = s-refl-∞
 inst-s-l (⟹^S inst up1 up2) = s-weaken^0 (inst-s-l inst) up1 up2
 inst-s-l (⟹∙S inst up1 up2) = s-weaken∙0 (inst-s-l inst) up1 up2
 inst-s-l (⟹,S inst) = s-weaken,0 (inst-s-l inst)
-inst-s-l (⟹=S inst up1 up2) = s-weaken=0 (inst-s-l inst) up1 (↑ty-st up2)
+inst-s-l (⟹=S inst up1 up2) = {!inst-s-l inst!}
+-- s-weaken=0 (inst-s-l inst) up1 (↑ty-st up2)
 
 inst-s-r (⟹^0 up) = s-refl-∞
 inst-s-r (⟹^S inst up1 up2) = s-weaken^0 (inst-s-r inst) up2 up1

@@ -5,7 +5,7 @@ open import Implicit.Decl.Base
 open import Implicit.Decl.Properties.Find
 
 private variable
-  Γ Γ' : Env n m
+  Γ Γ* Γ' : Env n m
   A A' B B' A* B* C C* C' C*' T : Type m
   j : Counter
   X k : Fin m
@@ -24,8 +24,6 @@ postulate
              → ⟦ T ⟧ A ⇘ A*
              → ⟦ T ⟧ B ⇘ B*
              → Γ ,= T ⊢ j # A ≤ B
-
-
 
 ▶-∋=-^ : Γ ∋ X := A
      → Γ ▶ k ,^⇘ Γ'

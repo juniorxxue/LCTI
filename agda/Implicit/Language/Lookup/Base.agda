@@ -172,7 +172,23 @@ data _▶_,∙⇘_ : Env n m → Fin (1 + m) → Env n (1 + m) → Set where
   ▶S= : Γ ▶ k ,∙⇘ Γ'
       → B ↑ty k ⇘ B'
       → Γ ,= B ▶ #S k ,∙⇘ Γ' ,= B'
-  
+
+infix 3 _▶_,=_⇘_
+data _▶_,=_⇘_ : Env n m → Fin (1 + m) → Type m → Env n (1 + m) → Set where
+  ▶Z : Γ ▶ #0 ,= A ⇘ Γ ,= A
+  ▶S, : Γ ▶ #S k ,= A ⇘ Γ'
+      → B ↑ty #S k ⇘ B'
+      → Γ , B ▶ #S k ,= A ⇘ Γ' , B'
+  ▶S^ : Γ ▶ k ,= A ⇘ Γ'
+      → ↑ty0 A ⇘ A' -- an alternative is defining an unshift
+      → Γ ,^ ▶ #S k ,= A' ⇘ Γ' ,^
+  ▶S∙ : Γ ▶ k ,= A ⇘ Γ'
+      → ↑ty0 A ⇘ A'
+      → Γ ,∙ ▶ #S k ,= A' ⇘ Γ' ,∙
+  ▶S= : Γ ▶ k ,= A ⇘ Γ'
+      → ↑ty0 A ⇘ A'
+      → B ↑ty k ⇘ B'
+      → Γ ,= B ▶ #S k ,= A' ⇘ Γ' ,= B'
 
 ----------------------------------------------------------------------
 --+                       Entry Replacement                        +--
