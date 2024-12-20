@@ -13,7 +13,7 @@ open import Data.Product using (_×_; proj₁; proj₂; ∃; ∃-syntax) renamin
 open import Data.List using (List; []; _∷_; _++_; reverse; map; foldr; downFrom) renaming (length to len) public
 open import Data.List.Properties using (map-++) public
 open import Data.Maybe using (Maybe; just; nothing) renaming (map to mmap) public
-open import Data.Fin using (Fin; punchIn; punchOut; toℕ; inject₁) renaming (zero to #0; suc to #S; pred to #pred; _≤_ to _#≤_) public
+open import Data.Fin using (Fin; punchIn; punchOut; toℕ; inject₁) renaming (zero to #0; suc to #S; pred to #pred; _<_ to _#<_; _≤_ to _#≤_) public
 open import Data.Fin.Properties using (punchInᵢ≢i; punchOut-punchIn) renaming (<-cmp to #<-cmp; _≟_ to _#≟_) public
 open import Function renaming (_∋_ to _∋⦂_) public
 
@@ -100,3 +100,18 @@ punchIn-≤ {k₁ = #S k₁} {k₂ = #S k₂} (s≤s sm) = cong #S (punchIn-≤ 
 
 #2 : ∀ {m} → Fin (3 + m)
 #2 = #S #1
+
+punchIn-inject : ∀ {m} {X : Fin m} {k}
+               → X #< k
+               → inject₁ X ≡ punchIn k X
+punchIn-inject {X = #0} {k = #S k} lt = refl
+punchIn-inject {X = #S X} {k = #S k} (s≤s lt) = cong #S (punchIn-inject lt)
+
+punchIn-inject-neq : ∀ {m} {X : Fin m} {k k'}
+                   → X #< k
+                   → X ≢ k'
+                   → inject₁ X ≢ punchIn k k'
+punchIn-inject-neq {X = #0} {k = #S k} {#0} lt neq = λ z → neq refl
+punchIn-inject-neq {X = #S X} {k = #S k} {#0} lt neq = λ ()
+punchIn-inject-neq {X = #0} {k = #S k} {#S k'} lt neq = λ ()
+punchIn-inject-neq {X = #S X} {k = #S k} {#S k'} (s≤s lt) neq = ≢-suc (punchIn-inject-neq lt (≢-pred neq))

@@ -2,6 +2,7 @@ module Implicit.Decl.Properties.Weaken where
 
 open import Implicit.Language
 open import Implicit.Decl.Base
+open import Implicit.Decl.Properties.Find
 
 private variable
   Γ Γ' : Env n m
@@ -71,7 +72,7 @@ s-weaken^ (s-∀ s) upΓ (↑ty-∀ upA) (↑ty-∀ upB) = s-∀ (s-weaken^ s (�
 s-weaken^ {k = k} (s-∀l {B = B} {C = C} {D} s x fd st₁ st₂) upΓ (↑ty-∀ upA) (↑ty-arr upB upB₁)
   with ↑ty-total B k | ↑ty-total C (#S k) | ↑ty-total D (#S k)
 ... | ⟨ B' , upB' ⟩ | ⟨ C' , upC' ⟩ | ⟨ D' , upD' ⟩
-  = s-∀l (s-weaken^ s (▶S= upΓ upB') upA (↑ty-arr upC' upD')) x {!!} (↑ty-st-comm0 st₁ upB' upC' upB) (↑ty-st-comm0 st₂ upB' upD' upB₁)
+  = s-∀l (s-weaken^ s (▶S= upΓ upB') upA (↑ty-arr upC' upD')) x (↑ty-find0 fd upA) (↑ty-st-comm0 st₁ upB' upC' upB) (↑ty-st-comm0 st₂ upB' upD' upB₁)
 s-weaken^ {k = k} (s-var-l {B = B} x s) upΓ ↑ty-var upB with ↑ty-total B k
 ... | ⟨ B' , upB' ⟩ = s-var-l (▶-∋= x upΓ upB') (s-weaken^ s upΓ upB' upB)
 s-weaken^ {k = k} (s-var-r {B = B} x s) upΓ upA ↑ty-var with ↑ty-total B k
