@@ -2,7 +2,11 @@ module Implicit.Complete where
 
 open import Implicit.Language
 open import Implicit.Decl renaming (find to d-find)
-open import Implicit.Algo renaming (find to a-find)
+open import Implicit.Algo
+
+private variable
+  Γ : Env n m
+  X : Fin m
 
 infix 3 _⊢_~_
 
@@ -26,40 +30,25 @@ data _⊢_~_ where
     → Γ ⊢ ⟨ j , B ⟩ ~ Σ
     → Γ ⊢ ⟨ 𝕔 j , A `→ B ⟩ ~ ([ e ]↝ Σ)
 
-postulate
-  ⊢d→⊢c : ∀ {Γ : Env n m} {e A j}
-    → Γ ⊢ j # e ⦂ A
-    → 𝕎 Γ ⊢c A
-
-  ⊢m-w : ∀ {Γ : Env n m} {A e j}
-    → Γ ⊢ j # e ⦂ A
-    → 𝕄 (𝕎 Γ) ⊢ j # e ⦂ A
-
 infix 3 _⊢_≊_
-data _⊢_≊_ : SEnv n m → Type m → Type m → Set where
+data _⊢_≊_ : Env n m → Type m → Type m → Set where
 
-  ≊-int : ∀ {Ψ : SEnv n m}
-    → Ψ ⊢ Int ≊ Int
+  ≊-int : Γ ⊢ Int ≊ Int
 
-  ≊-var : ∀ {Ψ : SEnv n m} {X}
-    → Ψ ⊢ ‶ X ≊ ‶ X
+  ≊-var : Γ ⊢ ‶ X ≊ ‶ X
 
-  ≊-left : ∀ {Ψ : SEnv n m} {X A}
-    → X := A ∈ Ψ
-    → Ψ ⊢ ‶ X ≊ A
+  ≊-left : Γ ∋ X := A
+         → Γ ⊢ ‶ X ≊ A
     
-  ≊-right : ∀ {Ψ : SEnv n m} {X A}
-    → X := A ∈ Ψ
-    → Ψ ⊢ A ≊ ‶ X
+  ≊-right : X := A ∈ Γ
+          → Γ ⊢ A ≊ ‶ X
 
-  ≊-arr : ∀ {Ψ : SEnv n m} {A B A' B'}
-    → Ψ ⊢ A ≊ A'
-    → Ψ ⊢ B ≊ B'
-    → Ψ ⊢ A `→ B ≊ A' `→ B'
+  ≊-arr : Γ ⊢ A ≊ A'
+        → Γ ⊢ B ≊ B'
+        → Γ ⊢ A `→ B ≊ A' `→ B'
 
-  ≊-∀ : ∀ {Ψ : SEnv n m} {A B}
-    → Ψ ,∙ ⊢ A ≊ B
-    → Ψ ⊢ `∀ A ≊ `∀ B
+  ≊-∀ : Γ ,∙ ⊢ A ≊ B
+      → Γ ⊢ `∀ A ≊ `∀ B
 
 ≊-refl : ∀ {Ψ : SEnv n m} {A}
   → Ψ ⊢ A ≊ A
@@ -100,7 +89,7 @@ complete-≤ : ∀ {Γ : Env n m} {Σ j A B}
 complete-≤' : ∀ {Γ : Env n m} {Ψ Σ j A B}
   → Γ ⊢ j # B ≤ A
   → Γ ⊢ ⟨ j , A ⟩ ~ Σ ~> Ψ
-  → Ψ ⊆ (𝕎 Γ) x (exvar(Ψ) in B) × someCon(j) -- w
+--  → Ψ ⊆ (𝕎 Γ) x (exvar(Ψ) in B) × someCon(j) -- w
   → Ψ ⊢ B ≤⁺ Σ ⊣ 𝕎 Γ ↪ A -- this is too loose, abtrary Ψ cannot prove simple cases
   
 complete-inf : ∀ {Γ : Env n m} {e A}
