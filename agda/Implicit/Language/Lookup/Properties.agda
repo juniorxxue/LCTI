@@ -3,12 +3,6 @@ module Implicit.Language.Lookup.Properties where
 open import Implicit.Language.Base
 open import Implicit.Language.Lookup.Base
 open import Implicit.Language.Shift
-
-private variable
-  Γ Γ' : Env n m
-  k k' X : Fin m
-  x : Fin n
-  A A' B : Type m
   
 ∋⦂-unique : Γ ∋ x ⦂ A
           → Γ ∋ x ⦂ B

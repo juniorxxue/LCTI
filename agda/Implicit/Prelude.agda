@@ -17,41 +17,32 @@ open import Data.Fin using (Fin; punchIn; punchOut; toℕ; inject₁) renaming (
 open import Data.Fin.Properties using (punchInᵢ≢i; punchOut-punchIn) renaming (<-cmp to #<-cmp; _≟_ to _#≟_) public
 open import Function renaming (_∋_ to _∋⦂_) public
 
-m+1≤n→m≤n : ∀ {m n}
-  → suc m ≤ n
-  → m ≤ n
+variable
+  m m' n n' o : ℕ
+
+m+1≤n→m≤n : suc m ≤ n
+          → m ≤ n
 m+1≤n→m≤n (s≤s m+1≤n) = m≤n⇒m≤1+n m+1≤n
 
-n-1+1≡n+1-1 : ∀ {n}
-  → 0 < n
-  → suc (pred n) ≡ pred (suc n)
+n-1+1≡n+1-1 : 0 < n
+            → suc (pred n) ≡ pred (suc n)
 n-1+1≡n+1-1 (s≤s 0<n) = refl
 
-m+1≰n+1⇒m≰n : ∀ {m n}
-  → suc m ≰ suc n
-  → m ≰ n
+m+1≰n+1⇒m≰n : suc m ≰ suc n
+            → m ≰ n
 m+1≰n+1⇒m≰n m+1≰n+1 = λ m≤n → m+1≰n+1 (s≤s m≤n)  
   
-m≰n⇒n<m : ∀ {m n}
-  → m ≰ n
-  → n < m
+m≰n⇒n<m : m ≰ n
+        → n < m
 m≰n⇒n<m {zero} {zero} m≰n = ⊥-elim (m≰n z≤n)
 m≰n⇒n<m {zero} {suc n} m≰n = ⊥-elim (m≰n z≤n)
 m≰n⇒n<m {suc m} {zero} m≰n = s≤s z≤n
 m≰n⇒n<m {suc m} {suc n} m≰n = s≤s (m≰n⇒n<m {m} {n} (m+1≰n+1⇒m≰n m≰n))
 
-n<m⇒m≰n : ∀ {m n}
-  → n < m
-  → m ≰ n
-n<m⇒m≰n {suc m} {zero} n<m = λ ()
-n<m⇒m≰n {suc m} {suc n} (s≤s n<m) (s≤s m≤n) = n<m⇒m≰n {m} {n} n<m m≤n
-
-m+0≡m : ∀ m
-  → m + 0 ≡ m
+m+0≡m : ∀ m → m + 0 ≡ m
 m+0≡m m rewrite +-comm m 0 = refl
 
-m≤m : ∀ {m}
-  → m ≤ m
+m≤m : m ≤ m
 m≤m {zero} = z≤n
 m≤m {suc m} = s≤s m≤m
 
@@ -63,14 +54,12 @@ data Singleton {a} {A : Set a} (x : A) : Set a where
 inspect : ∀ {a} {A : Set a} (x : A) → Singleton x
 inspect x = x with≡ refl
 
-m+n<o⇒m<o : ∀ {m n o}
-  → m + n < o
-  → m < o
+m+n<o⇒m<o : m + n < o
+          → m < o
 m+n<o⇒m<o {m} {n} {o} m+n<o = ≤-trans (s≤s (m≤m+n m n)) m+n<o
 
-m+n<o⇒n<o : ∀ {m n o}
-  → m + n < o
-  → n < o
+m+n<o⇒n<o : m + n < o
+          → n < o
 m+n<o⇒n<o {m} {n} {o} m+n<o = ≤-trans (s≤s (m≤n+m n m)) m+n<o
 
 
@@ -79,19 +68,21 @@ m+n<o⇒n<o {m} {n} {o} m+n<o = ≤-trans (s≤s (m≤n+m n m)) m+n<o
 --+                              Fin                               +--
 ----------------------------------------------------------------------
 
-≢-pred : ∀ {n} {x y : Fin n}
-  → #S x ≢ #S y
-  → x ≢ y
+variable
+  x y : Fin n
+  k k' k₁ k₂ X : Fin m
+
+≢-pred : #S x ≢ #S y
+       → x ≢ y
 ≢-pred neq eq = neq (cong #S eq)
 
-≢-suc : ∀ {n} {x y : Fin n}
-  → x ≢ y
-  → #S x ≢ #S y
+≢-suc : x ≢ y
+      → #S x ≢ #S y
 ≢-suc eq refl = ⊥-elim (eq refl)
 
-punchIn-≤ : ∀ {m} {k₁ : Fin m} {k₂}
-  → k₂ #≤ k₁
-  → punchIn k₂ k₁ ≡ #S k₁
+punchIn-≤ : ∀ {k₁ : Fin m} {k₂}
+          → k₂ #≤ k₁
+          → punchIn k₂ k₁ ≡ #S k₁
 punchIn-≤ {k₁ = k₁} {k₂ = #0} sm = refl
 punchIn-≤ {k₁ = #S k₁} {k₂ = #S k₂} (s≤s sm) = cong #S (punchIn-≤ sm)
 
@@ -101,14 +92,12 @@ punchIn-≤ {k₁ = #S k₁} {k₂ = #S k₂} (s≤s sm) = cong #S (punchIn-≤ 
 #2 : ∀ {m} → Fin (3 + m)
 #2 = #S #1
 
-punchIn-inject : ∀ {m} {X : Fin m} {k}
-               → X #< k
+punchIn-inject : X #< k
                → inject₁ X ≡ punchIn k X
 punchIn-inject {X = #0} {k = #S k} lt = refl
 punchIn-inject {X = #S X} {k = #S k} (s≤s lt) = cong #S (punchIn-inject lt)
 
-punchIn-inject-neq : ∀ {m} {X : Fin m} {k k'}
-                   → X #< k
+punchIn-inject-neq : X #< k
                    → X ≢ k'
                    → inject₁ X ≢ punchIn k k'
 punchIn-inject-neq {X = #0} {k = #S k} {#0} lt neq = λ z → neq refl

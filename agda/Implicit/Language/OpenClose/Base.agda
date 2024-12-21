@@ -3,14 +3,6 @@ module Implicit.Language.OpenClose.Base where
 open import Implicit.Language.Base
 open import Implicit.Language.Lookup
 
-private
-  variable
-    Γ : Env n m
-    X : Fin m
-    A B : Type m
-    e e₁ e₂ : Term n m
-    x : Fin n
-
 infix 3 _⊢c_
 infix 3 _⊢o_
 

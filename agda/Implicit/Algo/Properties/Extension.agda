@@ -3,13 +3,6 @@ module Implicit.Algo.Properties.Extension where
 open import Implicit.Language
 open import Implicit.Algo.Base
 
-private variable
-  ≤ : Polar
-  Γ Γ' Γ'' : Env n m
-  A B : Type m
-  Σ : Context n m
-  X : Fin m
-
 s-⊆ : Γ ⊢ A ⌞ ≤ ⌝ Σ ⊣ Γ' ↪ B
     → Γ ⊆ Γ'
 s-⊆ s-int = ⊆-refl

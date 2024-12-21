@@ -4,13 +4,6 @@ open import Implicit.Language
 open import Implicit.Decl renaming (find to d-find)
 open import Implicit.Algo
 
-private variable
-  Γ Γ' : Env n m
-  A B C : Type m
-  ≤ : Polar
-  j : Counter
-  Σ Σ' : Context n m
- 
 infix 3 _⊢_~_
 data _⊢_~_ : Env n m → Counter × Type m → Context n m → Set where
 

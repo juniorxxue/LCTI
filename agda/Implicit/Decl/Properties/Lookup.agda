@@ -5,11 +5,6 @@ open import Implicit.Decl.Base
 open import Implicit.Decl.Properties.Subtyping
 open import Implicit.Decl.Properties.Weaken
 
-private variable
-  Γ Δ : Env n m
-  A B : Type m
-  k : Fin m
-
 inst-s-l : [ A / k ] Γ ⟹ Δ ↪ B
          → Δ ⊢ ∞ # A ≤ B
 

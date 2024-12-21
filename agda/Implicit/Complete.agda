@@ -4,10 +4,6 @@ open import Implicit.Language
 open import Implicit.Decl renaming (find to d-find)
 open import Implicit.Algo
 
-private variable
-  Γ : Env n m
-  X : Fin m
-
 infix 3 _⊢_~_
 
 data _⊢_~_ : Env n m → Counter × Type m → Context n m → Set
@@ -40,7 +36,7 @@ data _⊢_≊_ : Env n m → Type m → Type m → Set where
   ≊-left : Γ ∋ X := A
          → Γ ⊢ ‶ X ≊ A
     
-  ≊-right : X := A ∈ Γ
+  ≊-right : Γ ∋ X := A
           → Γ ⊢ A ≊ ‶ X
 
   ≊-arr : Γ ⊢ A ≊ A'
@@ -50,8 +46,7 @@ data _⊢_≊_ : Env n m → Type m → Type m → Set where
   ≊-∀ : Γ ,∙ ⊢ A ≊ B
       → Γ ⊢ `∀ A ≊ `∀ B
 
-≊-refl : ∀ {Ψ : SEnv n m} {A}
-  → Ψ ⊢ A ≊ A
+≊-refl : Γ ⊢ A ≊ A
 ≊-refl {A = Int} = ≊-int
 ≊-refl {A = ‶ X} = ≊-var
 ≊-refl {A = A `→ A₁} = ≊-arr ≊-refl ≊-refl
@@ -60,15 +55,15 @@ data _⊢_≊_ : Env n m → Type m → Type m → Set where
 data JustTyp (Γ : Env n m) (Σ : Context n m) (e : Term n m) (A : Type m) : Set where
   typs : ∀ {B}
     → (⊢e : Γ ⊢ Σ ⇒ e ⇒ B)
-    → (sim : 𝕎 Γ ⊢ A ≊ B)
+    → (sim : Γ ⊢ A ≊ B)
     → JustTyp Γ Σ e A
 
-data JustSub (Ψ' : SEnv n m) (Σ : Context n m) (A : Type m) : Set where
-  subs : ∀ {Ψ B}
-    → (ext : Ψ ⊆ Ψ')
-    → (sub : Ψ ⊢ A ≤⁺ Σ ⊣ Ψ' ↪ B)
-    → (sim : Ψ ⊢ A ≊ B)
-    → JustSub Ψ' Σ A
+data JustSub (Γ' : Env n m) (Σ : Context n m) (A : Type m) : Set where
+  subs : ∀ {Γ B}
+    → (ext : Γ ⊆ Γ')
+    → (sub : Γ ⊢ A ⌞ ≤⁺ ⌝ Σ ⊣ Γ' ↪ B)
+    → (sim : Γ ⊢ A ≊ B)
+    → JustSub Γ' Σ A
 
 complete' : ∀ {Γ : Env n m} {Σ j e A}
   → Γ ⊢ j # e ⦂ A
@@ -83,8 +78,7 @@ complete : ∀ {Γ : Env n m} {Σ j e A}
 complete-≤ : ∀ {Γ : Env n m} {Σ j A B}
   → Γ ⊢ j # B ≤ A
   → Γ ⊢ ⟨ j , A ⟩ ~ Σ -- should be gen to consider existential vars
-  → 𝕎 Γ ⊢ B ≤⁺ Σ ⊣ 𝕎 Γ ↪ A -- too strict
-
+  → Γ ⊢ B ⌞ ≤⁺ ⌝ Σ ⊣ Γ ↪ A -- too strict
 
 complete-≤' : ∀ {Γ : Env n m} {Ψ Σ j A B}
   → Γ ⊢ j # B ≤ A

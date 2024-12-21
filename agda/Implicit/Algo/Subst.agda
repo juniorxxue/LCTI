@@ -3,13 +3,6 @@ module Implicit.Algo.Subst where
 open import Implicit.Language
 open import Implicit.Algo.Syntax
 
-private variable
-  k : Fin m
-  A A' B B' C D : Type m
-  Σ Σ' : Context n m
-  e e' : Term n m
-  Γ Γ' : Env n m
-
 -- subst a type in context
 infix 3 ⟦_/_⟧ᶜ_⇘_
 data ⟦_/_⟧ᶜ_⇘_ : Fin (1 + m) → Type m → Context n (1 + m) → Context n m → Set where

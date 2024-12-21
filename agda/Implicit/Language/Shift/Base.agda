@@ -43,11 +43,6 @@ open import Implicit.Language.Base
 ----------------------------------------------------------------------
 --+                         Relation Ver.                          +--
 ----------------------------------------------------------------------
-private variable
-  k X : Fin m
-  x y : Fin n
-  A B A' B' : Type m
-  e e' e₁ e₂ e₁' e₂' : Term n m
 
 infix 3 _↑tm_⇘_
 data _↑tm_⇘_ : Term n m → Fin (1 + n) → Term (1 + n) m → Set where

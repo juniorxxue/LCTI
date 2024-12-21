@@ -3,12 +3,6 @@ module Implicit.Algo.Properties.Split where
 open import Implicit.Language
 open import Implicit.Algo.Base
 
-private variable
-  Σ Σ' Σ₁ Σ₂ Σ* Σ'* : Context n m
-  A A' A₁ A₂ T T* B A* : Type m
-  e̅ : Apps n m
-  A̅ : AppsType m
-
 sspl-unique :
     ⟦ Σ , A ⟧→s⟦ Σ₁ ,  A₁ ⟧
   → ⟦ Σ , A ⟧→s⟦ Σ₂ ,  A₂ ⟧

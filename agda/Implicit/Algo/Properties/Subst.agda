@@ -3,11 +3,6 @@ module Implicit.Algo.Properties.Subst where
 open import Implicit.Language
 open import Implicit.Algo.Base
 
-private variable
-  Σ Σ' Σ* : Context n m
-  k : Fin m
-  T : Type m
-
 ↑tyᶜ-st-eq :
     Σ ↑tyᶜ k ⇘ Σ'
   → ⟦ k / T ⟧ᶜ Σ' ⇘ Σ*

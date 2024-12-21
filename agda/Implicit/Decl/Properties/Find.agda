@@ -3,11 +3,6 @@ module Implicit.Decl.Properties.Find where
 open import Implicit.Language
 open import Implicit.Decl.Base
 
-private variable
-  A A' : Type m
-  j : Counter
-  k k' X : Fin m
-
 ↑ty-find : find A X j
          → A ↑ty k ⇘ A'
          → X #< k

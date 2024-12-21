@@ -4,12 +4,6 @@ open import Implicit.Language
 open import Implicit.Decl.Base
 open import Implicit.Decl.Properties.Find
 
-private variable
-  Γ Γ* Γ' : Env n m
-  A A' B B' A* B* C C* C' C*' T : Type m
-  j : Counter
-  X k : Fin m
-
 postulate
 
   s-weaken : ∀ {Γ : Env (1 + n) m} {k j A B }

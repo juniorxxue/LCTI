@@ -7,15 +7,6 @@ open import Implicit.Algo.Lookup
 -- an algorithmic version to define closedness and openness
 -- however, it could work for defining a specification around k ε A and and Ψ ⊢^ k
 
-private
-  variable
-    Γ : Env n m
-    X : Fin m
-    A B : Type m
-    Σ : Context n m
-    e e₁ e₂ : Term n m
-    x : Fin n
-
 infix 3 _⊢cᶜ_
 data _⊢cᶜ_ : Env n m → Context n m → Set where
   ⊢c-empty : Γ ⊢cᶜ □

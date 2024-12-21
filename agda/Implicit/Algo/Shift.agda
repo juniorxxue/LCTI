@@ -5,13 +5,6 @@ module Implicit.Algo.Shift where
 open import Implicit.Language
 open import Implicit.Algo.Syntax
 
-private variable
-  x : Fin n
-  k : Fin m
-  A A' : Type m
-  e e' : Term n m
-  Σ Σ' : Context n m
-
 infix 3 _↑tmᶜ_⇘_
 data _↑tmᶜ_⇘_ : Context n m → Fin (1 + n) → Context (1 + n) m → Set where
   ↑tmᶜ-□ : (Context n m ∋⦂ □) ↑tmᶜ x ⇘ □

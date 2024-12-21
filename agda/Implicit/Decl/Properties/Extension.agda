@@ -3,12 +3,6 @@ module Implicit.Decl.Properties.Extension where
 open import Implicit.Language
 open import Implicit.Decl.Base
 
-private variable
-  Γ Δ : Env n m
-  A B : Type m
-  j : Counter
-  e : Term n m
-
 s-⊆-prv : Γ ⊢ j # A ≤ B
     → Γ ⊆ Δ
     → Δ ⊢ j # A ≤ B

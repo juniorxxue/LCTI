@@ -12,12 +12,9 @@ data AppsType : ℕ → Set where
   _∷a_ : Type m → AppsType m → AppsType m
   `∀_  : AppsType (1 + m) → AppsType m
 
-private variable
-  x : Fin n
-  e e' : Term n m
+variable
   e̅ e̅' : Apps n m
-  Σ Σ' : Context n m
-  A : Type m
+  A̅ A̅' : AppsType m
 
 infix 3 _↑tmᵃ_⇘_
 data _↑tmᵃ_⇘_ : Apps n m → Fin (1 + n) → Apps (1 + n) m → Set where

@@ -3,10 +3,6 @@ module Implicit.Language.Shift.Properties where
 open import Implicit.Language.Base
 open import Implicit.Language.Shift.Base
 
-private variable
-  k k₁ k₂ : Fin m
-  A A₁ A₂ B C D E : Type m
-
 ↑ty-unique :
     A ↑ty k ⇘ A₁
   → A ↑ty k ⇘ A₂

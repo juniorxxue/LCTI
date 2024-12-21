@@ -2,10 +2,6 @@ module Implicit.Language.Extension.Base where
 
 open import Implicit.Language.Base
 
-private variable
-  Γ Γ' : Env n m
-  A : Type m
-
 infix 3 _⊆_
 data _⊆_ : Env n m → Env n m → Set where
   base : ∅ ⊆ ∅

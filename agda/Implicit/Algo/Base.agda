@@ -9,15 +9,6 @@ open import Implicit.Algo.OpenClose public
 open import Implicit.Algo.Lookup public
 open import Implicit.Algo.Split public
 
-private variable
-  Γ Γ' Γ₁ Γ₂ Γ₃ : Env n m
-  Σ Σ' : Context n m
-  e e₁ e₂ g e' : Term n m
-  A B C D A' C' D' : Type m
-  x : Fin n
-  X k : Fin m
-  ≤ : Polar
-
 infix 3 _⊢_⇒_⇒_
 infix 3 _⊢_⌞_⌝_⊣_↪_
 

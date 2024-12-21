@@ -8,13 +8,8 @@ data Counter : Set where
   𝕚 : Counter → Counter
   𝕔 : Counter → Counter
 
-private variable
+variable
   j : Counter
-  Γ : Env n m
-  k X : Fin m
-  x : Fin n
-  A B C D C' D' : Type m
-  e e₁ e₂ : Term n m  
 
 data NonZ : Counter → Set where
   nz-∞ : NonZ ∞

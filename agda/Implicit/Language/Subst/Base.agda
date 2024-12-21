@@ -4,13 +4,7 @@ open import Implicit.Language.Base
 open import Implicit.Language.Shift
 
 private variable
-  A A' B B' C C' D : Type m
-  e e' e₁ e₁' e₂ e₂' : Term n m
-  k X : Fin m
   i : ℕ
-  x : Fin n
-  
-
 
 ----------------------------------------------------------------------
 --+                         Function Ver.                          +--

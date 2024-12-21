@@ -5,15 +5,6 @@ open import Implicit.Algo.Base
 open import Implicit.Algo.Properties.Split
 open import Implicit.Algo.Properties.Subst
 
-private variable
-  Γ Γ' : Env n m
-  Σ : Context n m
-  A A' B B' C D T : Type m
-  e : Term n m
-  e̅ : Apps n m
-  A̅ : AppsType m
-  ≤ : Polar
-
 data Split : (Σ : Context n m) → (A : Type m) → Set where
   case-τ :
       (spl : ⟦ Σ , A ⟧→s⟦ τ T , A' ⟧)

@@ -4,11 +4,6 @@ open import Implicit.Language.Base
 open import Implicit.Language.Subst.Base
 open import Implicit.Language.Shift
 
-private variable
-  k k₁ k₂ X : Fin m
-  A A* A*' T T' A' B B₁ B₂ B' B* C C' C* C*' : Type m
-  e e' e* : Term n m
-
 st-unique :
     ⟦ k / A ⟧ B ⇘ B₁
   → ⟦ k / A ⟧ B ⇘ B₂

@@ -5,13 +5,6 @@ open import Implicit.Language.Extension.Base
 
 open import Implicit.Language.Lookup
 
-private variable
-  Γ Γ' Γ'' Δ : Env n m
-  A B C : Type m
-  X k : Fin m
-  x : Fin n
-  
-
 ⊆-refl : Γ ⊆ Γ
 ⊆-refl {Γ = ∅} = base
 ⊆-refl {Γ = Γ , A} = var ⊆-refl
