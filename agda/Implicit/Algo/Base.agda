@@ -46,7 +46,7 @@ data _⊢_⇒_⇒_ where
       Γ ⊢ □ ⇒ g ⇒ A
     → (ne : NonEmpty Σ)
     → (gc : GenericConsumer g)
-    → (s : Γ ⊢ A ⌞ ≤⁺ ⌝ Σ ⊣ Γ ↪ B)
+    → (s : Γ ⊢ A ⌞ ≤⁺ ⌝ Σ ⊣ Δ ↪ B)
     → Γ ⊢ Σ ⇒ g ⇒ B
     
   ⊢tabs :
