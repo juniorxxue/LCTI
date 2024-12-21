@@ -59,34 +59,28 @@ data _⊢_⌞_⌝_⊣_↪_ where
       Γ ⊢ Int ⌞ ≤ ⌝ τ Int ⊣ Γ ↪ Int
 
   s-empty :
-      (p : Γ ⊢c A)
-    → Γ ⊢ A ⌞ ≤ ⌝ □ ⊣ Γ ↪ A
+      Γ ⊢ A ⌞ ≤ ⌝ □ ⊣ Γ ↪ A
 
   s-var :
-      (clo : Γ ⊢c (‶ X))
-    → Γ ⊢ (‶ X) ⌞ ≤ ⌝ τ (‶ X) ⊣ Γ ↪ ‶ X
+      Γ ⊢ (‶ X) ⌞ ≤ ⌝ τ (‶ X) ⊣ Γ ↪ ‶ X
 
   s-ex-l^ :
-      (clo : Γ ⊢c A)
-    → (x-in : Γ ∋^ X)
+      (x-in : Γ ∋^ X)
     → (inst : [ A / X ] Γ ⟹ Γ' ↪ B)
     → Γ ⊢ ‶ X ⌞ ≤⁺ ⌝ τ A ⊣ Γ' ↪ A
  
   s-ex-l= :
-      (clo : Γ ⊢c A)
-    → (x-in : Γ ∋ X := B)
+      (x-in : Γ ∋ X := B)
     → Γ ⊢ B ⌞ ≤ ⌝ τ A ⊣ Γ' ↪ A'
     → Γ ⊢ ‶ X ⌞ ≤ ⌝ τ A ⊣ Γ' ↪ A
 
   s-ex-r^ :
-      (clo : Γ ⊢c A)
-    → (x-in : Γ ∋^ X)
+      (x-in : Γ ∋^ X)
     → (inst : [ A / X ] Γ ⟹ Γ' ↪ B)
     → Γ ⊢ A ⌞ ≤⁻ ⌝ τ (‶ X) ⊣ Γ' ↪ ‶ X
 
   s-ex-r= :
-      (clo : Γ ⊢c A)
-    → (x-in : Γ ∋ X := B)
+      (x-in : Γ ∋ X := B)
     → Γ ⊢ A ⌞ ≤ ⌝ τ B ⊣ Γ' ↪ A'
     → Γ ⊢ A ⌞ ≤ ⌝ τ (‶ X) ⊣ Γ' ↪ (‶ X)
 
@@ -96,8 +90,9 @@ data _⊢_⌞_⌝_⊣_↪_ where
     → Γ₁ ⊢ A `→ B ⌞ ≤ ⌝ τ (C `→ D) ⊣ Γ₃ ↪ (C `→ D)
 
   s-term-c :
-      (cloA : Γ ⊢c A)
-    → (⊢e : Γ ⊢ τ A ⇒ e ⇒ A')
+--      (cloA : Γ ⊢c A)
+-- comment this one, if we restrict such condition on the typing
+      (⊢e : Γ ⊢ τ A ⇒ e ⇒ A')
     → Γ ⊢ B ⌞ ≤⁺ ⌝ Σ ⊣ Γ' ↪ D
     → Γ ⊢ (A `→ B) ⌞ ≤⁺ ⌝ ([ e ]↝ Σ) ⊣ Γ' ↪ A' `→ D
 

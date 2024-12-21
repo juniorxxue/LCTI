@@ -100,13 +100,13 @@ sound (⊢tabs ⊢e) with sound ⊢e
 ... | typs ~Z s = typs ~Z (⊢tabs s)
 
 sound-s s-int = subs ~∞ s-int
-sound-s (s-empty p) = subs ~Z s-refl
-sound-s (s-var clo) = subs ~∞ s-var
-sound-s (s-ex-l^ clo x-in inst) = subs ~∞ (s-var-l (inst-in inst) (inst-s-r inst))
-sound-s (s-ex-l= clo x-in s) with sound-s s
+sound-s s-empty = subs ~Z s-refl
+sound-s s-var = subs ~∞ s-var
+sound-s (s-ex-l^ x-in inst) = subs ~∞ (s-var-l (inst-in inst) (inst-s-r inst))
+sound-s (s-ex-l= x-in s) with sound-s s
 ... | subs ~∞ s₁ = subs ~∞ (s-var-l (⊆-in:= x-in (s-⊆ s)) s₁)
-sound-s (s-ex-r^ clo x-in inst) = subs ~∞ (s-var-r (inst-in inst) (inst-s-l inst))
-sound-s (s-ex-r= clo x-in s) with sound-s s
+sound-s (s-ex-r^ x-in inst) = subs ~∞ (s-var-r (inst-in inst) (inst-s-l inst))
+sound-s (s-ex-r= x-in s) with sound-s s
 ... | subs ~∞ s₁ = subs ~∞ (s-var-r (⊆-in:= x-in (s-⊆ s)) s₁)
 sound-s s'@(s-arr s s₁) with sound-s s | sound-s s₁
 ... | subs ~∞ s₂ | subs ~∞ s₃ = subs ~∞ (s-arr₁ (s-⊆-prv s₂ (s-⊆ s₁)) s₃)

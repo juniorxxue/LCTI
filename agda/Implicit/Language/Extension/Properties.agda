@@ -23,6 +23,15 @@ open import Implicit.Language.Lookup
 ⊆-trans (evar-sol ⊆1) (svar ⊆2) = evar-sol (⊆-trans ⊆1 ⊆2)
 ⊆-trans (svar ⊆1) (svar ⊆2) = svar (⊆-trans ⊆1 ⊆2)
 
+⊆-id : Γ ⊆ Δ
+     → Δ ⊆ Γ
+     → Γ ≡ Δ
+⊆-id base ext2 = refl
+⊆-id (uvar ext1) (uvar ext2) rewrite ⊆-id ext1 ext2 = refl
+⊆-id (var ext1) (var ext2) rewrite ⊆-id ext1 ext2 = refl
+⊆-id (evar ext1) (evar ext2) rewrite ⊆-id ext1 ext2 = refl
+⊆-id (svar ext1) (svar ext2) rewrite ⊆-id ext1 ext2 = refl
+
 ⟹-⊆ : [ A / X ] Γ ⟹ Γ' ↪ B
      → Γ ⊆ Γ'
 ⟹-⊆ (⟹^0 sf) = evar-sol ⊆-refl

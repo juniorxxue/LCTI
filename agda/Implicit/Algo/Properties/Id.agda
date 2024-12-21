@@ -41,14 +41,14 @@ data Split : (Σ : Context n m) → (A : Type m) → Set where
 ⊢id (⊢sub ⊢e ne gc s) spl = ≤id' s (spl→sspl spl)
 
 ≤id s-int = case-τ none-τ refl
-≤id (s-empty p) = case-□ none-□
-≤id (s-var clo) = case-τ none-τ refl
-≤id (s-ex-l^ clo x-in inst) = case-τ none-τ refl
-≤id (s-ex-l= clo x-in s) = case-τ none-τ refl
-≤id (s-ex-r^ clo x-in inst) = case-τ none-τ refl
-≤id (s-ex-r= clo x-in s) = case-τ none-τ refl
+≤id s-empty = case-□ none-□
+≤id s-var = case-τ none-τ refl
+≤id (s-ex-l^ x-in inst) = case-τ none-τ refl
+≤id (s-ex-l= x-in s) = case-τ none-τ refl
+≤id (s-ex-r^ x-in inst) = case-τ none-τ refl
+≤id (s-ex-r= x-in s) = case-τ none-τ refl
 ≤id (s-arr s s₁) = case-τ none-τ refl
-≤id (s-term-c cloA ⊢e s) with ≤id s
+≤id (s-term-c ⊢e s) with ≤id s
 ... | case-τ spl eq = case-τ (have-e spl) eq
 ... | case-□ spl = case-□ (have-e spl)
 ≤id (s-term-o opnA ⊢e s s₁) with ≤id s₁
