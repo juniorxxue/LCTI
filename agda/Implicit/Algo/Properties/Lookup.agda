@@ -3,12 +3,6 @@ module Implicit.Algo.Properties.Lookup where
 open import Implicit.Language
 open import Implicit.Algo.Base
 
-private variable
-  A A' B C : Type m
-  k k₁ k₂ : Fin m
-  Σ Σ' : Context n m
-  Γ Γ' : Env n m
-
 ε-↑ty : k₁ ε A
       → A ↑ty k₂ ⇘ A'
       → k₂ #≤ k₁
