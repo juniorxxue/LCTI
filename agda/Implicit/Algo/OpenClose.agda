@@ -21,3 +21,18 @@ data _⊢oᶜ_ : Env n m → Context n m → Set where
 data Polarity (Γ : Env n m) (A : Type m) (Σ : Context n m) : Polar → Set where
   polar-l : (cloA : Γ ⊢c A) → Polarity Γ A Σ ≤⁻
   polar-r : (cloA : Γ ⊢cᶜ Σ) → Polarity Γ A Σ ≤⁺
+
+data Closed : Env n m → Set where
+  clo-Z : Closed ∅
+  clo-S, : Closed Γ
+         → (cloA : Γ ⊢c A)
+         → Closed (Γ , A)
+  clo-S∙ : Closed Γ
+         → Closed (Γ ,∙)
+  clo-S^ : Closed Γ
+         → Closed (Γ ,^)         
+  clo-S= : Closed Γ
+         → (cloA : Γ ⊢c A)
+         → Closed (Γ ,= A)
+         
+
