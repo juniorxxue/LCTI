@@ -110,7 +110,7 @@ sound-s (s-ex-r= x-in s) with sound-s s
 ... | subs ~∞ s₁ = subs ~∞ (s-var-r (⊆-in:= x-in (s-⊆ s)) s₁)
 sound-s s'@(s-arr s s₁) with sound-s s | sound-s s₁
 ... | subs ~∞ s₂ | subs ~∞ s₃ = subs ~∞ (s-arr₁ (s-⊆-prv s₂ (s-⊆ s₁)) s₃)
-sound-s (s-term-c cloA ⊢e s) with sound-s s
+sound-s (s-term-c ⊢e s) with sound-s s
 ... | subs j~Σ s₁ rewrite sym (⊢id0 ⊢e) = subs (~C (t-⊆-prv (sound-∞ ⊢e) (s-⊆ s)) j~Σ) (s-arr₃ s₁)
 sound-s s'@(s-term-o opnA ⊢e s s₁) with sound-s s | sound-s s₁
 ... | subs ~∞ s₂ | subs j~Σ s₃ = subs (~I (t-⊆-prv (sound-0 ⊢e) (s-⊆ s')) j~Σ) (s-arr₂ (s-⊆-prv s₂ (s-⊆ s₁)) s₃)
@@ -118,3 +118,12 @@ sound-s (s-∀ s) with sound-s s
 ... | subs ~∞ s₁ = subs ~∞ (s-∀ s₁)
 sound-s (s-∀l s upᶜ upᵉ st₁ st₂) with sound-s s
 ... | subs j~Σ s₁ = subs (~-subst j~Σ {!!} (st-arr st₁ st₂)) (s-∀l s₁ {!!} {!!} st₁ st₂)
+
+temp : Γ ,^ ⊢ A ⌞ ≤⁺ ⌝ [ e' ]↝ Σ' ⊣ Γ' ,= B ↪ C `→ D
+     → Γ' ,= B ⊢ ⟨ j , C `→ D ⟩ ~ [ e' ]↝ Σ'
+     → d-find A #0 j
+temp (s-term-c ⊢e s) (~I ⊢e₁ j~Σ) = {!!}
+temp (s-term-c ⊢e s) (~C ⊢e₁ j~Σ) = {!!}
+temp (s-term-o opnA ⊢e s s₁) (~I ⊢e₁ j~Σ) = {!!}
+temp (s-term-o opnA ⊢e s s₁) (~C ⊢e₁ j~Σ) = {!!}
+temp (s-∀l s upᶜ upᵉ st₁ st₂) j~Σ = {!!}
