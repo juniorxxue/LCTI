@@ -3,105 +3,16 @@ module Implicit.Algo.Properties.OpenClose where
 open import Implicit.Language
 open import Implicit.Algo.Base
 open import Implicit.Algo.Properties.Lookup
+open import Implicit.Algo.Properties.Extension
 
 ----------------------------------------------------------------------
---+                        Inversion Lemmas                        +--
+--+                       Lemmas around ⊢cᶜ                        +--
 ----------------------------------------------------------------------
 
-
-^∈-∙∈-false :
-    Γ ∋^ k
-  → Γ ∋∙ k
-  → ⊥
-^∈-∙∈-false (S^ ^in) (S^ ∙in) = ^∈-∙∈-false ^in ∙in
-^∈-∙∈-false (S∙ ^in) (S∙ ∙in) = ^∈-∙∈-false ^in ∙in
-^∈-∙∈-false (S, ^in) (S, ∙in) = ^∈-∙∈-false ^in ∙in
-^∈-∙∈-false (S= ^in) (S= ∙in) = ^∈-∙∈-false ^in ∙in
-
-^∈-=∈-false :
-    Γ ∋^ k
-  → Γ ∋= k
-  → ⊥
-^∈-=∈-false (S^ in1) (S^ in2) = ^∈-=∈-false in1 in2
-^∈-=∈-false (S∙ in1) (S∙ in2) = ^∈-=∈-false in1 in2
-^∈-=∈-false (S, in1) (S, in2) = ^∈-=∈-false in1 in2
-^∈-=∈-false (S= in1) (S= in2) = ^∈-=∈-false in1 in2
-
-    
-⊢c-^∈-false : k ε A
-            → Γ ∋^ k
-            → Γ ⊢c A
-            → ⊥
-⊢c-^∈-false ε-var inΓ (⊢c-var-∙ x) = ^∈-∙∈-false inΓ x
-⊢c-^∈-false ε-var inΓ (⊢c-var-= x) = ^∈-=∈-false inΓ x
-⊢c-^∈-false (ε-arr-l inA) inΓ (⊢c-arr cloA cloA₁) = ⊢c-^∈-false inA inΓ cloA
-⊢c-^∈-false (ε-arr-r inA) inΓ (⊢c-arr cloA cloA₁) = ⊢c-^∈-false inA inΓ cloA₁
-⊢c-^∈-false (ε-∀ inA) inΓ (⊢c-∀ cloA) = ⊢c-^∈-false inA (S∙ inΓ) cloA
-
-{-
-test : Γ ,= B ⊢c A
-     → Γ ,∙ ⊢c A
--}     
-
--- in k position, we replace a ,= B with ,∙
-infix 3 _◆_⇘_
-data _◆_⇘_ : Env n m → Fin m → Env n m → Set where
-  ◆Z : Γ ,= A ◆ #0 ⇘ Γ ,∙
-  ◆S, : Γ ◆ k ⇘ Γ'
-      → Γ , A ◆ k ⇘ Γ' , A
-  ◆S∙ : Γ ◆ k ⇘ Γ'
-      → Γ ,∙ ◆ #S k ⇘ Γ' ,∙
-  ◆S= : Γ ◆ k ⇘ Γ'
-      → Γ ,= A ◆ #S k ⇘ Γ' ,= A
-  ◆S^ : Γ ◆ k ⇘ Γ'
-      → Γ ,^ ◆ #S k ⇘ Γ' ,^
-
-◆-∙∈ : Γ ∋∙ X
-     → Γ ◆ k ⇘ Γ'
-     → Γ' ∋∙ X
-◆-∙∈ (S= inΓ) ◆Z = S∙ inΓ
-◆-∙∈ (S, inΓ) (◆S, ◆Γ) = S, (◆-∙∈ inΓ ◆Γ)
-◆-∙∈ Z (◆S∙ ◆Γ) = Z
-◆-∙∈ (S∙ inΓ) (◆S∙ ◆Γ) = S∙ (◆-∙∈ inΓ ◆Γ)
-◆-∙∈ (S= inΓ) (◆S= ◆Γ) = S= (◆-∙∈ inΓ ◆Γ)
-◆-∙∈ (S^ inΓ) (◆S^ ◆Γ) = S^ (◆-∙∈ inΓ ◆Γ)
-
--- should this A exposed to the outside?
-◆-=∈-≢ : Γ ∋= X
-     → Γ ◆ k ⇘ Γ'
-     → k ≢ X
-     → Γ' ∋= X
-◆-=∈-≢ Z ◆Z neq = ⊥-elim (neq refl)
-◆-=∈-≢ Z (◆S= ◆Γ) neq = Z
-◆-=∈-≢ (S, inΓ) (◆S, ◆Γ) neq = S, (◆-=∈-≢ inΓ ◆Γ neq)
-◆-=∈-≢ (S^ inΓ) (◆S^ ◆Γ) neq = S^ (◆-=∈-≢ inΓ ◆Γ (≢-pred neq))
-◆-=∈-≢ (S∙ inΓ) (◆S∙ ◆Γ) neq = S∙ (◆-=∈-≢ inΓ ◆Γ (≢-pred neq))
-◆-=∈-≢ (S= inΓ) ◆Z neq = S∙ inΓ
-◆-=∈-≢ (S= inΓ) (◆S= ◆Γ) neq = S= (◆-=∈-≢ inΓ ◆Γ (≢-pred neq))
-
-◆-=∈-≡ : Γ ∋= k
-     → Γ ◆ k ⇘ Γ'
-     → Γ' ∋∙ k
-◆-=∈-≡ Z ◆Z = Z
-◆-=∈-≡ (S, inΓ) (◆S, ◆Γ) = S, (◆-=∈-≡ inΓ ◆Γ)
-◆-=∈-≡ (S^ inΓ) (◆S^ ◆Γ) = S^ (◆-=∈-≡ inΓ ◆Γ)
-◆-=∈-≡ (S∙ inΓ) (◆S∙ ◆Γ) = S∙ (◆-=∈-≡ inΓ ◆Γ)
-◆-=∈-≡ (S= inΓ) (◆S= ◆Γ) = S= (◆-=∈-≡ inΓ ◆Γ)
-
-⊢c-◆ : Γ ⊢c A
-     → Γ ◆ k ⇘ Γ'
-     → Γ' ⊢c A
-⊢c-◆ ⊢c-int ◆Γ = ⊢c-int
-⊢c-◆ (⊢c-var-∙ inΓ) ◆Γ = ⊢c-var-∙ (◆-∙∈ inΓ ◆Γ)
-⊢c-◆ {k = k} (⊢c-var-= {X = X} inΓ) ◆Γ with k #≟ X
-... | yes refl = ⊢c-var-∙ (◆-=∈-≡ inΓ ◆Γ)
-... | no ¬p = ⊢c-var-= (◆-=∈-≢ inΓ ◆Γ ¬p)
-⊢c-◆ (⊢c-arr clo clo₁) ◆Γ = ⊢c-arr (⊢c-◆ clo ◆Γ) (⊢c-◆ clo₁ ◆Γ)
-⊢c-◆ (⊢c-∀ clo) ◆Γ = ⊢c-∀ (⊢c-◆ clo (◆S∙ ◆Γ))
-
-⊢c-◆0 : Γ ,= B ⊢c A
-      → Γ ,∙ ⊢c A
-⊢c-◆0 clo = ⊢c-◆ clo ◆Z
+postulate
+  ⊢cᶜ-strengthen0 : Γ , A ⊢cᶜ Σ'
+                  → ↑tmᶜ0 Σ ⇘ Σ'
+                  → Γ ⊢cᶜ Σ
 
 ----------------------------------------------------------------------
 --+                           Extension                            +--
@@ -121,7 +32,7 @@ data _◆_⇘_ : Env n m → Fin m → Env n m → Set where
           → Γ ⊆ Γ'
           → Γ' ⊢cᵉ e
 ⊆-closedᵉ ⊢c-lit ss = ⊢c-lit
-⊆-closedᵉ (⊢c-var inΓ clo) ss = {!ss!}
+⊆-closedᵉ ⊢c-var ss = ⊢c-var
 ⊆-closedᵉ (⊢c-lam clo) ss = ⊢c-lam (⊆-closedᵉ clo (var ss))
 ⊆-closedᵉ (⊢c-app clo clo₁) ss = ⊢c-app (⊆-closedᵉ clo ss) (⊆-closedᵉ clo₁ ss)
 ⊆-closedᵉ (⊢c-ann x clo) ss = ⊢c-ann (⊆-closed x ss) (⊆-closedᵉ clo ss)
@@ -133,6 +44,7 @@ data _◆_⇘_ : Env n m → Fin m → Env n m → Set where
 ⊆-closedᶜ ⊢c-empty ss = ⊢c-empty
 ⊆-closedᶜ (⊢c-τ cloA) ss = ⊢c-τ (⊆-closed cloA ss)
 ⊆-closedᶜ (⊢c-term cloe clo) ss = ⊢c-term (⊆-closedᵉ cloe ss) (⊆-closedᶜ clo ss)
+
 
 
 ----------------------------------------------------------------------
@@ -155,6 +67,11 @@ polar-∀ : Polarity Γ (`∀ A) (τ (`∀ B)) ≤
 polar-∀ (polar-l (⊢c-∀ cloA)) = polar-l cloA
 polar-∀ (polar-r (⊢c-τ (⊢c-∀ cloA))) = polar-r (⊢c-τ cloA)
 
+polar-tm-r : Polarity Γ (A `→ B) ([ e ]↝ Σ) ≤
+           → Polarity Γ B Σ ≤
+polar-tm-r (polar-l (⊢c-arr cloA cloA₁)) = polar-l cloA₁
+polar-tm-r (polar-r (⊢c-term cloe cloA)) = polar-r cloA
+
 polar-⊆ : Polarity Γ A Σ ≤
         → Γ ⊆ Γ'
         → Polarity Γ' A Σ ≤
@@ -162,20 +79,83 @@ polar-⊆ (polar-l cloA) ss = polar-l (⊆-closed cloA ss)
 polar-⊆ (polar-r cloA) ss = polar-r (⊆-closedᶜ cloA ss)
 
 ----------------------------------------------------------------------
---+                   Inference result is closed                   +--
+--+                    Typing implies closeness                    +--
 ----------------------------------------------------------------------
 
-result-closed : Γ ⊢ Σ ⇒ e ⇒ A
-              → Γ ⊢cᶜ Σ
-              → Γ ⊢cᵉ e
-              → Γ ⊢c A
-result-closed ⊢lit cloΣ cloe = ⊢c-int
-result-closed (⊢var x∈Γ) cloΣ (⊢c-var inΓ clo) rewrite ∋⦂-unique x∈Γ inΓ = clo
-result-closed (⊢ann ⊢e) cloΣ (⊢c-ann cloA cloe) = cloA
-result-closed (⊢app ⊢e) cloΣ (⊢c-app cloe cloe₁) with result-closed ⊢e (⊢c-term cloe₁ cloΣ) cloe
-... | ⊢c-arr ind ind₁ = ind₁
-result-closed (⊢lam₁ ⊢e) (⊢c-τ (⊢c-arr cloA cloA₁)) (⊢c-lam cloe) =
-  ⊢c-arr cloA (⊢c-weaken0 (result-closed ⊢e (⊢c-τ (⊢c-strengthen0 cloA₁)) {!!}))
-result-closed (⊢lam₂ ⊢e up-c ⊢e₁) cloΣ cloe = {!!}
-result-closed (⊢sub ⊢e ne gc s) cloΣ cloe = {!!}
-result-closed (⊢tabs ⊢e) cloΣ cloe = {!!}
+
+⊢closeΓ : Γ ⊢ Σ ⇒ e ⇒ A
+        → Closed Γ
+
+⊢closeΣ : Γ ⊢ Σ ⇒ e ⇒ A
+        → Γ ⊢cᶜ Σ
+
+⊢closee : Γ ⊢ Σ ⇒ e ⇒ A
+        → Γ ⊢cᵉ e
+
+⊢closeA : Γ ⊢ Σ ⇒ e ⇒ A
+        → Γ ⊢c A
+
+-- inference result is closed under output env
+s-closed : Γ ⊢ A ⌞ ≤ ⌝ Σ ⊣ Δ ↪ B
+         → Polarity Γ A Σ ≤
+         → Δ ⊢c B
+
+⊢closeΓ (⊢lit cloΓ) = cloΓ
+⊢closeΓ (⊢var cloΓ x∈Γ) = cloΓ
+⊢closeΓ (⊢ann ⊢e) = ⊢closeΓ ⊢e
+⊢closeΓ (⊢app ⊢e) = ⊢closeΓ ⊢e
+⊢closeΓ (⊢lam₁ ⊢e) with ⊢closeΓ ⊢e
+... | clo-S, clo cloA = clo
+⊢closeΓ (⊢lam₂ ⊢e up-c ⊢e₁) = ⊢closeΓ ⊢e
+⊢closeΓ (⊢sub ⊢e ne gc cloΣ s) = ⊢closeΓ ⊢e
+⊢closeΓ (⊢tabs ⊢e) with ⊢closeΓ ⊢e
+... | clo-S∙ clo = clo
+
+⊢closeΣ (⊢lit cloΓ) = ⊢c-empty
+⊢closeΣ (⊢var cloΓ x∈Γ) = ⊢c-empty
+⊢closeΣ (⊢ann ⊢e) = ⊢c-empty
+⊢closeΣ (⊢app ⊢e) with ⊢closeΣ ⊢e
+... | ⊢c-term cloe clo = clo
+⊢closeΣ (⊢lam₁ ⊢e) with ⊢closeΓ ⊢e | ⊢closeΣ ⊢e
+... | clo-S, clo1 cloA | ⊢c-τ cloA₁ = ⊢c-τ (⊢c-arr cloA (⊢c-strengthen,0 cloA₁))
+⊢closeΣ (⊢lam₂ ⊢e up-c ⊢e₁) with ⊢closeΣ ⊢e₁
+... | clo = ⊢c-term (⊢closee ⊢e) (⊢cᶜ-strengthen0 clo up-c)
+⊢closeΣ (⊢sub ⊢e ne gc cloΣ s) = cloΣ
+⊢closeΣ (⊢tabs ⊢e) = ⊢c-empty
+
+⊢closee (⊢lit cloΓ) = ⊢c-lit
+⊢closee (⊢var cloΓ x∈Γ) = ⊢c-var
+⊢closee (⊢ann ⊢e) with ⊢closeΣ ⊢e
+... | ⊢c-τ cloA = ⊢c-ann cloA (⊢closee ⊢e)
+⊢closee (⊢app ⊢e) with ⊢closeΣ ⊢e
+... | ⊢c-term cloe clo = ⊢c-app (⊢closee ⊢e) cloe
+⊢closee (⊢lam₁ ⊢e) = ⊢c-lam (⊢closee ⊢e)
+⊢closee (⊢lam₂ ⊢e up-c ⊢e₁) = ⊢c-lam (⊢closee ⊢e₁)
+⊢closee (⊢sub ⊢e ne gc cloΣ s) = ⊢closee ⊢e
+⊢closee (⊢tabs ⊢e) = ⊢c-tlam (⊢closee ⊢e)
+
+⊢closeA (⊢lit cloΓ) = ⊢c-int
+⊢closeA (⊢var cloΓ x∈Γ) = ∋⦂-closed cloΓ x∈Γ
+⊢closeA (⊢ann ⊢e) with ⊢closeΣ ⊢e
+... | ⊢c-τ cloA = cloA
+⊢closeA (⊢app ⊢e) with ⊢closeA ⊢e
+... | ⊢c-arr clo clo₁ = clo₁
+⊢closeA (⊢lam₁ ⊢e) with ⊢closeΓ ⊢e | ⊢closeA ⊢e
+... | clo-S, cloΓ cloA | clo' = ⊢c-arr cloA (⊢c-strengthen,0 clo')
+⊢closeA (⊢lam₂ ⊢e up-c ⊢e₁) = ⊢c-arr (⊢closeA ⊢e) (⊢c-strengthen,0 (⊢closeA ⊢e₁))
+⊢closeA (⊢sub ⊢e ne gc cloΣ s) = s-closed s (polar-r cloΣ)
+⊢closeA (⊢tabs ⊢e) = ⊢c-∀ (⊢closeA ⊢e)
+
+s-closed s-int pl = ⊢c-int
+s-closed (s-empty clo) pl = clo
+s-closed s-var (polar-l cloA) = cloA
+s-closed s-var (polar-r (⊢c-τ cloA)) = cloA
+s-closed (s-ex-l^ x-in inst) (polar-r (⊢c-τ cloA)) = {!!}
+s-closed (s-ex-l= x-in s) pl = {!!}
+s-closed (s-ex-r^ x-in inst) pl = {!!}
+s-closed (s-ex-r= x-in s) pl = {!!}
+s-closed (s-arr s s₁) pl = {!!}
+s-closed (s-term-c ⊢e s) pl = ⊢c-arr (⊆-closed (⊢closeA ⊢e) (s-⊆ s)) (s-closed s (polar-tm-r pl))
+s-closed (s-term-o opnA ⊢e s s₁) pl = {!!}
+s-closed (s-∀ s) pl = {!!}
+s-closed (s-∀l s upᶜ upᵉ st₁ st₂) pl = {!!}

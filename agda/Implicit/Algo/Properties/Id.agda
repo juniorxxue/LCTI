@@ -38,10 +38,10 @@ data Split : (Σ : Context n m) → (A : Type m) → Set where
 ⊢id (⊢lam₁ ⊢e) none-τ rewrite ⊢id ⊢e none-τ = refl
 ⊢id (⊢lam₂ ⊢e upc ⊢e₁) (have-e spl) = let ⟨ _ , ⟨ spl' , _ ⟩ ⟩ = spl-↑tm spl upc
                                       in ⊢id ⊢e₁ spl'
-⊢id (⊢sub ⊢e ne gc s) spl = ≤id' s (spl→sspl spl)
+⊢id (⊢sub ⊢e ne gc clo s) spl = ≤id' s (spl→sspl spl)
 
 ≤id s-int = case-τ none-τ refl
-≤id s-empty = case-□ none-□
+≤id (s-empty clo) = case-□ none-□
 ≤id s-var = case-τ none-τ refl
 ≤id (s-ex-l^ x-in inst) = case-τ none-τ refl
 ≤id (s-ex-l= x-in s) = case-τ none-τ refl

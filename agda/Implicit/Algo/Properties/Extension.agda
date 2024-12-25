@@ -6,7 +6,7 @@ open import Implicit.Algo.Base
 s-⊆ : Γ ⊢ A ⌞ ≤ ⌝ Σ ⊣ Γ' ↪ B
     → Γ ⊆ Γ'
 s-⊆ s-int = ⊆-refl
-s-⊆ s-empty = ⊆-refl
+s-⊆ (s-empty clo) = ⊆-refl
 s-⊆ s-var = ⊆-refl
 s-⊆ (s-ex-l^ x-in inst) = ⟹-⊆ inst
 s-⊆ (s-ex-l= x-in s) = s-⊆ s

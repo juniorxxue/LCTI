@@ -17,7 +17,7 @@ data _∋_⦂_ : Env n m → Fin n → Type m → Set where
      → (up : ↑ty0 A ⇘ A')
      → Γ ,^ ∋ x ⦂ A'     
   S= : Γ ∋ x ⦂ A
-     → ↑ty0 A ⇘ A'
+     → (up : ↑ty0 A ⇘ A')
      → Γ ,= B ∋ x ⦂ A'
 
 -- lookup an entry: solution

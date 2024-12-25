@@ -49,4 +49,15 @@ data _⊢cᵉ_ : Env n m → Term n m → Set where
   ⊢c-tlam : Γ ,∙ ⊢cᵉ e → Γ ⊢cᵉ (Λ e)
 
 
-
+data Closed : Env n m → Set where
+  clo-Z : Closed ∅
+  clo-S, : Closed Γ
+         → (cloA : Γ ⊢c A)
+         → Closed (Γ , A)
+  clo-S∙ : Closed Γ
+         → Closed (Γ ,∙)
+  clo-S^ : Closed Γ
+         → Closed (Γ ,^)         
+  clo-S= : Closed Γ
+         → (cloA : Γ ⊢c A)
+         → Closed (Γ ,= A)

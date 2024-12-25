@@ -62,7 +62,8 @@ data _⊢_⌞_⌝_⊣_↪_ where
       Γ ⊢ Int ⌞ ≤ ⌝ τ Int ⊣ Γ ↪ Int
 
   s-empty :
-      Γ ⊢ A ⌞ ≤ ⌝ □ ⊣ Γ ↪ A
+      (clo : Γ ⊢c A)
+    → Γ ⊢ A ⌞ ≤⁺ ⌝ □ ⊣ Γ ↪ A
 
   s-var :
       Γ ⊢ (‶ X) ⌞ ≤ ⌝ τ (‶ X) ⊣ Γ ↪ ‶ X
@@ -118,59 +119,3 @@ data _⊢_⌞_⌝_⊣_↪_ where
     → (st₂ : ⟦ B ⟧ D ⇘ D')
     → Γ ⊢ `∀ A ⌞ ≤⁺ ⌝ ([ e ]↝ Σ) ⊣ Γ' ↪ C' `→ D'
 
-
-⊢closeΓ : Γ ⊢ Σ ⇒ e ⇒ A
-        → Closed Γ
-
-⊢closeΣ : Γ ⊢ Σ ⇒ e ⇒ A
-        → Γ ⊢cᶜ Σ
-
-⊢closee : Γ ⊢ Σ ⇒ e ⇒ A
-        → Γ ⊢cᵉ e
-
-⊢closeA : Γ ⊢ Σ ⇒ e ⇒ A
-        → Γ ⊢c A
-
-⊢closeΓ (⊢lit cloΓ) = cloΓ
-⊢closeΓ (⊢var cloΓ x∈Γ) = cloΓ
-⊢closeΓ (⊢ann ⊢e) = ⊢closeΓ ⊢e
-⊢closeΓ (⊢app ⊢e) = ⊢closeΓ ⊢e
-⊢closeΓ (⊢lam₁ ⊢e) with ⊢closeΓ ⊢e
-... | clo-S, clo cloA = clo
-⊢closeΓ (⊢lam₂ ⊢e up-c ⊢e₁) = ⊢closeΓ ⊢e
-⊢closeΓ (⊢sub ⊢e ne gc cloΣ s) = ⊢closeΓ ⊢e
-⊢closeΓ (⊢tabs ⊢e) with ⊢closeΓ ⊢e
-... | clo-S∙ clo = clo
-
-⊢closeΣ (⊢lit cloΓ) = ⊢c-empty
-⊢closeΣ (⊢var cloΓ x∈Γ) = ⊢c-empty
-⊢closeΣ (⊢ann ⊢e) = ⊢c-empty
-⊢closeΣ (⊢app ⊢e) with ⊢closeΣ ⊢e
-... | ⊢c-term cloe clo = clo
-⊢closeΣ (⊢lam₁ ⊢e) with ⊢closeΓ ⊢e | ⊢closeΣ ⊢e
-... | clo-S, clo1 cloA | ⊢c-τ cloA₁ = ⊢c-τ (⊢c-arr cloA {!!})
-⊢closeΣ (⊢lam₂ ⊢e up-c ⊢e₁) with ⊢closeΣ ⊢e₁
-... | clo = ⊢c-term (⊢closee ⊢e) {!!}
-⊢closeΣ (⊢sub ⊢e ne gc cloΣ s) = cloΣ
-⊢closeΣ (⊢tabs ⊢e) = ⊢c-empty
-
-⊢closee (⊢lit cloΓ) = ⊢c-lit
-⊢closee (⊢var cloΓ x∈Γ) = ⊢c-var
-⊢closee (⊢ann ⊢e) with ⊢closeΣ ⊢e
-... | ⊢c-τ cloA = ⊢c-ann cloA (⊢closee ⊢e)
-⊢closee (⊢app ⊢e) with ⊢closeΣ ⊢e
-... | ⊢c-term cloe clo = ⊢c-app (⊢closee ⊢e) cloe
-⊢closee (⊢lam₁ ⊢e) = ⊢c-lam (⊢closee ⊢e)
-⊢closee (⊢lam₂ ⊢e up-c ⊢e₁) = ⊢c-lam (⊢closee ⊢e₁)
-⊢closee (⊢sub ⊢e ne gc cloΣ s) = ⊢closee ⊢e
-⊢closee (⊢tabs ⊢e) = ⊢c-tlam (⊢closee ⊢e)
-
-⊢closeA (⊢lit cloΓ) = ⊢c-int
-⊢closeA (⊢var cloΓ x∈Γ) = {!!}
-⊢closeA (⊢ann ⊢e) = {!!}
-⊢closeA (⊢app ⊢e) with ⊢closeA ⊢e
-... | ⊢c-arr clo clo₁ = clo₁
-⊢closeA (⊢lam₁ ⊢e) = ⊢c-arr {!!} {!!}
-⊢closeA (⊢lam₂ ⊢e up-c ⊢e₁) = ⊢c-arr (⊢closeA ⊢e) {!⊢closeA ⊢e₁!}
-⊢closeA (⊢sub ⊢e ne gc cloΣ s) = {!!}
-⊢closeA (⊢tabs ⊢e) = ⊢c-∀ (⊢closeA ⊢e)
