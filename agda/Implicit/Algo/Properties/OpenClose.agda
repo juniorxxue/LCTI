@@ -2,6 +2,7 @@ module Implicit.Algo.Properties.OpenClose where
 
 open import Implicit.Language
 open import Implicit.Algo.Base
+open import Implicit.Algo.Properties.Id
 open import Implicit.Algo.Properties.Lookup
 open import Implicit.Algo.Properties.Extension
 
@@ -17,16 +18,6 @@ postulate
 ----------------------------------------------------------------------
 --+                           Extension                            +--
 ----------------------------------------------------------------------
-
-
-⊆-closed : Γ ⊢c A
-         → Γ ⊆ Γ'
-         → Γ' ⊢c A
-⊆-closed ⊢c-int ss = ⊢c-int
-⊆-closed (⊢c-var-∙ x) ss = ⊢c-var-∙ (⊆-in∙ x ss)
-⊆-closed (⊢c-var-= x) ss = ⊢c-var-= (⊆-in= x ss)
-⊆-closed (⊢c-arr clo clo₁) ss = ⊢c-arr (⊆-closed clo ss) (⊆-closed clo₁ ss)
-⊆-closed (⊢c-∀ clo) ss = ⊢c-∀ (⊆-closed clo (uvar ss))
 
 ⊆-closedᵉ : Γ ⊢cᵉ e
           → Γ ⊆ Γ'
@@ -45,8 +36,6 @@ postulate
 ⊆-closedᶜ (⊢c-τ cloA) ss = ⊢c-τ (⊆-closed cloA ss)
 ⊆-closedᶜ (⊢c-term cloe clo) ss = ⊢c-term (⊆-closedᵉ cloe ss) (⊆-closedᶜ clo ss)
 
-
-
 ----------------------------------------------------------------------
 --+                            Polarity                            +--
 ----------------------------------------------------------------------
@@ -54,29 +43,38 @@ postulate
 
 polar-arr-l : Polarity Γ (A `→ B) (τ (C `→ D)) ≤
             → Polarity Γ C (τ A) (⋆ ≤)
-polar-arr-l (polar-l (⊢c-arr cloA cloA₁)) = polar-r (⊢c-τ cloA)
-polar-arr-l (polar-r (⊢c-τ (⊢c-arr cloA cloA₁))) = polar-l cloA
+polar-arr-l (polar-l cloΓ (⊢c-arr cloA cloA₁)) = polar-r cloΓ (⊢c-τ cloA)
+polar-arr-l (polar-r cloΓ (⊢c-τ (⊢c-arr cloA cloA₁))) = polar-l cloΓ cloA
 
 polar-arr-r : Polarity Γ (A `→ B) (τ (C `→ D)) ≤
             → Polarity Γ B (τ D) ≤
-polar-arr-r (polar-l (⊢c-arr cloA cloA₁)) = polar-l cloA₁
-polar-arr-r (polar-r (⊢c-τ (⊢c-arr cloA cloA₁))) = polar-r (⊢c-τ cloA₁)
+polar-arr-r (polar-l cloΓ (⊢c-arr cloA cloA₁)) = polar-l cloΓ cloA₁
+polar-arr-r (polar-r cloΓ (⊢c-τ (⊢c-arr cloA cloA₁))) = polar-r cloΓ (⊢c-τ cloA₁)
 
 polar-∀ : Polarity Γ (`∀ A) (τ (`∀ B)) ≤
         → Polarity (Γ ,∙) A (τ B) ≤
-polar-∀ (polar-l (⊢c-∀ cloA)) = polar-l cloA
-polar-∀ (polar-r (⊢c-τ (⊢c-∀ cloA))) = polar-r (⊢c-τ cloA)
+polar-∀ (polar-l cloΓ (⊢c-∀ cloA)) = polar-l (clo-S∙ cloΓ) cloA
+polar-∀ (polar-r cloΓ (⊢c-τ (⊢c-∀ cloA))) = polar-r (clo-S∙ cloΓ) (⊢c-τ cloA)
 
 polar-tm-r : Polarity Γ (A `→ B) ([ e ]↝ Σ) ≤
            → Polarity Γ B Σ ≤
-polar-tm-r (polar-l (⊢c-arr cloA cloA₁)) = polar-l cloA₁
-polar-tm-r (polar-r (⊢c-term cloe cloA)) = polar-r cloA
+polar-tm-r (polar-l cloΓ (⊢c-arr cloA cloA₁)) = polar-l cloΓ cloA₁
+polar-tm-r (polar-r cloΓ (⊢c-term cloe cloA)) = polar-r cloΓ cloA
 
+{-
 polar-⊆ : Polarity Γ A Σ ≤
         → Γ ⊆ Γ'
         → Polarity Γ' A Σ ≤
-polar-⊆ (polar-l cloA) ss = polar-l (⊆-closed cloA ss)
-polar-⊆ (polar-r cloA) ss = polar-r (⊆-closedᶜ cloA ss)
+polar-⊆ (polar-l cloΓ cloA) ss = polar-l {!!} (⊆-closed cloA ss)
+polar-⊆ (polar-r cloΓ cloA) ss = polar-r {!!} (⊆-closedᶜ cloA ss)
+-}
+
+polar-in : Polarity Γ (‶ X) Σ ≤
+         → Γ ∋ X := A
+         → Polarity Γ A Σ ≤
+polar-in (polar-l cloΓ (⊢c-var-∙ inΓ₁)) inΓ = {!!}
+polar-in (polar-l cloΓ (⊢c-var-= inΓ₁)) inΓ = polar-l cloΓ {!!}
+polar-in (polar-r cloΓ cloΣ) inΓ = polar-r cloΓ cloΣ
 
 ----------------------------------------------------------------------
 --+                    Typing implies closeness                    +--
@@ -143,15 +141,16 @@ s-closed : Γ ⊢ A ⌞ ≤ ⌝ Σ ⊣ Δ ↪ B
 ⊢closeA (⊢lam₁ ⊢e) with ⊢closeΓ ⊢e | ⊢closeA ⊢e
 ... | clo-S, cloΓ cloA | clo' = ⊢c-arr cloA (⊢c-strengthen,0 clo')
 ⊢closeA (⊢lam₂ ⊢e up-c ⊢e₁) = ⊢c-arr (⊢closeA ⊢e) (⊢c-strengthen,0 (⊢closeA ⊢e₁))
-⊢closeA (⊢sub ⊢e ne gc cloΣ s) = s-closed s (polar-r cloΣ)
+⊢closeA (⊢sub ⊢e ne gc cloΣ s) = s-closed s (polar-r (⊢closeΓ ⊢e) cloΣ)
 ⊢closeA (⊢tabs ⊢e) = ⊢c-∀ (⊢closeA ⊢e)
 
 s-closed s-int pl = ⊢c-int
 s-closed (s-empty clo) pl = clo
-s-closed s-var (polar-l cloA) = cloA
-s-closed s-var (polar-r (⊢c-τ cloA)) = cloA
-s-closed (s-ex-l^ x-in inst) (polar-r (⊢c-τ cloA)) = {!!}
-s-closed (s-ex-l= x-in s) pl = {!!}
+s-closed s-var (polar-l cloΓ cloA) = cloA
+s-closed s-var (polar-r cloΓ (⊢c-τ cloA)) = cloA
+s-closed (s-ex-l^ x-in inst) (polar-r cloΓ (⊢c-τ cloA)) = ⊆-closed cloA (inst-⊆ inst)
+s-closed (s-ex-l= x-in s) pl with ≤id0 s
+... | refl = s-closed s {!!}
 s-closed (s-ex-r^ x-in inst) pl = {!!}
 s-closed (s-ex-r= x-in s) pl = {!!}
 s-closed (s-arr s s₁) pl = {!!}

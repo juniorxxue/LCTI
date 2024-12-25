@@ -19,8 +19,8 @@ data _⊢oᶜ_ : Env n m → Context n m → Set where
   ⊢o-term : Γ ⊢oᶜ Σ → Γ ⊢oᶜ [ e ]↝ Σ -- we may add conditions onto `e` later
 
 data Polarity (Γ : Env n m) (A : Type m) (Σ : Context n m) : Polar → Set where
-  polar-l : (cloA : Γ ⊢c A) → Polarity Γ A Σ ≤⁻
-  polar-r : (cloΣ : Γ ⊢cᶜ Σ) → Polarity Γ A Σ ≤⁺
+  polar-l : (cloΓ : Closed Γ) → (cloA : Γ ⊢c A) → Polarity Γ A Σ ≤⁻
+  polar-r : (cloΓ : Closed Γ) → (cloΣ : Γ ⊢cᶜ Σ) → Polarity Γ A Σ ≤⁺
 
 
          
