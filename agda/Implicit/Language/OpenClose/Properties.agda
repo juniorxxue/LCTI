@@ -20,6 +20,18 @@ postulate
               → ↑ty0 A ⇘ A'
               → Γ ,^ ⊢c A'
 
+  ⊢c-strengthen^0 : Γ ,^ ⊢c A'
+                  → ↑ty0 A ⇘ A'
+                  → Γ ⊢c A
+
+  ⊢c-strengthen=0 : Γ ,= T ⊢c A'
+                  → ↑ty0 A ⇘ A'
+                  → Γ ⊢c A
+
+  ⊢c-strengthen∙0 : Γ ,∙ ⊢c A'
+                  → ↑ty0 A ⇘ A'
+                  → Γ ⊢c A
+
   ⊢c-weaken=0 : Γ ⊢c A
               → ↑ty0 A ⇘ A'
               → Γ ,= B ⊢c A'  
@@ -105,3 +117,44 @@ data _◆_⇘_ : Env n m → Fin m → Env n m → Set where
 ⊢c-◆0 : Γ ,= B ⊢c A
       → Γ ,∙ ⊢c A
 ⊢c-◆0 clo = ⊢c-◆ clo ◆Z
+
+----------------------------------------------------------------------
+--+                       False elimination                        +--
+----------------------------------------------------------------------
+
+^∈-∙∈-false :
+    Γ ∋^ k
+  → Γ ∋∙ k
+  → ⊥
+^∈-∙∈-false (S^ ^in) (S^ ∙in) = ^∈-∙∈-false ^in ∙in
+^∈-∙∈-false (S∙ ^in) (S∙ ∙in) = ^∈-∙∈-false ^in ∙in
+^∈-∙∈-false (S, ^in) (S, ∙in) = ^∈-∙∈-false ^in ∙in
+^∈-∙∈-false (S= ^in) (S= ∙in) = ^∈-∙∈-false ^in ∙in
+
+^∈-=∈-false :
+    Γ ∋^ k
+  → Γ ∋= k
+  → ⊥
+^∈-=∈-false (S^ in1) (S^ in2) = ^∈-=∈-false in1 in2
+^∈-=∈-false (S∙ in1) (S∙ in2) = ^∈-=∈-false in1 in2
+^∈-=∈-false (S, in1) (S, in2) = ^∈-=∈-false in1 in2
+^∈-=∈-false (S= in1) (S= in2) = ^∈-=∈-false in1 in2
+
+∙∈-=∈-false :
+    Γ ∋∙ X
+  → Γ ∋ X := A
+  → ⊥
+∙∈-=∈-false (S, in1) (S, in2) = ∙∈-=∈-false in1 in2
+∙∈-=∈-false (S∙ in1) (S∙ in2 up) = ∙∈-=∈-false in1 in2
+∙∈-=∈-false (S= in1) (S= in2 up) = ∙∈-=∈-false in1 in2
+∙∈-=∈-false (S^ in1) (S^ in2 up) = ∙∈-=∈-false in1 in2
+    
+⊢c-^∈-false : k ε A
+            → Γ ∋^ k
+            → Γ ⊢c A
+            → ⊥
+⊢c-^∈-false ε-var inΓ (⊢c-var-∙ x) = ^∈-∙∈-false inΓ x
+⊢c-^∈-false ε-var inΓ (⊢c-var-= x) = ^∈-=∈-false inΓ x
+⊢c-^∈-false (ε-arr-l inA) inΓ (⊢c-arr cloA cloA₁) = ⊢c-^∈-false inA inΓ cloA
+⊢c-^∈-false (ε-arr-r inA) inΓ (⊢c-arr cloA cloA₁) = ⊢c-^∈-false inA inΓ cloA₁
+⊢c-^∈-false (ε-∀ inA) inΓ (⊢c-∀ cloA) = ⊢c-^∈-false inA (S∙ inΓ) cloA

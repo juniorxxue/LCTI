@@ -40,6 +40,15 @@ inst-in (⟹=S inst up1 up2) = S= (inst-in inst) up2
 ↑ty-¬ε (¬ε-arr ninA ninA₁) (↑ty-arr up up₁) lt = ¬ε-arr (↑ty-¬ε ninA up lt) (↑ty-¬ε ninA₁ up₁ lt)
 ↑ty-¬ε (¬ε-∀ ninA) (↑ty-∀ up) lt = ¬ε-∀ (↑ty-¬ε ninA up (s≤s lt))
 
+:=to= : Γ ∋ k := A
+      → Γ ∋= k
+:=to= (Z up) = Z
+:=to= (S, inΓ) = S, (:=to= inΓ)
+:=to= (S^ inΓ up) = S^ (:=to= inΓ)
+:=to= (S∙ inΓ up) = S∙ (:=to= inΓ)
+:=to= (S= inΓ up) = S= (:=to= inΓ)
+
+
 
 
 

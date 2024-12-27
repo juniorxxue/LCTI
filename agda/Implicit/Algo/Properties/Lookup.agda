@@ -30,14 +30,6 @@ open import Implicit.Algo.Base
         → #S k εᶜ Σ'
 εᶜ-↑tyᶜ0 k-in up-c = εᶜ-↑tyᶜ k-in up-c z≤n
 
-:=to= : Γ ∋ k := A
-      → Γ ∋= k
-:=to= (Z up) = Z
-:=to= (S, inΓ) = S, (:=to= inΓ)
-:=to= (S^ inΓ up) = S^ (:=to= inΓ)
-:=to= (S∙ inΓ up) = S∙ (:=to= inΓ)
-:=to= (S= inΓ up) = S= (:=to= inΓ)
-
 
 ----------------------------------------------------------------------
 --+                           Extension                            +--
