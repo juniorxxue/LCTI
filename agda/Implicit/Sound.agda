@@ -84,8 +84,8 @@ sound-∞ : ∀ {Γ : Env n m} {e A B}
 sound-∞ ⊢e rewrite ⊢id0 ⊢e with sound ⊢e
 ... | typs ~∞ ⊢e = ⊢e
 
-sound ⊢lit = typs ~Z ⊢lit
-sound (⊢var x∈Γ) = typs ~Z (⊢var x∈Γ)
+sound (⊢lit cloΓ) = typs ~Z ⊢lit
+sound (⊢var cloΓ x∈Γ) = typs ~Z (⊢var x∈Γ)
 sound (⊢ann ⊢e) = typs ~Z (⊢ann (sound-∞ ⊢e))
 sound (⊢app ⊢e) with sound ⊢e
 ... | typs (~I ⊢e₁ j~Σ) ⊢e = typs j~Σ (⊢app₂ ⊢e ⊢e₁)
@@ -94,13 +94,13 @@ sound (⊢lam₁ ⊢e) with sound ⊢e
 ... | typs ~∞ s = typs ~∞ (⊢lam₁ s)
 sound (⊢lam₂ ⊢e up-c ⊢e₁) with sound ⊢e₁
 ... | typs j ⊢e' = typs (~I (sound-0 ⊢e) (~-weaken0 j up-c)) (⊢lam₂ ⊢e')
-sound (⊢sub ⊢e ne gc s) with sound-s s
+sound (⊢sub ⊢e ne gc cloΣ s) with sound-s s
 ... | subs j~Σ s₁ = typs j~Σ (⊢sub' (sound-0 ⊢e) s₁)
 sound (⊢tabs ⊢e) with sound ⊢e
 ... | typs ~Z s = typs ~Z (⊢tabs s)
 
 sound-s s-int = subs ~∞ s-int
-sound-s s-empty = subs ~Z s-refl
+sound-s (s-empty clo) = subs ~Z s-refl
 sound-s s-var = subs ~∞ s-var
 sound-s (s-ex-l^ x-in inst) = subs ~∞ (s-var-l (inst-in inst) (inst-s-r inst))
 sound-s (s-ex-l= x-in s) with sound-s s

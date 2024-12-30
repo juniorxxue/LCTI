@@ -4,54 +4,26 @@ open import Implicit.Language
 open import Implicit.Algo.Base
 open import Implicit.Algo.Properties.Extension
 open import Implicit.Algo.Properties.OpenClose
-open import Implicit.Algo.Properties.Lookup
 
-private variable
-  Γ Γ' : Env n m
-  A B C D : Type m
-  k X : Fin m
-  Σ : Context n m
-  e : Term n m
-  ≤ : Polar
 
-----------------------------------------------------------------------
---+                          Small Lemmas                          +--
-----------------------------------------------------------------------
-inst-in : ∀ {X}
-  → [ A / X ] Γ ⟹ Γ'
-  → Γ' ∋= X
-inst-in (⟹^0 up) = Z
-inst-in (⟹^S inst up) = S^ (inst-in inst)
-inst-in (⟹∙S inst up) = S∙ (inst-in inst)
-inst-in (⟹,S inst) = S, (inst-in inst)
-inst-in (⟹=S up inst) = S= (inst-in inst)
+t-⊆-prv : Γ ⊢ Σ ⇒ e ⇒ A
+        → Γ ⊆ Δ
+        → Closed Δ
+        → Δ ⊢ Σ ⇒ e ⇒ A
 
-----------------------------------------------------------------------
---+ Invariant: appearing existentials must be solved in output env +--
-----------------------------------------------------------------------
+postulate
+  s-⊆-prv : Γ ⊢ A ⌞ ≤ ⌝ Σ ⊣ Γ ↪ B
+          → Γ ⊢c A
+          → Γ ⊢cᶜ Σ
+          → Δ ⊢ A ⌞ ≤ ⌝ Σ ⊣ Δ ↪ B
 
-s-out-closed-l : Γ ⊢ A ⌞ ≤ ⌝ Σ ⊣ Γ' ↪ B
-               → Polarity Γ A Σ ≤
-               → Γ' ⊢c A
-
-s-out-closed-r : Γ ⊢ A ⌞ ≤ ⌝ Σ ⊣ Γ' ↪ B
-               → Polarity Γ A Σ ≤
-               → Γ' ⊢cᶜ Σ
-
-s-out-closed-r s pr = {!!}
-               
-s-out-closed-l s-int pr = ⊢c-int
-s-out-closed-l (s-empty p) pr = p
-s-out-closed-l (s-var clo) pr = clo
-s-out-closed-l (s-ex-l^ clo x-in inst) pr = ⊢c-var-= (inst-in inst)
-s-out-closed-l (s-ex-l= clo x-in s) pr = ⊆-closed (⊢c-var-= (:=to= x-in)) (s-⊆ s)
-s-out-closed-l s'@(s-ex-r^ clo x-in inst) (polar-l cloA) = ⊆-closed clo (s-⊆ s')
-s-out-closed-l (s-ex-r= clo x-in s) pr = ⊆-closed clo (s-⊆ s)
-s-out-closed-l (s-arr s s₁) pr with s-out-closed-r s (polar-arr-l pr)
-... | ⊢c-τ cloA = ⊢c-arr (⊆-closed cloA (s-⊆ s₁)) (s-out-closed-l s₁ (polar-arr-r (polar-⊆ pr (s-⊆ s))))
-s-out-closed-l (s-term-c cloA ⊢e s) (polar-r (⊢c-term cloA₁)) = ⊢c-arr (⊆-closed cloA (s-⊆ s)) (s-out-closed-l s (polar-r cloA₁))
-s-out-closed-l (s-term-o opnA ⊢e s s₁) (polar-r (⊢c-term cloA)) with s-out-closed-r s (polar-l {!!})
-... | ⊢c-τ cloA₁ = ⊢c-arr (⊆-closed cloA₁ (s-⊆ s₁)) (s-out-closed-l s₁ (polar-r (⊆-closedᶜ cloA (s-⊆ s))))
-s-out-closed-l (s-∀ s) pr = ⊢c-∀ (s-out-closed-l s (polar-∀ pr))
-s-out-closed-l (s-∀l s upᶜ upᵉ st₁ st₂) (polar-r cloA) = ⊢c-∀ (⊢c-◆0 (s-out-closed-l s (polar-r {!!})))
-
+t-⊆-prv (⊢lit cloΓ) ext cloΔ = ⊢lit cloΔ
+t-⊆-prv (⊢var cloΓ x∈Γ) ext cloΔ = ⊢var cloΔ (⊆-in⦂ x∈Γ ext)
+t-⊆-prv (⊢ann ⊢e) ext cloΔ = ⊢ann (t-⊆-prv ⊢e ext cloΔ)
+t-⊆-prv (⊢app ⊢e) ext cloΔ = ⊢app (t-⊆-prv ⊢e ext cloΔ)
+t-⊆-prv ⊢e'@(⊢lam₁ ⊢e) ext cloΔ with ⊢close-τ ⊢e'
+... | (⊢c-arr cloA cloB) with t-⊆-prv ⊢e (var ext) (clo-S, cloΔ (⊆-closed cloA ext))
+... | ind = ⊢lam₁ ind
+t-⊆-prv (⊢lam₂ ⊢e up-c ⊢e₁) ext cloΔ = {!!}
+t-⊆-prv (⊢sub ⊢e ne gc cloΣ s) ext cloΔ = ⊢sub (t-⊆-prv ⊢e ext cloΔ) ne gc {!!} (s-⊆-prv s (⊢closeA ⊢e) cloΣ)
+t-⊆-prv (⊢tabs ⊢e) ext cloΔ = ⊢tabs (t-⊆-prv ⊢e (uvar ext) (clo-S∙ cloΔ))

@@ -266,3 +266,12 @@ s-closed-r (s-∀ s) pr with s-closed-r s (polar-∀ pr)
 ... | ⊢c-τ cloA = ⊢c-τ (⊢c-∀ cloA)
 s-closed-r s'@(s-∀l s upᶜ upᵉ st₁ st₂) (polar-r cloΓ cloΣ) = ⊆-closedᶜ cloΣ (s-⊆ s')
 
+
+----------------------------------------------------------------------
+--+                           Corollaries                          +--
+----------------------------------------------------------------------
+
+⊢close-τ : Γ ⊢ τ A ⇒ e ⇒ B
+     → Γ ⊢c A
+⊢close-τ ⊢e with ⊢closeΣ ⊢e
+... | ⊢c-τ cloA = cloA
