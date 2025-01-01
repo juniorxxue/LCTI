@@ -66,10 +66,10 @@ data ⟦_⟧⇒⟦_,_⟧ : Context n m → Apps n m → Context n m → Set wher
          → ⟦ [ e ]↝ Σ ⟧⇒⟦ e ∷a e̅ , Σ' ⟧
 
 
-infix 4 _⊕_:=_
-data _⊕_:=_ : Apps n m → Context n m → Context n m → Set where
-
-  ⊕nil : nil ⊕ Σ := Σ
-  
-  ⊕cons-e : e̅ ⊕ Σ := Σ'
-          → (e ∷a e̅) ⊕ Σ := [ e ]↝ Σ'
+-- share the same argument, however first end with □, second end with any Σ'
+-- used for proving general subsumption
+infix 3 _≊_
+data _≊_ : Context n m → Context n m → Set where
+  ≊Z : □ ≊ Σ
+  ≊S : Σ ≊ Σ'
+     → [ e ]↝ Σ ≊ [ e ]↝ Σ'

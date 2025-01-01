@@ -24,6 +24,6 @@ t-⊆-prv (⊢app ⊢e) ext cloΔ = ⊢app (t-⊆-prv ⊢e ext cloΔ)
 t-⊆-prv ⊢e'@(⊢lam₁ ⊢e) ext cloΔ with ⊢close-τ ⊢e'
 ... | (⊢c-arr cloA cloB) with t-⊆-prv ⊢e (var ext) (clo-S, cloΔ (⊆-closed cloA ext))
 ... | ind = ⊢lam₁ ind
-t-⊆-prv (⊢lam₂ ⊢e up-c ⊢e₁) ext cloΔ = {!!}
-t-⊆-prv (⊢sub ⊢e ne gc cloΣ s) ext cloΔ = ⊢sub (t-⊆-prv ⊢e ext cloΔ) ne gc {!!} (s-⊆-prv s (⊢closeA ⊢e) cloΣ)
+t-⊆-prv (⊢lam₂ ⊢e up-c ⊢e₁) ext cloΔ = ⊢lam₂ (t-⊆-prv ⊢e ext cloΔ) up-c (t-⊆-prv ⊢e₁ (var ext) (clo-S, cloΔ (⊢closeA (t-⊆-prv ⊢e ext cloΔ))))
+t-⊆-prv (⊢sub ⊢e ne gc cloΣ s) ext cloΔ = ⊢sub (t-⊆-prv ⊢e ext cloΔ) ne gc (⊆-closedᶜ cloΣ ext) (s-⊆-prv s (⊢closeA ⊢e) cloΣ)
 t-⊆-prv (⊢tabs ⊢e) ext cloΔ = ⊢tabs (t-⊆-prv ⊢e (uvar ext) (clo-S∙ cloΔ))
