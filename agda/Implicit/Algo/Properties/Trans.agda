@@ -29,7 +29,7 @@ s-trans (s-∀l s1 upᶜ upᵉ st₁ st₂) s2 newΣ pr1 pr2 = {!!}
 
 
 s-trans : Γ ⊢ A₁ ⌞ ≤ ⌝ Σ ⊣ Δ ↪ A₂
-        → Δ ⊢ A₂ ⌞ ≤ ⌝ Σ' ⊣ Δ ↪ A₃
+        → Δ ⊢ A₂ ⌞ ≤ ⌝ Σ' ⊣ Δ ↪ A₃ -- A₂ couldn't be open
         → Σ ≊ Σ'
         → Γ ⊢ A₁ ⌞ ≤ ⌝ Σ' ⊣ Δ ↪ A₃
 s-trans (s-empty clo) s2 ≊Z = s2
@@ -41,4 +41,6 @@ s-trans (s-term-o opnA ⊢e s1 s3) (s-term-c ⊢e₁ s2) (≊S newΣ) with ⊢id
 ... | refl = s-term-o opnA ⊢e s1 (s-trans s3 s2 newΣ)
 s-trans s@(s-term-o opnA ⊢e s1 s3) (s-term-o opnA₁ ⊢e₁ s2 s4) newΣ =
   ⊥-elim (⊢c-⊢o-disjoint (⊆-closed (⊢closeA ⊢e) (s-⊆ s)) opnA₁)
-s-trans (s-∀l s1 upᶜ upᵉ st₁ st₂) s2 newΣ = {!!}
+s-trans (s-∀l s1 upᶜ upᵉ st₁ st₂) (s-term-c ⊢e s2) newΣ with ⊢id0 ⊢e
+... | refl = s-∀l (s-trans s1 (s-term-c {!!} {!!}) {!!}) {!!} {!!} st₁ {!!}
+s-trans (s-∀l s1 upᶜ upᵉ st₁ st₂) (s-term-o opnA ⊢e s2 s3) newΣ = {!!}

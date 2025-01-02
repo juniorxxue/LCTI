@@ -2,6 +2,7 @@ module Implicit.Algo.Properties.Split where
 
 open import Implicit.Language
 open import Implicit.Algo.Base
+open import Implicit.Algo.Properties.Shift
 
 sspl-unique :
     ⟦ Σ , A ⟧→s⟦ Σ₁ ,  A₁ ⟧
@@ -37,8 +38,10 @@ spl-↑tm :
 spl-↑tm none-τ ↑tmᶜ-τ = ⟨ nil , ⟨ none-τ , nil ⟩ ⟩
 spl-↑tm (have-e spl) (↑tmᶜ-e {e' = e'} up-e up-c) = ⟨ e' ∷a spl-↑tm spl up-c .proj₁ ,
                                            ⟨ have-e (spl-↑tm spl up-c .proj₂ .proj₁) ,
-                                           up-e ∷a spl-↑tm spl up-c .proj₂ .proj₂ ⟩
-                                           ⟩
-
-  
-  
+                                           up-e ∷a spl-↑tm spl up-c .proj₂ .proj₂ ⟩ ⟩
+≊-weaken : Σ₁ ≊ Σ₂
+         → ↑tmᶜ0 Σ₁ ⇘ Σ₁'
+         → ↑tmᶜ0 Σ₂ ⇘ Σ₂'
+         → Σ₁' ≊ Σ₂'
+≊-weaken ≊Z ↑tmᶜ-□ up2 = ≊Z
+≊-weaken (≊S eq) (↑tmᶜ-e up-e up1) (↑tmᶜ-e up-e₁ up2) rewrite ↑tm-unique up-e up-e₁ = ≊S (≊-weaken eq up1 up2)

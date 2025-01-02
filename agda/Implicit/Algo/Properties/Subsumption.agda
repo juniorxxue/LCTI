@@ -6,7 +6,22 @@ open import Implicit.Algo.Properties.Id
 open import Implicit.Algo.Properties.OpenClose
 open import Implicit.Algo.Properties.Extension
 open import Implicit.Algo.Properties.Strengthen
+open import Implicit.Algo.Properties.Weaken
+open import Implicit.Algo.Properties.Shift
+open import Implicit.Algo.Properties.Split
 open import Implicit.Algo.Properties.Environments
+
+postulate
+  s-trans : Γ ⊢ A₁ ⌞ ≤ ⌝ Σ ⊣ Δ ↪ A₂
+        → Δ ⊢ A₂ ⌞ ≤ ⌝ Σ' ⊣ Δ ↪ A₃ -- A₂ couldn't be open
+        → Σ ≊ Σ'
+        → Γ ⊢ A₁ ⌞ ≤ ⌝ Σ' ⊣ Δ ↪ A₃
+
+  s-subst : Γ ,= T ⊢ A ⌞ ≤ ⌝ Σ' ⊣ Δ ,= T ↪ B
+          → ⟦ T ⟧ A ⇘ A*
+          → ⟦ T ⟧ B ⇘ B*
+          → ↑tyᶜ0 Σ ⇘ Σ'
+          → Γ ⊢ A* ⌞ ≤ ⌝ Σ ⊣ Δ ↪ B*
 
 s-refl : Γ ⊢ A ⌞ ≤ ⌝ τ A ⊣ Γ ↪ A
 s-refl {A = Int} = s-int
@@ -20,8 +35,6 @@ s-refl {A = `∀ A} = s-∀ s-refl
 
 ⊢to≤ : Γ ⊢ Σ ⇒ e ⇒ A
      → Γ ⊢ A ⌞ ≤⁺ ⌝ Σ ⊣ Γ ↪ A
-
-
 
 subsumption : Γ ⊢ Σ ⇒ e ⇒ A
              → Σ ≊ Σ'
@@ -42,15 +55,23 @@ subsumption {Σ' = τ _} (⊢var cloΓ x∈Γ) ≊Z (⊢c-τ cloA) s = ⊢sub (�
 subsumption {Σ' = τ _} (⊢ann ⊢e) ≊Z (⊢c-τ cloA) s = ⊢sub (⊢ann ⊢e) ne-τ gc-ann (⊢c-τ cloA) s
 subsumption {Σ' = τ _} (⊢app ⊢e) ≊Z (⊢c-τ cloA) s with ⊢to≤ ⊢e
 ... | (s-term-c ⊢e₁ r) = ⊢app (subsumption ⊢e (≊S ≊Z) (⊢c-term (⊢closee ⊢e₁) (⊢c-τ cloA)) (s-term-c ⊢e₁ s))
-... | s-term-o opnA ⊢e₁ r r₁ = {!⊢closeA ⊢e₁!}
+... | s-term-o opnA ⊢e₁ r r₁ = ⊥-elim (⊢c-⊢o-disjoint (⊢closeA ⊢e₁) opnA)
 subsumption {Σ' = τ _} (⊢tabs ⊢e) ≊Z (⊢c-τ cloA) s = ⊢sub (⊢tabs ⊢e) ne-τ gc-tlam (⊢c-τ cloA) s
 subsumption {Σ' = [ e ]↝ Σ'} (⊢var cloΓ x∈Γ) newΣ cloΣ' s = ⊢sub (⊢var cloΓ x∈Γ) ne-app gc-var cloΣ' s
 subsumption {Σ' = [ e ]↝ Σ'} (⊢ann ⊢e) newΣ cloΣ' s = ⊢sub (⊢ann ⊢e) ne-app gc-ann cloΣ' s
-subsumption {Σ' = [ e ]↝ Σ'} (⊢app ⊢e) newΣ cloΣ' s = {!!}
-subsumption {Σ' = [ e ]↝ Σ'} (⊢lam₂ ⊢e up-c ⊢e₁) newΣ cloΣ' s = {!!}
+subsumption {Σ' = [ e ]↝ Σ'} (⊢app ⊢e) newΣ cloΣ' s with ⊢to≤ ⊢e
+... | s-term-c ⊢e₁ r = ⊢app (subsumption ⊢e (≊S newΣ) (⊢c-term (⊢closee ⊢e₁) cloΣ') (s-term-c ⊢e₁ s))
+... | s-term-o opnA ⊢e₁ r r₁ = ⊥-elim (⊢c-⊢o-disjoint (⊢closeA ⊢e₁) opnA)
+subsumption {Σ' = [ e ]↝ Σ'} (⊢lam₂ ⊢e up-c ⊢e₁) (≊S newΣ) (⊢c-term cloe cloΣ') (s-term-c ⊢e₂ s) with ⊢id0 ⊢e₂
+                                                                                                    | ↑tmᶜ0-total Σ'
+... | refl | ⟨ nΣ' , up-Σ ⟩ = ⊢lam₂ ⊢e up-Σ (subsumption ⊢e₁
+                                                         (≊-weaken newΣ up-c up-Σ)
+                                                         (⊢cᶜ-weaken,0 cloΣ' up-Σ)
+                                                         (s-weaken,0 s up-Σ))
+subsumption {Σ' = [ e ]↝ Σ'} (⊢lam₂ ⊢e up-c ⊢e₁) (≊S newΣ) cloΣ' (s-term-o opnA ⊢e₂ s s₁)
+  = ⊥-elim (⊢c-⊢o-disjoint (⊢closeA ⊢e) opnA)
 subsumption {Σ' = [ e ]↝ Σ'} (⊢sub ⊢e ne gc cloΣ s₁) (≊S newΣ) (⊢c-term cloe cloΣ') s =
-  ⊢sub ⊢e ne-app gc (⊢c-term cloe cloΣ') {!!}
--- (s-trans s₁ (≊S newΣ) s)
+  ⊢sub ⊢e ne-app gc (⊢c-term cloe cloΣ') (s-trans s₁ s (≊S newΣ))
 subsumption {Σ' = [ e ]↝ Σ'} (⊢tabs ⊢e) newΣ cloΣ' s = ⊢sub (⊢tabs ⊢e) ne-app gc-tlam cloΣ' s
 
 {-
@@ -88,7 +109,9 @@ s-refined-p s'@(s-term-o opnA ⊢e s s₁) pr'@(polar-r cloΓ (⊢c-term cloe cl
   s-term-c (t-⊆-prv (subsumption0 ⊢e s-refl (⊢c-τ (⊢closeA ⊢e))) (s-⊆ s') (s-closed-env s' pr'))
            (s-refined-p s₁ (polar-r (s-closed-env s (polar-l cloΓ (⊢closeA ⊢e))) (⊆-closedᶜ cloΣ (s-⊆ s))))
 s-refined-p (s-∀ s) pr = s-∀ (s-refined-p s (polar-∀ pr))
-s-refined-p (s-∀l s upᶜ upᵉ st₁ st₂) pr = {!s-refined-p s ?!}
+s-refined-p (s-∀l s upᶜ upᵉ st₁ st₂) (polar-r cloΓ cloΣ) =
+  s-subst (s-refined-p s (polar-r (clo-S^ cloΓ) (⊢cᶜ-weaken^0 cloΣ (↑tyᶜ-e upᵉ upᶜ))))
+          (st-arr st₁ st₂) (st-arr st₁ st₂) (↑tyᶜ-e upᵉ upᶜ)
 
 {-
 s-refined : Γ ⊢ A ⌞ ≤⁺ ⌝ Σ ⊣ Δ ↪ B -- generlise output env to be Δ to deal with s-∀l case

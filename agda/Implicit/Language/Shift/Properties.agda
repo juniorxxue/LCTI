@@ -3,6 +3,37 @@ module Implicit.Language.Shift.Properties where
 open import Implicit.Language.Base
 open import Implicit.Language.Shift.Base
 
+----------------------------------------------------------------------
+--+                           term shift                           +--
+----------------------------------------------------------------------
+
+-- proof generated
+↑tm-total : ∀ (e : Term n m) (x)
+  → ∃ λ e'
+  → e ↑tm x ⇘ e'
+↑tm-total (lit i) x = ⟨ lit i , ↑tm-lit ⟩
+↑tm-total (` x₁) x = ⟨ ` punchIn x x₁ , ↑tm-var ⟩
+↑tm-total (ƛ e) x = ⟨ ƛ ↑tm-total e (#S x) .proj₁ , ↑tm-ƛ (↑tm-total e (#S x) .proj₂) ⟩
+↑tm-total (e · e₁) x = ⟨ ↑tm-total e x .proj₁ · ↑tm-total e₁ x .proj₁ ,
+                        ↑tm-app (↑tm-total e x .proj₂) (↑tm-total e₁ x .proj₂) ⟩
+↑tm-total (e ⦂ A) x = ⟨ ↑tm-total e x .proj₁ ⦂ A , ↑tm-⦂ (↑tm-total e x .proj₂) ⟩
+↑tm-total (Λ e) x = ⟨ Λ ↑tm-total e x .proj₁ , ↑tm-Λ (↑tm-total e x .proj₂) ⟩
+
+
+↑tm-unique : e ↑tm k ⇘ e₁
+           → e ↑tm k ⇘ e₂
+           → e₁ ≡ e₂
+↑tm-unique ↑tm-lit ↑tm-lit = refl
+↑tm-unique ↑tm-var ↑tm-var = refl
+↑tm-unique (↑tm-ƛ up1) (↑tm-ƛ up2) rewrite ↑tm-unique up1 up2 = refl
+↑tm-unique (↑tm-app up1 up3) (↑tm-app up2 up4) rewrite ↑tm-unique up1 up2 | ↑tm-unique up3 up4 = refl
+↑tm-unique (↑tm-⦂ up1) (↑tm-⦂ up2) rewrite ↑tm-unique up1 up2 = refl
+↑tm-unique (↑tm-Λ up1) (↑tm-Λ up2) rewrite ↑tm-unique up1 up2 = refl
+
+----------------------------------------------------------------------
+--+                           type shift                           +--
+----------------------------------------------------------------------
+
 ↑ty-unique :
     A ↑ty k ⇘ A₁
   → A ↑ty k ⇘ A₂

@@ -10,7 +10,7 @@ data Context : ℕ → ℕ → Set where
   [_]↝_ : (e : Term n m) → Context n m → Context n m
 
 variable
-  Σ Σ' Σ* Σ'* Σ₁ Σ₂ Σ'' : Context n m
+  Σ Σ' Σ* Σ'* Σ₁ Σ₂ Σ₁' Σ₂' Σ'' : Context n m
 
 data NonEmpty : Context n m → Set where
   ne-τ    : ∀ {A : Type m} → NonEmpty (Context n m ∋⦂ τ A)
