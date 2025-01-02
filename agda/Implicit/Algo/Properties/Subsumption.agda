@@ -48,7 +48,8 @@ subsumption {Σ' = [ e ]↝ Σ'} (⊢var cloΓ x∈Γ) newΣ cloΣ' s = ⊢sub (
 subsumption {Σ' = [ e ]↝ Σ'} (⊢ann ⊢e) newΣ cloΣ' s = ⊢sub (⊢ann ⊢e) ne-app gc-ann cloΣ' s
 subsumption {Σ' = [ e ]↝ Σ'} (⊢app ⊢e) newΣ cloΣ' s = {!!}
 subsumption {Σ' = [ e ]↝ Σ'} (⊢lam₂ ⊢e up-c ⊢e₁) newΣ cloΣ' s = {!!}
-subsumption {Σ' = [ e ]↝ Σ'} (⊢sub ⊢e ne gc cloΣ s₁) (≊S newΣ) (⊢c-term cloe cloΣ') s = ⊢sub ⊢e ne-app gc (⊢c-term cloe cloΣ') {!!}
+subsumption {Σ' = [ e ]↝ Σ'} (⊢sub ⊢e ne gc cloΣ s₁) (≊S newΣ) (⊢c-term cloe cloΣ') s =
+  ⊢sub ⊢e ne-app gc (⊢c-term cloe cloΣ') {!!}
 -- (s-trans s₁ (≊S newΣ) s)
 subsumption {Σ' = [ e ]↝ Σ'} (⊢tabs ⊢e) newΣ cloΣ' s = ⊢sub (⊢tabs ⊢e) ne-app gc-tlam cloΣ' s
 
