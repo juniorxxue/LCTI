@@ -3,11 +3,7 @@ module Implicit.Complete where
 open import Implicit.Language
 open import Implicit.Decl renaming (find to d-find)
 open import Implicit.Algo
-
-postualte
-  subsumption0 : Γ ⊢ □ ⇒ e ⇒ A
-               → Γ ⊢ A ⌞ ≤⁺ ⌝ Σ ⊣ Γ ↪ A'
-               → Γ ⊢ Σ ⇒ e ⇒ A'
+open import Implicit.Algo.Properties.Subsumption
 
 infix 3 _⊢_~_
 
@@ -106,14 +102,14 @@ complete-≤-chk : ∀ {Γ : Env n m} {A B}
   → Γ ⊢ B ⌞ ≤⁺ ⌝ τ A ⊣ Γ ↪ A
 complete-≤-chk B≤A = complete-≤ B≤A ~∞  
 
-complete ⊢lit ~Z = ⊢lit
-complete (⊢var x) ~Z = ⊢var x
+complete ⊢lit ~Z = ⊢lit {!!}
+complete (⊢var x) ~Z = ⊢var {!!} x
 complete (⊢ann ⊢e) ~Z = ⊢ann (complete-chk ⊢e)
 complete (⊢lam₁ ⊢e) ~∞ = ⊢lam₁ (complete-chk ⊢e)
 complete (⊢lam₂ ⊢e) (~I ⊢e' j~Σ) = ⊢lam₂ ⊢e' {!!} (complete ⊢e {!!})
 complete {Γ = Γ} (⊢app₁ ⊢e ⊢e₁) j~Σ = ⊢app (complete ⊢e (~C (complete-chk ⊢e₁) j~Σ))
 complete (⊢app₂ ⊢e ⊢e₁) j~Σ = ⊢app (complete ⊢e (~I (complete-inf ⊢e₁) j~Σ))
-complete (⊢sub ⊢e B≤A j≢Z) j~Σ = subsumption0 (complete ⊢e ~Z) {!!} -- general subsumption is required; and a subtyping completeness lemma
+complete (⊢sub ⊢e B≤A j≢Z) j~Σ = subsumption0 (complete ⊢e ~Z) {!!} {!!}
 complete (⊢tabs ⊢e) ~Z = ⊢tabs (complete-inf ⊢e)
 
 complete-≤ s-refl j~Σ = {!!}

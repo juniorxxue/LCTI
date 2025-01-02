@@ -129,15 +129,15 @@ data _▶_,_⇘_ : Env n m → Fin (1 + n) → Type m → Env (1 + n) m → Set 
   ▶Z : Γ ▶ #0 , A ⇘ Γ , A
   ▶S, : Γ ▶ k , A ⇘ Γ'
       → (Γ , B) ▶ #S k , A ⇘ Γ' , B
-  ▶S^ : Γ ▶ #S k , A ⇘ Γ'
+  ▶S^ : Γ ▶ k , A ⇘ Γ'
       → ↑ty0 A ⇘ A'
-      → (Γ ,^) ▶ #S k , A' ⇘ Γ' ,^
-  ▶S∙ : Γ ▶ #S k , A ⇘ Γ'
+      → (Γ ,^) ▶ k , A' ⇘ Γ' ,^
+  ▶S∙ : Γ ▶ k , A ⇘ Γ'
       → ↑ty0 A ⇘ A'
-      → (Γ ,∙) ▶ #S k , A' ⇘ Γ' ,∙
-  ▶S= : Γ ▶ #S k , A* ⇘ Γ'
-      → ⟦ B ⟧ A ⇘ A* -- ?
-      → (Γ ,= B) ▶ #S k , A ⇘ Γ' ,= B
+      → (Γ ,∙) ▶ k , A' ⇘ Γ' ,∙
+  ▶S= : Γ ▶ k , A  ⇘ Γ'
+      → ↑ty0 A ⇘ A'
+      → (Γ ,= B) ▶ k , A' ⇘ Γ' ,= B
 
 infix 3 _▶_,^⇘_
 data _▶_,^⇘_ : Env n m → Fin (1 + m) → Env n (1 + m) → Set where

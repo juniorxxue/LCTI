@@ -12,11 +12,31 @@ t-⊆-prv : Γ ⊢ Σ ⇒ e ⇒ A
         → Δ ⊢ Σ ⇒ e ⇒ A
 
 postulate
-  s-⊆-prv : Γ ⊢ A ⌞ ≤ ⌝ Σ ⊣ Γ ↪ B
+  s-⊆-prv : Γ' ⊢ A ⌞ ≤ ⌝ Σ ⊣ Γ ↪ B
+          → Γ ⊢c A
+          → Γ ⊢cᶜ Σ
+          → Γ ⊆ Δ
+          → Δ' ⊢ A ⌞ ≤ ⌝ Σ ⊣ Δ ↪ B
+
+{-
+s-⊆-prv' : Γ' ⊢ A ⌞ ≤ ⌝ Σ ⊣ Γ ↪ B
           → Γ ⊢c A
           → Γ ⊢cᶜ Σ
           → Γ ⊆ Δ
           → Δ ⊢ A ⌞ ≤ ⌝ Σ ⊣ Δ ↪ B
+s-⊆-prv' s-int clo cloΣ ss = s-int
+s-⊆-prv' (s-empty clo₁) clo cloΣ ss = {!!}
+s-⊆-prv' s-var clo cloΣ ss = {!!}
+s-⊆-prv' (s-ex-l^ x-in inst) clo cloΣ ss = {!!}
+s-⊆-prv' (s-ex-l= x-in s) clo cloΣ ss = {!!}
+s-⊆-prv' (s-ex-r^ x-in inst) clo cloΣ ss = {!!}
+s-⊆-prv' (s-ex-r= x-in s) clo cloΣ ss = {!!}
+s-⊆-prv' (s-arr s s₁) clo cloΣ ss = {!!}
+s-⊆-prv' (s-term-c ⊢e s) clo cloΣ ss = {!!}
+s-⊆-prv' (s-term-o opnA ⊢e s s₁) clo cloΣ ss = {!!}
+s-⊆-prv' (s-∀ s) clo cloΣ ss = {!!}
+s-⊆-prv' (s-∀l s upᶜ upᵉ st₁ st₂) clo cloΣ ss = s-∀l {!!} {!!} {!!} {!!} {!!}
+-}
 
 t-⊆-prv (⊢lit cloΓ) ext cloΔ = ⊢lit cloΔ
 t-⊆-prv (⊢var cloΓ x∈Γ) ext cloΔ = ⊢var cloΔ (⊆-in⦂ x∈Γ ext)

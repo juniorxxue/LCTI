@@ -4,16 +4,6 @@ open import Implicit.Language
 open import Implicit.Decl.Base
 open import Implicit.Decl.Properties.Find
 
-postulate
-
-  s-weaken : ∀ {Γ : Env (1 + n) m} {k j A B }
-    → Γ ∤,∤ k ⊢ j # A ≤ B
-    → Γ ⊢ j # A ≤ B
-  
-  weaken : ∀ {Γ : Env (1 + n) m} {k j e A}
-    → Γ ∤,∤ k ⊢ j # e ⦂ A
-    → Γ ⊢ j # ↑tm k e ⦂ A
-
 ▶-∋=-^ : Γ ∋ X := A
      → Γ ▶ k ,^⇘ Γ'
      → A ↑ty k ⇘ A'
@@ -68,14 +58,46 @@ postulate
 ▶-∋=-= (S= {A = A} inΓ up) (▶S= {k = k} newΓ x x₁) upA with ↑ty-total A k
 ... | ⟨ A' , upA' ⟩ = S= (▶-∋=-= inΓ newΓ upA') (↑ty-comm0 up upA upA')
 
+
+▶-∋=-, : Γ ∋ X := A
+       → Γ ▶ k , T ⇘ Γ'
+       → Γ' ∋ X := A
+▶-∋=-, (Z up) ▶Z = S, (Z up)
+▶-∋=-, (Z up) (▶S= newΓ x) = Z up
+▶-∋=-, (S, inΓ) ▶Z = S, (S, inΓ)
+▶-∋=-, (S, inΓ) (▶S, newΓ) = S, (▶-∋=-, inΓ newΓ)
+▶-∋=-, (S∙ inΓ up) ▶Z = S, (S∙ inΓ up)
+▶-∋=-, (S∙ inΓ up) (▶S∙ newΓ x) = S∙ (▶-∋=-, inΓ newΓ) up
+▶-∋=-, (S^ inΓ up) ▶Z = S, (S^ inΓ up)
+▶-∋=-, (S^ inΓ up) (▶S^ newΓ x) = S^ (▶-∋=-, inΓ newΓ) up
+▶-∋=-, (S= inΓ up) ▶Z = S, (S= inΓ up)
+▶-∋=-, (S= inΓ up) (▶S= newΓ x) = S= (▶-∋=-, inΓ newΓ) up
+
+----------------------------------------------------------------------
+--+                  weakening for term variables                  +--
+----------------------------------------------------------------------
+
+s-weaken, : Γ ⊢ j # A ≤ B
+          → Γ ▶ k , T ⇘ Γ'
+          → Γ' ⊢ j # A ≤ B
+s-weaken, s-refl newΓ = s-refl
+s-weaken, s-int newΓ = s-int
+s-weaken, s-var newΓ = s-var
+s-weaken, (s-arr₁ s s₁) newΓ = s-arr₁ (s-weaken, s newΓ) (s-weaken, s₁ newΓ)
+s-weaken, (s-arr₂ s s₁) newΓ = s-arr₂ (s-weaken, s newΓ) (s-weaken, s₁ newΓ)
+s-weaken, (s-arr₃ s) newΓ = s-arr₃ (s-weaken, s newΓ)
+s-weaken, {T = T} (s-∀ s) newΓ = s-∀ (s-weaken, s (▶S∙ newΓ (proj₂ (↑ty0-total T) )))
+s-weaken, {T = T} (s-∀l s x fd st₁ st₂) newΓ = s-∀l (s-weaken, s (▶S= newΓ (proj₂ (↑ty0-total T)))) x fd st₁ st₂
+s-weaken, (s-var-l x s) newΓ = s-var-l (▶-∋=-, x newΓ) (s-weaken, s newΓ)
+s-weaken, (s-var-r x s) newΓ = s-var-r (▶-∋=-, x newΓ) (s-weaken, s newΓ)
+
 s-weaken,0 : Γ ⊢ j # A ≤ B
            → Γ , T ⊢ j # A ≤ B
-s-weaken,0 s = s-weaken {k = #0} s
-                 
-weaken-0 : ∀ {Γ : Env (1 + n) m} {j e A}
-  → Γ ⊢ j # e ⦂ A
-  → Γ , A ⊢ j # ↑tm0 e ⦂ A
-weaken-0 {Γ = Γ} {A = A} ⊢e = weaken {Γ = Γ , A} {k = #0} ⊢e
+s-weaken,0 s = s-weaken, s ▶Z
+
+----------------------------------------------------------------------
+--+              weakening for exsitential variables               +--
+----------------------------------------------------------------------
 
 s-weaken^ : Γ ⊢ j # A ≤ B
           → Γ ▶ k ,^⇘ Γ'

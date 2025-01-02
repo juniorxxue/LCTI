@@ -65,7 +65,7 @@ data _⊢_#_≤_ : Env n m → Counter → Type m → Type m → Set where
       Γ ,= B ⊢ j # A ≤ C `→ D
   -- we guess a solution of B here, we must make sure this B is provided from the counter
   -- what we does is to make sure the all inputs matching the counter should at least have the quantifer contained
-    → (𝕚𝕔 j)
+    → (ic : (𝕚𝕔 j))
     → (fd : find A #0 j)
     → (st₁ : ⟦ B ⟧ C ⇘ C')
     → (st₂ : ⟦ B ⟧ D ⇘ D')

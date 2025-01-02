@@ -13,10 +13,17 @@ st-unique st-var st-var = refl
 st-unique (st-arr st1 st3) (st-arr st2 st4) rewrite st-unique st1 st2 | st-unique st3 st4 = refl
 st-unique (st-∀ up st1) (st-∀ up₁ st2) rewrite ↑ty-unique up up₁ | st-unique st1 st2 = refl
 
-postulate
-  st-total : ∀ (A : Type m) k B → ∃[ B* ](⟦ k / A ⟧ B ⇘ B*)
-  st0-total : ∀ (A : Type m) B → ∃[ B* ](⟦ A ⟧ B ⇘ B*)
+st-total : ∀ (A : Type m) k B → ∃[ B* ](⟦ k / A ⟧ B ⇘ B*)
+st-total A k Int = ⟨ Int , st-int ⟩
+st-total A k (‶ X) = ⟨ ⟦ k / A ⟧ˣ X , st-var ⟩
+st-total A k (B `→ B₁) = ⟨ st-total A k B .proj₁ `→ st-total A k B₁ .proj₁ ,
+                          st-arr (st-total A k B .proj₂) (st-total A k B₁ .proj₂) ⟩
+st-total A k (`∀ B) with ↑ty0-total A
+... | ⟨ A' , upA ⟩ with st-total A' (#S k) B
+... | ⟨ B* , stB ⟩ = ⟨ `∀ B* , st-∀ upA stB ⟩
 
+st0-total : ∀ (A : Type m) B → ∃[ B* ](⟦ A ⟧ B ⇘ B*)
+st0-total A B = st-total A #0 B
 
 st0-unique :
     ⟦ A ⟧ B ⇘ B₁

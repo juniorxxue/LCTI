@@ -8,10 +8,10 @@ open import Implicit.Language.OpenClose.Base
 
 postulate
   ⊢c-strengthen,0 : Γ , B ⊢c A
-                 → Γ ⊢c A
+                  → Γ ⊢c A
 
   ⊢c-weaken,0 : Γ ⊢c A
-             → Γ , B ⊢c A
+              → Γ , B ⊢c A
 
   ⊢c-weaken∙0 : Γ ⊢c A
               → ↑ty0 A ⇘ A'
