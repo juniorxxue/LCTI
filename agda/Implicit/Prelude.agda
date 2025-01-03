@@ -70,7 +70,7 @@ m+n<o⇒n<o {m} {n} {o} m+n<o = ≤-trans (s≤s (m≤n+m n m)) m+n<o
 
 variable
   x y : Fin n
-  k k' k₁ k₂ X : Fin m
+  k k' k₁ k₂ X Y : Fin m
 
 ≢-pred : #S x ≢ #S y
        → x ≢ y

@@ -4,18 +4,33 @@ open import Implicit.Language.Base
 open import Implicit.Language.Subst.Base
 open import Implicit.Language.Shift
 
+stx-unique : ⟦ k / A ⟧ˣ X ⇘ B₁
+           → ⟦ k / A ⟧ˣ X ⇘ B₂
+           → B₁ ≡ B₂
+stx-unique stx-eq stx-eq = refl
+stx-unique stx-eq (stx-neq ¬p) = ⊥-elim (¬p refl)
+stx-unique (stx-neq ¬p) stx-eq = ⊥-elim (¬p refl)
+stx-unique (stx-neq ¬p) (stx-neq ¬p₁) = refl
+
 st-unique :
     ⟦ k / A ⟧ B ⇘ B₁
   → ⟦ k / A ⟧ B ⇘ B₂
   → B₁ ≡ B₂
 st-unique st-int st-int = refl
-st-unique (st-var stx1) (st-var stx2) = {!!}
+st-unique (st-var stx1) (st-var stx2) = stx-unique stx1 stx2
 st-unique (st-arr st1 st3) (st-arr st2 st4) rewrite st-unique st1 st2 | st-unique st3 st4 = refl
 st-unique (st-∀ up st1) (st-∀ up₁ st2) rewrite ↑ty-unique up up₁ | st-unique st1 st2 = refl
 
+stx-total : ∀ (A : Type m) k X
+  → ∃[ A* ](⟦ k / A ⟧ˣ X ⇘ A*)
+stx-total A k X with k #≟ X
+... | yes refl = ⟨ A , stx-eq ⟩
+... | no ¬p = ⟨ (‶ punchOut {i = k} {j = X} ¬p) , stx-neq ¬p ⟩
+
 st-total : ∀ (A : Type m) k B → ∃[ B* ](⟦ k / A ⟧ B ⇘ B*)
 st-total A k Int = ⟨ Int , st-int ⟩
-st-total A k (‶ X) = {!!}
+st-total A k (‶ X) with stx-total A k X
+... | ⟨ A' , stx ⟩ = ⟨ A' , st-var stx ⟩
 st-total A k (B `→ B₁) = ⟨ st-total A k B .proj₁ `→ st-total A k B₁ .proj₁ ,
                           st-arr (st-total A k B .proj₂) (st-total A k B₁ .proj₂) ⟩
 st-total A k (`∀ B) with ↑ty0-total A
@@ -31,26 +46,29 @@ st0-unique :
   → B₁ ≡ B₂
 st0-unique st1 st2 = st-unique st1 st2
 
+↑ty-stx-eq : ⟦ k / T ⟧ˣ Y ⇘ B
+           → Y ≡ punchIn k X
+           → ‶ X ≡ B
+↑ty-stx-eq {k = k} {Y = Y} {X = X} stx-eq eq = ⊥-elim ((punchInᵢ≢i k X) (sym eq))
+↑ty-stx-eq {k = k} (stx-neq ¬p) refl = cong ‶_ (sym (punchOut-punchIn k))     
+
 ↑ty-st-eq :
     A ↑ty k ⇘ A'
   → ⟦ k / T ⟧ A' ⇘ B
   → A ≡ B
 ↑ty-st-eq ↑ty-int st-int = refl
-↑ty-st-eq {k = k} (↑ty-var {X = X}) (st-var stx) = {!!}
+↑ty-st-eq {k = k} (↑ty-var {X = X}) (st-var stx) = ↑ty-stx-eq stx refl
 ↑ty-st-eq (↑ty-arr up up₁) (st-arr st st₁) rewrite ↑ty-st-eq up st | ↑ty-st-eq up₁ st₁ = refl
 ↑ty-st-eq (↑ty-∀ up) (st-∀ up₁ st) = cong `∀_ (↑ty-st-eq up st)
 
 ↑ty-st :
     A ↑ty k ⇘ A'
   → ⟦ k / T ⟧ A' ⇘ A
-↑ty-st ↑ty-int = st-int
-↑ty-st {k = k} {T = T} (↑ty-var {X = X}) = {!!}
-↑ty-st (↑ty-arr up up₁) = st-arr (↑ty-st up) (↑ty-st up₁)
-↑ty-st {T = T} (↑ty-∀ up) with ↑ty-total T #0
-... | ⟨ _ , up' ⟩ = st-∀ up' (↑ty-st up)
+↑ty-st {A = A} {k} {A'} {T = T} up with st-total T k A'
+... | ⟨ A* , st ⟩ rewrite ↑ty-st-eq up st = st
 
 {-
--- this is a wrong lemma, T is Int, k is 0, A' is 0
+-- this is a wrong lemma, say T is Int, k is 0, A' is 0
 st-↑ty : ⟦ k / T ⟧ A' ⇘ A
        → A ↑ty k ⇘ A'
 st-↑ty st-int = ↑ty-int
