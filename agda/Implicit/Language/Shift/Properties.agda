@@ -67,12 +67,17 @@ open import Implicit.Language.Shift.Base
 ↑ty-shifted (↑ty-arr up up₁) = sfd-arr (↑ty-shifted up) (↑ty-shifted up₁)
 ↑ty-shifted (↑ty-∀ up) = sfd-∀ (↑ty-shifted up)
 
-postulate
-  ↑ty-comm : k₁ #≤ k₂
-           → A ↑ty k₁ ⇘ B
-           → B ↑ty #S k₂ ⇘ C
-           → A ↑ty k₂ ⇘ D
-           → D ↑ty (inject₁ k₁) ⇘ C         
+↑ty-comm : k₁ #≤ k₂
+         → A ↑ty k₁ ⇘ B
+         → B ↑ty #S k₂ ⇘ C
+         → A ↑ty k₂ ⇘ D
+         → D ↑ty (inject₁ k₁) ⇘ C
+↑ty-comm k₁≤k₂ ↑ty-int ↑ty-int ↑ty-int = ↑ty-int
+↑ty-comm {k₁ = k₁} {k₂} k₁≤k₂ (↑ty-var {X = X}) ↑ty-var ↑ty-var
+  rewrite sym (punchIn-comm {x = X} {j = k₁} {k = k₂} k₁≤k₂) = ↑ty-var
+↑ty-comm k₁≤k₂ (↑ty-arr up1 up4) (↑ty-arr up2 up5) (↑ty-arr up3 up6) =
+  ↑ty-arr (↑ty-comm k₁≤k₂ up1 up2 up3) (↑ty-comm k₁≤k₂ up4 up5 up6)
+↑ty-comm k₁≤k₂ (↑ty-∀ up1) (↑ty-∀ up2) (↑ty-∀ up3) = ↑ty-∀ (↑ty-comm (s≤s k₁≤k₂) up1 up2 up3)
 
 private variable
   A₀ Aₖ Aₖ₊₁ : Type m

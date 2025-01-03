@@ -104,3 +104,12 @@ punchIn-inject-neq {X = #0} {k = #S k} {#0} lt neq = λ z → neq refl
 punchIn-inject-neq {X = #S X} {k = #S k} {#0} lt neq = λ ()
 punchIn-inject-neq {X = #0} {k = #S k} {#S k'} lt neq = λ ()
 punchIn-inject-neq {X = #S X} {k = #S k} {#S k'} (s≤s lt) neq = ≢-suc (punchIn-inject-neq lt (≢-pred neq))
+
+punchIn-comm : ∀ {x : Fin n} {j k} 
+   → j #≤ k
+   → punchIn (inject₁ j) (punchIn k x) ≡
+      punchIn (#S k) (punchIn j x)
+punchIn-comm {x = #0} {#0} j≤k = refl
+punchIn-comm {x = #0} {#S j} {#S k} j≤k = refl
+punchIn-comm {x = #S x} {#0} j≤k = refl
+punchIn-comm {x = #S x} {#S j} {#S k} (s≤s j≤k) = cong #S (punchIn-comm j≤k)
