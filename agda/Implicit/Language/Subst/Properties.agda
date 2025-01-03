@@ -9,13 +9,13 @@ st-unique :
   → ⟦ k / A ⟧ B ⇘ B₂
   → B₁ ≡ B₂
 st-unique st-int st-int = refl
-st-unique st-var st-var = refl
+st-unique (st-var stx1) (st-var stx2) = {!!}
 st-unique (st-arr st1 st3) (st-arr st2 st4) rewrite st-unique st1 st2 | st-unique st3 st4 = refl
 st-unique (st-∀ up st1) (st-∀ up₁ st2) rewrite ↑ty-unique up up₁ | st-unique st1 st2 = refl
 
 st-total : ∀ (A : Type m) k B → ∃[ B* ](⟦ k / A ⟧ B ⇘ B*)
 st-total A k Int = ⟨ Int , st-int ⟩
-st-total A k (‶ X) = ⟨ ⟦ k / A ⟧ˣ X , st-var ⟩
+st-total A k (‶ X) = {!!}
 st-total A k (B `→ B₁) = ⟨ st-total A k B .proj₁ `→ st-total A k B₁ .proj₁ ,
                           st-arr (st-total A k B .proj₂) (st-total A k B₁ .proj₂) ⟩
 st-total A k (`∀ B) with ↑ty0-total A
@@ -31,18 +31,12 @@ st0-unique :
   → B₁ ≡ B₂
 st0-unique st1 st2 = st-unique st1 st2
 
-↑ty-stx-eq :
-  ‶ X ≡ ⟦ k / T ⟧ˣ (punchIn k X)
-↑ty-stx-eq {X = X} {k = k} with k #≟ (punchIn k X)
-... | yes p = ⊥-elim ((punchInᵢ≢i k X) (sym p))
-... | no ¬p = cong ‶_ (sym (punchOut-punchIn k))
-
 ↑ty-st-eq :
     A ↑ty k ⇘ A'
   → ⟦ k / T ⟧ A' ⇘ B
   → A ≡ B
 ↑ty-st-eq ↑ty-int st-int = refl
-↑ty-st-eq {k = k} (↑ty-var {X = X}) st-var = ↑ty-stx-eq {X = X} {k = k}
+↑ty-st-eq {k = k} (↑ty-var {X = X}) (st-var stx) = {!!}
 ↑ty-st-eq (↑ty-arr up up₁) (st-arr st st₁) rewrite ↑ty-st-eq up st | ↑ty-st-eq up₁ st₁ = refl
 ↑ty-st-eq (↑ty-∀ up) (st-∀ up₁ st) = cong `∀_ (↑ty-st-eq up st)
 
@@ -50,7 +44,7 @@ st0-unique st1 st2 = st-unique st1 st2
     A ↑ty k ⇘ A'
   → ⟦ k / T ⟧ A' ⇘ A
 ↑ty-st ↑ty-int = st-int
-↑ty-st {k = k} {T = T} (↑ty-var {X = X}) rewrite ↑ty-stx-eq {X = X} {k = k} {T = T} = st-var
+↑ty-st {k = k} {T = T} (↑ty-var {X = X}) = {!!}
 ↑ty-st (↑ty-arr up up₁) = st-arr (↑ty-st up) (↑ty-st up₁)
 ↑ty-st {T = T} (↑ty-∀ up) with ↑ty-total T #0
 ... | ⟨ _ , up' ⟩ = st-∀ up' (↑ty-st up)
@@ -105,14 +99,43 @@ st0-total-rev = st-total-rev #0
             → A* ↑ty k₁ ⇘ A*'
             → ⟦ k₂ / T ⟧ A ⇘ A*
 -}
-postulate
 
-  ↑ty-st-comm : k₁ #≤ k₂
-              → ⟦ k₁ / B ⟧ A ⇘ A*
-              → A ↑ty (#S k₂) ⇘ A'
-              → B ↑ty k₂ ⇘ B'
-              → A* ↑ty k₂ ⇘ A*'
-              → ⟦ (inject₁ k₁) / B' ⟧ A' ⇘ A*'
+punchIn-punchOut' : ∀ {k₂ : Fin (1 + m)}
+  → (¬p : k₁ ≢ X)
+  → (sm : k₁ #≤ k₂)
+  → punchOut {i = inject₁ k₁} {j = punchIn (#S k₂) X} (punchIn-inject-neq (s≤s sm) ¬p) ≡ punchIn k₂ (punchOut ¬p)
+punchIn-punchOut' {k₁ = #0} {#0} {k₂ = k₂} ¬p sm = ⊥-elim (¬p refl)
+punchIn-punchOut' {k₁ = #S #0} {#0} {k₂ = #S k₂} ¬p sm = refl
+punchIn-punchOut' {k₁ = #S (#S k₁)} {#0} {k₂ = #S k₂} ¬p sm = refl
+punchIn-punchOut' {k₁ = #0} {#S X} {k₂ = #0} ¬p sm = refl
+punchIn-punchOut' {k₁ = #0} {#S X} {k₂ = #S k₂} ¬p sm = refl
+punchIn-punchOut' {m = suc m} {k₁ = #S k₁} {X = #S X} {k₂ = #S k₂} ¬p (s≤s sm) = cong #S (punchIn-punchOut' (λ x → ¬p (cong #S x)) sm)
+
+↑ty-stx-comm : k₁ #≤ k₂
+             → ⟦ k₁ / B ⟧ˣ X ⇘ A*
+             ----------------------
+             → B ↑ty k₂ ⇘ B'
+             → A* ↑ty k₂ ⇘ A*'
+             ------------------
+             → ⟦ inject₁ k₁ / B' ⟧ˣ punchIn (#S k₂) X ⇘ A*'
+↑ty-stx-comm {k₁ = k₁} {k₂} {B = B} k₁≤k₂ stx-eq up1 up2
+  rewrite sym (punchIn-inject {X = k₁} {k = #S k₂} (s≤s k₁≤k₂)) rewrite ↑ty-unique up1 up2 = stx-eq
+↑ty-stx-comm {k₁ = k₁} {k₂} {X = X} k₁≤k₂ (stx-neq ¬p) up1 ↑ty-var rewrite sym (punchIn-punchOut' ¬p k₁≤k₂) = stx-neq (punchIn-inject-neq (s≤s k₁≤k₂) ¬p)
+
+↑ty-st-comm : k₁ #≤ k₂
+            → ⟦ k₁ / B ⟧ A ⇘ A*
+            --------------------
+            → A ↑ty (#S k₂) ⇘ A'
+            → B ↑ty k₂ ⇘ B'
+            → A* ↑ty k₂ ⇘ A*'
+            ----------------------
+            → ⟦ (inject₁ k₁) / B' ⟧ A' ⇘ A*'
+↑ty-st-comm k₁≤k₂ st-int ↑ty-int up2 ↑ty-int = st-int
+↑ty-st-comm k₁≤k₂ (st-var stx) ↑ty-var up2 up3 = st-var (↑ty-stx-comm k₁≤k₂ stx up2 up3)
+↑ty-st-comm k₁≤k₂ (st-arr st st₁) (↑ty-arr up1 up4) up2 (↑ty-arr up3 up5) =
+  st-arr (↑ty-st-comm k₁≤k₂ st up1 up2 up3) (↑ty-st-comm k₁≤k₂ st₁ up4 up2 up5)
+↑ty-st-comm {B' = B'} k₁≤k₂ (st-∀ up st) (↑ty-∀ up1) up2 (↑ty-∀ up3) with ↑ty0-total B'
+... | ⟨ nB' , upB' ⟩ = st-∀ upB' (↑ty-st-comm (s≤s k₁≤k₂) st up1 (↑ty-comm0' up2 upB' up) up3)
 
 ↑ty-st-comm0 : ⟦ B ⟧ C ⇘ C*
              → B ↑ty k ⇘ B'

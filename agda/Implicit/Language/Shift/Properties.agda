@@ -70,6 +70,7 @@ open import Implicit.Language.Shift.Base
 ↑ty-comm : k₁ #≤ k₂
          → A ↑ty k₁ ⇘ B
          → B ↑ty #S k₂ ⇘ C
+         ------------------
          → A ↑ty k₂ ⇘ D
          → D ↑ty (inject₁ k₁) ⇘ C
 ↑ty-comm k₁≤k₂ ↑ty-int ↑ty-int ↑ty-int = ↑ty-int
@@ -84,8 +85,30 @@ private variable
 
 ↑ty-comm0 : ↑ty0 A ⇘ A₀
           → A₀ ↑ty #S k ⇘ Aₖ₊₁
+          -------------------
           → A ↑ty k ⇘ Aₖ
           → ↑ty0 Aₖ ⇘ Aₖ₊₁
 ↑ty-comm0 up1 up2 up3 = ↑ty-comm {k₁ = #0} z≤n up1 up2 up3
 
-  
+-- ↑ty-comm describes a equal relation, and have another interpreation
+
+↑ty-comm' : k₁ #≤ k₂
+         → A ↑ty k₂ ⇘ D
+         → D ↑ty (inject₁ k₁) ⇘ C
+         ----------------
+         → A ↑ty k₁ ⇘ B
+         → B ↑ty #S k₂ ⇘ C
+↑ty-comm' k₁≤k₂ ↑ty-int ↑ty-int ↑ty-int = ↑ty-int
+↑ty-comm' {k₁ = k₁} {k₂} k₁≤k₂ (↑ty-var {X = X}) ↑ty-var ↑ty-var
+  rewrite punchIn-comm {x = X} {j = k₁} {k = k₂} k₁≤k₂ = ↑ty-var
+↑ty-comm' k₁≤k₂ (↑ty-arr up1 up4) (↑ty-arr up2 up5) (↑ty-arr up3 up6) =
+  ↑ty-arr (↑ty-comm' k₁≤k₂ up1 up2 up3) (↑ty-comm' k₁≤k₂ up4 up5 up6)
+↑ty-comm' k₁≤k₂ (↑ty-∀ up1) (↑ty-∀ up2) (↑ty-∀ up3) = ↑ty-∀ (↑ty-comm' (s≤s k₁≤k₂) up1 up2 up3)
+
+
+↑ty-comm0' : A ↑ty k ⇘ Aₖ
+           → ↑ty0 Aₖ ⇘ Aₖ₊₁
+           ---------------------
+           → ↑ty0 A ⇘ A₀
+           → A₀ ↑ty #S k ⇘ Aₖ₊₁
+↑ty-comm0' up1 up2 up3 = ↑ty-comm' z≤n up1 up2 up3           

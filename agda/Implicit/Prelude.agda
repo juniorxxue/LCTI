@@ -14,7 +14,7 @@ open import Data.List using (List; []; _∷_; _++_; reverse; map; foldr; downFro
 open import Data.List.Properties using (map-++) public
 open import Data.Maybe using (Maybe; just; nothing) renaming (map to mmap) public
 open import Data.Fin using (Fin; punchIn; punchOut; toℕ; inject₁) renaming (zero to #0; suc to #S; pred to #pred; _<_ to _#<_; _≤_ to _#≤_) public
-open import Data.Fin.Properties using (punchInᵢ≢i; punchOut-punchIn) renaming (<-cmp to #<-cmp; _≟_ to _#≟_) public
+open import Data.Fin.Properties using (punchInᵢ≢i; punchIn-punchOut; punchOut-punchIn) renaming (<-cmp to #<-cmp; _≟_ to _#≟_) public
 open import Function renaming (_∋_ to _∋⦂_) public
 
 variable
@@ -113,3 +113,7 @@ punchIn-comm {x = #0} {#0} j≤k = refl
 punchIn-comm {x = #0} {#S j} {#S k} j≤k = refl
 punchIn-comm {x = #S x} {#0} j≤k = refl
 punchIn-comm {x = #S x} {#S j} {#S k} (s≤s j≤k) = cong #S (punchIn-comm j≤k)
+
+m#<m+1 : k #< #S k
+m#<m+1 {k = #0} = s≤s z≤n
+m#<m+1 {k = #S k} = s≤s m#<m+1

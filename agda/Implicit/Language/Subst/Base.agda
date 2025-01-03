@@ -46,11 +46,12 @@ infix 7 ⟦_⟧ᵉ_
 --+                         Relation Ver.                          +--
 ----------------------------------------------------------------------
 
-infix 3 ⟦_/_⟧ˣ
-⟦_/_⟧ˣ : Fin (1 + m) → Type m → Fin (1 + m) → Type m
-⟦ k / A ⟧ˣ X with k #≟ X
-... | yes p = A
-... | no ¬p = ‶ punchOut {i = k} {j = X} ¬p
+infix 3 ⟦_/_⟧ˣ_⇘_
+data ⟦_/_⟧ˣ_⇘_ : Fin (1 + m) → Type m → Fin (1 + m) → Type m → Set where
+  stx-eq  : ⟦ k / A ⟧ˣ k ⇘ A
+  stx-neq : (¬p : k ≢ X)
+          → ⟦ k / A ⟧ˣ X ⇘ ‶ punchOut {i = k} {j = X} ¬p
+  
 
 -- type subst
 infix 3 ⟦_/_⟧_⇘_
@@ -58,7 +59,8 @@ data ⟦_/_⟧_⇘_ : Fin (1 + m) → Type m → Type (1 + m) → Type m → Set
   st-int :
       ⟦ k / A ⟧ Int ⇘ Int
   st-var :
-      ⟦ k / A ⟧ (‶ X) ⇘ ⟦ k / A ⟧ˣ X
+      (stx : ⟦ k / A ⟧ˣ X ⇘ B)
+    → ⟦ k / A ⟧ (‶ X) ⇘ B
   st-arr :
       ⟦ k / A ⟧ B ⇘ B'
     → ⟦ k / A ⟧ C ⇘ C'
