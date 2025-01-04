@@ -5,41 +5,14 @@ open import Implicit.Language.Lookup
 open import Implicit.Language.Shift
 open import Implicit.Language.Subst
 open import Implicit.Language.OpenClose.Base
+open import Implicit.Language.OpenClose.Weaken
+open import Implicit.Language.OpenClose.Strengthen
 
 postulate
-  ⊢c-strengthen,0 : Γ , B ⊢c A
-                  → Γ ⊢c A
-
-  ⊢c-weaken,0 : Γ ⊢c A
-              → Γ , B ⊢c A
-
-  ⊢c-weaken∙0 : Γ ⊢c A
-              → ↑ty0 A ⇘ A'
-              → Γ ,∙ ⊢c A'
-              
-  ⊢c-weaken^0 : Γ ⊢c A
-              → ↑ty0 A ⇘ A'
-              → Γ ,^ ⊢c A'
-
-  ⊢c-strengthen^0 : Γ ,^ ⊢c A'
-                  → ↑ty0 A ⇘ A'
-                  → Γ ⊢c A
-
-  ⊢c-strengthen=0 : Γ ,= T ⊢c A'
-                  → ↑ty0 A ⇘ A'
-                  → Γ ⊢c A
 
   ⊢c-subst : Δ ,= T ⊢c A
            → ⟦ T ⟧ A ⇘ A*
            → Δ ⊢c A*
-
-  ⊢c-strengthen∙0 : Γ ,∙ ⊢c A'
-                  → ↑ty0 A ⇘ A'
-                  → Γ ⊢c A
-
-  ⊢c-weaken=0 : Γ ⊢c A
-              → ↑ty0 A ⇘ A'
-              → Γ ,= B ⊢c A'  
              
 ∋⦂-closed : Closed Γ
           → Γ ∋ x ⦂ A

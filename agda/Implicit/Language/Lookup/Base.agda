@@ -143,14 +143,14 @@ infix 3 _▶_,^⇘_
 data _▶_,^⇘_ : Env n m → Fin (1 + m) → Env n (1 + m) → Set where
   ▶Z : Γ ▶ #0 ,^⇘ Γ ,^
   ▶S, : Γ ▶ #S k ,^⇘ Γ'
-      → A ↑ty #S k ⇘ A'
+      → (upA : A ↑ty #S k ⇘ A')
       → Γ , A ▶ #S k ,^⇘ Γ' , A'
   ▶S^ : Γ ▶ k ,^⇘ Γ'
       → Γ ,^ ▶ #S k ,^⇘ Γ' ,^
   ▶S∙ : Γ ▶ k ,^⇘ Γ'
       → Γ ,∙ ▶ #S k ,^⇘ Γ' ,∙
   ▶S= : Γ ▶ k ,^⇘ Γ'
-      → B ↑ty k ⇘ B'
+      → (upB : B ↑ty k ⇘ B')
       → Γ ,= B ▶ #S k ,^⇘ Γ' ,= B'
 
 infix 3 _▶_,∙⇘_
