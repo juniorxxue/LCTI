@@ -120,8 +120,51 @@ _∤,∤_ {suc n} (Γ , A) (#S k) = (Γ ∤,∤ k) , A
 (Γ ,^) ∤,∤ k = (Γ ∤,∤ k) ,^
 (Γ ,= A) ∤,∤ k = (Γ ∤,∤ k) ,= A
 
+-- remove (x : A) from k-th position
+infix 3 _◀_,⇘_
+data _◀_,⇘_ : Env (1 + n) m → Fin (1 + n) → Env n m → Set where
+  ◀Z : Γ , A ◀ #0 ,⇘ Γ
+  ◀S, : Γ ◀ k ,⇘ Γ'
+      → Γ , B ◀ #S k ,⇘ Γ' , B
+  ◀S^ : Γ ◀ k ,⇘ Γ'
+      → (Γ ,^) ◀ k ,⇘ Γ' ,^
+  ◀S∙ : Γ ◀ k ,⇘ Γ'
+      → (Γ ,∙) ◀ k ,⇘ Γ' ,∙
+  ◀S= : Γ ◀ k ,⇘ Γ'
+      → (Γ ,= A) ◀ k ,⇘ Γ' ,= A
+
+-- remove exsitential variable â from k-th posititon
+infix 3 _◀_^⇘_
+data _◀_^⇘_ : Env n (1 + m) → Fin (1 + m) → Env n m → Set where
+  ◀Z  : Γ ,^ ◀ #0 ^⇘ Γ
+  ◀S, : Γ ◀ k ^⇘ Γ'
+      → B ↑ty k ⇘ B'
+      → Γ , B' ◀ k ^⇘ Γ' , B
+  ◀S^ : Γ ◀ k ^⇘ Γ'
+      → Γ ,^ ◀ #S k ^⇘ Γ' ,^
+  ◀S∙ : Γ ◀ k ^⇘ Γ'
+      → Γ ,∙ ◀ #S k ^⇘ Γ' ,∙
+  ◀S= : Γ ◀ k ^⇘ Γ'
+      → A ↑ty k ⇘ A'
+      → Γ ,= A' ◀ #S k ^⇘ Γ' ,= A
+
+-- remove type variable a from k-th posititon
+infix 3 _◀_∙⇘_
+data _◀_∙⇘_ : Env n (1 + m) → Fin (1 + m) → Env n m → Set where
+  ◀Z  : Γ ,∙ ◀ #0 ∙⇘ Γ
+  ◀S, : Γ ◀ k ∙⇘ Γ'
+      → B ↑ty k ⇘ B'
+      → Γ , B' ◀ k ∙⇘ Γ' , B
+  ◀S^ : Γ ◀ k ∙⇘ Γ'
+      → Γ ,^ ◀ #S k ∙⇘ Γ' ,^
+  ◀S∙ : Γ ◀ k ∙⇘ Γ'
+      → Γ ,∙ ◀ #S k ∙⇘ Γ' ,∙
+  ◀S= : Γ ◀ k ∙⇘ Γ'
+      → A ↑ty k ⇘ A'
+      → Γ ,= A' ◀ #S k ∙⇘ Γ' ,= A
+
 ----------------------------------------------------------------------
---+                         Entry Addition                         +--
+--+                         Entry Insertion                        +--
 ----------------------------------------------------------------------
 
 infix 3 _▶_,_⇘_
