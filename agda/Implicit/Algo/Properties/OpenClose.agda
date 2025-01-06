@@ -79,7 +79,7 @@ polar-⊆ (polar-r cloΓ cloA) ss clo = polar-r clo (⊆-closedᶜ cloA ss)
 polar-in-l : Polarity Γ (‶ X) Σ ≤
            → Γ ∋ X := A
            → Polarity Γ A Σ ≤
-polar-in-l (polar-l cloΓ (⊢c-var-∙ inΓ₁)) inΓ = ⊥-elim (∙∈-=∈-false inΓ₁ inΓ)
+polar-in-l (polar-l cloΓ (⊢c-var-∙ inΓ₁)) inΓ = ⊥-elim (∙∈-=∈-false inΓ₁ (:=to= inΓ))
 polar-in-l (polar-l cloΓ (⊢c-var-= inΓ₁)) inΓ = polar-l cloΓ (∋=-closed cloΓ inΓ)
 polar-in-l (polar-r cloΓ cloΣ) inΓ = polar-r cloΓ cloΣ
 
@@ -201,8 +201,8 @@ s-closed (s-term-c ⊢e s) pl = ⊢c-arr (⊆-closed (⊢closeA ⊢e) (s-⊆ s))
 s-closed s'@(s-term-o opnA ⊢e s s₁) (polar-r cloΓ (⊢c-term cloe cloΣ)) =
   ⊢c-arr (⊆-closed (⊢closeA ⊢e) (s-⊆ s')) (s-closed s₁ (polar-r (s-closed-env s (polar-l cloΓ (⊢closeA ⊢e))) (⊆-closedᶜ cloΣ (s-⊆ s))))
 s-closed (s-∀ s) pl = ⊢c-∀ (s-closed s (polar-∀ pl))
-s-closed (s-∀l s upᶜ upᵉ st₁ st₂) (polar-r cloΓ cloΣ) =
-  ⊢c-subst (s-closed s (polar-r (clo-S^ cloΓ) (⊢cᶜ-weaken^0 cloΣ (↑tyᶜ-e upᵉ upᶜ)))) (st-arr st₁ st₂)
+s-closed (s-∀l s upᶜ upᵉ st₁ st₂) (polar-r cloΓ cloΣ) with s-closed-env s (polar-r (clo-S^ cloΓ) (⊢cᶜ-weaken^0 cloΣ (↑tyᶜ-e upᵉ upᶜ)))
+... | clo-S= cloΔ cloA = ⊢c-subst0 (s-closed s (polar-r (clo-S^ cloΓ) (⊢cᶜ-weaken^0 cloΣ (↑tyᶜ-e upᵉ upᶜ)))) cloA (st-arr st₁ st₂)
 
 s-closed-env s-int (polar-l cloΓ cloA) = cloΓ
 s-closed-env s-int (polar-r cloΓ cloΣ) = cloΓ

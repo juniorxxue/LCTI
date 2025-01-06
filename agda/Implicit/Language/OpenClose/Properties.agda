@@ -8,12 +8,6 @@ open import Implicit.Language.OpenClose.Base
 open import Implicit.Language.OpenClose.Weaken
 open import Implicit.Language.OpenClose.Strengthen
 
-postulate
-
-  ⊢c-subst : Δ ,= T ⊢c A
-           → ⟦ T ⟧ A ⇘ A*
-           → Δ ⊢c A*
-             
 ∋⦂-closed : Closed Γ
           → Γ ∋ x ⦂ A
           → Γ ⊢c A
@@ -96,36 +90,6 @@ data _◆_⇘_ : Env n m → Fin m → Env n m → Set where
       → Γ ,∙ ⊢c A
 ⊢c-◆0 clo = ⊢c-◆ clo ◆Z
 
-----------------------------------------------------------------------
---+                       False elimination                        +--
-----------------------------------------------------------------------
-
-^∈-∙∈-false :
-    Γ ∋^ k
-  → Γ ∋∙ k
-  → ⊥
-^∈-∙∈-false (S^ ^in) (S^ ∙in) = ^∈-∙∈-false ^in ∙in
-^∈-∙∈-false (S∙ ^in) (S∙ ∙in) = ^∈-∙∈-false ^in ∙in
-^∈-∙∈-false (S, ^in) (S, ∙in) = ^∈-∙∈-false ^in ∙in
-^∈-∙∈-false (S= ^in) (S= ∙in) = ^∈-∙∈-false ^in ∙in
-
-^∈-=∈-false :
-    Γ ∋^ k
-  → Γ ∋= k
-  → ⊥
-^∈-=∈-false (S^ in1) (S^ in2) = ^∈-=∈-false in1 in2
-^∈-=∈-false (S∙ in1) (S∙ in2) = ^∈-=∈-false in1 in2
-^∈-=∈-false (S, in1) (S, in2) = ^∈-=∈-false in1 in2
-^∈-=∈-false (S= in1) (S= in2) = ^∈-=∈-false in1 in2
-
-∙∈-=∈-false :
-    Γ ∋∙ X
-  → Γ ∋ X := A
-  → ⊥
-∙∈-=∈-false (S, in1) (S, in2) = ∙∈-=∈-false in1 in2
-∙∈-=∈-false (S∙ in1) (S∙ in2 up) = ∙∈-=∈-false in1 in2
-∙∈-=∈-false (S= in1) (S= in2 up) = ∙∈-=∈-false in1 in2
-∙∈-=∈-false (S^ in1) (S^ in2 up) = ∙∈-=∈-false in1 in2
     
 ⊢c-^∈-false : k ε A
             → Γ ∋^ k
