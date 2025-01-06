@@ -5,14 +5,12 @@ open import Implicit.Language.Lookup
 open import Implicit.Language.Shift
 open import Implicit.Language.Subst
 open import Implicit.Language.OpenClose.Base
-open import Implicit.Language.OpenClose.Subst
 
--- subst lemma implies this, only with Γ ⊢c T
-⊢c-strengthen=0 : Γ ,= T ⊢c A'
-                → ↑ty0 A ⇘ A'
-                → Γ ⊢c A
-⊢c-strengthen=0 clo up = ⊢c-subst0 clo (↑ty-st up)                
-                  
+-- subst lemma implies this, only with condition Γ ⊢c T, but obviously we need less to prove this lemam
+postulate
+  ⊢c-strengthen=0 : Γ ,= T ⊢c A'
+                  → ↑ty0 A ⇘ A'
+                  → Γ ⊢c A
 
 ⊢c-strengthen, : Γ ⊢c A
                → Γ ◀ k ,⇘ Γ'
