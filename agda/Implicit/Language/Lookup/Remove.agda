@@ -49,3 +49,6 @@ open import Implicit.Language.Shift
 ◀^-∋= {k = #S k} {#S X} (S∙ inΓ) (◀S∙ newΓ) = S∙ (◀^-∋= inΓ newΓ)
 ◀^-∋= {k = #S k} {#S X} (S= inΓ) (◀S= newΓ x) = S= (◀^-∋= inΓ newΓ)
 ◀^-∋= {k = #S k} {#S X} (S^ inΓ) (◀S^ newΓ) = S^ (◀^-∋= inΓ newΓ)
+
+-- remove an entry a=A, we should be careful about this
+-- removing an entry a=A requires us to do substittuiion on the remaining env

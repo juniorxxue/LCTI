@@ -163,6 +163,31 @@ data _◀_∙⇘_ : Env n (1 + m) → Fin (1 + m) → Env n m → Set where
       → A ↑ty k ⇘ A'
       → Γ ,= A' ◀ #S k ∙⇘ Γ' ,= A
 
+
+-- remove an entry a=A, we should be careful about this
+-- removing an entry a=A requires us to do substittuiion on the remaining env
+
+-- in algo, we need to first lookup the type A
+-- then use type A to manipuate remaining envs to produce a new env
+-- in this relation, we could assume we know A
+infix 3 _◀_:=_⇘_
+data _◀_:=_⇘_ : Env n (1 + m) → Fin (1 + m) → Type m → Env n m → Set where
+  ◀Z : Γ ,= A ◀ #0 := A ⇘ Γ
+  ◀S, : Γ ◀ k := A ⇘ Γ'
+      → ⟦ k / A ⟧ B ⇘ B*
+      → Γ , B ◀ k := A ⇘ Γ' , B*
+  ◀S^ : Γ ◀ k := A ⇘ Γ'
+      → (up : ↑ty0 A ⇘ A')
+      → Γ ,^ ◀ #S k := A' ⇘ Γ' ,^
+  ◀S∙ : Γ ◀ k := A ⇘ Γ'
+      → (up : ↑ty0 A ⇘ A')
+      → Γ ,∙ ◀ #S k := A' ⇘ Γ' ,∙
+  ◀S= : Γ ◀ k := A ⇘ Γ'
+      → (up : ↑ty0 A ⇘ A')
+      → ⟦ k / A ⟧ B ⇘ B*
+      → Γ ,= B ◀ #S k := A' ⇘ Γ' ,= B*
+
+
 ----------------------------------------------------------------------
 --+                         Entry Insertion                        +--
 ----------------------------------------------------------------------

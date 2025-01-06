@@ -47,3 +47,36 @@ inst-in (⟹=S inst up1 up2) = S= (inst-in inst) up2
 :=to= (S^ inΓ up) = S^ (:=to= inΓ)
 :=to= (S∙ inΓ up) = S∙ (:=to= inΓ)
 :=to= (S= inΓ up) = S= (:=to= inΓ)
+
+
+----------------------------------------------------------------------
+--+                       False elimination                        +--
+----------------------------------------------------------------------
+
+^∈-∙∈-false :
+    Γ ∋^ k
+  → Γ ∋∙ k
+  → ⊥
+^∈-∙∈-false (S^ ^in) (S^ ∙in) = ^∈-∙∈-false ^in ∙in
+^∈-∙∈-false (S∙ ^in) (S∙ ∙in) = ^∈-∙∈-false ^in ∙in
+^∈-∙∈-false (S, ^in) (S, ∙in) = ^∈-∙∈-false ^in ∙in
+^∈-∙∈-false (S= ^in) (S= ∙in) = ^∈-∙∈-false ^in ∙in
+
+^∈-=∈-false :
+    Γ ∋^ k
+  → Γ ∋= k
+  → ⊥
+^∈-=∈-false (S^ in1) (S^ in2) = ^∈-=∈-false in1 in2
+^∈-=∈-false (S∙ in1) (S∙ in2) = ^∈-=∈-false in1 in2
+^∈-=∈-false (S, in1) (S, in2) = ^∈-=∈-false in1 in2
+^∈-=∈-false (S= in1) (S= in2) = ^∈-=∈-false in1 in2
+
+∙∈-=∈-false :
+    Γ ∋∙ X
+  → Γ ∋= X
+  → ⊥
+∙∈-=∈-false (S, in1) (S, in2) = ∙∈-=∈-false in1 in2
+∙∈-=∈-false (S∙ in1) (S∙ in2) = ∙∈-=∈-false in1 in2
+∙∈-=∈-false (S= in1) (S= in2) = ∙∈-=∈-false in1 in2
+∙∈-=∈-false (S^ in1) (S^ in2) = ∙∈-=∈-false in1 in2
+  

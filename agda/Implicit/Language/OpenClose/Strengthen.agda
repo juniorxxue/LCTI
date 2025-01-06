@@ -7,7 +7,7 @@ open import Implicit.Language.Subst
 open import Implicit.Language.OpenClose.Base
 open import Implicit.Language.OpenClose.Subst
 
--- subst lemma implies this
+-- subst lemma implies this, only with Γ ⊢c T
 ⊢c-strengthen=0 : Γ ,= T ⊢c A'
                 → ↑ty0 A ⇘ A'
                 → Γ ⊢c A
