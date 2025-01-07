@@ -7,9 +7,7 @@ open import Implicit.Algo.Properties.Subsumption
 
 infix 3 _⊢_~_
 
-data _⊢_~_ : Env n m → Counter × Type m → Context n m → Set
-
-data _⊢_~_ where
+data _⊢_~_ : Env n m → Counter × Type m → Context n m → Set where
 
   ~Z : ∀ {Γ : Env n m} {A}
     → Γ ⊢ ⟨ Z , A ⟩ ~ □
@@ -36,7 +34,7 @@ data _⊢_≊_ : Env n m → Type m → Type m → Set where
 
   ≊-left : Γ ∋ X := A
          → Γ ⊢ ‶ X ≊ A
-    
+
   ≊-right : Γ ∋ X := A
           → Γ ⊢ A ≊ ‶ X
 
@@ -86,11 +84,11 @@ complete-≤' : Δ ⊢ j # B ≤ A
             --  → Ψ ⊆ (𝕎 Γ) x (exvar(Ψ) in B) × someCon(j) -- w
 --            → (Γ ⊆ Δ) × (Exvar Γ B) ×
             → Γ ⊢ B ⌞ ≤⁺ ⌝ Σ ⊣ Δ ↪ A
-  
+
 complete-inf : ∀ {Γ : Env n m} {e A}
   → Γ ⊢ Z # e ⦂ A
   → Γ ⊢ □ ⇒ e ⇒ A
-complete-inf ⊢e = complete ⊢e ~Z  
+complete-inf ⊢e = complete ⊢e ~Z
 
 complete-chk : ∀ {Γ : Env n m} {e A}
   → Γ ⊢ ∞ # e ⦂ A
@@ -100,7 +98,7 @@ complete-chk ⊢e = complete ⊢e ~∞
 complete-≤-chk : ∀ {Γ : Env n m} {A B}
   → Γ ⊢ ∞ # B ≤ A
   → Γ ⊢ B ⌞ ≤⁺ ⌝ τ A ⊣ Γ ↪ A
-complete-≤-chk B≤A = complete-≤ B≤A ~∞  
+complete-≤-chk B≤A = complete-≤ B≤A ~∞
 
 complete ⊢lit ~Z = ⊢lit {!!}
 complete (⊢var x) ~Z = ⊢var {!!} x

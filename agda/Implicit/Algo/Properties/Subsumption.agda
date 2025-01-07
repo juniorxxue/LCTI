@@ -5,6 +5,7 @@ open import Implicit.Algo.Base
 open import Implicit.Algo.Properties.Id
 open import Implicit.Algo.Properties.OpenClose
 open import Implicit.Algo.Properties.Extension
+open import Implicit.Algo.Properties.Polarity
 open import Implicit.Algo.Properties.Strengthen
 open import Implicit.Algo.Properties.Weaken
 open import Implicit.Algo.Properties.Shift
@@ -42,7 +43,7 @@ subsumption : Γ ⊢ Σ ⇒ e ⇒ A
              → Γ ⊢ A ⌞ ≤⁺ ⌝ Σ' ⊣ Γ ↪ A'
              → Γ ⊢ Σ' ⇒ e ⇒ A'
 
--- corollary            
+-- corollary
 subsumption0 : Γ ⊢ □ ⇒ e ⇒ A
              → Γ ⊢ A ⌞ ≤⁺ ⌝ Σ ⊣ Γ ↪ A'
              → Γ ⊢cᶜ Σ
@@ -116,7 +117,7 @@ s-refined-p (s-∀l s upᶜ upᵉ st₁ st₂) (polar-r cloΓ cloΣ) =
 {-
 s-refined : Γ ⊢ A ⌞ ≤⁺ ⌝ Σ ⊣ Δ ↪ B -- generlise output env to be Δ to deal with s-∀l case
           → Δ ⊢ B ⌞ ≤⁺ ⌝ Σ ⊣ Δ ↪ B
-          
+
 s-refined s-int = s-int
 s-refined (s-empty clo) = s-empty clo
 s-refined s-var = s-var

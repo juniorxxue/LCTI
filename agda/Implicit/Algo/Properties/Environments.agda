@@ -4,6 +4,7 @@ open import Implicit.Language
 open import Implicit.Algo.Base
 open import Implicit.Algo.Properties.Extension
 open import Implicit.Algo.Properties.OpenClose
+open import Implicit.Algo.Properties.Polarity
 
 
 t-⊆-prv : Γ ⊢ Σ ⇒ e ⇒ A
