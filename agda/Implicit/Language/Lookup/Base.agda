@@ -15,7 +15,7 @@ data _∋_⦂_ : Env n m → Fin n → Type m → Set where
      → Γ ,∙ ∋ x ⦂ A'
   S^ : Γ ∋ x ⦂ A
      → (up : ↑ty0 A ⇘ A')
-     → Γ ,^ ∋ x ⦂ A'     
+     → Γ ,^ ∋ x ⦂ A'
   S= : Γ ∋ x ⦂ A
      → (up : ↑ty0 A ⇘ A')
      → Γ ,= B ∋ x ⦂ A'
@@ -32,7 +32,7 @@ data _∋_:=_ : Env n m → Fin m → Type m → Set where
      → Γ ,∙ ∋ #S k := A'
   S^ : Γ ∋ k := A
      → (up : ↑ty0 A ⇘ A')
-     → Γ ,^ ∋ #S k := A'     
+     → Γ ,^ ∋ #S k := A'
   S= : Γ ∋ k := A
      → (up : ↑ty0 A ⇘ A')
      → Γ ,= B ∋ #S k := A'
@@ -163,6 +163,21 @@ data _◀_∙⇘_ : Env n (1 + m) → Fin (1 + m) → Env n m → Set where
       → A ↑ty k ⇘ A'
       → Γ ,= A' ◀ #S k ∙⇘ Γ' ,= A
 
+-- remove solution entry, without doing subst
+infix 3 _◀_=⇘_
+data _◀_=⇘_ : Env n (1 + m) → Fin (1 + m) → Env n m → Set where
+  ◀Z  : Γ ,= T ◀ #0 =⇘ Γ
+  ◀S, : Γ ◀ k =⇘ Γ'
+      → B ↑ty k ⇘ B'
+      → Γ , B' ◀ k =⇘ Γ' , B
+  ◀S^ : Γ ◀ k =⇘ Γ'
+      → Γ ,^ ◀ #S k =⇘ Γ' ,^
+  ◀S∙ : Γ ◀ k =⇘ Γ'
+      → Γ ,∙ ◀ #S k =⇘ Γ' ,∙
+  ◀S= : Γ ◀ k =⇘ Γ'
+      → A ↑ty k ⇘ A'
+      → Γ ,= A' ◀ #S k =⇘ Γ' ,= A
+
 
 -- remove an entry a=A, we should be careful about this
 -- removing an entry a=A requires us to do substittuiion on the remaining env
@@ -279,5 +294,3 @@ data [_/_]_⟹_↪_ : Type m → Fin m → Env n m → Env n m → Type m → Se
        → (up1 : ↑ty0 A ⇘ A')
        → (up2 : ↑ty0 C ⇘ C')
        → [ A' / #S k ] (Γ ,= B) ⟹ (Γ' ,= B) ↪ C'
-
-

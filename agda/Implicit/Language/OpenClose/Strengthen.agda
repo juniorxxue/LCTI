@@ -7,11 +7,6 @@ open import Implicit.Language.Subst
 open import Implicit.Language.OpenClose.Base
 
 -- subst lemma implies this, only with condition Γ ⊢c T, but obviously we need less to prove this lemam
-postulate
-  ⊢c-strengthen=0 : Γ ,= T ⊢c A'
-                  → ↑ty0 A ⇘ A'
-                  → Γ ⊢c A
-
 ⊢c-strengthen, : Γ ⊢c A
                → Γ ◀ k ,⇘ Γ'
                → Γ' ⊢c A
@@ -52,9 +47,28 @@ postulate
 ⊢c-strengthen∙ (⊢c-arr inΓ inΓ₁) newΓ (↑ty-arr upA upA₁) = ⊢c-arr (⊢c-strengthen∙ inΓ newΓ upA)
                                                                   (⊢c-strengthen∙ inΓ₁ newΓ upA₁)
 ⊢c-strengthen∙ (⊢c-∀ inΓ) newΓ (↑ty-∀ upA) = ⊢c-∀ (⊢c-strengthen∙ inΓ (▶S∙ newΓ) upA)
-                   
+
 
 ⊢c-strengthen∙0 : Γ ,∙ ⊢c A'
                 → ↑ty0 A ⇘ A'
                 → Γ ⊢c A
-⊢c-strengthen∙0 clo up = ⊢c-strengthen∙ clo ▶Z up                
+⊢c-strengthen∙0 clo up = ⊢c-strengthen∙ clo ▶Z up
+
+
+
+⊢c-strengthen= : Γ ⊢c A'
+               → Γ ◀ k =⇘ Γ'
+               → A ↑ty k ⇘ A'
+               → Γ' ⊢c A
+⊢c-strengthen= ⊢c-int newΓ ↑ty-int = ⊢c-int
+⊢c-strengthen= (⊢c-var-∙ inΓ) newΓ ↑ty-var = ⊢c-var-∙ (◀=-∋∙ inΓ newΓ)
+⊢c-strengthen= (⊢c-var-= inΓ) newΓ ↑ty-var = ⊢c-var-= (◀=-∋= inΓ newΓ)
+⊢c-strengthen= (⊢c-arr cloA cloA₁) newΓ (↑ty-arr upA upA₁) = ⊢c-arr (⊢c-strengthen= cloA newΓ upA)
+                                                                    (⊢c-strengthen= cloA₁ newΓ upA₁)
+⊢c-strengthen= (⊢c-∀ cloA) newΓ (↑ty-∀ upA) = ⊢c-∀ (⊢c-strengthen= cloA (◀S∙ newΓ) upA)
+
+
+⊢c-strengthen=0 : Γ ,= T ⊢c A'
+                → ↑ty0 A ⇘ A'
+                → Γ ⊢c A
+⊢c-strengthen=0 cloA upA = ⊢c-strengthen= cloA ◀Z upA
