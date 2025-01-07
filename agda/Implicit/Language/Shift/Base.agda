@@ -64,6 +64,10 @@ data _↑tm_⇘_ : Term n m → Fin (1 + n) → Term (1 + n) m → Set where
       e ↑tm k ⇘ e'
     → (Λ e) ↑tm k ⇘ Λ e'
 
+infix 3 ↑tm0_⇘_
+↑tm0_⇘_ : Term n m → Term (1 + n) m → Set
+↑tm0_⇘_ e = _↑tm_⇘_ e #0
+
 infix 3 _↑ty_⇘_
 data _↑ty_⇘_ : Type m → Fin (1 + m) → Type (1 + m) → Set where
   ↑ty-int :
@@ -116,4 +120,3 @@ data Shifted : Type m → Fin m → Set where
   sfd-var : ∀ {k : Fin m} {b} → k ≢ b → Shifted (‶ k) b
   sfd-arr : ∀ {A B : Type m} {b} → Shifted A b → Shifted B b → Shifted (A `→ B) b
   sfd-∀ : ∀ {A : Type (1 + m)} {b} → Shifted A (#S b) → Shifted (`∀ A) b
-

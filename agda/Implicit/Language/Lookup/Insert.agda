@@ -165,6 +165,7 @@ open import Implicit.Language.Shift
 ▶∙-∋∙-rev {k = #0} (S∙ inΓ) ▶Z = inΓ
 ▶∙-∋∙-rev {k = #S k} {#0} Z (▶S∙ newΓ) = Z
 ▶∙-∋∙-rev {k = #S k} {#0} (S, inΓ) (▶S, newΓ x) = S, (▶∙-∋∙-rev inΓ newΓ)
+▶∙-∋∙-rev {Γ' = Γ' , A} {#0} (S, x) (▶S, x₁ x₂) = S, (▶∙-∋∙-rev x x₁)
 ▶∙-∋∙-rev {k = #S k} {#S X} (S, inΓ) (▶S, newΓ x) = S, (▶∙-∋∙-rev inΓ newΓ)
 ▶∙-∋∙-rev {k = #S k} {#S X} (S∙ inΓ) (▶S∙ newΓ) = S∙ (▶∙-∋∙-rev inΓ newΓ)
 ▶∙-∋∙-rev {k = #S k} {#S X} (S= inΓ) (▶S= newΓ x) = S= (▶∙-∋∙-rev inΓ newΓ)
@@ -175,6 +176,7 @@ open import Implicit.Language.Shift
           → Γ ∋= X
 ▶∙-∋=-rev {k = #0} (S∙ inΓ) ▶Z = inΓ
 ▶∙-∋=-rev {k = #S k} {#0} Z (▶S= x newΓ) = Z
+▶∙-∋=-rev {Γ' = Γ' , A} {#0} (S, x) (▶S, x₁ x₂) = S, (▶∙-∋=-rev x x₁)
 ▶∙-∋=-rev {k = #S k} {#0} (S, inΓ) (▶S, newΓ x) = S, (▶∙-∋=-rev inΓ newΓ)
 ▶∙-∋=-rev {k = #S k} {#S X} (S, inΓ) (▶S, newΓ x) = S, (▶∙-∋=-rev inΓ newΓ)
 ▶∙-∋=-rev {k = #S k} {#S X} (S∙ inΓ) (▶S∙ newΓ) = S∙ (▶∙-∋=-rev inΓ newΓ)

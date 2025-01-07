@@ -72,3 +72,24 @@ open import Implicit.Language.OpenClose.Base
                 → ↑ty0 A ⇘ A'
                 → Γ ⊢c A
 ⊢c-strengthen=0 cloA upA = ⊢c-strengthen= cloA ◀Z upA
+
+----------------------------------------------------------------------
+--+                       lemmas about ⊢cᵉ                         +--
+----------------------------------------------------------------------
+
+⊢cᵉ-strengthen, : Γ ⊢cᵉ e'
+                → Γ ◀ k ,⇘ Γ'
+                → e ↑tm k ⇘ e'
+                → Γ' ⊢cᵉ e
+⊢cᵉ-strengthen, ⊢c-lit newΓ ↑tm-lit = ⊢c-lit
+⊢cᵉ-strengthen, ⊢c-var newΓ ↑tm-var = ⊢c-var
+⊢cᵉ-strengthen, (⊢c-lam clo-e) newΓ (↑tm-ƛ up-e) = ⊢c-lam (⊢cᵉ-strengthen, clo-e (◀S, newΓ) up-e)
+⊢cᵉ-strengthen, (⊢c-app clo-e clo-e₁) newΓ (↑tm-app up-e up-e₁) = ⊢c-app (⊢cᵉ-strengthen, clo-e newΓ up-e)
+                                                                         (⊢cᵉ-strengthen, clo-e₁ newΓ up-e₁)
+⊢cᵉ-strengthen, (⊢c-ann cloA clo-e) newΓ (↑tm-⦂ up-e) = ⊢c-ann (⊢c-strengthen, cloA newΓ) (⊢cᵉ-strengthen, clo-e newΓ up-e)
+⊢cᵉ-strengthen, (⊢c-tlam clo-e) newΓ (↑tm-Λ up-e) = ⊢c-tlam (⊢cᵉ-strengthen, clo-e (◀S∙ newΓ) up-e)
+
+⊢cᵉ-strengthen,0 : Γ , A ⊢cᵉ e'
+                 → ↑tm0 e ⇘ e'
+                 → Γ ⊢cᵉ e
+⊢cᵉ-strengthen,0 clo-e up-e = ⊢cᵉ-strengthen, clo-e ◀Z up-e

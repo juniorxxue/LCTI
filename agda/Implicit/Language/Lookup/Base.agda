@@ -225,9 +225,9 @@ data _▶_,_⇘_ : Env n m → Fin (1 + n) → Type m → Env (1 + n) m → Set 
 infix 3 _▶_,^⇘_
 data _▶_,^⇘_ : Env n m → Fin (1 + m) → Env n (1 + m) → Set where
   ▶Z : Γ ▶ #0 ,^⇘ Γ ,^
-  ▶S, : Γ ▶ #S k ,^⇘ Γ'
-      → (upA : A ↑ty #S k ⇘ A')
-      → Γ , A ▶ #S k ,^⇘ Γ' , A'
+  ▶S, : Γ ▶ k ,^⇘ Γ'
+      → (upA : A ↑ty k ⇘ A')
+      → Γ , A ▶ k ,^⇘ Γ' , A'
   ▶S^ : Γ ▶ k ,^⇘ Γ'
       → Γ ,^ ▶ #S k ,^⇘ Γ' ,^
   ▶S∙ : Γ ▶ k ,^⇘ Γ'
@@ -239,9 +239,9 @@ data _▶_,^⇘_ : Env n m → Fin (1 + m) → Env n (1 + m) → Set where
 infix 3 _▶_,∙⇘_
 data _▶_,∙⇘_ : Env n m → Fin (1 + m) → Env n (1 + m) → Set where
   ▶Z : Γ ▶ #0 ,∙⇘ Γ ,∙
-  ▶S, : Γ ▶ #S k ,∙⇘ Γ'
-      → A ↑ty #S k ⇘ A'
-      → Γ , A ▶ #S k ,∙⇘ Γ' , A'
+  ▶S, : Γ ▶ k ,∙⇘ Γ'
+      → A ↑ty k ⇘ A'
+      → Γ , A ▶ k ,∙⇘ Γ' , A'
   ▶S^ : Γ ▶ k ,∙⇘ Γ'
       → Γ ,^ ▶ #S k ,∙⇘ Γ' ,^
   ▶S∙ : Γ ▶ k ,∙⇘ Γ'
@@ -253,9 +253,9 @@ data _▶_,∙⇘_ : Env n m → Fin (1 + m) → Env n (1 + m) → Set where
 infix 3 _▶_,=_⇘_
 data _▶_,=_⇘_ : Env n m → Fin (1 + m) → Type m → Env n (1 + m) → Set where
   ▶Z : Γ ▶ #0 ,= A ⇘ Γ ,= A
-  ▶S, : Γ ▶ #S k ,= A ⇘ Γ'
-      → B ↑ty #S k ⇘ B'
-      → Γ , B ▶ #S k ,= A ⇘ Γ' , B'
+  ▶S, : Γ ▶ k ,= A ⇘ Γ'
+      → B ↑ty k ⇘ B'
+      → Γ , B ▶ k ,= A ⇘ Γ' , B'
   ▶S^ : Γ ▶ k ,= A ⇘ Γ'
       → ↑ty0 A ⇘ A' -- an alternative is defining an unshift
       → Γ ,^ ▶ #S k ,= A' ⇘ Γ' ,^
