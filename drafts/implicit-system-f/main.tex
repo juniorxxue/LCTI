@@ -34,16 +34,10 @@
 \begin{align*}
 &\text{Types} \quad\quad &A, B, C, D ::=&~ a \mid \mathtt{Int} \mid A \rightarrow B \mid \forall a.~A\\
 &\text{Expressions} \quad \quad &e::=&~ i \mid x \mid \lambda x . ~e \mid e_1~e_2 \mid e : A \mid \Lambda a.~e\\
-&\text{Environments} \quad\quad &\Gamma::=&~ . \mid \Gamma, x : A \mid \Gamma, a \mid \Gamma, \hat{a} = A\\
+&\text{Environments} \quad\quad &\Gamma::=&~ . \mid \Gamma, x : A \mid \Gamma, a \mid \Gamma , \hat{a} \mid \Gamma, \hat{a} = A\\
 &\text{Counters} \quad\quad &n ::=&~ 0 \mid \infty \mid S~n\\
-\end{align*}
-
-\subsection{Algo.}
-
-\begin{align*}
     &\text{Contexts} \quad\quad &\Sigma ::=&~  \square  \mid A \mid \boxed{e} \leadsto \Sigma\\
     &\text{Generic Consumers} \quad \quad &g::=&~ i \mid x \mid e : A \mid \Lambda a.~e\\
-    &\text{Environments} \quad\quad &\Psi ::=&~ . \mid \Psi, x : A \mid \Psi, a \mid \Psi, \hat{a} \mid \Psi, \hat{a}= A\\
 \end{align*}
 
 
@@ -136,11 +130,11 @@
 
 \begin{mathpar}
 \inferrule*[lab=T-Lit]
-{ }
+{ \vdash_c \Gamma}
 {\Gamma \vdash \square \Rightarrow i \Rightarrow \mathsf{Int}}
 
 \inferrule*[lab=T-Var]
-{x : A \in \Gamma}
+{ \vdash_c \Gamma \\ x : A \in \Gamma}
 {\Gamma \vdash \square \Rightarrow x \Rightarrow A}
 
 \inferrule*[lab=T-Ann]
@@ -163,7 +157,8 @@
 \inferrule*[lab=T-Sub]
 {\Gamma \vdash \square \Rightarrow g \Rightarrow A\\
 \Sigma \neq \square\\
- \Gamma \vdash A <: \Sigma \dashv \Gamma \rightsquigarrow B}
+ \Gamma \vdash_c \Sigma \\
+ \Gamma \vdash A \leq^+ \Sigma \dashv \Gamma \rightsquigarrow B}
 {\Gamma \vdash \Sigma \Rightarrow g \Rightarrow B}
 
 \inferrule*[lab=T-TAbs]
@@ -174,10 +169,10 @@
 %{\Gamma, a \vdash \Sigma  \Rightarrow e \Rightarrow B}
 %{\Gamma \vdash \boxed{A} \leadsto \Sigma \Rightarrow \Lambda a. ~e \Rightarrow [A/a]B}
 
-\inferrule*[lab=T-TApp]
-%{\Gamma \vdash H \Rightarrow e \Rightarrow \forall X.~B}
-{\Gamma \vdash \boxed{A} \leadsto \Sigma \Rightarrow e \Rightarrow B}
-{\Gamma \vdash  \Sigma \Rightarrow e[A] \Rightarrow B}
+%\inferrule*[lab=T-TApp]
+%%{\Gamma \vdash H \Rightarrow e \Rightarrow \forall X.~B}
+%{\Gamma \vdash \boxed{A} \leadsto \Sigma \Rightarrow e \Rightarrow B}
+%{\Gamma \vdash  \Sigma \Rightarrow e[A] \Rightarrow B}
 \end{mathpar}
 
 \begin{comment}
@@ -228,72 +223,63 @@
 \end{mathpar}
 \end{comment}
 
-\subsection{Subtyping: $\boxed{\Psi \vdash A <: \Sigma \dashv \Psi' \rightsquigarrow A'}$}
+\subsection{Subtyping: $\boxed{\Gamma \vdash A <: \Sigma \dashv \Gamma' \rightsquigarrow A'}$}
 
-\begin{align*}
-    &\text{Environments} \quad\quad &\Gamma ::=&~ . \mid \Gamma, A \mid \Gamma, a \mid \Gamma, \hat{a} = A \\
-    &\text{Subtyping Environments} \quad\quad &\Psi :=&~ \Gamma \mid \Psi, a \mid \Psi, \hat{a} \mid \Psi , \hat{a} = A\\
-\end{align*}
 \begin{mathpar}
 \inferrule*[lab=S-Int]
 { }
-{\Psi \vdash \mathtt{Int} <: \mathtt{Int} \dashv \Psi \rightsquigarrow \mathtt{Int}}
+{\Gamma \vdash \mathtt{Int} \leq^+ \mathtt{Int} \dashv \Gamma \rightsquigarrow \mathtt{Int}}
 
 \inferrule*[lab=S-Empty]
-{\Psi \vdash_{close} A}
-{\Psi \vdash A <: \square \dashv \Psi \rightsquigarrow A}
+{\Gamma \vdash_cA}
+{\Gamma \vdash A \leq^+ \square \dashv \Gamma \rightsquigarrow A}
 
 \inferrule*[lab=S-Var]
-{\Psi \vdash_{close} a}
-{\Psi \vdash a <: a \dashv \Psi \rightsquigarrow a}
+{ }
+{\Gamma \vdash a \leq a \dashv \Gamma \rightsquigarrow a}
 
 \inferrule*[lab=S-Ex-L]
-{\hat{a} \in \Psi \\
-\Psi \vdash_{close} A}
-{\Psi \vdash \hat{a} <: A \dashv [(\hat{a} = A)/\hat{a}]~\Psi \rightsquigarrow A}
+{\hat{a} \in \Gamma}
+{\Gamma \vdash \hat{a} \leq^+ A \dashv [(\hat{a} = A)/\hat{a}]~\Gamma \rightsquigarrow A}
 
 \inferrule*[lab=S-Ex-L-eq]
-{\hat{a} = B \in \Psi \\
-\Psi \vdash B <: A \dashv \Psi' \rightsquigarrow A'\\
-\Psi \vdash_{close} A}
-{\Psi \vdash \hat{a} <: A \dashv \Psi' \rightsquigarrow A'}
+{\hat{a} = B \in \Gamma \\
+\Gamma \vdash B <: A \dashv \Gamma' \rightsquigarrow A'}
+{\Gamma \vdash \hat{a} \leq A \dashv \Gamma' \rightsquigarrow A'}
 
 \inferrule*[lab=S-Ex-R]
-{\hat{a} \in \Psi \\
-\Psi \vdash_{close} A}
-{\Psi \vdash A <: \hat{a} \dashv [(\hat{a} = A)/\hat{a}]~\Psi \rightsquigarrow A}
+{\hat{a} \in \Gamma}
+{\Gamma \vdash A \leq^- \hat{a} \dashv [(\hat{a} = A)/\hat{a}]~\Gamma \rightsquigarrow A}
 
 \inferrule*[lab=S-Ex-R-eq]
-{\hat{a} = B \in \Psi \\
-\Psi \vdash A <: B \dashv \Psi' \rightsquigarrow A''\\
-\Psi \vdash_{close} A}
-{\Psi \vdash A <: \hat{a} \dashv \Psi' \rightsquigarrow A''}
+{\hat{a} = B \in \Gamma \\
+\Gamma \vdash A \leq B \dashv \Gamma' \rightsquigarrow A''}
+{\Gamma \vdash A \leq \hat{a} \dashv \Gamma' \rightsquigarrow A''}
 
 \inferrule*[lab=S-Arr]
-{\Psi \vdash C <: A \dashv \Psi_1 \rightsquigarrow A' \\
- \Psi_1 \vdash B <: D \dashv \Psi_2 \rightsquigarrow D'}
-{\Psi \vdash A \rightarrow B <: C \rightarrow D \dashv \Psi_2 \rightsquigarrow C \rightarrow D}
+{\Gamma \vdash C \leq^* A \dashv \Gamma_1 \rightsquigarrow A' \\
+ \Gamma_1 \vdash B \leq D \dashv \Gamma_2 \rightsquigarrow D'}
+{\Gamma \vdash A \rightarrow B \leq C \rightarrow D \dashv \Gamma_2 \rightsquigarrow C \rightarrow D}
 
 \inferrule*[lab=S-Term-Closed]
-{ \Psi \vdash_{close} A \\
-\| \Psi \| \vdash A \Rightarrow e \Rightarrow A'\\
- \Psi \vdash B <: \Sigma \dashv \Psi' \rightsquigarrow D}
-{\Psi \vdash A \rightarrow B <: \boxed{e} \leadsto \Sigma \dashv \Psi' \rightsquigarrow A' \rightarrow D}
+{ \Gamma \vdash A \Rightarrow e \Rightarrow A'\\
+ \Gamma \vdash B \leq^+ \Sigma \dashv \Gamma' \rightsquigarrow D}
+{\Gamma \vdash A \rightarrow B \leq^+ \boxed{e} \leadsto \Sigma \dashv \Gamma' \rightsquigarrow A' \rightarrow D}
 
 \inferrule*[lab=S-Term-Open]
-{ \Psi \vdash_{open} A \\
-\| \Psi \| \vdash \square \Rightarrow e \Rightarrow C\\
-\Psi \vdash C <: A \dashv \Psi_1 \rightsquigarrow A' \\
-\Psi_1 \vdash B <: \Sigma \dashv \Psi_2 \rightsquigarrow D}
-{\Psi \vdash A \rightarrow B <: \boxed{e} \leadsto \Sigma \dashv \Psi_2 \rightsquigarrow C \rightarrow D}
+{ \Gamma \vdash_{open} A \\
+\Gamma \vdash \square \Rightarrow e \Rightarrow C\\
+\Gamma \vdash C \leq^- A \dashv \Gamma_1 \rightsquigarrow A' \\
+\Gamma_1 \vdash B \leq^+ \Sigma \dashv \Gamma_2 \rightsquigarrow D}
+{\Gamma \vdash A \rightarrow B \leq^+ \boxed{e} \leadsto \Sigma \dashv \Gamma_2 \rightsquigarrow C \rightarrow D}
 
 \inferrule*[lab=S-$\forall$]
-{\Psi, a \vdash A <: B \dashv \Psi', a\rightsquigarrow C}
-{\Psi \vdash \forall a.A <: \forall a.~B \dashv \Psi' \rightsquigarrow \forall a. C}
+{\Gamma, a \vdash A \leq B \dashv \Gamma', a\rightsquigarrow C}
+{\Gamma \vdash \forall a.A \leq \forall a.~B \dashv \Gamma' \rightsquigarrow \forall a. C}
 
 \inferrule*[lab=S-$\forall$L]
-{\Psi, \hat{a} \vdash A <: \boxed{e} \leadsto \Sigma \dashv \Psi', \hat{a}=A \rightsquigarrow B}
-{\Psi \vdash \forall a. A <: \boxed{e} \leadsto \Sigma \dashv \Psi' \rightsquigarrow [A/\hat{a}]B}
+{\Gamma, \hat{a} \vdash A \leq^+ \boxed{e} \leadsto \Sigma \dashv \Gamma', \hat{a}=A \rightsquigarrow B}
+{\Gamma \vdash \forall a. A \leq^+ \boxed{e} \leadsto \Sigma \dashv \Gamma' \rightsquigarrow [A/\hat{a}]B}
 \end{mathpar}
 
 \end{document}
