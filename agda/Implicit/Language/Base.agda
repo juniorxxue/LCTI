@@ -60,5 +60,5 @@ data Env : ℕ → ℕ → Set where
 
 variable
   Γ Γ' Γ'' Γ₁ Γ₂ Γ₃ Γ* : Env n m
-  Δ Δ' : Env n m
+  Δ Δ' Δ₁ Δ₂ : Env n m
   Ψ : Env n m

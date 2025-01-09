@@ -8,6 +8,7 @@ open import Implicit.Language
 open import Implicit.Algo.Base
 open import Implicit.Algo.Properties.Id
 open import Implicit.Algo.Properties.OpenClose
+open import Implicit.Algo.Properties.Polarity
 open import Implicit.Algo.Properties.Extension
 
 {-
@@ -28,6 +29,17 @@ s-trans (s-∀l s1 upᶜ upᵉ st₁ st₂) s2 newΣ pr1 pr2 = {!!}
 -}
 
 
+---
+Γ |- e : A              Γ |- 1 : Int   X = Int
+
+Γ , X=Int |- [] => 1 => X
+
+[T/x] A' == A
+---------------------
+Γ , x = T |- e : A'
+
+---
+
 s-trans : Γ ⊢ A₁ ⌞ ≤ ⌝ Σ ⊣ Δ ↪ A₂
         → Δ ⊢ A₂ ⌞ ≤ ⌝ Σ' ⊣ Δ ↪ A₃ -- A₂ couldn't be open
         → Σ ≊ Σ'
@@ -42,5 +54,5 @@ s-trans (s-term-o opnA ⊢e s1 s3) (s-term-c ⊢e₁ s2) (≊S newΣ) with ⊢id
 s-trans s@(s-term-o opnA ⊢e s1 s3) (s-term-o opnA₁ ⊢e₁ s2 s4) newΣ =
   ⊥-elim (⊢c-⊢o-disjoint (⊆-closed (⊢closeA ⊢e) (s-⊆ s)) opnA₁)
 s-trans (s-∀l s1 upᶜ upᵉ st₁ st₂) (s-term-c ⊢e s2) newΣ with ⊢id0 ⊢e
-... | refl = s-∀l (s-trans s1 (s-term-c {!!} {!!}) {!!}) {!!} {!!} st₁ {!!}
+... | refl = s-∀l (s-trans s1 (s-term-c {!⊢e!} {!!}) {!!}) {!!} {!!} st₁ {!!}
 s-trans (s-∀l s1 upᶜ upᵉ st₁ st₂) (s-term-o opnA ⊢e s2 s3) newΣ = {!!}
