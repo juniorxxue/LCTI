@@ -1,4 +1,5 @@
-module Implicit.Complete where
+module Implicit.Complete2 where
+-- in the theorem statement, some closeness condition will be discarded
 
 open import Implicit.Language
 open import Implicit.Decl renaming (find to d-find)
@@ -40,8 +41,10 @@ data _⊢_≊_ : Env n m → Type m → Type m → Set where
   ≊-left : Γ ∋ X := A
          → Γ ⊢ ‶ X ≊ A
 
+{-
   ≊-right : Γ ∋ X := A
           → Γ ⊢ A ≊ ‶ X
+-}
 
   ≊-arr : Γ ⊢ A' ≊ A
         → Γ ⊢ B ≊ B'
@@ -68,7 +71,7 @@ data JustTyp (Γ : Env n m) (Σ : Context n m) (e : Term n m) (A : Type m) : Set
 
 data JustSub (Γ' : Env n m) (Σ : Context n m) (A : Type m) : Set where
   subs : ∀ {Γ B}
-    → (ext : Γ ⊆ Γ')
+    → (ext : Γ ⊆ Γ') -- this will be changed later
     → (sub : Γ ⊢ A ⌞ ≤⁺ ⌝ Σ ⊣ Γ' ↪ B)
     → (sim : Γ ⊢ A ≊ B)
     → JustSub Γ' Σ A
@@ -76,30 +79,19 @@ data JustSub (Γ' : Env n m) (Σ : Context n m) (A : Type m) : Set where
 complete : ∀ {Γ : Env n m} {Σ j e A}
   → Γ ⊢ j # e ⦂ A
   → Closed Γ
-  → Γ ⊢cᵉ e
-  → Γ ⊢c A
   → Γ ⊢ ⟨ j , A ⟩ ~ Σ
   → JustTyp Γ Σ e A
 
 complete-≤ : Γ ⊢ j # A ≤ B
            → Γ ⊢ ⟨ j , B ⟩ ~ Σ
-            --  → Ψ ⊆ (𝕎 Γ) x (exvar(Ψ) in B) × someCon(j) -- w
---            → (Γ ⊆ Δ) × (Exvar Γ B) ×
             → JustSub Γ Σ A
 
-complete ⊢lit cloΓ clo-e cloA ~Z = typs (⊢lit cloΓ) ≊-int
-complete (⊢var x∈Γ) cloΓ clo-e cloA ~Z = typs (⊢var cloΓ x∈Γ) ≊-refl
-complete (⊢ann ⊢e) cloΓ (⊢c-ann cloA₁ clo-e) cloA ~Z with complete ⊢e cloΓ clo-e cloA₁ ~∞ -- check corollary shown here
-... | typs ⊢e₁ sim = typs (⊢ann ⊢e₁) ≊-refl
-complete (⊢lam₁ ⊢e) cloΓ (⊢c-lam clo-e) (⊢c-arr cloA cloA₁) ~∞ with complete ⊢e (clo-S, cloΓ cloA) {!!} (⊢c-weaken,0 cloA₁) ~∞
-... | typs ⊢e₁ sim = typs (⊢lam₁ ⊢e₁) (≊-arr ≊-refl (≊-weaken0 sim))
-complete (⊢lam₂ ⊢e) cloΓ clo-e (⊢c-arr cloA cloA₁) (~I ⊢e₁ j~Σ) with complete ⊢e (clo-S, cloΓ cloA) {!!} (⊢c-weaken,0 cloA₁) (~weaken,0 j~Σ {!!})
-... | typs ⊢e₂ sim = typs (⊢lam₂ ⊢e₁ {!!} ⊢e₂) (≊-arr ≊-refl (≊-weaken0 sim))
-complete (⊢app₁ ⊢e ⊢e₁) cloΓ clo-e cloA j~Σ with complete ⊢e cloΓ {!!} (⊢c-arr {!!} cloA) (~C {!!} j~Σ)
-... | typs ⊢e' (≊-right x) = {!!}
-... | typs ⊢e' (≊-arr sim sim₁) = typs (⊢app ⊢e') sim₁
-complete (⊢app₂ ⊢e ⊢e₁) cloΓ clo-e cloA j~Σ with complete ⊢e cloΓ {!!} (⊢c-arr {!!} cloA) (~I {!!} {!!})
-... | typs ⊢e' (≊-right x) = {!!}
-... | typs ⊢e₂ (≊-arr sim sim₁) = typs (⊢app ⊢e₂) sim₁
-complete (⊢sub ⊢e B≤A j≢Z) cloΓ clo-e cloA j~Σ = {!!}
-complete (⊢tabs ⊢e) cloΓ clo-e cloA ~Z = {!!}
+complete ⊢lit cloΓ j~Σ = {!!}
+complete (⊢var x∈Γ) cloΓ j~Σ = {!!}
+complete (⊢ann ⊢e) cloΓ j~Σ = {!!}
+complete (⊢lam₁ ⊢e) cloΓ j~Σ = {!!}
+complete (⊢lam₂ ⊢e) cloΓ j~Σ = {!!}
+complete (⊢app₁ ⊢e ⊢e₁) cloΓ j~Σ = {!!}
+complete (⊢app₂ ⊢e ⊢e₁) cloΓ j~Σ = {!!}
+complete (⊢sub ⊢e B≤A j≢Z) cloΓ j~Σ = {!!}
+complete (⊢tabs ⊢e) cloΓ j~Σ = {!!}
