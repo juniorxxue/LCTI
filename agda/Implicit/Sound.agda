@@ -52,12 +52,6 @@ data JustSub (Γ : Env n m) (Σ : Context n m) (A : Type m) (B : Type m) : Set w
     → (s : Γ ⊢ j # A ≤ B)
     → JustSub Γ Σ A B
 
-data JustSub' (Γ : Env n m) (Σ : Context n m) (A : Type m) (B : Type m) : Set where
-  subs : ∀ {j}
-    → (j~Σ : Γ ⊢ ⟨ j , B ⟩ ~ Σ)
-    → (s : Γ ⊢ j # A ≤ B)
-    → JustSub' Γ Σ A B
-
 data JustTyping (Γ : Env n m) (Σ : Context n m) (e : Term n m) (A : Type m) : Set where
   typs : ∀ {j}
     → (j~Σ : Γ ⊢ ⟨ j , A ⟩ ~ Σ)
@@ -117,13 +111,25 @@ sound-s s'@(s-term-o opnA ⊢e s s₁) with sound-s s | sound-s s₁
 sound-s (s-∀ s) with sound-s s
 ... | subs ~∞ s₁ = subs ~∞ (s-∀ s₁)
 sound-s (s-∀l s upᶜ upᵉ st₁ st₂) with sound-s s
-... | subs j~Σ s₁ = subs (~-subst j~Σ {!!} (st-arr st₁ st₂)) (s-∀l s₁ {!!} {!!} st₁ st₂)
+... | subs IH-j~Σ IH = subs ((~-subst IH-j~Σ {!!} (st-arr st₁ st₂))) (s-∀l IH {!!} {!!} st₁ st₂)
+-- subs (~-subst j~Σ {!!} (st-arr st₁ st₂)) (s-∀l s₁ {!!} {!!} st₁ st₂)
 
-temp : Γ ,^ ⊢ A ⌞ ≤⁺ ⌝ [ e' ]↝ Σ' ⊣ Γ' ,= B ↪ C `→ D
-     → Γ' ,= B ⊢ ⟨ j , C `→ D ⟩ ~ [ e' ]↝ Σ'
-     → d-find A #0 j
-temp (s-term-c ⊢e s) (~I ⊢e₁ j~Σ) = {!!}
-temp (s-term-c ⊢e s) (~C ⊢e₁ j~Σ) = {!!}
-temp (s-term-o opnA ⊢e s s₁) (~I ⊢e₁ j~Σ) = {!!}
-temp (s-term-o opnA ⊢e s s₁) (~C ⊢e₁ j~Σ) = {!!}
-temp (s-∀l s upᶜ upᵉ st₁ st₂) j~Σ = {!!}
+sound-find : Γ ⊢ A  ⌞ ≤⁺ ⌝ Σ ⊣ Γ' ↪ B
+           → Γ  ∋^ k
+           → Γ' ∋= k
+           → Γ' ⊢ ⟨ j , B ⟩ ~ Σ
+           → d-find A k j
+sound-find s-int k^ k= j~Σ = {!!}
+sound-find (s-empty clo) k^ k= j~Σ = {!!}
+sound-find s-var k^ k= j~Σ = {!!}
+sound-find (s-ex-l^ x-in inst) k^ k= ~∞ = f-∞ {!!}
+sound-find (s-ex-l= x-in s) k^ k= ~∞ = f-∞ {!!}
+sound-find (s-ex-r= x-in s) k^ k= j~Σ = {!!}
+sound-find (s-arr s s₁) k^ k= j~Σ = {!!}
+sound-find (s-term-c ⊢e s) k^ k= (~I ⊢e₁ j~Σ) = {!!}
+-- f-arr-𝕚-r (sound-find s k^ k= j~Σ)
+sound-find (s-term-c ⊢e s) k^ k= (~C ⊢e₁ j~Σ) = f-arr-𝕔 (sound-find s k^ k= j~Σ)
+sound-find (s-term-o opnA ⊢e s s₁) k^ k= (~I ⊢e₁ j~Σ) = {!!}
+sound-find (s-term-o opnA ⊢e s s₁) k^ k= (~C ⊢e₁ j~Σ) = {!!}
+sound-find (s-∀ s) k^ k= j~Σ = {!!}
+sound-find (s-∀l s upᶜ upᵉ st₁ st₂) k^ k= j~Σ = {!!}

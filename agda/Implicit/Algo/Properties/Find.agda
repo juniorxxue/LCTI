@@ -22,10 +22,10 @@ data find : Env n m → Type m → Fin m → Context n m → Set where
     → find (Γ ,∙) A (#S k) Σ'
     → ↑tyᶜ0 Σ ⇘ Σ'
     → find Γ (`∀ A) k Σ
--- this find backtracks    
+-- this find backtracks
 
 postulate
-  s-find-gen : ∀ {Ψ Ψ' : SEnv n (1 + m)} {k Σ A B C}
+  s-find-gen : ∀ {Ψ Ψ' : Env n (1 + m)} {k Σ A B C}
     → k ^∈ Ψ
     → k := C ∈ Ψ'
     → Ψ ⊢ A ⌞ ≤ ⌝ Σ ⊣ Ψ' ↪ B
