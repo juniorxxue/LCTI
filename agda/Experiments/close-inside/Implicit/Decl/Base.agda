@@ -21,7 +21,7 @@ data 𝕚𝕔 : Counter → Set where
   case-𝕔 : 𝕚𝕔 (𝕔 j)
 
 -- find A k j
--- at j-th position of A type, should have a bound variable, example: |-1 forall a. a -> a <: Int 
+-- at j-th position of A type, should have a bound variable, example: |-1 forall a. a -> a <: Int
 data find : Type m → Fin m → Counter → Set where
   f-∞       : k ε A
             → find A k ∞
@@ -30,7 +30,7 @@ data find : Type m → Fin m → Counter → Set where
   f-arr-𝕚-r : find B k j
             → find (A `→ B) k (𝕚 j)
   f-arr-𝕔   : find B k j
-            → find (A `→ B) k (𝕔 j)    
+            → find (A `→ B) k (𝕔 j)
   f-∀       : find A (#S k) j
             → find (`∀ A) k j
 
@@ -42,11 +42,20 @@ data find : Type m → Fin m → Counter → Set where
 infix 3 _⊢_#_≤_
 data _⊢_#_≤_ : Env n m → Counter → Type m → Type m → Set where
   s-refl :
-      Γ ⊢ Z # A ≤ A
+      (cloΓ : Closed Γ)
+    → (cloA : Γ ⊢c A)
+    → Γ ⊢ Z # A ≤ A
   s-int :
-      Γ ⊢ ∞ # Int ≤ Int
-  s-var :
-      Γ ⊢ ∞ # ‶ X ≤ ‶ X
+      (cloΓ : Closed Γ)
+    → Γ ⊢ ∞ # Int ≤ Int
+  s-var-∙ :
+      (cloΓ : Closed Γ)
+    → (inΓ : Γ ∋∙ X)
+    → Γ ⊢ ∞ # ‶ X ≤ ‶ X
+  s-var-= :
+      (cloΓ : Closed Γ)
+    → (inΓ : Γ ∋= X)
+    → Γ ⊢ ∞ # ‶ X ≤ ‶ X
   s-arr₁ :
       Γ ⊢ ∞ # C ≤ A
     → Γ ⊢ ∞ # B ≤ D
@@ -56,8 +65,9 @@ data _⊢_#_≤_ : Env n m → Counter → Type m → Type m → Set where
     → Γ ⊢ j # B ≤ D
     → Γ ⊢ 𝕚 j # A `→ B ≤ C `→ D
   s-arr₃ :
-      Γ ⊢ j # B ≤ D
-    → Γ ⊢ 𝕔 j # A `→ B ≤ A `→ D    
+      (cloA : Γ ⊢c A)
+    → Γ ⊢ j # B ≤ D
+    → Γ ⊢ 𝕔 j # A `→ B ≤ A `→ D
   s-∀ :
       Γ ,∙ ⊢ ∞ # A ≤ B
     → Γ ⊢ ∞ # `∀ A ≤ `∀ B
@@ -72,13 +82,13 @@ data _⊢_#_≤_ : Env n m → Counter → Type m → Type m → Set where
     → Γ ⊢ j # `∀ A ≤ C' `→ D'
   -- two atomic rules
   s-var-l : ∀ {X A B}
-    → Γ ∋ X := B
+    → (inΓ : Γ ∋ X := B)
     → Γ ⊢ ∞ # B ≤ A
     → Γ ⊢ ∞ # ‶ X ≤ A
   s-var-r : ∀ {X A B}
-    → Γ ∋ X := B
+    → (inΓ : Γ ∋ X := B)
     → Γ ⊢ ∞ # A ≤ B
-    → Γ ⊢ ∞ # A ≤ ‶ X    
+    → Γ ⊢ ∞ # A ≤ ‶ X
 
 ----------------------------------------------------------------------
 --+                             Typing                             +--
@@ -87,9 +97,11 @@ data _⊢_#_≤_ : Env n m → Counter → Type m → Type m → Set where
 infix 3 _⊢_#_⦂_
 data _⊢_#_⦂_ : Env n m → Counter → Term n m → Type m → Set where
   ⊢lit : ∀ {num : ℕ}
+    → (cloΣ : Closed Γ)
     → Γ ⊢ Z # (lit num) ⦂ Int
   ⊢var :
-      (x∈Γ : Γ ∋ x ⦂ A)
+      (cloΣ : Closed Γ)
+    → (x∈Γ : Γ ∋ x ⦂ A)
     → Γ ⊢ Z # ` x ⦂ A
   ⊢ann :
       Γ ⊢ ∞ # e ⦂ A
@@ -116,6 +128,6 @@ data _⊢_#_⦂_ : Env n m → Counter → Term n m → Type m → Set where
   ⊢tabs :
       Γ ,∙ ⊢ Z # e ⦂ A
     → Γ ⊢ Z # Λ e ⦂ `∀ A
-    
+
 -- small note: e @ A must be inferreable, and in the form of
 -- (e @ A) e', e' could only be checked

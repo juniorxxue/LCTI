@@ -108,7 +108,7 @@ s-refined-p (s-term-c ⊢e s) (polar-r cloΓ (⊢c-term cloe cloΣ)) with ⊢id0
 ... | refl = s-term-c (t-⊆-prv ⊢e (s-⊆ s) (s-closed-env s (polar-r cloΓ cloΣ))) (s-refined-p s (polar-r cloΓ cloΣ))
 s-refined-p s'@(s-term-o opnA ⊢e s s₁) pr'@(polar-r cloΓ (⊢c-term cloe cloΣ)) =
   s-term-c (t-⊆-prv (subsumption0 ⊢e s-refl (⊢c-τ (⊢closeA ⊢e))) (s-⊆ s') (s-closed-env s' pr'))
-           (s-refined-p s₁ (polar-r (s-closed-env s (polar-l cloΓ (⊢closeA ⊢e))) (⊆-closedᶜ cloΣ (s-⊆ s))))
+           (s-refined-p s₁ (polar-r (s-closed-env s (polar-l cloΓ (⊢closeA ⊢e))) (⊆-cloAᶜ cloΣ (s-⊆ s))))
 s-refined-p (s-∀ s) pr = s-∀ (s-refined-p s (polar-∀ pr))
 s-refined-p (s-∀l s upᶜ upᵉ st₁ st₂) (polar-r cloΓ cloΣ) =
   s-subst (s-refined-p s (polar-r (clo-S^ cloΓ) (⊢cᶜ-weaken^0 cloΣ (↑tyᶜ-e upᵉ upᶜ))))

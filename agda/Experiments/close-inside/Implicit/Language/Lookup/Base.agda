@@ -271,6 +271,8 @@ data _▶_,=_⇘_ : Env n m → Fin (1 + m) → Type m → Env n (1 + m) → Set
 --+                       Entry Replacement                        +--
 ----------------------------------------------------------------------
 
+-- could be a combination of weaken and strengthen
+
 -- replace entry ^a with a solution ^a=A in an environment
 infix 3 [_/_]_⟹_↪_
 data [_/_]_⟹_↪_ : Type m → Fin m → Env n m → Env n m → Type m → Set where
