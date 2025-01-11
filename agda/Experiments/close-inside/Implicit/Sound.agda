@@ -101,8 +101,6 @@ sound (⊢tabs ⊢e) with sound ⊢e
 {-
 sound-s s'@(s-term-o opnA ⊢e s s₁) with sound-s s | sound-s s₁
 ... | subs ~∞ s₂ | subs j~Σ s₃ = subs (~I (t-⊆-prv (sound-0 ⊢e) (s-⊆ s' {!!})) j~Σ) (s-arr₂ (s-⊆-prv s₂ (s-⊆ s₁ {!!})) s₃)
-sound-s (s-∀ s) with sound-s s
-... | subs ~∞ s₁ = subs ~∞ (s-∀ s₁)
 sound-s (s-∀l s upᶜ upᵉ st₁ st₂) with sound-s s
 ... | subs IH-j~Σ IH = subs ((~-subst IH-j~Σ {!!} (st-arr st₁ st₂))) (s-∀l IH {!!} {!!} st₁ st₂)
 -}
