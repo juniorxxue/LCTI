@@ -8,6 +8,7 @@ open import Implicit.Algo.Subst public
 open import Implicit.Algo.OpenClose public
 open import Implicit.Algo.Lookup public
 open import Implicit.Algo.Split public
+open import Implicit.Algo.Polarity public
 
 infix 3 _⊢_⇒_⇒_
 infix 3 _⊢_⌞_⌝_⊣_↪_
@@ -51,7 +52,7 @@ data _⊢_⇒_⇒_ where
     → (cloΣ : Γ ⊢cᶜ Σ)
     → (s : Γ ⊢ A ⌞ ≤⁺ ⌝ Σ ⊣ Γ ↪ B)
     → Γ ⊢ Σ ⇒ g ⇒ B
-    
+
   ⊢tabs :
       Γ ,∙ ⊢ □ ⇒ e ⇒ A
     → Γ ⊢ □ ⇒ Λ e ⇒ `∀ A
@@ -72,7 +73,7 @@ data _⊢_⌞_⌝_⊣_↪_ where
       (x-in : Γ ∋^ X)
     → (inst : [ A / X ] Γ ⟹ Γ' ↪ B)
     → Γ ⊢ ‶ X ⌞ ≤⁺ ⌝ τ A ⊣ Γ' ↪ A
- 
+
   s-ex-l= :
       (x-in : Γ ∋ X := B)
     → Γ ⊢ B ⌞ ≤ ⌝ τ A ⊣ Γ' ↪ A'
@@ -118,4 +119,3 @@ data _⊢_⌞_⌝_⊣_↪_ where
     → (st₁ : ⟦ B ⟧ C ⇘ C')
     → (st₂ : ⟦ B ⟧ D ⇘ D')
     → Γ ⊢ `∀ A ⌞ ≤⁺ ⌝ ([ e ]↝ Σ) ⊣ Γ' ↪ C' `→ D'
-

@@ -78,8 +78,8 @@ sound-∞ : ∀ {Γ : Env n m} {e A B}
 sound-∞ ⊢e rewrite ⊢id0 ⊢e with sound ⊢e
 ... | typs ~∞ ⊢e = ⊢e
 
-sound (⊢lit cloΓ) = typs ~Z ⊢lit
-sound (⊢var cloΓ x∈Γ) = typs ~Z (⊢var x∈Γ)
+sound (⊢lit cloΓ) = typs ~Z (⊢lit cloΓ)
+sound (⊢var cloΓ x∈Γ) = typs ~Z (⊢var cloΓ x∈Γ)
 sound (⊢ann ⊢e) = typs ~Z (⊢ann (sound-∞ ⊢e))
 sound (⊢app ⊢e) with sound ⊢e
 ... | typs (~I ⊢e₁ j~Σ) ⊢e = typs j~Σ (⊢app₂ ⊢e ⊢e₁)
@@ -93,26 +93,25 @@ sound (⊢sub ⊢e ne gc cloΣ s) with sound-s s
 sound (⊢tabs ⊢e) with sound ⊢e
 ... | typs ~Z s = typs ~Z (⊢tabs s)
 
-sound-s s-int = subs ~∞ s-int
-sound-s (s-empty clo) = subs ~Z s-refl
-sound-s s-var = subs ~∞ s-var
-sound-s (s-ex-l^ x-in inst) = subs ~∞ (s-var-l (inst-in inst) (inst-s-r inst))
+sound-s s-int = subs ~∞ (s-int {!!})
+sound-s (s-empty clo) = subs ~Z {!!}
+sound-s s-var = subs ~∞ {!!}
+sound-s (s-ex-l^ x-in inst) = subs ~∞ (s-var-l (inst-in inst) {!!})
 sound-s (s-ex-l= x-in s) with sound-s s
-... | subs ~∞ s₁ = subs ~∞ (s-var-l (⊆-in:= x-in (s-⊆ s)) s₁)
-sound-s (s-ex-r^ x-in inst) = subs ~∞ (s-var-r (inst-in inst) (inst-s-l inst))
+... | subs ~∞ s₁ = subs ~∞ (s-var-l (⊆-in:= x-in (s-⊆ s {!!})) s₁)
+sound-s (s-ex-r^ x-in inst) = subs ~∞ (s-var-r (inst-in inst) {!!})
 sound-s (s-ex-r= x-in s) with sound-s s
-... | subs ~∞ s₁ = subs ~∞ (s-var-r (⊆-in:= x-in (s-⊆ s)) s₁)
+... | subs ~∞ s₁ = subs ~∞ (s-var-r (⊆-in:= x-in (s-⊆ s {!!})) s₁)
 sound-s s'@(s-arr s s₁) with sound-s s | sound-s s₁
-... | subs ~∞ s₂ | subs ~∞ s₃ = subs ~∞ (s-arr₁ (s-⊆-prv s₂ (s-⊆ s₁)) s₃)
+... | subs ~∞ s₂ | subs ~∞ s₃ = subs ~∞ (s-arr₁ (s-⊆-prv s₂ (s-⊆ s₁ {!!})) s₃)
 sound-s (s-term-c ⊢e s) with sound-s s
-... | subs j~Σ s₁ rewrite sym (⊢id0 ⊢e) = subs (~C (t-⊆-prv (sound-∞ ⊢e) (s-⊆ s)) j~Σ) (s-arr₃ s₁)
+... | subs j~Σ s₁ rewrite sym (⊢id0 ⊢e) = subs (~C (t-⊆-prv (sound-∞ ⊢e) (s-⊆ s {!!})) j~Σ) (s-arr₃ {!!} s₁)
 sound-s s'@(s-term-o opnA ⊢e s s₁) with sound-s s | sound-s s₁
-... | subs ~∞ s₂ | subs j~Σ s₃ = subs (~I (t-⊆-prv (sound-0 ⊢e) (s-⊆ s')) j~Σ) (s-arr₂ (s-⊆-prv s₂ (s-⊆ s₁)) s₃)
+... | subs ~∞ s₂ | subs j~Σ s₃ = subs (~I (t-⊆-prv (sound-0 ⊢e) (s-⊆ s' {!!})) j~Σ) (s-arr₂ (s-⊆-prv s₂ (s-⊆ s₁ {!!})) s₃)
 sound-s (s-∀ s) with sound-s s
 ... | subs ~∞ s₁ = subs ~∞ (s-∀ s₁)
 sound-s (s-∀l s upᶜ upᵉ st₁ st₂) with sound-s s
 ... | subs IH-j~Σ IH = subs ((~-subst IH-j~Σ {!!} (st-arr st₁ st₂))) (s-∀l IH {!!} {!!} st₁ st₂)
--- subs (~-subst j~Σ {!!} (st-arr st₁ st₂)) (s-∀l s₁ {!!} {!!} st₁ st₂)
 
 sound-find : Γ ⊢ A  ⌞ ≤⁺ ⌝ Σ ⊣ Γ' ↪ B
            → Γ  ∋^ k
@@ -126,7 +125,7 @@ sound-find (s-ex-l^ x-in inst) k^ k= ~∞ = f-∞ {!!}
 sound-find (s-ex-l= x-in s) k^ k= ~∞ = f-∞ {!!}
 sound-find (s-ex-r= x-in s) k^ k= j~Σ = {!!}
 sound-find (s-arr s s₁) k^ k= j~Σ = {!!}
-sound-find (s-term-c ⊢e s) k^ k= (~I ⊢e₁ j~Σ) = {!!}
+sound-find (s-term-c ⊢e s) k^ k= (~I ⊢e₁ j~Σ) = f-arr-𝕚-r (sound-find s k^ k= j~Σ)
 -- f-arr-𝕚-r (sound-find s k^ k= j~Σ)
 sound-find (s-term-c ⊢e s) k^ k= (~C ⊢e₁ j~Σ) = f-arr-𝕔 (sound-find s k^ k= j~Σ)
 sound-find (s-term-o opnA ⊢e s s₁) k^ k= (~I ⊢e₁ j~Σ) = {!!}
