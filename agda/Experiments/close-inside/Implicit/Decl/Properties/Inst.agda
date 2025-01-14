@@ -6,6 +6,15 @@ open import Implicit.Decl.Properties.Subtyping
 open import Implicit.Decl.Properties.OpenClose
 open import Implicit.Decl.Properties.Weaken
 
+inst-eq : [ A / k ] Γ ⟹ Δ ↪ B
+        → A ≡ B
+inst-eq (⟹^0 up) = refl
+inst-eq (⟹^S inst up1 up2) with inst-eq inst
+... | refl = ↑ty-unique up1 up2
+inst-eq (⟹∙S inst up1 up2) = {!!}
+inst-eq (⟹,S inst) = inst-eq inst
+inst-eq (⟹=S inst up1 up2) = {!!}
+
 inst-s-l : [ A / k ] Γ ⟹ Δ ↪ B
          → Closed Γ
          → Γ ⊢c A
