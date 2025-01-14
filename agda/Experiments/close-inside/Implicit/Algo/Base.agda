@@ -71,7 +71,7 @@ data _⊢_⌞_⌝_⊣_↪_ where
 
   s-ex-l^ :
       (x-in : Γ ∋^ X)
-    → (inst : [ A / X ] Γ ⟹ Γ' ↪ B)
+    → (inst : [ A / X ] Γ ⟹ Γ')
     → Γ ⊢ ‶ X ⌞ ≤⁺ ⌝ τ A ⊣ Γ' ↪ A
 
   s-ex-l= :
@@ -81,7 +81,7 @@ data _⊢_⌞_⌝_⊣_↪_ where
 
   s-ex-r^ :
       (x-in : Γ ∋^ X)
-    → (inst : [ A / X ] Γ ⟹ Γ' ↪ B)
+    → (inst : [ A / X ] Γ ⟹ Γ')
     → Γ ⊢ A ⌞ ≤⁻ ⌝ τ (‶ X) ⊣ Γ' ↪ ‶ X
 
   s-ex-r= :

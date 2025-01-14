@@ -23,14 +23,14 @@ polar-⊆ (polar-r cloΓ cloA) ss = polar-r (⊆-closed cloΓ ss) (⊆-cloAᶜ c
 
 inst-closedΓ : Closed Γ
              → Γ ⊢c A
-             → [ A / X ] Γ ⟹ Δ ↪ B
+             → [ A / X ] Γ ⟹ Δ
              → Closed Δ
 inst-closedΓ (clo-S^ cloΓ) cloA (⟹^0 up) = clo-S= cloΓ (⊢c-strengthen^0 cloA up)
-inst-closedΓ (clo-S^ cloΓ) cloA (⟹^S inst up1 up2) = clo-S^ (inst-closedΓ cloΓ (⊢c-strengthen^0 cloA up1) inst)
-inst-closedΓ (clo-S∙ cloΓ) cloA (⟹∙S inst up1 up2) = clo-S∙ (inst-closedΓ cloΓ (⊢c-strengthen∙0 cloA up1) inst)
+inst-closedΓ (clo-S^ cloΓ) cloA (⟹^S inst up1) = clo-S^ (inst-closedΓ cloΓ (⊢c-strengthen^0 cloA up1) inst)
+inst-closedΓ (clo-S∙ cloΓ) cloA (⟹∙S inst up1) = clo-S∙ (inst-closedΓ cloΓ (⊢c-strengthen∙0 cloA up1) inst)
 inst-closedΓ (clo-S, cloΓ cloA₁) cloA (⟹,S inst) =
   clo-S, (inst-closedΓ cloΓ (⊢c-strengthen,0 cloA) inst) (⊆-cloA cloA₁ (inst-⊆ inst (⊢c-strengthen,0 cloA)))
-inst-closedΓ (clo-S= cloΓ cloA₁) cloA (⟹=S inst up1 up2) =
+inst-closedΓ (clo-S= cloΓ cloA₁) cloA (⟹=S inst up1) =
   clo-S= (inst-closedΓ cloΓ (⊢c-strengthen=0 cloA up1) inst) (⊆-cloA cloA₁ (inst-⊆ inst (⊢c-strengthen=0 cloA up1)))
 
 ----------------------------------------------------------------------

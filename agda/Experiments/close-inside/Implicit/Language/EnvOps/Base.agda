@@ -174,25 +174,22 @@ data _▶_,=_⇘_ : Env n m → Fin (1 + m) → Type m → Env n (1 + m) → Set
 -- could be a combination of weaken and strengthen
 
 -- replace entry ^a with a solution ^a=A in an environment
-infix 3 [_/_]_⟹_↪_
-data [_/_]_⟹_↪_ : Type m → Fin m → Env n m → Env n m → Type m → Set where
+infix 3 [_/_]_⟹_
+data [_/_]_⟹_ : Type m → Fin m → Env n m → Env n m → Set where
   ⟹^0 : (up : ↑ty0 A ⇘ A')
-      → [ A' / #0 ] (Γ ,^) ⟹ (Γ ,= A) ↪ A'
+      → [ A' / #0 ] (Γ ,^) ⟹ (Γ ,= A)
 
-  ⟹^S : [ A / k ] Γ ⟹ Γ' ↪ B
+  ⟹^S : [ A / k ] Γ ⟹ Γ'
       → (up1 : ↑ty0 A ⇘ A')
-      → (up2 : ↑ty0 B ⇘ B')
-      → [ A' / #S k ] (Γ ,^) ⟹ Γ' ,^ ↪ B'
+      → [ A' / #S k ] (Γ ,^) ⟹ Γ' ,^
 
-  ⟹∙S : [ A / k ] Γ ⟹ Γ' ↪ B
+  ⟹∙S : [ A / k ] Γ ⟹ Γ'
       → (up1 : ↑ty0 A ⇘ A')
-      → (up2 : ↑ty0 B ⇘ B')
-      → [ A' / #S k ] (Γ ,∙) ⟹ (Γ' ,∙) ↪ B'
+      → [ A' / #S k ] (Γ ,∙) ⟹ (Γ' ,∙)
 
-  ⟹,S : [ A / k ] Γ ⟹ Γ' ↪ C
-       → [ A / k ] (Γ , B) ⟹ (Γ' , B) ↪ C
+  ⟹,S : [ A / k ] Γ ⟹ Γ'
+       → [ A / k ] (Γ , B) ⟹ (Γ' , B)
 
-  ⟹=S : [ A / k ] Γ ⟹ Γ' ↪ C
-       → (up1 : ↑ty0 A ⇘ A')
-       → (up2 : ↑ty0 C ⇘ C')
-       → [ A' / #S k ] (Γ ,= B) ⟹ (Γ' ,= B) ↪ C'
+  ⟹=S : [ A / k ] Γ ⟹ Γ'
+        → (up1 : ↑ty0 A ⇘ A')
+       → [ A' / #S k ] (Γ ,= B) ⟹ (Γ' ,= B)

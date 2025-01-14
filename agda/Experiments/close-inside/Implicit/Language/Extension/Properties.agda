@@ -107,11 +107,11 @@ open import Implicit.Language.OpenClose
 ⊆-id (evar ext1) (evar ext2) rewrite ⊆-id ext1 ext2 = refl
 ⊆-id (svar ext1) (svar ext2) rewrite ⊆-id ext1 ext2 = refl
 
-inst-⊆ : [ A / X ] Γ ⟹ Γ' ↪ B
+inst-⊆ : [ A / X ] Γ ⟹ Γ'
        → Γ ⊢c A
        → Γ ⊆ Γ'
 inst-⊆ (⟹^0 up) cloA = evar-sol ⊆-refl (⊢c-strengthen^0 cloA up)
-inst-⊆ (⟹^S inst up1 up2) cloA = evar (inst-⊆ inst (⊢c-strengthen^0 cloA up1))
-inst-⊆ (⟹∙S inst up1 up2) cloA = uvar (inst-⊆ inst (⊢c-strengthen∙0 cloA up1))
+inst-⊆ (⟹^S inst up1) cloA = evar (inst-⊆ inst (⊢c-strengthen^0 cloA up1))
+inst-⊆ (⟹∙S inst up1) cloA = uvar (inst-⊆ inst (⊢c-strengthen∙0 cloA up1))
 inst-⊆ (⟹,S inst) cloA = var (inst-⊆ inst (⊢c-strengthen,0 cloA))
-inst-⊆ (⟹=S inst up1 up2) cloA = svar (inst-⊆ inst (⊢c-strengthen=0 cloA up1))
+inst-⊆ (⟹=S inst up1) cloA = svar (inst-⊆ inst (⊢c-strengthen=0 cloA up1))

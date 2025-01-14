@@ -111,10 +111,12 @@ sound-s' s-var (polar-l cloΓ (⊢c-var-∙ inΓ)) = subs ~∞ (s-var-∙ cloΓ 
 sound-s' s-var (polar-l cloΓ (⊢c-var-= inΓ)) = subs ~∞ (s-var-= cloΓ inΓ)
 sound-s' s-var (polar-r cloΓ (⊢c-τ (⊢c-var-∙ inΓ))) = subs ~∞ (s-var-∙ cloΓ inΓ)
 sound-s' s-var (polar-r cloΓ (⊢c-τ (⊢c-var-= inΓ))) = subs ~∞ (s-var-= cloΓ inΓ)
-sound-s' (s-ex-l^ x-in inst) (polar-r cloΓ (⊢c-τ cloA)) = subs ~∞ (s-var-l (inst-in inst) (inst-s-r inst cloΓ cloA))
+sound-s' (s-ex-l^ x-in inst) (polar-r cloΓ (⊢c-τ cloA)) =
+  subs ~∞ (s-var-l (inst-in inst) (s-refl-∞ (⊆-closed cloΓ (inst-⊆ inst cloA)) (⊆-cloA cloA (inst-⊆ inst cloA))))
 sound-s' (s-ex-l= x-in s) pr with sound-s' s (polar-in-l pr x-in)
 ... | subs ~∞ s₁ = subs ~∞ (s-var-l (⊆-in:= x-in (s-⊆ s (polar-in-l pr x-in))) s₁)
-sound-s' (s-ex-r^ x-in inst) (polar-l cloΓ cloA) = subs ~∞ (s-var-r (inst-in inst) (inst-s-l inst cloΓ cloA))
+sound-s' (s-ex-r^ x-in inst) (polar-l cloΓ cloA) =
+  subs ~∞ (s-var-r (inst-in inst) (s-refl-∞ (⊆-closed cloΓ (inst-⊆ inst cloA)) (⊆-cloA cloA (inst-⊆ inst cloA))))
 sound-s' (s-ex-r= x-in s) pr with sound-s' s (polar-in-r pr x-in)
 ... | subs ~∞ s₁ = subs ~∞ (s-var-r (⊆-in:= x-in (s-⊆ s (polar-in-r pr x-in))) s₁)
 sound-s' s'@(s-arr s s₁) pr with sound-s' s (polar-arr-l pr) | sound-s' s₁ (polar-arr-r (polar-⊆ pr (s-⊆ s (polar-arr-l pr))))
