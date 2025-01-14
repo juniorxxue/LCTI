@@ -17,10 +17,11 @@ open import Implicit.Algo.Properties.Extension
 
 ⊢cᶜ-weaken,0 : Γ ⊢cᶜ Σ
              → ↑tmᶜ0 Σ ⇘ Σ'
+             → Γ ⊢c A
              → Γ , A ⊢cᶜ Σ'
-⊢cᶜ-weaken,0 ⊢c-empty ↑tmᶜ-□ = ⊢c-empty
-⊢cᶜ-weaken,0 (⊢c-τ cloA) ↑tmᶜ-τ = ⊢c-τ (⊢c-weaken,0 cloA)
-⊢cᶜ-weaken,0 (⊢c-term cloe cloΣ) (↑tmᶜ-e up-e upΣ) = ⊢c-term (⊢cᵉ-weaken,0 cloe up-e) (⊢cᶜ-weaken,0 cloΣ upΣ)
+⊢cᶜ-weaken,0 ⊢c-empty ↑tmᶜ-□ cloA = ⊢c-empty
+⊢cᶜ-weaken,0 (⊢c-τ cloA) ↑tmᶜ-τ cloA' = ⊢c-τ (⊢c-weaken,0 cloA cloA')
+⊢cᶜ-weaken,0 (⊢c-term cloe cloΣ) (↑tmᶜ-e up-e upΣ) cloA = ⊢c-term (⊢cᵉ-weaken,0 cloe up-e cloA) (⊢cᶜ-weaken,0 cloΣ upΣ cloA)
 
 ⊢cᶜ-strengthen,0 : Γ , A ⊢cᶜ Σ'
                 → ↑tmᶜ0 Σ ⇘ Σ'
@@ -34,8 +35,8 @@ open import Implicit.Algo.Properties.Extension
 ----------------------------------------------------------------------
 
 ⊆-cloAᵉ : Γ ⊢cᵉ e
-          → Γ ⊆ Γ'
-          → Γ' ⊢cᵉ e
+        → Γ ⊆ Γ'
+        → Γ' ⊢cᵉ e
 ⊆-cloAᵉ ⊢c-lit ss = ⊢c-lit
 ⊆-cloAᵉ ⊢c-var ss = ⊢c-var
 ⊆-cloAᵉ (⊢c-lam clo) ss = ⊢c-lam (⊆-cloAᵉ clo (var ss))
@@ -44,8 +45,8 @@ open import Implicit.Algo.Properties.Extension
 ⊆-cloAᵉ (⊢c-tlam clo) ss = ⊢c-tlam (⊆-cloAᵉ clo (uvar ss))
 
 ⊆-cloAᶜ : Γ ⊢cᶜ Σ
-          → Γ ⊆ Γ'
-          → Γ' ⊢cᶜ Σ
+        → Γ ⊆ Γ'
+        → Γ' ⊢cᶜ Σ
 ⊆-cloAᶜ ⊢c-empty ss = ⊢c-empty
 ⊆-cloAᶜ (⊢c-τ cloA) ss = ⊢c-τ (⊆-cloA cloA ss)
 ⊆-cloAᶜ (⊢c-term cloe clo) ss = ⊢c-term (⊆-cloAᵉ cloe ss) (⊆-cloAᶜ clo ss)

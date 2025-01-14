@@ -3,7 +3,7 @@ module Implicit.Language.Lookup.Properties where
 open import Implicit.Language.Base
 open import Implicit.Language.Lookup.Base
 open import Implicit.Language.Shift
-  
+
 ∋⦂-unique : Γ ∋ x ⦂ A
           → Γ ∋ x ⦂ B
           → A ≡ B
@@ -14,13 +14,6 @@ open import Implicit.Language.Shift
 ∋⦂-unique (S= in1 x) (S= in2 x₁) rewrite ∋⦂-unique in1 in2 = ↑ty-unique x x₁
 
 
-inst-in : [ A / k ] Γ ⟹ Γ' ↪ B
-        → Γ' ∋ k := B
-inst-in (⟹^0 up) = Z up
-inst-in (⟹^S inst up1 up2) = S^ (inst-in inst) up2
-inst-in (⟹∙S inst up1 up2) = S∙ (inst-in inst) up2
-inst-in (⟹,S inst) = S, (inst-in inst)
-inst-in (⟹=S inst up1 up2) = S= (inst-in inst) up2
 
 ↑ty-ε : X ε A
       → A ↑ty k ⇘ A'
@@ -79,4 +72,3 @@ inst-in (⟹=S inst up1 up2) = S= (inst-in inst) up2
 ∙∈-=∈-false (S∙ in1) (S∙ in2) = ∙∈-=∈-false in1 in2
 ∙∈-=∈-false (S= in1) (S= in2) = ∙∈-=∈-false in1 in2
 ∙∈-=∈-false (S^ in1) (S^ in2) = ∙∈-=∈-false in1 in2
-  

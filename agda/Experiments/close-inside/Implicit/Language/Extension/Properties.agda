@@ -4,6 +4,7 @@ open import Implicit.Language.Base
 open import Implicit.Language.Extension.Base
 
 open import Implicit.Language.Lookup
+open import Implicit.Language.EnvOps
 open import Implicit.Language.OpenClose
 
 ----------------------------------------------------------------------

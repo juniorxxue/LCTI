@@ -5,6 +5,7 @@ open import Implicit.Language.Lookup
 open import Implicit.Language.Shift
 open import Implicit.Language.Subst
 open import Implicit.Language.OpenClose.Base
+open import Implicit.Language.EnvOps
 
 ⊢c-weaken, : Γ ⊢c A
            → Γ ▶ k , T ⇘ Γ'
@@ -15,8 +16,10 @@ open import Implicit.Language.OpenClose.Base
 ⊢c-weaken, (⊢c-arr clo clo₁) extΓ = ⊢c-arr (⊢c-weaken, clo extΓ) (⊢c-weaken, clo₁ extΓ)
 ⊢c-weaken, {T = T} (⊢c-∀ clo) extΓ = ⊢c-∀ (⊢c-weaken, clo (▶S∙ extΓ (proj₂ (↑ty0-total T))))
 
-⊢c-weaken,0 : Γ ⊢c A → Γ , B ⊢c A
-⊢c-weaken,0 clo = ⊢c-weaken, clo ▶Z
+⊢c-weaken,0 : Γ ⊢c A
+            → Γ ⊢c B
+            → Γ , B ⊢c A
+⊢c-weaken,0 clo cloB = ⊢c-weaken, clo (▶Z cloB)
 
 ⊢c-weaken^ : Γ ⊢c A
            → Γ ▶ k ,^⇘ Γ'
@@ -61,8 +64,9 @@ open import Implicit.Language.OpenClose.Base
 
 ⊢c-weaken=0 : Γ ⊢c A
             → ↑ty0 A ⇘ A'
+            → Γ ⊢c B
             → Γ ,= B ⊢c A'
-⊢c-weaken=0 clo upA = ⊢c-weaken= clo ▶Z upA
+⊢c-weaken=0 clo upA cloB = ⊢c-weaken= clo (▶Z cloB) upA
 
 ----------------------------------------------------------------------
 --+                       lemmas about ⊢cᵉ                         +--
@@ -82,8 +86,9 @@ open import Implicit.Language.OpenClose.Base
 
 ⊢cᵉ-weaken,0 : Γ ⊢cᵉ e
              → ↑tm0 e ⇘ e'
+             → Γ ⊢c T
              → Γ , T ⊢cᵉ e'
-⊢cᵉ-weaken,0 clo-e up-e = ⊢cᵉ-weaken, clo-e ▶Z up-e
+⊢cᵉ-weaken,0 clo-e up-e cloT = ⊢cᵉ-weaken, clo-e (▶Z cloT) up-e
 
 ⊢cᵉ-weaken^ : Γ ⊢cᵉ e
             → Γ ▶ k ,^⇘ Γ'

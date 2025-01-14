@@ -5,6 +5,9 @@ open import Implicit.Language.Lookup
 open import Implicit.Language.Shift
 open import Implicit.Language.Subst
 open import Implicit.Language.OpenClose.Base
+open import Implicit.Language.EnvOps.Base
+open import Implicit.Language.EnvOps.Insert
+open import Implicit.Language.EnvOps.Remove
 
 -- subst lemma implies this, only with condition Γ ⊢c T, but obviously we need less to prove this lemam
 ⊢c-strengthen, : Γ ⊢c A

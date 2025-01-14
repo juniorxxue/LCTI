@@ -7,5 +7,4 @@ open import Implicit.Algo.Properties.Subst public
 open import Implicit.Algo.Properties.OpenClose public
 open import Implicit.Algo.Properties.Polarity public
 
--- open import Implicit.Algo.Properties.Find
---  using (find) public
+-- open import Implicit.Algo.Properties.Find public

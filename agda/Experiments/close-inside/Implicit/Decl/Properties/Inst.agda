@@ -16,14 +16,18 @@ inst-s-r : [ A / k ] Γ ⟹ Δ ↪ B
          → Γ ⊢c A
          → Δ ⊢ ∞ # B ≤ A
 
-inst-s-l (⟹^0 up) (clo-S^ cloΓ) cloA = s-refl-∞ (clo-S= cloΓ (⊢c-strengthen^0 cloA up)) (⊢c-weaken=0 (⊢c-strengthen^0 cloA up) up)
+inst-s-l (⟹^0 up) (clo-S^ cloΓ) cloA = s-refl-∞ (clo-S= cloΓ (⊢c-strengthen^0 cloA up)) (⊢c-weaken=0 (⊢c-strengthen^0 cloA up) up (⊢c-strengthen^0 cloA up))
 inst-s-l (⟹^S inst up1 up2) (clo-S^ cloΓ) cloA = s-weaken^0 (inst-s-l inst cloΓ (⊢c-strengthen^0 cloA up1)) up1 up2
 inst-s-l (⟹∙S inst up1 up2) (clo-S∙ cloΓ) cloA = s-weaken∙0 (inst-s-l inst cloΓ (⊢c-strengthen∙0 cloA up1)) up1 up2
-inst-s-l (⟹,S inst) (clo-S, cloΓ cloA₁) cloA = s-weaken,0 (inst-s-l inst cloΓ (⊢c-strengthen,0 cloA))
-inst-s-l (⟹=S inst up1 up2) (clo-S= cloΓ cloA₁) cloA = s-weaken=0 (inst-s-l inst cloΓ (⊢c-strengthen=0 cloA up1)) up1 up2
+inst-s-l (⟹,S inst) (clo-S, cloΓ cloA₁) cloA =
+  s-weaken,0 (inst-s-l inst cloΓ (⊢c-strengthen,0 cloA)) (⊆-cloA cloA₁ (inst-⊆ inst (⊢c-strengthen,0 cloA)))
+inst-s-l (⟹=S inst up1 up2) (clo-S= cloΓ cloA₁) cloA =
+  s-weaken=0 (inst-s-l inst cloΓ (⊢c-strengthen=0 cloA up1)) up1 up2 (⊆-cloA cloA₁ (inst-⊆ inst (⊢c-strengthen=0 cloA up1)))
 
-inst-s-r (⟹^0 up) (clo-S^ cloΓ) cloA = s-refl-∞ (clo-S= cloΓ (⊢c-strengthen^0 cloA up)) (⊢c-weaken=0 (⊢c-strengthen^0 cloA up) up)
+inst-s-r (⟹^0 up) (clo-S^ cloΓ) cloA = s-refl-∞ (clo-S= cloΓ (⊢c-strengthen^0 cloA up)) (⊢c-weaken=0 (⊢c-strengthen^0 cloA up) up (⊢c-strengthen^0 cloA up))
 inst-s-r (⟹^S inst up1 up2) (clo-S^ cloΓ) cloA = s-weaken^0 (inst-s-r inst cloΓ (⊢c-strengthen^0 cloA up1)) up2 up1
 inst-s-r (⟹∙S inst up1 up2) (clo-S∙ cloΓ) cloA = s-weaken∙0 (inst-s-r inst cloΓ (⊢c-strengthen∙0 cloA up1)) up2 up1
-inst-s-r (⟹,S inst) (clo-S, cloΓ cloA₁) cloA = s-weaken,0 (inst-s-r inst cloΓ (⊢c-strengthen,0 cloA))
-inst-s-r (⟹=S inst up1 up2) (clo-S= cloΓ cloA₁) cloA = s-weaken=0 (inst-s-r inst cloΓ (⊢c-strengthen=0 cloA up1)) up2 up1
+inst-s-r (⟹,S inst) (clo-S, cloΓ cloA₁) cloA =
+  s-weaken,0 (inst-s-r inst cloΓ (⊢c-strengthen,0 cloA)) (⊆-cloA cloA₁ (inst-⊆ inst (⊢c-strengthen,0 cloA)))
+inst-s-r (⟹=S inst up1 up2) (clo-S= cloΓ cloA₁) cloA =
+  s-weaken=0 (inst-s-r inst cloΓ (⊢c-strengthen=0 cloA up1)) up2 up1 (⊆-cloA cloA₁ (inst-⊆ inst (⊢c-strengthen=0 cloA up1)))

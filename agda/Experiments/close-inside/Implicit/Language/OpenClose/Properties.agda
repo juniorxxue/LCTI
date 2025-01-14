@@ -11,20 +11,20 @@ open import Implicit.Language.OpenClose.Strengthen
 ∋⦂-closed : Closed Γ
           → Γ ∋ x ⦂ A
           → Γ ⊢c A
-∋⦂-closed (clo-S, cloΓ cloA) Z = ⊢c-weaken,0 cloA
-∋⦂-closed (clo-S, cloΓ cloA) (S, inΓ) = ⊢c-weaken,0 (∋⦂-closed cloΓ inΓ)
+∋⦂-closed (clo-S, cloΓ cloA) Z = ⊢c-weaken,0 cloA cloA
+∋⦂-closed (clo-S, cloΓ cloA) (S, inΓ) = ⊢c-weaken,0 (∋⦂-closed cloΓ inΓ) cloA
 ∋⦂-closed (clo-S∙ cloΓ) (S∙ inΓ up) = ⊢c-weaken∙0 (∋⦂-closed cloΓ inΓ) up
 ∋⦂-closed (clo-S^ cloΓ) (S^ inΓ up) = ⊢c-weaken^0 (∋⦂-closed cloΓ inΓ) up
-∋⦂-closed (clo-S= cloΓ cloA) (S= inΓ x) = ⊢c-weaken=0 (∋⦂-closed cloΓ inΓ) x
+∋⦂-closed (clo-S= cloΓ cloA) (S= inΓ x) = ⊢c-weaken=0 (∋⦂-closed cloΓ inΓ) x cloA
 
 ∋=-closed : Closed Γ
           → Γ ∋ X := A
           → Γ ⊢c A
-∋=-closed (clo-S= cloΓ cloA) (Z up) = ⊢c-weaken=0 cloA up
-∋=-closed (clo-S, cloΓ cloA) (S, inΓ) = ⊢c-weaken,0 (∋=-closed cloΓ inΓ)
+∋=-closed (clo-S= cloΓ cloA) (Z up) = ⊢c-weaken=0 cloA up cloA
+∋=-closed (clo-S, cloΓ cloA) (S, inΓ) = ⊢c-weaken,0 (∋=-closed cloΓ inΓ) cloA
 ∋=-closed (clo-S∙ cloΓ) (S∙ inΓ up) = ⊢c-weaken∙0 (∋=-closed cloΓ inΓ) up
 ∋=-closed (clo-S^ cloΓ) (S^ inΓ up) = ⊢c-weaken^0 (∋=-closed cloΓ inΓ) up
-∋=-closed (clo-S= cloΓ cloA) (S= inΓ up) = ⊢c-weaken=0 (∋=-closed cloΓ inΓ) up
+∋=-closed (clo-S= cloΓ cloA) (S= inΓ up) = ⊢c-weaken=0 (∋=-closed cloΓ inΓ) up cloA
 
 ----------------------------------------------------------------------
 --+                          replacement                           +--
@@ -90,7 +90,7 @@ data _◆_⇘_ : Env n m → Fin m → Env n m → Set where
       → Γ ,∙ ⊢c A
 ⊢c-◆0 clo = ⊢c-◆ clo ◆Z
 
-    
+
 ⊢c-^∈-false : k ε A
             → Γ ∋^ k
             → Γ ⊢c A

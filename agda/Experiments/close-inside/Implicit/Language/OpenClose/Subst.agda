@@ -5,6 +5,7 @@ open import Implicit.Language.Lookup
 open import Implicit.Language.Shift
 open import Implicit.Language.Subst
 open import Implicit.Language.OpenClose.Base
+open import Implicit.Language.EnvOps
 open import Implicit.Language.OpenClose.Weaken
 
 ◀=-imply-∋= : Γ ◀ k := T ⇘ Γ*
