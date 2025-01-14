@@ -72,9 +72,10 @@ data _⊢cⁿ_by_ : Env n m → Type m → Fin (1 + n) → Set where
   clb-S, : Γ ⊢cⁿ A by k
          → Γ , T ⊢cⁿ A by #S k
 
-  clb-S∙ : Γ ⊢cⁿ A by k
-         → (up : ↑ty0 A ⇘ A')
-         → Γ ,∙ ⊢cⁿ A' by k
+  clb-S∙ : Γ ⊢cⁿ A' by k
+--         → (up : ↑ty0 A ⇘ A')
+         → (don : ↓ty0 A ⇘ A')
+         → Γ ,∙ ⊢cⁿ A by k
 
   clb-S^ : Γ ⊢cⁿ A by k
          → (up : ↑ty0 A ⇘ A')

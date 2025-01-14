@@ -11,9 +11,9 @@ open import Implicit.Decl.Properties.Find
 ⊢cⁿto⊢c : Γ ⊢cⁿ A by #0
         → Γ ⊢c A
 ⊢cⁿto⊢c (clb-Z cloA) = cloA
-⊢cⁿto⊢c (clb-S∙ clo up) = ⊢c-weaken∙0 (⊢cⁿto⊢c clo) up
-⊢cⁿto⊢c (clb-S^ clo up) = ⊢c-weaken^0 (⊢cⁿto⊢c clo) up
-⊢cⁿto⊢c (clb-S= clo up) = ⊢c-weaken=0 (⊢cⁿto⊢c clo) up
+⊢cⁿto⊢c (clb-S∙ clo up) = ⊢c-weaken∙0 (⊢cⁿto⊢c clo) {!!}
+⊢cⁿto⊢c (clb-S^ clo up) = ⊢c-weaken^0 (⊢cⁿto⊢c clo) {!!}
+⊢cⁿto⊢c (clb-S= clo up) = ⊢c-weaken=0 (⊢cⁿto⊢c clo) {!!}
 
 ⊢cⁿ-strengthen, : Γ ⊢cⁿ A by k
                 → Γ ◀ k' ,⇘ Γ'
@@ -28,8 +28,23 @@ open import Implicit.Decl.Properties.Find
 ⊢cⁿ-strengthen^ : Γ ⊢cⁿ A' by k
                 → Γ ◀ k' ^⇘ Γ'
                 → A ↑ty k' ⇘ A'
-                → Γ' ⊢cⁿ A by {!pinch k'!}
-⊢cⁿ-strengthen^ clo newΓ' upA = {!clo!}
+                → Γ' ⊢cⁿ A by k
+⊢cⁿ-strengthen^ (clb-Z cloA) newΓ' upA = clb-Z (⊢c-strengthen^ cloA newΓ' upA)
+⊢cⁿ-strengthen^ (clb-S, clo) (◀S, newΓ' x) upA = clb-S, (⊢cⁿ-strengthen^ clo newΓ' upA)
+⊢cⁿ-strengthen^ (clb-S∙ clo up) (◀S∙ newΓ') upA = clb-S∙ (⊢cⁿ-strengthen^ clo newΓ' {!!}) {!!}
+⊢cⁿ-strengthen^ (clb-S^ clo up) ◀Z upA = {!!}
+⊢cⁿ-strengthen^ (clb-S^ clo up) (◀S^ newΓ') upA = {!!}
+⊢cⁿ-strengthen^ (clb-S= clo up) (◀S= newΓ' up₁) upA = clb-S= (⊢cⁿ-strengthen^ clo newΓ' {!!}) {!!}
+
+⊢cⁿ-strengthen^' : Γ ⊢cⁿ A by k
+                 → Γ ◀ k' ^⇘ Γ'
+                 → A ↓ty k' ⇘ A'
+                 → Γ' ⊢cⁿ A' by k
+⊢cⁿ-strengthen^' (clb-Z cloA) newΓ don = clb-Z {!!}
+⊢cⁿ-strengthen^' (clb-S, clo) (◀S, newΓ up) don = clb-S, (⊢cⁿ-strengthen^' clo newΓ don)
+⊢cⁿ-strengthen^' (clb-S∙ clo up) (◀S∙ newΓ) don = clb-S∙ (⊢cⁿ-strengthen^' clo newΓ {!!}) {!!}
+⊢cⁿ-strengthen^' (clb-S^ clo up) newΓ don = {!!}
+⊢cⁿ-strengthen^' (clb-S= clo up) newΓ don = {!!}
 
 closed-weaken, : Closed Γ
                → Γ ▶ k , T ⇘ Γ'
@@ -39,7 +54,7 @@ closed-weaken, clo-Z ▶Z (clb-Z cloA) = clo-S, clo-Z cloA
 closed-weaken, (clo-S, cloΓ cloA) ▶Z (clb-Z cloA₁) = clo-S, (clo-S, cloΓ cloA) cloA₁
 closed-weaken, (clo-S, cloΓ cloA) (▶S, newΓ) (clb-S, cloT) = clo-S, (closed-weaken, cloΓ newΓ cloT) (⊢c-weaken, cloA newΓ)
 closed-weaken, (clo-S∙ cloΓ) ▶Z (clb-Z cloA) = clo-S, (clo-S∙ cloΓ) cloA
-closed-weaken, (clo-S∙ cloΓ) ▶Z (clb-S∙ cloT up) = clo-S, (clo-S∙ cloΓ) (⊢c-weaken∙ (⊢cⁿto⊢c cloT) ▶Z up)
+closed-weaken, (clo-S∙ cloΓ) ▶Z (clb-S∙ cloT up) = clo-S, (clo-S∙ cloΓ) {!!}
 closed-weaken, (clo-S∙ cloΓ) (▶S∙ newΓ x) cloT = clo-S∙ (closed-weaken, cloΓ newΓ {!!})
 closed-weaken, (clo-S^ cloΓ) newΓ cloT = {!!}
 closed-weaken, (clo-S= cloΓ cloA) newΓ cloT = {!!}
@@ -56,7 +71,7 @@ s-weaken, (s-arr₁ s s₁) cloT newΓ = s-arr₁ (s-weaken, s cloT newΓ) (s-we
 s-weaken, (s-arr₂ s s₁) cloT newΓ = s-arr₂ (s-weaken, s cloT newΓ) (s-weaken, s₁ cloT newΓ)
 s-weaken, (s-arr₃ cloA s) cloT newΓ = s-arr₃ (⊢c-weaken, cloA newΓ) (s-weaken, s cloT newΓ)
 s-weaken, {T = T} (s-∀ s) cloT newΓ = let ⟨ T' , upT ⟩ = ↑ty0-total T
-                                      in s-∀ (s-weaken, s (clb-S∙ cloT upT) (▶S∙ newΓ upT))
+                                      in s-∀ (s-weaken, s (clb-S∙ cloT {!!}) (▶S∙ newΓ upT))
 s-weaken, {T = T} (s-∀l s ic fd st₁ st₂) cloT newΓ = let ⟨ T' , upT ⟩ = ↑ty0-total T
                                                      in s-∀l (s-weaken, s (clb-S= cloT upT) (▶S= newΓ upT)) ic fd st₁ st₂
 s-weaken, (s-var-l inΓ s) cloT newΓ = s-var-l (▶,-∋:= inΓ newΓ) (s-weaken, s cloT newΓ)
