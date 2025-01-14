@@ -10,7 +10,7 @@ open import Implicit.Algo.Properties.Polarity
 -- and free variables in A must appear in Γ₂
 
 infix 3 _∤_⊢oˣ_
-data _∤_⊢oˣ_ : Env n m → Fin m → Fin m → Set where
+data _∤_⊢oˣ_ : Env n m → Fin (1 + m) → Fin m → Set where
 
   opnx= : Γ ∋= X
         → Γ ∤ k ⊢oˣ X
@@ -23,7 +23,7 @@ data _∤_⊢oˣ_ : Env n m → Fin m → Fin m → Set where
         → Γ ∤ k ⊢oˣ X
 
 infix 3 _∤_⊢o_
-data _∤_⊢o_ : Env n m → Fin m → Type m → Set where
+data _∤_⊢o_ : Env n m → Fin (1 + m) → Type m → Set where
 
   opn-int : Γ ∤ k ⊢o Int
 
@@ -38,7 +38,7 @@ data _∤_⊢o_ : Env n m → Fin m → Type m → Set where
         → Γ ∤ k ⊢o `∀ A
 
 infix 3 _⊆_∣_⊆_by_
-data _⊆_∣_⊆_by_ : Env n m → Env n m → Env n m → Env n m → Fin m → Set where
+data _⊆_∣_⊆_by_ : Env n m → Env n m → Env n m → Env n m → Fin (1 + m) → Set where
 
   ⊆⊆-Z : (ext : Γ ⊆ Δ)
        → Γ ⊆ Δ ∣ Γ ⊆ Δ by #0
@@ -93,7 +93,6 @@ data _⊆_∣_⊆_by_ : Env n m → Env n m → Env n m → Env n m → Fin m �
 ⊆⊆-open-var-in (S^ inΓ) (s≤s lt) (⊆-S^^ exts) = S^ (⊆⊆-open-var-in inΓ lt exts)
 ⊆⊆-open-var-in (S^ inΓ) (s≤s lt) (⊆-S^= exts) = S^ (⊆⊆-open-var-in inΓ lt exts)
 
-
 ⊆⊆-open-var : Γ₁ ∋^ X
             → Γ₁ ∤ k ⊢oˣ X
             → Γ₁ ⊆ Δ₁ ∣ Γ₂ ⊆ Δ₂ by k
@@ -101,3 +100,23 @@ data _⊆_∣_⊆_by_ : Env n m → Env n m → Env n m → Env n m → Fin m �
 ⊆⊆-open-var inΓ (opnx= x) exts = ⊥-elim (^∈-=∈-false inΓ x)
 ⊆⊆-open-var inΓ (opnx∙ x) exts = ⊥-elim (^∈-∙∈-false inΓ x)
 ⊆⊆-open-var inΓ (opnx^ x x₁) exts = ⊆⊆-open-var-in inΓ x₁ exts
+
+⊆⊆-inst-var : [ B / X ] Γ₁ ⟹ Γ₂
+            → X #< k
+            → Γ₁ ⊆ Δ₁ ∣ Γ₂ ⊆ Δ₂ by k
+            → [ B / X ] Δ₁ ⟹ Δ₂
+⊆⊆-inst-var (⟹^0 up) lt (⊆-S^= exts) with ⊆⊆-one-input exts
+... | refl = ⟹^0 up
+⊆⊆-inst-var (⟹^S inst up1) (s≤s lt) (⊆-S^^ exts) = ⟹^S (⊆⊆-inst-var inst lt exts) up1
+⊆⊆-inst-var (⟹∙S inst up1) (s≤s lt) (⊆-S∙∙ exts) = ⟹∙S (⊆⊆-inst-var inst lt exts) up1
+⊆⊆-inst-var (⟹,S inst) lt (⊆⊆-S, exts) = ⟹,S (⊆⊆-inst-var inst lt exts)
+⊆⊆-inst-var (⟹=S inst up1) (s≤s lt) (⊆-S== exts) = ⟹=S (⊆⊆-inst-var inst lt exts) up1
+
+⊆⊆-inst-var-o : [ B / X ] Γ₁ ⟹ Γ₂
+              → Γ₁ ∋^ X
+              → Γ₁ ∤ k ⊢oˣ X
+              → Γ₁ ⊆ Δ₁ ∣ Γ₂ ⊆ Δ₂ by k
+              → [ B / X ] Δ₁ ⟹ Δ₂
+⊆⊆-inst-var-o inst inΓ (opnx= x) exts = ⊥-elim (^∈-=∈-false inΓ x)
+⊆⊆-inst-var-o inst inΓ (opnx∙ x) exts = ⊥-elim (^∈-∙∈-false inΓ x)
+⊆⊆-inst-var-o inst inΓ (opnx^ x x₁) exts = ⊆⊆-inst-var inst x₁ exts

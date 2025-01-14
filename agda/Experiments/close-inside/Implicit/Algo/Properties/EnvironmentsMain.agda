@@ -42,8 +42,8 @@ s-⊆-prv-gen+ (s-empty clo) opn ext with ⊆⊆-one-input ext
 ... | refl = s-empty (⊆-cloA clo (⊆⊆-⊆-l ext))
 s-⊆-prv-gen+ s-var opn ext with ⊆⊆-one-input ext
 ... | refl = s-var
-s-⊆-prv-gen+ (s-ex-l^ x-in inst) (opn-var x) ext = s-ex-l^ (⊆⊆-open-var x-in x ext) {!!}
-s-⊆-prv-gen+ (s-ex-l= x-in s) opn ext = {!!}
+s-⊆-prv-gen+ (s-ex-l^ x-in inst) (opn-var x) ext = s-ex-l^ (⊆⊆-open-var x-in x ext) (⊆⊆-inst-var-o inst x-in x ext)
+s-⊆-prv-gen+ (s-ex-l= x-in s) opn ext = s-ex-l= (⊆-in:= x-in (⊆⊆-⊆-l ext)) (s-⊆-prv-gen+ s {!!} ext)
 s-⊆-prv-gen+ (s-ex-r= x-in s) opn ext = {!!}
 s-⊆-prv-gen+ (s-arr s s₁) (opn-arr opn opn₁) ext = s-arr (s-⊆-prv-gen- s opn {!!}) (s-⊆-prv-gen+ s₁ {!!} {!!})
 s-⊆-prv-gen+ (s-term-c ⊢e s) opn ext = {!!}
@@ -72,3 +72,20 @@ t-⊆-prv (⊢lam₂ ⊢e up-c ⊢e₁) ext cloΔ =
 t-⊆-prv (⊢sub ⊢e ne gc cloΣ s) ext cloΔ =
   ⊢sub (t-⊆-prv ⊢e ext cloΔ) ne gc (⊆-cloAᶜ cloΣ ext) (s-⊆-prv s ext)
 t-⊆-prv (⊢tabs ⊢e) ext cloΔ = ⊢tabs (t-⊆-prv ⊢e (uvar ext) (clo-S∙ cloΔ))
+
+
+clo-opnx : Γ ⊢c A
+         → Γ ∤ k ⊢o A
+clo-opnx ⊢c-int = opn-int
+clo-opnx (⊢c-var-∙ inΓ) = opn-var (opnx∙ inΓ)
+clo-opnx (⊢c-var-= inΓ) = opn-var (opnx= inΓ)
+clo-opnx (⊢c-arr clo clo₁) = opn-arr (clo-opnx clo) (clo-opnx clo₁)
+clo-opnx (⊢c-∀ clo) = opn-∀ (clo-opnx clo)
+
+s-⊆-prv' : Γ ⊢ A ⌞ ≤ ⌝ Σ ⊣ Γ ↪ B
+         → Γ ⊢c A
+         → Γ ⊢cᶜ Σ
+         → Γ ⊆ Δ
+         → Δ ⊢ A ⌞ ≤ ⌝ Σ ⊣ Δ ↪ B
+s-⊆-prv' {≤ = ≤⁺} s cloA cloΣ ext = s-⊆-prv-gen+ {k = #0} s (clo-opnx cloA) (⊆⊆-Z ext)
+s-⊆-prv' {≤ = ≤⁻} {τ A} s cloA (⊢c-τ cloA₁) ext = s-⊆-prv-gen- {k = #0} s (clo-opnx cloA₁) (⊆⊆-Z ext)
