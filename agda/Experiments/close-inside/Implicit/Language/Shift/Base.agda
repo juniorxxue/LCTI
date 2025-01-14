@@ -82,28 +82,9 @@ data _↑ty_⇘_ : Type m → Fin (1 + m) → Type (1 + m) → Set where
       A ↑ty #S k ⇘ A'
     → (`∀ A) ↑ty k ⇘ `∀ A'
 
-infix 3 _↓ty_⇘_
-data _↓ty_⇘_ : Type (1 + m) → Fin (1 + m) → Type m → Set where
-  ↓ty-int :
-      Int ↓ty k ⇘ Int
-  ↓ty-var :
-      (¬p : k ≢ X)
-    → ‶ X ↓ty k ⇘ ‶ punchOut ¬p
-  ↓ty-arr :
-      A ↓ty k ⇘ A'
-    → B ↓ty k ⇘ B'
-    → A `→ B ↓ty k ⇘ A' `→ B'
-  ↓ty-∀ :
-      A ↓ty #S k ⇘ A'
-    → `∀ A ↓ty k ⇘ `∀ A'
-
 infix 3 ↑ty0_⇘_
 ↑ty0_⇘_ : Type m → Type (1 + m) → Set
 ↑ty0_⇘_ A = _↑ty_⇘_ A #0
-
-infix 3 ↓ty0_⇘_
-↓ty0_⇘_ : Type (1 + m) → Type m → Set
-↓ty0_⇘_ A = _↓ty_⇘_ A #0
 
 infix 3 _↑tyᵉ_⇘_
 data _↑tyᵉ_⇘_ : Term n m → Fin (1 + m) → Term n (1 + m) → Set where

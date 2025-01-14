@@ -138,14 +138,14 @@ infix 3 _◀_^⇘_
 data _◀_^⇘_ : Env n (1 + m) → Fin (1 + m) → Env n m → Set where
   ◀Z  : Γ ,^ ◀ #0 ^⇘ Γ
   ◀S, : Γ ◀ k ^⇘ Γ'
-      → (up : B ↑ty k ⇘ B')
+      → B ↑ty k ⇘ B'
       → Γ , B' ◀ k ^⇘ Γ' , B
   ◀S^ : Γ ◀ k ^⇘ Γ'
       → Γ ,^ ◀ #S k ^⇘ Γ' ,^
   ◀S∙ : Γ ◀ k ^⇘ Γ'
       → Γ ,∙ ◀ #S k ^⇘ Γ' ,∙
   ◀S= : Γ ◀ k ^⇘ Γ'
-      → (up : A ↑ty k ⇘ A')
+      → A ↑ty k ⇘ A'
       → Γ ,= A' ◀ #S k ^⇘ Γ' ,= A
 
 -- remove type variable a from k-th posititon
