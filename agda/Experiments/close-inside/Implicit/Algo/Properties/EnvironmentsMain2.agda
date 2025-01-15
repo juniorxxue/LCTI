@@ -1,4 +1,5 @@
-module Implicit.Algo.Properties.EnvironmentsMain where
+module Implicit.Algo.Properties.EnvironmentsMain2 where
+-- version : Closed in lemma
 
 open import Implicit.Language
 open import Implicit.Algo.Base

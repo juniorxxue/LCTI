@@ -143,8 +143,8 @@ sound-find (s-ex-r= x-in s) k^ k= j~Σ = {!!}
 sound-find (s-arr s s₁) k^ k= j~Σ = {!!}
 sound-find (s-term-c ⊢e s) k^ k= (~I ⊢e₁ j~Σ) = f-arr-𝕚-r (sound-find s k^ k= j~Σ)
 -- f-arr-𝕚-r (sound-find s k^ k= j~Σ)
-sound-find (s-term-c ⊢e s) k^ k= (~C ⊢e₁ j~Σ) = f-arr-𝕔 (sound-find s k^ k= j~Σ)
+sound-find (s-term-c ⊢e s) k^ k= (~C ⊢e₁ j~Σ) = f-arr-𝕔 {!!} (sound-find s k^ k= j~Σ)
 sound-find (s-term-o opnA ⊢e s s₁) k^ k= (~I ⊢e₁ j~Σ) = {!!}
-sound-find (s-term-o opnA ⊢e s s₁) k^ k= (~C ⊢e₁ j~Σ) = {!!}
+sound-find (s-term-o opnA ⊢e s s₁) k^ k= (~C ⊢e₁ j~Σ) = f-arr-𝕔 {!!} {!!}
 sound-find (s-∀ s) k^ k= j~Σ = {!!}
 sound-find (s-∀l s upᶜ upᵉ st₁ st₂) k^ k= j~Σ = {!!}
