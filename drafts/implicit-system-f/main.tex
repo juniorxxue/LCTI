@@ -37,7 +37,7 @@
 &\text{Environments} \quad\quad &\Gamma::=&~ . \mid \Gamma, x : A \mid \Gamma, a \mid \Gamma , \hat{a} \mid \Gamma, \hat{a} = A\\
 &\text{Counters} \quad\quad &n ::=&~ 0 \mid \infty \mid S~n\\
     &\text{Contexts} \quad\quad &\Sigma ::=&~  \square  \mid A \mid \boxed{e} \leadsto \Sigma\\
-    &\text{Generic Consumers} \quad \quad &g::=&~ i \mid x \mid e : A \mid \Lambda a.~e\\
+    &\text{Generic Consumers} \quad \quad &g::=&~ i \mid x \mid e : A \mid \Lambda a.~e
 \end{align*}
 
 
@@ -47,11 +47,11 @@
 
 \begin{mathpar}
     \inferrule*[lab=Int]
-    { }
+    {\vdash_c \Gamma}
     {\Gamma \vdash_0 i : \mathtt{Int}}
 
     \inferrule*[lab=Var]
-    {x : A \in \Gamma}
+    {\vdash_c \Gamma \\ x : A \in \Gamma}
     {\Gamma \vdash_0 x : A}
 
     \inferrule*[lab=Ann]
@@ -89,16 +89,22 @@
 
 \begin{mathpar}
     \inferrule*[lab=S-Refl]
-    { }
+    {\vdash_c \Gamma \\
+     \Gamma \vdash A}
     {\Gamma \vdash_0 A <: A}
 
     \inferrule*[lab=S-Int]
-    { }
+    {\vdash_c \Gamma}
     {\Gamma \vdash_{\infty} \mathtt{Int} <: \mathtt{Int}}
     
     \inferrule*[lab=S-Var]
-    { }
+    {\vdash_c \Gamma}
     {\Gamma \vdash_\infty a <: a}
+    
+    \inferrule*[lab=S-Var-Slv]
+    {\vdash_c \Gamma \\
+      \hat{a} = A \in \Gamma}
+    {\Gamma \vdash_\infty \hat{a} <: \hat{a}}
 
     \inferrule*[lab=S-Arr]
     {\Gamma \vdash_{\infty} C <: A \\
@@ -226,9 +232,9 @@
 \subsection{Subtyping: $\boxed{\Gamma \vdash A \leq \Sigma \dashv \Gamma' \rightsquigarrow A'}$}
 
 \begin{mathpar}
-\inferrule*[lab=S-Int]
+\inferrule*[lab=\texttt{S-Int}]
 { }
-{\Gamma \vdash \mathtt{Int} \leq^+ \mathtt{Int} \dashv \Gamma \rightsquigarrow \mathtt{Int}}
+{\Gamma \vdash \mathtt{Int} \leq \mathtt{Int} \dashv \Gamma \rightsquigarrow \mathtt{Int}}
 
 \inferrule*[lab=S-Empty]
 {\Gamma \vdash_cA}
@@ -237,6 +243,10 @@
 \inferrule*[lab=S-Var]
 { }
 {\Gamma \vdash a \leq a \dashv \Gamma \rightsquigarrow a}
+
+\inferrule*[lab=S-Var-Slv]
+{ \hat{a} = A \in \Gamma}
+{\Gamma \vdash \hat{a} \leq \hat{a} \dashv \Gamma \rightsquigarrow \hat{a}}
 
 \inferrule*[lab=S-Ex-L]
 {\hat{a} \in \Gamma}
@@ -249,7 +259,7 @@
 
 \inferrule*[lab=S-Ex-R]
 {\hat{a} \in \Gamma}
-{\Gamma \vdash A \leq^- \hat{a} \dashv [(\hat{a} = A)/\hat{a}]~\Gamma \rightsquigarrow A}
+{\Gamma \vdash A \leq^- \hat{a} \dashv [(\hat{a} = A)/\hat{a}]~\Gamma \rightsquigarrow \hat{a}}
 
 \inferrule*[lab=S-Ex-R-eq]
 {\hat{a} = B \in \Gamma \\
@@ -278,8 +288,8 @@
 {\Gamma \vdash \forall a.A \leq \forall a.~B \dashv \Gamma' \rightsquigarrow \forall a. C}
 
 \inferrule*[lab=S-$\forall$L]
-{\Gamma, \hat{a} \vdash A \leq^+ \boxed{e} \leadsto \Sigma \dashv \Gamma', \hat{a}=A \rightsquigarrow B}
-{\Gamma \vdash \forall a. A \leq^+ \boxed{e} \leadsto \Sigma \dashv \Gamma' \rightsquigarrow [A/\hat{a}]B}
+{\Gamma, \hat{a} \vdash A \leq^+ \boxed{e} \leadsto \Sigma \dashv \Gamma', \hat{a}=C \rightsquigarrow B}
+{\Gamma \vdash \forall a. A \leq^+ \boxed{e} \leadsto \Sigma \dashv \Gamma' \rightsquigarrow [C/\hat{a}]B}
 \end{mathpar}
 
 \end{document}
