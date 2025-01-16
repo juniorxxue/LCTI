@@ -96,7 +96,7 @@ open import Implicit.Language.EnvOps
             → Γ' ⊢cᵉ e'
 ⊢cᵉ-weaken^ ⊢c-lit newΓ ↑tyᵉ-lit = ⊢c-lit
 ⊢cᵉ-weaken^ ⊢c-var newΓ ↑tyᵉ-var = ⊢c-var
-⊢cᵉ-weaken^ {k = k} (⊢c-lam {A = A} clo-e) newΓ (↑tyᵉ-ƛ up-e) = ⊢c-lam (⊢cᵉ-weaken^ clo-e (▶S, newΓ (proj₂ (↑ty-total A k))) up-e)
+⊢cᵉ-weaken^ (⊢c-lam clo-e) newΓ (↑tyᵉ-ƛ up-e) = ⊢c-lam (⊢cᵉ-weaken^ clo-e (▶S, newΓ ↑ty-int) up-e)
 ⊢cᵉ-weaken^ (⊢c-app clo-e clo-e₁) newΓ (↑tyᵉ-app up-e up-e₁) = ⊢c-app (⊢cᵉ-weaken^ clo-e newΓ up-e)
                                                                       (⊢cᵉ-weaken^ clo-e₁ newΓ up-e₁)
 ⊢cᵉ-weaken^ (⊢c-ann cloA clo-e) newΓ (↑tyᵉ-⦂ up-e up) = ⊢c-ann (⊢c-weaken^ cloA newΓ up) (⊢cᵉ-weaken^ clo-e newΓ up-e)
@@ -106,3 +106,20 @@ open import Implicit.Language.EnvOps
              → ↑tyᵉ0 e ⇘ e'
              → Γ ,^ ⊢cᵉ e'
 ⊢cᵉ-weaken^0 clo-e up-e = ⊢cᵉ-weaken^ clo-e ▶Z up-e
+
+⊢cᵉ-weaken= : Γ ⊢cᵉ e
+            → Γ ▶ k ,= T ⇘ Γ'
+            → e ↑tyᵉ k ⇘ e'
+            → Γ' ⊢cᵉ e'
+⊢cᵉ-weaken= ⊢c-lit newΓ ↑tyᵉ-lit = ⊢c-lit
+⊢cᵉ-weaken= ⊢c-var newΓ ↑tyᵉ-var = ⊢c-var
+⊢cᵉ-weaken= {k = k} (⊢c-lam clo) newΓ (↑tyᵉ-ƛ up) = ⊢c-lam (⊢cᵉ-weaken= clo (▶S, newΓ ↑ty-int) up)
+⊢cᵉ-weaken= (⊢c-app clo clo₁) newΓ (↑tyᵉ-app up up₁) = ⊢c-app (⊢cᵉ-weaken= clo newΓ up) (⊢cᵉ-weaken= clo₁ newΓ up₁)
+⊢cᵉ-weaken= (⊢c-ann cloA clo) newΓ (↑tyᵉ-⦂ up up₁) = ⊢c-ann (⊢c-weaken= cloA newΓ up₁) (⊢cᵉ-weaken= clo newΓ up)
+⊢cᵉ-weaken= {T = T} (⊢c-tlam clo) newΓ (↑tyᵉ-Λ up) = ⊢c-tlam (⊢cᵉ-weaken= clo (▶S∙ newΓ (proj₂ (↑ty0-total T ))) up)
+
+⊢cᵉ-weaken=0 : Γ ⊢cᵉ e
+             → Γ ⊢c T
+             → ↑tyᵉ0 e ⇘ e'
+             → Γ ,= T ⊢cᵉ e'
+⊢cᵉ-weaken=0 cloe cloT up = ⊢cᵉ-weaken= cloe (▶Z cloT) up

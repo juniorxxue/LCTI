@@ -96,3 +96,21 @@ open import Implicit.Language.EnvOps.Remove
                  → ↑tm0 e ⇘ e'
                  → Γ ⊢cᵉ e
 ⊢cᵉ-strengthen,0 clo-e up-e = ⊢cᵉ-strengthen, clo-e ◀Z up-e
+
+
+⊢cᵉ-strengthen= : Γ ⊢cᵉ e'
+                → Γ ◀ k =⇘ Γ'
+                → e ↑tyᵉ k ⇘ e'
+                → Γ' ⊢cᵉ e
+⊢cᵉ-strengthen= ⊢c-lit newΓ ↑tyᵉ-lit = ⊢c-lit
+⊢cᵉ-strengthen= ⊢c-var newΓ ↑tyᵉ-var = ⊢c-var
+⊢cᵉ-strengthen= (⊢c-lam clo) newΓ (↑tyᵉ-ƛ up) = ⊢c-lam (⊢cᵉ-strengthen= clo (◀S, newΓ ↑ty-int) up)
+⊢cᵉ-strengthen= (⊢c-app clo clo₁) newΓ (↑tyᵉ-app up up₁) = ⊢c-app (⊢cᵉ-strengthen= clo newΓ up)
+                                                            (⊢cᵉ-strengthen= clo₁ newΓ up₁)
+⊢cᵉ-strengthen= (⊢c-ann cloA clo) newΓ (↑tyᵉ-⦂ up up₁) = ⊢c-ann (⊢c-strengthen= cloA newΓ up₁) (⊢cᵉ-strengthen= clo newΓ up)
+⊢cᵉ-strengthen= (⊢c-tlam clo) newΓ (↑tyᵉ-Λ up) = ⊢c-tlam (⊢cᵉ-strengthen= clo (◀S∙ newΓ) up)
+
+⊢cᵉ-strengthen=0 : Γ ,= T ⊢cᵉ e'
+                 → ↑tyᵉ0 e ⇘ e'
+                 → Γ ⊢cᵉ e
+⊢cᵉ-strengthen=0 clo up = ⊢cᵉ-strengthen= clo ◀Z up

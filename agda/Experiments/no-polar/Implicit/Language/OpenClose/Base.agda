@@ -16,7 +16,7 @@ data _⊢o_ : Env n m → Type m → Set where
     → Γ ⊢o (A `→ B)
   ⊢o-arr-r :
       Γ ⊢o B
-    → Γ ⊢o (A `→ B)    
+    → Γ ⊢o (A `→ B)
   ⊢o-∀ :
       Γ ,∙ ⊢o A
     → Γ ⊢o `∀ A
@@ -42,7 +42,7 @@ infix 3 _⊢cᵉ_
 data _⊢cᵉ_ : Env n m → Term n m → Set where
   ⊢c-lit : ∀ {num} → Γ ⊢cᵉ (lit num)
   ⊢c-var : Γ ⊢cᵉ (` x)
-  ⊢c-lam : Γ , A ⊢cᵉ e
+  ⊢c-lam : Γ , Int ⊢cᵉ e
          → Γ ⊢cᵉ (ƛ e)
   ⊢c-app : Γ ⊢cᵉ e₁ → Γ ⊢cᵉ e₂ → Γ ⊢cᵉ (e₁ · e₂)
   ⊢c-ann : (cloA : Γ ⊢c A) → Γ ⊢cᵉ e → Γ ⊢cᵉ (e ⦂ A)
@@ -57,7 +57,7 @@ data Closed : Env n m → Set where
   clo-S∙ : Closed Γ
          → Closed (Γ ,∙)
   clo-S^ : Closed Γ
-         → Closed (Γ ,^)         
+         → Closed (Γ ,^)
   clo-S= : Closed Γ
          → (cloA : Γ ⊢c A)
          → Closed (Γ ,= A)
