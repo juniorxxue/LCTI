@@ -30,5 +30,7 @@ s-weaken, {T = T} (s-∀l s upᶜ upᵉ st₁ st₂) newΓ newΔ (↑tmᶜ-e up-
 
 s-weaken,0 : Γ ⊢ A ⌞ ≤ ⌝ Σ ⊣ Δ ↪ B
            → ↑tmᶜ0 Σ ⇘ Σ'
+           → Γ ⊢c T
+           → Δ ⊢c T
            → Γ , T ⊢ A ⌞ ≤ ⌝ Σ' ⊣ Δ , T ↪ B
-s-weaken,0 s upΣ = s-weaken, s ▶Z ▶Z upΣ
+s-weaken,0 s upΣ cloT cloT' = s-weaken, s (▶Z cloT) (▶Z cloT') upΣ

@@ -1,9 +1,9 @@
-module Implicit.Language.Lookup.Remove where
+module Implicit.Language.EnvOps.Remove where
 
 open import Implicit.Language.Base
-open import Implicit.Language.Lookup.Base
 open import Implicit.Language.Shift
-
+open import Implicit.Language.Lookup
+open import Implicit.Language.EnvOps.Base
 
 ◀,-∋∙ : Γ ∋∙ X
       → Γ ◀ k ,⇘ Γ'
