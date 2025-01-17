@@ -139,7 +139,7 @@ sound-find (s-empty clo) k^ k= j~Σ = {!!}
 sound-find s-var k^ k= j~Σ = {!!}
 sound-find (s-ex-l^ x-in inst) k^ k= ~∞ = f-∞ {!!}
 sound-find (s-ex-l= x-in s) k^ k= ~∞ = f-∞ {!!}
-sound-find (s-ex-r= x-in s) k^ k= j~Σ = {!!}
+sound-find (s-ex-r= x-in s) k^ k= ~∞ = f-∞ {!!}
 sound-find (s-arr s s₁) k^ k= j~Σ = {!!}
 sound-find (s-term-c ⊢e s) k^ k= (~I ⊢e₁ j~Σ) = f-arr-𝕚-r (sound-find s k^ k= j~Σ)
 -- f-arr-𝕚-r (sound-find s k^ k= j~Σ)
