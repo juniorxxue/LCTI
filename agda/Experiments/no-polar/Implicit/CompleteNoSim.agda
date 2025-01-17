@@ -1,4 +1,4 @@
-module Implicit.Complete where
+module Implicit.CompleteNoSim where
 
 open import Implicit.Language
 open import Implicit.Decl renaming (find to d-find)
@@ -35,69 +35,6 @@ postulate
             → ↑tmᶜ0 Σ ⇘ Σ'
             → Γ , A ⊢ ⟨ j , B ⟩ ~ Σ'
 
-infix 3 _⊢_≊_
-data _⊢_≊_ : Env n m → Type m → Type m → Set where
-
-  ≊-int : Γ ⊢ Int ≊ Int
-
-  ≊-var : Γ ⊢ ‶ X ≊ ‶ X
-
-  ≊-left : Γ ∋ X := A
-         → Γ ⊢ ‶ X ≊ A
-
-  ≊-right : Γ ∋ X := A
-          → Γ ⊢ A ≊ ‶ X
-
-  ≊-arr : Γ ⊢ A' ≊ A
-        → Γ ⊢ B ≊ B'
-        → Γ ⊢ A `→ B ≊ A' `→ B'
-
-  ≊-∀ : Γ ,∙ ⊢ A ≊ B
-      → Γ ⊢ `∀ A ≊ `∀ B
-
-postulate
-  ≊-weaken,0 : Γ , T ⊢ A ≊ B
-            → Γ ⊢ A ≊ B
-
-≊-refl : Γ ⊢ A ≊ A
-≊-refl {A = Int} = ≊-int
-≊-refl {A = ‶ X} = ≊-var
-≊-refl {A = A `→ A₁} = ≊-arr ≊-refl ≊-refl
-≊-refl {A = `∀ A} = ≊-∀ ≊-refl
-
-≊-sym : Γ ⊢ A ≊ B
-      → Γ ⊢ B ≊ A
-≊-sym ≊-int = ≊-int
-≊-sym ≊-var = ≊-var
-≊-sym (≊-left x) = ≊-right x
-≊-sym (≊-right x) = ≊-left x
-≊-sym (≊-arr AB AB₁) = ≊-arr (≊-sym AB) (≊-sym AB₁)
-≊-sym (≊-∀ AB) = ≊-∀ (≊-sym AB)
-
-
-{-
-infix 3 _⊆_
-data _⊆_ : Env n m → Env n m → Set where
-  base : ∅ ⊆ ∅
-  uvar :
-      Γ ⊆ Γ'
-    → Γ ,∙ ⊆ Γ' ,∙
-  var :
-      Γ ⊆ Γ'
-    → Γ , A ⊆ Γ' , A
-  evar :
-      Γ ⊆ Γ'
-    → Γ ,^ ⊆ Γ' ,^
-  evar-sol :
-      Γ ⊆ Γ'
-    → (cloA : Γ' ⊢c A) -- instead of Γ, we use Γ' to prove trans, not sure it's a good choice or not
-    → Γ ,^ ⊆ Γ' ,= A
-  svar :
-      Γ ⊆ Γ'
-    → Γ ,= A ⊆ Γ' ,= A
--}
-
-
 data Transfer : Env n m → Env n m → Type m → Counter → Set where
 
   base : Transfer ∅ ∅ A j
@@ -130,22 +67,16 @@ transfer-int {Δ = Δ ,^} = evar {!!}
 transfer-int {Δ = Δ ,∙} = uvar {!!}
 transfer-int {Δ = Δ ,= A} = svar {!!}
 
-data JustTyp (Γ : Env n m) (Σ : Context n m) (e : Term n m) (A : Type m) : Set where
-  typs : ∀ {B}
-    → (⊢e : Γ ⊢ Σ ⇒ e ⇒ B)
-    → (sim : Γ ⊢ A ≊ B)
-    → JustTyp Γ Σ e A
 
 data JustSub (Δ : Env n m) (Σ : Context n m) (A : Type m) (B : Type m) (j : Counter) : Set where
   subs : ∀ {Γ C}
     → (ext : Transfer Γ Δ A j)
     → (sub : Γ ⊢ A ≤ Σ ⊣ Δ ↪ C)
-    → (sim : Δ ⊢ B ≊ C)
     → JustSub Δ Σ A B j
 
 complete : Γ ⊢ j # e ⦂ A
          → Γ ⊢ ⟨ j , A ⟩ ~ Σ
-         → JustTyp Γ Σ e A
+         → Γ ⊢ Σ ⇒ e ⇒ A
 
 complete-∞ : Γ ⊢ ∞ # e ⦂ A
            → Γ ⊢ τ A ⇒ e ⇒ A

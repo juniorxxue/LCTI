@@ -59,17 +59,17 @@ infix 4 ⟦_⟧⇒⟦_,_⟧
 data ⟦_⟧⇒⟦_,_⟧ : Context n m → Apps n m → Context n m → Set where
 
   none-□ : ⟦ (Context n m ∋⦂ □) ⟧⇒⟦ nil , □ ⟧
-  
+
   none-τ : ⟦ (Context n m ∋⦂ τ A) ⟧⇒⟦ nil , τ A ⟧
-  
+
   have-e : ⟦ Σ ⟧⇒⟦ e̅ , Σ' ⟧
          → ⟦ [ e ]↝ Σ ⟧⇒⟦ e ∷a e̅ , Σ' ⟧
 
 
 -- share the same argument, however first end with □, second end with any Σ'
 -- used for proving general subsumption
-infix 3 _≊_
-data _≊_ : Context n m → Context n m → Set where
-  ≊Z : □ ≊ Σ
-  ≊S : Σ ≊ Σ'
-     → [ e ]↝ Σ ≊ [ e ]↝ Σ'
+infix 3 _≋_
+data _≋_ : Context n m → Context n m → Set where
+  ≋Z : □ ≋ Σ
+  ≋S : Σ ≋ Σ'
+     → [ e ]↝ Σ ≋ [ e ]↝ Σ'

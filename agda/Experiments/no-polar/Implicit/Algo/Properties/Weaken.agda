@@ -5,11 +5,11 @@ open import Implicit.Algo.Base
 
 postulate
 
-  s-weaken, : Γ ⊢ A ⌞ ≤ ⌝ Σ ⊣ Δ ↪ B
+  s-weaken, : Γ ⊢ A ≤ Σ ⊣ Δ ↪ B
             → Γ ▶ k , T ⇘ Γ'
             → Δ ▶ k , T ⇘ Δ'
             → Σ ↑tmᶜ k ⇘ Σ'
-            → Γ' ⊢ A  ⌞ ≤ ⌝ Σ' ⊣ Δ' ↪ B
+            → Γ' ⊢ A  ≤ Σ' ⊣ Δ' ↪ B
 {-
 s-weaken, s-int newΓ newΔ ↑tmᶜ-τ = {!!} -- unique
 s-weaken, (s-empty clo) newΓ newΔ ↑tmᶜ-□ = {!!} -- unique
@@ -28,9 +28,9 @@ s-weaken, {T = T} (s-∀l s upᶜ upᵉ st₁ st₂) newΓ newΔ (↑tmᶜ-e up-
   s-∀l (s-weaken, s (▶S^ newΓ {!!}) (▶S= newΔ {!!}) (↑tmᶜ-e {!!} {!!})) {!!} {!!} st₁ st₂
 -}
 
-s-weaken,0 : Γ ⊢ A ⌞ ≤ ⌝ Σ ⊣ Δ ↪ B
+s-weaken,0 : Γ ⊢ A ≤ Σ ⊣ Δ ↪ B
            → ↑tmᶜ0 Σ ⇘ Σ'
            → Γ ⊢c T
            → Δ ⊢c T
-           → Γ , T ⊢ A ⌞ ≤ ⌝ Σ' ⊣ Δ , T ↪ B
+           → Γ , T ⊢ A ≤ Σ' ⊣ Δ , T ↪ B
 s-weaken,0 s upΣ cloT cloT' = s-weaken, s (▶Z cloT) (▶Z cloT') upΣ

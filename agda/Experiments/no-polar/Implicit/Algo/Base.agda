@@ -66,12 +66,12 @@ data _⊢_≤_⊣_↪_ where
     → (clo : Γ ⊢c A)
     → Γ ⊢ A ≤ □ ⊣ Γ ↪ A
 
-  s-var :
+  s-var-∙ :
       (cloΓ : Closed Γ)
     → (x-in : Γ ∋∙ X)
     → Γ ⊢ (‶ X) ≤ τ (‶ X) ⊣ Γ ↪ ‶ X
 
-  s-var-slv :
+  s-var-= :
       (cloΓ : Closed Γ)
     → (x-in : Γ ∋= X)
     → Γ ⊢ (‶ X) ≤ τ (‶ X) ⊣ Γ ↪ ‶ X

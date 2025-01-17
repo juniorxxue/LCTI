@@ -121,8 +121,8 @@ s-clo-ret {Σ = [ e ]↝ Σ} (s-∀l s upᶜ upᵉ st₁ st₂) with s-clo-out s
 
 s-clo-l (s-int cloΓ) = ⊢c-int
 s-clo-l (s-empty cloΓ clo) = clo
-s-clo-l (s-var cloΓ x-in) = ⊢c-var-∙ x-in
-s-clo-l (s-var-slv cloΓ x-in) = ⊢c-var-= x-in
+s-clo-l (s-var-∙ cloΓ x-in) = ⊢c-var-∙ x-in
+s-clo-l (s-var-= cloΓ x-in) = ⊢c-var-= x-in
 s-clo-l (s-ex-l^ cloA cloΓ x-in inst) = ⊢c-var-= (:=to= (inst-in inst))
 s-clo-l (s-ex-l= x-in s) = ⊢c-var-= (:=to= (⊆-in:= x-in (s-⊆ s)))
 s-clo-l s'@(s-ex-r^ cloA cloΓ x-in inst) = ⊆-cloA cloA (s-⊆ s')
@@ -136,8 +136,8 @@ s-clo-l (s-∀l s upᶜ upᵉ st₁ st₂) = ⊢c-∀ (⊢c-◆0 (s-clo-l s))
 
 s-clo-r (s-int cloΓ) = ⊢c-τ ⊢c-int
 s-clo-r (s-empty cloΓ clo) = ⊢c-empty
-s-clo-r (s-var cloΓ x-in) = ⊢c-τ (⊢c-var-∙ x-in)
-s-clo-r (s-var-slv cloΓ x-in) = ⊢c-τ (⊢c-var-= x-in)
+s-clo-r (s-var-∙ cloΓ x-in) = ⊢c-τ (⊢c-var-∙ x-in)
+s-clo-r (s-var-= cloΓ x-in) = ⊢c-τ (⊢c-var-= x-in)
 s-clo-r s'@(s-ex-l^ cloA cloΓ x-in inst) = ⊢c-τ (⊆-cloA cloA (s-⊆ s'))
 s-clo-r (s-ex-l= x-in s) = s-clo-r s
 s-clo-r (s-ex-r^ cloA cloΓ x-in inst) = ⊢c-τ (⊢c-var-= (:=to= (inst-in inst)))
@@ -151,8 +151,8 @@ s-clo-r (s-∀l s upᶜ upᵉ st₁ st₂) = ⊢cᶜ-strengthen=0 (s-clo-r s) (�
 
 s-clo-in (s-int cloΓ) = cloΓ
 s-clo-in (s-empty cloΓ clo) = cloΓ
-s-clo-in (s-var cloΓ x-in) = cloΓ
-s-clo-in (s-var-slv cloΓ x-in) = cloΓ
+s-clo-in (s-var-∙ cloΓ x-in) = cloΓ
+s-clo-in (s-var-= cloΓ x-in) = cloΓ
 s-clo-in (s-ex-l^ cloA cloΓ x-in inst) = cloΓ
 s-clo-in (s-ex-l= x-in s) = s-clo-in s
 s-clo-in (s-ex-r^ cloA cloΓ x-in inst) = cloΓ

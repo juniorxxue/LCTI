@@ -62,13 +62,11 @@ sound : ∀ {Γ : Env n m} {Σ e A}
   → Γ ⊢ Σ ⇒ e ⇒ A
   → JustTyping Γ Σ e A
 
-sound-s : ∀ {Γ Γ' : Env n m} {Σ A B}
-  → Γ ⊢ A ⌞ ≤ ⌝ Σ ⊣ Γ' ↪ B
-  → JustSub Γ' Σ A B
+sound-s : Γ ⊢ A ≤ Σ ⊣ Γ' ↪ B
+        → JustSub Γ' Σ A B
 
 sound-s' : ∀ {Γ Γ' : Env n m} {Σ A B}
-  → Γ ⊢ A ⌞ ≤ ⌝ Σ ⊣ Γ' ↪ B
-  → Polarity Γ A Σ ≤
+  → Γ ⊢ A ≤ Σ ⊣ Γ' ↪ B
   → JustSub Γ' Σ A B
 
 sound-0 : ∀ {Γ : Env n m} {e A}
@@ -93,7 +91,7 @@ sound (⊢lam₁ ⊢e) with sound ⊢e
 ... | typs ~∞ s = typs ~∞ (⊢lam₁ s)
 sound (⊢lam₂ ⊢e up-c ⊢e₁) with sound ⊢e₁
 ... | typs j ⊢e' = typs (~I (sound-0 ⊢e) (~-weaken0 j up-c)) (⊢lam₂ ⊢e')
-sound (⊢sub ⊢e ne gc cloΣ s) with sound-s' s (polar-r (⊢closeΓ ⊢e) cloΣ)
+sound (⊢sub ⊢e ne gc s) with sound-s' s
 ... | subs j~Σ s₁ = typs j~Σ (⊢sub' (sound-0 ⊢e) s₁)
 sound (⊢tabs ⊢e) with sound ⊢e
 ... | typs ~Z s = typs ~Z (⊢tabs s)
@@ -105,46 +103,22 @@ sound-s (s-∀l s upᶜ upᵉ st₁ st₂) with sound-s s
 ... | subs IH-j~Σ IH = subs ((~-subst IH-j~Σ {!!} (st-arr st₁ st₂))) (s-∀l IH {!!} {!!} st₁ st₂)
 -}
 
-sound-s' s-int pr = subs ~∞ (s-int (polar-closed pr))
-sound-s' (s-empty clo) (polar-r cloΓ cloΣ) = subs ~Z (s-refl cloΓ clo)
-sound-s' s-var (polar-l cloΓ (⊢c-var-∙ inΓ)) = subs ~∞ (s-var-∙ cloΓ inΓ)
-sound-s' s-var (polar-l cloΓ (⊢c-var-= inΓ)) = subs ~∞ (s-var-= cloΓ inΓ)
-sound-s' s-var (polar-r cloΓ (⊢c-τ (⊢c-var-∙ inΓ))) = subs ~∞ (s-var-∙ cloΓ inΓ)
-sound-s' s-var (polar-r cloΓ (⊢c-τ (⊢c-var-= inΓ))) = subs ~∞ (s-var-= cloΓ inΓ)
-sound-s' (s-ex-l^ x-in inst) (polar-r cloΓ (⊢c-τ cloA)) =
-  subs ~∞ (s-var-l (inst-in inst) (s-refl-∞ (⊆-closed cloΓ (inst-⊆ inst cloA)) (⊆-cloA cloA (inst-⊆ inst cloA))))
-sound-s' (s-ex-l= x-in s) pr with sound-s' s (polar-in-l pr x-in)
-... | subs ~∞ s₁ = subs ~∞ (s-var-l (⊆-in:= x-in (s-⊆ s (polar-in-l pr x-in))) s₁)
-sound-s' (s-ex-r^ x-in inst) (polar-l cloΓ cloA) =
-  subs ~∞ (s-var-r (inst-in inst) (s-refl-∞ (⊆-closed cloΓ (inst-⊆ inst cloA)) (⊆-cloA cloA (inst-⊆ inst cloA))))
-sound-s' (s-ex-r= x-in s) pr with sound-s' s (polar-in-r pr x-in)
-... | subs ~∞ s₁ = subs ~∞ (s-var-r (⊆-in:= x-in (s-⊆ s (polar-in-r pr x-in))) s₁)
-sound-s' s'@(s-arr s s₁) pr with sound-s' s (polar-arr-l pr) | sound-s' s₁ (polar-arr-r (polar-⊆ pr (s-⊆ s (polar-arr-l pr))))
-... | subs ~∞ s₂ | subs ~∞ s₃ = subs ~∞ (s-arr₁ (s-⊆-prv s₂ (s-⊆ s₁ ((polar-arr-r (polar-⊆ pr (s-⊆ s (polar-arr-l pr))))))) s₃)
-sound-s' (s-term-c ⊢e s) pr'@(polar-r cloΓ (⊢c-term cloe cloΣ)) with sound-s' s (polar-tm-r pr')
-... | subs j~Σ s₁ with ⊢id0 ⊢e
-... | refl = subs (~C (t-⊆-prv (sound-∞ ⊢e) (s-⊆ s (polar-r cloΓ cloΣ))) j~Σ) (s-arr₃ (⊆-cloA (⊢closeA ⊢e) (s-⊆ s (polar-r cloΓ cloΣ))) s₁)
-sound-s' (s-term-o opnA ⊢e s s₁) pr = {!!}
-sound-s' (s-∀ s) pr with sound-s' s (polar-∀ pr)
-... | subs ~∞ s₁ = subs ~∞ (s-∀ s₁)
-sound-s' (s-∀l s upᶜ upᵉ st₁ st₂) pr = {!!}
+sound-s' (s-int cloΓ) = subs ~∞ (s-int cloΓ)
+sound-s' (s-empty cloΓ clo) = subs ~Z (s-refl cloΓ clo)
+sound-s' (s-var-∙ cloΓ x-in) = subs ~∞ (s-var-∙ cloΓ x-in)
+sound-s' (s-var-= cloΓ x-in) = subs ~∞ (s-var-= cloΓ x-in)
+sound-s' (s-ex-l^ cloA cloΓ x-in inst) = subs ~∞ (s-var-l (inst-in inst) (s-refl-∞ (inst-closedΓ cloΓ cloA inst) (⊆-cloA cloA (inst-⊆ inst cloA))))
+sound-s' (s-ex-l= x-in s) = subs ~∞ {!!}
+sound-s' (s-ex-r^ cloA cloΓ x-in inst) = {!!}
+sound-s' (s-ex-r= x-in s) = {!!}
+sound-s' (s-arr s s₁) = subs {!!} {!!}
+sound-s' (s-term-c ⊢e s) = {!!}
+sound-s' (s-term-o opnA ⊢e s s₁) = {!!}
+sound-s' (s-∀ s) = {!!}
+sound-s' (s-∀l s upᶜ upᵉ st₁ st₂) = {!!}
 
-sound-find : Γ ⊢ A  ⌞ ≤⁺ ⌝ Σ ⊣ Γ' ↪ B
+sound-find : Γ ⊢ A  ≤ Σ ⊣ Γ' ↪ B
            → Γ  ∋^ k
            → Γ' ∋= k
            → Γ' ⊢ ⟨ j , B ⟩ ~ Σ
            → d-find A k j
-sound-find s-int k^ k= j~Σ = {!!}
-sound-find (s-empty clo) k^ k= j~Σ = {!!}
-sound-find s-var k^ k= j~Σ = {!!}
-sound-find (s-ex-l^ x-in inst) k^ k= ~∞ = f-∞ {!!}
-sound-find (s-ex-l= x-in s) k^ k= ~∞ = f-∞ {!!}
-sound-find (s-ex-r= x-in s) k^ k= j~Σ = {!!}
-sound-find (s-arr s s₁) k^ k= j~Σ = {!!}
-sound-find (s-term-c ⊢e s) k^ k= (~I ⊢e₁ j~Σ) = f-arr-𝕚-r (sound-find s k^ k= j~Σ)
--- f-arr-𝕚-r (sound-find s k^ k= j~Σ)
-sound-find (s-term-c ⊢e s) k^ k= (~C ⊢e₁ j~Σ) = f-arr-𝕔 {!!} (sound-find s k^ k= j~Σ)
-sound-find (s-term-o opnA ⊢e s s₁) k^ k= (~I ⊢e₁ j~Σ) = {!!}
-sound-find (s-term-o opnA ⊢e s s₁) k^ k= (~C ⊢e₁ j~Σ) = f-arr-𝕔 {!!} {!!}
-sound-find (s-∀ s) k^ k= j~Σ = {!!}
-sound-find (s-∀l s upᶜ upᵉ st₁ st₂) k^ k= j~Σ = {!!}

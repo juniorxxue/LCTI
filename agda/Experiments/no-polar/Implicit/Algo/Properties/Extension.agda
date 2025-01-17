@@ -7,8 +7,8 @@ s-⊆ : Γ ⊢ A ≤ Σ ⊣ Γ' ↪ B
     → Γ ⊆ Γ'
 s-⊆ (s-int cloΓ) = ⊆-refl
 s-⊆ (s-empty cloΓ clo) = ⊆-refl
-s-⊆ (s-var cloΓ x-in) = ⊆-refl
-s-⊆ (s-var-slv cloΓ x-in) = ⊆-refl
+s-⊆ (s-var-∙ cloΓ x-in) = ⊆-refl
+s-⊆ (s-var-= cloΓ x-in) = ⊆-refl
 s-⊆ (s-ex-l^ cloA cloΓ x-in inst) = inst-⊆ inst cloA
 s-⊆ (s-ex-l= x-in s) = s-⊆ s
 s-⊆ (s-ex-r^ cloA cloΓ x-in inst) = inst-⊆ inst cloA
