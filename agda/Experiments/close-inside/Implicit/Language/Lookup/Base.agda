@@ -90,7 +90,7 @@ data _ε_ : Fin m → Type m → Set where
   ε-∀ :
       #S k ε A
     → k ε `∀ A
-
+{-
 -- a neg definition of ε
 infix 3 _¬ε_
 data _¬ε_ : Fin m → Type m → Set where
@@ -106,3 +106,4 @@ data _¬ε_ : Fin m → Type m → Set where
   ¬ε-∀ :
       #S k ¬ε A
     → k ¬ε `∀ A
+-}

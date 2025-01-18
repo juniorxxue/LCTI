@@ -76,7 +76,7 @@ data _⊢_⌞_⌝_⊣_↪_↡_ where
       Γ ⊢ (‶ X) ⌞ ≤ ⌝ τ (‶ X) ⊣ Γ ↪ ‶ X ↡ ∞
 
   s-ex-l^ :
-      (x-in : Γ ∋^ X)
+      (x-in : Γ ∋^ X) -- this is not necessary, since inst implies
     → (inst : [ A / X ] Γ ⟹ Γ')
     → Γ ⊢ ‶ X ⌞ ≤⁺ ⌝ τ A ⊣ Γ' ↪ A ↡ ∞
 

@@ -29,7 +29,7 @@ data find : Type m → Fin m → Counter → Set where
             → find (A `→ B) k (𝕚 j)
   f-arr-𝕚-r : find B k j
             → find (A `→ B) k (𝕚 j)
-  f-arr-𝕔   : k ¬ε A
+  f-arr-𝕔   : (¬inA : ¬ (k ε A))
             → find B k j
             → find (A `→ B) k (𝕔 j)
   f-∀       : find A (#S k) j
