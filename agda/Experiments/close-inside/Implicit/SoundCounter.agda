@@ -107,7 +107,10 @@ sound-s (s-arr s s₁) pr with ≤id0 (sc-sound s) | ≤id0 (sc-sound s₁)
   in s-arr₁ (s-⊆-prv (sound-s s (polar-arr-l pr)) (s-⊆ (sc-sound s₁) pr-r)) (sound-s s₁ pr-r)
 sound-s s'@(s-term-c ⊢e s) pr with ⊢id0 (tc-sound ⊢e)
 ... | refl = let ext = s-⊆ (sc-sound s') pr in s-arr₃ (⊆-cloA (⊢closeA (tc-sound ⊢e)) ext) (sound-s s (polar-tm-r pr))
-sound-s (s-term-o opnA ⊢e s s₁) pr = {!!}
+sound-s s'@(s-term-o opnA ⊢e s s₁) pr with ≤id0 (sc-sound s)
+... | refl = let pr-l = polar-l (polar-closed pr) (⊢closeA (tc-sound ⊢e))
+                 pr-r = polar-⊆ (polar-tm-r pr) (s-⊆ (sc-sound s) pr-l)
+  in s-arr₂ (s-⊆-prv (sound-s s pr-l) (s-⊆ (sc-sound s₁) pr-r)) (sound-s s₁ pr-r)
 sound-s (s-∀ s) pr = s-∀ (sound-s s (polar-∀ pr))
 sound-s (s-∀l s upᶜ upᵉ st₁ st₂) (polar-r cloΓ cloΣ) = let pr' = polar-r (clo-S^ cloΓ) (⊢cᶜ-weaken^0 cloΣ (↑tyᶜ-e upᵉ upᶜ))
   in s-∀l (sound-s s pr') (ic-aux (sc-~ s pr')) (sound-find-l0 s cloΓ cloΣ upᵉ upᶜ) st₁ st₂
