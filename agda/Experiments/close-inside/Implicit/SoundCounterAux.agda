@@ -178,6 +178,10 @@ data _⊆_w/t_ : Env n m → Env n m → Type m → Set where
           → Γ ⊆ Δ w/t A `→ B
   ext-∀   : Γ ,∙ ⊆ Δ ,∙ w/t A
           → Γ ⊆ Δ w/t `∀ A
+{-
+  ext-∀l   : Γ ,^ ⊆ Δ ,= T w/t A
+           → Γ ⊆ Δ w/t `∀ A
+-}
 
 extv-∙-eq : Γ ∋∙ X
           → Γ ⊆ Δ w/v X
@@ -290,3 +294,20 @@ s-extend-r (s-ex-r= x-in s) cloΓ cloA with s-all-closed s cloΓ cloA (⊢c-τ (
 s-extend-r (s-arr s s₁) cloΓ (⊢c-arr cloA cloA₁) = ext-arr (s-extend-l s cloΓ (⊢c-τ cloA))
   (s-extend-r s₁ (s-closed-env s (polar-r cloΓ (⊢c-τ cloA))) (⊆-cloA cloA₁ (s-⊆ s (polar-r cloΓ (⊢c-τ cloA)))))
 s-extend-r (s-∀ s) cloΓ (⊢c-∀ cloA) = ext-∀ (s-extend-r s (clo-S∙ cloΓ) cloA)
+
+env-◆◇-false : Γ ◇ k ⇘ Γ₁
+             → Γ ◆ k ⇘ Γ₂
+             → ⊥
+env-◆◇-false (◇S, newΓ1) (◆S, newΓ2) = env-◆◇-false newΓ1 newΓ2
+env-◆◇-false (◇S∙ newΓ1) (◆S∙ newΓ2) = env-◆◇-false newΓ1 newΓ2
+env-◆◇-false (◇S= newΓ1) (◆S= newΓ2) = env-◆◇-false newΓ1 newΓ2
+env-◆◇-false (◇S^ newΓ1) (◆S^ newΓ2) = env-◆◇-false newΓ1 newΓ2
+
+ext-◆◇ : Γ ⊆ Δ w/t A
+       → Γ ◇ k ⇘ Γ'
+       → Δ ◆ k ⇘ Δ'
+       → Γ' ⊆ Δ' w/t A
+ext-◆◇ ext-int newΓ newΔ = ⊥-elim (env-◆◇-false newΓ newΔ)
+ext-◆◇ (ext-var x) newΓ newΔ = ext-var {!!}
+ext-◆◇ (ext-arr ext ext₁) newΓ newΔ = ext-arr {!!} {!!}
+ext-◆◇ (ext-∀ ext) newΓ newΔ = ext-∀ (ext-◆◇ ext (◇S∙ newΓ) (◆S∙ newΔ))
