@@ -61,35 +61,22 @@ NonEmpty-NonZ ne-τ ~∞ = nz-∞
 NonEmpty-NonZ ne-app (~I ⊢e j~Σ) = nz-I
 NonEmpty-NonZ ne-app (~C ⊢e j~Σ) = nz-C
 
-
-postulate
-  ~subst0 : (Γ ,= B) ⊢ ⟨ j , A ⟩ ~ Σ
-        → ⟦ B ⟧ᶜ Σ ⇘ Σ'
-        → ⟦ B ⟧ A ⇘ A'
-        → Γ ⊢ ⟨ j , A' ⟩ ~ Σ'
-
-
-  ~weaken,0 : Γ , A ⊢ ⟨ j , B ⟩ ~ Σ'
-          → ↑tmᶜ0 Σ ⇘ Σ'
-          → Γ ⊢ ⟨ j , B ⟩ ~ Σ
-
-{-
+~subst0 : (Γ ,= B) ⊢ ⟨ j , A ⟩ ~ Σ
+        → ⟦ B ⟧ᶜ Σ ⇘ Σ*
+        → ⟦ B ⟧ A ⇘ A*
+        → Γ ⊢ ⟨ j , A* ⟩ ~ Σ*
 ~subst0 ~Z empty st2 = ~Z
 ~subst0 ~∞ (fulltype st) st2 rewrite st-unique st st2 = ~∞
-~subst0 (~I ⊢e j~Σ) (term st1 ste) (st-arr st2 st3) = ~I {!!} {!!}
-~subst0 (~C ⊢e j~Σ) st1 st2 = {!!}
--}
+~subst0 (~I ⊢e j~Σ) (term st1 ste) (st-arr st2 st3) = ~I (t-subst0 ⊢e ste st2) (~subst0 j~Σ st1 st3)
+~subst0 (~C ⊢e j~Σ) (term st1 ste) (st-arr st2 st3) = ~C (t-subst0 ⊢e ste st2) (~subst0 j~Σ st1 st3)
 
-
-
-
-{-
-~weaken,0 ~Z ↑tmᶜ-□ = ~Z
-~weaken,0 ~∞ ↑tmᶜ-τ = ~∞
-~weaken,0 (~I ⊢e j~Σ) (↑tmᶜ-e up-e up) = ~I {!!} {!!}
-~weaken,0 (~C ⊢e j~Σ) up = {!!}
--}
-
+~strengthen,0 : Γ , A ⊢ ⟨ j , B ⟩ ~ Σ'
+              → ↑tmᶜ0 Σ ⇘ Σ'
+              → Γ ⊢ ⟨ j , B ⟩ ~ Σ
+~strengthen,0 ~Z ↑tmᶜ-□ = ~Z
+~strengthen,0 ~∞ ↑tmᶜ-τ = ~∞
+~strengthen,0 (~I ⊢e j~Σ) (↑tmᶜ-e up-e up) = ~I (t-strengthen,0 ⊢e up-e) (~strengthen,0 j~Σ up)
+~strengthen,0 (~C ⊢e j~Σ) (↑tmᶜ-e up-e up) = ~C (t-strengthen,0 ⊢e up-e) (~strengthen,0 j~Σ up)
 
 inst-affect-one : [ A / X ] Γ ⟹ Δ
                 → Γ ∋^ k
@@ -168,13 +155,22 @@ data _⊆_w/v_ : Env n m → Env n m → Fin m → Set where
   ext-S= : Γ ⊆ Δ w/v k
          → Γ ,= A ⊆ Δ ,= A w/v #S k
 
+data Merge : Env n m → Env n m → Env n m → Set where
+  mrg-∅    : Merge ∅ ∅ ∅
+  mrg-S,   : Merge (Γ , A) (Γ , A) (Γ , A)
+  mrg-S∙   : Merge (Γ ,∙) (Γ ,∙) (Γ ,∙)
+  mrg-S^   : Merge (Γ ,^) (Γ ,^) (Γ ,^)
+  mrg-S=   : Merge (Γ ,= A) (Γ ,= A) (Γ ,= A)
+  mrg-S^-l : Merge (Γ ,^) (Γ ,= A) (Γ ,= A)
+  mrg-S^-r : Merge (Γ ,= A) (Γ ,^) (Γ ,= A)
+
 infix 3 _⊆_w/t_
 data _⊆_w/t_ : Env n m → Env n m → Type m → Set where
   ext-int : Γ ⊆ Γ w/t Int
   ext-var : Γ ⊆ Δ w/v X
           → Γ ⊆ Δ w/t ‶ X
-  ext-arr : Γ ⊆ Γ' w/t A
-          → Γ' ⊆ Δ w/t B
+  ext-arr : Γ ⊆ Ω w/t A
+          → Ω ⊆ Δ w/t B
           → Γ ⊆ Δ w/t A `→ B
   ext-∀   : Γ ,∙ ⊆ Δ ,∙ w/t A
           → Γ ⊆ Δ w/t `∀ A
@@ -303,11 +299,24 @@ env-◆◇-false (◇S∙ newΓ1) (◆S∙ newΓ2) = env-◆◇-false newΓ1 new
 env-◆◇-false (◇S= newΓ1) (◆S= newΓ2) = env-◆◇-false newΓ1 newΓ2
 env-◆◇-false (◇S^ newΓ1) (◆S^ newΓ2) = env-◆◇-false newΓ1 newΓ2
 
+-- let's try to take a merge approach
 ext-◆◇ : Γ ⊆ Δ w/t A
        → Γ ◇ k ⇘ Γ'
        → Δ ◆ k ⇘ Δ'
        → Γ' ⊆ Δ' w/t A
+
+ext-◇◇ : Γ ⊆ Δ w/t A
+       → Γ ◇ k ⇘ Γ'
+       → Δ ◇ k ⇘ Δ'
+       → Γ' ⊆ Δ' w/t A
+
+ext-◆◆ : Γ ⊆ Δ w/t A
+       → Γ ◆ k ⇘ Γ'
+       → Δ ◆ k ⇘ Δ'
+       → Γ' ⊆ Δ' w/t A
+
 ext-◆◇ ext-int newΓ newΔ = ⊥-elim (env-◆◇-false newΓ newΔ)
 ext-◆◇ (ext-var x) newΓ newΔ = ext-var {!!}
 ext-◆◇ (ext-arr ext ext₁) newΓ newΔ = ext-arr {!!} {!!}
+-- ext-arr (ext-◆◇ ext newΓ {!!}) (ext-◆◇ ext₁ {!!} newΔ)
 ext-◆◇ (ext-∀ ext) newΓ newΔ = ext-∀ (ext-◆◇ ext (◇S∙ newΓ) (◆S∙ newΔ))

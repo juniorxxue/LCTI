@@ -96,3 +96,17 @@ open import Implicit.Language.EnvOps.Remove
                  → ↑tm0 e ⇘ e'
                  → Γ ⊢cᵉ e
 ⊢cᵉ-strengthen,0 clo-e up-e = ⊢cᵉ-strengthen, clo-e ◀Z up-e
+
+----------------------------------------------------------------------
+--+                             closed                             +--
+----------------------------------------------------------------------
+
+
+closed-strengthen, : Closed Γ
+                   → Γ ◀ k ,⇘ Γ'
+                   → Closed Γ'
+closed-strengthen, (clo-S, cloΓ cloA) ◀Z = cloΓ
+closed-strengthen, (clo-S, cloΓ cloA) (◀S, newΓ) = clo-S, (closed-strengthen, cloΓ newΓ) (⊢c-strengthen, cloA newΓ)
+closed-strengthen, (clo-S∙ cloΓ) (◀S∙ newΓ) = clo-S∙ (closed-strengthen, cloΓ newΓ)
+closed-strengthen, (clo-S^ cloΓ) (◀S^ newΓ) = clo-S^ (closed-strengthen, cloΓ newΓ)
+closed-strengthen, (clo-S= cloΓ cloA) (◀S= newΓ) = clo-S= (closed-strengthen, cloΓ newΓ) (⊢c-strengthen, cloA newΓ)

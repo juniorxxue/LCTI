@@ -183,3 +183,6 @@ s-weaken=0 : Γ ⊢ j # A ≤ B
            → Γ ⊢c T
            → Γ ,= T ⊢ j # A' ≤ B'
 s-weaken=0 s upA upB cloT = s-weaken= s (▶Z cloT) upA upB
+
+
+
