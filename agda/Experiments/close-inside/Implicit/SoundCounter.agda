@@ -124,7 +124,8 @@ sound-find-l (s-empty clo) cloΓ cloA inΓ inΔ = ⊥-elim (^∈-=∈-false inΓ
 sound-find-l s-var cloΓ cloA inΓ inΔ = ⊥-elim (^∈-=∈-false inΓ inΔ)
 sound-find-l (s-ex-l^ x-in inst) cloΓ cloA inΓ inΔ with inst-affect-one inst inΓ inΔ
 ... | refl = f-∞ ε-var
-sound-find-l (s-ex-l= x-in s) cloΓ (⊢c-τ cloA) inΓ inΔ = {!!} -- Δ is equal Γ
+sound-find-l (s-ex-l= x-in s) cloΓ (⊢c-τ cloA) inΓ inΔ with s-all-closed (sc-sound s) cloΓ (∋=-closed cloΓ x-in) (⊢c-τ cloA)
+... | refl = ⊥-elim (^∈-=∈-false inΓ inΔ)
 sound-find-l (s-ex-r= x-in s) cloΓ cloA inΓ inΔ = sound-find-l s cloΓ (⊢c-τ (∋=-closed cloΓ x-in)) inΓ inΔ
 sound-find-l (s-arr s s₁) cloΓ (⊢c-τ (⊢c-arr cloA cloA₁)) inΓ inΔ with s-⊆ (sc-sound s) (polar-l cloΓ cloA)
 ... | ext with s-⊆-exsol ext inΓ
@@ -144,7 +145,8 @@ sound-find-r s-var cloΓ cloB inΓ inΔ = ⊥-elim (^∈-=∈-false inΓ inΔ)
 sound-find-r (s-ex-l= x-in s) cloΓ cloB inΓ inΔ = sound-find-r s cloΓ (∋=-closed cloΓ x-in) inΓ inΔ
 sound-find-r (s-ex-r^ x-in inst) cloΓ cloB inΓ inΔ with inst-affect-one inst inΓ inΔ
 ... | refl = f-∞ ε-var
-sound-find-r (s-ex-r= x-in s) cloΓ cloB inΓ inΔ = {!!} -- equal
+sound-find-r (s-ex-r= x-in s) cloΓ cloB inΓ inΔ with s-all-closed (sc-sound s) cloΓ cloB (⊢c-τ (∋=-closed cloΓ x-in))
+... | refl = ⊥-elim (^∈-=∈-false inΓ inΔ)
 sound-find-r (s-arr s s₁) cloΓ (⊢c-arr cloB cloB₁) inΓ inΔ with s-⊆ (sc-sound s) (polar-r cloΓ (⊢c-τ cloB))
 ... | ext with s-⊆-exsol ext inΓ
 ... | is-ex inΓ₁ = find-arr-r (sound-find-r s₁ (⊆-closed cloΓ ext) (⊆-cloA cloB₁ ext) inΓ₁ inΔ)
@@ -222,4 +224,4 @@ s-imply s'@(s-term-o opnA ⊢e s s₁) pr@(polar-r cloΓ cloΣ) with s-imply s (
 s-imply (s-∀ s) pr with s-imply s (polar-∀ pr)
 ... | subs ~∞ s₁ = subs ~∞ (s-∀ s₁)
 s-imply (s-∀l s upᶜ upᵉ st₁ st₂) (polar-r cloΓ cloΣ) with s-imply s (polar-r (clo-S^ cloΓ) (⊢cᶜ-weaken^0 cloΣ (↑tyᶜ-e upᵉ upᶜ)))
-... | subs j~Σ s₁ = subs (~subst0 j~Σ {!!} (st-arr st₁ st₂)) (s-∀l s₁ upᶜ upᵉ st₁ st₂)
+... | subs j~Σ s₁ = subs (~subst0 j~Σ (↑tyᶜ-st (↑tyᶜ-e upᵉ upᶜ)) (st-arr st₁ st₂)) (s-∀l s₁ upᶜ upᵉ st₁ st₂)

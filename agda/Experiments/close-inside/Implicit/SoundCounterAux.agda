@@ -34,45 +34,6 @@ sc-sound (s-term-o opnA ⊢e s s₁) = s-term-o opnA (tc-sound ⊢e) (sc-sound s
 sc-sound (s-∀ s) = s-∀ (sc-sound s)
 sc-sound (s-∀l s upᶜ upᵉ st₁ st₂) = s-∀l (sc-sound s) upᶜ upᵉ st₁ st₂
 
-
--- define this relation is doable, but the weakening and subst lemma rely the properties of algo system
-infix 3 _⊢_∻_
-data _⊢_∻_ : Env n m → Counter × Type m → Context n m → Set where
-
-  ∻Z : ∀ {Γ : Env n m} {A}
-    → Γ ⊢ ⟨ Z , A ⟩ ∻ □
-
-  ∻∞ : ∀ {Γ : Env n m} {A }
-    → Γ ⊢ ⟨ ∞ , A ⟩ ∻ τ A
-
-  ∻I : ∀ {Γ : Env n m} {j A B Σ e}
-    → (⊢e : Γ ⊢ □ ⇒ e ⇒ A)
-    → Γ ⊢ ⟨ j , B ⟩ ∻ Σ
-    → Γ ⊢ ⟨ 𝕚 j , A `→ B ⟩ ∻ ([ e ]↝ Σ)
-
-  ∻C : ∀ {Γ : Env n m} {j A B Σ e}
-    → (⊢e : Γ ⊢ τ A ⇒ e ⇒ A)
-    → Γ ⊢ ⟨ j , B ⟩ ∻ Σ
-    → Γ ⊢ ⟨ 𝕔 j , A `→ B ⟩ ∻ ([ e ]↝ Σ)
-
-{-
-tc-∻ : Γ ⊢ Σ ⇒ e ⇒ A ↡ j
-     → Γ ⊢ ⟨ j , A ⟩ ∻ Σ
-tc-∻ (⊢lit cloΓ) = ∻Z
-tc-∻ (⊢var cloΓ x∈Γ) = ∻Z
-tc-∻ (⊢ann ⊢e) = ∻Z
-tc-∻ (⊢app ⊢e) with tc-∻ ⊢e
-... | ∻I ⊢e₁ r = r
-... | ∻C ⊢e₁ r = r
-tc-∻ (⊢lam₁ ⊢e) with ⊢id0 (tc-sound ⊢e)
-... | refl = ∻∞
-tc-∻ (⊢lam₂ ⊢e up-c ⊢e₁) = ∻I (tc-sound ⊢e) {!g!}
-tc-∻ (⊢sub ⊢e ne gc cloΣ s) = {!!}
-tc-∻ (⊢tabs ⊢e) = ∻Z
--}
-
-
-
 infix 3 _⊢_~_
 data _⊢_~_ : Env n m → Counter × Type m → Context n m → Set where
 
@@ -190,7 +151,6 @@ find-arr-l fd = f-∞ (ε-arr-l (find-ε fd))
 ⊢c-¬ε (⊢c-arr cloA cloA₁) inΓ (ε-arr-r inA) = ⊢c-¬ε cloA₁ inΓ inA
 ⊢c-¬ε (⊢c-∀ cloA) inΓ (ε-∀ inA) = ⊢c-¬ε cloA (S∙ inΓ) inA
 
-
 -- a more restricted extending
 
 infix 3 _⊆_w/v_
@@ -208,83 +168,16 @@ data _⊆_w/v_ : Env n m → Env n m → Fin m → Set where
   ext-S= : Γ ⊆ Δ w/v k
          → Γ ,= A ⊆ Δ ,= A w/v #S k
 
-data Merge : Env n m → Env n m → Env n m → Set where
-  mrg-∅    : Merge ∅ ∅ ∅
-  mrg-S,   : Merge (Γ , A) (Γ , A) (Γ , A)
-  mrg-S∙   : Merge (Γ ,∙) (Γ ,∙) (Γ ,∙)
-  mrg-S^   : Merge (Γ ,^) (Γ ,^) (Γ ,^)
-  mrg-S=   : Merge (Γ ,= A) (Γ ,= A) (Γ ,= A)
-  mrg-S^-l : Merge (Γ ,^) (Γ ,= A) (Γ ,= A)
-  mrg-S^-r : Merge (Γ ,= A) (Γ ,^) (Γ ,= A)
-
 infix 3 _⊆_w/t_
 data _⊆_w/t_ : Env n m → Env n m → Type m → Set where
   ext-int : Γ ⊆ Γ w/t Int
   ext-var : Γ ⊆ Δ w/v X
           → Γ ⊆ Δ w/t ‶ X
-  ext-arr : Γ ⊆ Δ₁ w/t A
-          → Γ ⊆ Δ₂ w/t B
-          → Merge Δ₁ Δ₂ Δ
+  ext-arr : Γ ⊆ Γ' w/t A
+          → Γ' ⊆ Δ w/t B
           → Γ ⊆ Δ w/t A `→ B
   ext-∀   : Γ ,∙ ⊆ Δ ,∙ w/t A
           → Γ ⊆ Δ w/t `∀ A
-
-{-
-data Extend : Env n m → Env n m → Type m → Set where
-  base : Extend ∅ ∅ A
-  uvar : Extend Γ Δ (`∀ A)
-       → Extend (Γ ,∙) (Δ ,∙) A
-  var : Extend Γ Δ A
-      → Extend (Γ , B) (Δ , B) A
-  evar : Extend Γ Δ (`∀ A)
-       → Extend (Γ ,^) (Δ ,^) A
-  evar-sol : Extend Γ Δ (`∀ A)
-           → #0 ε A
-           → Extend (Γ ,^) (Δ ,= B) A
-  svar : Extend Γ Δ (`∀ A)
-        → Extend (Γ ,= B) (Δ ,= B) A
-
-extend-close : Extend Γ Δ A
-             → Γ ⊢c A
-             → Γ ≡ Δ
-extend-close base cloA = refl
-extend-close (uvar ext) cloA rewrite extend-close ext (⊢c-∀ cloA) = refl
-extend-close (var ext) cloA rewrite extend-close ext (⊢c-strengthen,0 cloA) = refl
-extend-close (evar ext) cloA rewrite extend-close ext (⊢c-∀ {!!}) = refl
-extend-close (evar-sol ext x) cloA = {!!}
-extend-close (svar ext) cloA = {!!}
-
-extend-same : Γ ⊢c A
-            → Extend Γ Γ A
-extend-same {Γ = ∅} cloA = base
-extend-same {Γ = Γ , A} cloA = var (extend-same {Γ = Γ} (⊢c-strengthen,0 cloA))
-extend-same {Γ = Γ ,^} cloA = evar (extend-same {Γ = Γ} (⊢c-∀ {!!}))
-extend-same {Γ = Γ ,∙} cloA = uvar (extend-same {Γ = Γ} (⊢c-∀ cloA))
-extend-same {Γ = Γ ,= A} cloA = svar (extend-same {Γ = Γ} (⊢c-∀ {!!}))
-
-extend-inst : [ B / X ] Γ ⟹ Δ
-            → Extend Γ Δ (‶ X)
-extend-inst (⟹^0 up) = evar-sol (extend-same (⊢c-∀ (⊢c-var-∙ Z))) ε-var
-extend-inst (⟹^S inst up1) = evar {!extend-inst inst!}
-extend-inst (⟹∙S inst up1) = {!!}
-extend-inst (⟹,S inst) = {!!}
-extend-inst (⟹=S inst up1) = {!!}
--}
-
-merge-refl-eq : Merge Γ Γ Δ
-           → Γ ≡ Δ
-merge-refl-eq mrg-∅ = refl
-merge-refl-eq mrg-S, = refl
-merge-refl-eq mrg-S∙ = refl
-merge-refl-eq mrg-S^ = refl
-merge-refl-eq mrg-S= = refl
-
-merge-refl : Merge Γ Γ Γ
-merge-refl {Γ = ∅} = mrg-∅
-merge-refl {Γ = Γ , A} = mrg-S,
-merge-refl {Γ = Γ ,^} = mrg-S^
-merge-refl {Γ = Γ ,∙} = mrg-S∙
-merge-refl {Γ = Γ ,= A} = mrg-S=
 
 extv-∙-eq : Γ ∋∙ X
           → Γ ⊆ Δ w/v X
@@ -326,8 +219,8 @@ ext-close-eq : Γ ⊢c A
 ext-close-eq ⊢c-int ext-int = refl
 ext-close-eq (⊢c-var-∙ inΓ) (ext-var x) = extv-∙-eq inΓ x
 ext-close-eq (⊢c-var-= inΓ) (ext-var x) = extv-=-eq inΓ x
-ext-close-eq (⊢c-arr cloA cloA₁) (ext-arr ext ext₁ x) with ext-close-eq cloA ext | ext-close-eq cloA₁ ext₁
-... | refl | refl = merge-refl-eq x
+ext-close-eq (⊢c-arr cloA cloA₁) (ext-arr ext ext₁) with ext-close-eq cloA ext
+... | refl = ext-close-eq cloA₁ ext₁
 ext-close-eq (⊢c-∀ cloA) (ext-∀ ext) with ext-close-eq cloA ext
 ... | refl = refl
 
@@ -336,7 +229,7 @@ ext-close : Γ ⊢c A
 ext-close ⊢c-int = ext-int
 ext-close (⊢c-var-∙ inΓ) = ext-var (extv-∙ inΓ)
 ext-close (⊢c-var-= inΓ) = ext-var (extv-= inΓ)
-ext-close (⊢c-arr cloA cloA₁) = ext-arr (ext-close cloA) (ext-close cloA₁) merge-refl
+ext-close (⊢c-arr cloA cloA₁) = ext-arr (ext-close cloA) (ext-close cloA₁)
 ext-close (⊢c-∀ cloA) = ext-∀ (ext-close cloA)
 
 inst-extv : [ A / X ] Γ ⟹ Δ
@@ -375,39 +268,25 @@ s-extend-l (s-ex-l^ x-in inst) cloΓ (⊢c-τ cloA) = ext-var (inst-extv inst cl
 s-extend-l (s-ex-l= x-in s) cloΓ cloΣ with s-all-closed s cloΓ (∋=-closed cloΓ x-in) cloΣ
 ... | refl = ext-var (extv-= (:=to= x-in))
 s-extend-l (s-ex-r= x-in s) cloΓ (⊢c-τ cloA) = s-extend-l s cloΓ (⊢c-τ (∋=-closed cloΓ x-in))
-s-extend-l (s-arr s s₁) cloΓ (⊢c-τ (⊢c-arr cloA cloA₁)) with s-extend-r s {!!} {!!} | s-extend-l s₁ {!!} {!!}
-... | r1 | r2 = ext-arr {!!} {!!} {!!}
-s-extend-l (s-term-c ⊢e s) cloΓ cloΣ = {!!}
-s-extend-l (s-term-o opnA ⊢e s s₁) cloΓ cloΣ = {!!}
-s-extend-l (s-∀ s) cloΓ cloΣ = {!!}
-s-extend-l (s-∀l s upᶜ upᵉ st₁ st₂) cloΓ cloΣ with s-extend-l s (clo-S^ cloΓ) {!!}
-... | r = ext-∀ {!!}
+s-extend-l (s-arr s s₁) cloΓ (⊢c-τ (⊢c-arr cloA cloA₁)) with s-extend-r s cloΓ cloA
+                        | s-extend-l s₁ (s-closed-env s (polar-l cloΓ cloA)) (⊢c-τ (⊆-cloA cloA₁ (s-⊆ s (polar-l cloΓ cloA))))
+... | r1 | r2 = ext-arr r1 r2
+s-extend-l (s-term-c ⊢e s) cloΓ (⊢c-term cloe cloΣ) = ext-arr (ext-close (⊢close-τ ⊢e)) (s-extend-l s cloΓ cloΣ)
+s-extend-l (s-term-o opnA ⊢e s s₁) cloΓ (⊢c-term cloe cloΣ) = let cloC = ⊢closeA ⊢e
+                                                                  ext = s-⊆ s (polar-l cloΓ cloC)
+  in ext-arr (s-extend-r s cloΓ cloC) (s-extend-l s₁ (s-closed-env s (polar-l cloΓ cloC)) (⊆-cloAᶜ cloΣ ext))
+s-extend-l (s-∀ s) cloΓ (⊢c-τ (⊢c-∀ cloA)) = ext-∀ (s-extend-l s (clo-S∙ cloΓ) (⊢c-τ cloA))
+s-extend-l (s-∀l s upᶜ upᵉ st₁ st₂) cloΓ cloΣ with s-extend-l s (clo-S^ cloΓ) (⊢cᶜ-weaken^0 cloΣ (↑tyᶜ-e upᵉ upᶜ))
+... | r = ext-∀ (helper r)
+  where postulate
+    helper : Γ ,^ ⊆ Δ ,= B w/t A → Γ ,∙ ⊆ Δ ,∙ w/t A
 
-
-
-{-
-s-extend-l : Γ ⊢ A ⌞ ≤⁺ ⌝ Σ ⊣ Δ ↪ B
-           → Closed Γ
-           → Γ ⊢cᶜ Σ
-           → Extend Γ Δ A
-s-extend-r : Γ ⊢ A ⌞ ≤⁻ ⌝ (τ B) ⊣ Δ ↪ C
-           → Closed Γ
-           → Γ ⊢c A
-           → Extend Γ Δ B
-
-s-extend-l s-int cloΓ cloΣ = extend-same ⊢c-int
-s-extend-l (s-empty clo) cloΓ cloΣ = extend-same clo
-s-extend-l s-var cloΓ (⊢c-τ cloA) = extend-same cloA
-s-extend-l (s-ex-l^ x-in inst) cloΓ cloΣ = {!!}
-s-extend-l (s-ex-l= x-in s) cloΓ cloΣ = {!!}
-s-extend-l (s-ex-r= x-in s) cloΓ cloΣ = {!!}
-s-extend-l (s-arr s s₁) cloΓ cloΣ = {!!}
-s-extend-l (s-term-c ⊢e s) cloΓ cloΣ = {!!}
-s-extend-l (s-term-o opnA ⊢e s s₁) cloΓ cloΣ = {!!}
-s-extend-l (s-∀ s) cloΓ cloΣ = {!!}
--- with s-extend-l s (clo-S∙ cloΓ) (⊢c-τ {!cloΓ!})
-s-extend-l (s-∀l s upᶜ upᵉ st₁ st₂) cloΓ cloΣ = {!!}
-
-s-extend-r s cloΓ cloA = {!!}
-
--}
+s-extend-r s-int cloΓ cloA = ext-int
+s-extend-r s-var cloΓ cloA = ext-close cloA
+s-extend-r (s-ex-l= x-in s) cloΓ cloA = s-extend-r s cloΓ (∋=-closed cloΓ x-in)
+s-extend-r (s-ex-r^ x-in inst) cloΓ cloA = ext-var (inst-extv inst cloA)
+s-extend-r (s-ex-r= x-in s) cloΓ cloA with s-all-closed s cloΓ cloA (⊢c-τ (∋=-closed cloΓ x-in))
+... | refl = ext-var (extv-= (:=to= x-in))
+s-extend-r (s-arr s s₁) cloΓ (⊢c-arr cloA cloA₁) = ext-arr (s-extend-l s cloΓ (⊢c-τ cloA))
+  (s-extend-r s₁ (s-closed-env s (polar-r cloΓ (⊢c-τ cloA))) (⊆-cloA cloA₁ (s-⊆ s (polar-r cloΓ (⊢c-τ cloA)))))
+s-extend-r (s-∀ s) cloΓ (⊢c-∀ cloA) = ext-∀ (s-extend-r s (clo-S∙ cloΓ) cloA)
