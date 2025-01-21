@@ -78,9 +78,9 @@ data _⊢_#_≤_ : Env n m → Counter → Type m → Type m → Set where
   -- what we does is to make sure the all inputs matching the counter should at least have the quantifer contained
     → (ic : (𝕚𝕔 j))
     → (fd : find A #0 j)
-    → (st₁ : ⟦ B ⟧ C ⇘ C')
-    → (st₂ : ⟦ B ⟧ D ⇘ D')
-    → Γ ⊢ j # `∀ A ≤ C' `→ D'
+    → (st₁ : ⟦ B ⟧ C ⇘ C*)
+    → (st₂ : ⟦ B ⟧ D ⇘ D*)
+    → Γ ⊢ j # `∀ A ≤ C* `→ D*
   -- two atomic rules
   s-var-l : ∀ {X A B}
     → (inΓ : Γ ∋ X := B)

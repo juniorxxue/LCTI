@@ -72,6 +72,10 @@ variable
   x y : Fin n
   k k' k₁ k₂ X Y : Fin m
 
+inject₂ : Fin n → Fin (suc (suc n))
+inject₂ #0 = #0
+inject₂ (#S k) = #S (inject₂ k)
+
 ≢-pred : #S x ≢ #S y
        → x ≢ y
 ≢-pred neq eq = neq (cong #S eq)

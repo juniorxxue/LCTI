@@ -50,7 +50,7 @@ st0-unique st1 st2 = st-unique st1 st2
            → Y ≡ punchIn k X
            → ‶ X ≡ B
 ↑ty-stx-eq {k = k} {Y = Y} {X = X} stx-eq eq = ⊥-elim ((punchInᵢ≢i k X) (sym eq))
-↑ty-stx-eq {k = k} (stx-neq ¬p) refl = cong ‶_ (sym (punchOut-punchIn k))     
+↑ty-stx-eq {k = k} (stx-neq ¬p) refl = cong ‶_ (sym (punchOut-punchIn k))
 
 ↑ty-st-eq :
     A ↑ty k ⇘ A'
@@ -86,7 +86,7 @@ st-↑ty (st-∀ up st) = ↑ty-∀ (st-↑ty st)
 ↑tyᵉ-st-eq (↑tyᵉ-ƛ up) (st-ƛ st) = cong ƛ_ (↑tyᵉ-st-eq up st)
 ↑tyᵉ-st-eq (↑tyᵉ-app up up₁) (st-· st st₁) rewrite ↑tyᵉ-st-eq up st | ↑tyᵉ-st-eq up₁ st₁ = refl
 ↑tyᵉ-st-eq (↑tyᵉ-⦂ up x) (st-⦂ st x₁) rewrite ↑tyᵉ-st-eq up st | ↑ty-st-eq x x₁ = refl
-↑tyᵉ-st-eq (↑tyᵉ-Λ up) (st-Λ st) = cong Λ_ (↑tyᵉ-st-eq up st)
+↑tyᵉ-st-eq (↑tyᵉ-Λ up) (st-Λ st up') = cong Λ_ (↑tyᵉ-st-eq up st)
 
 ↑tyᵉ-st :
     e ↑tyᵉ k ⇘ e'
@@ -96,7 +96,7 @@ st-↑ty (st-∀ up st) = ↑ty-∀ (st-↑ty st)
 ↑tyᵉ-st (↑tyᵉ-ƛ up) = st-ƛ (↑tyᵉ-st up)
 ↑tyᵉ-st (↑tyᵉ-app up up₁) = st-· (↑tyᵉ-st up) (↑tyᵉ-st up₁)
 ↑tyᵉ-st (↑tyᵉ-⦂ up up₁) = st-⦂ (↑tyᵉ-st up) (↑ty-st up₁)
-↑tyᵉ-st (↑tyᵉ-Λ up) = st-Λ (↑tyᵉ-st up)
+↑tyᵉ-st {T = T} (↑tyᵉ-Λ up) = st-Λ (↑tyᵉ-st up) (proj₂ (↑ty0-total T))
 
 st-total-rev : ∀ k B → ∃[ A ](⟦ k / T ⟧ A ⇘ B)
 st-total-rev k B = let ⟨ B* , up ⟩ = ↑ty-total B k in ⟨ B* , ↑ty-st up ⟩
@@ -113,7 +113,7 @@ st0-total-rev = st-total-rev #0
             → A ↑ty (inject₁ k₁) ⇘ A'
             → T ↑ty k₁ ⇘ T'
             → ⟦ #S k₂ / T' ⟧ A' ⇘ A*'
-            ---------------            
+            ---------------
             → A* ↑ty k₁ ⇘ A*'
             → ⟦ k₂ / T ⟧ A ⇘ A*
 -}
@@ -162,5 +162,55 @@ punchIn-punchOut' {m = suc m} {k₁ = #S k₁} {X = #S X} {k₂ = #S k₂} ¬p (
              → ⟦ B' ⟧ C' ⇘ C*'
 ↑ty-st-comm0 up1 st1 up2 up3 = ↑ty-st-comm {k₁ = #0} z≤n up1 up2 st1 up3
 
+#≤-inject : ∀ {k₁ : Fin (1 + m)} {k₂ : Fin (1 + m)}
+          → k₁ #≤ k₂
+          → inject₁ k₁ #≤ k₂
+#≤-inject {k₁ = #0} {k₂} lt = lt
+#≤-inject {m = suc m} {k₁ = #S k₁} {#S k₂} (s≤s lt) = s≤s (#≤-inject lt)
+
+postulate
+  ↑ty-stx-comm1 : k₁ #≤ k₂
+                → ⟦ k₂ / T ⟧ˣ X ⇘ A*
+                -----------------------
+                → T ↑ty k₁ ⇘ T'
+                -----------------------
+                → ⟦ #S k₂ / T' ⟧ˣ punchIn (inject₁ k₁) X ⇘ A*'
+                → A* ↑ty k₁ ⇘ A*'
+{-
+↑ty-stx-comm1 {k₁ = k₁} {k₂} lt stx-eq upT stX rewrite punchIn-≤ {k₁ = k₂} {k₂ = inject₁ k₁} (#≤-inject lt) with stX
+... | stx-eq = upT
+... | stx-neq ¬p = ⊥-elim (¬p refl)
+↑ty-stx-comm1 {m} {k₁ = #0} {k₂} {X = X} lt (stx-neq ¬p) upT stx-eq = ⊥-elim (¬p refl)
+↑ty-stx-comm1 {m} {k₁ = #0} {k₂} {X = X} lt (stx-neq ¬p) upT (stx-neq ¬p₁) = ↑ty-var
+↑ty-stx-comm1 {m} {k₁ = #S k₁} {k₂} {X = #0} lt (stx-neq ¬p) upT (stx-neq ¬p₁) = {!!}
+↑ty-stx-comm1 {m} {k₁ = #S k₁} {k₂} {X = #S X} lt (stx-neq ¬p) upT stx-eq = {!!}
+↑ty-stx-comm1 {m} {k₁ = #S k₁} {k₂} {X = #S X} lt (stx-neq ¬p) upT (stx-neq ¬p₁) = {!!}
+-}
 
 
+↑ty-st-comm1 : k₁ #≤ k₂
+             --------------------
+             → ⟦ k₂ / T ⟧ A ⇘ A*
+             --------------------
+             → T ↑ty k₁ ⇘ T'
+             → A ↑ty (inject₁ k₁) ⇘ A'
+             → ⟦ #S k₂ / T' ⟧ A' ⇘ A*'
+             --------------------
+             → A* ↑ty k₁ ⇘ A*'
+↑ty-st-comm1 lt st-int upT ↑ty-int st-int = ↑ty-int
+↑ty-st-comm1 lt (st-var stx) upT ↑ty-var (st-var stx₁) = ↑ty-stx-comm1 lt stx upT stx₁
+↑ty-st-comm1 lt (st-arr stA stA₁) upT (↑ty-arr upA upA₁) (st-arr stA' stA'') =
+  ↑ty-arr (↑ty-st-comm1 lt stA upT upA stA') (↑ty-st-comm1 lt stA₁ upT upA₁ stA'')
+↑ty-st-comm1 lt (st-∀ up stA) upT (↑ty-∀ upA) (st-∀ up₁ stA') = ↑ty-∀ (↑ty-st-comm1 (s≤s lt) stA (↑ty-comm0' upT up₁ up) upA stA')
+
+
+postulate
+  st-st-comm : ∀ {k₁ : Fin (1 + m)} {k₂ T U U* U** U*₂ V T* V'}
+             → k₁ #≤ k₂
+             → ⟦ (inject₁ k₁) / U ⟧ T ⇘ U*
+             → ⟦ k₂ / V ⟧ U* ⇘ U**
+             ------------------------
+             → V ↑ty k₁ ⇘ V'
+             → ⟦ #S k₂ / V' ⟧ T ⇘ T*
+             → ⟦ k₂ / V ⟧ U ⇘ U*₂
+             → ⟦ k₁ / U*₂ ⟧ T* ⇘ U**

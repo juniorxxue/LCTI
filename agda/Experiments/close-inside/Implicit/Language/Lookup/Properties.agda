@@ -13,6 +13,18 @@ open import Implicit.Language.Shift
 ∋⦂-unique (S^ in1 x) (S^ in2 up) rewrite ∋⦂-unique in1 in2 = ↑ty-unique x up
 ∋⦂-unique (S= in1 x) (S= in2 x₁) rewrite ∋⦂-unique in1 in2 = ↑ty-unique x x₁
 
+∋:=-unique : Γ ∋ k := A
+           → Γ ∋ k := B
+           → A ≡ B
+∋:=-unique (Z up) (Z up₁) = ↑ty-unique up up₁
+∋:=-unique (S, in1) (S, in2) = ∋:=-unique in1 in2
+∋:=-unique (S∙ in1 up) (S∙ in2 up₁) with ∋:=-unique in1 in2
+... | refl = ↑ty-unique up up₁
+∋:=-unique (S^ in1 up) (S^ in2 up₁) with ∋:=-unique in1 in2
+... | refl = ↑ty-unique up up₁
+∋:=-unique (S= in1 up) (S= in2 up₁) with ∋:=-unique in1 in2
+... | refl = ↑ty-unique up up₁
+
 
 
 ↑ty-ε : X ε A

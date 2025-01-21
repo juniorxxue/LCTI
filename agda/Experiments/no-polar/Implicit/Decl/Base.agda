@@ -2,23 +2,7 @@ module Implicit.Decl.Base where
 
 open import Implicit.Language
 
-data Counter : Set where
-  Z : Counter
-  ∞ : Counter
-  𝕚 : Counter → Counter
-  𝕔 : Counter → Counter
 
-variable
-  j : Counter
-
-data NonZ : Counter → Set where
-  nz-∞ : NonZ ∞
-  nz-I : NonZ (𝕚 j)
-  nz-C : NonZ (𝕔 j)
-
-data 𝕚𝕔 : Counter → Set where
-  case-𝕚 : 𝕚𝕔 (𝕚 j)
-  case-𝕔 : 𝕚𝕔 (𝕔 j)
 
 -- find A k j
 -- at j-th position of A type, should have a bound variable, example: |-1 forall a. a -> a <: Int

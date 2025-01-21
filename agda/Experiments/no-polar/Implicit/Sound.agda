@@ -4,6 +4,13 @@ open import Implicit.Language
 open import Implicit.Decl renaming (find to d-find)
 open import Implicit.Algo
 
+postulate
+  ⊢id0 : Γ ⊢ τ A ⇒ e ⇒ B ↡ ∞
+       → A ≡ B
+
+  s-id0 : Γ ⊢ A ≤ τ B ⊣ Γ ↪ C ↡ j
+        → B ≡ C
+
 infix 3 _⊢_~_
 data _⊢_~_ : Env n m → Counter × Type m → Context n m → Set where
 
@@ -14,111 +21,107 @@ data _⊢_~_ : Env n m → Counter × Type m → Context n m → Set where
     → Γ ⊢ ⟨ ∞ , A ⟩ ~ τ A
 
   ~I : ∀ {Γ : Env n m} {j A B Σ e}
-    → (⊢e : Γ ⊢ Z # e ⦂ A) -- is A or not
+    → (⊢e : Γ ⊢ □ ⇒ e ⇒ A ↡ Z)
     → Γ ⊢ ⟨ j , B ⟩ ~ Σ
     → Γ ⊢ ⟨ 𝕚 j , A `→ B ⟩ ~ ([ e ]↝ Σ)
 
   ~C : ∀ {Γ : Env n m} {j A B Σ e}
-    → (⊢e : Γ ⊢ ∞ # e ⦂ A)
+    → (⊢e : Γ ⊢ (τ A) ⇒ e ⇒ A ↡ ∞)
     → Γ ⊢ ⟨ j , B ⟩ ~ Σ
     → Γ ⊢ ⟨ 𝕔 j , A `→ B ⟩ ~ ([ e ]↝ Σ)
 
-postulate
 
-  ~-subst : ∀ {Γ : Env n m} {Σ A B j Σ' A'}
-    → (Γ ,= B) ⊢ ⟨ j , A ⟩ ~ Σ
-    → ⟦ B ⟧ᶜ Σ ⇘ Σ'
-    → ⟦ B ⟧ A ⇘ A'
-    → Γ ⊢ ⟨ j , A' ⟩ ~ Σ'
+algo-~ : Γ ⊢ Σ ⇒ e ⇒ A ↡ j
+       → Γ ⊢ ⟨ j , A ⟩ ~ Σ
 
-  ~-weaken0 : Γ , A ⊢ ⟨ j , B ⟩ ~ Σ'
-            → ↑tmᶜ0 Σ ⇘ Σ'
-            → Γ ⊢ ⟨ j , B ⟩ ~ Σ
+s-~ : Γ ⊢ A₁ ≤ Σ ⊣ Γ ↪ A ↡ j
+    → Γ ⊢ ⟨ j , A ⟩ ~ Σ
+
+s-~ (s-int cloΓ) = ~∞
+s-~ (s-empty cloΓ clo) = ~Z
+s-~ (s-var-∙ cloΓ x-in) = ~∞
+s-~ (s-var-= cloΓ x-in) = ~∞
+s-~ (s-ex-l^ cloA cloΓ x-in inst) = ~∞
+s-~ (s-ex-l= x-in s) = ~∞
+s-~ (s-ex-r^ cloA cloΓ x-in inst) = ~∞
+s-~ (s-ex-r= x-in s) = ~∞
+s-~ (s-arr s s₁) = ~∞
+s-~ (s-term-c ⊢e s) with ⊢id0 ⊢e
+... | refl = ~C ⊢e (s-~ s)
+s-~ (s-term-o opnA ⊢e s s₁) = ~I ⊢e {!!}
+s-~ (s-∀ s) rewrite s-id0 s = ~∞
+s-~ (s-∀l s upᶜ upᵉ st₁ st₂) = {!s-~!}
+
+algo-~ (⊢lit cloΓ) = ~Z
+algo-~ (⊢var cloΓ x∈Γ) = ~Z
+algo-~ (⊢ann ⊢e) = ~Z
+algo-~ (⊢app ⊢e) with algo-~ ⊢e
+... | ~I ⊢e₁ r = r
+... | ~C ⊢e₁ r = r
+algo-~ (⊢lam₁ ⊢e) rewrite ⊢id0 ⊢e = ~∞
+algo-~ (⊢lam₂ ⊢e up-c ⊢e₁) = ~I ⊢e {!algo-~ ⊢e₁!}
+algo-~ (⊢sub ⊢e ne gc s) = s-~ s
+algo-~ (⊢tabs ⊢e) = ~Z
+
 
 ----------------------------------------------------------------------
 --+                             Typing                             +--
 ----------------------------------------------------------------------
 
-e-ic : ∀ {Γ : Env n m} {j A Σ e}
-  → Γ ⊢ ⟨ j , A ⟩ ~ [ e ]↝ Σ
-  → 𝕚𝕔 j
-e-ic (~I ⊢e ~j) = case-𝕚
-e-ic (~C ⊢e ~j) = case-𝕔
-
-
-data JustSub (Γ : Env n m) (Σ : Context n m) (A : Type m) (B : Type m) : Set where
-  subs : ∀ {j}
-    → (j~Σ : Γ ⊢ ⟨ j , B ⟩ ~ Σ)
-    → (s : Γ ⊢ j # A ≤ B)
-    → JustSub Γ Σ A B
-
-data JustTyping (Γ : Env n m) (Σ : Context n m) (e : Term n m) (A : Type m) : Set where
-  typs : ∀ {j}
-    → (j~Σ : Γ ⊢ ⟨ j , A ⟩ ~ Σ)
-    → (s : Γ ⊢ j # e ⦂ A)
-    → JustTyping Γ Σ e A
-
 sound : ∀ {Γ : Env n m} {Σ e A}
-  → Γ ⊢ Σ ⇒ e ⇒ A
-  → JustTyping Γ Σ e A
+  → Γ ⊢ Σ ⇒ e ⇒ A ↡ j
+  → Γ ⊢ j # e ⦂ A
 
-sound-s : Γ ⊢ A ≤ Σ ⊣ Γ' ↪ B
-        → JustSub Γ' Σ A B
-
-sound-s' : ∀ {Γ Γ' : Env n m} {Σ A B}
-  → Γ ⊢ A ≤ Σ ⊣ Γ' ↪ B
-  → JustSub Γ' Σ A B
+sound-s : ∀ {Γ Γ' : Env n m} {Σ A B}
+  → Γ ⊢ A ≤ Σ ⊣ Δ ↪ B ↡ j
+  → Δ ⊢ j # A ≤ B
 
 sound-0 : ∀ {Γ : Env n m} {e A}
-  → Γ ⊢ □ ⇒ e ⇒ A
+  → Γ ⊢ □ ⇒ e ⇒ A ↡ Z
   → Γ ⊢ Z # e ⦂ A
-sound-0 ⊢e with sound ⊢e
-... | typs ~Z ⊢e = ⊢e
+sound-0 ⊢e = sound ⊢e
 
 sound-∞ : ∀ {Γ : Env n m} {e A B}
-  → Γ ⊢ τ B ⇒ e ⇒ A
+  → Γ ⊢ τ B ⇒ e ⇒ A ↡ ∞
   → Γ ⊢ ∞ # e ⦂ B
-sound-∞ ⊢e rewrite ⊢id0 ⊢e with sound ⊢e
-... | typs ~∞ ⊢e = ⊢e
+sound-∞ ⊢e with ⊢id0 ⊢e
+... | refl = sound ⊢e
 
-sound (⊢lit cloΓ) = typs ~Z (⊢lit cloΓ)
-sound (⊢var cloΓ x∈Γ) = typs ~Z (⊢var cloΓ x∈Γ)
-sound (⊢ann ⊢e) = typs ~Z (⊢ann (sound-∞ ⊢e))
+sound (⊢lit cloΓ) = ⊢lit cloΓ
+sound (⊢var cloΓ x∈Γ) = ⊢var cloΓ x∈Γ
+sound (⊢ann ⊢e) = ⊢ann (sound-∞ ⊢e)
 sound (⊢app ⊢e) with sound ⊢e
-... | typs (~I ⊢e₁ j~Σ) ⊢e = typs j~Σ (⊢app₂ ⊢e ⊢e₁)
-... | typs (~C ⊢e₁ j~Σ) ⊢e = typs j~Σ (⊢app₁ ⊢e ⊢e₁)
-sound (⊢lam₁ ⊢e) with sound ⊢e
-... | typs ~∞ s = typs ~∞ (⊢lam₁ s)
-sound (⊢lam₂ ⊢e up-c ⊢e₁) with sound ⊢e₁
-... | typs j ⊢e' = typs (~I (sound-0 ⊢e) (~-weaken0 j up-c)) (⊢lam₂ ⊢e')
-sound (⊢sub ⊢e ne gc s) with sound-s' s
-... | subs j~Σ s₁ = typs j~Σ (⊢sub' (sound-0 ⊢e) s₁)
-sound (⊢tabs ⊢e) with sound ⊢e
-... | typs ~Z s = typs ~Z (⊢tabs s)
+sound (⊢app {j = Z} ⊢e) | r = {!!}
+sound (⊢app {j = ∞} ⊢e) | r = {!!}
+sound (⊢app {j = 𝕚 j} ⊢e) | r with algo-~ ⊢e
+... | ~I ⊢e₁ r' = ⊢app₂ r (sound-0 ⊢e₁)
+sound (⊢app {j = 𝕔 j} ⊢e) | r with algo-~ ⊢e
+... | ~C ⊢e₁ r' = ⊢app₁ r (sound-∞ ⊢e₁)
+sound (⊢lam₁ ⊢e) = ⊢lam₁ (sound ⊢e)
+sound (⊢lam₂ ⊢e up-c ⊢e₁) = ⊢lam₂ (sound ⊢e₁)
+sound (⊢sub ⊢e ne gc s) = ⊢sub' (sound ⊢e) (sound-s s)
+sound (⊢tabs ⊢e) = ⊢tabs (sound ⊢e)
 
-{-
-sound-s s'@(s-term-o opnA ⊢e s s₁) with sound-s s | sound-s s₁
-... | subs ~∞ s₂ | subs j~Σ s₃ = subs (~I (t-⊆-prv (sound-0 ⊢e) (s-⊆ s' {!!})) j~Σ) (s-arr₂ (s-⊆-prv s₂ (s-⊆ s₁ {!!})) s₃)
-sound-s (s-∀l s upᶜ upᵉ st₁ st₂) with sound-s s
-... | subs IH-j~Σ IH = subs ((~-subst IH-j~Σ {!!} (st-arr st₁ st₂))) (s-∀l IH {!!} {!!} st₁ st₂)
--}
+sound-s (s-int cloΓ) = s-int cloΓ
+sound-s (s-empty cloΓ clo) = s-refl cloΓ clo
+sound-s (s-var-∙ cloΓ x-in) = s-var-∙ cloΓ x-in
+sound-s (s-var-= cloΓ x-in) = s-var-= cloΓ x-in
+sound-s (s-ex-l^ cloA cloΓ x-in inst) = {!!}
+sound-s (s-ex-l= x-in s) = {!!}
+sound-s (s-ex-r^ cloA cloΓ x-in inst) = {!!}
+sound-s (s-ex-r= x-in s) = {!!}
+sound-s (s-arr s s₁) = {!!}
+sound-s (s-term-c ⊢e s) = {!!}
+sound-s (s-term-o opnA ⊢e s s₁) = {!!}
+sound-s (s-∀ s) = s-∀ (sound-s s)
+sound-s (s-∀l s upᶜ upᵉ st₁ st₂) = s-∀l (sound-s s) {!𝕚𝕔!} {!!} st₁ st₂
 
-sound-s' (s-int cloΓ) = subs ~∞ (s-int cloΓ)
-sound-s' (s-empty cloΓ clo) = subs ~Z (s-refl cloΓ clo)
-sound-s' (s-var-∙ cloΓ x-in) = subs ~∞ (s-var-∙ cloΓ x-in)
-sound-s' (s-var-= cloΓ x-in) = subs ~∞ (s-var-= cloΓ x-in)
-sound-s' (s-ex-l^ cloA cloΓ x-in inst) = subs ~∞ (s-var-l (inst-in inst) (s-refl-∞ (inst-closedΓ cloΓ cloA inst) (⊆-cloA cloA (inst-⊆ inst cloA))))
-sound-s' (s-ex-l= x-in s) = subs ~∞ {!!}
-sound-s' (s-ex-r^ cloA cloΓ x-in inst) = {!!}
-sound-s' (s-ex-r= x-in s) = {!!}
-sound-s' (s-arr s s₁) = subs {!!} {!!}
-sound-s' (s-term-c ⊢e s) = {!!}
-sound-s' (s-term-o opnA ⊢e s s₁) = {!!}
-sound-s' (s-∀ s) = {!!}
-sound-s' (s-∀l s upᶜ upᵉ st₁ st₂) = {!!}
-
-sound-find : Γ ⊢ A  ≤ Σ ⊣ Γ' ↪ B
-           → Γ  ∋^ k
-           → Γ' ∋= k
-           → Γ' ⊢ ⟨ j , B ⟩ ~ Σ
+sound-find-l : Γ ⊢ A ≤ Σ ⊣ Δ ↪ B ↡ j
+           → Γ ∋^ k
+           → Δ ∋= k
            → d-find A k j
+
+sound-find-r : Γ ⊢ A ≤ τ B ⊣ Δ ↪ C ↡ j
+           → Γ ∋^ k
+           → Δ ∋= k
+           → d-find B k j
