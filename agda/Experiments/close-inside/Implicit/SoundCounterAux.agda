@@ -291,6 +291,7 @@ s-extend-r (s-arr s s₁) cloΓ (⊢c-arr cloA cloA₁) = ext-arr (s-extend-l s 
   (s-extend-r s₁ (s-closed-env s (polar-r cloΓ (⊢c-τ cloA))) (⊆-cloA cloA₁ (s-⊆ s (polar-r cloΓ (⊢c-τ cloA)))))
 s-extend-r (s-∀ s) cloΓ (⊢c-∀ cloA) = ext-∀ (s-extend-r s (clo-S∙ cloΓ) cloA)
 
+{-
 env-◆◇-false : Γ ◇ k ⇘ Γ₁
              → Γ ◆ k ⇘ Γ₂
              → ⊥
@@ -320,3 +321,4 @@ ext-◆◇ (ext-var x) newΓ newΔ = ext-var {!!}
 ext-◆◇ (ext-arr ext ext₁) newΓ newΔ = ext-arr {!!} {!!}
 -- ext-arr (ext-◆◇ ext newΓ {!!}) (ext-◆◇ ext₁ {!!} newΔ)
 ext-◆◇ (ext-∀ ext) newΓ newΔ = ext-∀ (ext-◆◇ ext (◇S∙ newΓ) (◆S∙ newΔ))
+-}

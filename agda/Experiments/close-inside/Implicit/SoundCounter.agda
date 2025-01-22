@@ -53,7 +53,7 @@ tc-~ (⊢app ⊢e) with tc-~ ⊢e
 ... | ~C ⊢e₁ r = r
 tc-~ (⊢lam₁ ⊢e) with ⊢id0 (tc-sound ⊢e)
 ... | refl = ~∞
-tc-~ (⊢lam₂ ⊢e up-c ⊢e₁) = ~I (sound ⊢e) (~weaken,0 (tc-~ ⊢e₁) up-c)
+tc-~ (⊢lam₂ ⊢e up-c ⊢e₁) = ~I (sound ⊢e) (~strengthen,0 (tc-~ ⊢e₁) up-c)
 tc-~ (⊢sub ⊢e ne gc cloΣ s) = sc-~ s (polar-r (⊢closeΓ (tc-sound ⊢e)) cloΣ)
 tc-~ (⊢tabs ⊢e) = ~Z
 
@@ -198,7 +198,7 @@ t-imply (⊢app ⊢e) with t-imply ⊢e
 t-imply (⊢lam₁ ⊢e) with t-imply ⊢e
 ... | typs ~∞ ⊢e₁ = typs ~∞ (⊢lam₁ ⊢e₁)
 t-imply (⊢lam₂ ⊢e up-c ⊢e₁) with t-imply ⊢e | t-imply ⊢e₁
-... | typs ~Z ⊢e₂ | typs j~Σ₁ ⊢e₃ = typs (~I (sound-0 ⊢e) (~weaken,0 j~Σ₁ up-c)) (⊢lam₂ ⊢e₂ up-c ⊢e₃)
+... | typs ~Z ⊢e₂ | typs j~Σ₁ ⊢e₃ = typs (~I (sound-0 ⊢e) (~strengthen,0 j~Σ₁ up-c)) (⊢lam₂ ⊢e₂ up-c ⊢e₃)
 t-imply (⊢sub ⊢e ne gc cloΣ s) with s-imply s (polar-r (⊢closeΓ ⊢e) cloΣ) | t-imply ⊢e
 ... | subs j~Σ s₁ | typs ~Z ⊢e₁ = typs j~Σ (⊢sub ⊢e₁ ne gc cloΣ s₁)
 t-imply (⊢tabs ⊢e) with t-imply ⊢e

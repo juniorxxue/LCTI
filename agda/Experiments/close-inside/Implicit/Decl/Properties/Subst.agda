@@ -6,11 +6,6 @@ open import Implicit.Decl.Properties.OpenClose
 open import Implicit.Decl.Properties.Subtyping
 open import Implicit.Decl.Properties.SubstAux
 
-◀:=-shifted : Γ ◀ k := T ⇘ Γ*
-            → T ↑ty k ⇘ T'
-            → Shifted T' k
-◀:=-shifted newΓ = {!newΓ!}
-
 ◀=-closedT : Γ ◀ k := T ⇘ Γ*
           → Closed Γ
           → Γ* ⊢c T
@@ -62,7 +57,7 @@ s-subst (s-∀ s) newΓ (st-∀ up stA) (st-∀ up₁ stB) with ↑ty-unique up 
 s-subst {k = k} {T} (s-∀l {B = B} {C = C} {D = D} s ic fd st₁ st₂) newΓ (st-∀ {A' = A'} up stA) (st-arr stB stB₁)
   with st-total T k B | st-total A' (#S k) C | st-total A' (#S k) D
 ... | ⟨ B* , stB' ⟩ | ⟨ C* , stC ⟩ | ⟨ D* , stD ⟩ = s-∀l (s-subst s (◀S= newΓ up stB') stA (st-arr stC stD)) ic
-  {!!}
+  (find-st0 fd up stA)
   (st-st-comm z≤n st₁ stB up stC stB')
   (st-st-comm z≤n st₂ stB₁ up stD stB')
 -- var-l
@@ -90,7 +85,7 @@ t-subst : Γ ⊢ j # e ⦂ A
         → ⟦ k / T ⟧ A ⇘ A*
         → Γ* ⊢ j # e* ⦂ A*
 t-subst (⊢lit cloΣ) newΓ st-lit st-int = ⊢lit (◀=-closed cloΣ newΓ)
-t-subst (⊢var cloΣ x∈Γ) newΓ st-var stA = ⊢var (◀=-closed cloΣ newΓ) {!!}
+t-subst (⊢var cloΣ x∈Γ) newΓ st-var stA = ⊢var (◀=-closed cloΣ newΓ) (∋⦂-subst x∈Γ newΓ stA)
 t-subst (⊢ann ⊢e) newΓ (st-⦂ ste st) stA with st-unique st stA
 ... | refl = ⊢ann (t-subst ⊢e newΓ ste st)
 t-subst (⊢lam₁ ⊢e) newΓ (st-ƛ ste) (st-arr stA stA₁) = ⊢lam₁ (t-subst ⊢e (◀S, newΓ stA) ste stA₁)
