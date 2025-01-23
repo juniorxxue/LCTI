@@ -1,4 +1,4 @@
-\documentclass{article}
+\documentclass[9pt]{article}
 
 \RequirePackage[T1]{fontenc} 
 %\usepackage[tt=false, type1=true]{libertine} 
@@ -7,7 +7,12 @@
 
 \usepackage{comment}
 
-\usepackage{fullpage}
+%\usepackage{fullpage}
+\usepackage[a4paper, margin=1.5cm]{geometry}
+
+%\usepackage{setspace}
+%\setstretch{0.9} % shrink line spacing slightly
+
 \usepackage{graphicx} % Required for inserting images
 
 \usepackage{mathpartir}
@@ -47,11 +52,11 @@
 
 \begin{mathpar}
     \inferrule*[lab=Int]
-    {\vdash_c \Gamma}
+    {\vdash_{close} \Gamma}
     {\Gamma \vdash_0 i : \mathtt{Int}}
 
     \inferrule*[lab=Var]
-    {\vdash_c \Gamma \\ x : A \in \Gamma}
+    {\vdash_{close} \Gamma \\ x : A \in \Gamma}
     {\Gamma \vdash_0 x : A}
 
     \inferrule*[lab=Ann]
@@ -89,20 +94,20 @@
 
 \begin{mathpar}
     \inferrule*[lab=S-Refl]
-    {\vdash_c \Gamma \\
+    {\vdash_{close} \Gamma \\
      \Gamma \vdash A}
     {\Gamma \vdash_0 A <: A}
 
     \inferrule*[lab=S-Int]
-    {\vdash_c \Gamma}
+    {\vdash_{close} \Gamma}
     {\Gamma \vdash_{\infty} \mathtt{Int} <: \mathtt{Int}}
     
     \inferrule*[lab=S-Var]
-    {\vdash_c \Gamma}
+    {\vdash_{close} \Gamma}
     {\Gamma \vdash_\infty a <: a}
     
     \inferrule*[lab=S-Var-Slv]
-    {\vdash_c \Gamma \\
+    {\vdash_{close} \Gamma \\
       \hat{a} = A \in \Gamma}
     {\Gamma \vdash_\infty \hat{a} <: \hat{a}}
 
@@ -120,6 +125,7 @@
      \hat{a} \in FV(S~n, A) \\
      \Gamma, \hat{a} = B \vdash_{S~n}  A <: C \to D}
     {\Gamma \vdash_{S~n} \forall a. ~A <: [B/\hat{a}]C \to [B/\hat{a}]D}
+    \\    
     
     \inferrule*[lab=S-var-l]
     {\hat{a} = B \in \Gamma \\ \Gamma \vdash_\infty B <: A}
@@ -136,11 +142,11 @@
 
 \begin{mathpar}
 \inferrule*[lab=T-Lit]
-{ \vdash_c \Gamma}
+{ \vdash_{close} \Gamma}
 {\Gamma \vdash \square \Rightarrow i \Rightarrow \mathsf{Int}}
 
 \inferrule*[lab=T-Var]
-{ \vdash_c \Gamma \\ x : A \in \Gamma}
+{ \vdash_{close} \Gamma \\ x : A \in \Gamma}
 {\Gamma \vdash \square \Rightarrow x \Rightarrow A}
 
 \inferrule*[lab=T-Ann]
@@ -163,7 +169,7 @@
 \inferrule*[lab=T-Sub]
 {\Gamma \vdash \square \Rightarrow g \Rightarrow A\\
 \Sigma \neq \square\\
- \Gamma \vdash_c \Sigma \\
+ \Gamma \vdash_{close} \Sigma \\
  \Gamma \vdash A \leq^+ \Sigma \dashv \Gamma \rightsquigarrow B}
 {\Gamma \vdash \Sigma \Rightarrow g \Rightarrow B}
 
@@ -237,16 +243,17 @@
 {\Gamma \vdash \mathtt{Int} \leq \mathtt{Int} \dashv \Gamma \rightsquigarrow \mathtt{Int}}
 
 \inferrule*[lab=S-Empty]
-{\Gamma \vdash_cA}
+{\Gamma \vdash_{close}A}
 {\Gamma \vdash A \leq^+ \square \dashv \Gamma \rightsquigarrow A}
 
 \inferrule*[lab=S-Var]
 { }
 {\Gamma \vdash a \leq a \dashv \Gamma \rightsquigarrow a}
 
-\inferrule*[lab=S-Var-Slv]
-{ \hat{a} = A \in \Gamma}
-{\Gamma \vdash \hat{a} \leq \hat{a} \dashv \Gamma \rightsquigarrow \hat{a}}
+%\inferrule*[lab=S-Var-Slv]
+%{ \hat{a} = A \in \Gamma}
+%{\Gamma \vdash \hat{a} \leq \hat{a} \dashv \Gamma \rightsquigarrow \hat{a}}
+\\
 
 \inferrule*[lab=S-Ex-L]
 {\hat{a} \in \Gamma}
@@ -255,7 +262,8 @@
 \inferrule*[lab=S-Ex-L-eq]
 {\hat{a} = B \in \Gamma \\
 \Gamma \vdash B <: A \dashv \Gamma' \rightsquigarrow A'}
-{\Gamma \vdash \hat{a} \leq A \dashv \Gamma' \rightsquigarrow A'}
+{\Gamma \vdash \hat{a} \leq A \dashv \Gamma' \rightsquigarrow A}
+\\
 
 \inferrule*[lab=S-Ex-R]
 {\hat{a} \in \Gamma}
@@ -264,14 +272,15 @@
 \inferrule*[lab=S-Ex-R-eq]
 {\hat{a} = B \in \Gamma \\
 \Gamma \vdash A \leq B \dashv \Gamma' \rightsquigarrow A''}
-{\Gamma \vdash A \leq \hat{a} \dashv \Gamma' \rightsquigarrow A''}
+{\Gamma \vdash A \leq \hat{a} \dashv \Gamma' \rightsquigarrow \hat{a}}
 
 \inferrule*[lab=S-Arr]
 {\Gamma \vdash C \leq^* A \dashv \Gamma_1 \rightsquigarrow A' \\
  \Gamma_1 \vdash B \leq D \dashv \Gamma_2 \rightsquigarrow D'}
 {\Gamma \vdash A \rightarrow B \leq C \rightarrow D \dashv \Gamma_2 \rightsquigarrow C \rightarrow D}
+\\
 
-\inferrule*[lab=S-Term-Closed]
+\inferrule*[lab=S-Term-Close]
 { \Gamma \vdash A \Rightarrow e \Rightarrow A'\\
  \Gamma \vdash B \leq^+ \Sigma \dashv \Gamma' \rightsquigarrow D}
 {\Gamma \vdash A \rightarrow B \leq^+ \boxed{e} \leadsto \Sigma \dashv \Gamma' \rightsquigarrow A' \rightarrow D}
@@ -282,6 +291,7 @@
 \Gamma \vdash C \leq^- A \dashv \Gamma_1 \rightsquigarrow A' \\
 \Gamma_1 \vdash B \leq^+ \Sigma \dashv \Gamma_2 \rightsquigarrow D}
 {\Gamma \vdash A \rightarrow B \leq^+ \boxed{e} \leadsto \Sigma \dashv \Gamma_2 \rightsquigarrow C \rightarrow D}
+\\
 
 \inferrule*[lab=S-$\forall$]
 {\Gamma, a \vdash A \leq B \dashv \Gamma', a\rightsquigarrow C}
