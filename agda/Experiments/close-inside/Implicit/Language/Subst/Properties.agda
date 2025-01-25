@@ -203,6 +203,17 @@ postulate
   ↑ty-arr (↑ty-st-comm1 lt stA upT upA stA') (↑ty-st-comm1 lt stA₁ upT upA₁ stA'')
 ↑ty-st-comm1 lt (st-∀ up stA) upT (↑ty-∀ upA) (st-∀ up₁ stA') = ↑ty-∀ (↑ty-st-comm1 (s≤s lt) stA (↑ty-comm0' upT up₁ up) upA stA')
 
+postulate
+  ↑ty-st-comm1' : k₁ #≤ k₂
+                --------------------
+                → ⟦ k₂ / T ⟧ A ⇘ A*
+                --------------------
+                → T ↑ty k₁ ⇘ T'
+                → A ↑ty (inject₁ k₁) ⇘ A'
+                → A* ↑ty k₁ ⇘ A*'
+                --------------------
+                → ⟦ #S k₂ / T' ⟧ A' ⇘ A*'
+
 
 postulate
   st-st-comm : ∀ {k₁ : Fin (1 + m)} {k₂ T U U* U** U*₂ V T* V'}

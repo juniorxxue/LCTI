@@ -49,7 +49,7 @@ s-cloB (s-arr₂ s s₁) = ⊢c-arr (s-cloA s) (s-cloB s₁)
 s-cloB (s-arr₃ cloA s) = ⊢c-arr cloA (s-cloB s)
 s-cloB (s-∀ s) = ⊢c-∀ (s-cloB s)
 s-cloB (s-∀l s ic fd st₁ st₂) with s-cloΓ s
-... | clo-S= r cloA = ⊢c-subst0 (s-cloB s) cloA (st-arr st₁ st₂)
+... | clo-S= r cloA = ⊢c-subst0 (s-cloB s) cloA (st-arr (↑ty-st st₁) (↑ty-st st₂))
 s-cloB (s-var-l x s) = s-cloB s
 s-cloB (s-var-r x s) = ⊢c-var-= (:=to= x)
 

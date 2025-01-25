@@ -113,7 +113,7 @@ sound-s s'@(s-term-o opnA ⊢e s s₁) pr with ≤id0 (sc-sound s)
   in s-arr₂ (s-⊆-prv (sound-s s pr-l) (s-⊆ (sc-sound s₁) pr-r)) (sound-s s₁ pr-r)
 sound-s (s-∀ s) pr = s-∀ (sound-s s (polar-∀ pr))
 sound-s (s-∀l s upᶜ upᵉ st₁ st₂) (polar-r cloΓ cloΣ) = let pr' = polar-r (clo-S^ cloΓ) (⊢cᶜ-weaken^0 cloΣ (↑tyᶜ-e upᵉ upᶜ))
-  in s-∀l (sound-s s pr') (ic-aux (sc-~ s pr')) (sound-find-l0 s cloΓ cloΣ upᵉ upᶜ) st₁ st₂
+  in s-∀l (sound-s s pr') (ic-aux (sc-~ s pr')) (sound-find-l0 s cloΓ cloΣ upᵉ upᶜ) {!!} {!!}
     where ic-aux : Δ ,= B ⊢ ⟨ j , C `→ D ⟩ ~ [ e' ]↝ Σ'
                  → 𝕚𝕔 j
           ic-aux (~I ⊢e s) = case-𝕚
