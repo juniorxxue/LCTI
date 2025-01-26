@@ -1,4 +1,4 @@
-module Implicit.Decl.Base where
+module Implicit.Spec.Base where
 
 open import Implicit.Language
 
@@ -49,14 +49,6 @@ data _⊢_#_≤_ : Env n m → Counter → Type m → Type m → Set where
   s-int :
       (cloΓ : Closed Γ)
     → Γ ⊢ ∞ # Int ≤ Int
-  s-var-∙ :
-      (cloΓ : Closed Γ)
-    → (inΓ : Γ ∋∙ X)
-    → Γ ⊢ ∞ # ‶ X ≤ ‶ X
-  s-var-= :
-      (cloΓ : Closed Γ)
-    → (inΓ : Γ ∋= X)
-    → Γ ⊢ ∞ # ‶ X ≤ ‶ X
   s-arr₁ :
       Γ ⊢ ∞ # C ≤ A
     → Γ ⊢ ∞ # B ≤ D
@@ -73,13 +65,12 @@ data _⊢_#_≤_ : Env n m → Counter → Type m → Type m → Set where
       Γ ,∙ ⊢ ∞ # A ≤ B
     → Γ ⊢ ∞ # `∀ A ≤ `∀ B
   s-∀l :
-      Γ ,= B ⊢ j # A ≤ C' `→ D'
+      ⟦ B ⟧ A ⇘ A*
+    → Γ ⊢ j # A* ≤ C `→ D
   -- we guess a solution of B here, we must make sure this B is provided from the counter
   -- what we does is to make sure the all inputs matching the counter should at least have the quantifer contained
     → (ic : (𝕚𝕔 j))
     → (fd : find A #0 j)
-    → (upC : ↑ty0 C ⇘ C')
-    → (upD : ↑ty0 D ⇘ D')
     → Γ ⊢ j # `∀ A ≤ C `→ D
   -- two atomic rules
   s-var-l : ∀ {X A B}
