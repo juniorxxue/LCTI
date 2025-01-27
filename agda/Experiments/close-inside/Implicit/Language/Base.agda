@@ -21,6 +21,7 @@ data Type : ℕ → Set where
 variable
   A  B  C  D  E  T  : Type m
   A% B% C% D% E% T% : Type m
+  A%' B%' C%' D%'   : Type m
   A* B* C* D* E* T* : Type m
   A*' B*' C*' D*' E*' T*' : Type m
   A' B' C' D' E' T' : Type m
