@@ -1,8 +1,8 @@
-module Implicit.Decl.Properties.SubstAux where
+module Implicit.Interm.Properties.SubstAux where
 
 open import Implicit.Language
-open import Implicit.Decl.Base
-open import Implicit.Decl.Properties.OpenClose
+open import Implicit.Interm.Base
+open import Implicit.Interm.Properties.OpenClose
 
 
 ∋:=-subst : Γ ∋ X := A

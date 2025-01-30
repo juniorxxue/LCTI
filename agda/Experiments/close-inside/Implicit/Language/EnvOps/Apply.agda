@@ -31,15 +31,45 @@ data _≫ˣ_⇘_ where
      → Γ ,= T ≫ˣ #S k ⇘ A%'
 
 data _≫_⇘_ where
-  app-int : Γ ≫ Int ⇘ Int
-  app-var : Γ ≫ˣ X ⇘ A
+  ap-int : Γ ≫ Int ⇘ Int
+  ap-var : Γ ≫ˣ X ⇘ A
           → Γ ≫ (‶ X) ⇘ A
-  app-arr : Γ ≫ A ⇘ A%
+  ap-arr : Γ ≫ A ⇘ A%
           → Γ ≫ B ⇘ B%
           → Γ ≫ (A `→ B) ⇘ A% `→ B%
-  app-∀   : Γ ,∙ ≫ A ⇘ A%
+  ap-∀   : Γ ,∙ ≫ A ⇘ A%
           → Γ ≫ `∀ A ⇘ `∀ A%
 
+
+infix 3 _≫ᵉ_⇘_
+data _≫ᵉ_⇘_ : Env n m → Term n m → Term n m → Set where
+  ap-lit : ∀ {num} → Γ ≫ᵉ lit num ⇘ lit num
+  ap-var : Γ ≫ᵉ (` x) ⇘ (` x)
+  ap-lam : Γ , A ≫ᵉ e ⇘ e%
+         → Γ ≫ᵉ (ƛ e) ⇘ ƛ e%
+  ap-ann : (apA : Γ ≫ A ⇘ A%)
+          → Γ ≫ᵉ e ⇘ e%
+          → Γ ≫ᵉ (e ⦂ A) ⇘ (e% ⦂ A%)
+  ap-app : Γ ≫ᵉ e₁ ⇘ e₁%
+         → Γ ≫ᵉ e₂ ⇘ e₂%
+         → Γ ≫ᵉ (e₁ · e₂) ⇘ e₁% · e₂%
+  ap-tlam : Γ ,∙ ≫ᵉ e ⇘ e%
+         → Γ ≫ᵉ (Λ e) ⇘ Λ e%
+
 _ : (∅ ,= Int ,^ ,= Int) ≫ (‶ #0 `→ ‶ #2) ⇘ Int `→ Int
-_ = app-arr (app-var (Z= app-int ↑ty-int))
-            (app-var (S= (S^ (Z= app-int ↑ty-int) ↑ty-int) ↑ty-int))
+_ = ap-arr (ap-var (Z= ap-int ↑ty-int))
+            (ap-var (S= (S^ (Z= ap-int ↑ty-int) ↑ty-int) ↑ty-int))
+
+infix 3 _≫ᵍ_
+data _≫ᵍ_ : Env n m → Env n m → Set where
+  ap-Z : ∅ ≫ᵍ ∅
+  ap-S, : Γ ≫ᵍ Γ%
+        → Γ ≫ A ⇘ A%
+        → Γ , A ≫ᵍ Γ% , A%
+  ap-S∙ : Γ ≫ᵍ Γ%
+        → Γ ,∙ ≫ᵍ Γ% ,∙
+  ap-S^ : Γ ≫ᵍ Γ%
+        → Γ ,^ ≫ᵍ Γ% ,^
+  ap-S= : Γ ≫ᵍ Γ%
+        → Γ ≫ A ⇘ A%
+        → Γ ,= A ≫ᵍ Γ% ,= A%

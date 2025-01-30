@@ -1,8 +1,8 @@
-module Implicit.Decl.Properties.WeakenTyping where
+module Implicit.Interm.Properties.WeakenTyping where
 
 open import Implicit.Language
-open import Implicit.Decl.Base
-open import Implicit.Decl.Properties.Weaken
+open import Implicit.Interm.Base
+open import Implicit.Interm.Properties.Weaken
 
 ----------------------------------------------------------------------
 --+                       weaken for typing                        +--

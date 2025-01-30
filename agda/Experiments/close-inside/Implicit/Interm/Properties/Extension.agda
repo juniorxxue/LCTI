@@ -1,8 +1,8 @@
-module Implicit.Decl.Properties.Extension where
+module Implicit.Interm.Properties.Extension where
 
 open import Implicit.Language
-open import Implicit.Decl.Base
-open import Implicit.Decl.Properties.OpenClose
+open import Implicit.Interm.Base
+open import Implicit.Interm.Properties.OpenClose
 
 s-⊆-prv : Γ ⊢ j # A ≤ B
         → Γ ⊆ Δ

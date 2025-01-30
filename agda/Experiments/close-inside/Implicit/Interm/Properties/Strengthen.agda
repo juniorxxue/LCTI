@@ -1,7 +1,7 @@
-module Implicit.Decl.Properties.Strengthen where
+module Implicit.Interm.Properties.Strengthen where
 
 open import Implicit.Language
-open import Implicit.Decl.Base
+open import Implicit.Interm.Base
 
 s-strengthen, : Γ ⊢ j # A ≤ B
               → Γ ◀ k ,⇘ Γ'

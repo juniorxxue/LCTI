@@ -1,10 +1,10 @@
-module Implicit.Decl.Properties.Subst where
+module Implicit.Interm.Properties.Subst where
 
 open import Implicit.Language
-open import Implicit.Decl.Base
-open import Implicit.Decl.Properties.OpenClose
-open import Implicit.Decl.Properties.Subtyping
-open import Implicit.Decl.Properties.SubstAux
+open import Implicit.Interm.Base
+open import Implicit.Interm.Properties.OpenClose
+open import Implicit.Interm.Properties.Subtyping
+open import Implicit.Interm.Properties.SubstAux
 
 ◀=-closedT : Γ ◀ k := T ⇘ Γ*
           → Closed Γ
@@ -54,12 +54,12 @@ s-subst (s-arr₃ cloA s) newΓ (st-arr stA stA₁) (st-arr stB stB₁) with st-
 ... | refl = s-arr₃ (⊢c-subst cloA newΓ (◀=-closedT newΓ (s-cloΓ s)) stA) (s-subst s newΓ stA₁ stB₁)
 s-subst (s-∀ s) newΓ (st-∀ up stA) (st-∀ up₁ stB) with ↑ty-unique up up₁
 ... | refl = s-∀ (s-subst s (◀S∙ newΓ up) stA stB)
-s-subst {k = k} {T} (s-∀l {B = B} {C = C} {D = D} s ic fd up₁ up₂) newΓ (st-∀ {A' = A'} up stA) (st-arr {B* = B*} {C* = C*} stB stC)
-  with st-total T k B | ↑ty0-total B* | ↑ty0-total C*
-... | ⟨ _ , stB' ⟩ | ⟨ B*' , up-B* ⟩ | ⟨ C*' , up-C* ⟩ =
-  s-∀l (s-subst s (◀S= newΓ up stB') stA
-    (st-arr (↑ty-st-comm1' z≤n stB up up₁ up-B*) (↑ty-st-comm1' z≤n stC up up₂ up-C*))) ic
-    (find-st0 fd up stA) up-B* up-C*
+s-subst {k = k} {T} (s-∀l {B = B} {C = C} {D = D} s ic fd st₁ st₂) newΓ (st-∀ {A' = A'} up stA) (st-arr stB stB₁)
+  with st-total T k B | st-total A' (#S k) C | st-total A' (#S k) D
+... | ⟨ B* , stB' ⟩ | ⟨ C* , stC ⟩ | ⟨ D* , stD ⟩ = s-∀l (s-subst s (◀S= newΓ up stB') stA (st-arr stC stD)) ic
+  (find-st0 fd up stA)
+  (st-st-comm z≤n st₁ stB up stC stB')
+  (st-st-comm z≤n st₂ stB₁ up stD stB')
 -- var-l
 s-subst {k = k} {T = T} (s-var-l inΓ s) newΓ (st-var stx-eq) stB with ↑ty-total T k
 ... | ⟨ T' , upT ⟩ with ◀=-imply-∋:= newΓ upT

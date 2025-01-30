@@ -1,7 +1,7 @@
-module Implicit.Decl.Properties.Subtyping where
+module Implicit.Interm.Properties.Subtyping where
 
 open import Implicit.Language
-open import Implicit.Decl.Base
+open import Implicit.Interm.Base
 
 ⊢sub' : Γ ⊢ Z # e ⦂ B
       → Γ ⊢ j # B ≤ A

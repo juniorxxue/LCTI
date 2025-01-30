@@ -1,40 +1,6 @@
-module Implicit.Spec.Base where
+module Implicit.Interm.Base where
 
 open import Implicit.Language
-
-data Counter : Set where
-  Z : Counter
-  ∞ : Counter
-  𝕚 : Counter → Counter
-  𝕔 : Counter → Counter
-
-variable
-  j : Counter
-
-data NonZ : Counter → Set where
-  nz-∞ : NonZ ∞
-  nz-I : NonZ (𝕚 j)
-  nz-C : NonZ (𝕔 j)
-
-data 𝕚𝕔 : Counter → Set where
-  case-𝕚 : 𝕚𝕔 (𝕚 j)
-  case-𝕔 : 𝕚𝕔 (𝕔 j)
-
--- find A k j
--- at j-th position of A type, should have a bound variable, example: |-1 forall a. a -> a <: Int
-data find : Type m → Fin m → Counter → Set where
-  f-∞       : k ε A
-            → find A k ∞
-  f-arr-𝕚-l : k ε A
-            → find (A `→ B) k (𝕚 j)
-  f-arr-𝕚-r : find B k j
-            → find (A `→ B) k (𝕚 j)
-  f-arr-𝕔   : (¬inA : ¬ (k ε A))
-            → find B k j
-            → find (A `→ B) k (𝕔 j)
-  f-∀       : find A (#S k) j
-            → find (`∀ A) k j
-
 
 ----------------------------------------------------------------------
 --+                           Subtyping                            +--
@@ -49,6 +15,14 @@ data _⊢_#_≤_ : Env n m → Counter → Type m → Type m → Set where
   s-int :
       (cloΓ : Closed Γ)
     → Γ ⊢ ∞ # Int ≤ Int
+  s-var-∙ :
+      (cloΓ : Closed Γ)
+    → (inΓ : Γ ∋∙ X)
+    → Γ ⊢ ∞ # ‶ X ≤ ‶ X
+  s-var-= :
+      (cloΓ : Closed Γ)
+    → (inΓ : Γ ∋= X)
+    → Γ ⊢ ∞ # ‶ X ≤ ‶ X
   s-arr₁ :
       Γ ⊢ ∞ # C ≤ A
     → Γ ⊢ ∞ # B ≤ D
@@ -65,13 +39,16 @@ data _⊢_#_≤_ : Env n m → Counter → Type m → Type m → Set where
       Γ ,∙ ⊢ ∞ # A ≤ B
     → Γ ⊢ ∞ # `∀ A ≤ `∀ B
   s-∀l :
-      ⟦ B ⟧ A ⇘ A*
-    → Γ ⊢ j # A* ≤ C `→ D
+      Γ ,= B ⊢ j # A ≤ C `→ D
   -- we guess a solution of B here, we must make sure this B is provided from the counter
   -- what we does is to make sure the all inputs matching the counter should at least have the quantifer contained
     → (ic : (𝕚𝕔 j))
     → (fd : find A #0 j)
-    → Γ ⊢ j # `∀ A ≤ C `→ D
+--    → (upC : ↑ty0 C ⇘ C')
+    → (stC : ⟦ B ⟧ C ⇘ C*)
+--    → (upD : ↑ty0 D ⇘ D')
+    → (stD : ⟦ B ⟧ D ⇘ D*)
+    → Γ ⊢ j # `∀ A ≤ C* `→ D*
   -- two atomic rules
   s-var-l : ∀ {X A B}
     → (inΓ : Γ ∋ X := B)
