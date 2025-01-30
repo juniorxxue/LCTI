@@ -20,6 +20,8 @@ data Type : ℕ → Set where
 
 variable
   A  B  C  D  E  T  : Type m
+  A% B% C% D% E% T% : Type m
+  A%' B%' C%' D%'   : Type m
   A* B* C* D* E* T* : Type m
   A*' B*' C*' D*' E*' T*' : Type m
   A' B' C' D' E' T' : Type m
@@ -37,6 +39,7 @@ data Term : ℕ → ℕ → Set where
 
 variable
   e  e' e* : Term n m
+  e% e%' e₁% e₂% : Term n m
   e₁  e₂  : Term n m
   e₁' e₂' : Term n m
   g : Term n m -- reserved for generic consumers
@@ -60,5 +63,6 @@ data Env : ℕ → ℕ → Set where
 
 variable
   Γ Γ' Γ'' Γ₁ Γ₂ Γ₃ Γ* : Env n m
+  Γ% : Env n m
   Δ Δ' Δ₁ Δ₂ : Env n m
-  Ψ : Env n m
+  Ψ Ω : Env n m

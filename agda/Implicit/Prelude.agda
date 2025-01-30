@@ -30,8 +30,8 @@ n-1+1≡n+1-1 (s≤s 0<n) = refl
 
 m+1≰n+1⇒m≰n : suc m ≰ suc n
             → m ≰ n
-m+1≰n+1⇒m≰n m+1≰n+1 = λ m≤n → m+1≰n+1 (s≤s m≤n)  
-  
+m+1≰n+1⇒m≰n m+1≰n+1 = λ m≤n → m+1≰n+1 (s≤s m≤n)
+
 m≰n⇒n<m : m ≰ n
         → n < m
 m≰n⇒n<m {zero} {zero} m≰n = ⊥-elim (m≰n z≤n)
@@ -72,6 +72,10 @@ variable
   x y : Fin n
   k k' k₁ k₂ X Y : Fin m
 
+inject₂ : Fin n → Fin (suc (suc n))
+inject₂ #0 = #0
+inject₂ (#S k) = #S (inject₂ k)
+
 ≢-pred : #S x ≢ #S y
        → x ≢ y
 ≢-pred neq eq = neq (cong #S eq)
@@ -105,7 +109,7 @@ punchIn-inject-neq {X = #S X} {k = #S k} {#0} lt neq = λ ()
 punchIn-inject-neq {X = #0} {k = #S k} {#S k'} lt neq = λ ()
 punchIn-inject-neq {X = #S X} {k = #S k} {#S k'} (s≤s lt) neq = ≢-suc (punchIn-inject-neq lt (≢-pred neq))
 
-punchIn-comm : ∀ {x : Fin n} {j k} 
+punchIn-comm : ∀ {x : Fin n} {j k}
    → j #≤ k
    → punchIn (inject₁ j) (punchIn k x) ≡
       punchIn (#S k) (punchIn j x)

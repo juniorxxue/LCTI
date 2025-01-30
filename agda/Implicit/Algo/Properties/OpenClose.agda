@@ -17,10 +17,11 @@ open import Implicit.Algo.Properties.Extension
 
 ⊢cᶜ-weaken,0 : Γ ⊢cᶜ Σ
              → ↑tmᶜ0 Σ ⇘ Σ'
+             → Γ ⊢c A
              → Γ , A ⊢cᶜ Σ'
-⊢cᶜ-weaken,0 ⊢c-empty ↑tmᶜ-□ = ⊢c-empty
-⊢cᶜ-weaken,0 (⊢c-τ cloA) ↑tmᶜ-τ = ⊢c-τ (⊢c-weaken,0 cloA)
-⊢cᶜ-weaken,0 (⊢c-term cloe cloΣ) (↑tmᶜ-e up-e upΣ) = ⊢c-term (⊢cᵉ-weaken,0 cloe up-e) (⊢cᶜ-weaken,0 cloΣ upΣ)
+⊢cᶜ-weaken,0 ⊢c-empty ↑tmᶜ-□ cloA = ⊢c-empty
+⊢cᶜ-weaken,0 (⊢c-τ cloA) ↑tmᶜ-τ cloA' = ⊢c-τ (⊢c-weaken,0 cloA cloA')
+⊢cᶜ-weaken,0 (⊢c-term cloe cloΣ) (↑tmᶜ-e up-e upΣ) cloA = ⊢c-term (⊢cᵉ-weaken,0 cloe up-e cloA) (⊢cᶜ-weaken,0 cloΣ upΣ cloA)
 
 ⊢cᶜ-strengthen,0 : Γ , A ⊢cᶜ Σ'
                 → ↑tmᶜ0 Σ ⇘ Σ'
@@ -33,19 +34,19 @@ open import Implicit.Algo.Properties.Extension
 --+                           Extension                            +--
 ----------------------------------------------------------------------
 
-⊆-closedᵉ : Γ ⊢cᵉ e
-          → Γ ⊆ Γ'
-          → Γ' ⊢cᵉ e
-⊆-closedᵉ ⊢c-lit ss = ⊢c-lit
-⊆-closedᵉ ⊢c-var ss = ⊢c-var
-⊆-closedᵉ (⊢c-lam clo) ss = ⊢c-lam (⊆-closedᵉ clo (var ss))
-⊆-closedᵉ (⊢c-app clo clo₁) ss = ⊢c-app (⊆-closedᵉ clo ss) (⊆-closedᵉ clo₁ ss)
-⊆-closedᵉ (⊢c-ann x clo) ss = ⊢c-ann (⊆-closed x ss) (⊆-closedᵉ clo ss)
-⊆-closedᵉ (⊢c-tlam clo) ss = ⊢c-tlam (⊆-closedᵉ clo (uvar ss))
+⊆-cloAᵉ : Γ ⊢cᵉ e
+        → Γ ⊆ Γ'
+        → Γ' ⊢cᵉ e
+⊆-cloAᵉ ⊢c-lit ss = ⊢c-lit
+⊆-cloAᵉ ⊢c-var ss = ⊢c-var
+⊆-cloAᵉ (⊢c-lam clo) ss = ⊢c-lam (⊆-cloAᵉ clo (var ss))
+⊆-cloAᵉ (⊢c-app clo clo₁) ss = ⊢c-app (⊆-cloAᵉ clo ss) (⊆-cloAᵉ clo₁ ss)
+⊆-cloAᵉ (⊢c-ann x clo) ss = ⊢c-ann (⊆-cloA x ss) (⊆-cloAᵉ clo ss)
+⊆-cloAᵉ (⊢c-tlam clo) ss = ⊢c-tlam (⊆-cloAᵉ clo (uvar ss))
 
-⊆-closedᶜ : Γ ⊢cᶜ Σ
-          → Γ ⊆ Γ'
-          → Γ' ⊢cᶜ Σ
-⊆-closedᶜ ⊢c-empty ss = ⊢c-empty
-⊆-closedᶜ (⊢c-τ cloA) ss = ⊢c-τ (⊆-closed cloA ss)
-⊆-closedᶜ (⊢c-term cloe clo) ss = ⊢c-term (⊆-closedᵉ cloe ss) (⊆-closedᶜ clo ss)
+⊆-cloAᶜ : Γ ⊢cᶜ Σ
+        → Γ ⊆ Γ'
+        → Γ' ⊢cᶜ Σ
+⊆-cloAᶜ ⊢c-empty ss = ⊢c-empty
+⊆-cloAᶜ (⊢c-τ cloA) ss = ⊢c-τ (⊆-cloA cloA ss)
+⊆-cloAᶜ (⊢c-term cloe clo) ss = ⊢c-term (⊆-cloAᵉ cloe ss) (⊆-cloAᶜ clo ss)

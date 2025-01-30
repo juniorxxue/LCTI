@@ -51,7 +51,7 @@ data ⟦_/_⟧ˣ_⇘_ : Fin (1 + m) → Type m → Fin (1 + m) → Type m → Se
   stx-eq  : ⟦ k / A ⟧ˣ k ⇘ A
   stx-neq : (¬p : k ≢ X)
           → ⟦ k / A ⟧ˣ X ⇘ ‶ punchOut {i = k} {j = X} ¬p
-  
+
 
 -- type subst
 infix 3 ⟦_/_⟧_⇘_
@@ -62,26 +62,27 @@ data ⟦_/_⟧_⇘_ : Fin (1 + m) → Type m → Type (1 + m) → Type m → Set
       (stx : ⟦ k / A ⟧ˣ X ⇘ B)
     → ⟦ k / A ⟧ (‶ X) ⇘ B
   st-arr :
-      ⟦ k / A ⟧ B ⇘ B'
-    → ⟦ k / A ⟧ C ⇘ C'
-    → ⟦ k / A ⟧ (B `→ C) ⇘ B' `→ C'
+      ⟦ k / A ⟧ B ⇘ B*
+    → ⟦ k / A ⟧ C ⇘ C*
+    → ⟦ k / A ⟧ (B `→ C) ⇘ B* `→ C*
   st-∀ :
       (up : ↑ty0 A ⇘ A')
     → ⟦ #S k / A' ⟧ B ⇘ B'
     → ⟦ k / A ⟧ (`∀ B) ⇘ `∀ B'
 
+infix 3 ⟦_⟧_⇘_
 ⟦_⟧_⇘_ : Type m → Type (1 + m) → Type m → Set
 ⟦_⟧_⇘_ = ⟦_/_⟧_⇘_ #0
 
 -- type subst in term
-infix 5 ⟦_/_⟧ᵉ_⇘_
+infix 3 ⟦_/_⟧ᵉ_⇘_
 data ⟦_/_⟧ᵉ_⇘_ : Fin (1 + m) → Type m → Term n (1 + m) → Term n m → Set where
   st-lit :
       ⟦ k / A ⟧ᵉ lit i ⇘ (Term n m ∋⦂ lit i)
   st-var :
       ⟦ k / A ⟧ᵉ ` x ⇘ (Term n m ∋⦂ ` x)
-  st-ƛ : ∀ {k A e e'}
-    → ⟦ k / A ⟧ᵉ e ⇘ e'
+  st-ƛ :
+      ⟦ k / A ⟧ᵉ e ⇘ e'
     → ⟦ k / A ⟧ᵉ (ƛ e) ⇘ (Term n m ∋⦂ ƛ e')
   st-· :
       ⟦ k / A ⟧ᵉ e₁ ⇘ e₁'
@@ -92,5 +93,11 @@ data ⟦_/_⟧ᵉ_⇘_ : Fin (1 + m) → Type m → Term n (1 + m) → Term n m 
     → (st : ⟦ k / A ⟧ B ⇘ B')
     → ⟦ k / A ⟧ᵉ (e ⦂ B) ⇘ (Term n m ∋⦂ e' ⦂ B')
   st-Λ :
-      ⟦ #S k / ↑ty0 A ⟧ᵉ e ⇘ e'
+      ⟦ #S k / A' ⟧ᵉ e ⇘ e'
+    → (up : ↑ty0 A ⇘ A')
     → ⟦ k / A ⟧ᵉ (Λ e) ⇘ (Term n m ∋⦂ Λ e')
+
+
+infix 3 ⟦_⟧ᵉ_⇘_
+⟦_⟧ᵉ_⇘_ : Type m → Term n (1 + m) → Term n m → Set
+⟦_⟧ᵉ_⇘_ = ⟦_/_⟧ᵉ_⇘_ #0

@@ -48,11 +48,11 @@ s-trans (s-empty clo) s2 ≊Z = s2
 s-trans (s-term-c ⊢e s1) (s-term-c ⊢e₁ s2) (≊S newΣ) with ⊢id0 ⊢e | ⊢id0 ⊢e₁
 ... | refl | refl = s-term-c ⊢e (s-trans s1 s2 newΣ)
 s-trans (s-term-c ⊢e s1) (s-term-o opnA ⊢e₁ s2 s3) newΣ =
-  ⊥-elim (⊢c-⊢o-disjoint (⊆-closed (⊢closeA ⊢e) (s-⊆ s1)) opnA)
+  ⊥-elim (⊢c-⊢o-disjoint (⊆-cloA (⊢closeA ⊢e) (s-⊆ s1)) opnA)
 s-trans (s-term-o opnA ⊢e s1 s3) (s-term-c ⊢e₁ s2) (≊S newΣ) with ⊢id0 ⊢e₁
 ... | refl = s-term-o opnA ⊢e s1 (s-trans s3 s2 newΣ)
 s-trans s@(s-term-o opnA ⊢e s1 s3) (s-term-o opnA₁ ⊢e₁ s2 s4) newΣ =
-  ⊥-elim (⊢c-⊢o-disjoint (⊆-closed (⊢closeA ⊢e) (s-⊆ s)) opnA₁)
+  ⊥-elim (⊢c-⊢o-disjoint (⊆-cloA (⊢closeA ⊢e) (s-⊆ s)) opnA₁)
 s-trans (s-∀l s1 upᶜ upᵉ st₁ st₂) (s-term-c ⊢e s2) newΣ with ⊢id0 ⊢e
 ... | refl = s-∀l (s-trans s1 (s-term-c {!⊢e!} {!!}) {!!}) {!!} {!!} st₁ {!!}
 s-trans (s-∀l s1 upᶜ upᵉ st₁ st₂) (s-term-o opnA ⊢e s2 s3) newΣ = {!!}

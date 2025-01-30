@@ -2,37 +2,6 @@ module Implicit.Decl.Base where
 
 open import Implicit.Language
 
-data Counter : Set where
-  Z : Counter
-  ∞ : Counter
-  𝕚 : Counter → Counter
-  𝕔 : Counter → Counter
-
-variable
-  j : Counter
-
-data NonZ : Counter → Set where
-  nz-∞ : NonZ ∞
-  nz-I : NonZ (𝕚 j)
-  nz-C : NonZ (𝕔 j)
-
-data 𝕚𝕔 : Counter → Set where
-  case-𝕚 : 𝕚𝕔 (𝕚 j)
-  case-𝕔 : 𝕚𝕔 (𝕔 j)
-
--- find A k j
--- at j-th position of A type, should have a bound variable, example: |-1 forall a. a -> a <: Int 
-data find : Type m → Fin m → Counter → Set where
-  f-∞       : k ε A
-            → find A k ∞
-  f-arr-𝕚-l : k ε A
-            → find (A `→ B) k (𝕚 j)
-  f-arr-𝕚-r : find B k j
-            → find (A `→ B) k (𝕚 j)
-  f-arr-𝕔   : find B k j
-            → find (A `→ B) k (𝕔 j)    
-  f-∀       : find A (#S k) j
-            → find (`∀ A) k j
 
 
 ----------------------------------------------------------------------
@@ -42,11 +11,16 @@ data find : Type m → Fin m → Counter → Set where
 infix 3 _⊢_#_≤_
 data _⊢_#_≤_ : Env n m → Counter → Type m → Type m → Set where
   s-refl :
-      Γ ⊢ Z # A ≤ A
+      (cloΓ : Norm Γ)
+    → (cloA : Γ ⊢n A)
+    → Γ ⊢ Z # A ≤ A
   s-int :
-      Γ ⊢ ∞ # Int ≤ Int
-  s-var :
-      Γ ⊢ ∞ # ‶ X ≤ ‶ X
+      (cloΓ : Norm Γ)
+    → Γ ⊢ ∞ # Int ≤ Int
+  s-var-∙ :
+      (cloΓ : Norm Γ)
+    → (inΓ : Γ ∋∙ X)
+    → Γ ⊢ ∞ # ‶ X ≤ ‶ X
   s-arr₁ :
       Γ ⊢ ∞ # C ≤ A
     → Γ ⊢ ∞ # B ≤ D
@@ -56,29 +30,21 @@ data _⊢_#_≤_ : Env n m → Counter → Type m → Type m → Set where
     → Γ ⊢ j # B ≤ D
     → Γ ⊢ 𝕚 j # A `→ B ≤ C `→ D
   s-arr₃ :
-      Γ ⊢ j # B ≤ D
-    → Γ ⊢ 𝕔 j # A `→ B ≤ A `→ D    
+      (cloA : Γ ⊢n A)
+    → Γ ⊢ j # B ≤ D
+    → Γ ⊢ 𝕔 j # A `→ B ≤ A `→ D
   s-∀ :
       Γ ,∙ ⊢ ∞ # A ≤ B
     → Γ ⊢ ∞ # `∀ A ≤ `∀ B
   s-∀l :
-      Γ ,= B ⊢ j # A ≤ C `→ D
+      ⟦ B ⟧ A ⇘ A*
+    → Γ ⊢ j # A* ≤ C `→ D
   -- we guess a solution of B here, we must make sure this B is provided from the counter
   -- what we does is to make sure the all inputs matching the counter should at least have the quantifer contained
     → (ic : (𝕚𝕔 j))
     → (fd : find A #0 j)
-    → (st₁ : ⟦ B ⟧ C ⇘ C')
-    → (st₂ : ⟦ B ⟧ D ⇘ D')
-    → Γ ⊢ j # `∀ A ≤ C' `→ D'
-  -- two atomic rules
-  s-var-l : ∀ {X A B}
-    → Γ ∋ X := B
-    → Γ ⊢ ∞ # B ≤ A
-    → Γ ⊢ ∞ # ‶ X ≤ A
-  s-var-r : ∀ {X A B}
-    → Γ ∋ X := B
-    → Γ ⊢ ∞ # A ≤ B
-    → Γ ⊢ ∞ # A ≤ ‶ X    
+    → Γ ⊢ j # `∀ A ≤ C `→ D
+
 
 ----------------------------------------------------------------------
 --+                             Typing                             +--
@@ -87,9 +53,11 @@ data _⊢_#_≤_ : Env n m → Counter → Type m → Type m → Set where
 infix 3 _⊢_#_⦂_
 data _⊢_#_⦂_ : Env n m → Counter → Term n m → Type m → Set where
   ⊢lit : ∀ {num : ℕ}
+    → (cloΣ : Norm Γ)
     → Γ ⊢ Z # (lit num) ⦂ Int
   ⊢var :
-      (x∈Γ : Γ ∋ x ⦂ A)
+      (cloΣ : Norm Γ)
+    → (x∈Γ : Γ ∋ x ⦂ A)
     → Γ ⊢ Z # ` x ⦂ A
   ⊢ann :
       Γ ⊢ ∞ # e ⦂ A
@@ -116,6 +84,6 @@ data _⊢_#_⦂_ : Env n m → Counter → Term n m → Type m → Set where
   ⊢tabs :
       Γ ,∙ ⊢ Z # e ⦂ A
     → Γ ⊢ Z # Λ e ⦂ `∀ A
-    
+
 -- small note: e @ A must be inferreable, and in the form of
 -- (e @ A) e', e' could only be checked

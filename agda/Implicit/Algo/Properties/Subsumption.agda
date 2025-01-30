@@ -104,11 +104,11 @@ s-refined-p (s-ex-l= x-in s) pr = s-refl
 s-refined-p (s-ex-r^ x-in inst) pr = s-refl
 s-refined-p (s-ex-r= x-in s) pr = s-refl
 s-refined-p (s-arr s s₁) pr = s-refl
-s-refined-p (s-term-c ⊢e s) (polar-r cloΓ (⊢c-term cloe cloΣ)) with ⊢id0 ⊢e
-... | refl = s-term-c (t-⊆-prv ⊢e (s-⊆ s) (s-closed-env s (polar-r cloΓ cloΣ))) (s-refined-p s (polar-r cloΓ cloΣ))
+s-refined-p (s-term-c ⊢e s) pr'@(polar-r cloΓ (⊢c-term cloe cloΣ)) with ⊢id0 ⊢e
+... | refl = s-term-c (t-⊆-prv ⊢e (s-⊆ s (polar-tm-r pr')) (s-closed-env s (polar-r cloΓ cloΣ))) (s-refined-p s (polar-r cloΓ cloΣ))
 s-refined-p s'@(s-term-o opnA ⊢e s s₁) pr'@(polar-r cloΓ (⊢c-term cloe cloΣ)) =
-  s-term-c (t-⊆-prv (subsumption0 ⊢e s-refl (⊢c-τ (⊢closeA ⊢e))) (s-⊆ s') (s-closed-env s' pr'))
-           (s-refined-p s₁ (polar-r (s-closed-env s (polar-l cloΓ (⊢closeA ⊢e))) (⊆-closedᶜ cloΣ (s-⊆ s))))
+  s-term-c (t-⊆-prv (subsumption0 ⊢e s-refl (⊢c-τ (⊢closeA ⊢e))) (s-⊆ s' pr') (s-closed-env s' pr'))
+           (s-refined-p s₁ (polar-r (s-closed-env s (polar-l cloΓ (⊢closeA ⊢e))) (⊆-cloAᶜ cloΣ (s-⊆ s (polar-l cloΓ (⊢closeA ⊢e))))))
 s-refined-p (s-∀ s) pr = s-∀ (s-refined-p s (polar-∀ pr))
 s-refined-p (s-∀l s upᶜ upᵉ st₁ st₂) (polar-r cloΓ cloΣ) =
   s-subst (s-refined-p s (polar-r (clo-S^ cloΓ) (⊢cᶜ-weaken^0 cloΣ (↑tyᶜ-e upᵉ upᶜ))))
@@ -137,8 +137,7 @@ s-refined (s-∀l s upᶜ upᵉ st₁ st₂) = {!s-refined-p s ?!}
 ⊢to≤ (⊢ann ⊢e) = s-empty (⊢close-τ ⊢e)
 ⊢to≤ (⊢app ⊢e) with ⊢to≤ ⊢e
 ... | s-term-c ⊢e₁ r = r
-... | s-term-o opnA ⊢e₁ r r₁ with ⊆-id (s-⊆ r) (s-⊆ r₁)
-... | refl = r₁
+... | s-term-o opnA ⊢e₁ r r₁ = ⊥-elim (⊢c-⊢o-disjoint (⊢closeA ⊢e₁) opnA)
 ⊢to≤ (⊢lam₁ ⊢e) with ⊢id0 ⊢e
 ... | refl = s-refl
 ⊢to≤ (⊢lam₂ ⊢e up-c ⊢e₁) = s-term-c (subsumption0 ⊢e s-refl (⊢c-τ (⊢closeA ⊢e))) (s-strengthen,0 (⊢to≤ ⊢e₁) up-c)

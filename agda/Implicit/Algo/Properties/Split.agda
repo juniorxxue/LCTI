@@ -8,7 +8,7 @@ sspl-unique :
     ⟦ Σ , A ⟧→s⟦ Σ₁ ,  A₁ ⟧
   → ⟦ Σ , A ⟧→s⟦ Σ₂ ,  A₂ ⟧
   → Σ₁ ≡ Σ₂ × A₁ ≡ A₂
-sspl-unique none-□ none-□ = ⟨ refl , refl ⟩  
+sspl-unique none-□ none-□ = ⟨ refl , refl ⟩
 sspl-unique none-τ none-τ = ⟨ refl , refl ⟩
 sspl-unique (have-e spl1) (have-e spl2) = sspl-unique spl1 spl2
 

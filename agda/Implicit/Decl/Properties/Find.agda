@@ -1,3 +1,4 @@
+{-# OPTIONS --allow-unsolved-metas #-}
 module Implicit.Decl.Properties.Find where
 
 open import Implicit.Language
@@ -11,7 +12,7 @@ open import Implicit.Decl.Base
 ↑ty-find (f-∞ x) up x<k = f-∞ (↑ty-ε x up x<k)
 ↑ty-find (f-arr-𝕚-l x) (↑ty-arr up up₁) x<k = f-arr-𝕚-l (↑ty-ε x up x<k)
 ↑ty-find (f-arr-𝕚-r fd) (↑ty-arr up up₁) x<k = f-arr-𝕚-r (↑ty-find fd up₁ x<k)
-↑ty-find (f-arr-𝕔 fd) (↑ty-arr up up₁) x<k = f-arr-𝕔 (↑ty-find fd up₁ x<k)
+↑ty-find (f-arr-𝕔 nin fd) (↑ty-arr up up₁) x<k = f-arr-𝕔 {!!} (↑ty-find fd up₁ x<k)
 ↑ty-find (f-∀ fd) (↑ty-∀ up) x<k = f-∀ (↑ty-find fd up (s≤s x<k))
 
 ↑ty-find0 : find A #0 j

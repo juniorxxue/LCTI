@@ -291,7 +291,6 @@ s-extend-r (s-arr s s₁) cloΓ (⊢c-arr cloA cloA₁) = ext-arr (s-extend-l s 
   (s-extend-r s₁ (s-closed-env s (polar-r cloΓ (⊢c-τ cloA))) (⊆-cloA cloA₁ (s-⊆ s (polar-r cloΓ (⊢c-τ cloA)))))
 s-extend-r (s-∀ s) cloΓ (⊢c-∀ cloA) = ext-∀ (s-extend-r s (clo-S∙ cloΓ) cloA)
 
-{-
 env-◆◇-false : Γ ◇ k ⇘ Γ₁
              → Γ ◆ k ⇘ Γ₂
              → ⊥
@@ -300,10 +299,11 @@ env-◆◇-false (◇S∙ newΓ1) (◆S∙ newΓ2) = env-◆◇-false newΓ1 new
 env-◆◇-false (◇S= newΓ1) (◆S= newΓ2) = env-◆◇-false newΓ1 newΓ2
 env-◆◇-false (◇S^ newΓ1) (◆S^ newΓ2) = env-◆◇-false newΓ1 newΓ2
 
+{-
 -- let's try to take a merge approach
 ext-◆◇ : Γ ⊆ Δ w/t A
        → Γ ◇ k ⇘ Γ'
-       → Δ ◆ k ⇘ Δ'
+       → Δ ◆ k ⇘ Δ' -- 3 above implies k ε A
        → Γ' ⊆ Δ' w/t A
 
 ext-◇◇ : Γ ⊆ Δ w/t A
@@ -318,7 +318,7 @@ ext-◆◆ : Γ ⊆ Δ w/t A
 
 ext-◆◇ ext-int newΓ newΔ = ⊥-elim (env-◆◇-false newΓ newΔ)
 ext-◆◇ (ext-var x) newΓ newΔ = ext-var {!!}
-ext-◆◇ (ext-arr ext ext₁) newΓ newΔ = ext-arr {!!} {!!}
+ext-◆◇ (ext-arr ext ext₁) newΓ newΔ = ext-arr (ext-◆◇ ext newΓ {!!}) (ext-◆◇ ext₁ {!!} {!!})
 -- ext-arr (ext-◆◇ ext newΓ {!!}) (ext-◆◇ ext₁ {!!} newΔ)
 ext-◆◇ (ext-∀ ext) newΓ newΔ = ext-∀ (ext-◆◇ ext (◇S∙ newΓ) (◆S∙ newΔ))
 -}

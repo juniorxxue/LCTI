@@ -5,6 +5,9 @@ open import Implicit.Language.Lookup
 open import Implicit.Language.Shift
 open import Implicit.Language.Subst
 open import Implicit.Language.OpenClose.Base
+open import Implicit.Language.EnvOps.Base
+open import Implicit.Language.EnvOps.Insert
+open import Implicit.Language.EnvOps.Remove
 
 -- subst lemma implies this, only with condition Γ ⊢c T, but obviously we need less to prove this lemam
 ⊢c-strengthen, : Γ ⊢c A
@@ -93,3 +96,17 @@ open import Implicit.Language.OpenClose.Base
                  → ↑tm0 e ⇘ e'
                  → Γ ⊢cᵉ e
 ⊢cᵉ-strengthen,0 clo-e up-e = ⊢cᵉ-strengthen, clo-e ◀Z up-e
+
+----------------------------------------------------------------------
+--+                             closed                             +--
+----------------------------------------------------------------------
+
+
+closed-strengthen, : Closed Γ
+                   → Γ ◀ k ,⇘ Γ'
+                   → Closed Γ'
+closed-strengthen, (clo-S, cloΓ cloA) ◀Z = cloΓ
+closed-strengthen, (clo-S, cloΓ cloA) (◀S, newΓ) = clo-S, (closed-strengthen, cloΓ newΓ) (⊢c-strengthen, cloA newΓ)
+closed-strengthen, (clo-S∙ cloΓ) (◀S∙ newΓ) = clo-S∙ (closed-strengthen, cloΓ newΓ)
+closed-strengthen, (clo-S^ cloΓ) (◀S^ newΓ) = clo-S^ (closed-strengthen, cloΓ newΓ)
+closed-strengthen, (clo-S= cloΓ cloA) (◀S= newΓ) = clo-S= (closed-strengthen, cloΓ newΓ) (⊢c-strengthen, cloA newΓ)
