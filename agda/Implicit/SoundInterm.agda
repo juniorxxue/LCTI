@@ -76,8 +76,9 @@ sound-s (s-arr₂ s s₁) (ap-arr apA apA₁) (ap-arr apB apB₁) apΓ = s-arr�
 sound-s (s-arr₃ cloA s) (ap-arr apA apA₁) (ap-arr apB apB₁) apΓ with ap-unique apA apB
 ... | refl = s-arr₃ (ap-closeA cloA apΓ apB) (sound-s s apA₁ apB₁ apΓ)
 sound-s (s-∀ s) (ap-∀ apA) (ap-∀ apB) apΓ = s-∀ (sound-s s apA apB (ap-S∙ apΓ))
-sound-s (s-∀l {B = B} s ic fd upC upD) (ap-∀ apA) (ap-arr apB apB₁) apΓ =
-  s-∀l {B = B} {!!} {!!} {!!} {!!}
+sound-s (s-∀l {B = B} s ic fd upC upD) (ap-∀ {A% = A%} apA) (ap-arr apB apB₁) apΓ =
+  let ⟨ A%* , stA% ⟩ = st0-total B A%
+  in s-∀l {B = B} stA% (sd-strengthen=0 (sound-s s {!!} {!!} (ap-S= apΓ {!!})) {!!} {!!}) ic {!!}
 sound-s (s-var-l inΓ s) (ap-var x) apB apΓ = sound-s s (ap-var= inΓ x) apB apΓ
 sound-s (s-var-r inΓ s) apA (ap-var x) apΓ = sound-s s apA (ap-var= inΓ x) apΓ
 
@@ -94,8 +95,9 @@ sound (⊢lam₁ ⊢e) (ap-arr apA apA₁) (ap-lam ape) apΓ =
   ⊢lam₁ (sound ⊢e (ap-weaken,0 apA₁) (ape-invar,0 ape) (ap-S, apΓ apA))
 sound (⊢lam₂ ⊢e) (ap-arr apA apA₁) (ap-lam ape) apΓ =
   ⊢lam₂ (sound ⊢e (ap-weaken,0 apA₁) (ape-invar,0 ape) (ap-S, apΓ apA))
-sound (⊢app₁ ⊢e ⊢e₁) apA (ap-app ape ape₁) apΓ with ap-total (t-cloA ⊢e₁)
-... | ⟨ A%' , ap' ⟩ = ⊢app₁ (sound ⊢e (ap-arr ap' apA) ape apΓ) (sound ⊢e₁ ap' ape₁ apΓ)
+sound (⊢app₁ ⊢e ⊢e₁) apA (ap-app ape ape₁) apΓ = {!!}
+-- with ap-total (t-cloA ⊢e₁)
+-- ... | ⟨ A%' , ap' ⟩ = ⊢app₁ (sound ⊢e (ap-arr ap' apA) ape apΓ) (sound ⊢e₁ ap' ape₁ apΓ)
 sound (⊢app₂ ⊢e ⊢e₁) apA (ap-app ape ape₁) apΓ with ap-total (t-cloA ⊢e₁)
 ... | ⟨ A%' , ap' ⟩ = ⊢app₂ (sound ⊢e (ap-arr ap' apA) ape apΓ) (sound ⊢e₁ ap' ape₁ apΓ)
 sound (⊢sub ⊢e B≤A j≢Z) apA ape apΓ with ap-total (t-cloA ⊢e)
