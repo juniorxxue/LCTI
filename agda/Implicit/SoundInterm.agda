@@ -12,17 +12,13 @@ postulate
             → Γ ≫ A ⇘ B%
             → A% ≡ B%
 
-  apx-unique : Γ ≫ˣ X ⇘ A%
-             → Γ ≫ˣ X ⇘ B%
-             → A% ≡ B%
-
   ap-closed : Closed Γ
             → Γ ≫ᵍ Γ%
             → Norm Γ%
 
   ap-closeA : Γ ⊢c A
             → Γ ≫ᵍ Γ%
-            → Γ ≫ A ⇘ A%
+            → Γ% ≫ A ⇘ A%
             → Γ% ⊢n A%
 
   ap-∋∙ : Γ ∋∙ X
@@ -31,7 +27,7 @@ postulate
 
   ap-∋⦂ : Γ ∋ x ⦂ A
         → Γ ≫ᵍ Γ%
-        → Γ ≫ A ⇘ A%
+        → Γ% ≫ A ⇘ A%
         → Γ% ∋ x ⦂ A%
 
   ap-weaken,0 : Γ ≫ A ⇘ A%
@@ -43,14 +39,6 @@ postulate
   ape-invar,0 : Γ , T₁ ≫ᵉ e ⇘ e%
               → Γ , T₂ ≫ᵉ e ⇘ e%
 
-  apx-uvar : Γ ≫ˣ X ⇘ A%
-           → Γ ∋∙ X
-           → A% ≡ ‶ X
-
-  ap-var= : Γ ∋ X := A
-          → Γ ≫ˣ X ⇘ A%
-          → Γ ≫ A ⇘ A%
-
   sd-strengthen=0 : Γ ,= T ⊢d j # A' ≤ B'
               → ↑ty0 A ⇘ A'
               → ↑ty0 B ⇘ B'
@@ -59,35 +47,58 @@ postulate
   sd-refl-∞ : Norm Γ
             → Γ ⊢d ∞ # A ≤ A
 
+  ap-var=-ap : Γ ∋ X := A
+             → Γ ≫ᵍ Γ%
+             → Γ% ∋ X := A%
+             → Γ% ≫ A ⇘ A%
+
 sound-s : Γ ⊢i j # A ≤ B
-        → Γ ≫ A ⇘ A%
-        → Γ ≫ B ⇘ B%
         → Γ ≫ᵍ Γ%
+        → Γ% ≫ A ⇘ A%
+        → Γ% ≫ B ⇘ B%
         → Γ% ⊢d j # A% ≤ B%
-sound-s (s-refl cloΓ cloA) apA apB apΓ with ap-unique apA apB
+sound-s (s-refl cloΓ cloA) apΓ apA apB with ap-unique apA apB
 ... | refl = s-refl (ap-closed cloΓ apΓ) (ap-closeA cloA apΓ apB)
-sound-s (s-int cloΓ) ap-int ap-int apΓ = s-int (ap-closed cloΓ apΓ)
-sound-s (s-var-∙ cloΓ inΓ) (ap-var x) (ap-var x₁) apΓ with apx-uvar x inΓ | apx-uvar x₁ inΓ
-... | refl | refl = s-var-∙ (ap-closed cloΓ apΓ) (ap-∋∙ inΓ apΓ)
-sound-s (s-var-= cloΓ inΓ) (ap-var x) (ap-var x₁) apΓ with apx-unique x x₁
+sound-s (s-int cloΓ) apΓ ap-int ap-int = s-int (ap-closed cloΓ apΓ)
+sound-s (s-var-∙ cloΓ inΓ) apΓ apA apB with ap-unique apA apB
 ... | refl = sd-refl-∞ (ap-closed cloΓ apΓ)
-sound-s (s-arr₁ s s₁) (ap-arr apA apA₁) (ap-arr apB apB₁) apΓ = s-arr₁ (sound-s s apB apA apΓ) (sound-s s₁ apA₁ apB₁ apΓ)
-sound-s (s-arr₂ s s₁) (ap-arr apA apA₁) (ap-arr apB apB₁) apΓ = s-arr₂ (sound-s s apB apA apΓ) (sound-s s₁ apA₁ apB₁ apΓ)
-sound-s (s-arr₃ cloA s) (ap-arr apA apA₁) (ap-arr apB apB₁) apΓ with ap-unique apA apB
-... | refl = s-arr₃ (ap-closeA cloA apΓ apB) (sound-s s apA₁ apB₁ apΓ)
-sound-s (s-∀ s) (ap-∀ apA) (ap-∀ apB) apΓ = s-∀ (sound-s s apA apB (ap-S∙ apΓ))
+sound-s (s-var-= cloΓ inΓ) apΓ apA apB with ap-unique apA apB
+... | refl = sd-refl-∞ (ap-closed cloΓ apΓ)
+sound-s (s-arr₁ s s₁) apΓ (ap-arr apA apA₁) (ap-arr apB apB₁) = s-arr₁ (sound-s s apΓ apB apA) (sound-s s₁ apΓ apA₁ apB₁)
+sound-s (s-arr₂ s s₁) apΓ (ap-arr apA apA₁) (ap-arr apB apB₁) = s-arr₂ (sound-s s apΓ apB apA) (sound-s s₁ apΓ apA₁ apB₁)
+sound-s (s-arr₃ cloA s) apΓ (ap-arr apA apA₁) (ap-arr apB apB₁) with ap-unique apA apB
+... | refl = s-arr₃ (ap-closeA cloA apΓ apB) (sound-s s apΓ apA₁ apB₁)
+sound-s (s-∀ s) apΓ (ap-∀ apA) (ap-∀ apB) = s-∀ (sound-s s (ap-S∙ apΓ) apA apB)
+sound-s (s-∀l s ic fd stC stD) apΓ apA apB = {!!}
+sound-s (s-var-l inΓ s) apΓ (ap-var= x) apB = sound-s s apΓ (ap-var=-ap inΓ apΓ x) apB
+sound-s (s-var-l inΓ s) apΓ (ap-var∙ x) apB = sound-s s apΓ {!!} apB -- false
+sound-s (s-var-r inΓ s) apΓ apA (ap-var= x) = sound-s s apΓ apA (ap-var=-ap inΓ apΓ x)
+sound-s (s-var-r inΓ s) apΓ apA (ap-var∙ x) = {!!} -- false
+
+{-
 sound-s (s-∀l {B = B} s ic fd upC upD) (ap-∀ {A% = A%} apA) (ap-arr apB apB₁) apΓ =
   let ⟨ A%* , stA% ⟩ = st0-total B A%
   in s-∀l {B = B} stA% (sd-strengthen=0 (sound-s s {!!} {!!} (ap-S= apΓ {!!})) {!!} {!!}) ic {!!}
-sound-s (s-var-l inΓ s) (ap-var x) apB apΓ = sound-s s (ap-var= inΓ x) apB apΓ
-sound-s (s-var-r inΓ s) apA (ap-var x) apΓ = sound-s s apA (ap-var= inΓ x) apΓ
+sound-s (s-var-l inΓ s) (ap-var x) apB apΓ = sound-s s {!!} apB apΓ
+sound-s (s-var-r inΓ s) apA (ap-var x) apΓ = sound-s s apA {!!} apΓ
+-}
 
 sound : Γ ⊢i j # e ⦂ A
-      → Γ ≫ A ⇘ A%
-      → Γ ≫ᵉ e ⇘ e%
       → Γ ≫ᵍ Γ%
+      → Γ% ≫ A ⇘ A%
+      → Γ% ≫ᵉ e ⇘ e%
       → Γ% ⊢d j # e% ⦂ A%
-sound (⊢lit cloΣ) ap-int ap-lit apΓ = ⊢lit (ap-closed cloΣ apΓ)
+sound (⊢lit cloΣ) apΓ ap-int ap-lit = ⊢lit (ap-closed cloΣ apΓ)
+sound (⊢var cloΣ x∈Γ) apΓ apA ap-var = ⊢var (ap-closed cloΣ apΓ) (ap-∋⦂ x∈Γ apΓ apA)
+sound (⊢ann ⊢e) apΓ apA ape = {!!}
+sound (⊢lam₁ ⊢e) apΓ apA ape = {!!}
+sound (⊢lam₂ ⊢e) apΓ apA ape = {!!}
+sound (⊢app₁ ⊢e ⊢e₁) apΓ apA ape = {!!}
+sound (⊢app₂ ⊢e ⊢e₁) apΓ apA ape = {!!}
+sound (⊢sub ⊢e B≤A j≢Z) apΓ apA ape = {!!}
+sound (⊢tabs ⊢e) apΓ apA ape = {!!}
+
+{-
 sound (⊢var cloΣ x∈Γ) apA ap-var apΓ = ⊢var (ap-closed cloΣ apΓ) (ap-∋⦂ x∈Γ apΓ apA)
 sound (⊢ann ⊢e) apA (ap-ann x ape) apΓ with ap-unique apA x
 ... | refl = ⊢ann (sound ⊢e apA ape apΓ)
@@ -103,3 +114,4 @@ sound (⊢app₂ ⊢e ⊢e₁) apA (ap-app ape ape₁) apΓ with ap-total (t-clo
 sound (⊢sub ⊢e B≤A j≢Z) apA ape apΓ with ap-total (t-cloA ⊢e)
 ... | ⟨ A% , ap ⟩ = ⊢sub (sound ⊢e ap ape apΓ) (sound-s B≤A ap apA apΓ) j≢Z
 sound (⊢tabs ⊢e) (ap-∀ apA) (ap-tlam ape) apΓ = ⊢tabs (sound ⊢e apA ape (ap-S∙ apΓ))
+-}
