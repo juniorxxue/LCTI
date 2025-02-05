@@ -1,7 +1,7 @@
 module Implicit.SoundCounterAux where
 
 open import Implicit.Language hiding (_≤_)
-open import Implicit.Decl renaming (find to d-find)
+open import Implicit.Interm
 open import Implicit.Algo
 open import Implicit.Algo.BaseCounter
 
@@ -115,17 +115,17 @@ s-⊆-exsol (svar ext) (S= inΓ) with s-⊆-exsol ext inΓ
 ... | is-sol x = is-sol (S= x)
 
 
-find-ε : d-find A k ∞
+find-ε : find A k ∞
        → k ε A
 find-ε (f-∞ x) = x
 find-ε (f-∀ fd) = ε-∀ (find-ε fd)
 
-find-arr-r : d-find B k ∞
-         → d-find (A `→ B) k ∞
+find-arr-r : find B k ∞
+         → find (A `→ B) k ∞
 find-arr-r fd = f-∞ (ε-arr-r (find-ε fd))
 
-find-arr-l : d-find A k ∞
-           → d-find (A `→ B) k ∞
+find-arr-l : find A k ∞
+           → find (A `→ B) k ∞
 find-arr-l fd = f-∞ (ε-arr-l (find-ε fd))
 
 ⊢c-¬ε : Γ ⊢c A

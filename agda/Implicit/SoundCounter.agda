@@ -1,7 +1,7 @@
 module Implicit.SoundCounter where
 
 open import Implicit.Language hiding (_≤_)
-open import Implicit.Decl renaming (find to d-find)
+open import Implicit.Interm
 open import Implicit.Algo
 open import Implicit.Algo.BaseCounter
 open import Implicit.SoundCounterAux
@@ -28,21 +28,21 @@ sound-find-l : Γ ⊢ A  ⌞ ≤⁺ ⌝ Σ ⊣ Δ ↪ B ↡ j
              → Γ ⊢cᶜ Σ
              → Γ ∋^ k
              → Δ ∋= k
-             → d-find A k j
+             → find A k j
 
 sound-find-r : Γ ⊢ A  ⌞ ≤⁻ ⌝ τ B ⊣ Δ ↪ C ↡ j
              → Closed Γ
              → Γ ⊢c A
              → Γ ∋^ k
              → Δ ∋= k
-             → d-find B k j
+             → find B k j
 
 sound-find-l0 : Γ ,^ ⊢ A ⌞ ≤⁺ ⌝ [ e' ]↝ Σ' ⊣ Δ ,= B ↪ C `→ D ↡ j
               → Closed Γ
               → Γ ⊢cᶜ [ e ]↝ Σ
               → ↑tyᵉ0 e ⇘ e'
               → ↑tyᶜ0 Σ ⇘ Σ'
-              → d-find A #0 j
+              → find A #0 j
 sound-find-l0 s cloΓ clo up1 up2 = sound-find-l s (clo-S^ cloΓ) (⊢cᶜ-weaken^0 clo (↑tyᶜ-e up1 up2)) Z Z
 
 tc-~ (⊢lit cloΓ) = ~Z
