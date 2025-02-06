@@ -38,6 +38,19 @@ open import Implicit.Language.EnvOps.Base
 ◀^-∋∙ {k = #S k} {#S X} (S= inΓ) (◀S= newΓ x) = S= (◀^-∋∙ inΓ newΓ)
 ◀^-∋∙ {k = #S k} {#S X} (S^ inΓ) (◀S^ newΓ) = S^ (◀^-∋∙ inΓ newΓ)
 
+◀∙-∋∙ : Γ ∋∙ punchIn k X
+      → Γ ◀ k ∙⇘ Γ'
+      → Γ' ∋∙ X
+◀∙-∋∙ {k = #0} (S, inΓ) (◀S, newΓ x) = S, (◀∙-∋∙ inΓ newΓ)
+◀∙-∋∙ {k = #0} (S∙ inΓ) ◀Z = inΓ
+◀∙-∋∙ {k = #S k} {#0} Z (◀S∙ newΓ) = Z
+◀∙-∋∙ {k = #S k} {#0} (S, inΓ) (◀S, newΓ x) = S, (◀∙-∋∙ inΓ newΓ)
+◀∙-∋∙ {k = #S k} {#S X} (S, inΓ) (◀S, newΓ x) = S, (◀∙-∋∙ inΓ newΓ)
+◀∙-∋∙ {k = #S k} {#S X} (S∙ inΓ) (◀S∙ newΓ) = S∙ (◀∙-∋∙ inΓ newΓ)
+◀∙-∋∙ {k = #S k} {#S X} (S= inΓ) (◀S= newΓ x) = S= (◀∙-∋∙ inΓ newΓ)
+◀∙-∋∙ {k = #S k} {#S X} (S^ inΓ) (◀S^ newΓ) = S^ (◀∙-∋∙ inΓ newΓ)
+
+
 ◀^-∋= : Γ ∋= punchIn k X
       → Γ ◀ k ^⇘ Γ'
       → Γ' ∋= X

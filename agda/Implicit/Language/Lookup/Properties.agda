@@ -85,3 +85,12 @@ open import Implicit.Language.Shift
 ∙∈-=∈-false (S∙ in1) (S∙ in2) = ∙∈-=∈-false in1 in2
 ∙∈-=∈-false (S= in1) (S= in2) = ∙∈-=∈-false in1 in2
 ∙∈-=∈-false (S^ in1) (S^ in2) = ∙∈-=∈-false in1 in2
+
+∙∈-:=∈-false :
+    Γ ∋∙ X
+  → Γ ∋ X := A
+  → ⊥
+∙∈-:=∈-false (S, inΓ) (S, inΓ') = ∙∈-:=∈-false inΓ inΓ'
+∙∈-:=∈-false (S∙ inΓ) (S∙ inΓ' up) = ∙∈-:=∈-false inΓ inΓ'
+∙∈-:=∈-false (S= inΓ) (S= inΓ' up) = ∙∈-:=∈-false inΓ inΓ'
+∙∈-:=∈-false (S^ inΓ) (S^ inΓ' up) = ∙∈-:=∈-false inΓ inΓ'

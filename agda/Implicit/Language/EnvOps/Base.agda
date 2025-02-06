@@ -51,8 +51,8 @@ infix 3 _◀_∙⇘_
 data _◀_∙⇘_ : Env n (1 + m) → Fin (1 + m) → Env n m → Set where
   ◀Z  : Γ ,∙ ◀ #0 ∙⇘ Γ
   ◀S, : Γ ◀ k ∙⇘ Γ'
-      → B ↑ty k ⇘ B'
-      → Γ , B' ◀ k ∙⇘ Γ' , B
+      → A ↑ty k ⇘ A'
+      → Γ , A' ◀ k ∙⇘ Γ' , A
   ◀S^ : Γ ◀ k ∙⇘ Γ'
       → Γ ,^ ◀ #S k ∙⇘ Γ' ,^
   ◀S∙ : Γ ◀ k ∙⇘ Γ'
