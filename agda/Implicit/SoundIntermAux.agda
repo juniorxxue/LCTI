@@ -93,6 +93,15 @@ ap-∋= (S∙ inΓ) (ap-S∙ apΓ) = S∙ (ap-∋= inΓ apΓ)
 ap-∋= (S= inΓ) (ap-S= apΓ x) = S= (ap-∋= inΓ apΓ)
 ap-∋= (S^ inΓ) (ap-S^ apΓ) = S^ (ap-∋= inΓ apΓ)
 
+ap-close-prv : Γ ⊢c A
+             → Γ ≫ᵍ Γ%
+             → Γ% ⊢c A
+ap-close-prv ⊢c-int apΓ = ⊢c-int
+ap-close-prv (⊢c-var-∙ inΓ) apΓ = ⊢c-var-∙ (ap-∋∙ inΓ apΓ)
+ap-close-prv (⊢c-var-= inΓ) apΓ = ⊢c-var-= (ap-∋= inΓ apΓ)
+ap-close-prv (⊢c-arr cloA cloA₁) apΓ = ⊢c-arr (ap-close-prv cloA apΓ) (ap-close-prv cloA₁ apΓ)
+ap-close-prv (⊢c-∀ cloA) apΓ = ⊢c-∀ (ap-close-prv cloA (ap-S∙ apΓ))
+
 ap-closeA : Γ ⊢c A
           → Γ ≫ᵍ Γ%
           → Norm Γ%
@@ -135,6 +144,9 @@ postulate
   ap-weaken,0 : Γ ≫ A ⇘ A%
               → Γ , T ≫ A ⇘ A%
 
+  ap-strengthen,0 : Γ , T ≫ A ⇘ A%
+                  → Γ ≫ A ⇘ A%
+
 ap-var=-ap : Γ ∋ X := A
            → Γ ≫ᵍ Γ%
            → Γ% ∋ X := A%
@@ -164,27 +176,95 @@ ap-var=-ap (S= inΓ up) (ap-S= apΓ x) (S= inΓ% up₁) = ap-weaken=0 (ap-var=-a
 ◀∙-∋:=' {k = #S k} {#S X} (S^ inΓ up) (◀S^ newΓ) (S^ inΓ' up₁) = ↑ty-comm' z≤n (◀∙-∋:=' inΓ newΓ inΓ') up up₁
 ◀∙-∋:=' {k = #S k} {#S X} (S= inΓ up) (◀S= newΓ x) (S= inΓ' up₁) = ↑ty-comm' z≤n (◀∙-∋:=' inΓ newΓ inΓ') up up₁
 
-ap-↑ty : Γ ≫ A' ⇘ A%'
+◀^-∋:=' : Γ ∋ punchIn k X := A'
+        → Γ ◀ k ^⇘ Γ'
+        → Γ' ∋ X := A
+        → A ↑ty k ⇘ A'
+◀^-∋:=' {k = #0} {#0} (S, inΓ) (◀S, newΓ x) (S, inΓ') = ◀^-∋:=' inΓ newΓ inΓ'
+◀^-∋:=' {k = #0} {#0} (S^ (Z up₂) up) ◀Z (Z up₁) with ↑ty-unique up₁ up₂
+... | refl = up
+◀^-∋:=' {k = #0} {#0} (S^ (S, inΓ) up) ◀Z (S, inΓ') with ∋:=-unique inΓ inΓ'
+... | refl = up
+◀^-∋:=' {k = #0} {#S X} (S, inΓ) (◀S, newΓ x) (S, inΓ') = ◀^-∋:=' inΓ newΓ inΓ'
+◀^-∋:=' {k = #0} {#S X} (S^ inΓ up) ◀Z inΓ' with ∋:=-unique inΓ inΓ'
+... | refl = up
+◀^-∋:=' {k = #S k} {#0} (Z up) (◀S= newΓ x) (Z up₁) = ↑ty-comm' z≤n x up up₁
+◀^-∋:=' {k = #S k} {#0} (S, inΓ) (◀S, newΓ x) (S, inΓ') = ◀^-∋:=' inΓ newΓ inΓ'
+◀^-∋:=' {k = #S k} {#S X} (S, inΓ) (◀S, newΓ x) (S, inΓ') = ◀^-∋:=' inΓ newΓ inΓ'
+◀^-∋:=' {k = #S k} {#S X} (S∙ inΓ up) (◀S∙ newΓ) (S∙ inΓ' up₁) = ↑ty-comm' z≤n (◀^-∋:=' inΓ newΓ inΓ') up up₁
+◀^-∋:=' {k = #S k} {#S X} (S^ inΓ up) (◀S^ newΓ) (S^ inΓ' up₁) = ↑ty-comm' z≤n (◀^-∋:=' inΓ newΓ inΓ') up up₁
+◀^-∋:=' {k = #S k} {#S X} (S= inΓ up) (◀S= newΓ x) (S= inΓ' up₁) = ↑ty-comm' z≤n (◀^-∋:=' inΓ newΓ inΓ') up up₁
+
+◀=-∋:=' : Γ ∋ punchIn k X := A'
+        → Γ ◀ k =⇘ Γ'
+        → Γ' ∋ X := A
+        → A ↑ty k ⇘ A'
+◀=-∋:=' {k = #0} {#0} (S, inΓ) (◀S, newΓ x) (S, inΓ') = ◀=-∋:=' inΓ newΓ inΓ'
+◀=-∋:=' {k = #0} {#0} (S= (Z up₂) up) ◀Z (Z up₁) with ↑ty-unique up₁ up₂
+... | refl = up
+◀=-∋:=' {k = #0} {#0} (S= (S, inΓ) up) ◀Z (S, inΓ') with ∋:=-unique inΓ inΓ'
+... | refl = up
+◀=-∋:=' {k = #0} {#S X} (S, inΓ) (◀S, newΓ x) (S, inΓ') = ◀=-∋:=' inΓ newΓ inΓ'
+◀=-∋:=' {k = #0} {#S X} (S= inΓ up) ◀Z inΓ' with ∋:=-unique inΓ inΓ'
+... | refl = up
+◀=-∋:=' {k = #S k} {#0} (Z up) (◀S= newΓ x) (Z up₁) = ↑ty-comm' z≤n x up up₁
+◀=-∋:=' {k = #S k} {#0} (S, inΓ) (◀S, newΓ x) (S, inΓ') = ◀=-∋:=' inΓ newΓ inΓ'
+◀=-∋:=' {k = #S k} {#S X} (S, inΓ) (◀S, newΓ x) (S, inΓ') = ◀=-∋:=' inΓ newΓ inΓ'
+◀=-∋:=' {k = #S k} {#S X} (S∙ inΓ up) (◀S∙ newΓ) (S∙ inΓ' up₁) = ↑ty-comm' z≤n (◀=-∋:=' inΓ newΓ inΓ') up up₁
+◀=-∋:=' {k = #S k} {#S X} (S^ inΓ up) (◀S^ newΓ) (S^ inΓ' up₁) = ↑ty-comm' z≤n (◀=-∋:=' inΓ newΓ inΓ') up up₁
+◀=-∋:=' {k = #S k} {#S X} (S= inΓ up) (◀S= newΓ x) (S= inΓ' up₁) = ↑ty-comm' z≤n (◀=-∋:=' inΓ newΓ inΓ') up up₁
+
+ap-↑ty-∙ : Γ ≫ A' ⇘ A%'
        → Γ ◀ k ∙⇘ Γ'
        → A ↑ty k ⇘ A'
        → Γ' ≫ A ⇘ A%
        → A% ↑ty k ⇘ A%'
-ap-↑ty ap-int newΓ ↑ty-int ap-int = ↑ty-int
-ap-↑ty (ap-var= x) newΓ ↑ty-var (ap-var= x₁) = ◀∙-∋:=' x newΓ x₁
-ap-↑ty (ap-var= x) newΓ ↑ty-var (ap-var∙ x₁) = {!!} -- false
-ap-↑ty (ap-var∙ x) newΓ ↑ty-var (ap-var= x₁) = {!!} -- false
-ap-↑ty (ap-var∙ x) newΓ ↑ty-var (ap-var∙ x₁) = ↑ty-var
-ap-↑ty (ap-arr apA' apA'') newΓ (↑ty-arr upA upA₁) (ap-arr apA apA₁) = ↑ty-arr (ap-↑ty apA' newΓ upA apA) (ap-↑ty apA'' newΓ upA₁ apA₁)
-ap-↑ty (ap-∀ apA') newΓ (↑ty-∀ upA) (ap-∀ apA) = ↑ty-∀ (ap-↑ty apA' (◀S∙ newΓ) upA apA)
+ap-↑ty-∙ ap-int newΓ ↑ty-int ap-int = ↑ty-int
+ap-↑ty-∙ (ap-var= x) newΓ ↑ty-var (ap-var= x₁) = ◀∙-∋:=' x newΓ x₁
+ap-↑ty-∙ (ap-var= x) newΓ ↑ty-var (ap-var∙ x₁) = ⊥-elim (∙∈-=∈-false x₁ (◀∙-∋= (:=to= x) newΓ))
+ap-↑ty-∙ (ap-var∙ x) newΓ ↑ty-var (ap-var= x₁) = ⊥-elim (∙∈-=∈-false (◀∙-∋∙ x newΓ) (:=to= x₁))
+ap-↑ty-∙ (ap-var∙ x) newΓ ↑ty-var (ap-var∙ x₁) = ↑ty-var
+ap-↑ty-∙ (ap-arr apA' apA'') newΓ (↑ty-arr upA upA₁) (ap-arr apA apA₁) = ↑ty-arr (ap-↑ty-∙ apA' newΓ upA apA) (ap-↑ty-∙ apA'' newΓ upA₁ apA₁)
+ap-↑ty-∙ (ap-∀ apA') newΓ (↑ty-∀ upA) (ap-∀ apA) = ↑ty-∀ (ap-↑ty-∙ apA' (◀S∙ newΓ) upA apA)
 
-ap-∋⦂' : Γ ∋ x ⦂ A
+ap-↑ty^ : Γ ≫ A' ⇘ A%'
+       → Γ ◀ k ^⇘ Γ'
+       → A ↑ty k ⇘ A'
+       → Γ' ≫ A ⇘ A%
+       → A% ↑ty k ⇘ A%'
+ap-↑ty^ ap-int newΓ ↑ty-int ap-int = ↑ty-int
+ap-↑ty^ (ap-var= x) newΓ ↑ty-var (ap-var= x₁) = ◀^-∋:=' x newΓ x₁
+ap-↑ty^ (ap-var= x) newΓ ↑ty-var (ap-var∙ x₁) = ⊥-elim (∙∈-=∈-false x₁ (◀^-∋= (:=to= x) newΓ))
+ap-↑ty^ (ap-var∙ x) newΓ ↑ty-var (ap-var= x₁) = ⊥-elim (∙∈-=∈-false (◀^-∋∙ x newΓ) (:=to= x₁))
+ap-↑ty^ (ap-var∙ x) newΓ ↑ty-var (ap-var∙ x₁) = ↑ty-var
+ap-↑ty^ (ap-arr apA' apA'') newΓ (↑ty-arr upA upA₁) (ap-arr apA apA₁) = ↑ty-arr (ap-↑ty^ apA' newΓ upA apA) (ap-↑ty^ apA'' newΓ upA₁ apA₁)
+ap-↑ty^ (ap-∀ apA') newΓ (↑ty-∀ upA) (ap-∀ apA) = ↑ty-∀ (ap-↑ty^ apA' (◀S∙ newΓ) upA apA)
+
+ap-↑ty= : Γ ≫ A' ⇘ A%'
+       → Γ ◀ k =⇘ Γ'
+       → A ↑ty k ⇘ A'
+       → Γ' ≫ A ⇘ A%
+       → A% ↑ty k ⇘ A%'
+ap-↑ty= ap-int newΓ ↑ty-int ap-int = ↑ty-int
+ap-↑ty= (ap-var= x) newΓ ↑ty-var (ap-var= x₁) = ◀=-∋:=' x newΓ x₁
+ap-↑ty= (ap-var= x) newΓ ↑ty-var (ap-var∙ x₁) = ⊥-elim (∙∈-=∈-false x₁ (◀=-∋= (:=to= x) newΓ))
+ap-↑ty= (ap-var∙ x) newΓ ↑ty-var (ap-var= x₁) = ⊥-elim (∙∈-=∈-false (◀=-∋∙ x newΓ) (:=to= x₁))
+ap-↑ty= (ap-var∙ x) newΓ ↑ty-var (ap-var∙ x₁) = ↑ty-var
+ap-↑ty= (ap-arr apA' apA'') newΓ (↑ty-arr upA upA₁) (ap-arr apA apA₁) = ↑ty-arr (ap-↑ty= apA' newΓ upA apA) (ap-↑ty= apA'' newΓ upA₁ apA₁)
+ap-↑ty= (ap-∀ apA') newΓ (↑ty-∀ upA) (ap-∀ apA) = ↑ty-∀ (ap-↑ty= apA' (◀S∙ newΓ) upA apA)
+
+
+ap-∋⦂ : Γ ∋ x ⦂ A
        → Closed Γ
        → Γ ≫ᵍ Γ%
        → Γ% ≫ A ⇘ A%
        → Γ% ∋ x ⦂ A%
-ap-∋⦂' Z cloΓ apΓ apA = {!!}
-ap-∋⦂' (S, inΓ) cloΓ apΓ apA = {!!}
-ap-∋⦂' (S∙ inΓ up) (clo-S∙ cloΓ) (ap-S∙ apΓ) apA with ap-total {!!}
-... | ⟨ A% , apA' ⟩ = S∙ (ap-∋⦂' inΓ cloΓ apΓ apA') (ap-↑ty apA ◀Z up apA')
-ap-∋⦂' (S^ inΓ up) cloΓ apΓ apA = {!!}
-ap-∋⦂' (S= inΓ up) cloΓ apΓ apA = {!!}
+ap-∋⦂ Z (clo-S, cloΓ cloA) (ap-S, apΓ apA₁) apA with ap-unique apA₁ (ap-strengthen,0 apA)
+... | refl = Z
+ap-∋⦂ (S, inΓ) (clo-S, cloΓ cloA) (ap-S, apΓ apA₁) apA = S, (ap-∋⦂ inΓ cloΓ apΓ (ap-strengthen,0 apA))
+ap-∋⦂ (S∙ inΓ up) (clo-S∙ cloΓ) (ap-S∙ apΓ) apA with ap-total (ap-close-prv (∋⦂-closed cloΓ inΓ) apΓ)
+... | ⟨ A% , apA' ⟩ = S∙ (ap-∋⦂ inΓ cloΓ apΓ apA') (ap-↑ty-∙ apA ◀Z up apA')
+ap-∋⦂ (S^ inΓ up) (clo-S^ cloΓ) (ap-S^ apΓ) apA with ap-total (ap-close-prv (∋⦂-closed cloΓ inΓ) apΓ)
+... | ⟨ A% , apA' ⟩ = S^ (ap-∋⦂ inΓ cloΓ apΓ apA') (ap-↑ty^ apA ◀Z up apA')
+ap-∋⦂ (S= inΓ up) (clo-S= cloΓ cloA) (ap-S= apΓ x) apA with ap-total (ap-close-prv (∋⦂-closed cloΓ inΓ) apΓ)
+... | ⟨ A% , apA' ⟩ = S= (ap-∋⦂ inΓ cloΓ apΓ apA') (ap-↑ty= apA ◀Z up apA')

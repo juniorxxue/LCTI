@@ -7,11 +7,6 @@ open import Implicit.SoundIntermAux
 
 postulate
 
-  ap-∋⦂ : Γ ∋ x ⦂ A
-        → Γ ≫ᵍ Γ%
-        → Γ% ≫ A ⇘ A%
-        → Γ% ∋ x ⦂ A%
-
   ap-invar,0 : Γ , T₁ ≫ A ⇘ A%
              → Γ , T₂ ≫ A ⇘ A%
 
@@ -61,26 +56,17 @@ sound : Γ ⊢i j # e ⦂ A
       → Γ% ≫ᵉ e ⇘ e%
       → Γ% ⊢d j # e% ⦂ A%
 sound (⊢lit cloΣ) apΓ ap-int ap-lit = ⊢lit (ap-closed cloΣ apΓ)
-sound (⊢var cloΣ x∈Γ) apΓ apA ap-var = ⊢var (ap-closed cloΣ apΓ) (ap-∋⦂ x∈Γ apΓ apA)
+sound (⊢var cloΣ x∈Γ) apΓ apA ap-var = ⊢var (ap-closed cloΣ apΓ) (ap-∋⦂ x∈Γ cloΣ apΓ apA)
 sound (⊢ann ⊢e) apΓ apA (ap-ann apA₁ ape) with ap-unique apA apA₁
 ... | refl = ⊢ann (sound ⊢e apΓ apA ape)
 sound (⊢lam₁ ⊢e) apΓ (ap-arr apA apA₁) (ap-lam ape) =
   ⊢lam₁ (sound ⊢e (ap-S, apΓ apA) (ap-weaken,0 apA₁) (ape-invar,0 ape))
 sound (⊢lam₂ ⊢e) apΓ (ap-arr apA apA₁) (ap-lam ape) =
   ⊢lam₂ (sound ⊢e (ap-S, apΓ apA) (ap-weaken,0 apA₁) (ape-invar,0 ape))
-sound {Γ% = Γ%} (⊢app₁ ⊢e ⊢e₁) apΓ apA (ap-app ape ape₁) with ap-total {Γ = Γ%} {!!}
+sound (⊢app₁ ⊢e ⊢e₁) apΓ apA (ap-app ape ape₁) with ap-total (ap-close-prv (t-cloA ⊢e₁) apΓ)
 ... | ⟨ A%' , ap' ⟩ = ⊢app₁ (sound ⊢e apΓ (ap-arr ap' apA) ape) (sound ⊢e₁ apΓ ap' ape₁)
-sound (⊢app₂ ⊢e ⊢e₁) apΓ apA ape = {!!}
-sound (⊢sub ⊢e B≤A j≢Z) apΓ apA ape = {!!}
+sound (⊢app₂ ⊢e ⊢e₁) apΓ apA (ap-app ape ape₁)  with ap-total (ap-close-prv (t-cloA ⊢e₁) apΓ)
+... | ⟨ A%' , ap' ⟩ = ⊢app₂ (sound ⊢e apΓ (ap-arr ap' apA) ape) (sound ⊢e₁ apΓ ap' ape₁)
+sound (⊢sub ⊢e B≤A j≢Z) apΓ apA ape with ap-total (ap-close-prv (t-cloA ⊢e) apΓ)
+... | ⟨ A% , ap ⟩ = ⊢sub (sound ⊢e apΓ ap ape) (sound-s B≤A apΓ ap apA) j≢Z
 sound (⊢tabs ⊢e) apΓ (ap-∀ apA) (ap-tlam ape) = ⊢tabs (sound ⊢e (ap-S∙ apΓ) apA ape)
-
-{-
-sound (⊢app₁ ⊢e ⊢e₁) apA (ap-app ape ape₁) apΓ = {!!}
--- with ap-total (t-cloA ⊢e₁)
--- ... | ⟨ A%' , ap' ⟩ = ⊢app₁ (sound ⊢e (ap-arr ap' apA) ape apΓ) (sound ⊢e₁ ap' ape₁ apΓ)
-sound (⊢app₂ ⊢e ⊢e₁) apA (ap-app ape ape₁) apΓ with ap-total (t-cloA ⊢e₁)
-... | ⟨ A%' , ap' ⟩ = ⊢app₂ (sound ⊢e (ap-arr ap' apA) ape apΓ) (sound ⊢e₁ ap' ape₁ apΓ)
-sound (⊢sub ⊢e B≤A j≢Z) apA ape apΓ with ap-total (t-cloA ⊢e)
-... | ⟨ A% , ap ⟩ = ⊢sub (sound ⊢e ap ape apΓ) (sound-s B≤A ap apA apΓ) j≢Z
-sound (⊢tabs ⊢e) (ap-∀ apA) (ap-tlam ape) apΓ = ⊢tabs (sound ⊢e apA ape (ap-S∙ apΓ))
--}

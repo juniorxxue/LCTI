@@ -66,10 +66,10 @@ data _⊢_#_≤_ : Env n m → Counter → Type m → Type m → Set where
 infix 3 _⊢_#_⦂_
 data _⊢_#_⦂_ : Env n m → Counter → Term n m → Type m → Set where
   ⊢lit : ∀ {num : ℕ}
-    → (cloΣ : Closed Γ)
+    → (cloΓ : Closed Γ)
     → Γ ⊢ Z # (lit num) ⦂ Int
   ⊢var :
-      (cloΣ : Closed Γ)
+      (cloΓ : Closed Γ)
     → (x∈Γ : Γ ∋ x ⦂ A)
     → Γ ⊢ Z # ` x ⦂ A
   ⊢ann :
