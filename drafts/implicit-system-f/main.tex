@@ -32,64 +32,28 @@
 
 \maketitle
 
-\section{Syntax}
-
 \begin{align*}
 &\text{Types} \quad\quad &A, B, C, D ::=&~ a \mid \mathtt{Int} \mid A \rightarrow B \mid \forall a.~A\\
-&\text{Expressions} \quad \quad &e::=&~ i \mid x \mid \lambda x . ~e \mid e_1~e_2 \mid e : A \mid \Lambda a.~e\\
-&\text{Environments} \quad\quad &\Gamma::=&~ . \mid \Gamma, x : A \mid \Gamma, a \mid \Gamma , \hat{a} \mid \Gamma, \hat{a} = A\\
-&\text{Counters} \quad\quad &n ::=&~ 0 \mid \infty \mid I~n \mid C~n\\
-    &\text{Contexts} \quad\quad &\Sigma ::=&~  \square  \mid A \mid \boxed{e} \leadsto \Sigma\\
-    &\text{Generic Consumers} \quad \quad &g::=&~ i \mid x \mid e : A \mid \Lambda a.~e
+&\text{Expressions} \quad \quad &e::=&~ i \mid x \mid \lambda x . ~e \mid e_1~e_2 \mid e : A \mid \Lambda a.~e
 \end{align*}
 
 \section{Decl.}
 
-\subsection{Subtyping}
-
-\begin{mathpar}
-    \inferrule*[right=\texttt{S-Refl}]
-    {\vdash_{close} \Gamma \\
-     \Gamma \vdash A}
-    {\Gamma \vdash_0 A <: A}
-
-    \inferrule*[right=\texttt{S-Int}]
-    {\vdash_{close} \Gamma}
-    {\Gamma \vdash_{\infty} \mathtt{Int} <: \mathtt{Int}}
-    
-    \inferrule*[right=\texttt{S-Var}]
-    {\vdash_{close} \Gamma}
-    {\Gamma \vdash_\infty a <: a}
+\begin{align*}
+&\text{Environments} \quad\quad &\Gamma::=&~ . \mid \Gamma, x : A \mid \Gamma, a \\
+&\text{Counters} \quad\quad &n ::=&~ 0 \mid \infty \mid I~n \mid C~n
+\end{align*}
 
 
-    \inferrule*[right=\texttt{S-Arr}]
-    {\Gamma \vdash_{\infty} C <: A \\
-     \Gamma \vdash_{n-} B <: D}
-    {\Gamma \vdash_n A \rightarrow B <:C \rightarrow D}
-
-    \inferrule*[right=\texttt{S-$\forall$}]
-    {\Gamma , a \vdash_{\infty} A <: B}
-    {\Gamma \vdash_{\infty} \forall a.~A <: \forall a.~B}
-
-    \inferrule*[right=\texttt{S-$\forall$L}]
-    {\Gamma \vdash B \\
-     a \in \texttt{freevars}(S~n, A) \\
-     \Gamma \vdash_{S~n}  [B/a]A <: C \to D}
-    {\Gamma \vdash_{S~n} \forall a. ~A <: C \to D}
-\end{mathpar}
-
-
-\section{Interm.}
-
-\subsection{Typing}
+\subsection{Typing: $\Gamma \vdash_n e : A$}
 
 \begin{mathpar}
     \inferrule*[right=\texttt{Int}]
-    {\vdash_{close} \Gamma}
+	{ }
     {\Gamma \vdash_0 i : \mathtt{Int}}
 
     \inferrule*[right=\texttt{Var}]
-    {\vdash_{close} \Gamma \\ x : A \in \Gamma}
+    { }
     {\Gamma \vdash_0 x : A}
 
     \inferrule*[right=\texttt{Ann}]
@@ -123,25 +87,104 @@
     {\Gamma \vdash_0 \Lambda a.~e : \forall a.~A}
 \end{mathpar}
 
-\subsection{Subtyping}
+\subsection{Subtyping: $\Gamma \vdash_n A <: B$}
 
 \begin{mathpar}
     \inferrule*[right=\texttt{S-Refl}]
-    {\vdash_{close} \Gamma \\
-     \Gamma \vdash A}
+    { }
     {\Gamma \vdash_0 A <: A}
 
     \inferrule*[right=\texttt{S-Int}]
-    {\vdash_{close} \Gamma}
+    { }
     {\Gamma \vdash_{\infty} \mathtt{Int} <: \mathtt{Int}}
     
     \inferrule*[right=\texttt{S-Var}]
-    {\vdash_{close} \Gamma}
+    { }
+    {\Gamma \vdash_\infty a <: a}
+
+    \inferrule*[right=\texttt{S-Arr}]
+    {\Gamma \vdash_{\infty} C <: A \\
+     \Gamma \vdash_{n-} B <: D}
+    {\Gamma \vdash_n A \rightarrow B <:C \rightarrow D}
+
+    \inferrule*[right=\texttt{S-$\forall$}]
+    {\Gamma , a \vdash_{\infty} A <: B}
+    {\Gamma \vdash_{\infty} \forall a.~A <: \forall a.~B}
+
+    \inferrule*[right=\texttt{S-$\forall$L}]
+    {\Gamma \vdash B \\
+     a \in \texttt{freevars}(I/C~n, A) \\
+     \Gamma \vdash_{I/C~n}  [B/a]A <: C \to D}
+    {\Gamma \vdash_{I/C~n} \forall a. ~A <: C \to D}
+\end{mathpar}
+
+
+\section{Interm.}
+
+\begin{align*}
+&\text{Environments} \quad\quad &\Gamma::=&~ . \mid \Gamma, x : A \mid \Gamma, a \mid \Gamma, \hat{a} = A\\
+&\text{Counters} \quad\quad &n ::=&~ 0 \mid \infty \mid I~n \mid C~n
+\end{align*}
+
+\subsection{Typing: $\Gamma \vdash_n e : A$}
+
+\begin{mathpar}
+    \inferrule*[right=\texttt{Int}]
+    { }
+    {\Gamma \vdash_0 i : \mathtt{Int}}
+
+    \inferrule*[right=\texttt{Var}]
+    {x : A \in \Gamma}
+    {\Gamma \vdash_0 x : A}
+
+    \inferrule*[right=\texttt{Ann}]
+    {\Gamma \vdash_{\infty} e : A}
+    {\Gamma \vdash_0 (e : A) : A}
+
+    \inferrule*[right=\texttt{Lam}]
+    {\Gamma, x : A \vdash_{n-} e : B}
+    {\Gamma \vdash_{n} \lambda x.~ e : A \rightarrow B}
+    \\
+
+    \inferrule*[right=\texttt{App1}]
+    {\Gamma \vdash_{C~n} e_1 : A \rightarrow B \\
+    \Gamma \vdash_{\infty} e_2 : A}
+    {\Gamma \vdash_n e_1~e_2 : B}
+
+    \inferrule*[right=\texttt{App2}]
+    {\Gamma \vdash_{I~n} e_1 : A \rightarrow B \\
+    \Gamma \vdash_0 e_2 : A}
+    {\Gamma \vdash_n e_1~e_2 : B}
+    \\
+
+    \inferrule*[right=\texttt{Sub}]
+    {\Gamma \vdash_0 e : B \\
+    n \neq 0\\
+    \Gamma \vdash_n B <: A}
+    {\Gamma \vdash_n e : A}
+
+    \inferrule*[right=\texttt{TAbs}]
+    {\Gamma, a \vdash_0 e : A}
+    {\Gamma \vdash_0 \Lambda a.~e : \forall a.~A}
+\end{mathpar}
+
+\subsection{Subtyping: $\Gamma \vdash_n A <: B$}
+
+\begin{mathpar}
+    \inferrule*[right=\texttt{S-Refl}]
+    { }
+    {\Gamma \vdash_0 A <: A}
+
+    \inferrule*[right=\texttt{S-Int}]
+    { }
+    {\Gamma \vdash_{\infty} \mathtt{Int} <: \mathtt{Int}}
+    
+    \inferrule*[right=\texttt{S-Var}]
+    { }
     {\Gamma \vdash_\infty a <: a}
     
     \inferrule*[right=\texttt{S-Var-Slv}]
-    {\vdash_{close} \Gamma \\
-      \hat{a} = A \in \Gamma}
+    {\hat{a} = A \in \Gamma}
     {\Gamma \vdash_\infty \hat{a} <: \hat{a}}
 
     \inferrule*[right=\texttt{S-Arr}]
@@ -155,9 +198,9 @@
 
     \inferrule*[right=\texttt{S-$\forall$L}]
     {\Gamma \vdash B \\
-     \hat{a} \in FV(S~n, A) \\
-     \Gamma, \hat{a} = B \vdash_{S~n}  A <: C \to D}
-    {\Gamma \vdash_{S~n} \forall a. ~A <: [B/\hat{a}]C \to [B/\hat{a}]D}
+     a \in \texttt{freevars}(I/C~n , A) \\
+     \Gamma, \hat{a} = B \vdash_{I/C~n}  A <: C \to D}
+    {\Gamma \vdash_{I/C~n} \forall a. ~A <: [B/\hat{a}]C \to [B/\hat{a}]D}
     \\    
     
     \inferrule*[right=\texttt{S-var-l}]
@@ -171,15 +214,22 @@
 
 \section{Algo.}
 
-\subsection{Typing: $\boxed{\Gamma \vdash \Sigma \Rightarrow e \Rightarrow A}$}
+\begin{align*}
+&\text{Typing Environments} \quad\quad &\Gamma::=&~ . \mid \Gamma, x : A \mid \Gamma, a \mid \Gamma, \hat{a} = A\\
+&\text{Subtyping Environments} \quad\quad &\Gamma::=&~ . \mid \Gamma, x : A \mid \Gamma, a \mid \Gamma , \hat{a} \mid \Gamma, \hat{a} = A\\
+    &\text{Contexts} \quad\quad &\Sigma ::=&~  \square  \mid A \mid \boxed{e} \leadsto \Sigma\\
+    &\text{Generic Consumers} \quad \quad &g::=&~ i \mid x \mid e : A \mid \Lambda a.~e
+\end{align*}
+
+\subsection{Typing: $\Gamma \vdash \Sigma \Rightarrow e \Rightarrow A$}
 
 \begin{mathpar}
 \inferrule*[right=\texttt{T-Lit}]
-{ \vdash_{close} \Gamma}
+{ }
 {\Gamma \vdash \square \Rightarrow i \Rightarrow \mathsf{Int}}
 
 \inferrule*[right=\texttt{T-Var}]
-{ \vdash_{close} \Gamma \\ x : A \in \Gamma}
+{ x : A \in \Gamma}
 {\Gamma \vdash \square \Rightarrow x \Rightarrow A}
 
 \inferrule*[right=\texttt{T-Ann}]
@@ -202,7 +252,6 @@
 \inferrule*[right=\texttt{T-Sub}]
 {\Gamma \vdash \square \Rightarrow g \Rightarrow A\\
 \Sigma \neq \square\\
- \Gamma \vdash_{close} \Sigma \\
  \Gamma \vdash A \leq^+ \Sigma \dashv \Gamma \rightsquigarrow B}
 {\Gamma \vdash \Sigma \Rightarrow g \Rightarrow B}
 
@@ -268,7 +317,7 @@
 \end{mathpar}
 \end{comment}
 
-\subsection{Subtyping: $\boxed{\Gamma \vdash A \leq \Sigma \dashv \Gamma' \rightsquigarrow A'}$}
+\subsection{Subtyping: $\Gamma \vdash A \leq \Sigma \dashv \Gamma' \rightsquigarrow A'$}
 
 \begin{mathpar}
 \inferrule*[right=\texttt{\texttt{S-Int}}]
@@ -313,7 +362,7 @@
 {\Gamma \vdash A \rightarrow B \leq C \rightarrow D \dashv \Gamma_2 \rightsquigarrow C \rightarrow D}
 \\
 
-\inferrule*[right=\texttt{S-Term-Close}]
+\inferrule*[right=\texttt{S-Term-norm}]
 { \Gamma \vdash A \Rightarrow e \Rightarrow A'\\
  \Gamma \vdash B \leq^+ \Sigma \dashv \Gamma' \rightsquigarrow D}
 {\Gamma \vdash A \rightarrow B \leq^+ \boxed{e} \leadsto \Sigma \dashv \Gamma' \rightsquigarrow A' \rightarrow D}
