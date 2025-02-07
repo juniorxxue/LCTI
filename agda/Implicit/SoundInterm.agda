@@ -21,6 +21,90 @@ postulate
   sd-refl-∞ : Norm Γ
             → Γ ⊢d ∞ # A ≤ A
 
+ap-ε : k ε A
+     → Γ ∋∙ k
+     → Γ ≫ A ⇘ A%
+     → k ε A%
+ap-ε ε-var inΓ (ap-var= x) = ⊥-elim (∙∈-:=∈-false inΓ x)
+ap-ε ε-var inΓ (ap-var∙ x) = ε-var
+ap-ε (ε-arr-l inA) inΓ (ap-arr apA apA₁) = ε-arr-l (ap-ε inA inΓ apA)
+ap-ε (ε-arr-r inA) inΓ (ap-arr apA apA₁) = ε-arr-r (ap-ε inA inΓ apA₁)
+ap-ε (ε-∀ inA) inΓ (ap-∀ apA) = ε-∀ (ap-ε inA (S∙ inΓ) apA)
+
+infix 3 _¬εᵍ_
+data _¬εᵍ_ : Fin m → Env n m → Set where
+  Z : k ¬εᵍ ∅
+  Z^ : #0 ¬εᵍ Γ ,^
+  Z∙ : #0 ¬εᵍ Γ ,∙
+  Z= : ↑ty0 A ⇘ A'
+     → ¬ (#0 ε A')
+     → #0 ¬εᵍ Γ ,= A
+  S, : ¬ (k ε A)
+       → k ¬εᵍ Γ
+       → k ¬εᵍ Γ , A
+  S∙ : k ¬εᵍ Γ
+     → #S k ¬εᵍ Γ ,∙
+  S^ : k ¬εᵍ Γ
+     → #S k ¬εᵍ Γ ,^
+  S= : k ¬εᵍ Γ
+     → ↑ty0 A ⇘ A'
+     → ¬ (#S k ε A')
+     → #S k ¬εᵍ Γ ,= A
+
+εᵍ-false : Γ ∋ X := A
+         → k ε A
+         → k ¬εᵍ Γ
+         → ⊥
+εᵍ-false (Z up) inA (Z= x x₁) with ↑ty-unique up x
+... | refl = x₁ inA
+εᵍ-false (Z up) inA (S= ninΓ x x₁) with ↑ty-unique up x
+... | refl = x₁ inA
+εᵍ-false (S, inΓ) inA (S, x ninΓ) = εᵍ-false inΓ inA ninΓ
+εᵍ-false (S∙ inΓ up) inA Z∙ = ↑ty-ε-false up inA
+εᵍ-false (S∙ inΓ up) inA (S∙ ninΓ) = εᵍ-false inΓ (↑ty-ε-≤ inA up z≤n) ninΓ
+εᵍ-false (S^ inΓ up) inA Z^ = ↑ty-ε-false up inA
+εᵍ-false (S^ inΓ up) inA (S^ ninΓ) = εᵍ-false inΓ (↑ty-ε-≤ inA up z≤n) ninΓ
+εᵍ-false (S= inΓ up) inA (Z= x x₁) = ↑ty-ε-false up inA
+εᵍ-false (S= inΓ up) inA (S= ninΓ x x₁) = εᵍ-false inΓ (↑ty-ε-≤ inA up z≤n) ninΓ
+
+ap-ε-rev : k ε A%
+         → k ¬εᵍ Γ
+         → Γ ∋∙ k
+         → Γ ≫ A ⇘ A%
+         → k ε A
+ap-ε-rev ε-var ninΓ inΓ (ap-var= x) = ⊥-elim (εᵍ-false x ε-var ninΓ)
+ap-ε-rev ε-var ninΓ inΓ (ap-var∙ x) = ε-var
+ap-ε-rev (ε-arr-l inA%) ninΓ inΓ (ap-var= x) = ⊥-elim (εᵍ-false x (ε-arr-l inA%) ninΓ)
+ap-ε-rev (ε-arr-l inA%) ninΓ inΓ (ap-arr apA apA₁) = ε-arr-l (ap-ε-rev inA% ninΓ inΓ apA)
+ap-ε-rev (ε-arr-r inA%) ninΓ inΓ (ap-var= x) = ⊥-elim (εᵍ-false x (ε-arr-r inA%) ninΓ)
+ap-ε-rev (ε-arr-r inA%) ninΓ inΓ (ap-arr apA apA₁) = ε-arr-r (ap-ε-rev inA% ninΓ inΓ apA₁)
+ap-ε-rev (ε-∀ inA%) ninΓ inΓ (ap-var= x) = ⊥-elim (εᵍ-false x (ε-∀ inA%) ninΓ)
+ap-ε-rev (ε-∀ inA%) ninΓ inΓ (ap-∀ apA) = ε-∀ (ap-ε-rev inA% (S∙ ninΓ) (S∙ inΓ) apA)
+
+ap-¬ε : ¬ (k ε A)
+      → k ¬εᵍ Γ
+      → Γ ∋∙ k
+      → Γ ≫ A ⇘ A%
+      → k ε A%
+      → ⊥
+ap-¬ε ninA ninΓ inΓ apA inA% = ninA (ap-ε-rev inA% ninΓ inΓ apA)
+
+ap-find' : find A k j
+         → Γ ∋∙ k
+         → k ¬εᵍ Γ
+         → Γ ≫ A ⇘ A%
+         → find A% k j
+ap-find' (f-∞ x) inΓ ninΓ apA = f-∞ (ap-ε x inΓ apA)
+ap-find' (f-arr-𝕚-l x) inΓ ninΓ (ap-arr apA apA₁) = f-arr-𝕚-l (ap-ε x inΓ apA)
+ap-find' (f-arr-𝕚-r fd) inΓ ninΓ (ap-arr apA apA₁) = f-arr-𝕚-r (ap-find' fd inΓ ninΓ apA₁)
+ap-find' (f-arr-𝕔 ¬inA fd) inΓ ninΓ (ap-arr apA apA₁) = f-arr-𝕔 (ap-¬ε ¬inA ninΓ inΓ apA) (ap-find' fd inΓ ninΓ apA₁)
+ap-find' (f-∀ fd) inΓ ninΓ (ap-∀ apA) = f-∀ (ap-find' fd (S∙ inΓ) (S∙ ninΓ) apA)
+
+ap-find0 : find A #0 j
+         → Γ% ,∙ ≫ A ⇘ A% -- may need Norm Γ%
+         → find A% #0 j
+ap-find0 fd apA = ap-find' fd Z Z∙ apA
+
 sound-s : Γ ⊢i j # A ≤ B
         → Γ ≫ᵍ Γ%
         → Γ% ≫ A ⇘ A%
@@ -38,7 +122,9 @@ sound-s (s-arr₂ s s₁) apΓ (ap-arr apA apA₁) (ap-arr apB apB₁) = s-arr�
 sound-s (s-arr₃ cloA s) apΓ (ap-arr apA apA₁) (ap-arr apB apB₁) with ap-unique apA apB
 ... | refl = s-arr₃ (ap-closeA cloA apΓ (ap-closed (s-cloΓ s) apΓ) apB) (sound-s s apΓ apA₁ apB₁)
 sound-s (s-∀ s) apΓ (ap-∀ apA) (ap-∀ apB) = s-∀ (sound-s s (ap-S∙ apΓ) apA apB)
-sound-s (s-∀l s ic fd stC stD) apΓ apA apB = {!!}
+sound-s (s-∀l {B = B} s ic fd stC stD) apΓ (ap-∀ {A% = A%} apA) (ap-arr apB apB₁) =
+  let ⟨ A%* , stA% ⟩ = st0-total B A%
+  in s-∀l {B = B} stA% (sd-strengthen=0 (sound-s s {!!} {!!} {!!}) {!!} {!!}) ic (ap-find0 fd apA)
 sound-s (s-var-l inΓ s) apΓ (ap-var= x) apB = sound-s s apΓ (ap-var=-ap inΓ apΓ x) apB
 sound-s (s-var-l inΓ s) apΓ (ap-var∙ x) apB = ⊥-elim (∙∈-:=∈-false (ap-∋∙-rev x apΓ) inΓ)
 sound-s (s-var-r inΓ s) apΓ apA (ap-var= x) = sound-s s apΓ apA (ap-var=-ap inΓ apΓ x)
