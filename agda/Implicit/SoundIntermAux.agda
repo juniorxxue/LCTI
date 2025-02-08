@@ -141,6 +141,21 @@ postulate
               → ↑ty0 A% ⇘ A%'
               → Γ ,^ ≫ A' ⇘ A%'
 
+  ap-strengthen^0 : Γ ,^ ≫ A' ⇘ A%'
+              → ↑ty0 A ⇘ A'
+              → ↑ty0 A% ⇘ A%'
+                  → Γ ≫ A ⇘ A%
+
+  ap-strengthen∙0 : Γ ,∙ ≫ A' ⇘ A%'
+              → ↑ty0 A ⇘ A'
+              → ↑ty0 A% ⇘ A%'
+                  → Γ ≫ A ⇘ A%
+
+  ap-strengthen=0 : Γ ,= T ≫ A' ⇘ A%'
+              → ↑ty0 A ⇘ A'
+              → ↑ty0 A% ⇘ A%'
+                  → Γ ≫ A ⇘ A%
+
   ap-weaken,0 : Γ ≫ A ⇘ A%
               → Γ , T ≫ A ⇘ A%
 

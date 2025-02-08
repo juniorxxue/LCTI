@@ -70,6 +70,13 @@ ap-find0 : find A #0 j
          → find A% #0 j
 ap-find0 fd apA = ap-find' fd Z Z∙ apA
 
+late-ap-v2 : ∀ {C*%}
+           → ⟦ B ⟧ C ⇘ C*
+           → Γ% ≫ C* ⇘ C*%
+           → Γ% ≫ B ⇘ B%
+           → Γ% ,= B% ≫ C ⇘ C%'
+           → ↑ty0 C*% ⇘ C%'
+
 sound-s : Γ ⊢i j # A ≤ B
         → Γ ≫ᵍ Γ%
         → Γ% ≫ A ⇘ A%
@@ -87,15 +94,19 @@ sound-s (s-arr₂ s s₁) apΓ (ap-arr apA apA₁) (ap-arr apB apB₁) = s-arr�
 sound-s (s-arr₃ cloA s) apΓ (ap-arr apA apA₁) (ap-arr apB apB₁) with ap-unique apA apB
 ... | refl = s-arr₃ (ap-closeA cloA apΓ (ap-closed (s-cloΓ s) apΓ) apB) (sound-s s apΓ apA₁ apB₁)
 sound-s (s-∀ s) apΓ (ap-∀ apA) (ap-∀ apB) = s-∀ (sound-s s (ap-S∙ apΓ) apA apB)
-sound-s (s-∀l {B = B} s ic fd stC stD) apΓ (ap-∀ {A% = A%} apA) (ap-arr apB apB₁) with s-cloΓ s
+sound-s (s-∀l {B = B} s ic fd stC stD) apΓ (ap-∀ {A% = A%} apA) (ap-arr apC apD) with s-cloΓ s
 ... | clo-S= r cloA =
-  let ⟨ B%  , apB ⟩ = ap-total (ap-close-prv cloA apΓ)
+  let ⟨ B%  , apB% ⟩ = ap-total (ap-close-prv cloA apΓ)
       ⟨ A%* , stA% ⟩ = st0-total B% A%
-      ⟨ A%*' , apA% ⟩ = ap-total (ap-close-prv (s-cloA s) (ap-S= apΓ apB))
-      ⟨ C%*' , apC% ⟩ = ap-total {!!}
-      ⟨ D%*' , apD% ⟩ = ap-total {!!}
-  in s-∀l {B = B%} stA% (sd-strengthen=0 (sound-s s (ap-S= apΓ apB)
-    apA% {!!}) (late-ap apA stA% apA%) {!!}) ic (ap-find0 fd apA)
+      ⟨ A%*' , apA% ⟩ = ap-total (ap-close-prv (s-cloA s) (ap-S= apΓ apB%))
+      ⟨ C%' , apC% ⟩ = ap-total {!!}
+      ⟨ D%' , apD% ⟩ = ap-total {!!}
+  in s-∀l {B = B%} stA% (sd-strengthen=0 (sound-s s (ap-S= apΓ apB%)
+    apA% (ap-arr apC% apD%))
+    (late-ap apA stA% apA%) (↑ty-arr (late-ap-v2 stC apC apB% apC%)
+                                     (late-ap-v2 stD apD apB% apD%)))
+                                     ic
+                                     (ap-find0 fd apA)
 sound-s (s-var-l inΓ s) apΓ (ap-var= x) apB = sound-s s apΓ (ap-var=-ap inΓ apΓ x) apB
 sound-s (s-var-l inΓ s) apΓ (ap-var∙ x) apB = ⊥-elim (∙∈-:=∈-false (ap-∋∙-rev x apΓ) inΓ)
 sound-s (s-var-r inΓ s) apΓ apA (ap-var= x) = sound-s s apΓ apA (ap-var=-ap inΓ apΓ x)
