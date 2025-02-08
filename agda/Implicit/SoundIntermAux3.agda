@@ -75,19 +75,42 @@ shifted-↑ty (sfd-arr sf sf₁) = ⟨ shifted-↑ty sf .proj₁ `→ shifted-�
                                 ↑ty-arr (shifted-↑ty sf .proj₂) (shifted-↑ty sf₁ .proj₂) ⟩
 shifted-↑ty (sfd-∀ sf) = ⟨ `∀ shifted-↑ty sf .proj₁ , ↑ty-∀ (shifted-↑ty sf .proj₂) ⟩
 
+▶%-∋:-ap-↑ty-rev-^ : Γ ,^ ≫ A' ⇘ A%'
+                 → ↑ty0 A ⇘ A'
+                 → ∃[ A% ](↑ty0 A% ⇘ A%')
+▶%-∋:-ap-↑ty-rev-^ apA' upA with shifted-↑ty {k = #0} (ap-↑ty apA' Z^ (↑ty-shifted upA))
+... | ⟨ A% , upA% ⟩ = ⟨ A% , upA% ⟩
+
+▶%-∋:-ap-↑ty-rev-∙ : Γ ,∙ ≫ A' ⇘ A%'
+                 → ↑ty0 A ⇘ A'
+                 → ∃[ A% ](↑ty0 A% ⇘ A%')
+▶%-∋:-ap-↑ty-rev-∙ apA' upA with shifted-↑ty {k = #0} (ap-↑ty apA' Z∙ (↑ty-shifted upA))
+... | ⟨ A% , upA% ⟩ = ⟨ A% , upA% ⟩
+
+▶%-∋:-ap-↑ty-rev-= : Γ ,= T ≫ A' ⇘ A%'
+                 → ↑ty0 A ⇘ A'
+                 → ∃[ A% ](↑ty0 A% ⇘ A%')
+▶%-∋:-ap-↑ty-rev-= {T = T} apA' upA = let ⟨ T' , upT ⟩ = ↑ty0-total T in shifted-↑ty (ap-↑ty apA' (Z= upT (ε-shifted-false (↑ty-shifted upT))) (↑ty-shifted upA))
+
 ▶%-∋:=-ap : Γ ▶% k ,= A ⇘ Γ'
-          → k ¬εᵍ Γ
           → Γ' ∋ k := A%'
           → Γ ≫ A ⇘ A%
           → A% ↑ty k ⇘ A%'
-▶%-∋:=-ap (▶%Z x) ninΓ (Z up) apA = {!!}
-▶%-∋:=-ap (▶%S, newΓ up) ninΓ (S, inΓ) apA = ▶%-∋:=-ap newΓ {!!} inΓ (ap-strengthen,0 apA)
-▶%-∋:=-ap (▶%S^ newΓ x) ninΓ (S^ inΓ up) apA with ▶%-∋:=-ap newΓ {!!} inΓ (ap-strengthen^0 apA x {!!})
-... | ih = ↑ty-comm' z≤n ih up {!!}
-▶%-∋:=-ap (▶%S∙ newΓ x) ninΓ (S∙ inΓ up) apA with ▶%-∋:=-ap newΓ {!!} inΓ (ap-strengthen∙0 apA x {!!})
-... | ih = ↑ty-comm' z≤n ih up {!!}
-▶%-∋:=-ap (▶%S= newΓ x x₁) ninΓ (S= inΓ up) apA with ▶%-∋:=-ap newΓ {!!} inΓ (ap-strengthen=0 apA x {!!})
-... | ih = ↑ty-comm' z≤n ih up {!!}
+▶%-∋:=-ap (▶%Z x) (Z up) apA with ap-unique x apA
+... | refl = up
+▶%-∋:=-ap (▶%S, newΓ up) (S, inΓ) apA = ▶%-∋:=-ap newΓ inΓ (ap-strengthen,0 apA)
+▶%-∋:=-ap (▶%S^ newΓ x) (S^ inΓ up) apA
+  with ⟨ A , upA ⟩ ← ▶%-∋:-ap-↑ty-rev-^ apA x
+  with ▶%-∋:=-ap newΓ inΓ (ap-strengthen^0 apA x upA)
+... | ih = ↑ty-comm' z≤n ih up upA
+▶%-∋:=-ap (▶%S∙ newΓ x) (S∙ inΓ up) apA
+  with ⟨ A , upA ⟩ ← ▶%-∋:-ap-↑ty-rev-∙ apA x
+  with ▶%-∋:=-ap newΓ inΓ (ap-strengthen∙0 apA x upA)
+... | ih = ↑ty-comm' z≤n ih up upA
+▶%-∋:=-ap (▶%S= newΓ x x₁) (S= inΓ up) apA
+  with ⟨ A , upA ⟩ ← ▶%-∋:-ap-↑ty-rev-= apA x
+  with ▶%-∋:=-ap newΓ inΓ (ap-strengthen=0 apA x upA)
+... | ih = ↑ty-comm' z≤n ih up upA
 
 late-ap-v2-gen : ∀ {A*% Γ'}
                → ⟦ k / B ⟧ A ⇘ A*
@@ -96,7 +119,7 @@ late-ap-v2-gen : ∀ {A*% Γ'}
                → Γ' ≫ A      ⇘ A%'
                → A*% ↑ty k   ⇘ A%'
 late-ap-v2-gen st-int ap-int newΓ ap-int = ↑ty-int
-late-ap-v2-gen (st-var stx-eq) apA* newΓ (ap-var= x) = ▶%-∋:=-ap newΓ {!!} x apA*
+late-ap-v2-gen (st-var stx-eq) apA* newΓ (ap-var= x) = ▶%-∋:=-ap newΓ x apA*
 late-ap-v2-gen (st-var (stx-neq ¬p)) (ap-var= x₁) newΓ (ap-var= x) = {!!}
 late-ap-v2-gen (st-var (stx-neq ¬p)) (ap-var∙ x₁) newΓ (ap-var= x) = ⊥-elim (∙∈-:=∈-false (▶%-punchOut-∋∙ ¬p x₁ newΓ) x)
 late-ap-v2-gen (st-var stx-eq) apA* newΓ (ap-var∙ x) = ⊥-elim (∙∈-=∈-false x (▶%-∋= newΓ))
