@@ -4,6 +4,7 @@ open import Implicit.Language hiding (_≤_)
 open import Implicit.Decl renaming (_⊢_#_⦂_ to _⊢d_#_⦂_; _⊢_#_≤_ to _⊢d_#_≤_)
 open import Implicit.Interm renaming (_⊢_#_⦂_ to _⊢i_#_⦂_; _⊢_#_≤_ to _⊢i_#_≤_)
 open import Implicit.SoundIntermAux
+open import Implicit.SoundIntermAux2
 
 postulate
 
@@ -30,42 +31,6 @@ ap-ε ε-var inΓ (ap-var∙ x) = ε-var
 ap-ε (ε-arr-l inA) inΓ (ap-arr apA apA₁) = ε-arr-l (ap-ε inA inΓ apA)
 ap-ε (ε-arr-r inA) inΓ (ap-arr apA apA₁) = ε-arr-r (ap-ε inA inΓ apA₁)
 ap-ε (ε-∀ inA) inΓ (ap-∀ apA) = ε-∀ (ap-ε inA (S∙ inΓ) apA)
-
-infix 3 _¬εᵍ_
-data _¬εᵍ_ : Fin m → Env n m → Set where
-  Z : k ¬εᵍ ∅
-  Z^ : #0 ¬εᵍ Γ ,^
-  Z∙ : #0 ¬εᵍ Γ ,∙
-  Z= : ↑ty0 A ⇘ A'
-     → ¬ (#0 ε A')
-     → #0 ¬εᵍ Γ ,= A
-  S, : ¬ (k ε A)
-       → k ¬εᵍ Γ
-       → k ¬εᵍ Γ , A
-  S∙ : k ¬εᵍ Γ
-     → #S k ¬εᵍ Γ ,∙
-  S^ : k ¬εᵍ Γ
-     → #S k ¬εᵍ Γ ,^
-  S= : k ¬εᵍ Γ
-     → ↑ty0 A ⇘ A'
-     → ¬ (#S k ε A')
-     → #S k ¬εᵍ Γ ,= A
-
-εᵍ-false : Γ ∋ X := A
-         → k ε A
-         → k ¬εᵍ Γ
-         → ⊥
-εᵍ-false (Z up) inA (Z= x x₁) with ↑ty-unique up x
-... | refl = x₁ inA
-εᵍ-false (Z up) inA (S= ninΓ x x₁) with ↑ty-unique up x
-... | refl = x₁ inA
-εᵍ-false (S, inΓ) inA (S, x ninΓ) = εᵍ-false inΓ inA ninΓ
-εᵍ-false (S∙ inΓ up) inA Z∙ = ↑ty-ε-false up inA
-εᵍ-false (S∙ inΓ up) inA (S∙ ninΓ) = εᵍ-false inΓ (↑ty-ε-≤ inA up z≤n) ninΓ
-εᵍ-false (S^ inΓ up) inA Z^ = ↑ty-ε-false up inA
-εᵍ-false (S^ inΓ up) inA (S^ ninΓ) = εᵍ-false inΓ (↑ty-ε-≤ inA up z≤n) ninΓ
-εᵍ-false (S= inΓ up) inA (Z= x x₁) = ↑ty-ε-false up inA
-εᵍ-false (S= inΓ up) inA (S= ninΓ x x₁) = εᵍ-false inΓ (↑ty-ε-≤ inA up z≤n) ninΓ
 
 ap-ε-rev : k ε A%
          → k ¬εᵍ Γ
@@ -122,9 +87,15 @@ sound-s (s-arr₂ s s₁) apΓ (ap-arr apA apA₁) (ap-arr apB apB₁) = s-arr�
 sound-s (s-arr₃ cloA s) apΓ (ap-arr apA apA₁) (ap-arr apB apB₁) with ap-unique apA apB
 ... | refl = s-arr₃ (ap-closeA cloA apΓ (ap-closed (s-cloΓ s) apΓ) apB) (sound-s s apΓ apA₁ apB₁)
 sound-s (s-∀ s) apΓ (ap-∀ apA) (ap-∀ apB) = s-∀ (sound-s s (ap-S∙ apΓ) apA apB)
-sound-s (s-∀l {B = B} s ic fd stC stD) apΓ (ap-∀ {A% = A%} apA) (ap-arr apB apB₁) =
-  let ⟨ A%* , stA% ⟩ = st0-total B A%
-  in s-∀l {B = B} stA% (sd-strengthen=0 (sound-s s {!!} {!!} {!!}) {!!} {!!}) ic (ap-find0 fd apA)
+sound-s (s-∀l {B = B} s ic fd stC stD) apΓ (ap-∀ {A% = A%} apA) (ap-arr apB apB₁) with s-cloΓ s
+... | clo-S= r cloA =
+  let ⟨ B%  , apB ⟩ = ap-total (ap-close-prv cloA apΓ)
+      ⟨ A%* , stA% ⟩ = st0-total B% A%
+      ⟨ A%*' , apA% ⟩ = ap-total (ap-close-prv (s-cloA s) (ap-S= apΓ apB))
+      ⟨ C%*' , apC% ⟩ = ap-total {!!}
+      ⟨ D%*' , apD% ⟩ = ap-total {!!}
+  in s-∀l {B = B%} stA% (sd-strengthen=0 (sound-s s (ap-S= apΓ apB)
+    apA% {!!}) (late-ap apA stA% apA%) {!!}) ic (ap-find0 fd apA)
 sound-s (s-var-l inΓ s) apΓ (ap-var= x) apB = sound-s s apΓ (ap-var=-ap inΓ apΓ x) apB
 sound-s (s-var-l inΓ s) apΓ (ap-var∙ x) apB = ⊥-elim (∙∈-:=∈-false (ap-∋∙-rev x apΓ) inΓ)
 sound-s (s-var-r inΓ s) apΓ apA (ap-var= x) = sound-s s apΓ apA (ap-var=-ap inΓ apΓ x)

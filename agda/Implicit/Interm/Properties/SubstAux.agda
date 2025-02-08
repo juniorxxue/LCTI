@@ -5,6 +5,7 @@ open import Implicit.Interm.Base
 open import Implicit.Interm.Properties.OpenClose
 
 
+
 ∋:=-subst : Γ ∋ X := A
           → Γ ◀ k := T ⇘ Γ*
           → (¬p : k ≢ X)
@@ -57,37 +58,9 @@ punchOut-≤-inject {k₂ = #S k₂} {k₁ = #S k₁} ¬p (s≤s lt) = cong #S (
 ε-st (ε-arr-r inA) lt (st-arr st st₁) = ε-arr-r (ε-st inA lt st₁)
 ε-st (ε-∀ inA) lt (st-∀ up st) = ε-∀ (ε-st inA (s≤s lt) st)
 
-ε-shifted-false : Shifted A k
-                → k ε A
-                → ⊥
-ε-shifted-false (sfd-var x) ε-var = x refl
-ε-shifted-false (sfd-arr sd sd₁) (ε-arr-l inT) = ε-shifted-false sd inT
-ε-shifted-false (sfd-arr sd sd₁) (ε-arr-r inT) = ε-shifted-false sd₁ inT
-ε-shifted-false (sfd-∀ sd) (ε-∀ inT) = ε-shifted-false sd inT
-
-#S-injective : #S k₁ ≡ #S k₂
-             → k₁ ≡ k₂
-#S-injective refl = refl
-
-punchIn-≢ : k₁ ≢ k₂
-          → punchIn k k₁ ≢ punchIn k k₂
-punchIn-≢ {k₁ = k₁} {k₂} {#0} neq refl = neq refl
-punchIn-≢ {k₁ = #0} {#0} {#S k} neq peq = neq refl
-punchIn-≢ {k₁ = #S k₁} {#S k₂} {#S k} neq peq = punchIn-≢ (≢-pred neq) (#S-injective peq)
 
 
-shifted-lt : Shifted T k₁
-           → T ↑ty k₂ ⇘ T'
-           → k₂ #≤ k₁
-           → Shifted T' (#S k₁)
-shifted-lt sfd-int ↑ty-int lt = sfd-int
-shifted-lt (sfd-var x) ↑ty-var lt rewrite sym (punchIn-≤ lt) = sfd-var (punchIn-≢ x)
-shifted-lt (sfd-arr sd sd₁) (↑ty-arr upT upT₁) lt = sfd-arr (shifted-lt sd upT lt) (shifted-lt sd₁ upT₁ lt)
-shifted-lt (sfd-∀ sd) (↑ty-∀ upT) lt = sfd-∀ (shifted-lt sd upT (s≤s lt))
 
-ε-var-neg : ¬ (k ε ‶ X)
-          → X ≢ k
-ε-var-neg noin refl = noin ε-var
 
 
 find-¬ε : ¬ (inject₁ k₁ ε A)
