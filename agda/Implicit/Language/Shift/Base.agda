@@ -115,8 +115,20 @@ infix 3 ↑tyᵉ0_⇘_
 --+                            Shifted                             +--
 ----------------------------------------------------------------------
 
-data Shifted : Type m → Fin m → Set where
-  sfd-int : ∀ {b} → Shifted (Type m ∋⦂ Int) b
-  sfd-var : ∀ {k : Fin m} {b} → k ≢ b → Shifted (‶ k) b
-  sfd-arr : ∀ {A B : Type m} {b} → Shifted A b → Shifted B b → Shifted (A `→ B) b
-  sfd-∀ : ∀ {A : Type (1 + m)} {b} → Shifted A (#S b) → Shifted (`∀ A) b
+-- two-fold definition
+-- 1. a type is shifted by k
+-- 2. a neg definition of occurence
+infix 3 _¬ε_
+data _¬ε_ : Fin m → Type m → Set where
+  ¬ε-int :
+      k ¬ε Int
+  ¬ε-var :
+      k' ≢ k
+    → k ¬ε (‶ k')
+  ¬ε-arr :
+      k ¬ε A
+    → k ¬ε B
+    → k ¬ε A `→ B
+  ¬ε-∀ :
+      #S k ¬ε A
+    → k ¬ε `∀ A

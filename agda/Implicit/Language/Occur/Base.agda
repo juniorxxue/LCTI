@@ -18,31 +18,15 @@ data _ε_ : Fin m → Type m → Set where
       #S k ε A
     → k ε `∀ A
 
--- a neg definition of ε
-infix 3 _¬ε_
-data _¬ε_ : Fin m → Type m → Set where
-  ¬ε-int :
-      k ¬ε Int
-  ¬ε-var :
-      k ≢ k'
-    → k ¬ε (‶ k')
-  ¬ε-arr :
-      k ¬ε A
-    → k ¬ε B
-    → k ¬ε A `→ B
-  ¬ε-∀ :
-      #S k ¬ε A
-    → k ¬ε `∀ A
-
 infix 3 _¬εᵍ_
 data _¬εᵍ_ : Fin m → Env n m → Set where
   Z : k ¬εᵍ ∅
   Z^ : #0 ¬εᵍ Γ ,^
   Z∙ : #0 ¬εᵍ Γ ,∙
   Z= : ↑ty0 A ⇘ A'
-     → ¬ (#0 ε A')
+     → (#0 ¬ε A')
      → #0 ¬εᵍ Γ ,= A
-  S, : ¬ (k ε A)
+  S, : (k ¬ε A)
        → k ¬εᵍ Γ
        → k ¬εᵍ Γ , A
   S∙ : k ¬εᵍ Γ
@@ -51,5 +35,5 @@ data _¬εᵍ_ : Fin m → Env n m → Set where
      → #S k ¬εᵍ Γ ,^
   S= : k ¬εᵍ Γ
      → ↑ty0 A ⇘ A'
-     → ¬ (#S k ε A')
+     → (#S k ¬ε A')
      → #S k ¬εᵍ Γ ,= A

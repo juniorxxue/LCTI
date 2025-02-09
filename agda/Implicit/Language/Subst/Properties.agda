@@ -226,13 +226,11 @@ postulate
              → ⟦ k₂ / V ⟧ U ⇘ U*₂
              → ⟦ k₁ / U*₂ ⟧ T* ⇘ U**
 
-
-
-shifted-st-↑ty : Shifted A k
-               → ⟦ k / B ⟧ A ⇘ A*
-               → A* ↑ty k ⇘ A
-shifted-st-↑ty sfd-int st-int = ↑ty-int
-shifted-st-↑ty (sfd-var x) (st-var stx-eq) = ⊥-elim (x refl)
-shifted-st-↑ty (sfd-var x) (st-var (stx-neq ¬p)) = ↑ty-punchOut ¬p
-shifted-st-↑ty (sfd-arr sd sd₁) (st-arr st st₁) = ↑ty-arr (shifted-st-↑ty sd st) (shifted-st-↑ty sd₁ st₁)
-shifted-st-↑ty (sfd-∀ sd) (st-∀ up st) = ↑ty-∀ (shifted-st-↑ty sd st)
+st-↑ty : k ¬ε A
+       → ⟦ k / B ⟧ A ⇘ A*
+       → A* ↑ty k ⇘ A
+st-↑ty ¬ε-int st-int = ↑ty-int
+st-↑ty (¬ε-var x) (st-var stx-eq) = ⊥-elim (x refl)
+st-↑ty (¬ε-var x) (st-var (stx-neq ¬p)) = ↑ty-punchOut ¬p
+st-↑ty (¬ε-arr ¬inA ¬inA₁) (st-arr st st₁) = ↑ty-arr (st-↑ty ¬inA st) (st-↑ty ¬inA₁ st₁)
+st-↑ty (¬ε-∀ ¬inA) (st-∀ up st) = ↑ty-∀ (st-↑ty ¬inA st)

@@ -11,7 +11,7 @@ postulate
               → ↑ty0 B ⇘ B'
               → Γ ⊢d j # A ≤ B
 
-late-grd-gen' : ∀ {A%* A%*'}
+late-grd-gen : ∀ {A%* A%*'}
              → Γ ≫ A ⇘ A%
              → k ¬εᵍ Γ -- if we model ∙⟹, as two insertions, we could have this property implicitly.
              → ⟦ k / B ⟧ A% ⇘ A%*
@@ -19,19 +19,19 @@ late-grd-gen' : ∀ {A%* A%*'}
              → [ B' / k ] Γ ∙⟹ Γ'
              → Γ' ≫ A ⇘ A%*'
              → A%* ↑ty k ⇘ A%*'
-late-grd-gen' grd-int ninΓ st-int upB newΓ grd-int = ↑ty-int
-late-grd-gen' (grd-var= x) ninΓ stA% upB newΓ (grd-var= x₁) with ∙⟹-:=-eq x newΓ x₁
-... | refl = shifted-st-↑ty (εᵍ-shifted ninΓ x) stA%
-late-grd-gen' (grd-var= x) ninΓ stA% upB newΓ (grd-var∙ x₁) = ⊥-elim (∙⟹-:=-∙-false x newΓ x₁)
-late-grd-gen' (grd-var∙ x) ninΓ (st-var stx-eq) upB newΓ (grd-var= x₁) with ∙⟹-∙-:=-eq x newΓ x₁
+late-grd-gen grd-int ninΓ st-int upB newΓ grd-int = ↑ty-int
+late-grd-gen (grd-var= x) ninΓ stA% upB newΓ (grd-var= x₁) with ∙⟹-:=-eq x newΓ x₁
+... | refl = st-↑ty (εᵍ-:=-¬ε ninΓ x) stA%
+late-grd-gen (grd-var= x) ninΓ stA% upB newΓ (grd-var∙ x₁) = ⊥-elim (∙⟹-:=-∙-false x newΓ x₁)
+late-grd-gen (grd-var∙ x) ninΓ (st-var stx-eq) upB newΓ (grd-var= x₁) with ∙⟹-∙-:=-eq x newΓ x₁
 ... | refl = upB
-late-grd-gen' (grd-var∙ x) ninΓ (st-var (stx-neq ¬p)) upB newΓ (grd-var= x₁) = ⊥-elim (∙⟹-∙-:=-neq-false x newΓ x₁ ¬p)
-late-grd-gen' (grd-var∙ x) ninΓ (st-var stx-eq) upB newΓ (grd-var∙ x₁) = ⊥-elim (∙⟹-∙-eq-false x newΓ x₁)
-late-grd-gen' (grd-var∙ x) ninΓ (st-var (stx-neq ¬p)) upB newΓ (grd-var∙ x₁) = ↑ty-punchOut ¬p
-late-grd-gen' (grd-arr apA apA₁) ninΓ (st-arr stA% stA%₁) upB newΓ (grd-arr apA' apA'') = ↑ty-arr (late-grd-gen' apA ninΓ stA% upB newΓ apA')
-                                                                                               (late-grd-gen' apA₁ ninΓ stA%₁ upB newΓ apA'')
-late-grd-gen' {B' = B'} (grd-∀ apA) ninΓ (st-∀ up stA%) upB newΓ (grd-∀ apA') =
-   let ⟨ B'' , upB' ⟩ = ↑ty0-total B' in ↑ty-∀ (late-grd-gen' apA (S∙ ninΓ) stA% (↑ty-comm' z≤n upB upB' up) (∙⟹∙S newΓ upB') apA')
+late-grd-gen (grd-var∙ x) ninΓ (st-var (stx-neq ¬p)) upB newΓ (grd-var= x₁) = ⊥-elim (∙⟹-∙-:=-neq-false x newΓ x₁ ¬p)
+late-grd-gen (grd-var∙ x) ninΓ (st-var stx-eq) upB newΓ (grd-var∙ x₁) = ⊥-elim (∙⟹-∙-eq-false x newΓ x₁)
+late-grd-gen (grd-var∙ x) ninΓ (st-var (stx-neq ¬p)) upB newΓ (grd-var∙ x₁) = ↑ty-punchOut ¬p
+late-grd-gen (grd-arr apA apA₁) ninΓ (st-arr stA% stA%₁) upB newΓ (grd-arr apA' apA'') = ↑ty-arr (late-grd-gen apA ninΓ stA% upB newΓ apA')
+                                                                                               (late-grd-gen apA₁ ninΓ stA%₁ upB newΓ apA'')
+late-grd-gen {B' = B'} (grd-∀ apA) ninΓ (st-∀ up stA%) upB newΓ (grd-∀ apA') =
+   let ⟨ B'' , upB' ⟩ = ↑ty0-total B' in ↑ty-∀ (late-grd-gen apA (S∙ ninΓ) stA% (↑ty-comm' z≤n upB upB' up) (∙⟹∙S newΓ upB') apA')
 
 late-grd : ∀ {A%* A%*'}
         → Γ ,∙ ≫ A ⇘ A%
@@ -40,8 +40,7 @@ late-grd : ∀ {A%* A%*'}
         → ↑ty0 A%* ⇘ A%*'
 late-grd {B = B} apA stA% apA' =
   let ⟨ B' , upB ⟩ = ↑ty0-total B
---  in late-grd-gen apA stA% upB (∙⟹^0 upB) apA'
-  in late-grd-gen' apA Z∙ stA% upB (∙⟹^0 upB) apA'
+  in late-grd-gen apA Z∙ stA% upB (∙⟹^0 upB) apA'
 
 late-grd-v2-gen : ∀ {A*% Γ'}
                → ⟦ k / B ⟧ A ⇘ A*

@@ -209,14 +209,12 @@ grd-∋⦂ (S^ inΓ up) (clo-S^ cloΓ) (grd-S^ apΓ) apA with grd-total (grd-clo
 grd-∋⦂ (S= inΓ up) (clo-S= cloΓ cloA) (grd-S= apΓ x) apA with grd-total (grd-close-prv (∋⦂-closed cloΓ inΓ) apΓ)
 ... | ⟨ A% , apA' ⟩ = S= (grd-∋⦂ inΓ cloΓ apΓ apA') (grd-↑ty= apA ◀Z up apA')
 
-
-
-grd-↑ty : Γ ≫ A ⇘ A%
-       → k ¬εᵍ Γ
-       → Shifted A k
-       → Shifted A% k
-grd-↑ty grd-int ninΓ sfd-int = sfd-int
-grd-↑ty (grd-var= x) ninΓ (sfd-var x₁) = εᵍ-shifted ninΓ x
-grd-↑ty (grd-var∙ x) ninΓ (sfd-var x₁) = sfd-var x₁
-grd-↑ty (grd-arr apA apA₁) ninΓ (sfd-arr st st₁) = sfd-arr (grd-↑ty apA ninΓ st) (grd-↑ty apA₁ ninΓ st₁)
-grd-↑ty (grd-∀ apA) ninΓ (sfd-∀ st) = sfd-∀ (grd-↑ty apA (S∙ ninΓ) st)
+grd-¬ε-prv : Γ ≫ A ⇘ A%
+           → k ¬εᵍ Γ
+           → k ¬ε A
+           → k ¬ε A%
+grd-¬ε-prv grd-int ninΓ ¬ε-int = ¬ε-int
+grd-¬ε-prv (grd-var= x) ninΓ ninA = εᵍ-:=-¬ε ninΓ x
+grd-¬ε-prv (grd-var∙ x) ninΓ ninA = ninA
+grd-¬ε-prv (grd-arr grdA grdA₁) ninΓ (¬ε-arr ninA ninA₁) = ¬ε-arr (grd-¬ε-prv grdA ninΓ ninA) (grd-¬ε-prv grdA₁ ninΓ ninA₁)
+grd-¬ε-prv (grd-∀ grdA) ninΓ (¬ε-∀ ninA) = ¬ε-∀ (grd-¬ε-prv grdA (S∙ ninΓ) ninA)

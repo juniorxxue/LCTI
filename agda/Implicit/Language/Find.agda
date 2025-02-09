@@ -1,8 +1,9 @@
 module Implicit.Language.Find where
 
 open import Implicit.Language.Base
-open import Implicit.Language.Lookup.All
-open import Implicit.Language.Occur.All
+open import Implicit.Language.Shift.Base
+open import Implicit.Language.Lookup.Base
+open import Implicit.Language.Occur.Base
 
 -- find A k j
 -- at j-th position of A type, should have a bound variable, example: |-1 forall a. a -> a <: Int
@@ -13,7 +14,7 @@ data find : Type m → Fin m → Counter → Set where
             → find (A `→ B) k (𝕚 j)
   f-arr-𝕚-r : find B k j
             → find (A `→ B) k (𝕚 j)
-  f-arr-𝕔   : (¬inA : ¬ (k ε A))
+  f-arr-𝕔   : (¬inA : k ¬ε A)
             → find B k j
             → find (A `→ B) k (𝕔 j)
   f-∀       : find A (#S k) j

@@ -4,8 +4,6 @@ open import Implicit.Language.All
 open import Implicit.Interm.Base
 open import Implicit.Interm.Properties.OpenClose
 
-
-
 ∋:=-subst : Γ ∋ X := A
           → Γ ◀ k := T ⇘ Γ*
           → (¬p : k ≢ X)
@@ -58,11 +56,7 @@ punchOut-≤-inject {k₂ = #S k₂} {k₁ = #S k₁} ¬p (s≤s lt) = cong #S (
 ε-st (ε-arr-r inA) lt (st-arr st st₁) = ε-arr-r (ε-st inA lt st₁)
 ε-st (ε-∀ inA) lt (st-∀ up st) = ε-∀ (ε-st inA (s≤s lt) st)
 
-
-
-
-
-
+{-
 find-¬ε : ¬ (inject₁ k₁ ε A)
        → ⟦ k₂ / T ⟧ A ⇘ A*
        → Shifted T k₁
@@ -80,22 +74,42 @@ find-¬ε ninA (st-var (stx-neq ¬p)) sd lt ε-var = helper ¬p (ε-var-neg ninA
 find-¬ε ninA (st-arr st st₁) sd lt (ε-arr-l inA*) = find-¬ε (λ z → ninA (ε-arr-l z)) st sd lt inA*
 find-¬ε ninA (st-arr st st₁) sd lt (ε-arr-r inA*) = find-¬ε (λ z → ninA (ε-arr-r z)) st₁ sd lt inA*
 find-¬ε ninA (st-∀ up st) sd lt (ε-∀ inA*) = find-¬ε (λ z → ninA (ε-∀ z)) st (shifted-≤ sd up z≤n) (s≤s lt) inA*
+-}
+
+find-¬ε-helper : ∀ {m} {k₁ : Fin m} {k₂ k'}
+               → (¬p : k₂ ≢ k')
+               → k₁ #< k₂
+               → k' ≢ inject₁ k₁
+               → punchOut ¬p ≢ k₁
+find-¬ε-helper {suc m} {#0} {#S k₂} {#0} ¬p lt neq eq = neq refl
+find-¬ε-helper {suc m} {#S k₁} {#S k₂} {#S k'} ¬p (s≤s lt) neq refl = find-¬ε-helper (≢-pred ¬p) lt (≢-pred neq) refl
+
+find-¬ε : inject₁ k₁ ¬ε A
+        → ⟦ k₂ / T ⟧ A ⇘ A*
+        → k₁ ¬ε T
+        → k₁ #< k₂
+        → k₁ ¬ε A*
+find-¬ε ¬inA st-int ¬inT lt = ¬ε-int
+find-¬ε ¬inA (st-var stx-eq) ¬inT lt = ¬inT
+find-¬ε (¬ε-var x) (st-var (stx-neq ¬p)) ¬inT lt = ¬ε-var (find-¬ε-helper ¬p lt x)
+find-¬ε (¬ε-arr ¬inA ¬inA₁) (st-arr stA stA₁) ¬inT lt = ¬ε-arr (find-¬ε ¬inA stA ¬inT lt) (find-¬ε ¬inA₁ stA₁ ¬inT lt)
+find-¬ε (¬ε-∀ ¬inA) (st-∀ up stA) ¬inT lt = ¬ε-∀ (find-¬ε ¬inA stA (¬ε-↑ty0 ¬inT up) (s≤s lt))
 
 
 find-st : ∀ {A : Type (2 + m)} {k₁ k₂ j A* T}
         → find A (inject₁ k₁) j
         → k₁ #< k₂
-        → Shifted T k₁
+        → k₁ ¬ε T
         → ⟦ k₂ / T ⟧ A ⇘ A*
         → find A* k₁ j
 find-st (f-∞ x) lt upT st = f-∞ (ε-st x lt st)
 find-st (f-arr-𝕚-l x) lt upT (st-arr st st₁) = f-arr-𝕚-l (ε-st x lt st)
 find-st (f-arr-𝕚-r fd) lt upT (st-arr st st₁) = f-arr-𝕚-r (find-st fd lt upT st₁)
 find-st (f-arr-𝕔 ¬inA fd) lt upT (st-arr st st₁) = f-arr-𝕔 (find-¬ε ¬inA st upT lt) (find-st fd lt upT st₁)
-find-st (f-∀ fd) lt upT (st-∀ up st) = f-∀ (find-st fd (s≤s lt) (shifted-≤ upT up z≤n) st)
+find-st (f-∀ fd) lt upT (st-∀ up st) = f-∀ (find-st fd (s≤s lt) (¬ε-↑ty0 upT up) st)
 
 find-st0 : find A #0 j
          → ↑ty0 T ⇘ T'
          → ⟦ #S k / T' ⟧ A ⇘ A*
          → find A* #0 j
-find-st0 fd up st = find-st fd (s≤s z≤n) (↑ty-shifted up) st
+find-st0 fd up st = find-st fd (s≤s z≤n) (↑ty-¬ε up) st

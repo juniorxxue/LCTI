@@ -34,61 +34,31 @@ open import Implicit.Language.Occur.Base
 ↑ty-ε (ε-arr-r inA) (↑ty-arr up up₁) lt = ε-arr-r (↑ty-ε inA up₁ lt)
 ↑ty-ε (ε-∀ inA) (↑ty-∀ up) lt = ε-∀ (↑ty-ε inA up (s≤s lt))
 
+ε-¬ε-false : k ε A
+           → k ¬ε A
+           → ⊥
+ε-¬ε-false ε-var (¬ε-var x) = x refl
+ε-¬ε-false (ε-arr-l inA) (¬ε-arr ¬inA ¬inA₁) = ε-¬ε-false inA ¬inA
+ε-¬ε-false (ε-arr-r inA) (¬ε-arr ¬inA ¬inA₁) = ε-¬ε-false inA ¬inA₁
+ε-¬ε-false (ε-∀ inA) (¬ε-∀ ¬inA) = ε-¬ε-false inA ¬inA
 
-↑ty-¬ε : X ¬ε A
-      → A ↑ty k ⇘ A'
-      → X #< k
-      → inject₁ X ¬ε A'
-↑ty-¬ε ¬ε-int ↑ty-int lt = ¬ε-int
-↑ty-¬ε (¬ε-var x) ↑ty-var lt = ¬ε-var (punchIn-inject-neq lt x)
-↑ty-¬ε (¬ε-arr ninA ninA₁) (↑ty-arr up up₁) lt = ¬ε-arr (↑ty-¬ε ninA up lt) (↑ty-¬ε ninA₁ up₁ lt)
-↑ty-¬ε (¬ε-∀ ninA) (↑ty-∀ up) lt = ¬ε-∀ (↑ty-¬ε ninA up (s≤s lt))
+εᵍ-:=-¬ε : k ¬εᵍ Γ
+         → Γ ∋ X := A
+         → k ¬ε A
+εᵍ-:=-¬ε Z^ (S^ inΓ up) = ↑ty-¬ε up
+εᵍ-:=-¬ε Z∙ (S∙ inΓ up) = ↑ty-¬ε up
+εᵍ-:=-¬ε (Z= x x₁) (Z up) = ↑ty-¬ε up
+εᵍ-:=-¬ε (Z= x x₁) (S= inΓ up) = ↑ty-¬ε up
+εᵍ-:=-¬ε (S, x ninΓ) (S, inΓ) = εᵍ-:=-¬ε ninΓ inΓ
+εᵍ-:=-¬ε (S∙ ninΓ) (S∙ inΓ up) = ¬ε-↑ty0 (εᵍ-:=-¬ε ninΓ inΓ) up
+εᵍ-:=-¬ε (S^ ninΓ) (S^ inΓ up) = ¬ε-↑ty0 (εᵍ-:=-¬ε ninΓ inΓ) up
+εᵍ-:=-¬ε (S= ninΓ x x₁) (Z up) with ↑ty-unique up x
+... | refl = x₁
+εᵍ-:=-¬ε (S= ninΓ x x₁) (S= inΓ up) = ¬ε-↑ty0 (εᵍ-:=-¬ε ninΓ inΓ) up
 
-ε-shifted-false : Shifted A k
-                → k ε A
-                → ⊥
-ε-shifted-false (sfd-var x) ε-var = x refl
-ε-shifted-false (sfd-arr sd sd₁) (ε-arr-l inT) = ε-shifted-false sd inT
-ε-shifted-false (sfd-arr sd sd₁) (ε-arr-r inT) = ε-shifted-false sd₁ inT
-ε-shifted-false (sfd-∀ sd) (ε-∀ inT) = ε-shifted-false sd inT
 
-↑ty-ε-false : A ↑ty k ⇘ A'
-            → k ε A'
+εᵍ-:=-false : Γ ∋ X := A
+            → k ε A
+            → k ¬εᵍ Γ
             → ⊥
-↑ty-ε-false upA inA = ε-shifted-false (↑ty-shifted upA) inA
-
-ε-var-neg : ¬ (k ε ‶ X)
-          → X ≢ k
-ε-var-neg noin refl = noin ε-var
-
-εᵍ-false : Γ ∋ X := A
-         → k ε A
-         → k ¬εᵍ Γ
-         → ⊥
-εᵍ-false (Z up) inA (Z= x x₁) with ↑ty-unique up x
-... | refl = x₁ inA
-εᵍ-false (Z up) inA (S= ninΓ x x₁) with ↑ty-unique up x
-... | refl = x₁ inA
-εᵍ-false (S, inΓ) inA (S, x ninΓ) = εᵍ-false inΓ inA ninΓ
-εᵍ-false (S∙ inΓ up) inA Z∙ = ↑ty-ε-false up inA
-εᵍ-false (S∙ inΓ up) inA (S∙ ninΓ) = εᵍ-false inΓ (↑ty-ε-≤ inA up z≤n) ninΓ
-εᵍ-false (S^ inΓ up) inA Z^ = ↑ty-ε-false up inA
-εᵍ-false (S^ inΓ up) inA (S^ ninΓ) = εᵍ-false inΓ (↑ty-ε-≤ inA up z≤n) ninΓ
-εᵍ-false (S= inΓ up) inA (Z= x x₁) = ↑ty-ε-false up inA
-εᵍ-false (S= inΓ up) inA (S= ninΓ x x₁) = εᵍ-false inΓ (↑ty-ε-≤ inA up z≤n) ninΓ
-
-¬ε-shifted : ¬ (k ε A)
-           → Shifted A k
-¬ε-shifted {A = Int} nin = sfd-int
-¬ε-shifted {A = ‶ X} nin = sfd-var (helper nin)
-  where helper : ¬ (k ε ‶ X)
-               →  X ≢ k
-        helper nin refl = nin ε-var
-¬ε-shifted {A = A `→ A₁} nin = sfd-arr (¬ε-shifted (λ z → nin (ε-arr-l z)))
-                                       (¬ε-shifted (λ z → nin (ε-arr-r z)))
-¬ε-shifted {A = `∀ A} nin = sfd-∀ (¬ε-shifted (λ z → nin (ε-∀ z)))
-
-εᵍ-shifted : k ¬εᵍ Γ
-           → Γ ∋ X := A
-           → Shifted A k
-εᵍ-shifted ninΓ inΓ = ¬ε-shifted (λ x → εᵍ-false inΓ x ninΓ)
+εᵍ-:=-false inΓ inA ¬inΓ = ε-¬ε-false inA (εᵍ-:=-¬ε ¬inΓ inΓ)

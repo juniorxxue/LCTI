@@ -59,13 +59,12 @@ open import Implicit.Language.Shift.Base
 ↑ty0-total A = ↑ty-total A #0
 
 -- shifted
-↑ty-shifted : ∀ {A : Type m} {A' k}
-  → A ↑ty k ⇘ A'
-  → Shifted A' k
-↑ty-shifted ↑ty-int = sfd-int
-↑ty-shifted {k = k} (↑ty-var {X = X}) = sfd-var (punchInᵢ≢i k X)
-↑ty-shifted (↑ty-arr up up₁) = sfd-arr (↑ty-shifted up) (↑ty-shifted up₁)
-↑ty-shifted (↑ty-∀ up) = sfd-∀ (↑ty-shifted up)
+↑ty-¬ε : A ↑ty k ⇘ A'
+       → k ¬ε A'
+↑ty-¬ε ↑ty-int = ¬ε-int
+↑ty-¬ε {k = k} (↑ty-var {X = X}) = ¬ε-var (punchInᵢ≢i k X)
+↑ty-¬ε (↑ty-arr upA upA₁) = ¬ε-arr (↑ty-¬ε upA) (↑ty-¬ε upA₁)
+↑ty-¬ε (↑ty-∀ upA) = ¬ε-∀ (↑ty-¬ε upA)
 
 ↑ty-comm : k₁ #≤ k₂
          → A ↑ty k₁ ⇘ B
@@ -124,20 +123,41 @@ private variable
         helper ¬p eq with punchOut ¬p
         helper ¬p refl | Y = ↑ty-var
 
+↑ty-surjective : k ¬ε A'
+               → ∃[ A ](A ↑ty k ⇘ A')
+↑ty-surjective ¬ε-int = ⟨ Int , ↑ty-int ⟩
+↑ty-surjective (¬ε-var x) = ⟨ (‶ punchOut (≢-sym x)) , (↑ty-punchOut (≢-sym x)) ⟩
+↑ty-surjective (¬ε-arr ¬inA' ¬inA'') = ⟨ ↑ty-surjective ¬inA' .proj₁ `→ ↑ty-surjective ¬inA'' .proj₁ ,
+                                        ↑ty-arr (↑ty-surjective ¬inA' .proj₂)
+                                        (↑ty-surjective ¬inA'' .proj₂)
+                                        ⟩
+↑ty-surjective (¬ε-∀ ¬inA') = ⟨ `∀ ↑ty-surjective ¬inA' .proj₁ ,
+                               ↑ty-∀ (↑ty-surjective ¬inA' .proj₂) ⟩
 
-shifted-↑ty : Shifted A' k
-            → ∃[ A ](A ↑ty k ⇘ A')
-shifted-↑ty sfd-int = ⟨ Int , ↑ty-int ⟩
-shifted-↑ty (sfd-var x) = ⟨ (‶ punchOut (≢-sym x)) , ↑ty-punchOut (≢-sym x) ⟩
-shifted-↑ty (sfd-arr sf sf₁) = ⟨ shifted-↑ty sf .proj₁ `→ shifted-↑ty sf₁ .proj₁ ,
-                                ↑ty-arr (shifted-↑ty sf .proj₂) (shifted-↑ty sf₁ .proj₂) ⟩
-shifted-↑ty (sfd-∀ sf) = ⟨ `∀ shifted-↑ty sf .proj₁ , ↑ty-∀ (shifted-↑ty sf .proj₂) ⟩
+¬ε-↑ty : k₁ ¬ε T
+       → T ↑ty k₂ ⇘ T'
+       → k₂ #≤ k₁
+       → (#S k₁) ¬ε T'
+¬ε-↑ty ¬ε-int ↑ty-int lt = ¬ε-int
+¬ε-↑ty (¬ε-var x) ↑ty-var lt rewrite sym (punchIn-≤ lt) = ¬ε-var (punchIn-≢ x)
+¬ε-↑ty (¬ε-arr ¬inT ¬inT₁) (↑ty-arr upT upT₁) lt = ¬ε-arr (¬ε-↑ty ¬inT upT lt) (¬ε-↑ty ¬inT₁ upT₁ lt)
+¬ε-↑ty (¬ε-∀ ¬inT) (↑ty-∀ upT) lt = ¬ε-∀ (¬ε-↑ty ¬inT upT (s≤s lt))
 
-shifted-≤ : Shifted T k₁
-           → T ↑ty k₂ ⇘ T'
-           → k₂ #≤ k₁
-           → Shifted T' (#S k₁)
-shifted-≤ sfd-int ↑ty-int lt = sfd-int
-shifted-≤ (sfd-var x) ↑ty-var lt rewrite sym (punchIn-≤ lt) = sfd-var (punchIn-≢ x)
-shifted-≤ (sfd-arr sd sd₁) (↑ty-arr upT upT₁) lt = sfd-arr (shifted-≤ sd upT lt) (shifted-≤ sd₁ upT₁ lt)
-shifted-≤ (sfd-∀ sd) (↑ty-∀ upT) lt = sfd-∀ (shifted-≤ sd upT (s≤s lt))
+¬ε-↑ty0 : k ¬ε T
+        → ↑ty0 T ⇘ T'
+        → #S k ¬ε T'
+¬ε-↑ty0 ¬inT upT = ¬ε-↑ty ¬inT upT z≤n
+
+¬ε-↑ty' : X ¬ε A
+      → A ↑ty k ⇘ A'
+      → X #< k
+      → inject₁ X ¬ε A'
+¬ε-↑ty' ¬ε-int ↑ty-int lt = ¬ε-int
+¬ε-↑ty' (¬ε-var x) ↑ty-var lt = ¬ε-var (≢-sym (punchIn-inject-neq lt (≢-sym x)))
+¬ε-↑ty' (¬ε-arr ninA ninA₁) (↑ty-arr up up₁) lt = ¬ε-arr (¬ε-↑ty' ninA up lt) (¬ε-↑ty' ninA₁ up₁ lt)
+¬ε-↑ty' (¬ε-∀ ninA) (↑ty-∀ up) lt = ¬ε-∀ (¬ε-↑ty' ninA up (s≤s lt))
+
+¬ε-↑ty0' : #0 ¬ε A
+         → A ↑ty #S k ⇘ A'
+         → #0 ¬ε A'
+¬ε-↑ty0' ¬inA upA = ¬ε-↑ty' ¬inA upA (s≤s z≤n)

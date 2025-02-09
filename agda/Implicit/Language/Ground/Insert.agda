@@ -82,23 +82,22 @@ data _▶%_,=_⇘_ : Env n m → Fin (1 + m) → Type m → Env n (1 + m) → Se
 ▶%-∋= (▶%S= newΓ x x₁) = S= (▶%-∋= newΓ)
 
 
-
 ▶%-∋:-grd-↑ty-rev-^ : Γ ,^ ≫ A' ⇘ A%'
                  → ↑ty0 A ⇘ A'
                  → ∃[ A% ](↑ty0 A% ⇘ A%')
-▶%-∋:-grd-↑ty-rev-^ apA' upA with shifted-↑ty {k = #0} (grd-↑ty apA' Z^ (↑ty-shifted upA))
+▶%-∋:-grd-↑ty-rev-^ apA' upA with ↑ty-surjective {k = #0} (grd-¬ε-prv apA' Z^ (↑ty-¬ε upA))
 ... | ⟨ A% , upA% ⟩ = ⟨ A% , upA% ⟩
 
 ▶%-∋:-grd-↑ty-rev-∙ : Γ ,∙ ≫ A' ⇘ A%'
                  → ↑ty0 A ⇘ A'
                  → ∃[ A% ](↑ty0 A% ⇘ A%')
-▶%-∋:-grd-↑ty-rev-∙ apA' upA with shifted-↑ty {k = #0} (grd-↑ty apA' Z∙ (↑ty-shifted upA))
+▶%-∋:-grd-↑ty-rev-∙ apA' upA with ↑ty-surjective {k = #0} (grd-¬ε-prv apA' Z∙ (↑ty-¬ε upA))
 ... | ⟨ A% , upA% ⟩ = ⟨ A% , upA% ⟩
 
 ▶%-∋:-grd-↑ty-rev-= : Γ ,= T ≫ A' ⇘ A%'
                  → ↑ty0 A ⇘ A'
                  → ∃[ A% ](↑ty0 A% ⇘ A%')
-▶%-∋:-grd-↑ty-rev-= {T = T} apA' upA = let ⟨ T' , upT ⟩ = ↑ty0-total T in shifted-↑ty (grd-↑ty apA' (Z= upT (ε-shifted-false (↑ty-shifted upT))) (↑ty-shifted upA))
+▶%-∋:-grd-↑ty-rev-= {T = T} apA' upA = let ⟨ T' , upT ⟩ = ↑ty0-total T in ↑ty-surjective (grd-¬ε-prv apA' (Z= upT (↑ty-¬ε upT)) (↑ty-¬ε upA))
 
 ▶%-∋:=-ap : Γ ▶% k ,= A ⇘ Γ'
           → Γ' ∋ k := A%'

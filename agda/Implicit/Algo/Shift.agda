@@ -2,7 +2,7 @@ module Implicit.Algo.Shift where
 
 -- a module for shifting in new syntax of algorithmic system
 
-open import Implicit.Language
+open import Implicit.Language.All
 open import Implicit.Algo.Syntax
 
 infix 3 _↑tmᶜ_⇘_
@@ -29,9 +29,3 @@ data _↑tyᶜ_⇘_ : Context n m → Fin (1 + m) → Context n (1 + m) → Set 
 infix 3 ↑tyᶜ0_⇘_
 ↑tyᶜ0_⇘_ : Context n m → Context n (1 + m) → Set
 ↑tyᶜ0_⇘_ Σ = _↑tyᶜ_⇘_ Σ #0
-
-
-
-
-
-
