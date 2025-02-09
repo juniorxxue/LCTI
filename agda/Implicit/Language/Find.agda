@@ -1,25 +1,8 @@
-module Implicit.Language.Counter where
+module Implicit.Language.Find where
 
 open import Implicit.Language.Base
 open import Implicit.Language.Lookup.All
-
-data Counter : Set where
-  Z : Counter
-  ∞ : Counter
-  𝕚 : Counter → Counter
-  𝕔 : Counter → Counter
-
-variable
-  j : Counter
-
-data NonZ : Counter → Set where
-  nz-∞ : NonZ ∞
-  nz-I : NonZ (𝕚 j)
-  nz-C : NonZ (𝕔 j)
-
-data 𝕚𝕔 : Counter → Set where
-  case-𝕚 : 𝕚𝕔 (𝕚 j)
-  case-𝕔 : 𝕚𝕔 (𝕔 j)
+open import Implicit.Language.Occur.All
 
 -- find A k j
 -- at j-th position of A type, should have a bound variable, example: |-1 forall a. a -> a <: Int

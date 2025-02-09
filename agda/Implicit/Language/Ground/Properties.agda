@@ -3,6 +3,7 @@ module Implicit.Language.Ground.Properties where
 open import Implicit.Language.Base
 open import Implicit.Language.Shift.All
 open import Implicit.Language.Lookup.All
+open import Implicit.Language.Occur.All
 open import Implicit.Language.OpenClose.All
 open import Implicit.Language.Norm.All
 open import Implicit.Language.EnvOps.All

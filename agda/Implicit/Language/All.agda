@@ -6,8 +6,9 @@ open import Implicit.Language.Base public
 open import Implicit.Language.Shift.All public
 open import Implicit.Language.Subst.All public
 open import Implicit.Language.Lookup.All public
+open import Implicit.Language.Occur.All public
 
-open import Implicit.Language.Counter public
+open import Implicit.Language.Find public
 
 -- two files below are entangled
 open import Implicit.Language.Norm.All public

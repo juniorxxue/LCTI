@@ -66,3 +66,25 @@ variable
   Γ% : Env n m
   Δ Δ' Δ₁ Δ₂ : Env n m
   Ψ Ω : Env n m
+
+‶-injective : ‶ X ≡ ‶ Y
+            → X ≡ Y
+‶-injective refl = refl
+
+data Counter : Set where
+  Z : Counter
+  ∞ : Counter
+  𝕚 : Counter → Counter
+  𝕔 : Counter → Counter
+
+variable
+  j : Counter
+
+data NonZ : Counter → Set where
+  nz-∞ : NonZ ∞
+  nz-I : NonZ (𝕚 j)
+  nz-C : NonZ (𝕔 j)
+
+data 𝕚𝕔 : Counter → Set where
+  case-𝕚 : 𝕚𝕔 (𝕚 j)
+  case-𝕔 : 𝕚𝕔 (𝕔 j)

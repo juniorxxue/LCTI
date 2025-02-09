@@ -121,3 +121,14 @@ punchIn-comm {x = #S x} {#S j} {#S k} (s≤s j≤k) = cong #S (punchIn-comm j≤
 m#<m+1 : k #< #S k
 m#<m+1 {k = #0} = s≤s z≤n
 m#<m+1 {k = #S k} = s≤s m#<m+1
+
+
+#S-injective : #S X ≡ #S Y
+             → X ≡ Y
+#S-injective refl = refl
+
+punchIn-≢ : k₁ ≢ k₂
+          → punchIn k k₁ ≢ punchIn k k₂
+punchIn-≢ {k₁ = k₁} {k₂} {#0} neq refl = neq refl
+punchIn-≢ {k₁ = #0} {#0} {#S k} neq peq = neq refl
+punchIn-≢ {k₁ = #S k₁} {#S k₂} {#S k} neq peq = punchIn-≢ (≢-pred neq) (#S-injective peq)
