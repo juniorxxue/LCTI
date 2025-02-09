@@ -1,4 +1,4 @@
-module Implicit.Language.EnvOps where
+module Implicit.Language.EnvOps.All where
 
 open import Implicit.Language.EnvOps.Base public
 open import Implicit.Language.EnvOps.Insert public

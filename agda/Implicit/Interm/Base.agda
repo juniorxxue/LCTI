@@ -1,6 +1,6 @@
 module Implicit.Interm.Base where
 
-open import Implicit.Language
+open import Implicit.Language.All
 
 ----------------------------------------------------------------------
 --+                           Subtyping                            +--

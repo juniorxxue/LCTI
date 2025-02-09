@@ -1,7 +1,7 @@
 {-# OPTIONS --allow-unsolved-metas #-}
 module Implicit.Interm.Properties.Find where
 
-open import Implicit.Language
+open import Implicit.Language.All
 open import Implicit.Interm.Base
 
 ↑ty-find : find A X j

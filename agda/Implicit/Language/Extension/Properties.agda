@@ -1,11 +1,12 @@
 module Implicit.Language.Extension.Properties where
 
 open import Implicit.Language.Base
-open import Implicit.Language.Extension.Base
 
-open import Implicit.Language.Lookup
-open import Implicit.Language.EnvOps
-open import Implicit.Language.OpenClose
+open import Implicit.Language.Lookup.All
+open import Implicit.Language.EnvOps.All
+open import Implicit.Language.OpenClose.All
+
+open import Implicit.Language.Extension.Base
 
 ----------------------------------------------------------------------
 --+                             Lookup                             +--

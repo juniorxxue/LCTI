@@ -1,11 +1,11 @@
 module Implicit.Language.OpenClose.Subst where
 
 open import Implicit.Language.Base
-open import Implicit.Language.Lookup
-open import Implicit.Language.Shift
-open import Implicit.Language.Subst
+open import Implicit.Language.Lookup.All
+open import Implicit.Language.Shift.All
+open import Implicit.Language.Subst.All
 open import Implicit.Language.OpenClose.Base
-open import Implicit.Language.EnvOps
+open import Implicit.Language.EnvOps.All
 open import Implicit.Language.OpenClose.Weaken
 
 ◀=-imply-∋= : Γ ◀ k := T ⇘ Γ*

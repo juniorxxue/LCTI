@@ -1,8 +1,8 @@
 module Implicit.Language.Lookup.Base where
 
 open import Implicit.Language.Base
-open import Implicit.Language.Shift
-open import Implicit.Language.Subst
+open import Implicit.Language.Shift.All
+open import Implicit.Language.Subst.All
 
 -- lookup an entry: term variable
 infix 3 _∋_⦂_

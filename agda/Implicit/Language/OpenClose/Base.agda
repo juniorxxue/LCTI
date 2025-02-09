@@ -1,7 +1,7 @@
 module Implicit.Language.OpenClose.Base where
 
 open import Implicit.Language.Base
-open import Implicit.Language.Lookup
+open import Implicit.Language.Lookup.All
 
 infix 3 _⊢c_
 infix 3 _⊢o_
@@ -16,7 +16,7 @@ data _⊢o_ : Env n m → Type m → Set where
     → Γ ⊢o (A `→ B)
   ⊢o-arr-r :
       Γ ⊢o B
-    → Γ ⊢o (A `→ B)    
+    → Γ ⊢o (A `→ B)
   ⊢o-∀ :
       Γ ,∙ ⊢o A
     → Γ ⊢o `∀ A
@@ -57,7 +57,7 @@ data Closed : Env n m → Set where
   clo-S∙ : Closed Γ
          → Closed (Γ ,∙)
   clo-S^ : Closed Γ
-         → Closed (Γ ,^)         
+         → Closed (Γ ,^)
   clo-S= : Closed Γ
          → (cloA : Γ ⊢c A)
          → Closed (Γ ,= A)

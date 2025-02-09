@@ -1,6 +1,6 @@
 module Implicit.Interm.Properties.OpenClose where
 
-open import Implicit.Language
+open import Implicit.Language.All
 open import Implicit.Interm.Base
 
 ----------------------------------------------------------------------

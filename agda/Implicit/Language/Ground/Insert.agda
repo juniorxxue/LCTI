@@ -1,11 +1,11 @@
 module Implicit.Language.Ground.Insert where
 
 open import Implicit.Language.Base
-open import Implicit.Language.Shift
-open import Implicit.Language.Lookup
-open import Implicit.Language.OpenClose
-open import Implicit.Language.Norm
-open import Implicit.Language.EnvOps
+open import Implicit.Language.Shift.All
+open import Implicit.Language.Lookup.All
+open import Implicit.Language.OpenClose.All
+open import Implicit.Language.Norm.All
+open import Implicit.Language.EnvOps.All
 open import Implicit.Language.Ground.Base
 open import Implicit.Language.Ground.Properties
 

@@ -1,8 +1,8 @@
 module Implicit.Language.EnvOps.Properties where
 
 open import Implicit.Language.Base
-open import Implicit.Language.Shift
-open import Implicit.Language.Lookup
+open import Implicit.Language.Shift.All
+open import Implicit.Language.Lookup.All
 open import Implicit.Language.EnvOps.Base
 
 inst-in : [ A / k ] Γ ⟹ Γ'

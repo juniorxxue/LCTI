@@ -1,4 +1,4 @@
-module Implicit.Prelude where
+module Implicit.Language.Prelude where
 
 open import Data.Nat hiding (_/_) public
 open import Data.Nat.Properties public

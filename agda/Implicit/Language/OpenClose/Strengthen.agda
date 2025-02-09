@@ -1,9 +1,9 @@
 module Implicit.Language.OpenClose.Strengthen where
 
 open import Implicit.Language.Base
-open import Implicit.Language.Lookup
-open import Implicit.Language.Shift
-open import Implicit.Language.Subst
+open import Implicit.Language.Lookup.All
+open import Implicit.Language.Shift.All
+open import Implicit.Language.Subst.All
 open import Implicit.Language.OpenClose.Base
 open import Implicit.Language.EnvOps.Base
 open import Implicit.Language.EnvOps.Insert

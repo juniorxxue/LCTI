@@ -1,8 +1,8 @@
 module Implicit.Language.EnvOps.Base where
 
 open import Implicit.Language.Base
-open import Implicit.Language.Shift
-open import Implicit.Language.Subst
+open import Implicit.Language.Shift.All
+open import Implicit.Language.Subst.All
 open import Implicit.Language.OpenClose.Base
 
 ----------------------------------------------------------------------

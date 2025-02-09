@@ -1,6 +1,6 @@
 module Implicit.Interm.Properties.Strengthen where
 
-open import Implicit.Language
+open import Implicit.Language.All
 open import Implicit.Interm.Base
 
 s-strengthen, : Γ ⊢ j # A ≤ B

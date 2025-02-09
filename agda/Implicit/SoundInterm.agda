@@ -1,8 +1,8 @@
 module Implicit.SoundInterm where
 
-open import Implicit.Language hiding (_≤_)
-open import Implicit.Decl renaming (_⊢_#_⦂_ to _⊢d_#_⦂_; _⊢_#_≤_ to _⊢d_#_≤_; s-refl-∞ to sd-refl-∞)
-open import Implicit.Interm renaming (_⊢_#_⦂_ to _⊢i_#_⦂_; _⊢_#_≤_ to _⊢i_#_≤_)
+open import Implicit.Language.All hiding (_≤_)
+open import Implicit.Decl.All renaming (_⊢_#_⦂_ to _⊢d_#_⦂_; _⊢_#_≤_ to _⊢d_#_≤_; s-refl-∞ to sd-refl-∞)
+open import Implicit.Interm.All renaming (_⊢_#_⦂_ to _⊢i_#_⦂_; _⊢_#_≤_ to _⊢i_#_≤_)
 
 postulate
 

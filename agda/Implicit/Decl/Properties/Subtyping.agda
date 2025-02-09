@@ -1,6 +1,6 @@
 module Implicit.Decl.Properties.Subtyping where
 
-open import Implicit.Language
+open import Implicit.Language.All
 open import Implicit.Decl.Base
 
 ⊢sub' : Γ ⊢ Z # e ⦂ B

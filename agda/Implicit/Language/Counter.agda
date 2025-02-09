@@ -1,7 +1,7 @@
 module Implicit.Language.Counter where
 
 open import Implicit.Language.Base
-open import Implicit.Language.Lookup
+open import Implicit.Language.Lookup.All
 
 data Counter : Set where
   Z : Counter

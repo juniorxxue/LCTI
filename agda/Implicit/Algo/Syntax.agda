@@ -1,6 +1,6 @@
 module Implicit.Algo.Syntax where
 
-open import Implicit.Language
+open import Implicit.Language.All
 
 infixr 7 [_]↝_
 

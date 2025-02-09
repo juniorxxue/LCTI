@@ -1,8 +1,8 @@
 module Implicit.Language.Subst.Properties where
 
 open import Implicit.Language.Base
+open import Implicit.Language.Shift.All
 open import Implicit.Language.Subst.Base
-open import Implicit.Language.Shift
 
 stx-unique : ⟦ k / A ⟧ˣ X ⇘ B₁
            → ⟦ k / A ⟧ˣ X ⇘ B₂

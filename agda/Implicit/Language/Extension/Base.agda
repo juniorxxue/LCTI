@@ -1,7 +1,7 @@
 module Implicit.Language.Extension.Base where
 
 open import Implicit.Language.Base
-open import Implicit.Language.OpenClose
+open import Implicit.Language.OpenClose.All
 
 infix 3 _⊆_
 data _⊆_ : Env n m → Env n m → Set where

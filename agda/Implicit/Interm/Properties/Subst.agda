@@ -1,6 +1,6 @@
 module Implicit.Interm.Properties.Subst where
 
-open import Implicit.Language
+open import Implicit.Language.All
 open import Implicit.Interm.Base
 open import Implicit.Interm.Properties.OpenClose
 open import Implicit.Interm.Properties.Subtyping

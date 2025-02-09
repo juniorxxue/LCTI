@@ -1,7 +1,7 @@
 module Implicit.Language.Subst.Base where
 
 open import Implicit.Language.Base
-open import Implicit.Language.Shift
+open import Implicit.Language.Shift.All
 
 private variable
   i : ℕ

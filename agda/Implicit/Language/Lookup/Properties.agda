@@ -1,8 +1,8 @@
 module Implicit.Language.Lookup.Properties where
 
 open import Implicit.Language.Base
+open import Implicit.Language.Shift.All
 open import Implicit.Language.Lookup.Base
-open import Implicit.Language.Shift
 
 ∋⦂-unique : Γ ∋ x ⦂ A
           → Γ ∋ x ⦂ B

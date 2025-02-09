@@ -1,4 +1,4 @@
-module Implicit.Algo where
+module Implicit.Algo.All where
 
 open import Implicit.Algo.Base public
 open import Implicit.Algo.Properties.Extension public

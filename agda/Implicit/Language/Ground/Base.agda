@@ -1,9 +1,9 @@
 module Implicit.Language.Ground.Base where
 
 open import Implicit.Language.Base
-open import Implicit.Language.Shift
-open import Implicit.Language.Lookup
-open import Implicit.Language.EnvOps
+open import Implicit.Language.Shift.All
+open import Implicit.Language.Lookup.All
+open import Implicit.Language.EnvOps.All
 
 -- apply a env Γ to a (closed) type A, and obtain a ground type (with no freevars).
 infix 3 _≫_⇘_

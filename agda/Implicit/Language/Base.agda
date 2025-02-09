@@ -1,6 +1,6 @@
 module Implicit.Language.Base where
 
-open import Implicit.Prelude public
+open import Implicit.Language.Prelude public
 
 infixr 5  ƛ_
 infixl 7  _·_

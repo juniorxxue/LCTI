@@ -2,7 +2,7 @@ module Implicit.Language.Norm.Base where
 -- a strict version of close, where the allowable freevars are only universal variables
 
 open import Implicit.Language.Base
-open import Implicit.Language.Lookup
+open import Implicit.Language.Lookup.All
 
 infix 3 _⊢n_
 data _⊢n_ : Env n m → Type m → Set where
