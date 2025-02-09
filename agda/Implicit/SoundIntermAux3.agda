@@ -36,6 +36,24 @@ data _▶%_,=_⇘_ : Env n m → Fin (1 + m) → Type m → Env n (1 + m) → Se
 ▶%-punchOut-∋= {m = m} {k = #S k} {X = #0} ¬p Z (▶%S= newΓ x x₁) = Z
 ▶%-punchOut-∋= {m = m} {k = #S k} {X = #S X} ¬p (S= inΓ) (▶%S= newΓ x x₁) = S= (▶%-punchOut-∋= (≢-pred ¬p) inΓ newΓ)
 
+▶%-punchOut-∋:= : ∀ {m} {Γ : Env n m} {A A' k X B Γ'}
+       → (¬p : k ≢ X)
+       → Γ ∋ punchOut ¬p := A
+       → Γ ▶% k ,= B ⇘ Γ'
+       → Γ' ∋ X := A'
+       → A ↑ty k ⇘ A'
+▶%-punchOut-∋:= {m = m} {k = #0} {#0} ¬p inΓ (▶%Z x) (Z up) = ⊥-elim (¬p refl)
+▶%-punchOut-∋:= {m = m} {k = #0} {#S X} ¬p inΓ (▶%Z x) (S= inΓ' up) with ∋:=-unique inΓ inΓ'
+... | refl = up
+▶%-punchOut-∋:= {m = m} {k = k} {X} ¬p (S, inΓ) (▶%S, newΓ' up) (S, inΓ') = ▶%-punchOut-∋:= ¬p inΓ newΓ' inΓ'
+▶%-punchOut-∋:= {m = suc m} {k = #S k} {#S X} ¬p (S^ inΓ up) (▶%S^ newΓ' x) (S^ inΓ' up₁) with ▶%-punchOut-∋:= (≢-pred ¬p) inΓ newΓ' inΓ'
+... | r = ↑ty-comm' z≤n r up₁ up
+▶%-punchOut-∋:= {m = suc m} {k = #S k} {#S X} ¬p (S∙ inΓ up) (▶%S∙ newΓ' x) (S∙ inΓ' up₁) with ▶%-punchOut-∋:= (≢-pred ¬p) inΓ newΓ' inΓ'
+... | r = ↑ty-comm' z≤n r up₁ up
+▶%-punchOut-∋:= {m = suc m} {k = #S k} {#0} ¬p (Z up) (▶%S= newΓ' x x₁) (Z up₁) = ↑ty-comm' z≤n x₁ up₁ up
+▶%-punchOut-∋:= {m = suc m} {k = #S k} {#S X} ¬p (S= inΓ up) (▶%S= newΓ' x x₁) (S= inΓ' up₁) with ▶%-punchOut-∋:= (≢-pred ¬p) inΓ newΓ' inΓ'
+... | r = ↑ty-comm' z≤n r up₁ up
+
 ▶%-punchOut-∋∙ : ∀ {m} {Γ : Env n m} {k X B Γ'}
        → (¬p : k ≢ X)
        → Γ ∋∙ punchOut ¬p
@@ -120,7 +138,7 @@ late-ap-v2-gen : ∀ {A*% Γ'}
                → A*% ↑ty k   ⇘ A%'
 late-ap-v2-gen st-int ap-int newΓ ap-int = ↑ty-int
 late-ap-v2-gen (st-var stx-eq) apA* newΓ (ap-var= x) = ▶%-∋:=-ap newΓ x apA*
-late-ap-v2-gen (st-var (stx-neq ¬p)) (ap-var= x₁) newΓ (ap-var= x) = {!!}
+late-ap-v2-gen (st-var (stx-neq ¬p)) (ap-var= x₁) newΓ (ap-var= x) = ▶%-punchOut-∋:= ¬p x₁ newΓ x
 late-ap-v2-gen (st-var (stx-neq ¬p)) (ap-var∙ x₁) newΓ (ap-var= x) = ⊥-elim (∙∈-:=∈-false (▶%-punchOut-∋∙ ¬p x₁ newΓ) x)
 late-ap-v2-gen (st-var stx-eq) apA* newΓ (ap-var∙ x) = ⊥-elim (∙∈-=∈-false x (▶%-∋= newΓ))
 late-ap-v2-gen (st-var (stx-neq ¬p)) (ap-var= x₁) newΓ (ap-var∙ x) = ⊥-elim (∙∈-=∈-false x (▶%-punchOut-∋= ¬p (:=to= x₁) newΓ))
