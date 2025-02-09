@@ -1,6 +1,6 @@
 module Implicit.Algo.Properties.Shift where
 
-open import Implicit.Language
+open import Implicit.Language.All
 open import Implicit.Algo.Base
 
 

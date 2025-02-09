@@ -1,6 +1,6 @@
 module Implicit.Algo.OpenClose where
 
-open import Implicit.Language
+open import Implicit.Language.All
 open import Implicit.Algo.Syntax
 open import Implicit.Algo.Lookup
 
@@ -17,4 +17,3 @@ infix 3 _⊢oᶜ_
 data _⊢oᶜ_ : Env n m → Context n m → Set where
   ⊢o-τ : Γ ⊢o A → Γ ⊢oᶜ (τ A)
   ⊢o-term : Γ ⊢oᶜ Σ → Γ ⊢oᶜ [ e ]↝ Σ -- we may add conditions onto `e` later
-

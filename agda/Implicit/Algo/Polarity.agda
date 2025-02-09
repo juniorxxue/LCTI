@@ -1,6 +1,6 @@
 module Implicit.Algo.Polarity where
 
-open import Implicit.Language
+open import Implicit.Language.All
 open import Implicit.Algo.Syntax
 open import Implicit.Algo.OpenClose
 

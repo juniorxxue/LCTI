@@ -1,14 +1,7 @@
-module Implicit.Algo.BaseCounter where
+module Implicit.AlgoCounter.Base where
 
-open import Implicit.Language
-open import Implicit.Decl.Base
-open import Implicit.Algo.Syntax public
-open import Implicit.Algo.Shift public
-open import Implicit.Algo.Subst public
-open import Implicit.Algo.OpenClose public
-open import Implicit.Algo.Lookup public
-open import Implicit.Algo.Split public
-open import Implicit.Algo.Polarity public
+open import Implicit.Language.All
+open import Implicit.Algo.Base
 
 ✫ : Counter → Counter
 ✫ Z = Z

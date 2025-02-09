@@ -1,14 +1,58 @@
 module Implicit.SoundCounter where
 
-open import Implicit.Language hiding (_≤_)
-open import Implicit.Interm
-open import Implicit.Algo
-open import Implicit.Algo.BaseCounter
-open import Implicit.SoundCounterAux
+open import Implicit.Language.All hiding (_≤_)
+open import Implicit.Interm.All
+open import Implicit.Algo.All
+open import Implicit.AlgoCounter.All
+
+infix 3 _⊢_~_
+data _⊢_~_ : Env n m → Counter × Type m → Context n m → Set where
+
+  ~Z : ∀ {Γ : Env n m} {A}
+    → Γ ⊢ ⟨ Z , A ⟩ ~ □
+
+  ~∞ : ∀ {Γ : Env n m} {A }
+    → Γ ⊢ ⟨ ∞ , A ⟩ ~ τ A
+
+  ~I : ∀ {Γ : Env n m} {j A B Σ e}
+    → (⊢e : Γ ⊢ Z # e ⦂ A)
+    → Γ ⊢ ⟨ j , B ⟩ ~ Σ
+    → Γ ⊢ ⟨ 𝕚 j , A `→ B ⟩ ~ ([ e ]↝ Σ)
+
+  ~C : ∀ {Γ : Env n m} {j A B Σ e}
+    (⊢e : Γ ⊢ ∞ # e ⦂ A)
+    → Γ ⊢ ⟨ j , B ⟩ ~ Σ
+    → Γ ⊢ ⟨ 𝕔 j , A `→ B ⟩ ~ ([ e ]↝ Σ)
+
+
+NonEmpty-NonZ : NonEmpty Σ
+              → Γ ⊢ ⟨ j , A ⟩ ~ Σ
+              → NonZ j
+NonEmpty-NonZ ne-τ ~∞ = nz-∞
+NonEmpty-NonZ ne-app (~I ⊢e j~Σ) = nz-I
+NonEmpty-NonZ ne-app (~C ⊢e j~Σ) = nz-C
+
+~subst0 : (Γ ,= B) ⊢ ⟨ j , A ⟩ ~ Σ
+        → ⟦ B ⟧ᶜ Σ ⇘ Σ*
+        → ⟦ B ⟧ A ⇘ A*
+        → Γ ⊢ ⟨ j , A* ⟩ ~ Σ*
+~subst0 ~Z empty st2 = ~Z
+~subst0 ~∞ (fulltype st) st2 rewrite st-unique st st2 = ~∞
+~subst0 (~I ⊢e j~Σ) (term st1 ste) (st-arr st2 st3) = ~I (t-subst0 ⊢e ste st2) (~subst0 j~Σ st1 st3)
+~subst0 (~C ⊢e j~Σ) (term st1 ste) (st-arr st2 st3) = ~C (t-subst0 ⊢e ste st2) (~subst0 j~Σ st1 st3)
+
+~strengthen,0 : Γ , A ⊢ ⟨ j , B ⟩ ~ Σ'
+              → ↑tmᶜ0 Σ ⇘ Σ'
+              → Γ ⊢ ⟨ j , B ⟩ ~ Σ
+~strengthen,0 ~Z ↑tmᶜ-□ = ~Z
+~strengthen,0 ~∞ ↑tmᶜ-τ = ~∞
+~strengthen,0 (~I ⊢e j~Σ) (↑tmᶜ-e up-e up) = ~I (t-strengthen,0 ⊢e up-e) (~strengthen,0 j~Σ up)
+~strengthen,0 (~C ⊢e j~Σ) (↑tmᶜ-e up-e up) = ~C (t-strengthen,0 ⊢e up-e) (~strengthen,0 j~Σ up)
 
 ----------------------------------------------------------------------
 --+                             Typing                             +--
 ----------------------------------------------------------------------
+
 tc-~ : Γ ⊢ Σ ⇒ e ⇒ A ↡ j
      → Γ ⊢ ⟨ j , A ⟩ ~ Σ
 
@@ -113,7 +157,7 @@ sound-s s'@(s-term-o opnA ⊢e s s₁) pr with ≤id0 (sc-sound s)
   in s-arr₂ (s-⊆-prv (sound-s s pr-l) (s-⊆ (sc-sound s₁) pr-r)) (sound-s s₁ pr-r)
 sound-s (s-∀ s) pr = s-∀ (sound-s s (polar-∀ pr))
 sound-s (s-∀l s upᶜ upᵉ st₁ st₂) (polar-r cloΓ cloΣ) = let pr' = polar-r (clo-S^ cloΓ) (⊢cᶜ-weaken^0 cloΣ (↑tyᶜ-e upᵉ upᶜ))
-  in s-∀l (sound-s s pr') (ic-aux (sc-~ s pr')) (sound-find-l0 s cloΓ cloΣ upᵉ upᶜ) {!!} {!!}
+  in s-∀l (sound-s s pr') (ic-aux (sc-~ s pr')) (sound-find-l0 s cloΓ cloΣ upᵉ upᶜ) st₁ st₂
     where ic-aux : Δ ,= B ⊢ ⟨ j , C `→ D ⟩ ~ [ e' ]↝ Σ'
                  → 𝕚𝕔 j
           ic-aux (~I ⊢e s) = case-𝕚
@@ -132,7 +176,7 @@ sound-find-l (s-arr s s₁) cloΓ (⊢c-τ (⊢c-arr cloA cloA₁)) inΓ inΔ wi
 ... | is-ex inΓ₁ = find-arr-r (sound-find-l s₁ (⊆-closed cloΓ ext) (⊢c-τ (⊆-cloA cloA₁ ext)) inΓ₁ inΔ)
 ... | is-sol inΓ₁ = find-arr-l (sound-find-r s cloΓ cloA inΓ inΓ₁)
 sound-find-l (s-term-c ⊢e s) cloΓ (⊢c-term cloe cloA) inΓ inΔ with ⊢id0 (tc-sound ⊢e)
-... | refl = f-arr-𝕔 (⊢c-¬ε (⊢closeA (tc-sound ⊢e)) inΓ) (sound-find-l s (⊢closeΓ (tc-sound ⊢e)) cloA inΓ inΔ)
+... | refl = f-arr-𝕔 (⊢c-^∈-¬ε (⊢close-τ (tc-sound ⊢e)) inΓ) (sound-find-l s (⊢closeΓ (tc-sound ⊢e)) cloA inΓ inΔ)
 sound-find-l (s-term-o opnA ⊢e s s₁) cloΓ (⊢c-term cloe cloA) inΓ inΔ with s-⊆ (sc-sound s) (polar-l cloΓ (⊢closeA (tc-sound ⊢e)))
 ... | ext with s-⊆-exsol ext inΓ
 ... | is-ex inΓ₁ = f-arr-𝕚-r (sound-find-l s₁ (⊆-closed cloΓ ext) (⊆-cloAᶜ cloA ext) inΓ₁ inΔ)
@@ -156,8 +200,6 @@ sound-find-r (s-∀ s) cloΓ (⊢c-∀ cloB) inΓ inΔ = f-∀ (sound-find-r s (
 ----------------------------------------------------------------------
 --+                             Bridge                             +--
 ----------------------------------------------------------------------
-
-
 
 data JustType (Γ : Env n m) (Σ : Context n m) (e : Term n m) (A : Type m) : Set where
   typs : ∀ {j}

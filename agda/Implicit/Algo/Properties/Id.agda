@@ -1,6 +1,6 @@
 module Implicit.Algo.Properties.Id where
 
-open import Implicit.Language
+open import Implicit.Language.All
 open import Implicit.Algo.Base
 open import Implicit.Algo.Properties.Split
 open import Implicit.Algo.Properties.Subst
@@ -10,7 +10,7 @@ data Split : (Σ : Context n m) → (A : Type m) → Set where
       (spl : ⟦ Σ , A ⟧→s⟦ τ T , A' ⟧)
     → (eq : T ≡ A')
     → Split Σ A
-    
+
   case-□ :
       (spl : ⟦ Σ , A ⟧→s⟦ □ , A' ⟧)
     → Split Σ A
@@ -69,4 +69,4 @@ data Split : (Σ : Context n m) → (A : Type m) → Set where
 
 ≤id0 : Γ ⊢ A ⌞ ≤ ⌝ τ B ⊣ Γ' ↪ C
      → B ≡ C
-≤id0 s = ≤id' s none-τ  
+≤id0 s = ≤id' s none-τ

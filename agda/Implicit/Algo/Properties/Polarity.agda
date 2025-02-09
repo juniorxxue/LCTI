@@ -1,10 +1,9 @@
 module Implicit.Algo.Properties.Polarity where
 
-open import Implicit.Language
+open import Implicit.Language.All
 open import Implicit.Algo.Base
 open import Implicit.Algo.Properties.Id
 open import Implicit.Algo.Properties.Lookup
-open import Implicit.Algo.Properties.Extension
 open import Implicit.Algo.Properties.OpenClose
 
 -- the logic seems messed around

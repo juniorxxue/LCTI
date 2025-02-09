@@ -1,6 +1,6 @@
 module Implicit.Algo.Subst where
 
-open import Implicit.Language
+open import Implicit.Language.All
 open import Implicit.Algo.Syntax
 
 -- subst a type in context
@@ -19,5 +19,3 @@ data ⟦_/_⟧ᶜ_⇘_ : Fin (1 + m) → Type m → Context n (1 + m) → Contex
 infix 3 ⟦_⟧ᶜ_⇘_
 ⟦_⟧ᶜ_⇘_ : Type m → Context n (1 + m) → Context n m → Set
 ⟦_⟧ᶜ_⇘_ = ⟦_/_⟧ᶜ_⇘_ #0
-
-

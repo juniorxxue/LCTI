@@ -1,6 +1,6 @@
 module Implicit.Algo.Split where
 
-open import Implicit.Language
+open import Implicit.Language.All
 open import Implicit.Algo.Syntax
 
 data Apps : ℕ → ℕ → Set where
@@ -59,9 +59,9 @@ infix 4 ⟦_⟧⇒⟦_,_⟧
 data ⟦_⟧⇒⟦_,_⟧ : Context n m → Apps n m → Context n m → Set where
 
   none-□ : ⟦ (Context n m ∋⦂ □) ⟧⇒⟦ nil , □ ⟧
-  
+
   none-τ : ⟦ (Context n m ∋⦂ τ A) ⟧⇒⟦ nil , τ A ⟧
-  
+
   have-e : ⟦ Σ ⟧⇒⟦ e̅ , Σ' ⟧
          → ⟦ [ e ]↝ Σ ⟧⇒⟦ e ∷a e̅ , Σ' ⟧
 

@@ -86,3 +86,24 @@ open import Implicit.Language.Lookup.Base
 ∋∙-∋:=-false (S∙ inΓ) (S∙ inΓ' up) = ∋∙-∋:=-false inΓ inΓ'
 ∋∙-∋:=-false (S= inΓ) (S= inΓ' up) = ∋∙-∋:=-false inΓ inΓ'
 ∋∙-∋:=-false (S^ inΓ) (S^ inΓ' up) = ∋∙-∋:=-false inΓ inΓ'
+
+
+∋∙-∋^-≢ : Γ ∋∙ k₁
+        → Γ ∋^ k₂
+        → k₁ ≢ k₂
+∋∙-∋^-≢ Z (S∙ inΓ2) = λ ()
+∋∙-∋^-≢ (S, inΓ1) (S, inΓ2) = ∋∙-∋^-≢ inΓ1 inΓ2
+∋∙-∋^-≢ (S∙ inΓ1) (S∙ inΓ2) = ≢-suc (∋∙-∋^-≢ inΓ1 inΓ2)
+∋∙-∋^-≢ (S= inΓ1) (S= inΓ2) = ≢-suc (∋∙-∋^-≢ inΓ1 inΓ2)
+∋∙-∋^-≢ (S^ inΓ1) Z = λ ()
+∋∙-∋^-≢ (S^ inΓ1) (S^ inΓ2) = ≢-suc (∋∙-∋^-≢ inΓ1 inΓ2)
+
+∋=-∋^-≢ : Γ ∋= k₁
+        → Γ ∋^ k₂
+        → k₁ ≢ k₂
+∋=-∋^-≢ Z (S= in2) = λ ()
+∋=-∋^-≢ (S, inΓ1) (S, inΓ2) = ∋=-∋^-≢ inΓ1 inΓ2
+∋=-∋^-≢ (S∙ inΓ1) (S∙ inΓ2) = ≢-suc (∋=-∋^-≢ inΓ1 inΓ2)
+∋=-∋^-≢ (S= inΓ1) (S= inΓ2) = ≢-suc (∋=-∋^-≢ inΓ1 inΓ2)
+∋=-∋^-≢ (S^ inΓ1) Z = λ ()
+∋=-∋^-≢ (S^ inΓ1) (S^ inΓ2) = ≢-suc (∋=-∋^-≢ inΓ1 inΓ2)

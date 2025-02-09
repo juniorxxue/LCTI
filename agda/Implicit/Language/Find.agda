@@ -19,3 +19,16 @@ data find : Type m → Fin m → Counter → Set where
             → find (A `→ B) k (𝕔 j)
   f-∀       : find A (#S k) j
             → find (`∀ A) k j
+
+find-ε : find A k ∞
+       → k ε A
+find-ε (f-∞ x) = x
+find-ε (f-∀ fd) = ε-∀ (find-ε fd)
+
+find-arr-r : find B k ∞
+         → find (A `→ B) k ∞
+find-arr-r fd = f-∞ (ε-arr-r (find-ε fd))
+
+find-arr-l : find A k ∞
+           → find (A `→ B) k ∞
+find-arr-l fd = f-∞ (ε-arr-l (find-ε fd))

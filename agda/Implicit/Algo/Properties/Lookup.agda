@@ -1,6 +1,6 @@
 module Implicit.Algo.Properties.Lookup where
 
-open import Implicit.Language
+open import Implicit.Language.All
 open import Implicit.Algo.Base
 
 ε-↑ty : k₁ ε A

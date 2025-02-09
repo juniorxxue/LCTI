@@ -1,5 +1,8 @@
 module Implicit.Sound where
 
+-- this file is not intended as the proof, since the proof is broken
+-- will be removed after system is fully proved
+
 open import Implicit.Language
 open import Implicit.Decl renaming (find to d-find)
 open import Implicit.Algo

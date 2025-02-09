@@ -115,6 +115,14 @@ data _◇_⇘_ : Env n m → Fin m → Env n m → Set where
 ⊢c-^∈-false (ε-arr-r inA) inΓ (⊢c-arr cloA cloA₁) = ⊢c-^∈-false inA inΓ cloA₁
 ⊢c-^∈-false (ε-∀ inA) inΓ (⊢c-∀ cloA) = ⊢c-^∈-false inA (S∙ inΓ) cloA
 
+⊢c-^∈-¬ε : Γ ⊢c A
+         → Γ ∋^ k
+         → k ¬ε A
+⊢c-^∈-¬ε ⊢c-int inΓ = ¬ε-int
+⊢c-^∈-¬ε (⊢c-var-∙ inΓ₁) inΓ = ¬ε-var (∋∙-∋^-≢ inΓ₁ inΓ)
+⊢c-^∈-¬ε (⊢c-var-= inΓ₁) inΓ = ¬ε-var (∋=-∋^-≢ inΓ₁ inΓ)
+⊢c-^∈-¬ε (⊢c-arr cloA cloA₁) inΓ = ¬ε-arr (⊢c-^∈-¬ε cloA inΓ) (⊢c-^∈-¬ε cloA₁ inΓ)
+⊢c-^∈-¬ε (⊢c-∀ cloA) inΓ = ¬ε-∀ (⊢c-^∈-¬ε cloA (S∙ inΓ))
 
 ⊢c-⊢o-disjoint : Ψ ⊢c A
                → Ψ ⊢o A
