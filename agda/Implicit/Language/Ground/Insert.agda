@@ -1,8 +1,13 @@
-module Implicit.SoundIntermAux3 where
+module Implicit.Language.Ground.Insert where
 
-open import Implicit.Language hiding (_≤_)
-open import Implicit.SoundIntermAux
-open import Implicit.SoundIntermAux2
+open import Implicit.Language.Base
+open import Implicit.Language.Shift
+open import Implicit.Language.Lookup
+open import Implicit.Language.OpenClose
+open import Implicit.Language.Norm
+open import Implicit.Language.EnvOps
+open import Implicit.Language.Ground.Base
+open import Implicit.Language.Ground.Properties
 
 -- different to original insertion, when insert a type, we apply the environment to the operand
 infix 3 _▶%_,=_⇘_
@@ -75,83 +80,41 @@ data _▶%_,=_⇘_ : Env n m → Fin (1 + m) → Type m → Env n (1 + m) → Se
 ▶%-∋= (▶%S∙ newΓ x) = S∙ (▶%-∋= newΓ)
 ▶%-∋= (▶%S= newΓ x x₁) = S= (▶%-∋= newΓ)
 
-ap-↑ty : Γ ≫ A ⇘ A%
-       → k ¬εᵍ Γ
-       → Shifted A k
-       → Shifted A% k
-ap-↑ty ap-int ninΓ sfd-int = sfd-int
-ap-↑ty (ap-var= x) ninΓ (sfd-var x₁) = εᵍ-shifted ninΓ x
-ap-↑ty (ap-var∙ x) ninΓ (sfd-var x₁) = sfd-var x₁
-ap-↑ty (ap-arr apA apA₁) ninΓ (sfd-arr st st₁) = sfd-arr (ap-↑ty apA ninΓ st) (ap-↑ty apA₁ ninΓ st₁)
-ap-↑ty (ap-∀ apA) ninΓ (sfd-∀ st) = sfd-∀ (ap-↑ty apA (S∙ ninΓ) st)
 
-shifted-↑ty : Shifted A' k
-            → ∃[ A ](A ↑ty k ⇘ A')
-shifted-↑ty sfd-int = ⟨ Int , ↑ty-int ⟩
-shifted-↑ty (sfd-var x) = ⟨ (‶ punchOut (≢-sym x)) , ↑ty-punchOut (≢-sym x) ⟩
-shifted-↑ty (sfd-arr sf sf₁) = ⟨ shifted-↑ty sf .proj₁ `→ shifted-↑ty sf₁ .proj₁ ,
-                                ↑ty-arr (shifted-↑ty sf .proj₂) (shifted-↑ty sf₁ .proj₂) ⟩
-shifted-↑ty (sfd-∀ sf) = ⟨ `∀ shifted-↑ty sf .proj₁ , ↑ty-∀ (shifted-↑ty sf .proj₂) ⟩
 
-▶%-∋:-ap-↑ty-rev-^ : Γ ,^ ≫ A' ⇘ A%'
+▶%-∋:-grd-↑ty-rev-^ : Γ ,^ ≫ A' ⇘ A%'
                  → ↑ty0 A ⇘ A'
                  → ∃[ A% ](↑ty0 A% ⇘ A%')
-▶%-∋:-ap-↑ty-rev-^ apA' upA with shifted-↑ty {k = #0} (ap-↑ty apA' Z^ (↑ty-shifted upA))
+▶%-∋:-grd-↑ty-rev-^ apA' upA with shifted-↑ty {k = #0} (grd-↑ty apA' Z^ (↑ty-shifted upA))
 ... | ⟨ A% , upA% ⟩ = ⟨ A% , upA% ⟩
 
-▶%-∋:-ap-↑ty-rev-∙ : Γ ,∙ ≫ A' ⇘ A%'
+▶%-∋:-grd-↑ty-rev-∙ : Γ ,∙ ≫ A' ⇘ A%'
                  → ↑ty0 A ⇘ A'
                  → ∃[ A% ](↑ty0 A% ⇘ A%')
-▶%-∋:-ap-↑ty-rev-∙ apA' upA with shifted-↑ty {k = #0} (ap-↑ty apA' Z∙ (↑ty-shifted upA))
+▶%-∋:-grd-↑ty-rev-∙ apA' upA with shifted-↑ty {k = #0} (grd-↑ty apA' Z∙ (↑ty-shifted upA))
 ... | ⟨ A% , upA% ⟩ = ⟨ A% , upA% ⟩
 
-▶%-∋:-ap-↑ty-rev-= : Γ ,= T ≫ A' ⇘ A%'
+▶%-∋:-grd-↑ty-rev-= : Γ ,= T ≫ A' ⇘ A%'
                  → ↑ty0 A ⇘ A'
                  → ∃[ A% ](↑ty0 A% ⇘ A%')
-▶%-∋:-ap-↑ty-rev-= {T = T} apA' upA = let ⟨ T' , upT ⟩ = ↑ty0-total T in shifted-↑ty (ap-↑ty apA' (Z= upT (ε-shifted-false (↑ty-shifted upT))) (↑ty-shifted upA))
+▶%-∋:-grd-↑ty-rev-= {T = T} apA' upA = let ⟨ T' , upT ⟩ = ↑ty0-total T in shifted-↑ty (grd-↑ty apA' (Z= upT (ε-shifted-false (↑ty-shifted upT))) (↑ty-shifted upA))
 
 ▶%-∋:=-ap : Γ ▶% k ,= A ⇘ Γ'
           → Γ' ∋ k := A%'
           → Γ ≫ A ⇘ A%
           → A% ↑ty k ⇘ A%'
-▶%-∋:=-ap (▶%Z x) (Z up) apA with ap-unique x apA
+▶%-∋:=-ap (▶%Z x) (Z up) apA with grd-unique x apA
 ... | refl = up
-▶%-∋:=-ap (▶%S, newΓ up) (S, inΓ) apA = ▶%-∋:=-ap newΓ inΓ (ap-strengthen,0 apA)
+▶%-∋:=-ap (▶%S, newΓ up) (S, inΓ) apA = ▶%-∋:=-ap newΓ inΓ (grd-strengthen,0 apA)
 ▶%-∋:=-ap (▶%S^ newΓ x) (S^ inΓ up) apA
-  with ⟨ A , upA ⟩ ← ▶%-∋:-ap-↑ty-rev-^ apA x
-  with ▶%-∋:=-ap newΓ inΓ (ap-strengthen^0 apA x upA)
+  with ⟨ A , upA ⟩ ← ▶%-∋:-grd-↑ty-rev-^ apA x
+  with ▶%-∋:=-ap newΓ inΓ (grd-strengthen^0 apA x upA)
 ... | ih = ↑ty-comm' z≤n ih up upA
 ▶%-∋:=-ap (▶%S∙ newΓ x) (S∙ inΓ up) apA
-  with ⟨ A , upA ⟩ ← ▶%-∋:-ap-↑ty-rev-∙ apA x
-  with ▶%-∋:=-ap newΓ inΓ (ap-strengthen∙0 apA x upA)
+  with ⟨ A , upA ⟩ ← ▶%-∋:-grd-↑ty-rev-∙ apA x
+  with ▶%-∋:=-ap newΓ inΓ (grd-strengthen∙0 apA x upA)
 ... | ih = ↑ty-comm' z≤n ih up upA
 ▶%-∋:=-ap (▶%S= newΓ x x₁) (S= inΓ up) apA
-  with ⟨ A , upA ⟩ ← ▶%-∋:-ap-↑ty-rev-= apA x
-  with ▶%-∋:=-ap newΓ inΓ (ap-strengthen=0 apA x upA)
+  with ⟨ A , upA ⟩ ← ▶%-∋:-grd-↑ty-rev-= apA x
+  with ▶%-∋:=-ap newΓ inΓ (grd-strengthen=0 apA x upA)
 ... | ih = ↑ty-comm' z≤n ih up upA
-
-late-ap-v2-gen : ∀ {A*% Γ'}
-               → ⟦ k / B ⟧ A ⇘ A*
-               → Γ ≫ A*      ⇘ A*%
-               → Γ ▶% k ,= B ⇘ Γ'
-               → Γ' ≫ A      ⇘ A%'
-               → A*% ↑ty k   ⇘ A%'
-late-ap-v2-gen st-int ap-int newΓ ap-int = ↑ty-int
-late-ap-v2-gen (st-var stx-eq) apA* newΓ (ap-var= x) = ▶%-∋:=-ap newΓ x apA*
-late-ap-v2-gen (st-var (stx-neq ¬p)) (ap-var= x₁) newΓ (ap-var= x) = ▶%-punchOut-∋:= ¬p x₁ newΓ x
-late-ap-v2-gen (st-var (stx-neq ¬p)) (ap-var∙ x₁) newΓ (ap-var= x) = ⊥-elim (∙∈-:=∈-false (▶%-punchOut-∋∙ ¬p x₁ newΓ) x)
-late-ap-v2-gen (st-var stx-eq) apA* newΓ (ap-var∙ x) = ⊥-elim (∙∈-=∈-false x (▶%-∋= newΓ))
-late-ap-v2-gen (st-var (stx-neq ¬p)) (ap-var= x₁) newΓ (ap-var∙ x) = ⊥-elim (∙∈-=∈-false x (▶%-punchOut-∋= ¬p (:=to= x₁) newΓ))
-late-ap-v2-gen (st-var (stx-neq ¬p)) (ap-var∙ x₁) newΓ (ap-var∙ x) = ↑ty-punchOut ¬p
-late-ap-v2-gen (st-arr stA stA₁) (ap-arr apA* apA*₁) newΓ (ap-arr apA' apA'') = ↑ty-arr (late-ap-v2-gen stA apA* newΓ apA')
-                                                                                        (late-ap-v2-gen stA₁ apA*₁ newΓ apA'')
-late-ap-v2-gen (st-∀ up stA) (ap-∀ apA*) newΓ (ap-∀ apA') = ↑ty-∀ (late-ap-v2-gen stA apA* (▶%S∙ newΓ up) apA')
-
-
-late-ap-v2 : ∀ {C*%}
-           → ⟦ B ⟧ C ⇘ C*
-           → Γ% ≫ C* ⇘ C*%
-           → Γ% ≫ B ⇘ B%
-           → Γ% ,= B% ≫ C ⇘ C%'
-           → ↑ty0 C*% ⇘ C%'
-late-ap-v2 st apC* apB apC = late-ap-v2-gen st apC* (▶%Z apB) apC

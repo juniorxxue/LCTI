@@ -26,6 +26,17 @@ open import Implicit.Language.Shift
 ... | refl = ↑ty-unique up up₁
 
 
+∋:=-total : Γ ∋= X
+          → ∃[ A ](Γ ∋ X := A)
+∋:=-total (Z {A = A}) with ↑ty0-total A
+... | ⟨ A' , upA ⟩ = ⟨ A' , Z upA ⟩
+∋:=-total (S, inΓ) = ⟨ ∋:=-total inΓ .proj₁ , S, (∋:=-total inΓ .proj₂) ⟩
+∋:=-total (S∙ inΓ) with ∋:=-total inΓ
+... | ⟨ A , AinΓ ⟩ = let ⟨ A' , upA ⟩ = ↑ty0-total A in ⟨ A' , S∙ AinΓ upA ⟩
+∋:=-total (S^ inΓ) with ∋:=-total inΓ
+... | ⟨ A , AinΓ ⟩ = let ⟨ A' , upA ⟩ = ↑ty0-total A in ⟨ A' , S^ AinΓ upA ⟩
+∋:=-total (S= inΓ) with ∋:=-total inΓ
+... | ⟨ A , AinΓ ⟩ = let ⟨ A' , upA ⟩ = ↑ty0-total A in ⟨ A' , S= AinΓ upA ⟩
 
 ↑ty-ε : X ε A
       → A ↑ty k ⇘ A'
@@ -159,3 +170,37 @@ shifted-lt (sfd-∀ sd) (↑ty-∀ upT) lt = sfd-∀ (shifted-lt sd upT (s≤s l
 ε-var-neg : ¬ (k ε ‶ X)
           → X ≢ k
 ε-var-neg noin refl = noin ε-var
+
+
+
+εᵍ-false : Γ ∋ X := A
+         → k ε A
+         → k ¬εᵍ Γ
+         → ⊥
+εᵍ-false (Z up) inA (Z= x x₁) with ↑ty-unique up x
+... | refl = x₁ inA
+εᵍ-false (Z up) inA (S= ninΓ x x₁) with ↑ty-unique up x
+... | refl = x₁ inA
+εᵍ-false (S, inΓ) inA (S, x ninΓ) = εᵍ-false inΓ inA ninΓ
+εᵍ-false (S∙ inΓ up) inA Z∙ = ↑ty-ε-false up inA
+εᵍ-false (S∙ inΓ up) inA (S∙ ninΓ) = εᵍ-false inΓ (↑ty-ε-≤ inA up z≤n) ninΓ
+εᵍ-false (S^ inΓ up) inA Z^ = ↑ty-ε-false up inA
+εᵍ-false (S^ inΓ up) inA (S^ ninΓ) = εᵍ-false inΓ (↑ty-ε-≤ inA up z≤n) ninΓ
+εᵍ-false (S= inΓ up) inA (Z= x x₁) = ↑ty-ε-false up inA
+εᵍ-false (S= inΓ up) inA (S= ninΓ x x₁) = εᵍ-false inΓ (↑ty-ε-≤ inA up z≤n) ninΓ
+
+¬ε-shifted : ¬ (k ε A)
+           → Shifted A k
+¬ε-shifted {A = Int} nin = sfd-int
+¬ε-shifted {A = ‶ X} nin = sfd-var (helper nin)
+  where helper : ¬ (k ε ‶ X)
+               →  X ≢ k
+        helper nin refl = nin ε-var
+¬ε-shifted {A = A `→ A₁} nin = sfd-arr (¬ε-shifted (λ z → nin (ε-arr-l z)))
+                                       (¬ε-shifted (λ z → nin (ε-arr-r z)))
+¬ε-shifted {A = `∀ A} nin = sfd-∀ (¬ε-shifted (λ z → nin (ε-∀ z)))
+
+εᵍ-shifted : k ¬εᵍ Γ
+           → Γ ∋ X := A
+           → Shifted A k
+εᵍ-shifted ninΓ inΓ = ¬ε-shifted (λ x → εᵍ-false inΓ x ninΓ)

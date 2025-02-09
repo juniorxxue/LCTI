@@ -16,3 +16,5 @@ open import Implicit.Language.OpenClose public
 open import Implicit.Language.EnvOps public
 
 open import Implicit.Language.Extension public
+
+open import Implicit.Language.Ground public

@@ -111,4 +111,24 @@ private variable
            ---------------------
            → ↑ty0 A ⇘ A₀
            → A₀ ↑ty #S k ⇘ Aₖ₊₁
-↑ty-comm0' up1 up2 up3 = ↑ty-comm' z≤n up1 up2 up3           
+↑ty-comm0' up1 up2 up3 = ↑ty-comm' z≤n up1 up2 up3
+
+
+
+↑ty-punchOut : (¬p : k ≢ X)
+             → ‶ punchOut ¬p ↑ty k ⇘ ‶ X
+↑ty-punchOut ¬p = helper ¬p (sym (punchIn-punchOut ¬p))
+  where helper : (¬p : k ≢ X)
+               → X ≡ punchIn k (punchOut ¬p)
+               → ‶ punchOut ¬p ↑ty k ⇘ ‶ X
+        helper ¬p eq with punchOut ¬p
+        helper ¬p refl | Y = ↑ty-var
+
+
+shifted-↑ty : Shifted A' k
+            → ∃[ A ](A ↑ty k ⇘ A')
+shifted-↑ty sfd-int = ⟨ Int , ↑ty-int ⟩
+shifted-↑ty (sfd-var x) = ⟨ (‶ punchOut (≢-sym x)) , ↑ty-punchOut (≢-sym x) ⟩
+shifted-↑ty (sfd-arr sf sf₁) = ⟨ shifted-↑ty sf .proj₁ `→ shifted-↑ty sf₁ .proj₁ ,
+                                ↑ty-arr (shifted-↑ty sf .proj₂) (shifted-↑ty sf₁ .proj₂) ⟩
+shifted-↑ty (sfd-∀ sf) = ⟨ `∀ shifted-↑ty sf .proj₁ , ↑ty-∀ (shifted-↑ty sf .proj₂) ⟩
