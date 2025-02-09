@@ -11,11 +11,10 @@ open import Implicit.Decl.Base
 ⊢sub' {j = 𝕚 j} ⊢e s = ⊢sub ⊢e s nz-I
 ⊢sub' {j = 𝕔 j} ⊢e s = ⊢sub ⊢e s nz-C
 
-s-refl-∞ : Closed Γ
-         → Γ ⊢c A
+s-refl-∞ : Norm Γ
+         → Γ ⊢n A
          → Γ ⊢ ∞ # A ≤ A
-s-refl-∞ cloΓ ⊢c-int = s-int cloΓ
-s-refl-∞ cloΓ (⊢c-var-∙ inΓ) = s-var-∙ cloΓ inΓ
-s-refl-∞ cloΓ (⊢c-var-= inΓ) = s-var-= cloΓ inΓ
-s-refl-∞ cloΓ (⊢c-arr cloA cloA₁) = s-arr₁ (s-refl-∞ cloΓ cloA) (s-refl-∞ cloΓ cloA₁)
-s-refl-∞ cloΓ (⊢c-∀ cloA) = s-∀ (s-refl-∞ (clo-S∙ cloΓ) cloA)
+s-refl-∞ norΓ ⊢n-int = s-int norΓ
+s-refl-∞ norΓ (⊢n-var-∙ inΓ) = s-var-∙ norΓ inΓ
+s-refl-∞ norΓ (⊢n-arr norA norA₁) = s-arr₁ (s-refl-∞ norΓ norA) (s-refl-∞ norΓ norA₁)
+s-refl-∞ norΓ (⊢n-∀ norA) = s-∀ (s-refl-∞ (nom-S∙ norΓ) norA)
