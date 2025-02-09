@@ -83,7 +83,7 @@ inst-affect-one : [ A / X ] Γ ⟹ Δ
                 → Δ ∋= k
                 → k ≡ X
 inst-affect-one (⟹^0 up) Z inΔ = refl
-inst-affect-one (⟹^0 up) (S^ inΓ) (S= inΔ) = ⊥-elim (^∈-=∈-false inΓ inΔ)
+inst-affect-one (⟹^0 up) (S^ inΓ) (S= inΔ) = ⊥-elim (∋^-∋=-false inΓ inΔ)
 inst-affect-one (⟹^S inst up1) (S^ inΓ) (S^ inΔ) = cong #S (inst-affect-one inst inΓ inΔ)
 inst-affect-one (⟹∙S inst up1) (S∙ inΓ) (S∙ inΔ) = cong #S (inst-affect-one inst inΓ inΔ)
 inst-affect-one (⟹,S inst) (S, inΓ) (S, inΔ) = inst-affect-one inst inΓ inΔ
@@ -132,8 +132,8 @@ find-arr-l fd = f-∞ (ε-arr-l (find-ε fd))
       → Γ ∋^ k
       → k ε A
       → ⊥
-⊢c-¬ε (⊢c-var-∙ inΓ₁) inΓ ε-var = ^∈-∙∈-false inΓ inΓ₁
-⊢c-¬ε (⊢c-var-= inΓ₁) inΓ ε-var = ^∈-=∈-false inΓ inΓ₁
+⊢c-¬ε (⊢c-var-∙ inΓ₁) inΓ ε-var = ∋^-∋∙-false inΓ inΓ₁
+⊢c-¬ε (⊢c-var-= inΓ₁) inΓ ε-var = ∋^-∋=-false inΓ inΓ₁
 ⊢c-¬ε (⊢c-arr cloA cloA₁) inΓ (ε-arr-l inA) = ⊢c-¬ε cloA inΓ inA
 ⊢c-¬ε (⊢c-arr cloA cloA₁) inΓ (ε-arr-r inA) = ⊢c-¬ε cloA₁ inΓ inA
 ⊢c-¬ε (⊢c-∀ cloA) inΓ (ε-∀ inA) = ⊢c-¬ε cloA (S∙ inΓ) inA
@@ -266,7 +266,7 @@ s-extend-l (s-empty clo) cloΓ cloΣ = ext-close clo
 s-extend-l s-var cloΓ (⊢c-τ cloA) = ext-close cloA
 s-extend-l (s-ex-l^ x-in inst) cloΓ (⊢c-τ cloA) = ext-var (inst-extv inst cloA)
 s-extend-l (s-ex-l= x-in s) cloΓ cloΣ with s-all-closed s cloΓ (∋=-closed cloΓ x-in) cloΣ
-... | refl = ext-var (extv-= (:=to= x-in))
+... | refl = ext-var (extv-= (∋:=to∋= x-in))
 s-extend-l (s-ex-r= x-in s) cloΓ (⊢c-τ cloA) = s-extend-l s cloΓ (⊢c-τ (∋=-closed cloΓ x-in))
 s-extend-l (s-arr s s₁) cloΓ (⊢c-τ (⊢c-arr cloA cloA₁)) with s-extend-r s cloΓ cloA
                         | s-extend-l s₁ (s-closed-env s (polar-l cloΓ cloA)) (⊢c-τ (⊆-cloA cloA₁ (s-⊆ s (polar-l cloΓ cloA))))
@@ -286,7 +286,7 @@ s-extend-r s-var cloΓ cloA = ext-close cloA
 s-extend-r (s-ex-l= x-in s) cloΓ cloA = s-extend-r s cloΓ (∋=-closed cloΓ x-in)
 s-extend-r (s-ex-r^ x-in inst) cloΓ cloA = ext-var (inst-extv inst cloA)
 s-extend-r (s-ex-r= x-in s) cloΓ cloA with s-all-closed s cloΓ cloA (⊢c-τ (∋=-closed cloΓ x-in))
-... | refl = ext-var (extv-= (:=to= x-in))
+... | refl = ext-var (extv-= (∋:=to∋= x-in))
 s-extend-r (s-arr s s₁) cloΓ (⊢c-arr cloA cloA₁) = ext-arr (s-extend-l s cloΓ (⊢c-τ cloA))
   (s-extend-r s₁ (s-closed-env s (polar-r cloΓ (⊢c-τ cloA))) (⊆-cloA cloA₁ (s-⊆ s (polar-r cloΓ (⊢c-τ cloA)))))
 s-extend-r (s-∀ s) cloΓ (⊢c-∀ cloA) = ext-∀ (s-extend-r s (clo-S∙ cloΓ) cloA)

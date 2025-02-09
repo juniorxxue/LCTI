@@ -76,14 +76,14 @@ punchIn-≢ {k₁ = #0} {#0} {#S k} neq peq = neq refl
 punchIn-≢ {k₁ = #S k₁} {#S k₂} {#S k} neq peq = punchIn-≢ (≢-pred neq) (#S-injective peq)
 
 
-shifted-lt : Shifted T k₁
+shifted-≤ : Shifted T k₁
            → T ↑ty k₂ ⇘ T'
            → k₂ #≤ k₁
            → Shifted T' (#S k₁)
-shifted-lt sfd-int ↑ty-int lt = sfd-int
-shifted-lt (sfd-var x) ↑ty-var lt rewrite sym (punchIn-≤ lt) = sfd-var (punchIn-≢ x)
-shifted-lt (sfd-arr sd sd₁) (↑ty-arr upT upT₁) lt = sfd-arr (shifted-lt sd upT lt) (shifted-lt sd₁ upT₁ lt)
-shifted-lt (sfd-∀ sd) (↑ty-∀ upT) lt = sfd-∀ (shifted-lt sd upT (s≤s lt))
+shifted-≤ sfd-int ↑ty-int lt = sfd-int
+shifted-≤ (sfd-var x) ↑ty-var lt rewrite sym (punchIn-≤ lt) = sfd-var (punchIn-≢ x)
+shifted-≤ (sfd-arr sd sd₁) (↑ty-arr upT upT₁) lt = sfd-arr (shifted-≤ sd upT lt) (shifted-≤ sd₁ upT₁ lt)
+shifted-≤ (sfd-∀ sd) (↑ty-∀ upT) lt = sfd-∀ (shifted-≤ sd upT (s≤s lt))
 
 ε-var-neg : ¬ (k ε ‶ X)
           → X ≢ k
@@ -106,7 +106,7 @@ find-¬ε ninA (st-var (stx-neq ¬p)) sd lt ε-var = helper ¬p (ε-var-neg ninA
         helper {suc m} {k = #S k} {X = #S X} ¬p neq (s≤s lt) = helper {m} {k} {X} (≢-pred ¬p) (≢-pred neq) lt
 find-¬ε ninA (st-arr st st₁) sd lt (ε-arr-l inA*) = find-¬ε (λ z → ninA (ε-arr-l z)) st sd lt inA*
 find-¬ε ninA (st-arr st st₁) sd lt (ε-arr-r inA*) = find-¬ε (λ z → ninA (ε-arr-r z)) st₁ sd lt inA*
-find-¬ε ninA (st-∀ up st) sd lt (ε-∀ inA*) = find-¬ε (λ z → ninA (ε-∀ z)) st (shifted-lt sd up z≤n) (s≤s lt) inA*
+find-¬ε ninA (st-∀ up st) sd lt (ε-∀ inA*) = find-¬ε (λ z → ninA (ε-∀ z)) st (shifted-≤ sd up z≤n) (s≤s lt) inA*
 
 
 find-st : ∀ {A : Type (2 + m)} {k₁ k₂ j A* T}
@@ -119,7 +119,7 @@ find-st (f-∞ x) lt upT st = f-∞ (ε-st x lt st)
 find-st (f-arr-𝕚-l x) lt upT (st-arr st st₁) = f-arr-𝕚-l (ε-st x lt st)
 find-st (f-arr-𝕚-r fd) lt upT (st-arr st st₁) = f-arr-𝕚-r (find-st fd lt upT st₁)
 find-st (f-arr-𝕔 ¬inA fd) lt upT (st-arr st st₁) = f-arr-𝕔 (find-¬ε ¬inA st upT lt) (find-st fd lt upT st₁)
-find-st (f-∀ fd) lt upT (st-∀ up st) = f-∀ (find-st fd (s≤s lt) (shifted-lt upT up z≤n) st)
+find-st (f-∀ fd) lt upT (st-∀ up st) = f-∀ (find-st fd (s≤s lt) (shifted-≤ upT up z≤n) st)
 
 find-st0 : find A #0 j
          → ↑ty0 T ⇘ T'

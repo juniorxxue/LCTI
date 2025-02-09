@@ -36,7 +36,7 @@ polar-tm-r (polar-r cloΓ (⊢c-term cloe cloA)) = polar-r cloΓ cloA
 polar-in-l : Polarity Γ (‶ X) Σ ≤
            → Γ ∋ X := A
            → Polarity Γ A Σ ≤
-polar-in-l (polar-l cloΓ (⊢c-var-∙ inΓ₁)) inΓ = ⊥-elim (∙∈-=∈-false inΓ₁ (:=to= inΓ))
+polar-in-l (polar-l cloΓ (⊢c-var-∙ inΓ₁)) inΓ = ⊥-elim (∋∙-∋=-false inΓ₁ (∋:=to∋= inΓ))
 polar-in-l (polar-l cloΓ (⊢c-var-= inΓ₁)) inΓ = polar-l cloΓ (∋=-closed cloΓ inΓ)
 polar-in-l (polar-r cloΓ cloΣ) inΓ = polar-r cloΓ cloΣ
 

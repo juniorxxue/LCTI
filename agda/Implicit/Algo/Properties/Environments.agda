@@ -97,8 +97,8 @@ data _⊆_∣_⊆_by_ : Env n m → Env n m → Env n m → Env n m → Fin (1 +
             → Γ₁ ∤ k ⊢oˣ X
             → Γ₁ ⊆ Δ₁ ∣ Γ₂ ⊆ Δ₂ by k
             → Δ₁ ∋^ X
-⊆⊆-open-var inΓ (opnx= x) exts = ⊥-elim (^∈-=∈-false inΓ x)
-⊆⊆-open-var inΓ (opnx∙ x) exts = ⊥-elim (^∈-∙∈-false inΓ x)
+⊆⊆-open-var inΓ (opnx= x) exts = ⊥-elim (∋^-∋=-false inΓ x)
+⊆⊆-open-var inΓ (opnx∙ x) exts = ⊥-elim (∋^-∋∙-false inΓ x)
 ⊆⊆-open-var inΓ (opnx^ x x₁) exts = ⊆⊆-open-var-in inΓ x₁ exts
 
 ⊆⊆-inst-var : [ B / X ] Γ₁ ⟹ Γ₂
@@ -117,6 +117,6 @@ data _⊆_∣_⊆_by_ : Env n m → Env n m → Env n m → Env n m → Fin (1 +
               → Γ₁ ∤ k ⊢oˣ X
               → Γ₁ ⊆ Δ₁ ∣ Γ₂ ⊆ Δ₂ by k
               → [ B / X ] Δ₁ ⟹ Δ₂
-⊆⊆-inst-var-o inst inΓ (opnx= x) exts = ⊥-elim (^∈-=∈-false inΓ x)
-⊆⊆-inst-var-o inst inΓ (opnx∙ x) exts = ⊥-elim (^∈-∙∈-false inΓ x)
+⊆⊆-inst-var-o inst inΓ (opnx= x) exts = ⊥-elim (∋^-∋=-false inΓ x)
+⊆⊆-inst-var-o inst inΓ (opnx∙ x) exts = ⊥-elim (∋^-∋∙-false inΓ x)
 ⊆⊆-inst-var-o inst inΓ (opnx^ x x₁) exts = ⊆⊆-inst-var inst x₁ exts

@@ -34,8 +34,8 @@ grd-unique : Γ ≫ A ⇘ A%
           → A% ≡ B%
 grd-unique grd-int grd-int = refl
 grd-unique (grd-var= x) (grd-var= x₁) = ∋:=-unique x x₁
-grd-unique (grd-var= x) (grd-var∙ x₁) = ⊥-elim (∙∈-:=∈-false x₁ x)
-grd-unique (grd-var∙ x) (grd-var= x₁) = ⊥-elim (∙∈-:=∈-false x x₁)
+grd-unique (grd-var= x) (grd-var∙ x₁) = ⊥-elim (∋∙-∋:=-false x₁ x)
+grd-unique (grd-var∙ x) (grd-var= x₁) = ⊥-elim (∋∙-∋:=-false x x₁)
 grd-unique (grd-var∙ x) (grd-var∙ x₁) = refl
 grd-unique (grd-arr apA apA₁) (grd-arr apB apB₁) with grd-unique apA apB | grd-unique apA₁ apB₁
 ... | refl | refl = refl
@@ -87,10 +87,10 @@ grd-closeA : Γ ⊢c A
           → Γ% ≫ A ⇘ A%
           → Γ% ⊢n A%
 grd-closeA ⊢c-int cloΓ apΓ grd-int = ⊢n-int
-grd-closeA (⊢c-var-∙ inΓ) cloΓ apΓ (grd-var= x) = ⊥-elim (∙∈-:=∈-false (grd-∋∙ inΓ cloΓ) x)
+grd-closeA (⊢c-var-∙ inΓ) cloΓ apΓ (grd-var= x) = ⊥-elim (∋∙-∋:=-false (grd-∋∙ inΓ cloΓ) x)
 grd-closeA (⊢c-var-∙ inΓ) cloΓ apΓ (grd-var∙ x) = ⊢n-var-∙ x
 grd-closeA (⊢c-var-= inΓ) cloΓ apΓ (grd-var= x) = ∋:=-norm apΓ x
-grd-closeA (⊢c-var-= inΓ) cloΓ apΓ (grd-var∙ x) = ⊥-elim (∙∈-=∈-false x (grd-∋= inΓ cloΓ))
+grd-closeA (⊢c-var-= inΓ) cloΓ apΓ (grd-var∙ x) = ⊥-elim (∋∙-∋=-false x (grd-∋= inΓ cloΓ))
 grd-closeA (⊢c-arr cloA cloA₁) cloΓ apΓ (grd-arr apA apA₁) = ⊢n-arr (grd-closeA cloA cloΓ apΓ apA)
                                                                   (grd-closeA cloA₁ cloΓ apΓ apA₁)
 grd-closeA (⊢c-∀ cloA) cloΓ apΓ (grd-∀ apA) = ⊢n-∀ (grd-closeA cloA (grd-S∙ cloΓ) (nom-S∙ apΓ) apA)
@@ -161,8 +161,8 @@ grd-↑ty-∙ : Γ ≫ A' ⇘ A%'
        → A% ↑ty k ⇘ A%'
 grd-↑ty-∙ grd-int newΓ ↑ty-int grd-int = ↑ty-int
 grd-↑ty-∙ (grd-var= x) newΓ ↑ty-var (grd-var= x₁) = ◀∙-∋:=' x newΓ x₁
-grd-↑ty-∙ (grd-var= x) newΓ ↑ty-var (grd-var∙ x₁) = ⊥-elim (∙∈-=∈-false x₁ (◀∙-∋= (:=to= x) newΓ))
-grd-↑ty-∙ (grd-var∙ x) newΓ ↑ty-var (grd-var= x₁) = ⊥-elim (∙∈-=∈-false (◀∙-∋∙ x newΓ) (:=to= x₁))
+grd-↑ty-∙ (grd-var= x) newΓ ↑ty-var (grd-var∙ x₁) = ⊥-elim (∋∙-∋=-false x₁ (◀∙-∋= (∋:=to∋= x) newΓ))
+grd-↑ty-∙ (grd-var∙ x) newΓ ↑ty-var (grd-var= x₁) = ⊥-elim (∋∙-∋=-false (◀∙-∋∙ x newΓ) (∋:=to∋= x₁))
 grd-↑ty-∙ (grd-var∙ x) newΓ ↑ty-var (grd-var∙ x₁) = ↑ty-var
 grd-↑ty-∙ (grd-arr apA' apA'') newΓ (↑ty-arr upA upA₁) (grd-arr apA apA₁) = ↑ty-arr (grd-↑ty-∙ apA' newΓ upA apA) (grd-↑ty-∙ apA'' newΓ upA₁ apA₁)
 grd-↑ty-∙ (grd-∀ apA') newΓ (↑ty-∀ upA) (grd-∀ apA) = ↑ty-∀ (grd-↑ty-∙ apA' (◀S∙ newΓ) upA apA)
@@ -174,8 +174,8 @@ grd-↑ty^ : Γ ≫ A' ⇘ A%'
        → A% ↑ty k ⇘ A%'
 grd-↑ty^ grd-int newΓ ↑ty-int grd-int = ↑ty-int
 grd-↑ty^ (grd-var= x) newΓ ↑ty-var (grd-var= x₁) = ◀^-∋:=' x newΓ x₁
-grd-↑ty^ (grd-var= x) newΓ ↑ty-var (grd-var∙ x₁) = ⊥-elim (∙∈-=∈-false x₁ (◀^-∋= (:=to= x) newΓ))
-grd-↑ty^ (grd-var∙ x) newΓ ↑ty-var (grd-var= x₁) = ⊥-elim (∙∈-=∈-false (◀^-∋∙ x newΓ) (:=to= x₁))
+grd-↑ty^ (grd-var= x) newΓ ↑ty-var (grd-var∙ x₁) = ⊥-elim (∋∙-∋=-false x₁ (◀^-∋= (∋:=to∋= x) newΓ))
+grd-↑ty^ (grd-var∙ x) newΓ ↑ty-var (grd-var= x₁) = ⊥-elim (∋∙-∋=-false (◀^-∋∙ x newΓ) (∋:=to∋= x₁))
 grd-↑ty^ (grd-var∙ x) newΓ ↑ty-var (grd-var∙ x₁) = ↑ty-var
 grd-↑ty^ (grd-arr apA' apA'') newΓ (↑ty-arr upA upA₁) (grd-arr apA apA₁) = ↑ty-arr (grd-↑ty^ apA' newΓ upA apA) (grd-↑ty^ apA'' newΓ upA₁ apA₁)
 grd-↑ty^ (grd-∀ apA') newΓ (↑ty-∀ upA) (grd-∀ apA) = ↑ty-∀ (grd-↑ty^ apA' (◀S∙ newΓ) upA apA)
@@ -187,8 +187,8 @@ grd-↑ty= : Γ ≫ A' ⇘ A%'
        → A% ↑ty k ⇘ A%'
 grd-↑ty= grd-int newΓ ↑ty-int grd-int = ↑ty-int
 grd-↑ty= (grd-var= x) newΓ ↑ty-var (grd-var= x₁) = ◀=-∋:=' x newΓ x₁
-grd-↑ty= (grd-var= x) newΓ ↑ty-var (grd-var∙ x₁) = ⊥-elim (∙∈-=∈-false x₁ (◀=-∋= (:=to= x) newΓ))
-grd-↑ty= (grd-var∙ x) newΓ ↑ty-var (grd-var= x₁) = ⊥-elim (∙∈-=∈-false (◀=-∋∙ x newΓ) (:=to= x₁))
+grd-↑ty= (grd-var= x) newΓ ↑ty-var (grd-var∙ x₁) = ⊥-elim (∋∙-∋=-false x₁ (◀=-∋= (∋:=to∋= x) newΓ))
+grd-↑ty= (grd-var∙ x) newΓ ↑ty-var (grd-var= x₁) = ⊥-elim (∋∙-∋=-false (◀=-∋∙ x newΓ) (∋:=to∋= x₁))
 grd-↑ty= (grd-var∙ x) newΓ ↑ty-var (grd-var∙ x₁) = ↑ty-var
 grd-↑ty= (grd-arr apA' apA'') newΓ (↑ty-arr upA upA₁) (grd-arr apA apA₁) = ↑ty-arr (grd-↑ty= apA' newΓ upA apA) (grd-↑ty= apA'' newΓ upA₁ apA₁)
 grd-↑ty= (grd-∀ apA') newΓ (↑ty-∀ upA) (grd-∀ apA) = ↑ty-∀ (grd-↑ty= apA' (◀S∙ newΓ) upA apA)

@@ -79,7 +79,7 @@ find-¬ε ninA (st-var (stx-neq ¬p)) sd lt ε-var = helper ¬p (ε-var-neg ninA
         helper {suc m} {k = #S k} {X = #S X} ¬p neq (s≤s lt) = helper {m} {k} {X} (≢-pred ¬p) (≢-pred neq) lt
 find-¬ε ninA (st-arr st st₁) sd lt (ε-arr-l inA*) = find-¬ε (λ z → ninA (ε-arr-l z)) st sd lt inA*
 find-¬ε ninA (st-arr st st₁) sd lt (ε-arr-r inA*) = find-¬ε (λ z → ninA (ε-arr-r z)) st₁ sd lt inA*
-find-¬ε ninA (st-∀ up st) sd lt (ε-∀ inA*) = find-¬ε (λ z → ninA (ε-∀ z)) st (shifted-lt sd up z≤n) (s≤s lt) inA*
+find-¬ε ninA (st-∀ up st) sd lt (ε-∀ inA*) = find-¬ε (λ z → ninA (ε-∀ z)) st (shifted-≤ sd up z≤n) (s≤s lt) inA*
 
 
 find-st : ∀ {A : Type (2 + m)} {k₁ k₂ j A* T}
@@ -92,7 +92,7 @@ find-st (f-∞ x) lt upT st = f-∞ (ε-st x lt st)
 find-st (f-arr-𝕚-l x) lt upT (st-arr st st₁) = f-arr-𝕚-l (ε-st x lt st)
 find-st (f-arr-𝕚-r fd) lt upT (st-arr st st₁) = f-arr-𝕚-r (find-st fd lt upT st₁)
 find-st (f-arr-𝕔 ¬inA fd) lt upT (st-arr st st₁) = f-arr-𝕔 (find-¬ε ¬inA st upT lt) (find-st fd lt upT st₁)
-find-st (f-∀ fd) lt upT (st-∀ up st) = f-∀ (find-st fd (s≤s lt) (shifted-lt upT up z≤n) st)
+find-st (f-∀ fd) lt upT (st-∀ up st) = f-∀ (find-st fd (s≤s lt) (shifted-≤ upT up z≤n) st)
 
 find-st0 : find A #0 j
          → ↑ty0 T ⇘ T'

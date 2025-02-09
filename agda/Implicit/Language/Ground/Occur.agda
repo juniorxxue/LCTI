@@ -15,7 +15,7 @@ grd-ε : k ε A
      → Γ ∋∙ k
      → Γ ≫ A ⇘ A%
      → k ε A%
-grd-ε ε-var inΓ (grd-var= x) = ⊥-elim (∙∈-:=∈-false inΓ x)
+grd-ε ε-var inΓ (grd-var= x) = ⊥-elim (∋∙-∋:=-false inΓ x)
 grd-ε ε-var inΓ (grd-var∙ x) = ε-var
 grd-ε (ε-arr-l inA) inΓ (grd-arr apA apA₁) = ε-arr-l (grd-ε inA inΓ apA)
 grd-ε (ε-arr-r inA) inΓ (grd-arr apA apA₁) = ε-arr-r (grd-ε inA inΓ apA₁)

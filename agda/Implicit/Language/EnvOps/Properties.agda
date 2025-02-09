@@ -38,7 +38,7 @@ inst-in (⟹=S inst up1) = S= (inst-in inst) up1
                → ⊥
 ∙⟹-:=-∙-false (Z up) (∙⟹=S newΓ' up1) ()
 ∙⟹-:=-∙-false (S, inΓ) (∙⟹,S newΓ') (S, inΓ') = ∙⟹-:=-∙-false inΓ newΓ' inΓ'
-∙⟹-:=-∙-false (S∙ inΓ up) (∙⟹^0 up₁) (S= inΓ') = ∙∈-:=∈-false inΓ' inΓ
+∙⟹-:=-∙-false (S∙ inΓ up) (∙⟹^0 up₁) (S= inΓ') = ∋∙-∋:=-false inΓ' inΓ
 ∙⟹-:=-∙-false (S∙ inΓ up) (∙⟹∙S newΓ' up1) (S∙ inΓ') = ∙⟹-:=-∙-false inΓ newΓ' inΓ'
 ∙⟹-:=-∙-false (S^ inΓ up) (∙⟹^S newΓ' up1) (S^ inΓ') = ∙⟹-:=-∙-false inΓ newΓ' inΓ'
 ∙⟹-:=-∙-false (S= inΓ up) (∙⟹=S newΓ' up1) (S= inΓ') = ∙⟹-:=-∙-false inΓ newΓ' inΓ'
@@ -63,7 +63,7 @@ inst-in (⟹=S inst up1) = S= (inst-in inst) up1
                    → ⊥
 ∙⟹-∙-:=-neq-false Z (∙⟹^0 up) inΓ' neq = neq refl
 ∙⟹-∙-:=-neq-false (S, inΓ) (∙⟹,S newΓ) (S, inΓ') neq = ∙⟹-∙-:=-neq-false inΓ newΓ inΓ' neq
-∙⟹-∙-:=-neq-false (S∙ inΓ) (∙⟹^0 up) (S= inΓ' up₁) neq = ∙∈-:=∈-false inΓ inΓ'
+∙⟹-∙-:=-neq-false (S∙ inΓ) (∙⟹^0 up) (S= inΓ' up₁) neq = ∋∙-∋:=-false inΓ inΓ'
 ∙⟹-∙-:=-neq-false (S∙ inΓ) (∙⟹∙S newΓ up1) (S∙ inΓ' up) neq = ∙⟹-∙-:=-neq-false inΓ newΓ inΓ' (≢-pred neq)
 ∙⟹-∙-:=-neq-false (S= inΓ) (∙⟹=S newΓ up1) (S= inΓ' up) neq = ∙⟹-∙-:=-neq-false inΓ newΓ inΓ' (≢-pred neq)
 ∙⟹-∙-:=-neq-false (S^ inΓ) (∙⟹^S newΓ up1) (S^ inΓ' up) neq = ∙⟹-∙-:=-neq-false inΓ newΓ inΓ' (≢-pred neq)

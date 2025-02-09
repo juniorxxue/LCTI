@@ -33,12 +33,12 @@ late-grd-gen' (grd-arr apA apA₁) ninΓ (st-arr stA% stA%₁) upB newΓ (grd-ar
 late-grd-gen' {B' = B'} (grd-∀ apA) ninΓ (st-∀ up stA%) upB newΓ (grd-∀ apA') =
    let ⟨ B'' , upB' ⟩ = ↑ty0-total B' in ↑ty-∀ (late-grd-gen' apA (S∙ ninΓ) stA% (↑ty-comm' z≤n upB upB' up) (∙⟹∙S newΓ upB') apA')
 
-late-ap : ∀ {A%* A%*'}
+late-grd : ∀ {A%* A%*'}
         → Γ ,∙ ≫ A ⇘ A%
         → ⟦ B ⟧ A% ⇘ A%*
         → Γ ,= B ≫ A ⇘ A%*'
         → ↑ty0 A%* ⇘ A%*'
-late-ap {B = B} apA stA% apA' =
+late-grd {B = B} apA stA% apA' =
   let ⟨ B' , upB ⟩ = ↑ty0-total B
 --  in late-grd-gen apA stA% upB (∙⟹^0 upB) apA'
   in late-grd-gen' apA Z∙ stA% upB (∙⟹^0 upB) apA'
@@ -52,9 +52,9 @@ late-grd-v2-gen : ∀ {A*% Γ'}
 late-grd-v2-gen st-int grd-int newΓ grd-int = ↑ty-int
 late-grd-v2-gen (st-var stx-eq) apA* newΓ (grd-var= x) = ▶%-∋:=-ap newΓ x apA*
 late-grd-v2-gen (st-var (stx-neq ¬p)) (grd-var= x₁) newΓ (grd-var= x) = ▶%-punchOut-∋:= ¬p x₁ newΓ x
-late-grd-v2-gen (st-var (stx-neq ¬p)) (grd-var∙ x₁) newΓ (grd-var= x) = ⊥-elim (∙∈-:=∈-false (▶%-punchOut-∋∙ ¬p x₁ newΓ) x)
-late-grd-v2-gen (st-var stx-eq) apA* newΓ (grd-var∙ x) = ⊥-elim (∙∈-=∈-false x (▶%-∋= newΓ))
-late-grd-v2-gen (st-var (stx-neq ¬p)) (grd-var= x₁) newΓ (grd-var∙ x) = ⊥-elim (∙∈-=∈-false x (▶%-punchOut-∋= ¬p (:=to= x₁) newΓ))
+late-grd-v2-gen (st-var (stx-neq ¬p)) (grd-var∙ x₁) newΓ (grd-var= x) = ⊥-elim (∋∙-∋:=-false (▶%-punchOut-∋∙ ¬p x₁ newΓ) x)
+late-grd-v2-gen (st-var stx-eq) apA* newΓ (grd-var∙ x) = ⊥-elim (∋∙-∋=-false x (▶%-∋= newΓ))
+late-grd-v2-gen (st-var (stx-neq ¬p)) (grd-var= x₁) newΓ (grd-var∙ x) = ⊥-elim (∋∙-∋=-false x (▶%-punchOut-∋= ¬p (∋:=to∋= x₁) newΓ))
 late-grd-v2-gen (st-var (stx-neq ¬p)) (grd-var∙ x₁) newΓ (grd-var∙ x) = ↑ty-punchOut ¬p
 late-grd-v2-gen (st-arr stA stA₁) (grd-arr apA* apA*₁) newΓ (grd-arr apA' apA'') = ↑ty-arr (late-grd-v2-gen stA apA* newΓ apA')
                                                                                         (late-grd-v2-gen stA₁ apA*₁ newΓ apA'')
@@ -96,14 +96,14 @@ sound-s (s-∀l {B = B} s ic fd stC stD) apΓ (grd-∀ {A% = A%} apA) (grd-arr a
       ⟨ D%' , apD% ⟩ = grd-total (grd-close-prv cloD (grd-S= apΓ apB%))
   in s-∀l {B = B%} stA% (sd-strengthen=0 (sound-s s (grd-S= apΓ apB%)
     apA% (grd-arr apC% apD%))
-    (late-ap apA stA% apA%) (↑ty-arr (late-grd-v2 stC apC apB% apC%)
+    (late-grd apA stA% apA%) (↑ty-arr (late-grd-v2 stC apC apB% apC%)
                                      (late-grd-v2 stD apD apB% apD%)))
                                      ic
                                      (grd-find0 fd apA)
 sound-s (s-var-l inΓ s) apΓ (grd-var= x) apB = sound-s s apΓ (grd-var=-ap inΓ apΓ x) apB
-sound-s (s-var-l inΓ s) apΓ (grd-var∙ x) apB = ⊥-elim (∙∈-:=∈-false (grd-∋∙-rev x apΓ) inΓ)
+sound-s (s-var-l inΓ s) apΓ (grd-var∙ x) apB = ⊥-elim (∋∙-∋:=-false (grd-∋∙-rev x apΓ) inΓ)
 sound-s (s-var-r inΓ s) apΓ apA (grd-var= x) = sound-s s apΓ apA (grd-var=-ap inΓ apΓ x)
-sound-s (s-var-r inΓ s) apΓ apA (grd-var∙ x) = ⊥-elim (∙∈-:=∈-false (grd-∋∙-rev x apΓ) inΓ)
+sound-s (s-var-r inΓ s) apΓ apA (grd-var∙ x) = ⊥-elim (∋∙-∋:=-false (grd-∋∙-rev x apΓ) inΓ)
 
 sound : Γ ⊢i j # e ⦂ A
       → Γ ≫ᵍ Γ%

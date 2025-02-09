@@ -38,51 +38,51 @@ open import Implicit.Language.Lookup.Base
 ∋:=-total (S= inΓ) with ∋:=-total inΓ
 ... | ⟨ A , AinΓ ⟩ = let ⟨ A' , upA ⟩ = ↑ty0-total A in ⟨ A' , S= AinΓ upA ⟩
 
-:=to= : Γ ∋ k := A
+∋:=to∋= : Γ ∋ k := A
       → Γ ∋= k
-:=to= (Z up) = Z
-:=to= (S, inΓ) = S, (:=to= inΓ)
-:=to= (S^ inΓ up) = S^ (:=to= inΓ)
-:=to= (S∙ inΓ up) = S∙ (:=to= inΓ)
-:=to= (S= inΓ up) = S= (:=to= inΓ)
+∋:=to∋= (Z up) = Z
+∋:=to∋= (S, inΓ) = S, (∋:=to∋= inΓ)
+∋:=to∋= (S^ inΓ up) = S^ (∋:=to∋= inΓ)
+∋:=to∋= (S∙ inΓ up) = S∙ (∋:=to∋= inΓ)
+∋:=to∋= (S= inΓ up) = S= (∋:=to∋= inΓ)
 
 
 ----------------------------------------------------------------------
 --+                       False elimination                        +--
 ----------------------------------------------------------------------
 
-^∈-∙∈-false :
+∋^-∋∙-false :
     Γ ∋^ k
   → Γ ∋∙ k
   → ⊥
-^∈-∙∈-false (S^ ^in) (S^ ∙in) = ^∈-∙∈-false ^in ∙in
-^∈-∙∈-false (S∙ ^in) (S∙ ∙in) = ^∈-∙∈-false ^in ∙in
-^∈-∙∈-false (S, ^in) (S, ∙in) = ^∈-∙∈-false ^in ∙in
-^∈-∙∈-false (S= ^in) (S= ∙in) = ^∈-∙∈-false ^in ∙in
+∋^-∋∙-false (S^ ^in) (S^ ∙in) = ∋^-∋∙-false ^in ∙in
+∋^-∋∙-false (S∙ ^in) (S∙ ∙in) = ∋^-∋∙-false ^in ∙in
+∋^-∋∙-false (S, ^in) (S, ∙in) = ∋^-∋∙-false ^in ∙in
+∋^-∋∙-false (S= ^in) (S= ∙in) = ∋^-∋∙-false ^in ∙in
 
-^∈-=∈-false :
+∋^-∋=-false :
     Γ ∋^ k
   → Γ ∋= k
   → ⊥
-^∈-=∈-false (S^ in1) (S^ in2) = ^∈-=∈-false in1 in2
-^∈-=∈-false (S∙ in1) (S∙ in2) = ^∈-=∈-false in1 in2
-^∈-=∈-false (S, in1) (S, in2) = ^∈-=∈-false in1 in2
-^∈-=∈-false (S= in1) (S= in2) = ^∈-=∈-false in1 in2
+∋^-∋=-false (S^ in1) (S^ in2) = ∋^-∋=-false in1 in2
+∋^-∋=-false (S∙ in1) (S∙ in2) = ∋^-∋=-false in1 in2
+∋^-∋=-false (S, in1) (S, in2) = ∋^-∋=-false in1 in2
+∋^-∋=-false (S= in1) (S= in2) = ∋^-∋=-false in1 in2
 
-∙∈-=∈-false :
+∋∙-∋=-false :
     Γ ∋∙ X
   → Γ ∋= X
   → ⊥
-∙∈-=∈-false (S, in1) (S, in2) = ∙∈-=∈-false in1 in2
-∙∈-=∈-false (S∙ in1) (S∙ in2) = ∙∈-=∈-false in1 in2
-∙∈-=∈-false (S= in1) (S= in2) = ∙∈-=∈-false in1 in2
-∙∈-=∈-false (S^ in1) (S^ in2) = ∙∈-=∈-false in1 in2
+∋∙-∋=-false (S, in1) (S, in2) = ∋∙-∋=-false in1 in2
+∋∙-∋=-false (S∙ in1) (S∙ in2) = ∋∙-∋=-false in1 in2
+∋∙-∋=-false (S= in1) (S= in2) = ∋∙-∋=-false in1 in2
+∋∙-∋=-false (S^ in1) (S^ in2) = ∋∙-∋=-false in1 in2
 
-∙∈-:=∈-false :
+∋∙-∋:=-false :
     Γ ∋∙ X
   → Γ ∋ X := A
   → ⊥
-∙∈-:=∈-false (S, inΓ) (S, inΓ') = ∙∈-:=∈-false inΓ inΓ'
-∙∈-:=∈-false (S∙ inΓ) (S∙ inΓ' up) = ∙∈-:=∈-false inΓ inΓ'
-∙∈-:=∈-false (S= inΓ) (S= inΓ' up) = ∙∈-:=∈-false inΓ inΓ'
-∙∈-:=∈-false (S^ inΓ) (S^ inΓ' up) = ∙∈-:=∈-false inΓ inΓ'
+∋∙-∋:=-false (S, inΓ) (S, inΓ') = ∋∙-∋:=-false inΓ inΓ'
+∋∙-∋:=-false (S∙ inΓ) (S∙ inΓ' up) = ∋∙-∋:=-false inΓ inΓ'
+∋∙-∋:=-false (S= inΓ) (S= inΓ' up) = ∋∙-∋:=-false inΓ inΓ'
+∋∙-∋:=-false (S^ inΓ) (S^ inΓ' up) = ∋∙-∋:=-false inΓ inΓ'

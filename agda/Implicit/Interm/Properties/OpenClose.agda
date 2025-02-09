@@ -37,7 +37,7 @@ s-cloA (s-arr₂ s s₁) = ⊢c-arr (s-cloB s) (s-cloA s₁)
 s-cloA (s-arr₃ cloA s) = ⊢c-arr cloA (s-cloA s)
 s-cloA (s-∀ s) = ⊢c-∀ (s-cloA s)
 s-cloA (s-∀l s ic fd st₁ st₂) = ⊢c-∀ (⊢c-◆0 (s-cloA s))
-s-cloA (s-var-l x s) = ⊢c-var-= (:=to= x)
+s-cloA (s-var-l x s) = ⊢c-var-= (∋:=to∋= x)
 s-cloA (s-var-r x s) = s-cloA s
 
 s-cloB (s-refl cloΣ cloA) = cloA
@@ -51,7 +51,7 @@ s-cloB (s-∀ s) = ⊢c-∀ (s-cloB s)
 s-cloB (s-∀l s ic fd st₁ st₂) with s-cloΓ s
 ... | clo-S= r cloA = ⊢c-subst0 (s-cloB s) cloA (st-arr st₁ st₂)
 s-cloB (s-var-l x s) = s-cloB s
-s-cloB (s-var-r x s) = ⊢c-var-= (:=to= x)
+s-cloB (s-var-r x s) = ⊢c-var-= (∋:=to∋= x)
 
 ----------------------------------------------------------------------
 --+                             typing                             +--

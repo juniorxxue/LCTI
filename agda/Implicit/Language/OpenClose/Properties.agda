@@ -109,8 +109,8 @@ data _◇_⇘_ : Env n m → Fin m → Env n m → Set where
             → Γ ∋^ k
             → Γ ⊢c A
             → ⊥
-⊢c-^∈-false ε-var inΓ (⊢c-var-∙ x) = ^∈-∙∈-false inΓ x
-⊢c-^∈-false ε-var inΓ (⊢c-var-= x) = ^∈-=∈-false inΓ x
+⊢c-^∈-false ε-var inΓ (⊢c-var-∙ x) = ∋^-∋∙-false inΓ x
+⊢c-^∈-false ε-var inΓ (⊢c-var-= x) = ∋^-∋=-false inΓ x
 ⊢c-^∈-false (ε-arr-l inA) inΓ (⊢c-arr cloA cloA₁) = ⊢c-^∈-false inA inΓ cloA
 ⊢c-^∈-false (ε-arr-r inA) inΓ (⊢c-arr cloA cloA₁) = ⊢c-^∈-false inA inΓ cloA₁
 ⊢c-^∈-false (ε-∀ inA) inΓ (⊢c-∀ cloA) = ⊢c-^∈-false inA (S∙ inΓ) cloA
@@ -119,8 +119,8 @@ data _◇_⇘_ : Env n m → Fin m → Env n m → Set where
 ⊢c-⊢o-disjoint : Ψ ⊢c A
                → Ψ ⊢o A
                → ⊥
-⊢c-⊢o-disjoint (⊢c-var-∙ inΓ) (⊢o-var-^ x) = ^∈-∙∈-false x inΓ
-⊢c-⊢o-disjoint (⊢c-var-= inΓ) (⊢o-var-^ x) = ^∈-=∈-false x inΓ
+⊢c-⊢o-disjoint (⊢c-var-∙ inΓ) (⊢o-var-^ x) = ∋^-∋∙-false x inΓ
+⊢c-⊢o-disjoint (⊢c-var-= inΓ) (⊢o-var-^ x) = ∋^-∋=-false x inΓ
 ⊢c-⊢o-disjoint (⊢c-arr clo clo₁) (⊢o-arr-l opn) = ⊢c-⊢o-disjoint clo opn
 ⊢c-⊢o-disjoint (⊢c-arr clo clo₁) (⊢o-arr-r opn) = ⊢c-⊢o-disjoint clo₁ opn
 ⊢c-⊢o-disjoint (⊢c-∀ clo) (⊢o-∀ opn) = ⊢c-⊢o-disjoint clo opn

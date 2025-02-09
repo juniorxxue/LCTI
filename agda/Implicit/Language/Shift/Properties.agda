@@ -133,11 +133,11 @@ shifted-↑ty (sfd-arr sf sf₁) = ⟨ shifted-↑ty sf .proj₁ `→ shifted-�
                                 ↑ty-arr (shifted-↑ty sf .proj₂) (shifted-↑ty sf₁ .proj₂) ⟩
 shifted-↑ty (sfd-∀ sf) = ⟨ `∀ shifted-↑ty sf .proj₁ , ↑ty-∀ (shifted-↑ty sf .proj₂) ⟩
 
-shifted-lt : Shifted T k₁
+shifted-≤ : Shifted T k₁
            → T ↑ty k₂ ⇘ T'
            → k₂ #≤ k₁
            → Shifted T' (#S k₁)
-shifted-lt sfd-int ↑ty-int lt = sfd-int
-shifted-lt (sfd-var x) ↑ty-var lt rewrite sym (punchIn-≤ lt) = sfd-var (punchIn-≢ x)
-shifted-lt (sfd-arr sd sd₁) (↑ty-arr upT upT₁) lt = sfd-arr (shifted-lt sd upT lt) (shifted-lt sd₁ upT₁ lt)
-shifted-lt (sfd-∀ sd) (↑ty-∀ upT) lt = sfd-∀ (shifted-lt sd upT (s≤s lt))
+shifted-≤ sfd-int ↑ty-int lt = sfd-int
+shifted-≤ (sfd-var x) ↑ty-var lt rewrite sym (punchIn-≤ lt) = sfd-var (punchIn-≢ x)
+shifted-≤ (sfd-arr sd sd₁) (↑ty-arr upT upT₁) lt = sfd-arr (shifted-≤ sd upT lt) (shifted-≤ sd₁ upT₁ lt)
+shifted-≤ (sfd-∀ sd) (↑ty-∀ upT) lt = sfd-∀ (shifted-≤ sd upT (s≤s lt))
