@@ -12,12 +12,12 @@ open import Implicit.Language.Extension.InputOutput
 open import Implicit.Language.Extension.ExSol
 open import Implicit.Language.Extension.Occur
 
-data ReExt◆◇ (Γ : Env n m) (Δ : Env n m) (k : Fin m) (A : Type m) : Set where
+data ReExt◇◆ (Γ : Env n m) (Δ : Env n m) (k : Fin m) (A : Type m) : Set where
   justexts : ∀ {Γ' Δ'}
            → (newΓ : Γ ◇ k ⇘ Γ')
            → (newΔ : Δ ◆ k ⇘ Δ')
            → (ext : Γ' ⊆ Δ' w/t A)
-           → ReExt◆◇ Γ Δ k A
+           → ReExt◇◆ Γ Δ k A
 
 data ReExt◆◆ (Γ : Env n m) (Δ : Env n m) (k : Fin m) (A : Type m) : Set where
   justexts : ∀ {Γ' Δ'}
@@ -33,111 +33,111 @@ data ReExt◇◇ (Γ : Env n m) (Δ : Env n m) (k : Fin m) (A : Type m) : Set wh
            → (ext : Γ' ⊆ Δ' w/t A)
            → ReExt◇◇ Γ Δ k A
 
-extx-◆◇ : Γ ⊆ Δ w/v k
+⊆/x-◇◆ : Γ ⊆ Δ w/v k
         → Γ ∋^ k
-        → ReExt◆◇ Γ Δ k (‶ k)
-extx-◆◇ (ext-Z^ cloA) Z = justexts ◇Z ◆Z (ext-var ext-Z∙)
-extx-◆◇ (ext-S, extx) (S, inΓ) with extx-◆◇ extx inΓ
+        → ReExt◇◆ Γ Δ k (‶ k)
+⊆/x-◇◆ (ext-Z^ cloA) Z = justexts ◇Z ◆Z (ext-var ext-Z∙)
+⊆/x-◇◆ (ext-S, extx) (S, inΓ) with ⊆/x-◇◆ extx inΓ
 ... | justexts x x₁ (ext-var x₂) = justexts (◇S, x) (◆S, x₁) (ext-var (ext-S, x₂))
-extx-◆◇ (ext-S^ extx) (S^ inΓ) with extx-◆◇ extx inΓ
+⊆/x-◇◆ (ext-S^ extx) (S^ inΓ) with ⊆/x-◇◆ extx inΓ
 ... | justexts x x₁ (ext-var x₂) = justexts (◇S^ x) (◆S^ x₁) (ext-var (ext-S^ x₂))
-extx-◆◇ (ext-S∙ extx) (S∙ inΓ) with extx-◆◇ extx inΓ
+⊆/x-◇◆ (ext-S∙ extx) (S∙ inΓ) with ⊆/x-◇◆ extx inΓ
 ... | justexts x x₁ (ext-var x₂) = justexts (◇S∙ x) (◆S∙ x₁) (ext-var (ext-S∙ x₂))
-extx-◆◇ (ext-S= extx) (S= inΓ) with extx-◆◇ extx inΓ
+⊆/x-◇◆ (ext-S= extx) (S= inΓ) with ⊆/x-◇◆ extx inΓ
 ... | justexts x x₁ (ext-var x₂) = justexts (◇S= x) (◆S= x₁) (ext-var (ext-S= x₂))
 
-extx-◆◆ : Γ ⊆ Δ w/v X
+⊆/x-◆◆ : Γ ⊆ Δ w/v X
         → Γ ∋= k
         → ReExt◆◆ Γ Δ k (‶ X)
-extx-◆◆ (ext-Z^ cloA) (S^ inΓ) with ◆-total inΓ
+⊆/x-◆◆ (ext-Z^ cloA) (S^ inΓ) with ◆-total inΓ
 ... | ⟨ Γ' , newΓ ⟩ = justexts (◆S^ newΓ) (◆S= newΓ) (ext-var (ext-Z^ (⊢c-◆ cloA newΓ)))
-extx-◆◆ ext-Z∙ (S∙ inΓ) with ◆-total inΓ
+⊆/x-◆◆ ext-Z∙ (S∙ inΓ) with ◆-total inΓ
 ... | ⟨ _ , newΓ ⟩ = justexts (◆S∙ newΓ) (◆S∙ newΓ) (ext-var ext-Z∙)
-extx-◆◆ ext-Z= Z = justexts ◆Z ◆Z (ext-var ext-Z∙)
-extx-◆◆ ext-Z= (S= inΓ) with ◆-total inΓ
+⊆/x-◆◆ ext-Z= Z = justexts ◆Z ◆Z (ext-var ext-Z∙)
+⊆/x-◆◆ ext-Z= (S= inΓ) with ◆-total inΓ
 ... | ⟨ _ , newΓ ⟩ = justexts (◆S= newΓ) (◆S= newΓ) (ext-var ext-Z=)
-extx-◆◆ (ext-S, ext) (S, inΓ) with extx-◆◆ ext inΓ
+⊆/x-◆◆ (ext-S, ext) (S, inΓ) with ⊆/x-◆◆ ext inΓ
 ... | justexts newΓ newΔ (ext-var x) = justexts (◆S, newΓ) (◆S, newΔ) (ext-var (ext-S, x))
-extx-◆◆ (ext-S^ ext) (S^ inΓ) with extx-◆◆ ext inΓ
+⊆/x-◆◆ (ext-S^ ext) (S^ inΓ) with ⊆/x-◆◆ ext inΓ
 ... | justexts newΓ newΔ (ext-var x) = justexts (◆S^ newΓ) (◆S^ newΔ) (ext-var (ext-S^ x))
-extx-◆◆ (ext-S∙ ext) (S∙ inΓ) with extx-◆◆ ext inΓ
+⊆/x-◆◆ (ext-S∙ ext) (S∙ inΓ) with ⊆/x-◆◆ ext inΓ
 ... | justexts newΓ newΔ (ext-var x) = justexts (◆S∙ newΓ) (◆S∙ newΔ) (ext-var (ext-S∙ x))
-extx-◆◆ (ext-S= ext) Z = justexts ◆Z ◆Z (ext-var (ext-S∙ ext))
-extx-◆◆ (ext-S= ext) (S= inΓ) with extx-◆◆ ext inΓ
+⊆/x-◆◆ (ext-S= ext) Z = justexts ◆Z ◆Z (ext-var (ext-S∙ ext))
+⊆/x-◆◆ (ext-S= ext) (S= inΓ) with ⊆/x-◆◆ ext inΓ
 ... | justexts newΓ newΔ (ext-var x) = justexts (◆S= newΓ) (◆S= newΔ) (ext-var (ext-S= x))
 
-extx-◇◇ : Γ ⊆ Δ w/v X
+⊆/x-◇◇ : Γ ⊆ Δ w/v X
         → X ≢ k
         → Γ ∋^ k
         → ReExt◇◇ Γ Δ k (‶ X)
-extx-◇◇ (ext-Z^ cloA) neq Z = ⊥-elim (neq refl)
-extx-◇◇ (ext-Z^ cloA) neq (S^ inΓ) with ◇-total inΓ
+⊆/x-◇◇ (ext-Z^ cloA) neq Z = ⊥-elim (neq refl)
+⊆/x-◇◇ (ext-Z^ cloA) neq (S^ inΓ) with ◇-total inΓ
 ... | ⟨ Γ' , newΓ ⟩ = justexts (◇S^ newΓ) (◇S= newΓ) (ext-var (ext-Z^ (⊢c-◇ cloA newΓ)))
-extx-◇◇ ext-Z∙ neq (S∙ inΓ) with ◇-total inΓ
+⊆/x-◇◇ ext-Z∙ neq (S∙ inΓ) with ◇-total inΓ
 ... | ⟨ Γ' , newΓ ⟩ = justexts (◇S∙ newΓ) (◇S∙ newΓ) (ext-var ext-Z∙)
-extx-◇◇ ext-Z= neq (S= inΓ) with ◇-total inΓ
+⊆/x-◇◇ ext-Z= neq (S= inΓ) with ◇-total inΓ
 ... | ⟨ Γ' , newΓ ⟩ = justexts (◇S= newΓ) (◇S= newΓ) (ext-var ext-Z=)
-extx-◇◇ (ext-S, ext) neq (S, inΓ) with extx-◇◇ ext neq inΓ
+⊆/x-◇◇ (ext-S, ext) neq (S, inΓ) with ⊆/x-◇◇ ext neq inΓ
 ... | justexts newΓ newΔ (ext-var x) = justexts (◇S, newΓ) (◇S, newΔ) (ext-var (ext-S, x))
-extx-◇◇ (ext-S^ ext) neq Z = justexts ◇Z ◇Z (ext-var (ext-S∙ ext))
-extx-◇◇ (ext-S^ ext) neq (S^ inΓ) with extx-◇◇ ext (≢-pred neq) inΓ
+⊆/x-◇◇ (ext-S^ ext) neq Z = justexts ◇Z ◇Z (ext-var (ext-S∙ ext))
+⊆/x-◇◇ (ext-S^ ext) neq (S^ inΓ) with ⊆/x-◇◇ ext (≢-pred neq) inΓ
 ... | justexts newΓ newΔ (ext-var x) = justexts (◇S^ newΓ) (◇S^ newΔ) (ext-var (ext-S^ x))
-extx-◇◇ (ext-S∙ ext) neq (S∙ inΓ) with extx-◇◇ ext (≢-pred neq) inΓ
+⊆/x-◇◇ (ext-S∙ ext) neq (S∙ inΓ) with ⊆/x-◇◇ ext (≢-pred neq) inΓ
 ... | justexts newΓ newΔ (ext-var x) = justexts (◇S∙ newΓ) (◇S∙ newΔ) (ext-var (ext-S∙ x))
-extx-◇◇ (ext-S= ext) neq (S= inΓ) with extx-◇◇ ext (≢-pred neq) inΓ
+⊆/x-◇◇ (ext-S= ext) neq (S= inΓ) with ⊆/x-◇◇ ext (≢-pred neq) inΓ
 ... | justexts newΓ newΔ (ext-var x) = justexts (◇S= newΓ) (◇S= newΔ) (ext-var (ext-S= x))
 
-ext-◆◇ : Γ ⊆ Δ w/t A
+⊆/-◆◇ : Γ ⊆ Δ w/t A
        → k ε A
        → Γ ∋^ k
-       → ReExt◆◇ Γ Δ k A
+       → ReExt◇◆ Γ Δ k A
 
-ext-◆◇-derived : Γ ⊆ Δ w/t A
+⊆/-◆◇-derived : Γ ⊆ Δ w/t A
                → Γ ◇ k ⇘ Γ'
                → Δ ◆ k ⇘ Δ'
                → Γ' ⊆ Δ' w/t A
-ext-◆◇-derived {k = k} ext newΓ newΔ with ext-◆◇ ext (^in-=out-ε ext (◇-∋^ newΓ) (◆-∋= newΔ)) (◇-∋^ newΓ)
+⊆/-◆◇-derived {k = k} ext newΓ newΔ with ⊆/-◆◇ ext (^in-=out-ε ext (◇-∋^ newΓ) (◆-∋= newΔ)) (◇-∋^ newΓ)
 ... | justexts newΓ₁ newΔ₁ ext₁ rewrite ◆-unique newΔ newΔ₁ | ◇-unique newΓ newΓ₁ = ext₁
 
-ext-◆◆ : Γ ⊆ Δ w/t A
+⊆/-◆◆ : Γ ⊆ Δ w/t A
        → Γ ∋= k
        → ReExt◆◆ Γ Δ k A
 
-ext-◇◇ : Γ ⊆ Δ w/t A
+⊆/-◇◇ : Γ ⊆ Δ w/t A
        → k ¬ε A
        → Γ ∋^ k
        → ReExt◇◇ Γ Δ k A
 
-ext-◆◇ (ext-var x) ε-var inΓ = extx-◆◇ x inΓ
-ext-◆◇ (ext-arr ext ext₁) (ε-arr-l inA) inΓ with ext-◆◇ ext inA inΓ | ext-◆◆ ext₁ (ext-^in-=out ext inA inΓ)
+⊆/-◆◇ (ext-var x) ε-var inΓ = ⊆/x-◇◆ x inΓ
+⊆/-◆◇ (ext-arr ext ext₁) (ε-arr-l inA) inΓ with ⊆/-◆◇ ext inA inΓ | ⊆/-◆◆ ext₁ (⊆/-^in-=out ext inA inΓ)
 ... | justexts newΓ newΔ newext | justexts newΓ' newΔ' newext' rewrite ◆-unique newΔ newΓ' = justexts newΓ newΔ' (ext-arr newext newext')
-ext-◆◇ {k = k} (ext-arr {A = A} ext ext₁) (ε-arr-r inA) inΓ with ε-dec {k = k} {A = A}
+⊆/-◆◇ {k = k} (ext-arr {A = A} ext ext₁) (ε-arr-r inA) inΓ with ε-dec {k = k} {A = A}
 ... | inj₁ inA'
-  with justexts newΓ' newΔ' newext ← ext-◆◇ ext inA' inΓ
-  with justexts newΓ'' newΔ'' newext' ← ext-◆◆ ext₁ (ext-^in-=out ext inA' inΓ)
+  with justexts newΓ' newΔ' newext ← ⊆/-◆◇ ext inA' inΓ
+  with justexts newΓ'' newΔ'' newext' ← ⊆/-◆◆ ext₁ (⊆/-^in-=out ext inA' inΓ)
   with refl ← ◆-unique newΓ'' newΔ' = justexts newΓ' newΔ'' (ext-arr newext newext')
 ... | inj₂ ¬inA'
-  with justexts newΓ' newΔ' newext ← ext-◇◇ ext ¬inA' inΓ
-  with justexts newΓ'' newΔ'' newext' ← ext-◆◇ ext₁ inA (ext-^in-^out ext ¬inA' inΓ)
+  with justexts newΓ' newΔ' newext ← ⊆/-◇◇ ext ¬inA' inΓ
+  with justexts newΓ'' newΔ'' newext' ← ⊆/-◆◇ ext₁ inA (⊆/-^in-^out ext ¬inA' inΓ)
   with refl ← ◇-unique newΔ' newΓ'' = justexts newΓ' newΔ'' (ext-arr newext newext')
-ext-◆◇ (ext-∀ ext) (ε-∀ inA) inΓ with ext-◆◇ ext inA (S∙ inΓ)
+⊆/-◆◇ (ext-∀ ext) (ε-∀ inA) inΓ with ⊆/-◆◇ ext inA (S∙ inΓ)
 ... | justexts (◇S∙ newΓ) (◆S∙ newΔ) ext' = justexts newΓ newΔ (ext-∀ ext')
 
-ext-◆◆ ext-int inΓ with ◆-total inΓ
+⊆/-◆◆ ext-int inΓ with ◆-total inΓ
 ... | ⟨ Γ' , newΓ ⟩ = justexts newΓ newΓ ext-int
-ext-◆◆ (ext-var x) inΓ = extx-◆◆ x inΓ
-ext-◆◆ (ext-arr ext ext₁) inΓ
-  with justexts x x₁ x₂ ← ext-◆◆ ext inΓ
-  with justexts x' x₁' x₂' ← ext-◆◆ ext₁ (ext-=in-=out ext inΓ)
+⊆/-◆◆ (ext-var x) inΓ = ⊆/x-◆◆ x inΓ
+⊆/-◆◆ (ext-arr ext ext₁) inΓ
+  with justexts x x₁ x₂ ← ⊆/-◆◆ ext inΓ
+  with justexts x' x₁' x₂' ← ⊆/-◆◆ ext₁ (⊆/-=in-=out ext inΓ)
   with refl ← ◆-unique x' x₁ = justexts x x₁' (ext-arr x₂ x₂')
-ext-◆◆ (ext-∀ ext) inΓ with ext-◆◆ ext (S∙ inΓ)
+⊆/-◆◆ (ext-∀ ext) inΓ with ⊆/-◆◆ ext (S∙ inΓ)
 ... | justexts (◆S∙ x) (◆S∙ x₁) ext' = justexts x x₁ (ext-∀ ext')
 
-ext-◇◇ ext-int ¬ε-int inΓ with ◇-total inΓ
+⊆/-◇◇ ext-int ¬ε-int inΓ with ◇-total inΓ
 ... | ⟨ Γ' , newΓ ⟩ = justexts newΓ newΓ ext-int
-ext-◇◇ (ext-var x) (¬ε-var x₁) inΓ = extx-◇◇ x x₁ inΓ
-ext-◇◇ (ext-arr ext ext₁) (¬ε-arr ¬inA ¬inA₁) inΓ with ext-◇◇ ext ¬inA inΓ | ext-◇◇ ext₁ ¬inA₁ (ext-^in-^out ext ¬inA inΓ)
+⊆/-◇◇ (ext-var x) (¬ε-var x₁) inΓ = ⊆/x-◇◇ x x₁ inΓ
+⊆/-◇◇ (ext-arr ext ext₁) (¬ε-arr ¬inA ¬inA₁) inΓ with ⊆/-◇◇ ext ¬inA inΓ | ⊆/-◇◇ ext₁ ¬inA₁ (⊆/-^in-^out ext ¬inA inΓ)
 ... | justexts newΓ newΔ ext₂ | justexts newΓ₁ newΔ₁ ext₃
   with refl ← ◇-unique newΔ newΓ₁ = justexts newΓ newΔ₁ (ext-arr ext₂ ext₃)
-ext-◇◇ (ext-∀ ext) (¬ε-∀ ¬inA) inΓ with ext-◇◇ ext ¬inA (S∙ inΓ)
+⊆/-◇◇ (ext-∀ ext) (¬ε-∀ ¬inA) inΓ with ⊆/-◇◇ ext ¬inA (S∙ inΓ)
 ... | justexts (◇S∙ newΓ) (◇S∙ newΔ) ext₁ = justexts newΓ newΔ (ext-∀ ext₁)

@@ -13,7 +13,7 @@ open import Implicit.Language.Extension.ExSol
            → Δ ∋= k
            → k ε A
 ^in-=out-ε ext-int inΓ inΔ = ⊥-elim (∋^-∋=-false inΓ inΔ)
-^in-=out-ε (ext-var x) inΓ inΔ with extx-^in-=out-eq x inΓ inΔ
+^in-=out-ε (ext-var x) inΓ inΔ with ⊆/x-^in-=out-eq x inΓ inΔ
 ... | refl = ε-var
 ^in-=out-ε (ext-arr ext ext₁) inΓ inΔ with ⊆/-exsol ext inΓ
 ... | is-ex inΓ₁ = ε-arr-r (^in-=out-ε ext₁ inΓ₁ inΔ)
