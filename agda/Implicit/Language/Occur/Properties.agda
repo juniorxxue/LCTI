@@ -62,3 +62,17 @@ open import Implicit.Language.Occur.Base
             → k ¬εᵍ Γ
             → ⊥
 εᵍ-:=-false inΓ inA ¬inΓ = ε-¬ε-false inA (εᵍ-:=-¬ε ¬inΓ inΓ)
+
+
+ε-dec : (k ε A) ⊎ (k ¬ε A)
+ε-dec {k = k} {A = Int} = inj₂ ¬ε-int
+ε-dec {k = k} {A = ‶ X} with k #≟ X
+... | yes refl = inj₁ ε-var
+... | no ¬p = inj₂ (¬ε-var (≢-sym ¬p))
+ε-dec {k = k} {A = A `→ B} with ε-dec {k = k} {A = A} | ε-dec {k = k} {A = B}
+... | inj₁ p | _ = inj₁ (ε-arr-l p)
+... | _ | inj₁ p = inj₁ (ε-arr-r p)
+... | inj₂ p | inj₂ p' = inj₂ (¬ε-arr p p')
+ε-dec {k = k} {A = `∀ A} with ε-dec {k = #S k} {A = A}
+... | inj₁ p = inj₁ (ε-∀ p)
+... | inj₂ p = inj₂ (¬ε-∀ p)

@@ -77,3 +77,15 @@ inst-in (⟹=S inst up1) = S= (inst-in inst) up1
 ∙⟹-∙-eq-false (S∙ inΓ) (∙⟹∙S newΓ up1) (S∙ inΓ') = ∙⟹-∙-eq-false inΓ newΓ inΓ'
 ∙⟹-∙-eq-false (S= inΓ) (∙⟹=S newΓ up1) (S= inΓ') = ∙⟹-∙-eq-false inΓ newΓ inΓ'
 ∙⟹-∙-eq-false (S^ inΓ) (∙⟹^S newΓ up1) (S^ inΓ') = ∙⟹-∙-eq-false inΓ newΓ inΓ'
+
+
+inst-affect-one : [ A / X ] Γ ⟹ Δ
+                → Γ ∋^ k
+                → Δ ∋= k
+                → k ≡ X
+inst-affect-one (⟹^0 up) Z inΔ = refl
+inst-affect-one (⟹^0 up) (S^ inΓ) (S= inΔ) = ⊥-elim (∋^-∋=-false inΓ inΔ)
+inst-affect-one (⟹^S inst up1) (S^ inΓ) (S^ inΔ) = cong #S (inst-affect-one inst inΓ inΔ)
+inst-affect-one (⟹∙S inst up1) (S∙ inΓ) (S∙ inΔ) = cong #S (inst-affect-one inst inΓ inΔ)
+inst-affect-one (⟹,S inst) (S, inΓ) (S, inΔ) = inst-affect-one inst inΓ inΔ
+inst-affect-one (⟹=S inst up1) (S= inΓ) (S= inΔ) = cong #S (inst-affect-one inst inΓ inΔ)

@@ -1,6 +1,6 @@
 module Implicit.Algo.Properties.Environments where
 
-open import Implicit.Language
+open import Implicit.Language.All
 open import Implicit.Algo.Base
 open import Implicit.Algo.Properties.Extension
 open import Implicit.Algo.Properties.OpenClose

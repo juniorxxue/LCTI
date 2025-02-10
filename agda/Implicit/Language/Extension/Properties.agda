@@ -116,3 +116,67 @@ inst-⊆ (⟹^S inst up1) cloA = evar (inst-⊆ inst (⊢c-strengthen^0 cloA up1
 inst-⊆ (⟹∙S inst up1) cloA = uvar (inst-⊆ inst (⊢c-strengthen∙0 cloA up1))
 inst-⊆ (⟹,S inst) cloA = var (inst-⊆ inst (⊢c-strengthen,0 cloA))
 inst-⊆ (⟹=S inst up1) cloA = svar (inst-⊆ inst (⊢c-strengthen=0 cloA up1))
+
+
+
+extv-∙-eq : Γ ∋∙ X
+          → Γ ⊆ Δ w/v X
+          → Γ ≡ Δ
+extv-∙-eq Z ext-Z∙ = refl
+extv-∙-eq (S, inΓ) (ext-S, ext) rewrite extv-∙-eq inΓ ext = refl
+extv-∙-eq (S∙ inΓ) (ext-S∙ ext) rewrite extv-∙-eq inΓ ext = refl
+extv-∙-eq (S= inΓ) (ext-S= ext) rewrite extv-∙-eq inΓ ext = refl
+extv-∙-eq (S^ inΓ) (ext-S^ ext) rewrite extv-∙-eq inΓ ext = refl
+
+extv-∙ : Γ ∋∙ X
+       → Γ ⊆ Γ w/v X
+extv-∙ Z = ext-Z∙
+extv-∙ (S, inΓ) = ext-S, (extv-∙ inΓ)
+extv-∙ (S∙ inΓ) = ext-S∙ (extv-∙ inΓ)
+extv-∙ (S= inΓ) = ext-S= (extv-∙ inΓ)
+extv-∙ (S^ inΓ) = ext-S^ (extv-∙ inΓ)
+
+extv-=-eq : Γ ∋= X
+          → Γ ⊆ Δ w/v X
+          → Γ ≡ Δ
+extv-=-eq Z ext-Z= = refl
+extv-=-eq (S, inΓ) (ext-S, ext) rewrite extv-=-eq inΓ ext = refl
+extv-=-eq (S∙ inΓ) (ext-S∙ ext) rewrite extv-=-eq inΓ ext = refl
+extv-=-eq (S= inΓ) (ext-S= ext) rewrite extv-=-eq inΓ ext = refl
+extv-=-eq (S^ inΓ) (ext-S^ ext) rewrite extv-=-eq inΓ ext = refl
+
+extv-= : Γ ∋= X
+       → Γ ⊆ Γ w/v X
+extv-= Z = ext-Z=
+extv-= (S, inΓ) = ext-S, (extv-= inΓ)
+extv-= (S∙ inΓ) = ext-S∙ (extv-= inΓ)
+extv-= (S^ inΓ) = ext-S^ (extv-= inΓ)
+extv-= (S= inΓ) = ext-S= (extv-= inΓ)
+
+ext-close-eq : Γ ⊢c A
+             → Γ ⊆ Δ w/t A
+             → Γ ≡ Δ
+ext-close-eq ⊢c-int ext-int = refl
+ext-close-eq (⊢c-var-∙ inΓ) (ext-var x) = extv-∙-eq inΓ x
+ext-close-eq (⊢c-var-= inΓ) (ext-var x) = extv-=-eq inΓ x
+ext-close-eq (⊢c-arr cloA cloA₁) (ext-arr ext ext₁) with ext-close-eq cloA ext
+... | refl = ext-close-eq cloA₁ ext₁
+ext-close-eq (⊢c-∀ cloA) (ext-∀ ext) with ext-close-eq cloA ext
+... | refl = refl
+
+ext-close : Γ ⊢c A
+          → Γ ⊆ Γ w/t A
+ext-close ⊢c-int = ext-int
+ext-close (⊢c-var-∙ inΓ) = ext-var (extv-∙ inΓ)
+ext-close (⊢c-var-= inΓ) = ext-var (extv-= inΓ)
+ext-close (⊢c-arr cloA cloA₁) = ext-arr (ext-close cloA) (ext-close cloA₁)
+ext-close (⊢c-∀ cloA) = ext-∀ (ext-close cloA)
+
+inst-extv : [ A / X ] Γ ⟹ Δ
+         → Γ ⊢c A
+         → Γ ⊆ Δ w/v X
+inst-extv (⟹^0 up) cloA = ext-Z^ (⊢c-strengthen^0 cloA up)
+inst-extv (⟹^S inst up1) cloA = ext-S^ (inst-extv inst (⊢c-strengthen^0 cloA up1))
+inst-extv (⟹∙S inst up1) cloA = ext-S∙ (inst-extv inst (⊢c-strengthen∙0 cloA up1))
+inst-extv (⟹,S inst) cloA = ext-S, (inst-extv inst (⊢c-strengthen,0 cloA))
+inst-extv (⟹=S inst up1) cloA = ext-S= (inst-extv inst (⊢c-strengthen=0 cloA up1))
