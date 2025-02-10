@@ -51,7 +51,7 @@ s-subst (s-var-= cloΓ inΓ) newΓ (st-var stx) (st-var stx₁) with stx-unique 
 s-subst (s-arr₁ s s₁) newΓ (st-arr stA stA₁) (st-arr stB stB₁) = s-arr₁ (s-subst s newΓ stB stA) (s-subst s₁ newΓ stA₁ stB₁)
 s-subst (s-arr₂ s s₁) newΓ (st-arr stA stA₁) (st-arr stB stB₁) = s-arr₂ (s-subst s newΓ stB stA) (s-subst s₁ newΓ stA₁ stB₁)
 s-subst (s-arr₃ cloA s) newΓ (st-arr stA stA₁) (st-arr stB stB₁) with st-unique stA stB
-... | refl = s-arr₃ (⊢c-subst cloA newΓ (◀=-closedT newΓ (s-cloΓ s)) stA) (s-subst s newΓ stA₁ stB₁)
+... | refl = s-arr₃ (⊢c-subst cloA newΓ (◀=-closedT newΓ (s-closed s)) stA) (s-subst s newΓ stA₁ stB₁)
 s-subst (s-∀ s) newΓ (st-∀ up stA) (st-∀ up₁ stB) with ↑ty-unique up up₁
 ... | refl = s-∀ (s-subst s (◀S∙ newΓ up) stA stB)
 s-subst {k = k} {T} (s-∀l {B = B} {C = C} {D = D} s ic fd st₁ st₂) newΓ (st-∀ {A' = A'} up stA) (st-arr stB stB₁)

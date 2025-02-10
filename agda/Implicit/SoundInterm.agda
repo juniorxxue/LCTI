@@ -56,7 +56,7 @@ late-grd-v2-gen (st-var stx-eq) apA* newΓ (grd-var∙ x) = ⊥-elim (∋∙-∋
 late-grd-v2-gen (st-var (stx-neq ¬p)) (grd-var= x₁) newΓ (grd-var∙ x) = ⊥-elim (∋∙-∋=-false x (▶%-punchOut-∋= ¬p (∋:=to∋= x₁) newΓ))
 late-grd-v2-gen (st-var (stx-neq ¬p)) (grd-var∙ x₁) newΓ (grd-var∙ x) = ↑ty-punchOut ¬p
 late-grd-v2-gen (st-arr stA stA₁) (grd-arr apA* apA*₁) newΓ (grd-arr apA' apA'') = ↑ty-arr (late-grd-v2-gen stA apA* newΓ apA')
-                                                                                        (late-grd-v2-gen stA₁ apA*₁ newΓ apA'')
+                                                                                           (late-grd-v2-gen stA₁ apA*₁ newΓ apA'')
 late-grd-v2-gen (st-∀ up stA) (grd-∀ apA*) newΓ (grd-∀ apA') = ↑ty-∀ (late-grd-v2-gen stA apA* (▶%S∙ newΓ up) apA')
 
 
@@ -84,13 +84,13 @@ sound-s (s-var-= cloΓ inΓ) apΓ apA apB with grd-unique apA apB
 sound-s (s-arr₁ s s₁) apΓ (grd-arr apA apA₁) (grd-arr apB apB₁) = s-arr₁ (sound-s s apΓ apB apA) (sound-s s₁ apΓ apA₁ apB₁)
 sound-s (s-arr₂ s s₁) apΓ (grd-arr apA apA₁) (grd-arr apB apB₁) = s-arr₂ (sound-s s apΓ apB apA) (sound-s s₁ apΓ apA₁ apB₁)
 sound-s (s-arr₃ cloA s) apΓ (grd-arr apA apA₁) (grd-arr apB apB₁) with grd-unique apA apB
-... | refl = s-arr₃ (grd-closeA cloA apΓ (grd-closed (s-cloΓ s) apΓ) apB) (sound-s s apΓ apA₁ apB₁)
+... | refl = s-arr₃ (grd-closeA cloA apΓ (grd-closed (s-closed s) apΓ) apB) (sound-s s apΓ apA₁ apB₁)
 sound-s (s-∀ s) apΓ (grd-∀ apA) (grd-∀ apB) = s-∀ (sound-s s (grd-S∙ apΓ) apA apB)
-sound-s (s-∀l {B = B} s ic fd stC stD) apΓ (grd-∀ {A% = A%} apA) (grd-arr apC apD) with s-cloΓ s | s-cloB s
+sound-s (s-∀l {B = B} s ic fd stC stD) apΓ (grd-∀ {A% = A%} apA) (grd-arr apC apD) with s-closed s | s-close-r s
 ... | clo-S= r cloA | ⊢c-arr cloC cloD =
   let ⟨ B%  , apB% ⟩ = grd-total (grd-close-prv cloA apΓ)
       ⟨ A%* , stA% ⟩ = st0-total B% A%
-      ⟨ A%*' , apA% ⟩ = grd-total (grd-close-prv (s-cloA s) (grd-S= apΓ apB%))
+      ⟨ A%*' , apA% ⟩ = grd-total (grd-close-prv (s-close-l s) (grd-S= apΓ apB%))
       ⟨ C%' , apC% ⟩ = grd-total (grd-close-prv cloC (grd-S= apΓ apB%))
       ⟨ D%' , apD% ⟩ = grd-total (grd-close-prv cloD (grd-S= apΓ apB%))
   in s-∀l {B = B%} stA% (sd-strengthen=0 (sound-s s (grd-S= apΓ apB%)
@@ -117,10 +117,10 @@ sound (⊢lam₁ ⊢e) apΓ (grd-arr apA apA₁) (grd-lam ape) =
   ⊢lam₁ (sound ⊢e (grd-S, apΓ apA) (grd-weaken,0 apA₁) (grde-invar,0 ape))
 sound (⊢lam₂ ⊢e) apΓ (grd-arr apA apA₁) (grd-lam ape) =
   ⊢lam₂ (sound ⊢e (grd-S, apΓ apA) (grd-weaken,0 apA₁) (grde-invar,0 ape))
-sound (⊢app₁ ⊢e ⊢e₁) apΓ apA (grd-app ape ape₁) with grd-total (grd-close-prv (t-cloA ⊢e₁) apΓ)
+sound (⊢app₁ ⊢e ⊢e₁) apΓ apA (grd-app ape ape₁) with grd-total (grd-close-prv (t-close ⊢e₁) apΓ)
 ... | ⟨ A%' , ap' ⟩ = ⊢app₁ (sound ⊢e apΓ (grd-arr ap' apA) ape) (sound ⊢e₁ apΓ ap' ape₁)
-sound (⊢app₂ ⊢e ⊢e₁) apΓ apA (grd-app ape ape₁)  with grd-total (grd-close-prv (t-cloA ⊢e₁) apΓ)
+sound (⊢app₂ ⊢e ⊢e₁) apΓ apA (grd-app ape ape₁)  with grd-total (grd-close-prv (t-close ⊢e₁) apΓ)
 ... | ⟨ A%' , ap' ⟩ = ⊢app₂ (sound ⊢e apΓ (grd-arr ap' apA) ape) (sound ⊢e₁ apΓ ap' ape₁)
-sound (⊢sub ⊢e B≤A j≢Z) apΓ apA ape with grd-total (grd-close-prv (t-cloA ⊢e) apΓ)
+sound (⊢sub ⊢e B≤A j≢Z) apΓ apA ape with grd-total (grd-close-prv (t-close ⊢e) apΓ)
 ... | ⟨ A% , ap ⟩ = ⊢sub (sound ⊢e apΓ ap ape) (sound-s B≤A apΓ ap apA) j≢Z
 sound (⊢tabs ⊢e) apΓ (grd-∀ apA) (grd-tlam ape) = ⊢tabs (sound ⊢e (grd-S∙ apΓ) apA ape)
