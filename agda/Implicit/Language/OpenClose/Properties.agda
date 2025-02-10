@@ -57,6 +57,41 @@ data _◇_⇘_ : Env n m → Fin m → Env n m → Set where
   ◇S^ : Γ ◇ k ⇘ Γ'
       → Γ ,^ ◇ #S k ⇘ Γ' ,^
 
+◆-unique : Γ ◆ k ⇘ Γ₁
+         → Γ ◆ k ⇘ Γ₂
+         → Γ₁ ≡ Γ₂
+◆-unique ◆Z ◆Z = refl
+◆-unique (◆S, new1) (◆S, new2) rewrite ◆-unique new1 new2 = refl
+◆-unique (◆S∙ new1) (◆S∙ new2) rewrite ◆-unique new1 new2 = refl
+◆-unique (◆S= new1) (◆S= new2) rewrite ◆-unique new1 new2 = refl
+◆-unique (◆S^ new1) (◆S^ new2) rewrite ◆-unique new1 new2 = refl
+
+◆-total : Γ ∋= k
+        → ∃[ Γ' ](Γ ◆ k ⇘ Γ')
+◆-total {Γ = Γ ,= _} Z = ⟨ Γ ,∙ , ◆Z ⟩
+◆-total (S, {B = B} inΓ) with ◆-total inΓ
+... | ⟨ Γ' , newΓ ⟩ = ⟨ (Γ' , B) , ◆S, newΓ ⟩
+◆-total (S∙ inΓ) = ⟨ (◆-total inΓ .proj₁ ,∙) , ◆S∙ (◆-total inΓ .proj₂) ⟩
+◆-total (S^ inΓ) = ⟨ ◆-total inΓ .proj₁ ,^ , ◆S^ (◆-total inΓ .proj₂) ⟩
+◆-total (S= {B = B} inΓ) = ⟨ (◆-total inΓ .proj₁ ,= B) , ◆S= (◆-total inΓ .proj₂) ⟩
+
+◇-total : Γ ∋^ k
+        → ∃[ Γ' ](Γ ◇ k ⇘ Γ')
+◇-total {Γ = Γ ,^ } Z = ⟨ Γ ,∙ , ◇Z ⟩
+◇-total (S, {A = A} inΓ) = ⟨ (◇-total inΓ .proj₁ , A) , ◇S, (◇-total inΓ .proj₂) ⟩
+◇-total (S∙ inΓ) = ⟨ ◇-total inΓ .proj₁ ,∙ , ◇S∙ (◇-total inΓ .proj₂) ⟩
+◇-total (S= {B = B} inΓ) = ⟨ ◇-total inΓ .proj₁ ,= B , ◇S= (◇-total inΓ .proj₂) ⟩
+◇-total (S^ inΓ) = ⟨ ◇-total inΓ .proj₁ ,^ , ◇S^ (◇-total inΓ .proj₂) ⟩
+
+◇-unique : Γ ◇ k ⇘ Γ₁
+         → Γ ◇ k ⇘ Γ₂
+         → Γ₁ ≡ Γ₂
+◇-unique ◇Z ◇Z = refl
+◇-unique (◇S, in1) (◇S, in2) rewrite ◇-unique in1 in2 = refl
+◇-unique (◇S∙ in1) (◇S∙ in2) rewrite ◇-unique in1 in2 = refl
+◇-unique (◇S= in1) (◇S= in2) rewrite ◇-unique in1 in2 = refl
+◇-unique (◇S^ in1) (◇S^ in2) rewrite ◇-unique in1 in2 = refl
+
 ◆-∙∈ : Γ ∋∙ X
      → Γ ◆ k ⇘ Γ'
      → Γ' ∋∙ X
@@ -66,6 +101,26 @@ data _◇_⇘_ : Env n m → Fin m → Env n m → Set where
 ◆-∙∈ (S∙ inΓ) (◆S∙ ◆Γ) = S∙ (◆-∙∈ inΓ ◆Γ)
 ◆-∙∈ (S= inΓ) (◆S= ◆Γ) = S= (◆-∙∈ inΓ ◆Γ)
 ◆-∙∈ (S^ inΓ) (◆S^ ◆Γ) = S^ (◆-∙∈ inΓ ◆Γ)
+
+◇-∙∈ : Γ ∋∙ X
+     → Γ ◇ k ⇘ Γ'
+     → Γ' ∋∙ X
+◇-∙∈ Z (◇S∙ newΓ) = Z
+◇-∙∈ (S, inΓ) (◇S, newΓ) = S, (◇-∙∈ inΓ newΓ)
+◇-∙∈ (S∙ inΓ) (◇S∙ newΓ) = S∙ (◇-∙∈ inΓ newΓ)
+◇-∙∈ (S= inΓ) (◇S= newΓ) = S= (◇-∙∈ inΓ newΓ)
+◇-∙∈ (S^ inΓ) ◇Z = S∙ inΓ
+◇-∙∈ (S^ inΓ) (◇S^ newΓ) = S^ (◇-∙∈ inΓ newΓ)
+
+◇-=∈ : Γ ∋= X
+     → Γ ◇ k ⇘ Γ'
+     → Γ' ∋= X
+◇-=∈ Z (◇S= newΓ) = Z
+◇-=∈ (S, inΓ) (◇S, newΓ) = S, (◇-=∈ inΓ newΓ)
+◇-=∈ (S∙ inΓ) (◇S∙ newΓ) = S∙ (◇-=∈ inΓ newΓ)
+◇-=∈ (S= inΓ) (◇S= newΓ) = S= (◇-=∈ inΓ newΓ)
+◇-=∈ (S^ inΓ) ◇Z = S∙ inΓ
+◇-=∈ (S^ inΓ) (◇S^ newΓ) = S^ (◇-=∈ inΓ newΓ)
 
 -- should this A exposed to the outside?
 ◆-=∈-≢ : Γ ∋= X
@@ -103,6 +158,15 @@ data _◇_⇘_ : Env n m → Fin m → Env n m → Set where
 ⊢c-◆0 : Γ ,= B ⊢c A
       → Γ ,∙ ⊢c A
 ⊢c-◆0 clo = ⊢c-◆ clo ◆Z
+
+⊢c-◇ : Γ ⊢c A
+     → Γ ◇ k ⇘ Γ'
+     → Γ' ⊢c A
+⊢c-◇ ⊢c-int newΓ = ⊢c-int
+⊢c-◇ (⊢c-var-∙ inΓ) newΓ = ⊢c-var-∙ (◇-∙∈ inΓ newΓ)
+⊢c-◇ (⊢c-var-= inΓ) newΓ = ⊢c-var-= (◇-=∈ inΓ newΓ)
+⊢c-◇ (⊢c-arr cloA cloA₁) newΓ = ⊢c-arr (⊢c-◇ cloA newΓ) (⊢c-◇ cloA₁ newΓ)
+⊢c-◇ (⊢c-∀ cloA) newΓ = ⊢c-∀ (⊢c-◇ cloA (◇S∙ newΓ))
 
 
 ⊢c-^∈-false : k ε A
