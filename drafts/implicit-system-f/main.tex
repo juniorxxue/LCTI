@@ -362,7 +362,7 @@
 {\Gamma \vdash A \rightarrow B \leq C \rightarrow D \dashv \Gamma_2 \rightsquigarrow C \rightarrow D}
 \\
 
-\inferrule*[right=\texttt{S-Term-norm}]
+\inferrule*[right=\texttt{S-Term-Close}]
 { \Gamma \vdash A \Rightarrow e \Rightarrow A'\\
  \Gamma \vdash B \leq^+ \Sigma \dashv \Gamma' \rightsquigarrow D}
 {\Gamma \vdash A \rightarrow B \leq^+ \boxed{e} \leadsto \Sigma \dashv \Gamma' \rightsquigarrow A' \rightarrow D}
