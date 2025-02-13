@@ -69,6 +69,7 @@ data JustTyp (Γ : Env n m) (Σ : Context n m) (e : Term n m) (A : Type m) : Set
 data JustSub (Γ' : Env n m) (Σ : Context n m) (A : Type m) : Set where
   subs : ∀ {Γ B}
     → (ext : Γ ⊆ Γ')
+    → (ext : Γ ⊆ Γ' w/t A)
     → (sub : Γ ⊢ A ⌞ ≤⁺ ⌝ Σ ⊣ Γ' ↪ B)
     → (sim : Γ ⊢ A ≊ B)
     → JustSub Γ' Σ A
