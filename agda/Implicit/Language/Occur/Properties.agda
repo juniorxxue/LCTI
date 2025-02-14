@@ -34,6 +34,15 @@ open import Implicit.Language.Occur.Base
 ↑ty-ε (ε-arr-r inA) (↑ty-arr up up₁) lt = ε-arr-r (↑ty-ε inA up₁ lt)
 ↑ty-ε (ε-∀ inA) (↑ty-∀ up) lt = ε-∀ (↑ty-ε inA up (s≤s lt))
 
+↑ty-¬ε-prv : X ¬ε A
+           → A ↑ty k ⇘ A'
+           → X #< k
+           → inject₁ X ¬ε A'
+↑ty-¬ε-prv ¬ε-int ↑ty-int lt = ¬ε-int
+↑ty-¬ε-prv (¬ε-var x) ↑ty-var lt = ¬ε-var (≢-sym (punchIn-inject-neq lt (≢-sym x)))
+↑ty-¬ε-prv (¬ε-arr ¬inA ¬inA₁) (↑ty-arr upA upA₁) lt = ¬ε-arr (↑ty-¬ε-prv ¬inA upA lt) (↑ty-¬ε-prv ¬inA₁ upA₁ lt)
+↑ty-¬ε-prv (¬ε-∀ ¬inA) (↑ty-∀ upA) lt = ¬ε-∀ (↑ty-¬ε-prv ¬inA upA (s≤s lt))
+
 ε-¬ε-false : k ε A
            → k ¬ε A
            → ⊥
