@@ -216,7 +216,7 @@
 
 \begin{align*}
 &\text{Typing Environments} \quad\quad &\Gamma::=&~ . \mid \Gamma, x : A \mid \Gamma, a \mid \Gamma, \hat{a} = A\\
-&\text{Subtyping Environments} \quad\quad &\Gamma::=&~ . \mid \Gamma, x : A \mid \Gamma, a \mid \Gamma , \hat{a} \mid \Gamma, \hat{a} = A\\
+&\text{Subtyping Environments} \quad\quad &\Gamma, \Omega, \Delta ::=&~ . \mid \Gamma, x : A \mid \Gamma, a \mid \Gamma , \hat{a} \mid \Gamma, \hat{a} = A\\
     &\text{Contexts} \quad\quad &\Sigma ::=&~  \square  \mid A \mid \boxed{e} \leadsto \Sigma\\
     &\text{Generic Consumers} \quad \quad &g::=&~ i \mid x \mid e : A \mid \Lambda a.~e
 \end{align*}
@@ -343,8 +343,8 @@
 
 \inferrule*[right=\texttt{S-Ex-L-eq}]
 {\hat{a} = B \in \Gamma \\
-\Gamma \vdash B <: A \dashv \Gamma' \rightsquigarrow A'}
-{\Gamma \vdash \hat{a} \leq A \dashv \Gamma' \rightsquigarrow A}
+\Gamma \vdash B <: A \dashv \Delta \rightsquigarrow A'}
+{\Gamma \vdash \hat{a} \leq A \dashv \Delta \rightsquigarrow A}
 \\
 
 \inferrule*[right=\texttt{S-Ex-R}]
@@ -353,35 +353,35 @@
 
 \inferrule*[right=\texttt{S-Ex-R-eq}]
 {\hat{a} = B \in \Gamma \\
-\Gamma \vdash A \leq B \dashv \Gamma' \rightsquigarrow A''}
-{\Gamma \vdash A \leq \hat{a} \dashv \Gamma' \rightsquigarrow \hat{a}}
+\Gamma \vdash A \leq B \dashv \Delta \rightsquigarrow B'}
+{\Gamma \vdash A \leq \hat{a} \dashv \Delta \rightsquigarrow \hat{a}}
 
 \inferrule*[right=\texttt{S-Arr}]
-{\Gamma \vdash C \leq^* A \dashv \Gamma_1 \rightsquigarrow A' \\
- \Gamma_1 \vdash B \leq D \dashv \Gamma_2 \rightsquigarrow D'}
-{\Gamma \vdash A \rightarrow B \leq C \rightarrow D \dashv \Gamma_2 \rightsquigarrow C \rightarrow D}
+{\Gamma \vdash C \leq^* A \dashv \Omega \rightsquigarrow A' \\
+ \Omega \vdash B \leq D \dashv \Delta \rightsquigarrow D'}
+{\Gamma \vdash A \rightarrow B \leq C \rightarrow D \dashv \Delta \rightsquigarrow C \rightarrow D}
 \\
 
 \inferrule*[right=\texttt{S-Term-Close}]
 { \Gamma \vdash A \Rightarrow e \Rightarrow A'\\
- \Gamma \vdash B \leq^+ \Sigma \dashv \Gamma' \rightsquigarrow D}
-{\Gamma \vdash A \rightarrow B \leq^+ \boxed{e} \leadsto \Sigma \dashv \Gamma' \rightsquigarrow A' \rightarrow D}
+ \Gamma \vdash B \leq^+ \Sigma \dashv \Delta \rightsquigarrow D}
+{\Gamma \vdash A \rightarrow B \leq^+ \boxed{e} \leadsto \Sigma \dashv \Delta \rightsquigarrow A' \rightarrow D}
 
 \inferrule*[right=\texttt{S-Term-Open}]
 { \Gamma \vdash_{open} A \\
 \Gamma \vdash \square \Rightarrow e \Rightarrow C\\
-\Gamma \vdash C \leq^- A \dashv \Gamma_1 \rightsquigarrow A' \\
-\Gamma_1 \vdash B \leq^+ \Sigma \dashv \Gamma_2 \rightsquigarrow D}
-{\Gamma \vdash A \rightarrow B \leq^+ \boxed{e} \leadsto \Sigma \dashv \Gamma_2 \rightsquigarrow C \rightarrow D}
+\Gamma \vdash C \leq^- A \dashv \Omega \rightsquigarrow A' \\
+\Omega \vdash B \leq^+ \Sigma \dashv \Delta \rightsquigarrow D}
+{\Gamma \vdash A \rightarrow B \leq^+ \boxed{e} \leadsto \Sigma \dashv \Delta \rightsquigarrow C \rightarrow D}
 \\
 
 \inferrule*[right=\texttt{S-$\forall$}]
-{\Gamma, a \vdash A \leq B \dashv \Gamma', a\rightsquigarrow C}
-{\Gamma \vdash \forall a.A \leq \forall a.~B \dashv \Gamma' \rightsquigarrow \forall a. C}
+{\Gamma, a \vdash A \leq B \dashv \Delta, a\rightsquigarrow C}
+{\Gamma \vdash \forall a.A \leq \forall a.~B \dashv \Delta \rightsquigarrow \forall a. C}
 
 \inferrule*[right=\texttt{S-$\forall$L}]
-{\Gamma, \hat{a} \vdash A \leq^+ \boxed{e} \leadsto \Sigma \dashv \Gamma', \hat{a}=C \rightsquigarrow B}
-{\Gamma \vdash \forall a. A \leq^+ \boxed{e} \leadsto \Sigma \dashv \Gamma' \rightsquigarrow [C/\hat{a}]B}
+{\Gamma, \hat{a} \vdash A \leq^+ \boxed{e} \leadsto \Sigma \dashv \Delta, \hat{a}=C \rightsquigarrow B}
+{\Gamma \vdash \forall a. A \leq^+ \boxed{e} \leadsto \Sigma \dashv \Delta \rightsquigarrow [C/\hat{a}]B}
 \end{mathpar}
 
 \end{document}
