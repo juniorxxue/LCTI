@@ -88,3 +88,13 @@ data NonZ : Counter → Set where
 data 𝕚𝕔 : Counter → Set where
   case-𝕚 : 𝕚𝕔 (𝕚 j)
   case-𝕔 : 𝕚𝕔 (𝕔 j)
+
+data Polar : Set where
+  ≤⁺ ≤⁻ : Polar
+
+⋆ : Polar → Polar
+⋆ ≤⁺ = ≤⁻
+⋆ ≤⁻ = ≤⁺
+
+variable
+  ≤ : Polar

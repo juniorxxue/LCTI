@@ -22,12 +22,3 @@ data GenericConsumer : Term n m → Set where
   gc-ann : ∀ {e : Term n m} {A} → GenericConsumer (e ⦂ A)
   gc-tlam : ∀ {e : Term n (1 + m)} → GenericConsumer (Λ e)
 
-data Polar : Set where
-  ≤⁺ ≤⁻ : Polar
-
-⋆ : Polar → Polar
-⋆ ≤⁺ = ≤⁻
-⋆ ≤⁻ = ≤⁺
-
-variable
-  ≤ : Polar

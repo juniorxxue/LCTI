@@ -2,7 +2,7 @@ module Implicit.CompleteIntermAlgo where
 
 open import Implicit.Language.All hiding (_≤_; _⊆_w/v_; _⊆_w/t_)
 open import Implicit.Algo.All
-open import Implicit.Interm.All
+open import Implicit.Temp.Interm
 
 infix 3 _⊢_~_
 data _⊢_~_ : Env n m → Counter × Type m → Context n m → Set where
@@ -48,18 +48,34 @@ data _⊆_w/t_ : Env n m → Env n m → Type m → Set where
   ext-∀   : Γ ,∙ ⊆ Δ ,∙ w/t A
           → Γ ⊆ Δ w/t `∀ A
 
-complete-≤ : Δ ⊢ j # A ≤ B
-           → Γ ⊆ Δ w/t A
-           → Γ ⊢ ⟨ j , B ⟩ ~ Σ
-           → Γ ⊢ A ⌞ ≤ ⌝ Σ ⊣ Δ ↪ B
-complete-≤ (s-refl cloΓ cloA) ext ~Z = {!!}
-complete-≤ (s-int cloΓ) ext j~Σ = {!!}
-complete-≤ (s-var-∙ cloΓ inΓ) ext j~Σ = {!!}
-complete-≤ (s-var-= cloΓ inΓ) ext j~Σ = {!!}
-complete-≤ (s-arr₁ s s₁) (ext-arr ext ext₁) ~∞ = s-arr (complete-≤ s {!!} ~∞) (complete-≤ s₁ {!!} ~∞)
-complete-≤ (s-arr₂ s s₁) (ext-arr ext ext₁) (~I ⊢e j~Σ) = {!!}
-complete-≤ (s-arr₃ cloA s) ext j~Σ = {!taiji!}
-complete-≤ (s-∀ s) ext j~Σ = {!!}
-complete-≤ (s-∀l s ic fd stC stD) ext j~Σ = {!!}
-complete-≤ (s-var-l inΓ s) ext j~Σ = {!!}
-complete-≤ (s-var-r inΓ s) ext j~Σ = {!!}
+complete-≤⁺ : Δ ⊢ j # A ⌞ ≤⁺ ⌝ B
+            → Γ ⊆ Δ w/t A
+            → Γ ⊢ ⟨ j , B ⟩ ~ Σ
+            → Γ ⊢ A ⌞ ≤⁺ ⌝ Σ ⊣ Δ ↪ B
+
+complete-≤⁻ : Δ ⊢ j # A ⌞ ≤⁻ ⌝ B
+            → Γ ⊆ Δ w/t B -- how about embeeding it in decl (?)
+            → Γ ⊢ ⟨ j , B ⟩ ~ Σ
+            → Γ ⊢ A ⌞ ≤⁻ ⌝ Σ ⊣ Δ ↪ B
+
+complete-≤⁺ (s-refl cloΓ cloA) ext j~Σ = {!!}
+complete-≤⁺ (s-int cloΓ) ext j~Σ = {!!}
+complete-≤⁺ (s-var-∙ cloΓ inΓ) ext j~Σ = {!!}
+complete-≤⁺ (s-var-= cloΓ inΓ) ext j~Σ = {!!}
+complete-≤⁺ (s-arr₁ s s₁) (ext-arr ext ext₁) ~∞ = s-arr {!complete-≤⁻ s ? ~∞!} (complete-≤⁺ s₁ ext₁ ~∞)
+-- s-arr (complete-≤⁻ s {!!} ~∞) (complete-≤⁺ s₁ {!!} ~∞)
+complete-≤⁺ (s-arr₂ s s₁) ext j~Σ = {!!}
+complete-≤⁺ (s-arr₃ cloA s) ext j~Σ = {!!}
+complete-≤⁺ (s-∀ s) ext j~Σ = {!!}
+complete-≤⁺ (s-∀l s ic fd stC stD) (ext-∀ ext) (~I ⊢e j~Σ) = s-∀l (complete-≤⁺ s {!!} {!!}) {!!} {!!} stC stD
+complete-≤⁺ (s-∀l s ic fd stC stD) (ext-∀ ext) (~C ⊢e j~Σ) = s-∀l (complete-≤⁺ s {!!} {!!}) {!!} {!!} stC stD
+complete-≤⁺ (s-var-l inΓ s) ext j~Σ = {!!}
+complete-≤⁺ (s-var-r inΓ s) ext j~Σ = {!!}
+
+complete-≤⁻ (s-int cloΓ) ext j~Σ = {!!}
+complete-≤⁻ (s-var-∙ cloΓ inΓ) ext j~Σ = {!!}
+complete-≤⁻ (s-var-= cloΓ inΓ) ext j~Σ = {!!}
+complete-≤⁻ (s-arr₁ s s₁) ext j~Σ = {!!}
+complete-≤⁻ (s-∀ s) ext j~Σ = {!!}
+complete-≤⁻ (s-var-l inΓ s) ext j~Σ = {!!}
+complete-≤⁻ (s-var-r inΓ s) ext j~Σ = {!!}
