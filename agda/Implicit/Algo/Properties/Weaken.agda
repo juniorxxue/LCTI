@@ -1,6 +1,6 @@
 module Implicit.Algo.Properties.Weaken where
 
-open import Implicit.Language
+open import Implicit.Language.All
 open import Implicit.Algo.Base
 
 postulate

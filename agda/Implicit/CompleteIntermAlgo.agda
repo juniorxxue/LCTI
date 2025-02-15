@@ -62,7 +62,7 @@ complete-≤⁺ (s-refl cloΓ cloA) ext j~Σ = {!!}
 complete-≤⁺ (s-int cloΓ) ext j~Σ = {!!}
 complete-≤⁺ (s-var-∙ cloΓ inΓ) ext j~Σ = {!!}
 complete-≤⁺ (s-var-= cloΓ inΓ) ext j~Σ = {!!}
-complete-≤⁺ (s-arr₁ s s₁) (ext-arr ext ext₁) ~∞ = s-arr {!complete-≤⁻ s ? ~∞!} (complete-≤⁺ s₁ ext₁ ~∞)
+complete-≤⁺ (s-arr₁ s s₁) (ext-arr ext ext₁) ~∞ = s-arr {!!} {!complete-≤⁺ s₁!}
 -- s-arr (complete-≤⁻ s {!!} ~∞) (complete-≤⁺ s₁ {!!} ~∞)
 complete-≤⁺ (s-arr₂ s s₁) ext j~Σ = {!!}
 complete-≤⁺ (s-arr₃ cloA s) ext j~Σ = {!!}

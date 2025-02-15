@@ -1,10 +1,9 @@
 module Implicit.Algo.Properties.Subsumption where
 
-open import Implicit.Language
+open import Implicit.Language.All
 open import Implicit.Algo.Base
 open import Implicit.Algo.Properties.Id
 open import Implicit.Algo.Properties.OpenClose
-open import Implicit.Algo.Properties.Extension
 open import Implicit.Algo.Properties.Polarity
 open import Implicit.Algo.Properties.Strengthen
 open import Implicit.Algo.Properties.Weaken
@@ -18,11 +17,26 @@ postulate
         → Σ ≊ Σ'
         → Γ ⊢ A₁ ⌞ ≤ ⌝ Σ' ⊣ Δ ↪ A₃
 
+  s-trans0 : Γ ⊢ A ⌞ ≤⁺ ⌝ Σ ⊣ Γ ↪ B
+           → Σ ≊ Σ'
+           → Γ ⊢ B ⌞ ≤⁺ ⌝ Σ' ⊣ Γ ↪ C
+           → Γ ⊢ A ⌞ ≤⁺ ⌝ Σ' ⊣ Γ ↪ C
+
   s-subst : Γ ,= T ⊢ A ⌞ ≤ ⌝ Σ' ⊣ Δ ,= T ↪ B
           → ⟦ T ⟧ A ⇘ A*
           → ⟦ T ⟧ B ⇘ B*
           → ↑tyᶜ0 Σ ⇘ Σ'
           → Γ ⊢ A* ⌞ ≤ ⌝ Σ ⊣ Δ ↪ B*
+
+  s-⊆-prv : Γ ⊢ A ⌞ ≤ ⌝ Σ ⊣ Γ ↪ B
+            → Γ ⊆ Δ
+            → Δ ⊢ A ⌞ ≤ ⌝ Σ ⊣ Δ ↪ B
+
+
+  t-⊆-prv : Γ ⊢ Σ ⇒ e ⇒ A
+          → Γ ⊆ Δ
+          → Closed Δ
+          → Δ ⊢ Σ ⇒ e ⇒ A
 
 s-refl : Γ ⊢ A ⌞ ≤ ⌝ τ A ⊣ Γ ↪ A
 s-refl {A = Int} = s-int
@@ -67,31 +81,13 @@ subsumption {Σ' = [ e ]↝ Σ'} (⊢lam₂ ⊢e up-c ⊢e₁) (≊S newΣ) (⊢
                                                                                                     | ↑tmᶜ0-total Σ'
 ... | refl | ⟨ nΣ' , up-Σ ⟩ = ⊢lam₂ ⊢e up-Σ (subsumption ⊢e₁
                                                          (≊-weaken newΣ up-c up-Σ)
-                                                         (⊢cᶜ-weaken,0 cloΣ' up-Σ)
-                                                         (s-weaken,0 s up-Σ))
+                                                         (⊢cᶜ-weaken,0 cloΣ' up-Σ (⊢close-τ ⊢e₂))
+                                                         (s-weaken,0 s up-Σ (⊢close-τ ⊢e₂) (⊢close-τ ⊢e₂)))
 subsumption {Σ' = [ e ]↝ Σ'} (⊢lam₂ ⊢e up-c ⊢e₁) (≊S newΣ) cloΣ' (s-term-o opnA ⊢e₂ s s₁)
   = ⊥-elim (⊢c-⊢o-disjoint (⊢closeA ⊢e) opnA)
 subsumption {Σ' = [ e ]↝ Σ'} (⊢sub ⊢e ne gc cloΣ s₁) (≊S newΣ) (⊢c-term cloe cloΣ') s =
-  ⊢sub ⊢e ne-app gc (⊢c-term cloe cloΣ') (s-trans s₁ s (≊S newΣ))
+  ⊢sub ⊢e ne-app gc (⊢c-term cloe cloΣ') (s-trans0 s₁ (≊S newΣ) s)
 subsumption {Σ' = [ e ]↝ Σ'} (⊢tabs ⊢e) newΣ cloΣ' s = ⊢sub (⊢tabs ⊢e) ne-app gc-tlam cloΣ' s
-
-{-
-s-refined' : Γ ⊢ A ⌞ ≤⁺ ⌝ Σ ⊣ Γ ↪ B
-           → Γ ⊢ B ⌞ ≤⁺ ⌝ Σ ⊣ Γ ↪ B
-s-refined' s-int = s-int
-s-refined' (s-empty clo) = s-empty clo
-s-refined' s-var = s-var
-s-refined' (s-ex-l^ x-in inst) = s-refl
-s-refined' (s-ex-l= x-in s) = s-refl
-s-refined' (s-ex-r= x-in s) = s-refl
-s-refined' (s-arr s s₁) = s-refl
-s-refined' (s-term-c ⊢e s) with ⊢id0 ⊢e
-... | refl = s-term-c ⊢e (s-refined' s)
-s-refined' (s-term-o opnA ⊢e s s₁) with ⊆-id (s-⊆ s) (s-⊆ s₁)
-... | refl = s-term-c (subsumption0 ⊢e s-refl) (s-refined' s₁)
-s-refined' (s-∀ s) = s-∀ (s-refined' s)
-s-refined' (s-∀l s upᶜ upᵉ st₁ st₂) = {!!}
--}
 
 s-refined-p : Γ ⊢ A ⌞ ≤ ⌝ Σ ⊣ Δ ↪ B
             → Polarity Γ A Σ ≤
@@ -113,24 +109,6 @@ s-refined-p (s-∀ s) pr = s-∀ (s-refined-p s (polar-∀ pr))
 s-refined-p (s-∀l s upᶜ upᵉ st₁ st₂) (polar-r cloΓ cloΣ) =
   s-subst (s-refined-p s (polar-r (clo-S^ cloΓ) (⊢cᶜ-weaken^0 cloΣ (↑tyᶜ-e upᵉ upᶜ))))
           (st-arr st₁ st₂) (st-arr st₁ st₂) (↑tyᶜ-e upᵉ upᶜ)
-
-{-
-s-refined : Γ ⊢ A ⌞ ≤⁺ ⌝ Σ ⊣ Δ ↪ B -- generlise output env to be Δ to deal with s-∀l case
-          → Δ ⊢ B ⌞ ≤⁺ ⌝ Σ ⊣ Δ ↪ B
-
-s-refined s-int = s-int
-s-refined (s-empty clo) = s-empty clo
-s-refined s-var = s-var
-s-refined (s-ex-l^ x-in inst) = s-refl
-s-refined (s-ex-l= x-in s) = s-refl
-s-refined (s-ex-r= x-in s) = s-refl
-s-refined (s-arr s s₁) = s-refl
-s-refined (s-term-c ⊢e s) with ⊢id0 ⊢e
-... | refl = s-term-c {!!} (s-refined s)
-s-refined (s-term-o opnA ⊢e s s₁) = s-term-c {!subsumption0 ⊢e s-refl!} (s-refined s₁)
-s-refined (s-∀ s) = s-∀ (s-refined s)
-s-refined (s-∀l s upᶜ upᵉ st₁ st₂) = {!s-refined-p s ?!}
--}
 
 ⊢to≤ (⊢lit cloΓ) = s-empty ⊢c-int
 ⊢to≤ (⊢var cloΓ x∈Γ) = s-empty (∋⦂-closed cloΓ x∈Γ)
