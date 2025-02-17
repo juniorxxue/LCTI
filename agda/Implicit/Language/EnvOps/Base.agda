@@ -121,6 +121,29 @@ data _▶_,_⇘_ : Env n m → Fin (1 + n) → Type m → Env (1 + n) m → Set 
       → ↑ty0 A ⇘ A'
       → (Γ ,= B) ▶ k , A' ⇘ Γ' ,= B
 
+
+infix 3 _⨟_▶_,_⇘_⨟_
+data _⨟_▶_,_⇘_⨟_ : Env n m → Env n m → Fin (1 + n) → Type m → Env (1 + n) m → Env (1 + n) m → Set where
+  ▶Z  : (cloA : Γ ⊢c A)
+      → (cloA' : Δ ⊢c A)
+      → Γ ⨟ Δ ▶ #0 , A ⇘ Γ , A ⨟ Δ , A
+  ▶S, : Γ ⨟ Δ ▶ k , A ⇘ Γ' ⨟ Δ'
+      → Γ , B ⨟ Δ , B ▶ #S k , A ⇘ Γ' , B ⨟ Δ' , B
+  ▶S^ : Γ ⨟ Δ ▶ k , A ⇘ Γ' ⨟ Δ'
+      → ↑ty0 A ⇘ A'
+      → Γ ,^ ⨟ Δ ,^ ▶ k , A' ⇘ Γ' ,^ ⨟ Δ' ,^
+  ▶S∙ : Γ ⨟ Δ ▶ k , A ⇘ Γ' ⨟ Δ'
+      → ↑ty0 A ⇘ A'
+      → Γ ,∙ ⨟ Δ ,∙ ▶ k , A' ⇘ Γ' ,∙ ⨟ Δ' ,∙
+  ▶S= : Γ ⨟ Δ ▶ k , A  ⇘ Γ' ⨟ Δ'
+      → ↑ty0 A ⇘ A'
+      → Γ ,= B ⨟ Δ ,= B ▶ k , A' ⇘ Γ' ,= B ⨟ Δ' ,= B
+  ▶S^= : Γ ⨟ Δ ▶ k , A  ⇘ Γ' ⨟ Δ'
+      → ↑ty0 A ⇘ A'
+      → Γ ,^ ⨟ Δ ,= B ▶ k , A' ⇘ Γ' ,^ ⨟ Δ' ,= B
+
+
+
 infix 3 _▶_,^⇘_
 data _▶_,^⇘_ : Env n m → Fin (1 + m) → Env n (1 + m) → Set where
   ▶Z : Γ ▶ #0 ,^⇘ Γ ,^

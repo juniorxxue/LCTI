@@ -89,6 +89,20 @@ open import Implicit.Language.EnvOps.Base
 ▶,-∋∙ (S^ inΓ) (▶Z cloA) = S, (S^ inΓ)
 ▶,-∋∙ (S^ inΓ) (▶S^ extΓ x) = S^ (▶,-∋∙ inΓ extΓ)
 
+▶,-∋^ : Γ ∋^ X
+      → Γ ▶ k , T ⇘ Γ'
+      → Γ' ∋^ X
+▶,-∋^ Z (▶Z cloA) = S, Z
+▶,-∋^ Z (▶S^ newΓ x) = Z
+▶,-∋^ (S, inΓ) (▶Z cloA) = S, (S, inΓ)
+▶,-∋^ (S, inΓ) (▶S, newΓ) = S, (▶,-∋^ inΓ newΓ)
+▶,-∋^ (S∙ inΓ) (▶Z cloA) = S, (S∙ inΓ)
+▶,-∋^ (S∙ inΓ) (▶S∙ newΓ x) = S∙ (▶,-∋^ inΓ newΓ)
+▶,-∋^ (S= inΓ) (▶Z cloA) = S, (S= inΓ)
+▶,-∋^ (S= inΓ) (▶S= newΓ x) = S= (▶,-∋^ inΓ newΓ)
+▶,-∋^ (S^ inΓ) (▶Z cloA) = S, (S^ inΓ)
+▶,-∋^ (S^ inΓ) (▶S^ newΓ x) = S^ (▶,-∋^ inΓ newΓ)
+
 ▶,-∋= : Γ ∋= X
       → Γ ▶ k , T ⇘ Γ'
       → Γ' ∋= X

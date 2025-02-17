@@ -28,11 +28,6 @@ postulate
           → ↑tyᶜ0 Σ ⇘ Σ'
           → Γ ⊢ A* ⌞ ≤ ⌝ Σ ⊣ Δ ↪ B*
 
-  s-⊆-prv : Γ ⊢ A ⌞ ≤ ⌝ Σ ⊣ Γ ↪ B
-            → Γ ⊆ Δ
-            → Δ ⊢ A ⌞ ≤ ⌝ Σ ⊣ Δ ↪ B
-
-
   t-⊆-prv : Γ ⊢ Σ ⇒ e ⇒ A
           → Γ ⊆ Δ
           → Closed Δ
@@ -86,7 +81,8 @@ subsumption {Σ' = [ e ]↝ Σ'} (⊢lam₂ ⊢e up-c ⊢e₁) (≊S newΣ) (⊢
 subsumption {Σ' = [ e ]↝ Σ'} (⊢lam₂ ⊢e up-c ⊢e₁) (≊S newΣ) cloΣ' (s-term-o opnA ⊢e₂ s s₁)
   = ⊥-elim (⊢c-⊢o-disjoint (⊢closeA ⊢e) opnA)
 subsumption {Σ' = [ e ]↝ Σ'} (⊢sub ⊢e ne gc cloΣ s₁) (≊S newΣ) (⊢c-term cloe cloΣ') s =
-  ⊢sub ⊢e ne-app gc (⊢c-term cloe cloΣ') (s-trans0 s₁ (≊S newΣ) s)
+  ⊢sub ⊢e ne-app gc (⊢c-term cloe cloΣ') {!!}
+  -- (s-trans0 s₁ (≊S newΣ) s)
 subsumption {Σ' = [ e ]↝ Σ'} (⊢tabs ⊢e) newΣ cloΣ' s = ⊢sub (⊢tabs ⊢e) ne-app gc-tlam cloΣ' s
 
 s-refined-p : Γ ⊢ A ⌞ ≤ ⌝ Σ ⊣ Δ ↪ B

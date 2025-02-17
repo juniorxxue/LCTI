@@ -40,6 +40,20 @@ s-trans (s-∀l s1 upᶜ upᵉ st₁ st₂) s2 newΣ pr1 pr2 = {!!}
 ---
 -}
 
+-- define a similiard
+
+infix 3 _⊢_≋_
+data _⊢_≋_ : Env n m → Type m → Type m → Set where
+  ≋refl : Γ ⊢ A ≋ A
+
+
+data JustSub (Γ : Env n m) (A : Type m) (Σ : Context n m) (Δ : Env n m) (B : Type m) : Set where
+  justsubs : ∀ {C}
+           → Γ ⊢ A ⌞ ≤ ⌝ Σ ⊣ Δ ↪ C
+           → Γ ⊢ B ≋ C
+           → JustSub Γ A Σ Δ B
+
+{-
 s-trans : Γ ⊢ A₁ ⌞ ≤ ⌝ Σ ⊣ Δ ↪ A₂
         → Δ ⊢ A₂ ⌞ ≤ ⌝ Σ' ⊣ Δ ↪ A₃ -- A₂ couldn't be open
         → Σ ≊ Σ'
@@ -54,10 +68,21 @@ s-trans (s-term-o opnA ⊢e s1 s3) (s-term-c ⊢e₁ s2) (≊S newΣ) with ⊢id
 s-trans s@(s-term-o opnA ⊢e s1 s3) (s-term-o opnA₁ ⊢e₁ s2 s4) newΣ =
   ⊥-elim (⊢c-⊢o-disjoint (⊆-cloA (⊢closeA ⊢e) {!!}) opnA₁)
 s-trans (s-∀l s1 upᶜ upᵉ st₁ st₂) (s-term-c ⊢e s2) (≊S newΣ) with ⊢id0 ⊢e
-... | refl = {!!}
+... | refl = s-∀l (s-trans s1 (s-term-c {!!} {!!}) {!!}) {!!} {!!} {!!} {!!}
 -- s-∀l (s-trans s1 (s-term-c {!!} {!!}) {!!}) {!!} {!!} {!!} {!!}
 s-trans (s-∀l s1 upᶜ upᵉ st₁ st₂) (s-term-o opnA ⊢e s2 s3) newΣ = {!!}
+-}
 
+s-trans : Γ ⊢ A₁ ⌞ ≤ ⌝ Σ ⊣ Δ ↪ A₂
+        → Δ ⊢ A₂ ⌞ ≤ ⌝ Σ' ⊣ Δ ↪ A₃ -- A₂ couldn't be open
+        → Σ ≊ Σ'
+        → JustSub Γ A₁ Σ' Δ A₃
+s-trans (s-empty clo) s2 newΣ = {!!}
+s-trans (s-term-c ⊢e s1) s2 newΣ = {!!}
+s-trans (s-term-o opnA ⊢e s1 s3) s2 newΣ = {!!}
+s-trans (s-∀l s1 upᶜ upᵉ st₁ st₂) (s-term-c ⊢e s2) newΣ with s-trans s1 (s-term-c {!⊢e!} {!s2!}) {!!}
+... | justsubs s' sim = justsubs (s-∀l {!sim!} {!!} {!!} {!!} {!!}) {!!}
+s-trans (s-∀l s1 upᶜ upᵉ st₁ st₂) (s-term-o opnA ⊢e s2 s3) newΣ = {!!}
 
 {-
 
