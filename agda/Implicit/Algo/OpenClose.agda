@@ -13,6 +13,12 @@ data _⊢cᶜ_ : Env n m → Context n m → Set where
   ⊢c-τ : (cloA : Γ ⊢c A) → Γ ⊢cᶜ (τ A)
   ⊢c-term : (cloe : Γ ⊢cᵉ e) → Γ ⊢cᶜ Σ → Γ ⊢cᶜ [ e ]↝ Σ -- we may add conditions onto `e` later
 
+infix 3 _⊢cᶜ¹_
+data _⊢cᶜ¹_ : Env n m → Context n m → Set where
+  ⊢c-empty : Γ ⊢cᶜ¹ □
+  ⊢c-τ : (cloA : Γ ⊢c¹ A) → Γ ⊢cᶜ¹ (τ A)
+  ⊢c-term : Γ ⊢cᶜ¹ Σ → Γ ⊢cᶜ¹ [ e ]↝ Σ -- we may add conditions onto `e` later
+
 infix 3 _⊢oᶜ_
 data _⊢oᶜ_ : Env n m → Context n m → Set where
   ⊢o-τ : Γ ⊢o A → Γ ⊢oᶜ (τ A)

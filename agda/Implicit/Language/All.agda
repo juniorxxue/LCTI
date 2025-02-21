@@ -15,6 +15,11 @@ open import Implicit.Language.Norm.All public
 open import Implicit.Language.OpenClose.All public
 open import Implicit.Language.EnvOps.All public
 
-open import Implicit.Language.Extension.All public
+-- open import Implicit.Language.Extension.All public
 
 open import Implicit.Language.Ground.All public
+
+
+postulate
+    ∋:=¹-∋= : Γ ∋ X :=¹ B
+          → Γ ∋=¹ X

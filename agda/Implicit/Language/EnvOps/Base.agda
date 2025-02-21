@@ -9,15 +9,6 @@ open import Implicit.Language.OpenClose.Base
 --+                         Entry Removal                          +--
 ----------------------------------------------------------------------
 
--- remove k-th entry (term binding) from environment
-infix 5 _∤,∤_
-_∤,∤_ : Env (1 + n) m → Fin (1 + n) → Env n m
-(Γ , A) ∤,∤ #0 = Γ
-_∤,∤_ {suc n} (Γ , A) (#S k) = (Γ ∤,∤ k) , A
-(Γ ,∙) ∤,∤ k = (Γ ∤,∤ k) ,∙
-(Γ ,^) ∤,∤ k = (Γ ∤,∤ k) ,^
-(Γ ,= A) ∤,∤ k = (Γ ∤,∤ k) ,= A
-
 -- remove (x : A) from k-th position
 infix 3 _◀_,⇘_
 data _◀_,⇘_ : Env (1 + n) m → Fin (1 + n) → Env n m → Set where
@@ -200,6 +191,8 @@ data _▶_,=_⇘_ : Env n m → Fin (1 + m) → Type m → Env n (1 + m) → Set
 infix 3 [_/_]_⟹_
 data [_/_]_⟹_ : Type m → Fin m → Env n m → Env n m → Set where
   ⟹^0 : (up : ↑ty0 A ⇘ A')
+        → (cloA : Γ ⊢c A)
+        → (env : SubEnv Γ)
         → [ A' / #0 ] (Γ ,^) ⟹ (Γ ,= A)
 
   ⟹^S : [ A / k ] Γ ⟹ Γ'
@@ -216,6 +209,7 @@ data [_/_]_⟹_ : Type m → Fin m → Env n m → Env n m → Set where
   ⟹=S : [ A / k ] Γ ⟹ Γ'
         → (up1 : ↑ty0 A ⇘ A')
         → [ A' / #S k ] (Γ ,= B) ⟹ (Γ' ,= B)
+
 
 
 -- replace entry a with a solution ^a=A in an environment

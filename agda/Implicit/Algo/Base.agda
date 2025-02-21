@@ -8,7 +8,7 @@ open import Implicit.Algo.Subst public
 open import Implicit.Algo.OpenClose public
 open import Implicit.Algo.Lookup public
 open import Implicit.Algo.Split public
-open import Implicit.Algo.Polarity public
+-- open import Implicit.Algo.Polarity public
 
 infix 3 _⊢_⇒_⇒_
 infix 3 _⊢_⌞_⌝_⊣_↪_
@@ -19,11 +19,11 @@ data _⊢_⌞_⌝_⊣_↪_ : Env n m → Type m → Polar → Context n m → En
 data _⊢_⇒_⇒_ where
 
   ⊢lit : ∀ {num : ℕ}
-    → (cloΓ : Closed Γ)
+    → (cloΓ : TypClosed Γ)
     → Γ ⊢ □ ⇒ lit num ⇒ Int
 
   ⊢var :
-      (cloΓ : Closed Γ)
+      (cloΓ : TypClosed Γ)
     → (x∈Γ : Γ ∋ x ⦂ A)
     → Γ ⊢ □ ⇒ ` x ⇒ A
 
@@ -50,7 +50,7 @@ data _⊢_⇒_⇒_ where
     → (ne : NonEmpty Σ)
     → (gc : GenericConsumer g)
     → (cloΣ : Γ ⊢cᶜ Σ)
-    → (s : Γ ⊢ A ⌞ ≤⁺ ⌝ Σ ⊣ Γ ↪ B)
+    → (s : Γ ⋈ ⊢ A ⌞ ≤⁺ ⌝ Σ ⊣ Γ ⋈ ↪ B)
     → Γ ⊢ Σ ⇒ g ⇒ B
 
   ⊢tabs :
@@ -60,32 +60,53 @@ data _⊢_⇒_⇒_ where
 
 data _⊢_⌞_⌝_⊣_↪_ where
   s-int :
-      Γ ⊢ Int ⌞ ≤ ⌝ τ Int ⊣ Γ ↪ Int
+      (cloΓ : SubClosed Γ)
+    → Γ ⊢ Int ⌞ ≤ ⌝ τ Int ⊣ Γ ↪ Int
 
   s-empty :
-      (clo : Γ ⊢c A)
+      (cloΓ : SubClosed Γ)
+      → (clo : Γ ⊢c A)
     → Γ ⊢ A ⌞ ≤⁺ ⌝ □ ⊣ Γ ↪ A
 
-  s-var :
-      Γ ⊢ (‶ X) ⌞ ≤ ⌝ τ (‶ X) ⊣ Γ ↪ ‶ X
+  s-var-∙ :
+      (cloΓ : SubClosed Γ)
+    → Γ ∋∙ X
+    → Γ ⊢ (‶ X) ⌞ ≤ ⌝ τ (‶ X) ⊣ Γ ↪ ‶ X
+
+  s-var-= :
+      (cloΓ : SubClosed Γ)
+    → Γ ∋=¹ X
+    → Γ ⊢ (‶ X) ⌞ ≤ ⌝ τ (‶ X) ⊣ Γ ↪ ‶ X
 
   s-ex-l^ :
       (x-in : Γ ∋^ X)
+    → (cloA : Γ ⊢c¹ A)
     → (inst : [ A / X ] Γ ⟹ Γ')
     → Γ ⊢ ‶ X ⌞ ≤⁺ ⌝ τ A ⊣ Γ' ↪ A
 
   s-ex-l= :
       (x-in : Γ ∋ X := B)
+    → Γ ⊢ B ⌞ ≤⁺ ⌝ τ A ⊣ Γ' ↪ A'
+    → Γ ⊢ ‶ X ⌞ ≤⁺ ⌝ τ A ⊣ Γ' ↪ A
+
+  s-ex-typ-l= :
+      (x-in : Γ ∋ X :=¹ B)
     → Γ ⊢ B ⌞ ≤ ⌝ τ A ⊣ Γ' ↪ A'
     → Γ ⊢ ‶ X ⌞ ≤ ⌝ τ A ⊣ Γ' ↪ A
 
   s-ex-r^ :
       (x-in : Γ ∋^ X)
+    → (cloA : Γ ⊢c¹ A)
     → (inst : [ A / X ] Γ ⟹ Γ')
     → Γ ⊢ A ⌞ ≤⁻ ⌝ τ (‶ X) ⊣ Γ' ↪ ‶ X
 
   s-ex-r= :
       (x-in : Γ ∋ X := B)
+    → Γ ⊢ A ⌞ ≤⁻ ⌝ τ B ⊣ Γ' ↪ A'
+    → Γ ⊢ A ⌞ ≤⁻ ⌝ τ (‶ X) ⊣ Γ' ↪ (‶ X)
+
+  s-ex-typ-r= :
+      (x-in : Γ ∋ X :=¹ B)
     → Γ ⊢ A ⌞ ≤ ⌝ τ B ⊣ Γ' ↪ A'
     → Γ ⊢ A ⌞ ≤ ⌝ τ (‶ X) ⊣ Γ' ↪ (‶ X)
 
@@ -97,13 +118,13 @@ data _⊢_⌞_⌝_⊣_↪_ where
   s-term-c :
 --      (cloA : Γ ⊢c A)
 -- comment this one, if we restrict such condition on the typing
-      (⊢e : Γ ⊢ τ A ⇒ e ⇒ A')
+      (⊢e : 𝕣 Γ ⊢ τ A ⇒ e ⇒ A')
     → Γ ⊢ B ⌞ ≤⁺ ⌝ Σ ⊣ Γ' ↪ D
     → Γ ⊢ (A `→ B) ⌞ ≤⁺ ⌝ ([ e ]↝ Σ) ⊣ Γ' ↪ A' `→ D
 
   s-term-o :
       (opnA : Γ ⊢o A)
-    → (⊢e : Γ ⊢ □ ⇒ e ⇒ C)
+    → (⊢e : 𝕣 Γ ⊢ □ ⇒ e ⇒ C)
     → Γ ⊢ C ⌞ ≤⁻ ⌝ τ A ⊣ Γ₁ ↪ A'
     → Γ₁ ⊢ B ⌞ ≤⁺ ⌝ Σ ⊣ Γ₂ ↪ D
     → Γ ⊢ A `→ B ⌞ ≤⁺ ⌝ ([ e ]↝ Σ) ⊣ Γ₂ ↪ C `→ D

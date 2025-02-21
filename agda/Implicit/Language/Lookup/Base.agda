@@ -37,6 +37,22 @@ data _∋_:=_ : Env n m → Fin m → Type m → Set where
      → (up : ↑ty0 A ⇘ A')
      → Γ ,= B ∋ #S k := A'
 
+infix 3 _∋_:=¹_
+data _∋_:=¹_ : Env n m → Fin m → Type m → Set where
+  S, : Γ ∋ k :=¹ A
+     → Γ , B ∋ k :=¹ A
+  S∙ : Γ ∋ k :=¹ A
+     → (up : ↑ty0 A ⇘ A')
+     → Γ ,∙ ∋ #S k :=¹ A'
+  S^ : Γ ∋ k :=¹ A
+     → (up : ↑ty0 A ⇘ A')
+     → Γ ,^ ∋ #S k :=¹ A'
+  S= : Γ ∋ k :=¹ A
+     → (up : ↑ty0 A ⇘ A')
+     → Γ ,= B ∋ #S k :=¹ A'
+  S⋈ : Γ ∋ X := A
+     → Γ ⋈ ∋ X :=¹ A
+
 -- lookup an entry: solution (simpler ver.)
 infix 3 _∋=_
 data _∋=_ : Env n m → Fin m → Set where
@@ -50,6 +66,24 @@ data _∋=_ : Env n m → Fin m → Set where
   S= : Γ ∋= k
      → Γ ,= B ∋= #S k
 
+-- lookup an entry: solution in the typing environment.
+infix 3 _∋=¹_
+data _∋=¹_ : Env n m → Fin m → Set where
+{-
+  Z  : TypEnv Γ
+     → Γ ,= A ∋=¹ #0
+-}
+  S, : Γ ∋=¹ k
+     → Γ , B ∋=¹ k
+  S∙ : Γ ∋=¹ k
+     → Γ ,∙ ∋=¹ #S k
+  S^ : Γ ∋=¹ k
+     → Γ ,^ ∋=¹ #S k
+  S= : Γ ∋=¹ k
+     → Γ ,= B ∋=¹ #S k
+  S⋈ : Γ ∋= k
+    →  Γ ⋈ ∋=¹ k
+
 -- lookup an entry: (unsolved) existential variable
 infix 3 _∋^_
 data _∋^_ : Env n m → Fin m → Set where
@@ -62,6 +96,52 @@ data _∋^_ : Env n m → Fin m → Set where
      → Γ ,= B ∋^ #S k
   S^ : Γ ∋^ k
      → Γ ,^ ∋^ #S k
+
+-- ex variable in SubEnv
+infix 3 _∋^²_
+data _∋^²_ : Env n m → Fin m → Set where
+  Z^ : SubEnv Γ
+     → Γ ,^ ∋^² #0
+  S, : Γ ∋^² k
+     → Γ , B ∋^² k
+  S∙ : Γ ∋^² k
+     → Γ ,∙ ∋^² #S k
+  S^ : Γ ∋^² k
+     → Γ ,^ ∋^² #S k
+  S= : Γ ∋^² k
+     → Γ ,= B ∋^² #S k
+
+-- sol variable in SubEnv
+infix 3 _∋=²_
+data _∋=²_ : Env n m → Fin m → Set where
+  Z^ : SubEnv Γ
+     → Γ ,= A ∋=² #0
+  S, : Γ ∋=² k
+     → Γ , B ∋=² k
+  S∙ : Γ ∋=² k
+     → Γ ,∙ ∋=² #S k
+  S^ : Γ ∋=² k
+     → Γ ,^ ∋=² #S k
+  S= : Γ ∋=² k
+     → Γ ,= B ∋=² #S k
+
+{-
+-- ex variable in SubEnv, not sure where is it used
+infix 3 _∋^=²_
+data _∋^=²_ : Env n m → Fin m → Set where
+  Z^ : SubEnv Γ
+     → Γ ,^ ∋^=² #0
+  Z= : SubEnv Γ
+     → Γ ,= A ∋^=² #0
+  S, : Γ ∋^=² k
+     → Γ , B ∋^=² k
+  S∙ : Γ ∋^=² k
+     → Γ ,∙ ∋^=² #S k
+  S^ : Γ ∋^=² k
+     → Γ ,^ ∋^=² #S k
+  S= : Γ ∋^=² k
+     → Γ ,= B ∋^=² #S k
+-}
 
 -- lookup an entry: universal variable
 infix 3 _∋∙_

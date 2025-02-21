@@ -52,6 +52,7 @@ infixl 4 _,_
 infixl 4 _,∙
 infixl 4 _,^
 infixl 4 _,=_
+infixl 4 _⋈
 
 data Env : ℕ → ℕ → Set where
   ∅     : Env 0 0
@@ -59,13 +60,45 @@ data Env : ℕ → ℕ → Set where
   _,^   : Env n m → Env n (1 + m)
   _,∙   : Env n m → Env n (1 + m)
   _,=_  : Env n m → (A : Type m) → Env n (1 + m)
-
+  _⋈    : Env n m → Env n m
 
 variable
   Γ Γ' Γ'' Γ₁ Γ₂ Γ₃ Γ* : Env n m
   Γ% : Env n m
   Δ Δ' Δ₁ Δ₂ : Env n m
   Ψ Ω : Env n m
+
+data TypEnv : Env n m → Set where
+  Z⋈ : TypEnv ∅
+  S, : TypEnv Γ
+     → TypEnv (Γ , A)
+  S= : TypEnv Γ
+     → TypEnv (Γ ,= B)
+  S∙ : TypEnv Γ
+     → TypEnv (Γ ,∙)
+  S^ : TypEnv Γ
+     → TypEnv (Γ ,^)
+
+data SubEnv : Env n m → Set where
+  Z⋈ : TypEnv Γ
+     → SubEnv (Γ ⋈)
+  S, : SubEnv Γ
+     → SubEnv (Γ , A)
+  S= : SubEnv Γ
+     → SubEnv (Γ ,= B)
+  S∙ : SubEnv Γ
+     → SubEnv (Γ ,∙)
+  S^ : SubEnv Γ
+     → SubEnv (Γ ,^)
+
+
+𝕣 : Env n m → Env n m
+𝕣 ∅ = ∅
+𝕣 (Γ , A) = 𝕣 Γ , A
+𝕣 (Γ ,^) = 𝕣 Γ ,^
+𝕣 (Γ ,∙) = 𝕣 Γ ,∙
+𝕣 (Γ ,= A) = 𝕣 Γ ,= A
+𝕣 (Γ ⋈) = Γ
 
 ‶-injective : ‶ X ≡ ‶ Y
             → X ≡ Y

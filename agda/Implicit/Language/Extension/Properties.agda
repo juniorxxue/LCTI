@@ -87,6 +87,7 @@ open import Implicit.Language.Extension.Base
 ⊆-refl {Γ = Γ ,∙} = uvar ⊆-refl
 ⊆-refl {Γ = Γ ,^} = evar ⊆-refl
 ⊆-refl {Γ = Γ ,= A} = svar ⊆-refl
+⊆-refl {Γ = Γ ⋈} = mark ⊆-refl
 
 ⊆-trans : Γ ⊆ Γ'
         → Γ' ⊆ Γ''
@@ -98,6 +99,7 @@ open import Implicit.Language.Extension.Base
 ⊆-trans (evar ⊆1) (evar-sol ⊆2 cloA) = evar-sol (⊆-trans ⊆1 ⊆2) cloA
 ⊆-trans (evar-sol ⊆1 cloA) (svar ⊆2) = evar-sol (⊆-trans ⊆1 ⊆2) (⊆-cloA cloA ⊆2)
 ⊆-trans (svar ⊆1) (svar ⊆2) = svar (⊆-trans ⊆1 ⊆2)
+⊆-trans (mark ⊆1) (mark r) = mark (⊆-trans ⊆1 r)
 
 ⊆-id : Γ ⊆ Δ
      → Δ ⊆ Γ
@@ -107,11 +109,12 @@ open import Implicit.Language.Extension.Base
 ⊆-id (var ext1) (var ext2) rewrite ⊆-id ext1 ext2 = refl
 ⊆-id (evar ext1) (evar ext2) rewrite ⊆-id ext1 ext2 = refl
 ⊆-id (svar ext1) (svar ext2) rewrite ⊆-id ext1 ext2 = refl
+⊆-id (mark ext1) (mark ext2) rewrite ⊆-id ext1 ext2 = refl
 
 inst-⊆ : [ A / X ] Γ ⟹ Γ'
        → Γ ⊢c A
        → Γ ⊆ Γ'
-inst-⊆ (⟹^0 up) cloA = evar-sol ⊆-refl (⊢c-strengthen^0 cloA up)
+inst-⊆ (⟹^0 up cloA') cloA = evar-sol ⊆-refl (⊢c-strengthen^0 cloA up)
 inst-⊆ (⟹^S inst up1) cloA = evar (inst-⊆ inst (⊢c-strengthen^0 cloA up1))
 inst-⊆ (⟹∙S inst up1) cloA = uvar (inst-⊆ inst (⊢c-strengthen∙0 cloA up1))
 inst-⊆ (⟹,S inst) cloA = var (inst-⊆ inst (⊢c-strengthen,0 cloA))

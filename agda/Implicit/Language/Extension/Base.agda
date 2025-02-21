@@ -23,6 +23,9 @@ data _⊆_ : Env n m → Env n m → Set where
   svar :
       Γ ⊆ Γ'
     → Γ ,= A ⊆ Γ' ,= A
+  mark :
+      Γ ⊆ Γ'
+    → Γ ⋈ ⊆ Γ' ⋈
 
 data ExSol (Γ : Env n m) (k : Fin m) : Set where
   is-ex  : (inΓ : Γ ∋^ k) → ExSol Γ k
