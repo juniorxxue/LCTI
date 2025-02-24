@@ -88,6 +88,8 @@ open import Implicit.Language.EnvOps.Base
 ▶,-∋∙ (S= inΓ) (▶S= extΓ x) = S= (▶,-∋∙ inΓ extΓ)
 ▶,-∋∙ (S^ inΓ) (▶Z cloA) = S, (S^ inΓ)
 ▶,-∋∙ (S^ inΓ) (▶S^ extΓ x) = S^ (▶,-∋∙ inΓ extΓ)
+▶,-∋∙ {T = T} (S⋈ inΓ) newΓ = S⋈ (▶,-∋∙ {T = T} inΓ (▶S⋈ newΓ))
+
 
 ▶,-∋^ : Γ ∋^ X
       → Γ ▶ k , T ⇘ Γ'
@@ -130,6 +132,7 @@ open import Implicit.Language.EnvOps.Base
 ▶^-∋∙ (S= inΓ) (▶S= newΓ x) = S= (▶^-∋∙ inΓ newΓ)
 ▶^-∋∙ (S^ inΓ) ▶Z = S^ (S^ inΓ)
 ▶^-∋∙ (S^ inΓ) (▶S^ newΓ) = S^ (▶^-∋∙ inΓ newΓ)
+▶^-∋∙ (S⋈ inΓ) newΓ = S⋈ (▶^-∋∙ inΓ (▶S⋈ newΓ))
 
 ▶^-∋= : Γ ∋= X
       → Γ ▶ k ,^⇘ Γ'
@@ -159,6 +162,7 @@ open import Implicit.Language.EnvOps.Base
 ▶∙-∋∙ (S= inΓ) (▶S= newΓ x) = S= (▶∙-∋∙ inΓ newΓ)
 ▶∙-∋∙ (S^ inΓ) ▶Z = S∙ (S^ inΓ)
 ▶∙-∋∙ (S^ inΓ) (▶S^ newΓ) = S^ (▶∙-∋∙ inΓ newΓ)
+▶∙-∋∙ (S⋈ inΓ) newΓ = S⋈ (▶∙-∋∙ inΓ (▶S⋈ newΓ))
 
 ▶∙-∋= : Γ ∋= X
       → Γ ▶ k ,∙⇘ Γ'
@@ -185,6 +189,7 @@ open import Implicit.Language.EnvOps.Base
 ▶∙-∋∙-rev {k = #S k} {#S X} (S∙ inΓ) (▶S∙ newΓ) = S∙ (▶∙-∋∙-rev inΓ newΓ)
 ▶∙-∋∙-rev {k = #S k} {#S X} (S= inΓ) (▶S= newΓ x) = S= (▶∙-∋∙-rev inΓ newΓ)
 ▶∙-∋∙-rev {k = #S k} {#S X} (S^ inΓ) (▶S^ newΓ) = S^ (▶∙-∋∙-rev inΓ newΓ)
+▶∙-∋∙-rev (S⋈ inΓ) newΓ = S⋈ (▶∙-∋∙-rev inΓ (▶S⋈ newΓ))
 
 ▶∙-∋=-rev : Γ' ∋= punchIn k X
           → Γ ▶ k ,∙⇘ Γ'
@@ -211,6 +216,7 @@ open import Implicit.Language.EnvOps.Base
 ▶=-∋∙ (S= inΓ) (▶S= newΓ x x₁) = S= (▶=-∋∙ inΓ newΓ)
 ▶=-∋∙ (S^ inΓ) (▶Z cloA) = S= (S^ inΓ)
 ▶=-∋∙ (S^ inΓ) (▶S^ newΓ x) = S^ (▶=-∋∙ inΓ newΓ)
+▶=-∋∙ (S⋈ inΓ) newΓ = S⋈ (▶=-∋∙ inΓ (▶S⋈ newΓ))
 
 
 ▶=-∋= : Γ ∋= X

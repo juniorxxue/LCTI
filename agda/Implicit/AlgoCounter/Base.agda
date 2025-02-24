@@ -18,11 +18,11 @@ data _⊢_⌞_⌝_⊣_↪_↡_ : Env n m → Type m → Polar → Context n m �
 data _⊢_⇒_⇒_↡_ where
 
   ⊢lit : ∀ {num : ℕ}
-    → (cloΓ : Closed Γ)
+    → (cloΓ : TypClosed Γ)
     → Γ ⊢ □ ⇒ lit num ⇒ Int ↡ Z
 
   ⊢var :
-      (cloΓ : Closed Γ)
+      (cloΓ : TypClosed Γ)
     → (x∈Γ : Γ ∋ x ⦂ A)
     → Γ ⊢ □ ⇒ ` x ⇒ A ↡ Z
 
@@ -49,7 +49,7 @@ data _⊢_⇒_⇒_↡_ where
     → (ne : NonEmpty Σ)
     → (gc : GenericConsumer g)
     → (cloΣ : Γ ⊢cᶜ Σ)
-    → (s : Γ ⊢ A ⌞ ≤⁺ ⌝ Σ ⊣ Γ ↪ B ↡ j)
+    → (s : Γ ⋈ ⊢ A ⌞ ≤⁺ ⌝ Σ ⊣ Γ ⋈ ↪ B ↡ j)
     → Γ ⊢ Σ ⇒ g ⇒ B ↡ j
 
   ⊢tabs :
@@ -59,32 +59,53 @@ data _⊢_⇒_⇒_↡_ where
 
 data _⊢_⌞_⌝_⊣_↪_↡_ where
   s-int :
-      Γ ⊢ Int ⌞ ≤ ⌝ τ Int ⊣ Γ ↪ Int ↡ ∞
+     (cloΓ : SubClosed Γ)
+    → Γ ⊢ Int ⌞ ≤ ⌝ τ Int ⊣ Γ ↪ Int ↡ ∞
 
   s-empty :
-      (clo : Γ ⊢c A)
+     (cloΓ : SubClosed Γ)
+    → (clo : Γ ⊢c A)
     → Γ ⊢ A ⌞ ≤⁺ ⌝ □ ⊣ Γ ↪ A ↡ Z
 
-  s-var :
-      Γ ⊢ (‶ X) ⌞ ≤ ⌝ τ (‶ X) ⊣ Γ ↪ ‶ X ↡ ∞
+  s-var-∙ :
+          (cloΓ : SubClosed Γ)
+    → Γ ∋∙ X
+    → Γ ⊢ (‶ X) ⌞ ≤ ⌝ τ (‶ X) ⊣ Γ ↪ ‶ X ↡ ∞
+
+  s-var-= :
+      (cloΓ : SubClosed Γ)
+    → Γ ∋=¹ X
+    → Γ ⊢ (‶ X) ⌞ ≤ ⌝ τ (‶ X) ⊣ Γ ↪ ‶ X ↡ ∞
 
   s-ex-l^ :
-      (x-in : Γ ∋^ X) -- this is not necessary, since inst implies
+      (cloA : Γ ⊢c¹ A)
+      → (cloΓ : SubClosed Γ)
     → (inst : [ A / X ] Γ ⟹ Γ')
     → Γ ⊢ ‶ X ⌞ ≤⁺ ⌝ τ A ⊣ Γ' ↪ A ↡ ∞
 
   s-ex-l= :
       (x-in : Γ ∋ X := B)
+    → Γ ⊢ B ⌞ ≤⁺ ⌝ τ A ⊣ Γ' ↪ A' ↡ ∞
+    → Γ ⊢ ‶ X ⌞ ≤⁺ ⌝ τ A ⊣ Γ' ↪ A ↡ ∞
+
+  s-ex-typ-l= :
+      (x-in : Γ ∋ X :=¹ B)
     → Γ ⊢ B ⌞ ≤ ⌝ τ A ⊣ Γ' ↪ A' ↡ ∞
     → Γ ⊢ ‶ X ⌞ ≤ ⌝ τ A ⊣ Γ' ↪ A ↡ ∞
 
   s-ex-r^ :
-      (x-in : Γ ∋^ X)
+      (cloA : Γ ⊢c¹ A)
+    → (cloΓ : SubClosed Γ)
     → (inst : [ A / X ] Γ ⟹ Γ')
     → Γ ⊢ A ⌞ ≤⁻ ⌝ τ (‶ X) ⊣ Γ' ↪ ‶ X ↡ ∞
 
   s-ex-r= :
       (x-in : Γ ∋ X := B)
+    → Γ ⊢ A ⌞ ≤⁻ ⌝ τ B ⊣ Γ' ↪ A' ↡ ∞
+    → Γ ⊢ A ⌞ ≤⁻ ⌝ τ (‶ X) ⊣ Γ' ↪ (‶ X) ↡ ∞
+
+  s-ex-typ-r= :
+      (x-in : Γ ∋ X :=¹ B)
     → Γ ⊢ A ⌞ ≤ ⌝ τ B ⊣ Γ' ↪ A' ↡ ∞
     → Γ ⊢ A ⌞ ≤ ⌝ τ (‶ X) ⊣ Γ' ↪ (‶ X) ↡ ∞
 
@@ -96,13 +117,13 @@ data _⊢_⌞_⌝_⊣_↪_↡_ where
   s-term-c :
 --      (cloA : Γ ⊢c A)
 -- comment this one, if we restrict such condition on the typing
-      (⊢e : Γ ⊢ τ A ⇒ e ⇒ A' ↡ ∞)
+      (⊢e : 𝕣 Γ ⊢ τ A ⇒ e ⇒ A' ↡ ∞)
     → Γ ⊢ B ⌞ ≤⁺ ⌝ Σ ⊣ Γ' ↪ D ↡ j
     → Γ ⊢ (A `→ B) ⌞ ≤⁺ ⌝ ([ e ]↝ Σ) ⊣ Γ' ↪ A' `→ D ↡ (𝕔 j)
 
   s-term-o :
-      (opnA : Γ ⊢o A)
-    → (⊢e : Γ ⊢ □ ⇒ e ⇒ C ↡ Z)
+      (opnA : Γ ⊢o² A)
+    → (⊢e : 𝕣 Γ ⊢ □ ⇒ e ⇒ C ↡ Z)
     → Γ ⊢ C ⌞ ≤⁻ ⌝ τ A ⊣ Γ₁ ↪ A' ↡ ∞
     → Γ₁ ⊢ B ⌞ ≤⁺ ⌝ Σ ⊣ Γ₂ ↪ D ↡ j
     → Γ ⊢ A `→ B ⌞ ≤⁺ ⌝ ([ e ]↝ Σ) ⊣ Γ₂ ↪ C `→ D ↡ (𝕚 j)

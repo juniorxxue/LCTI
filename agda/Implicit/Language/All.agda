@@ -12,12 +12,12 @@ open import Implicit.Language.Find public
 
 -- two files below are entangled
 open import Implicit.Language.Norm.All public
-open import Implicit.Language.OpenClose.All public
-open import Implicit.Language.EnvOps.All public
+open import Implicit.Language.OpenClose.Base public
+open import Implicit.Language.EnvOps.Base public
 
 -- open import Implicit.Language.Extension.All public
 
-open import Implicit.Language.Ground.All public
+-- open import Implicit.Language.Ground.All public
 
 
 postulate

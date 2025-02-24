@@ -1,6 +1,7 @@
 module Implicit.Algo.OpenClose where
 
 open import Implicit.Language.All
+open import Implicit.Language.OpenClose.Base
 open import Implicit.Algo.Syntax
 open import Implicit.Algo.Lookup
 

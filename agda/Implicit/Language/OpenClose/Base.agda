@@ -125,6 +125,8 @@ data Closed : Env n m → Set where
   clo-S= : Closed Γ
          → (cloA : Γ ⊢c A)
          → Closed (Γ ,= A)
+  clo-S⋈ : Closed Γ
+         → Closed (Γ ⋈)
 
 data TypClosed : Env n m → Set where
   clo-Z : TypClosed ∅

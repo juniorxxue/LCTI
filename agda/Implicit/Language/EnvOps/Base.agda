@@ -111,6 +111,8 @@ data _▶_,_⇘_ : Env n m → Fin (1 + n) → Type m → Env (1 + n) m → Set 
   ▶S= : Γ ▶ k , A  ⇘ Γ'
       → ↑ty0 A ⇘ A'
       → (Γ ,= B) ▶ k , A' ⇘ Γ' ,= B
+  ▶S⋈ : Γ ▶ k , A  ⇘ Γ'
+      → Γ ⋈ ▶ k , A' ⇘ Γ' ⋈
 
 
 infix 3 _⨟_▶_,_⇘_⨟_
@@ -148,6 +150,8 @@ data _▶_,^⇘_ : Env n m → Fin (1 + m) → Env n (1 + m) → Set where
   ▶S= : Γ ▶ k ,^⇘ Γ'
       → (upB : B ↑ty k ⇘ B')
       → Γ ,= B ▶ #S k ,^⇘ Γ' ,= B'
+  ▶S⋈ : Γ ▶ k ,^⇘ Γ'
+      → Γ ⋈ ▶ k ,^⇘ Γ' ⋈
 
 infix 3 _▶_,∙⇘_
 data _▶_,∙⇘_ : Env n m → Fin (1 + m) → Env n (1 + m) → Set where
@@ -162,6 +166,8 @@ data _▶_,∙⇘_ : Env n m → Fin (1 + m) → Env n (1 + m) → Set where
   ▶S= : Γ ▶ k ,∙⇘ Γ'
       → B ↑ty k ⇘ B'
       → Γ ,= B ▶ #S k ,∙⇘ Γ' ,= B'
+  ▶S⋈ : Γ ▶ k ,∙⇘ Γ'
+      → Γ ⋈ ▶ k ,∙⇘ Γ' ⋈
 
 infix 3 _▶_,=_⇘_
 data _▶_,=_⇘_ : Env n m → Fin (1 + m) → Type m → Env n (1 + m) → Set where
@@ -180,6 +186,8 @@ data _▶_,=_⇘_ : Env n m → Fin (1 + m) → Type m → Env n (1 + m) → Set
       → ↑ty0 A ⇘ A'
       → B ↑ty k ⇘ B'
       → Γ ,= B ▶ #S k ,= A' ⇘ Γ' ,= B'
+  ▶S⋈ : Γ ▶ k ,= A ⇘ Γ'
+      → Γ ⋈ ▶ k ,= A ⇘ Γ' ⋈
 
 ----------------------------------------------------------------------
 --+                       Entry Replacement                        +--

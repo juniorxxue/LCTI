@@ -45,7 +45,7 @@ s-polarity {≤ = ≤⁺} (s-arr₁ s s₁) with s-polarity s | s-polarity s₁
 ... | pr-l x | pr-r (cc-∞ x₁) = pr-r (cc-∞ (⊢c¹-arr x x₁))
 s-polarity {≤ = ≤⁻} (s-arr₁ s s₁) with s-polarity s | s-polarity s₁
 ... | pr-r (cc-∞ x) | pr-l x₁ = pr-l (⊢c¹-arr x x₁)
-s-polarity (s-arr₂ s s₁) with s-polarity s | s-polarity s₁
+s-polarity (s-arr₂ opA s s₁) with s-polarity s | s-polarity s₁
 ... | pr-l x | pr-r x₁ = pr-r (cc-𝕚 x₁)
 s-polarity (s-arr₃ cloA s) with s-polarity s
 ... | pr-r x = pr-r (cc-𝕔 x)
@@ -54,10 +54,8 @@ s-polarity (s-∀ s) with s-polarity s
 ... | pr-r (cc-∞ x) = pr-r (cc-∞ (⊢c¹-∀ x))
 s-polarity (s-∀l s ic fd stC stD) with s-polarity s
 ... | pr-r x = pr-r (⊢c¹w/c-subst0 x stD stC)
-s-polarity (s-var-sub-l inΓ s) with s-polarity s
-... | pr-r x = pr-r x
-s-polarity (s-var-sub-r inΓ s) with s-polarity s
-... | pr-l x = pr-l x
+s-polarity (s-var-sub-l cloA inΓ) = pr-r (cc-∞ cloA)
+s-polarity (s-var-sub-r cloA inΓ) = pr-l cloA
 s-polarity (s-var-typ-l inΓ s) with s-polarity s
 ... | pr-l x = pr-l (⊢c¹-var-= (∋:=¹-∋= inΓ))
 ... | pr-r (cc-∞ x) = pr-r (cc-∞ x)

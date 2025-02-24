@@ -4,7 +4,7 @@ open import Implicit.Language.Base
 open import Implicit.Language.Shift.All
 open import Implicit.Language.Subst.All
 
--- lookup an entry: term variable
+-- lookup an entry: term variable, won't bypass the ⋈, since assume in TypEnv
 infix 3 _∋_⦂_
 data _∋_⦂_ : Env n m → Fin n → Type m → Set where
   Z  : Γ , A ∋ #0 ⦂ A
@@ -36,6 +36,9 @@ data _∋_:=_ : Env n m → Fin m → Type m → Set where
   S= : Γ ∋ k := A
      → (up : ↑ty0 A ⇘ A')
      → Γ ,= B ∋ #S k := A'
+  S⋈ : Γ ∋ k := A
+     → Γ ⋈ ∋ k := A
+
 
 infix 3 _∋_:=¹_
 data _∋_:=¹_ : Env n m → Fin m → Type m → Set where
@@ -53,6 +56,20 @@ data _∋_:=¹_ : Env n m → Fin m → Type m → Set where
   S⋈ : Γ ∋ X := A
      → Γ ⋈ ∋ X :=¹ A
 
+infix 3 _∋_:=²_
+data _∋_:=²_ : Env n m → Fin m → Type m → Set where
+  Z= : ↑ty0 A ⇘ A'
+     → Γ ,= A ∋ #0 :=² A'
+  S∙ : Γ ∋ k :=² A
+     → (up : ↑ty0 A ⇘ A')
+     → Γ ,∙ ∋ #S k :=² A'
+  S^ : Γ ∋ k :=² A
+     → (up : ↑ty0 A ⇘ A')
+     → Γ ,^ ∋ #S k :=² A'
+  S= : Γ ∋ k :=² A
+     → (up : ↑ty0 A ⇘ A')
+     → Γ ,= B ∋ #S k :=² A'
+
 -- lookup an entry: solution (simpler ver.)
 infix 3 _∋=_
 data _∋=_ : Env n m → Fin m → Set where
@@ -65,6 +82,8 @@ data _∋=_ : Env n m → Fin m → Set where
      → Γ ,^ ∋= #S k
   S= : Γ ∋= k
      → Γ ,= B ∋= #S k
+  S⋈ : Γ ∋= k
+     → Γ ⋈ ∋= k
 
 -- lookup an entry: solution in the typing environment.
 infix 3 _∋=¹_
@@ -96,12 +115,13 @@ data _∋^_ : Env n m → Fin m → Set where
      → Γ ,= B ∋^ #S k
   S^ : Γ ∋^ k
      → Γ ,^ ∋^ #S k
+  S⋈ : Γ ∋^ k
+     → Γ ⋈ ∋^ k
 
 -- ex variable in SubEnv
 infix 3 _∋^²_
 data _∋^²_ : Env n m → Fin m → Set where
-  Z^ : SubEnv Γ
-     → Γ ,^ ∋^² #0
+  Z^ : Γ ,^ ∋^² #0
   S, : Γ ∋^² k
      → Γ , B ∋^² k
   S∙ : Γ ∋^² k
@@ -114,8 +134,7 @@ data _∋^²_ : Env n m → Fin m → Set where
 -- sol variable in SubEnv
 infix 3 _∋=²_
 data _∋=²_ : Env n m → Fin m → Set where
-  Z^ : SubEnv Γ
-     → Γ ,= A ∋=² #0
+  Z^ : Γ ,= A ∋=² #0
   S, : Γ ∋=² k
      → Γ , B ∋=² k
   S∙ : Γ ∋=² k
@@ -155,3 +174,5 @@ data _∋∙_ : Env n m → Fin m → Set where
      → Γ ,= B ∋∙ #S k
   S^ : Γ ∋∙ k
     → Γ ,^ ∋∙ #S k
+  S⋈ : Γ ∋∙ k
+     → Γ ⋈ ∋∙ k

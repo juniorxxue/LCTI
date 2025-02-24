@@ -111,7 +111,7 @@ data Counter : Set where
   𝕔 : Counter → Counter
 
 variable
-  j : Counter
+  j j′ j″ : Counter
 
 data NonZ : Counter → Set where
   nz-∞ : NonZ ∞
@@ -131,3 +131,9 @@ data Polar : Set where
 
 variable
   ≤ : Polar
+
+data GenericConsumer : Term n m → Set where
+  gc-i : ∀ {i} → GenericConsumer (Term n m ∋⦂ lit i)
+  gc-var : ∀ {x} → GenericConsumer (Term n m ∋⦂ ` x)
+  gc-ann : ∀ {e : Term n m} {A} → GenericConsumer (e ⦂ A)
+  gc-tlam : ∀ {e : Term n (1 + m)} → GenericConsumer (Λ e)

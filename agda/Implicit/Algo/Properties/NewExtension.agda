@@ -42,8 +42,6 @@ data _⊆_ : Env n m → Env n m → Set where
 ⊆-refl (S∙ se) = uvar (⊆-refl se)
 ⊆-refl (S^ se) = evar (⊆-refl se)
 
-
-
 ⊆-senv : Γ ⊆ Γ'
        → SubEnv Γ
 ⊆-senv (uvar ext) = S∙ (⊆-senv ext)
@@ -74,7 +72,29 @@ postulate
 ⊆-trans : Γ ⊆ Ω
         → Ω ⊆ Δ
         → Γ ⊆ Δ
+⊆-trans (uvar ext1) (uvar ext2) = uvar (⊆-trans ext1 ext2)
+⊆-trans (var ext1) (var ext2) = var (⊆-trans ext1 ext2)
+⊆-trans (evar ext1) (evar ext2) = evar (⊆-trans ext1 ext2)
+⊆-trans (evar ext1) (evar-sol ext2 cloA) = evar-sol (⊆-trans ext1 ext2) cloA
+⊆-trans (evar-sol ext1 cloA) (svar ext2) = evar-sol (⊆-trans ext1 ext2) (⊆-closeA cloA ext2)
+⊆-trans (svar ext1) (svar ext2) = svar (⊆-trans ext1 ext2)
+⊆-trans (mark x) (mark x₁) = mark x
 
+closed-env : TypClosed Γ
+           → TypEnv Γ
+closed-env clo-Z = Z⋈
+closed-env (clo-S, cloΓ cloA) = S, (closed-env cloΓ)
+closed-env (clo-S∙ cloΓ) = S∙ (closed-env cloΓ)
+closed-env (clo-S^ cloΓ) = S^ (closed-env cloΓ)
+closed-env (clo-S= cloΓ cloA) = S= (closed-env cloΓ)
+
+sclosed-senv : SubClosed Γ
+             → SubEnv Γ
+sclosed-senv (clo-Z x) = Z⋈ (closed-env x)
+sclosed-senv (clo-S, cloΓ cloA) = S, (sclosed-senv cloΓ)
+sclosed-senv (clo-S∙ cloΓ) = S∙ (sclosed-senv cloΓ)
+sclosed-senv (clo-S^ cloΓ) = S^ (sclosed-senv cloΓ)
+sclosed-senv (clo-S= cloΓ cloA) = S= (sclosed-senv cloΓ)
 
 inst-⊆ : [ B / X ] Γ ⟹ Δ
        → Γ ⊆ Δ
@@ -86,10 +106,10 @@ inst-⊆ (⟹=S inst up1) = svar (inst-⊆ inst)
 
 s-⊆ : Γ ⊢ A ⌞ ≤ ⌝ Σ ⊣ Δ ↪ B
     → Γ ⊆ Δ
-s-⊆ (s-int cloΓ) = {!!}
-s-⊆ (s-empty cloΓ clo) = {!!}
-s-⊆ (s-var-∙ cloΓ x) = {!!}
-s-⊆ (s-var-= cloΓ x) = {!!}
+s-⊆ (s-int cloΓ) = ⊆-refl (sclosed-senv cloΓ)
+s-⊆ (s-empty cloΓ clo) = ⊆-refl (sclosed-senv cloΓ)
+s-⊆ (s-var-∙ cloΓ x) = ⊆-refl (sclosed-senv cloΓ)
+s-⊆ (s-var-= cloΓ x) = ⊆-refl (sclosed-senv cloΓ)
 s-⊆ (s-ex-l^ x-in cloA inst) = inst-⊆ inst
 s-⊆ (s-ex-l= x-in s) = s-⊆ s
 s-⊆ (s-ex-typ-l= x-in s) = s-⊆ s

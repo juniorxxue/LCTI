@@ -16,9 +16,3 @@ data NonEmpty : Context n m → Set where
   ne-τ    : ∀ {A : Type m} → NonEmpty (Context n m ∋⦂ τ A)
   ne-app  : ∀ {e} {Σ : Context n m} → NonEmpty ([ e ]↝ Σ)
 
-data GenericConsumer : Term n m → Set where
-  gc-i : ∀ {i} → GenericConsumer (Term n m ∋⦂ lit i)
-  gc-var : ∀ {x} → GenericConsumer (Term n m ∋⦂ ` x)
-  gc-ann : ∀ {e : Term n m} {A} → GenericConsumer (e ⦂ A)
-  gc-tlam : ∀ {e : Term n (1 + m)} → GenericConsumer (Λ e)
-
