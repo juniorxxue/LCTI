@@ -70,6 +70,6 @@ data ⟦_⟧⇒⟦_,_⟧ : Context n m → Apps n m → Context n m → Set wher
 -- used for proving general subsumption
 infix 3 _≊_
 data _≊_ : Context n m → Context n m → Set where
-  ≊Z : □ ≊ Σ
+  ≊Z : (Context n m ∋⦂ □) ≊ (τ A)
   ≊S : Σ ≊ Σ'
      → [ e ]↝ Σ ≊ [ e ]↝ Σ'

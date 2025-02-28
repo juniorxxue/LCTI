@@ -46,20 +46,15 @@ s-refl {A = `∀ A} = s-∀ s-refl
 ⊢to≤ : Γ ⊢ Σ ⇒ e ⇒ A
      → Γ ⊢ A ⌞ ≤⁺ ⌝ Σ ⊣ Γ ↪ A
 
-subsumption : Γ ⊢ Σ ⇒ e ⇒ A
-             → Σ ≊ Σ'
-             → Γ ⊢cᶜ Σ'
-             → Γ ⊢ A ⌞ ≤⁺ ⌝ Σ' ⊣ Γ ↪ A'
-             → Γ ⊢ Σ' ⇒ e ⇒ A'
-
+{-
 -- corollary
 subsumption0 : Γ ⊢ □ ⇒ e ⇒ A
-             → Γ ⊢ A ⌞ ≤⁺ ⌝ Σ ⊣ Γ ↪ A'
-             → Γ ⊢cᶜ Σ
-             → Γ ⊢ Σ ⇒ e ⇒ A'
-subsumption0 ⊢e s clo = subsumption ⊢e ≊Z clo s
+             → Γ ⊢ A ⌞ ≤⁻ ⌝ τ B ⊣ Γ ↪ B'
+             → Γ ⊢c B
+             → Γ ⊢ τ B ⇒ e ⇒ B'
+subsumption0 ⊢e s clo = subsumption ⊢e ≊Z (⊢c-τ clo) ?
 
-subsumption {Σ' = □} ⊢e ≊Z cloΣ' (s-empty clo) = ⊢e
+subsumption {Σ' = □} ⊢e () cloΣ' (s-empty clo)
 subsumption {Σ' = τ _} (⊢lit cloΓ) ≊Z (⊢c-τ cloA) s = ⊢sub (⊢lit cloΓ) ne-τ gc-i (⊢c-τ cloA) s
 subsumption {Σ' = τ _} (⊢var cloΓ x∈Γ) ≊Z (⊢c-τ cloA) s = ⊢sub (⊢var cloΓ x∈Γ) ne-τ gc-var (⊢c-τ cloA) s
 subsumption {Σ' = τ _} (⊢ann ⊢e) ≊Z (⊢c-τ cloA) s = ⊢sub (⊢ann ⊢e) ne-τ gc-ann (⊢c-τ cloA) s
@@ -75,7 +70,7 @@ subsumption {Σ' = [ e ]↝ Σ'} (⊢app ⊢e) newΣ cloΣ' s with ⊢to≤ ⊢e
 subsumption {Σ' = [ e ]↝ Σ'} (⊢lam₂ ⊢e up-c ⊢e₁) (≊S newΣ) (⊢c-term cloe cloΣ') (s-term-c ⊢e₂ s) with ⊢id0 ⊢e₂
                                                                                                     | ↑tmᶜ0-total Σ'
 ... | refl | ⟨ nΣ' , up-Σ ⟩ = ⊢lam₂ ⊢e up-Σ (subsumption ⊢e₁
-                                                         (≊-weaken newΣ up-c up-Σ)
+                                                         {!!}
                                                          (⊢cᶜ-weaken,0 cloΣ' up-Σ (⊢close-τ ⊢e₂))
                                                          (s-weaken,0 s up-Σ (⊢close-τ ⊢e₂) (⊢close-τ ⊢e₂)))
 subsumption {Σ' = [ e ]↝ Σ'} (⊢lam₂ ⊢e up-c ⊢e₁) (≊S newΣ) cloΣ' (s-term-o opnA ⊢e₂ s s₁)
@@ -99,7 +94,7 @@ s-refined-p (s-arr s s₁) pr = s-refl
 s-refined-p (s-term-c ⊢e s) pr'@(polar-r cloΓ (⊢c-term cloe cloΣ)) with ⊢id0 ⊢e
 ... | refl = s-term-c (t-⊆-prv ⊢e (s-⊆ s (polar-tm-r pr')) (s-closed-env s (polar-r cloΓ cloΣ))) (s-refined-p s (polar-r cloΓ cloΣ))
 s-refined-p s'@(s-term-o opnA ⊢e s s₁) pr'@(polar-r cloΓ (⊢c-term cloe cloΣ)) =
-  s-term-c (t-⊆-prv (subsumption0 ⊢e s-refl (⊢c-τ (⊢closeA ⊢e))) (s-⊆ s' pr') (s-closed-env s' pr'))
+  s-term-c (t-⊆-prv (subsumption0 ⊢e s-refl {!!}) (s-⊆ s' pr') (s-closed-env s' pr'))
            (s-refined-p s₁ (polar-r (s-closed-env s (polar-l cloΓ (⊢closeA ⊢e))) (⊆-cloAᶜ cloΣ (s-⊆ s (polar-l cloΓ (⊢closeA ⊢e))))))
 s-refined-p (s-∀ s) pr = s-∀ (s-refined-p s (polar-∀ pr))
 s-refined-p (s-∀l s upᶜ upᵉ st₁ st₂) (polar-r cloΓ cloΣ) =
@@ -114,6 +109,7 @@ s-refined-p (s-∀l s upᶜ upᵉ st₁ st₂) (polar-r cloΓ cloΣ) =
 ... | s-term-o opnA ⊢e₁ r r₁ = ⊥-elim (⊢c-⊢o-disjoint (⊢closeA ⊢e₁) opnA)
 ⊢to≤ (⊢lam₁ ⊢e) with ⊢id0 ⊢e
 ... | refl = s-refl
-⊢to≤ (⊢lam₂ ⊢e up-c ⊢e₁) = s-term-c (subsumption0 ⊢e s-refl (⊢c-τ (⊢closeA ⊢e))) (s-strengthen,0 (⊢to≤ ⊢e₁) up-c)
+⊢to≤ (⊢lam₂ ⊢e up-c ⊢e₁) = s-term-c (subsumption0 ⊢e s-refl {!!}) (s-strengthen,0 (⊢to≤ ⊢e₁) up-c)
 ⊢to≤ (⊢sub ⊢e ne gc cloΣ s) = s-refined-p s (polar-r (⊢closeΓ ⊢e) cloΣ)
 ⊢to≤ (⊢tabs ⊢e) = s-empty (⊢c-∀ (⊢closeA ⊢e))
+-}
