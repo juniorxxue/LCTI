@@ -65,8 +65,9 @@ data _⊢_⌞_⌝_⊣_↪_ where
 
   s-empty :
       (cloΓ : SubClosed Γ)
-      → (clo : Γ ⊢c A)
-    → Γ ⊢ A ⌞ ≤⁺ ⌝ □ ⊣ Γ ↪ A
+    → (clo : Γ ⊢c A)
+    → Γ ≫ A ⇘ A%
+    → Γ ⊢ A ⌞ ≤⁺ ⌝ □ ⊣ Γ ↪ A%
 
   s-var-∙ :
       (cloΓ : SubClosed Γ)
@@ -78,49 +79,60 @@ data _⊢_⌞_⌝_⊣_↪_ where
     → Γ ∋=¹ X
     → Γ ⊢ (‶ X) ⌞ ≤ ⌝ τ (‶ X) ⊣ Γ ↪ ‶ X
 
+  s-ex-typ-l=+ :
+      (x-in : Γ ∋ X :=¹ B)
+    → Γ ⊢ B ⌞ ≤⁺ ⌝ τ A ⊣ Γ' ↪ A'
+    → Γ ⊢ ‶ X ⌞ ≤⁺ ⌝ τ A ⊣ Γ' ↪ A
+
+  s-ex-typ-l=- :
+      (x-in : Γ ∋ X :=¹ B)
+    → Γ ⊢ B ⌞ ≤⁻ ⌝ τ A ⊣ Γ' ↪ A'
+    → Γ ⊢ ‶ X ⌞ ≤⁻ ⌝ τ A ⊣ Γ' ↪ ‶ X
+
+  s-ex-typ-r=+ :
+      (x-in : Γ ∋ X :=¹ B)
+    → Γ ⊢ A ⌞ ≤⁺ ⌝ τ B ⊣ Γ' ↪ B'
+    → Γ ⊢ A ⌞ ≤⁺ ⌝ τ (‶ X) ⊣ Γ' ↪ ‶ X
+
+  s-ex-typ-r=- :
+      (x-in : Γ ∋ X :=¹ B)
+    → Γ ⊢ A ⌞ ≤⁻ ⌝ τ B ⊣ Γ' ↪ B'
+    → Γ ⊢ A ⌞ ≤⁻ ⌝ τ (‶ X) ⊣ Γ' ↪ A
+
   s-ex-l^ :
       (x-in : Γ ∋^² X)
     → (cloA : Γ ⊢c¹ A)
     → (inst : [ A / X ] Γ ⟹ Γ')
     → Γ ⊢ ‶ X ⌞ ≤⁺ ⌝ τ A ⊣ Γ' ↪ A
 
+  s-ex-r^ :
+      (x-in : Γ ∋^² X)
+    → (cloA : Γ ⊢c¹ A)
+    → (inst : [ A / X ] Γ ⟹ Γ')
+    → Γ ⊢ A ⌞ ≤⁻ ⌝ τ (‶ X) ⊣ Γ' ↪ A
+
   s-ex-l= :
       (x-in : Γ ∋ X := B)
     → Γ ⊢ B ⌞ ≤⁺ ⌝ τ A ⊣ Γ' ↪ A'
     → Γ ⊢ ‶ X ⌞ ≤⁺ ⌝ τ A ⊣ Γ' ↪ A
 
-  s-ex-typ-l= :
-      (x-in : Γ ∋ X :=¹ B)
-    → Γ ⊢ B ⌞ ≤ ⌝ τ A ⊣ Γ' ↪ A'
-    → Γ ⊢ ‶ X ⌞ ≤ ⌝ τ A ⊣ Γ' ↪ A
-
-  s-ex-r^ :
-      (x-in : Γ ∋^² X)
-    → (cloA : Γ ⊢c¹ A)
-    → (inst : [ A / X ] Γ ⟹ Γ')
-    → Γ ⊢ A ⌞ ≤⁻ ⌝ τ (‶ X) ⊣ Γ' ↪ ‶ X
-
   s-ex-r= :
       (x-in : Γ ∋ X := B)
     → Γ ⊢ A ⌞ ≤⁻ ⌝ τ B ⊣ Γ' ↪ A'
-    → Γ ⊢ A ⌞ ≤⁻ ⌝ τ (‶ X) ⊣ Γ' ↪ (‶ X)
-
-  s-ex-typ-r= :
-      (x-in : Γ ∋ X :=¹ B)
-    → Γ ⊢ A ⌞ ≤ ⌝ τ B ⊣ Γ' ↪ A'
-    → Γ ⊢ A ⌞ ≤ ⌝ τ (‶ X) ⊣ Γ' ↪ (‶ X)
+    → Γ ⊢ A ⌞ ≤⁻ ⌝ τ (‶ X) ⊣ Γ' ↪ A
 
   s-arr :
-      Γ₁ ⊢ C ⌞ ⋆ ≤ ⌝ τ A ⊣ Γ₂ ↪ A'
+      Γ₁ ⊢ C ⌞ ⋆ ≤ ⌝ τ A ⊣ Γ₂ ↪ C'
     → Γ₂ ⊢ B ⌞ ≤ ⌝ τ D ⊣ Γ₃ ↪ D'
-    → Γ₁ ⊢ A `→ B ⌞ ≤ ⌝ τ (C `→ D) ⊣ Γ₃ ↪ (C `→ D)
+    → Γ₁ ⊢ A `→ B ⌞ ≤ ⌝ τ (C `→ D) ⊣ Γ₃ ↪ (C' `→ D')
 
   s-term-c :
---      (cloA : Γ ⊢c A)
+      (cloA : Γ ⊢c A)
 -- comment this one, if we restrict such condition on the typing
-      (⊢e : 𝕣 Γ ⊢ τ A ⇒ e ⇒ A')
+    → (ap : Γ ≫ A ⇘ A%)
+    → (⊢e : 𝕣 Γ ⊢ τ A% ⇒ e ⇒ A')
     → Γ ⊢ B ⌞ ≤⁺ ⌝ Σ ⊣ Γ' ↪ D
-    → Γ ⊢ (A `→ B) ⌞ ≤⁺ ⌝ ([ e ]↝ Σ) ⊣ Γ' ↪ A' `→ D
+    → Γ ⊢ (A `→ B) ⌞ ≤⁺ ⌝ ([ e ]↝ Σ) ⊣ Γ' ↪ A% `→ D
 
   s-term-o :
       (opnA : Γ ⊢o² A)
@@ -134,9 +146,9 @@ data _⊢_⌞_⌝_⊣_↪_ where
     → Γ ⊢ `∀ A ⌞ ≤ ⌝ τ (`∀ B) ⊣ Γ' ↪ `∀ C
 
   s-∀l :
-      Γ ,^ ⊢ A ⌞ ≤⁺ ⌝ ([ e' ]↝ Σ') ⊣ Γ' ,= B ↪ (C `→ D)
+      Γ ,^ ⊢ A ⌞ ≤⁺ ⌝ ([ e' ]↝ Σ') ⊣ Γ' ,= B ↪ (C' `→ D')
     → (upᶜ : ↑tyᶜ0 Σ ⇘ Σ')
     → (upᵉ : ↑tyᵉ0 e ⇘ e')
-    → (st₁ : ⟦ B ⟧ C ⇘ C')
-    → (st₂ : ⟦ B ⟧ D ⇘ D')
-    → Γ ⊢ `∀ A ⌞ ≤⁺ ⌝ ([ e ]↝ Σ) ⊣ Γ' ↪ C' `→ D'
+    → (upC : ↑ty0 C ⇘ C')
+    → (upD : ↑ty0 D ⇘ D')
+    → Γ ⊢ `∀ A ⌞ ≤⁺ ⌝ ([ e ]↝ Σ) ⊣ Γ' ↪ C `→ D

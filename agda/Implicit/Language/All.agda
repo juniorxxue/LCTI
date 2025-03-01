@@ -18,6 +18,7 @@ open import Implicit.Language.EnvOps.Base public
 -- open import Implicit.Language.Extension.All public
 
 -- open import Implicit.Language.Ground.All public
+open import Implicit.Language.Ground.Base public
 
 
 postulate
