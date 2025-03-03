@@ -65,8 +65,8 @@ data _⊢_⌞_⌝_⊣_↪_ where
 
   s-empty :
       (cloΓ : SubClosed Γ)
-    → (clo : Γ ⊢c A)
-    → Γ ≫ A ⇘ A%
+    → (cloA : Γ ⊢c A)
+    → Γ ≫² A ⇘ A%
     → Γ ⊢ A ⌞ ≤⁺ ⌝ □ ⊣ Γ ↪ A%
 
   s-var-∙ :
@@ -129,7 +129,7 @@ data _⊢_⌞_⌝_⊣_↪_ where
   s-term-c :
       (cloA : Γ ⊢c A)
 -- comment this one, if we restrict such condition on the typing
-    → (ap : Γ ≫ A ⇘ A%)
+    → (ap : Γ ≫² A ⇘ A%)
     → (⊢e : 𝕣 Γ ⊢ τ A% ⇒ e ⇒ A')
     → Γ ⊢ B ⌞ ≤⁺ ⌝ Σ ⊣ Γ' ↪ D
     → Γ ⊢ (A `→ B) ⌞ ≤⁺ ⌝ ([ e ]↝ Σ) ⊣ Γ' ↪ A% `→ D

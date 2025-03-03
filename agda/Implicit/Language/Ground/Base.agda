@@ -21,6 +21,23 @@ data _≫_⇘_ where
   grd-∀   : Γ ,∙ ≫ A ⇘ A%
           → Γ ≫ `∀ A ⇘ `∀ A%
 
+infix 3 _≫²_⇘_
+
+data _≫²_⇘_ : Env n m → Type m → Type m → Set
+data _≫²_⇘_ where
+  grd-int : Γ ≫² Int ⇘ Int
+  grd-var=¹ : Γ ∋ X :=¹ A
+          → Γ ≫² (‶ X) ⇘ (‶ X)
+  grd-var=² : Γ ∋ X :=² A
+          → Γ ≫² (‶ X) ⇘ A
+  grd-var∙ : Γ ∋∙ X
+          → Γ ≫² (‶ X) ⇘ (‶ X)
+  grd-arr : Γ ≫² A ⇘ A%
+          → Γ ≫² B ⇘ B%
+          → Γ ≫² (A `→ B) ⇘ A% `→ B%
+  grd-∀   : Γ ,∙ ≫² A ⇘ A%
+          → Γ ≫² `∀ A ⇘ `∀ A%
+
 infix 3 _≫ᵉ_⇘_
 data _≫ᵉ_⇘_ : Env n m → Term n m → Term n m → Set where
   grd-lit : ∀ {num} → Γ ≫ᵉ lit num ⇘ lit num
