@@ -11,7 +11,8 @@ data _⊢_#_⌞_⌝_ : Env n m → Counter → Type m → Polar → Type m → S
   s-refl :
       (cloΓ : SubClosed Γ)
     → (cloA : Γ ⊢c A)
-    → Γ ⊢ Z # A ⌞ ≤⁺ ⌝ A
+    → (grd : Γ ≫² A ⇘ A%)
+    → Γ ⊢ Z # A ⌞ ≤⁺ ⌝ A%
   s-int :
       (cloΓ : SubClosed Γ)
     → Γ ⊢ ∞ # Int ⌞ ≤ ⌝ Int
@@ -28,26 +29,27 @@ data _⊢_#_⌞_⌝_ : Env n m → Counter → Type m → Polar → Type m → S
     → Γ ⊢ ∞ # B ⌞ ≤ ⌝ D
     → Γ ⊢ ∞ # A `→ B ⌞ ≤ ⌝ C `→ D
   s-arr₂ :
-      (opnA : Γ ⊢o²' A)
-    → Γ ⊢ ∞ # C ⌞ ≤⁻ ⌝ A
+--      (opnA : Γ ⊢o²' A)
+      Γ ⊢ ∞ # C ⌞ ≤⁻ ⌝ A
     → Γ ⊢ j # B ⌞ ≤⁺ ⌝ D
     → Γ ⊢ 𝕚 j # A `→ B ⌞ ≤⁺ ⌝ C `→ D
   s-arr₃ :
       (cloA : Γ ⊢c A)
+    → (grd : Γ ≫² A ⇘ A%)
     → Γ ⊢ j # B ⌞ ≤⁺ ⌝ D
-    → Γ ⊢ 𝕔 j # A `→ B ⌞ ≤⁺ ⌝ A `→ D
+    → Γ ⊢ 𝕔 j # A `→ B ⌞ ≤⁺ ⌝ A% `→ D
   s-∀ :
       Γ ,∙ ⊢ ∞ # A ⌞ ≤ ⌝ B
     → Γ ⊢ ∞ # `∀ A ⌞ ≤ ⌝ `∀ B
   s-∀l :
-      Γ ,= B ⊢ j # A ⌞ ≤⁺ ⌝ C `→ D
+      Γ ,= B ⊢ j # A ⌞ ≤⁺ ⌝ C' `→ D'
   -- we guess a solution of B here, we must make sure this B is provided from the counter
   -- what we does is to make sure the all inputs matching the counter should at least have the quantifer contained
     → (ic : (𝕚𝕔 j))
     → (fd : find A #0 j)
-    → (stC : ⟦ B ⟧ C ⇘ C*)
-    → (stD : ⟦ B ⟧ D ⇘ D*)
-    → Γ ⊢ j # `∀ A ⌞ ≤⁺ ⌝ C* `→ D*
+    → (upC : ↑ty0 C ⇘ C')
+    → (upD : ↑ty0 D ⇘ D')
+    → Γ ⊢ j # `∀ A ⌞ ≤⁺ ⌝ C `→ D
   -- two atomic rules
   s-var-sub-l : ∀ {X A}
     → (cloA : Γ ⊢c¹ A)

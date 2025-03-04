@@ -14,39 +14,39 @@ open import Implicit.Algo.Base
      → Γ ⊆ Δ
      → Δ ≫² A ⇘ A%
 ⊆-≫² grd-int ext = grd-int
-⊆-≫² (grd-var=¹ x) ext = {!!}
+⊆-≫² (grd-var=¹ x) ext = {!!!}
 ⊆-≫² (grd-var=² x) ext = grd-var=² {!!}
 ⊆-≫² (grd-var∙ x) ext = {!!}
 ⊆-≫² (grd-arr grd grd₁) ext = grd-arr (⊆-≫² grd ext) (⊆-≫² grd₁ ext)
 ⊆-≫² (grd-∀ grd) ext = grd-∀ (⊆-≫² grd (uvar ext))
 
 
-test : Γ ⊢ A₂ ⌞ ≤⁺ ⌝ τ B ⊣ Δ ↪ A₃
+sub-≫²-prv : Γ ⊢ A₂ ⌞ ≤⁺ ⌝ τ B ⊣ Δ ↪ A₃
      → Γ ≫² A₁ ⇘ A₂
      → Γ ⊢ A₁ ⌞ ≤⁺ ⌝ τ B ⊣ Δ ↪ A₃
 
-test' : Γ ⊢ B ⌞ ≤⁻ ⌝ τ A₂ ⊣ Δ ↪ A₃
+sub-≫²-prv' : Γ ⊢ B ⌞ ≤⁻ ⌝ τ A₂ ⊣ Δ ↪ A₃
       → Γ ≫² A₁ ⇘ A₂
       → Γ ⊢ B ⌞ ≤⁻ ⌝ τ A₁ ⊣ Δ ↪ A₃
 
-test {A₁ = Int} s grd-int = s
-test {A₁ = ‶ X} s (grd-var=¹ x) = s
-test {A₁ = ‶ X} s (grd-var=² x) = {!!}
-test {A₁ = ‶ X} s (grd-var∙ x) = s
-test {A₁ = A₁ `→ A₂} (s-ex-typ-r=+ x-in s) (grd-arr ap ap₁) = s-ex-typ-r=+ x-in (test s (grd-arr ap ap₁))
-test {A₁ = A₁ `→ A₂} (s-arr s s₁) (grd-arr ap ap₁) = s-arr (test' s ap) (test s₁ (⊆-≫² ap₁ {!!}))
-test {A₁ = `∀ A₁} (s-ex-typ-r=+ x-in s) (grd-∀ ap) = s-ex-typ-r=+ x-in (test s (grd-∀ ap))
-test {A₁ = `∀ A₁} (s-∀ s) (grd-∀ ap) = s-∀ (test s ap)
+sub-≫²-prv {A₁ = Int} s grd-int = s
+sub-≫²-prv {A₁ = ‶ X} s (grd-var=¹ x) = s
+sub-≫²-prv {A₁ = ‶ X} s (grd-var=² x) = {!!}
+sub-≫²-prv {A₁ = ‶ X} s (grd-var∙ x) = s
+sub-≫²-prv {A₁ = A₁ `→ A₂} (s-ex-typ-r=+ x-in s) (grd-arr ap ap₁) = s-ex-typ-r=+ x-in (sub-≫²-prv s (grd-arr ap ap₁))
+sub-≫²-prv {A₁ = A₁ `→ A₂} (s-arr s s₁) (grd-arr ap ap₁) = s-arr (sub-≫²-prv' s ap) (sub-≫²-prv s₁ (⊆-≫² ap₁ {!!}))
+sub-≫²-prv {A₁ = `∀ A₁} (s-ex-typ-r=+ x-in s) (grd-∀ ap) = s-ex-typ-r=+ x-in (sub-≫²-prv s (grd-∀ ap))
+sub-≫²-prv {A₁ = `∀ A₁} (s-∀ s) (grd-∀ ap) = s-∀ (sub-≫²-prv s ap)
 
 
-test' {A₁ = Int} s grd-int = s
-test' {A₁ = ‶ X} s (grd-var=¹ x) = s
-test' {A₁ = ‶ X} s (grd-var=² x) = {!!}
-test' {A₁ = ‶ X} s (grd-var∙ x) = s
-test' {A₁ = A₁ `→ A₂} (s-ex-typ-l=- x-in s) (grd-arr ap ap₁) = s-ex-typ-l=- x-in (test' s (grd-arr ap ap₁))
-test' {A₁ = A₁ `→ A₂} (s-arr s s₁) (grd-arr ap ap₁) = s-arr (test s ap) (test' s₁ (⊆-≫² ap₁ {!!}))
-test' {A₁ = `∀ A₁} (s-ex-typ-l=- x-in s) (grd-∀ ap) = s-ex-typ-l=- x-in (test' s (grd-∀ ap))
-test' {A₁ = `∀ A₁} (s-∀ s) (grd-∀ ap) = s-∀ (test' s ap)
+sub-≫²-prv' {A₁ = Int} s grd-int = s
+sub-≫²-prv' {A₁ = ‶ X} s (grd-var=¹ x) = s
+sub-≫²-prv' {A₁ = ‶ X} s (grd-var=² x) = {!!}
+sub-≫²-prv' {A₁ = ‶ X} s (grd-var∙ x) = s
+sub-≫²-prv' {A₁ = A₁ `→ A₂} (s-ex-typ-l=- x-in s) (grd-arr ap ap₁) = s-ex-typ-l=- x-in (sub-≫²-prv' s (grd-arr ap ap₁))
+sub-≫²-prv' {A₁ = A₁ `→ A₂} (s-arr s s₁) (grd-arr ap ap₁) = s-arr (sub-≫²-prv s ap) (sub-≫²-prv' s₁ (⊆-≫² ap₁ {!!}))
+sub-≫²-prv' {A₁ = `∀ A₁} (s-ex-typ-l=- x-in s) (grd-∀ ap) = s-ex-typ-l=- x-in (sub-≫²-prv' s (grd-∀ ap))
+sub-≫²-prv' {A₁ = `∀ A₁} (s-∀ s) (grd-∀ ap) = s-∀ (sub-≫²-prv' s ap)
 
 
 -- s-trans : Γ ⊢ A₁ ⌞ ≤ ⌝ Σ ⊣ Δ ↪ A₂
