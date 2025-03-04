@@ -3,26 +3,6 @@ module Implicit.Algo.New.Extension where
 open import Implicit.Language.All hiding (_⊆_)
 open import Implicit.Algo.Base
 
-infix 3 _⊆_
-data _⊆_ : Env n m → Env n m → Set where
-  uvar :
-      Γ ⊆ Δ
-    → Γ ,∙ ⊆ Δ ,∙
-  var :
-      Γ ⊆ Δ
-    → Γ , A ⊆ Δ , A
-  evar :
-      Γ ⊆ Δ
-    → Γ ,^ ⊆ Δ ,^
-  evar-sol :
-      Γ ⊆ Δ
-    → (cloA : Δ ⊢c A)
-    → Γ ,^ ⊆ Δ ,= A
-  svar :
-      Γ ⊆ Δ
-    → Γ ,= A ⊆ Δ ,= A
-  mark : TypEnv Γ
-       → Γ ⋈ ⊆ Γ ⋈
 
 ⊆-refl : SubEnv Γ
        → Γ ⊆ Γ

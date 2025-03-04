@@ -20,150 +20,54 @@ data _∋_⦂_ : Env n m → Fin n → Type m → Set where
      → (up : ↑ty0 A ⇘ A')
      → Γ ,= B ∋ x ⦂ A'
 
--- lookup an entry: solution
+-- lookup an entry in subtyping env : solution
 infix 3 _∋_:=_
 data _∋_:=_ : Env n m → Fin m → Type m → Set where
-  Z  : (up : ↑ty0 A ⇘ A')
-     → Γ ,= A ∋ #0 := A'
-  S, : Γ ∋ k := A
-     → Γ , B ∋ k := A
-  S∙ : Γ ∋ k := A
+  Z  : SEnv Δ
      → (up : ↑ty0 A ⇘ A')
-     → Γ ,∙ ∋ #S k := A'
-  S^ : Γ ∋ k := A
+     → Δ ,= A ∋ #0 := A'
+  S, : Δ ∋ k := A
+     → Δ , B ∋ k := A
+  S∙ : Δ ∋ k := A
      → (up : ↑ty0 A ⇘ A')
-     → Γ ,^ ∋ #S k := A'
-  S= : Γ ∋ k := A
+     → Δ ,∙ ∋ #S k := A'
+  S^ : Δ ∋ k := A
      → (up : ↑ty0 A ⇘ A')
-     → Γ ,= B ∋ #S k := A'
-  S⋈ : Γ ∋ k := A
-     → Γ ⋈ ∋ k := A
+     → Δ ,^ ∋ #S k := A'
+  S= : Δ ∋ k := A
+     → (up : ↑ty0 A ⇘ A')
+     → Δ ,= B ∋ #S k := A'
 
-
-infix 3 _∋_:=¹_
-data _∋_:=¹_ : Env n m → Fin m → Type m → Set where
-  S, : Γ ∋ k :=¹ A
-     → Γ , B ∋ k :=¹ A
-  S∙ : Γ ∋ k :=¹ A
-     → (up : ↑ty0 A ⇘ A')
-     → Γ ,∙ ∋ #S k :=¹ A'
-  S^ : Γ ∋ k :=¹ A
-     → (up : ↑ty0 A ⇘ A')
-     → Γ ,^ ∋ #S k :=¹ A'
-  S= : Γ ∋ k :=¹ A
-     → (up : ↑ty0 A ⇘ A')
-     → Γ ,= B ∋ #S k :=¹ A'
-  S⋈ : Γ ∋ X := A
-     → Γ ⋈ ∋ X :=¹ A
-
-infix 3 _∋_:=²_
-data _∋_:=²_ : Env n m → Fin m → Type m → Set where
-  Z= : ↑ty0 A ⇘ A'
-     → Γ ,= A ∋ #0 :=² A'
-  S∙ : Γ ∋ k :=² A
-     → (up : ↑ty0 A ⇘ A')
-     → Γ ,∙ ∋ #S k :=² A'
-  S^ : Γ ∋ k :=² A
-     → (up : ↑ty0 A ⇘ A')
-     → Γ ,^ ∋ #S k :=² A'
-  S= : Γ ∋ k :=² A
-     → (up : ↑ty0 A ⇘ A')
-     → Γ ,= B ∋ #S k :=² A'
-
--- lookup an entry: solution (simpler ver.)
+-- lookup an entry in subtyping env: solution (simpler ver.)
 infix 3 _∋=_
 data _∋=_ : Env n m → Fin m → Set where
-  Z  : Γ ,= A ∋= #0
-  S, : Γ ∋= k
-     → Γ , B ∋= k
-  S∙ : Γ ∋= k
-     → Γ ,∙ ∋= #S k
-  S^ : Γ ∋= k
-     → Γ ,^ ∋= #S k
-  S= : Γ ∋= k
-     → Γ ,= B ∋= #S k
-  S⋈ : Γ ∋= k
-     → Γ ⋈ ∋= k
+  Z  : SEnv Δ
+     → Δ ,= A ∋= #0
+  S, : Δ ∋= k
+     → Δ , B ∋= k
+  S∙ : Δ ∋= k
+     → Δ ,∙ ∋= #S k
+  S^ : Δ ∋= k
+     → Δ ,^ ∋= #S k
+  S= : Δ ∋= k
+     → Δ ,= B ∋= #S k
 
--- this lookup works on the subtyping environment;
--- but lookup an entry: solution in the (inner) typing environment.
-infix 3 _∋=¹_
-data _∋=¹_ : Env n m → Fin m → Set where
-{-
-  Z  : TypEnv Γ
-     → Γ ,= A ∋=¹ #0
--}
-  S, : Γ ∋=¹ k
-     → Γ , B ∋=¹ k
-  S∙ : Γ ∋=¹ k
-     → Γ ,∙ ∋=¹ #S k
-  S^ : Γ ∋=¹ k
-     → Γ ,^ ∋=¹ #S k
-  S= : Γ ∋=¹ k
-     → Γ ,= B ∋=¹ #S k
-  S⋈ : Γ ∋= k
-    →  Γ ⋈ ∋=¹ k
-
--- lookup an entry: (unsolved) existential variable
+-- lookup an entry in subtyping env: (unsolved) existential variable
 infix 3 _∋^_
 data _∋^_ : Env n m → Fin m → Set where
-  Z  : Γ ,^ ∋^ #0
-  S, : Γ ∋^ k
-     → Γ , A ∋^ k
-  S∙ : Γ ∋^ k
-     → Γ ,∙ ∋^ #S k
-  S= : Γ ∋^ k
-     → Γ ,= B ∋^ #S k
-  S^ : Γ ∋^ k
-     → Γ ,^ ∋^ #S k
-  S⋈ : Γ ∋^ k
-     → Γ ⋈ ∋^ k
-
--- ex variable in SubEnv
-infix 3 _∋^²_
-data _∋^²_ : Env n m → Fin m → Set where
-  Z^ : Γ ,^ ∋^² #0
-  S, : Γ ∋^² k
-     → Γ , B ∋^² k
-  S∙ : Γ ∋^² k
-     → Γ ,∙ ∋^² #S k
-  S^ : Γ ∋^² k
-     → Γ ,^ ∋^² #S k
-  S= : Γ ∋^² k
-     → Γ ,= B ∋^² #S k
-
--- sol variable in SubEnv
-infix 3 _∋=²_
-data _∋=²_ : Env n m → Fin m → Set where
-  Z^ : Γ ,= A ∋=² #0
-  S, : Γ ∋=² k
-     → Γ , B ∋=² k
-  S∙ : Γ ∋=² k
-     → Γ ,∙ ∋=² #S k
-  S^ : Γ ∋=² k
-     → Γ ,^ ∋=² #S k
-  S= : Γ ∋=² k
-     → Γ ,= B ∋=² #S k
-
-{-
--- ex variable in SubEnv, not sure where is it used
-infix 3 _∋^=²_
-data _∋^=²_ : Env n m → Fin m → Set where
-  Z^ : SubEnv Γ
-     → Γ ,^ ∋^=² #0
-  Z= : SubEnv Γ
-     → Γ ,= A ∋^=² #0
-  S, : Γ ∋^=² k
-     → Γ , B ∋^=² k
-  S∙ : Γ ∋^=² k
-     → Γ ,∙ ∋^=² #S k
-  S^ : Γ ∋^=² k
-     → Γ ,^ ∋^=² #S k
-  S= : Γ ∋^=² k
-     → Γ ,= B ∋^=² #S k
--}
+  Z  : SEnv Δ
+     → Δ ,^ ∋^ #0
+  S, : Δ ∋^ k
+     → Δ , A ∋^ k
+  S∙ : Δ ∋^ k
+     → Δ ,∙ ∋^ #S k
+  S= : Δ ∋^ k
+     → Δ ,= B ∋^ #S k
+  S^ : Δ ∋^ k
+     → Δ ,^ ∋^ #S k
 
 -- lookup an entry: universal variable
+-- works on either typing or subtyping env
 infix 3 _∋∙_
 data _∋∙_ : Env n m → Fin m → Set where
   Z  : Γ ,∙ ∋∙ #0
@@ -174,6 +78,6 @@ data _∋∙_ : Env n m → Fin m → Set where
   S= : Γ ∋∙ k
      → Γ ,= B ∋∙ #S k
   S^ : Γ ∋∙ k
-    → Γ ,^ ∋∙ #S k
+     → Γ ,^ ∋∙ #S k
   S⋈ : Γ ∋∙ k
      → Γ ⋈ ∋∙ k

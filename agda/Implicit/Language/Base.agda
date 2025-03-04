@@ -63,34 +63,31 @@ data Env : ℕ → ℕ → Set where
   _⋈    : Env n m → Env n m
 
 variable
-  Γ Γ' Γ'' Γ₁ Γ₂ Γ₃ Γ* : Env n m
-  Γ% : Env n m
-  Δ Δ' Δ₁ Δ₂ : Env n m
-  Ψ Ω : Env n m
+  Γ Γ' Γ'' Γ₁ Γ₂ Γ₃ Γ* Γ% : Env n m -- typing env
+  Δ Δ' Δ₁ Δ₂ Ψ Ω : Env n m -- subtyping env
 
-data TypEnv : Env n m → Set where
-  Z⋈ : TypEnv ∅
-  S, : TypEnv Γ
-     → TypEnv (Γ , A)
-  S= : TypEnv Γ
-     → TypEnv (Γ ,= B)
-  S∙ : TypEnv Γ
-     → TypEnv (Γ ,∙)
-  S^ : TypEnv Γ
-     → TypEnv (Γ ,^)
+data TEnv : Env n m → Set where
+  Z⋈ : TEnv ∅
+  S, : TEnv Γ
+     → TEnv (Γ , A)
+  S= : TEnv Γ
+     → TEnv (Γ ,= B)
+  S∙ : TEnv Γ
+     → TEnv (Γ ,∙)
+  S^ : TEnv Γ
+     → TEnv (Γ ,^)
 
-data SubEnv : Env n m → Set where
-  Z⋈ : TypEnv Γ
-     → SubEnv (Γ ⋈)
-  S, : SubEnv Γ
-     → SubEnv (Γ , A)
-  S= : SubEnv Γ
-     → SubEnv (Γ ,= B)
-  S∙ : SubEnv Γ
-     → SubEnv (Γ ,∙)
-  S^ : SubEnv Γ
-     → SubEnv (Γ ,^)
-
+data SEnv : Env n m → Set where
+  Z⋈ : TEnv Γ
+     → SEnv (Γ ⋈)
+  S, : SEnv Δ
+     → SEnv (Δ , A)
+  S= : SEnv Δ
+     → SEnv (Δ ,= B)
+  S∙ : SEnv Δ
+     → SEnv (Δ ,∙)
+  S^ : SEnv Δ
+     → SEnv (Δ ,^)
 
 𝕣 : Env n m → Env n m
 𝕣 ∅ = ∅

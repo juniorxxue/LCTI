@@ -4,6 +4,7 @@ open import Implicit.Language.Base
 open import Implicit.Language.Shift.All
 open import Implicit.Language.Subst.All
 open import Implicit.Language.OpenClose.Base
+open import Implicit.Language.Regular.Base
 
 ----------------------------------------------------------------------
 --+                         Entry Removal                          +--
@@ -199,8 +200,8 @@ data _▶_,=_⇘_ : Env n m → Fin (1 + m) → Type m → Env n (1 + m) → Set
 infix 3 [_/_]_⟹_
 data [_/_]_⟹_ : Type m → Fin m → Env n m → Env n m → Set where
   ⟹^0 : (up : ↑ty0 A ⇘ A')
-        → (cloA : Γ ⊢c A)
-        → (env : SubEnv Γ)
+        → (regA : Γ ⊢r A)
+        → (env : SEnv Γ)
         → [ A' / #0 ] (Γ ,^) ⟹ (Γ ,= A)
 
   ⟹^S : [ A / k ] Γ ⟹ Γ'

@@ -9,57 +9,57 @@ open import Implicit.Language.All
 infix 3 _⊢_#_⌞_⌝_
 data _⊢_#_⌞_⌝_ : Env n m → Counter → Type m → Polar → Type m → Set where
   s-refl :
-      (cloΓ : SubClosed Γ)
-    → (cloA : Γ ⊢c A)
-    → (grd : Γ ≫ A ⇘ A%)
-    → Γ ⊢ Z # A ⌞ ≤⁺ ⌝ A%
+      (regΔ : SRegular Δ)
+    → (cloA : Δ ⊢c A)
+    → (grd : Δ ≫ A ⇘ A%)
+    → Δ ⊢ Z # A ⌞ ≤⁺ ⌝ A%
   s-int :
-      (cloΓ : SubClosed Γ)
-    → Γ ⊢ ∞ # Int ⌞ ≤ ⌝ Int
+      (regΔ : SRegular Δ)
+    → Δ ⊢ ∞ # Int ⌞ ≤ ⌝ Int
   s-var-∙ :
-      (cloΓ : SubClosed Γ)
-    → (inΓ : Γ ∋∙ X)
-    → Γ ⊢ ∞ # ‶ X ⌞ ≤ ⌝ ‶ X
+      (regΔ : SRegular Δ)
+    → (inΔ : Δ ∋∙ X)
+    → Δ ⊢ ∞ # ‶ X ⌞ ≤ ⌝ ‶ X
   s-arr₁ :
-      Γ ⊢ ∞ # C ⌞ ⋆ ≤ ⌝ A
-    → Γ ⊢ ∞ # B ⌞ ≤ ⌝ D
-    → Γ ⊢ ∞ # A `→ B ⌞ ≤ ⌝ C `→ D
+      Δ ⊢ ∞ # C ⌞ ⋆ ≤ ⌝ A
+    → Δ ⊢ ∞ # B ⌞ ≤ ⌝ D
+    → Δ ⊢ ∞ # A `→ B ⌞ ≤ ⌝ C `→ D
   s-arr₂ :
-      Γ ⊢ ∞ # C ⌞ ≤⁻ ⌝ A
-    → Γ ⊢ j # B ⌞ ≤⁺ ⌝ D
-    → Γ ⊢ 𝕚 j # A `→ B ⌞ ≤⁺ ⌝ C `→ D
+      Δ ⊢ ∞ # C ⌞ ≤⁻ ⌝ A
+    → Δ ⊢ j # B ⌞ ≤⁺ ⌝ D
+    → Δ ⊢ 𝕚 j # A `→ B ⌞ ≤⁺ ⌝ C `→ D
   s-arr₃ :
-      (cloA : Γ ⊢c A)
-    → (grd : Γ ≫ A ⇘ A%)
-    → Γ ⊢ j # B ⌞ ≤⁺ ⌝ D
-    → Γ ⊢ 𝕔 j # A `→ B ⌞ ≤⁺ ⌝ A% `→ D
+      (cloA : Δ ⊢c A)
+    → (grd : Δ ≫ A ⇘ A%)
+    → Δ ⊢ j # B ⌞ ≤⁺ ⌝ D
+    → Δ ⊢ 𝕔 j # A `→ B ⌞ ≤⁺ ⌝ A% `→ D
   s-∀ :
-      Γ ,∙ ⊢ ∞ # A ⌞ ≤ ⌝ B
-    → Γ ⊢ ∞ # `∀ A ⌞ ≤ ⌝ `∀ B
+      Δ ,∙ ⊢ ∞ # A ⌞ ≤ ⌝ B
+    → Δ ⊢ ∞ # `∀ A ⌞ ≤ ⌝ `∀ B
   s-∀l :
-      Γ ,= B ⊢ j # A ⌞ ≤⁺ ⌝ C' `→ D'
+      Δ ,= B ⊢ j # A ⌞ ≤⁺ ⌝ C' `→ D'
     → (ic : (𝕚𝕔 j))
     → (fd : find A #0 j)
     → (upC : ↑ty0 C ⇘ C')
     → (upD : ↑ty0 D ⇘ D')
-    → Γ ⊢ j # `∀ A ⌞ ≤⁺ ⌝ C `→ D
+    → Δ ⊢ j # `∀ A ⌞ ≤⁺ ⌝ C `→ D
   -- two atomic rules
   s-var-sub-l : ∀ {X A}
-    → (cloA : Γ ⊢c¹ A)
-    → (inΓ : Γ ∋ X :=² A)
-    → Γ ⊢ ∞ # ‶ X ⌞ ≤⁺ ⌝ A
+    → (SRegular Δ)
+    → (inΔ : Δ ∋ X := A)
+    → Δ ⊢ ∞ # ‶ X ⌞ ≤⁺ ⌝ A
   s-var-sub-r : ∀ {X A}
-    → (cloA : Γ ⊢c¹ A)
-    → (inΓ : Γ ∋ X :=² A)
-    → Γ ⊢ ∞ # A ⌞ ≤⁻ ⌝ ‶ X
+    → (SRegular Δ)
+    → (inΔ : Δ ∋ X := A)
+    → Δ ⊢ ∞ # A ⌞ ≤⁻ ⌝ ‶ X
 
-s-refl-∞ : SubClosed Γ
-         → Γ ⊢c¹ A
+s-refl-∞ : SRegular Γ
+         → Γ ⊢r A
          → Γ ⊢ ∞ # A ⌞ ≤ ⌝ A
-s-refl-∞ cloΓ ⊢c¹-int = s-int cloΓ
-s-refl-∞ cloΓ (⊢c¹-var-∙ inΓ) = s-var-∙ cloΓ inΓ
-s-refl-∞ cloΓ (⊢c¹-arr cloA cloA₁) = s-arr₁ (s-refl-∞ cloΓ cloA) (s-refl-∞ cloΓ cloA₁)
-s-refl-∞ cloΓ (⊢c¹-∀ cloA) = s-∀ (s-refl-∞ (clo-S∙ cloΓ) cloA)
+s-refl-∞ regΓ ⊢r-int = s-int regΓ
+s-refl-∞ regΓ (⊢r-var-∙ inΓ) = s-var-∙ regΓ inΓ
+s-refl-∞ regΓ (⊢r-arr regA regA₁) = s-arr₁ (s-refl-∞ regΓ regA) (s-refl-∞ regΓ regA₁)
+s-refl-∞ regΓ (⊢r-∀ regA) = s-∀ (s-refl-∞ (clo-S∙ regΓ) regA)
 
 ----------------------------------------------------------------------
 --+                             Typing                             +--
@@ -68,10 +68,10 @@ s-refl-∞ cloΓ (⊢c¹-∀ cloA) = s-∀ (s-refl-∞ (clo-S∙ cloΓ) cloA)
 infix 3 _⊢_#_⦂_
 data _⊢_#_⦂_ : Env n m → Counter → Term n m → Type m → Set where
   ⊢lit : ∀ {num : ℕ}
-    → (cloΓ : TypClosed Γ)
+    → (cloΓ : TRegular Γ)
     → Γ ⊢ Z # (lit num) ⦂ Int
   ⊢var :
-      (cloΓ : TypClosed Γ)
+      (cloΓ : TRegular Γ)
     → (x∈Γ : Γ ∋ x ⦂ A)
     → Γ ⊢ Z # ` x ⦂ A
   ⊢ann :

@@ -1,0 +1,62 @@
+module Implicit.Language.Regular.Base where
+
+open import Implicit.Language.Base
+open import Implicit.Language.Lookup.Base
+
+-- a regular type, just like system-f types
+infix 3 _⊢r_
+data _⊢r_ : Env n m → Type m → Set where
+  ⊢r-int :
+      Γ ⊢r Int
+  ⊢r-var-∙ :
+      (inΓ : Γ ∋∙ X)
+    → Γ ⊢r ‶ X
+  ⊢r-arr :
+      Γ ⊢r A
+    → Γ ⊢r B
+    → Γ ⊢r (A `→ B)
+  ⊢r-∀ :
+      Γ ,∙ ⊢r A
+    → Γ ⊢r `∀ A
+
+data Regular : Env n m → Set where
+  reg-Z : Regular ∅
+  reg-S, : Regular Γ
+         → (regA : Γ ⊢r A)
+         → Regular (Γ , A)
+  reg-S∙ : Regular Γ
+         → Regular (Γ ,∙)
+  reg-S^ : Regular Γ
+         → Regular (Γ ,^)
+  reg-S= : Regular Γ
+         → (regA : Γ ⊢r A)
+         → Regular (Γ ,= A)
+  reg-S⋈ : Regular Γ
+         → Regular (Γ ⋈)
+
+data TRegular : Env n m → Set where
+  reg-Z : TRegular ∅
+  reg-S, : TRegular Γ
+         → (regA : Γ ⊢r A)
+         → TRegular (Γ , A)
+  reg-S∙ : TRegular Γ
+         → TRegular (Γ ,∙)
+  reg-S^ : TRegular Γ
+         → TRegular (Γ ,^)
+  reg-S= : TRegular Γ
+         → (regA : Γ ⊢r A) -- we never access this entry, it's only created by initials
+         → TRegular (Γ ,= A)
+
+data SRegular : Env n m → Set where
+  reg-Z : TRegular Γ
+        → SRegular (Γ ⋈)
+  reg-S, : SRegular Δ
+         → (regA : Δ ⊢r A)
+         → SRegular (Δ , A)
+  reg-S∙ : SRegular Δ
+         → SRegular (Δ ,∙)
+  reg-S^ : SRegular Δ
+         → SRegular (Δ ,^)
+  reg-S= : SRegular Δ
+         → (regA : Δ ⊢r A)
+         → SRegular (Δ ,= A)

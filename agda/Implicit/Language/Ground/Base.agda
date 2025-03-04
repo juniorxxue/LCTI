@@ -10,16 +10,16 @@ open import Implicit.Language.EnvOps.Base
 infix 3 _≫_⇘_
 data _≫_⇘_ : Env n m → Type m → Type m → Set
 data _≫_⇘_ where
-  grd-int : Γ ≫ Int ⇘ Int
-  grd-var= : Γ ∋ X :=² A
-           → Γ ≫ (‶ X) ⇘ A
-  grd-var∙ : Γ ∋∙ X
-          → Γ ≫ (‶ X) ⇘ (‶ X)
-  grd-arr : Γ ≫ A ⇘ A%
-          → Γ ≫ B ⇘ B%
-          → Γ ≫ (A `→ B) ⇘ A% `→ B%
-  grd-∀   : Γ ,∙ ≫ A ⇘ A%
-          → Γ ≫ `∀ A ⇘ `∀ A%
+  grd-int : Δ ≫ Int ⇘ Int
+  grd-var= : Δ ∋ X := A
+           → Δ ≫ (‶ X) ⇘ A
+  grd-var∙ : Δ ∋∙ X
+          → Δ ≫ (‶ X) ⇘ (‶ X)
+  grd-arr : Δ ≫ A ⇘ A%
+          → Δ ≫ B ⇘ B%
+          → Δ ≫ (A `→ B) ⇘ A% `→ B%
+  grd-∀   : Δ ,∙ ≫ A ⇘ A%
+          → Δ ≫ `∀ A ⇘ `∀ A%
 
 infix 3 _≫ᵉ_⇘_
 data _≫ᵉ_⇘_ : Env n m → Term n m → Term n m → Set where

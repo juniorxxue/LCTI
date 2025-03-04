@@ -13,44 +13,44 @@ open import Implicit.Algo.Split public
 infix 3 _⊢_⌞_⌝_⊣_
 data _⊢_⌞_⌝_⊣_ : Env n m → Type m → Polar → Type m → Env n m → Set where
   s-int :
-      (cloΓ : SubClosed Γ)
-    → Γ ⊢ Int ⌞ ≤ ⌝ Int ⊣ Γ
+      (regΓ : SRegular Γ)
+    → Δ ⊢ Int ⌞ ≤ ⌝ Int ⊣ Δ
 
   s-var-∙ :
-      (cloΓ : SubClosed Γ)
-    → Γ ∋∙ X
-    → Γ ⊢ (‶ X) ⌞ ≤ ⌝ (‶ X) ⊣ Γ
+      (regΓ : SRegular Γ)
+    → Δ ∋∙ X
+    → Δ ⊢ (‶ X) ⌞ ≤ ⌝ (‶ X) ⊣ Δ
 
   s-ex-l^ :
-      (x-in : Γ ∋^² X)
-    → (cloA : Γ ⊢c¹ A)
-    → (inst : [ A / X ] Γ ⟹ Δ)
-    → Γ ⊢ ‶ X ⌞ ≤⁺ ⌝ A ⊣ Δ
+--      (x-in : Δ ∋^ X)
+--    → (regA : Δ ⊢r A)
+      (inst : [ A / X ] Δ ⟹ Ψ)
+    → Δ ⊢ ‶ X ⌞ ≤⁺ ⌝ A ⊣ Ψ
 
   s-ex-r^ :
-      (x-in : Γ ∋^² X)
-    → (cloA : Γ ⊢c¹ A)
-    → (inst : [ A / X ] Γ ⟹ Δ)
-    → Γ ⊢ A ⌞ ≤⁻ ⌝ (‶ X) ⊣ Δ
+--      (x-in : Δ ∋^ X) -- implied by inst
+--    → (regA : Γ ⊢r A) -- implied by the inst
+      (inst : [ A / X ] Δ ⟹ Ψ)
+    → Δ ⊢ A ⌞ ≤⁻ ⌝ (‶ X) ⊣ Ψ
 
   s-ex-l= :
-      (cloΓ : SubClosed Γ)
-    → (x-in : Γ ∋ X :=² A)
-    → Γ ⊢ ‶ X ⌞ ≤⁺ ⌝ A ⊣ Γ
+      (regΓ : SRegular Δ)
+    → (x-in : Δ ∋ X := A)
+    → Δ ⊢ ‶ X ⌞ ≤⁺ ⌝ A ⊣ Δ
 
   s-ex-r= :
-      (cloΓ : SubClosed Γ)
-    → (x-in : Γ ∋ X :=² A)
-    → Γ ⊢ A ⌞ ≤⁻ ⌝ (‶ X) ⊣ Γ
+      (regΓ : SRegular Δ)
+    → (x-in : Δ ∋ X := A)
+    → Δ ⊢ A ⌞ ≤⁻ ⌝ (‶ X) ⊣ Δ
 
   s-arr :
-      Γ ⊢ C ⌞ ⋆ ≤ ⌝ A ⊣ Ω
-    → Ω ⊢ B ⌞ ≤ ⌝ D ⊣ Δ
-    → Γ ⊢ A `→ B ⌞ ≤ ⌝ (C `→ D) ⊣ Δ
+      Δ ⊢ C ⌞ ⋆ ≤ ⌝ A ⊣ Ω
+    → Ω ⊢ B ⌞ ≤ ⌝ D ⊣ Ψ
+    → Δ ⊢ A `→ B ⌞ ≤ ⌝ (C `→ D) ⊣ Ψ
 
   s-∀ :
-      Γ ,∙ ⊢ A ⌞ ≤ ⌝ B ⊣ Δ ,∙
-    → Γ ⊢ `∀ A ⌞ ≤ ⌝ (`∀ B) ⊣ Δ
+      Δ ,∙ ⊢ A ⌞ ≤ ⌝ B ⊣ Ψ ,∙
+    → Δ ⊢ `∀ A ⌞ ≤ ⌝ (`∀ B) ⊣ Ψ
 
 infix 3 _⊢_⇒_⇒_
 infix 3 _⊢_≤⁺_⊣_↪_
@@ -61,11 +61,11 @@ data _⊢_≤⁺_⊣_↪_ : Env n m → Type m → Context n m → Env n m → T
 data _⊢_⇒_⇒_ where
 
   ⊢lit : ∀ {num : ℕ}
-    → (cloΓ : TypClosed Γ)
+    → (regΓ : TRegular Γ)
     → Γ ⊢ □ ⇒ lit num ⇒ Int
 
   ⊢var :
-      (cloΓ : TypClosed Γ)
+      (cloΓ : TRegular Γ)
     → (x∈Γ : Γ ∋ x ⦂ A)
     → Γ ⊢ □ ⇒ ` x ⇒ A
 
@@ -101,33 +101,33 @@ data _⊢_⇒_⇒_ where
 data _⊢_≤⁺_⊣_↪_ where
 
   s-empty :
-      (cloΓ : SubClosed Γ)
-    → (cloA : Γ ⊢c A)
-    → Γ ≫ A ⇘ A%
-    → Γ ⊢ A ≤⁺ □ ⊣ Γ ↪ A%
+      (cloΓ : SRegular Δ)
+    → (cloA : Δ ⊢c A)
+    → Δ ≫ A ⇘ A%
+    → Δ ⊢ A ≤⁺ □ ⊣ Δ ↪ A%
 
   s-type :
-      (ss : Γ ⊢ A ⌞ ≤⁺ ⌝ B ⊣ Γ')
-    → Γ ⊢ A ≤⁺ (τ B) ⊣ Γ' ↪ B
+      (ss : Δ ⊢ A ⌞ ≤⁺ ⌝ B ⊣ Ψ)
+    → Δ ⊢ A ≤⁺ (τ B) ⊣ Ψ ↪ B
 
   s-term-c :
-      (cloA : Γ ⊢c A)
-    → (ap : Γ ≫ A ⇘ A%)
-    → (⊢e : 𝕣 Γ ⊢ τ A% ⇒ e ⇒ A')
-    → Γ ⊢ B ≤⁺ Σ ⊣ Δ ↪ D
-    → Γ ⊢ (A `→ B) ≤⁺ ([ e ]↝ Σ) ⊣ Δ ↪ A% `→ D
+      (cloA : Δ ⊢c A)
+    → (ap : Δ ≫ A ⇘ A%)
+    → (⊢e : 𝕣 Δ ⊢ τ A% ⇒ e ⇒ A')
+    → Δ ⊢ B ≤⁺ Σ ⊣ Ψ ↪ D
+    → Δ ⊢ (A `→ B) ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ A% `→ D
 
   s-term-o :
-      (opnA : Γ ⊢o² A)
-    → (⊢e : 𝕣 Γ ⊢ □ ⇒ e ⇒ C)
-    → Γ ⊢ C ⌞ ≤⁻ ⌝ A ⊣ Ω
-    → Ω ⊢ B ≤⁺ Σ ⊣ Δ ↪ D
-    → Γ ⊢ A `→ B ≤⁺ ([ e ]↝ Σ) ⊣ Δ ↪ C `→ D
+      (opnA : Δ ⊢o A)
+    → (⊢e : 𝕣 Δ ⊢ □ ⇒ e ⇒ C)
+    → Δ ⊢ C ⌞ ≤⁻ ⌝ A ⊣ Ω
+    → Ω ⊢ B ≤⁺ Σ ⊣ Ψ ↪ D
+    → Δ ⊢ A `→ B ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ C `→ D
 
   s-∀l :
-      Γ ,^ ⊢ A ≤⁺ ([ e' ]↝ Σ') ⊣ Δ ,= B ↪ (C' `→ D')
+      Δ ,^ ⊢ A ≤⁺ ([ e' ]↝ Σ') ⊣ Ψ ,= B ↪ (C' `→ D')
     → (upᶜ : ↑tyᶜ0 Σ ⇘ Σ')
     → (upᵉ : ↑tyᵉ0 e ⇘ e')
     → (upC : ↑ty0 C ⇘ C')
     → (upD : ↑ty0 D ⇘ D')
-    → Γ ⊢ `∀ A ≤⁺ ([ e ]↝ Σ) ⊣ Δ ↪ C `→ D
+    → Δ ⊢ `∀ A ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ C `→ D
