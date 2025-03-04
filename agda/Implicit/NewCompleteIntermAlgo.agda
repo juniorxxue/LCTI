@@ -1,29 +1,12 @@
 module Implicit.NewCompleteIntermAlgo where
 
-open import Implicit.Language.All
+open import Implicit.Language.All hiding (_⊆_w/v_; _⊆_w/t_)
 open import Implicit.Algo.Base
 -- open import Implicit.Algo.Properties.NewPolarity
 open import Implicit.Interm.Base
-open import Implicit.Interm.Properties.Polarity
+open import Implicit.Interm.Ground
+-- open import Implicit.Interm.Properties.Polarity
 
-infix 3 _⊢_~_
-data _⊢_~_ : Env n m → Counter × Type m → Context n m → Set where
-
-  ~Z : ∀ {Γ : Env n m} {A}
-    → Γ ⊢ ⟨ Z , A ⟩ ~ □
-
-  ~∞ : ∀ {Γ : Env n m} {A }
-    → Γ ⊢ ⟨ ∞ , A ⟩ ~ τ A
-
-  ~I : ∀ {Γ : Env n m} {j A B Σ e}
-    → (⊢e : 𝕣 Γ ⊢ □ ⇒ e ⇒ A)
-    → Γ ⊢ ⟨ j , B ⟩ ~ Σ
-    → Γ ⊢ ⟨ 𝕚 j , A `→ B ⟩ ~ ([ e ]↝ Σ)
-
-  ~C : ∀ {Γ : Env n m} {j A B Σ e}
-    → (⊢e : 𝕣 Γ ⊢ τ A ⇒ e ⇒ A)
-    → Γ ⊢ ⟨ j , B ⟩ ~ Σ
-    → Γ ⊢ ⟨ 𝕔 j , A `→ B ⟩ ~ ([ e ]↝ Σ)
 
 infix 3 _⊆_w/v_
 data _⊆_w/v_ : Env n m → Env n m → Fin m → Set where
@@ -84,11 +67,6 @@ data _⊆_w/t_ : Env n m → Env n m → Type m → Set where
 ⊢c¹-⊆/ : Γ ⊢c¹ A
        → SubEnv Γ
        → Γ ⊆ Γ w/t A
-⊢c¹-⊆/ ⊢c¹-int senv = ext-int
-⊢c¹-⊆/ (⊢c¹-var-∙ inΓ) senv = ext-var (∋∙-⊆/ inΓ senv)
-⊢c¹-⊆/ (⊢c¹-var-= inΓ) senv = ext-var (∋=¹-⊆/ inΓ senv)
-⊢c¹-⊆/ (⊢c¹-arr cloA cloA₁) senv = ext-arr (⊢c¹-⊆/ cloA senv) (⊢c¹-⊆/ cloA₁ senv)
-⊢c¹-⊆/ (⊢c¹-∀ cloA) senv = ext-∀ (⊢c¹-⊆/ cloA (S∙ senv))
 
 ∋:=¹-⊢c¹ : Γ ∋ X :=¹ A
         → SubClosed Γ
@@ -99,27 +77,54 @@ data _⊆_w/t_ : Env n m → Env n m → Type m → Set where
 ∋:=¹-⊢c¹ (S= inΓ up) (clo-S= sclo cloA) = {!∋:=¹-⊢c¹ inΓ sclo!}
 ∋:=¹-⊢c¹ (S⋈ x) (clo-Z x₁) = {!!}
 
-complete-s+ : Δ ⊢ j # A ⌞ ≤⁺ ⌝ B
+infix 3 _⊢_~_
+data _⊢_~_ : Env n m → Counter × Type m → Context n m → Set where
+
+  ~Z : ∀ {Γ : Env n m} {A}
+    → Γ ⊢ ⟨ Z , A ⟩ ~ □
+
+  ~∞ : ∀ {Γ : Env n m} {A }
+    → Γ ⊢ ⟨ ∞ , A ⟩ ~ τ A
+
+  ~I : ∀ {Γ : Env n m} {j A B Σ e}
+    → (⊢e : Γ ⊢ □ ⇒ e ⇒ A)
+    → Γ ⊆ Ω w/t A
+    → Ω ⊢ ⟨ j , B ⟩ ~ Σ
+    → Γ ⊢ ⟨ 𝕚 j , A `→ B ⟩ ~ ([ e ]↝ Σ)
+
+  ~C : ∀ {Γ : Env n m} {j A B Σ e}
+    → (⊢e : Γ ⊢ τ A ⇒ e ⇒ A)
+    → Γ ⊢ ⟨ j , B ⟩ ~ Σ
+    → Γ ⊢ ⟨ 𝕔 j , A `→ B ⟩ ~ ([ e ]↝ Σ)
+
+infix 3 _⊆_w/t_w/c_
+data _⊆_w/t_w/c_ : Env n m → Env n m → Type m → Counter → Set where
+  ⊆Z : Γ ⊆ Γ w/t A w/c Z
+  ⊆∞ : Γ ⊆ Δ w/t A
+     → Γ ⊆ Δ w/t A w/c ∞
+  ⊆I : (ext : Γ ⊆ Ω w/t A)
+     → Ω ⊆ Δ w/t B w/c j
+     → Γ ⊆ Δ w/t (A `→ B) w/c (𝕚 j)
+  ⊆C : Γ ⊆ Δ w/t B w/c j
+     → Γ ⊆ Δ w/t (A `→ B) w/c (𝕔 j)
+  ⊆∀-I : Γ ,∙ ⊆ Δ ,∙ w/t A w/c (𝕚 j)
+     → Γ ⊆ Δ w/t `∀ A w/c (𝕚 j)
+  ⊆∀-C : Γ ,∙ ⊆ Δ ,∙ w/t A w/c (𝕔 j)
+     → Γ ⊆ Δ w/t `∀ A w/c (𝕔 j)
+
+postulate
+  open-close : ∀ (Γ : Env n m) A → Γ ⊢c A ⊎ Γ ⊢o A
+
+
+complete-ss+ : Δ ⊢ j # A ⌞ ≤⁺ ⌝ B
+             → Γ ⊆ Δ w/t A
+             → Γ ⊢ A ⌞ ≤⁺ ⌝ B ⊣ Δ
+
+complete-ss- : Δ ⊢ j # A ⌞ ≤⁻ ⌝ B
+             → Γ ⊆ Δ w/t B
+             → Γ ⊢ A ⌞ ≤⁻ ⌝ B ⊣ Δ
+
+complete-s :  Δ ⊢ j # A ⌞ ≤⁺ ⌝ B
             → Γ ⊆ Δ w/t A
             → Γ ⊢ ⟨ j , B ⟩ ~ Σ
-            → Γ ⊢ A ⌞ ≤⁺ ⌝ Σ ⊣ Δ ↪ B
-
-complete-s- : Δ ⊢ j # A ⌞ ≤⁻ ⌝ B
-            → Γ ⊆ Δ w/t B
-            → Γ ⊢ A ⌞ ≤⁻ ⌝ τ B ⊣ Δ ↪ B
-
-complete-s+ (s-refl cloΓ cloA) ext ~Z = _
-complete-s+ (s-int cloΓ) ext j~Σ = {!!}
-complete-s+ (s-var-∙ cloΓ inΓ) ext j~Σ = {!!}
-complete-s+ (s-var-= cloΓ inΓ) ext j~Σ = {!!}
-complete-s+ (s-arr₁ s s₁) ext j~Σ = {!!}
-complete-s+ (s-arr₂ opnA s s₁) (ext-arr ext ext₁) (~I ⊢e j~Σ)
-  = s-term-o {!!} ⊢e {!complete-s- s ?!} (complete-s+ s₁ ext₁ {!!})
-complete-s+ (s-arr₃ cloA s) ext (~C ⊢e j~Σ)
-  = s-term-c {!!} {!!}
-complete-s+ (s-∀ s) (ext-∀ ext) ~∞ = s-∀ (complete-s+ s ext ~∞)
-complete-s+ (s-∀l s ic fd stC stD) ext (~I ⊢e j~Σ) = s-∀l (complete-s+ s {!!} (~I {!!} {!!})) {!!} {!!} stC stD
-complete-s+ (s-∀l s ic fd stC stD) ext (~C ⊢e j~Σ) = {!!}
-complete-s+ (s-var-sub-l inΓ s) (ext-var x) ~∞ = s-ex-l^ _ _ _
-complete-s+ (s-var-typ-l inΓ s) (ext-var x) ~∞ = s-ex-typ-l= _ (complete-s+ s _ ~∞)
-complete-s+ (s-var-typ-r inΓ s) ext ~∞ = s-ex-typ-r= {!!} (complete-s+ s ext ~∞)
+            → Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B

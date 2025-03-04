@@ -10,11 +10,53 @@ open import Implicit.Algo.Lookup public
 open import Implicit.Algo.Split public
 -- open import Implicit.Algo.Polarity public
 
+infix 3 _⊢_⌞_⌝_⊣_
+data _⊢_⌞_⌝_⊣_ : Env n m → Type m → Polar → Type m → Env n m → Set where
+  s-int :
+      (cloΓ : SubClosed Γ)
+    → Γ ⊢ Int ⌞ ≤ ⌝ Int ⊣ Γ
+
+  s-var-∙ :
+      (cloΓ : SubClosed Γ)
+    → Γ ∋∙ X
+    → Γ ⊢ (‶ X) ⌞ ≤ ⌝ (‶ X) ⊣ Γ
+
+  s-ex-l^ :
+      (x-in : Γ ∋^² X)
+    → (cloA : Γ ⊢c¹ A)
+    → (inst : [ A / X ] Γ ⟹ Δ)
+    → Γ ⊢ ‶ X ⌞ ≤⁺ ⌝ A ⊣ Δ
+
+  s-ex-r^ :
+      (x-in : Γ ∋^² X)
+    → (cloA : Γ ⊢c¹ A)
+    → (inst : [ A / X ] Γ ⟹ Δ)
+    → Γ ⊢ A ⌞ ≤⁻ ⌝ (‶ X) ⊣ Δ
+
+  s-ex-l= :
+      (cloΓ : SubClosed Γ)
+    → (x-in : Γ ∋ X :=² A)
+    → Γ ⊢ ‶ X ⌞ ≤⁺ ⌝ A ⊣ Γ
+
+  s-ex-r= :
+      (cloΓ : SubClosed Γ)
+    → (x-in : Γ ∋ X :=² A)
+    → Γ ⊢ A ⌞ ≤⁻ ⌝ (‶ X) ⊣ Γ
+
+  s-arr :
+      Γ ⊢ C ⌞ ⋆ ≤ ⌝ A ⊣ Ω
+    → Ω ⊢ B ⌞ ≤ ⌝ D ⊣ Δ
+    → Γ ⊢ A `→ B ⌞ ≤ ⌝ (C `→ D) ⊣ Δ
+
+  s-∀ :
+      Γ ,∙ ⊢ A ⌞ ≤ ⌝ B ⊣ Δ ,∙
+    → Γ ⊢ `∀ A ⌞ ≤ ⌝ (`∀ B) ⊣ Δ
+
 infix 3 _⊢_⇒_⇒_
-infix 3 _⊢_⌞_⌝_⊣_↪_
+infix 3 _⊢_≤⁺_⊣_↪_
 
 data _⊢_⇒_⇒_ : Env n m → Context n m → Term n m → Type m → Set
-data _⊢_⌞_⌝_⊣_↪_ : Env n m → Type m → Polar → Context n m → Env n m → Type m → Set
+data _⊢_≤⁺_⊣_↪_ : Env n m → Type m → Context n m → Env n m → Type m → Set
 
 data _⊢_⇒_⇒_ where
 
@@ -49,106 +91,43 @@ data _⊢_⇒_⇒_ where
       Γ ⊢ □ ⇒ g ⇒ A
     → (ne : NonEmpty Σ)
     → (gc : GenericConsumer g)
-    → (cloΣ : Γ ⊢cᶜ Σ)
-    → (s : Γ ⋈ ⊢ A ⌞ ≤⁺ ⌝ Σ ⊣ Γ ⋈ ↪ B)
+    → (s : Γ ⋈ ⊢ A ≤⁺ Σ ⊣ Γ ⋈ ↪ B)
     → Γ ⊢ Σ ⇒ g ⇒ B
 
   ⊢tabs :
       Γ ,∙ ⊢ □ ⇒ e ⇒ A
     → Γ ⊢ □ ⇒ Λ e ⇒ `∀ A
 
-
-data _⊢_⌞_⌝_⊣_↪_ where
-  s-int :
-      (cloΓ : SubClosed Γ)
-    → Γ ⊢ Int ⌞ ≤ ⌝ τ Int ⊣ Γ ↪ Int
+data _⊢_≤⁺_⊣_↪_ where
 
   s-empty :
       (cloΓ : SubClosed Γ)
     → (cloA : Γ ⊢c A)
-    → Γ ≫² A ⇘ A%
-    → Γ ⊢ A ⌞ ≤⁺ ⌝ □ ⊣ Γ ↪ A%
+    → Γ ≫ A ⇘ A%
+    → Γ ⊢ A ≤⁺ □ ⊣ Γ ↪ A%
 
-  s-var-∙ :
-      (cloΓ : SubClosed Γ)
-    → Γ ∋∙ X
-    → Γ ⊢ (‶ X) ⌞ ≤ ⌝ τ (‶ X) ⊣ Γ ↪ ‶ X
-
-  s-var-= :
-      (cloΓ : SubClosed Γ)
-    → Γ ∋=¹ X
-    → Γ ⊢ (‶ X) ⌞ ≤ ⌝ τ (‶ X) ⊣ Γ ↪ ‶ X
-
-  s-ex-typ-l=+ :
-      (x-in : Γ ∋ X :=¹ B)
-    → Γ ⊢ B ⌞ ≤⁺ ⌝ τ A ⊣ Γ' ↪ A'
-    → Γ ⊢ ‶ X ⌞ ≤⁺ ⌝ τ A ⊣ Γ' ↪ A
-
-  s-ex-typ-l=- :
-      (x-in : Γ ∋ X :=¹ B)
-    → Γ ⊢ B ⌞ ≤⁻ ⌝ τ A ⊣ Γ' ↪ A'
-    → Γ ⊢ ‶ X ⌞ ≤⁻ ⌝ τ A ⊣ Γ' ↪ ‶ X
-
-  s-ex-typ-r=+ :
-      (x-in : Γ ∋ X :=¹ B)
-    → Γ ⊢ A ⌞ ≤⁺ ⌝ τ B ⊣ Γ' ↪ B'
-    → Γ ⊢ A ⌞ ≤⁺ ⌝ τ (‶ X) ⊣ Γ' ↪ ‶ X
-
-  s-ex-typ-r=- :
-      (x-in : Γ ∋ X :=¹ B)
-    → Γ ⊢ A ⌞ ≤⁻ ⌝ τ B ⊣ Γ' ↪ B'
-    → Γ ⊢ A ⌞ ≤⁻ ⌝ τ (‶ X) ⊣ Γ' ↪ A
-
-  s-ex-l^ :
-      (x-in : Γ ∋^² X)
-    → (cloA : Γ ⊢c¹ A)
-    → (inst : [ A / X ] Γ ⟹ Γ')
-    → Γ ⊢ ‶ X ⌞ ≤⁺ ⌝ τ A ⊣ Γ' ↪ A
-
-  s-ex-r^ :
-      (x-in : Γ ∋^² X)
-    → (cloA : Γ ⊢c¹ A)
-    → (inst : [ A / X ] Γ ⟹ Γ')
-    → Γ ⊢ A ⌞ ≤⁻ ⌝ τ (‶ X) ⊣ Γ' ↪ A
-
-  s-ex-l= :
-      (x-in : Γ ∋ X := B)
-    → Γ ⊢ B ⌞ ≤⁺ ⌝ τ A ⊣ Γ' ↪ A'
-    → Γ ⊢ ‶ X ⌞ ≤⁺ ⌝ τ A ⊣ Γ' ↪ A
-
-  s-ex-r= :
-      (x-in : Γ ∋ X := B)
-    → Γ ⊢ A ⌞ ≤⁻ ⌝ τ B ⊣ Γ' ↪ A'
-    → Γ ⊢ A ⌞ ≤⁻ ⌝ τ (‶ X) ⊣ Γ' ↪ A
-
-  s-arr :
-      Γ₁ ⊢ C ⌞ ⋆ ≤ ⌝ τ A ⊣ Γ₂ ↪ C'
-    → Γ₂ ⊢ B ⌞ ≤ ⌝ τ D ⊣ Γ₃ ↪ D'
-    → Γ₁ ⊢ A `→ B ⌞ ≤ ⌝ τ (C `→ D) ⊣ Γ₃ ↪ (C' `→ D')
+  s-type :
+      (ss : Γ ⊢ A ⌞ ≤⁺ ⌝ B ⊣ Γ')
+    → Γ ⊢ A ≤⁺ (τ B) ⊣ Γ' ↪ B
 
   s-term-c :
       (cloA : Γ ⊢c A)
--- comment this one, if we restrict such condition on the typing
-    → (ap : Γ ≫² A ⇘ A%)
+    → (ap : Γ ≫ A ⇘ A%)
     → (⊢e : 𝕣 Γ ⊢ τ A% ⇒ e ⇒ A')
-    → Γ ⊢ B ⌞ ≤⁺ ⌝ Σ ⊣ Γ' ↪ D
-    → Γ ⊢ (A `→ B) ⌞ ≤⁺ ⌝ ([ e ]↝ Σ) ⊣ Γ' ↪ A% `→ D
+    → Γ ⊢ B ≤⁺ Σ ⊣ Δ ↪ D
+    → Γ ⊢ (A `→ B) ≤⁺ ([ e ]↝ Σ) ⊣ Δ ↪ A% `→ D
 
   s-term-o :
       (opnA : Γ ⊢o² A)
     → (⊢e : 𝕣 Γ ⊢ □ ⇒ e ⇒ C)
-    → Γ ⊢ C ⌞ ≤⁻ ⌝ τ A ⊣ Γ₁ ↪ A'
-    → Γ₁ ⊢ B ⌞ ≤⁺ ⌝ Σ ⊣ Γ₂ ↪ D
-    → Γ ⊢ A `→ B ⌞ ≤⁺ ⌝ ([ e ]↝ Σ) ⊣ Γ₂ ↪ C `→ D
-
-  s-∀ :
-      Γ ,∙ ⊢ A ⌞ ≤ ⌝ τ B ⊣ Γ' ,∙ ↪ C
-    → Γ ⊢ `∀ A ⌞ ≤ ⌝ τ (`∀ B) ⊣ Γ' ↪ `∀ C
+    → Γ ⊢ C ⌞ ≤⁻ ⌝ A ⊣ Ω
+    → Ω ⊢ B ≤⁺ Σ ⊣ Δ ↪ D
+    → Γ ⊢ A `→ B ≤⁺ ([ e ]↝ Σ) ⊣ Δ ↪ C `→ D
 
   s-∀l :
-      Γ ,^ ⊢ A ⌞ ≤⁺ ⌝ ([ e' ]↝ Σ') ⊣ Γ' ,= B ↪ (C' `→ D')
+      Γ ,^ ⊢ A ≤⁺ ([ e' ]↝ Σ') ⊣ Δ ,= B ↪ (C' `→ D')
     → (upᶜ : ↑tyᶜ0 Σ ⇘ Σ')
     → (upᵉ : ↑tyᵉ0 e ⇘ e')
     → (upC : ↑ty0 C ⇘ C')
     → (upD : ↑ty0 D ⇘ D')
-    → Γ ⊢ `∀ A ⌞ ≤⁺ ⌝ ([ e ]↝ Σ) ⊣ Γ' ↪ C `→ D
+    → Γ ⊢ `∀ A ≤⁺ ([ e ]↝ Σ) ⊣ Δ ↪ C `→ D

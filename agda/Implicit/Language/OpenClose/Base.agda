@@ -19,22 +19,6 @@ data _⊢o²_ :  Env n m → Type m → Set where
       Γ ,∙ ⊢o² A
     → Γ ⊢o² `∀ A
 
--- used in s-arr-i rule, there're some variables in subtyping environment unsolved
-infix 3 _⊢o²'_
-data _⊢o²'_ :  Env n m → Type m → Set where
-  ⊢o²'-var-^ :
-      Γ ∋=² X
-    → Γ ⊢o²' ‶ X
-  ⊢o²'-arr-l :
-      Γ ⊢o²' A
-    → Γ ⊢o²' (A `→ B)
-  ⊢o²'-arr-r :
-      Γ ⊢o²' B
-    → Γ ⊢o²' (A `→ B)
-  ⊢o²'-∀ :
-      Γ ,∙ ⊢o²' A
-    → Γ ⊢o²' `∀ A
-
 -- used in polarity interpretation, Γ ⊢c¹ A means, type variables in A
 -- 1. universal var: it can be in typing and subtyping
 -- 2. ex var: it cannot have ex-var
@@ -46,9 +30,6 @@ data _⊢c¹_ : Env n m → Type m → Set where
       Γ ⊢c¹ Int
   ⊢c¹-var-∙ :
       (inΓ : Γ ∋∙ X)
-    → Γ ⊢c¹ ‶ X
-  ⊢c¹-var-= :
-      (inΓ : Γ ∋=¹ X)
     → Γ ⊢c¹ ‶ X
   ⊢c¹-arr :
       Γ ⊢c¹ A
@@ -82,7 +63,7 @@ data _⊢c_ : Env n m → Type m → Set where
       (inΓ : Γ ∋∙ X)
     → Γ ⊢c ‶ X
   ⊢c-var-= :
-      (inΓ : Γ ∋= X)
+      (inΓ : Γ ∋=¹ X)
     → Γ ⊢c ‶ X
   ⊢c-arr :
       Γ ⊢c A
@@ -131,26 +112,26 @@ data Closed : Env n m → Set where
 data TypClosed : Env n m → Set where
   clo-Z : TypClosed ∅
   clo-S, : TypClosed Γ
-         → (cloA : Γ ⊢c A)
+         → (cloA : Γ ⊢c¹ A)
          → TypClosed (Γ , A)
   clo-S∙ : TypClosed Γ
          → TypClosed (Γ ,∙)
   clo-S^ : TypClosed Γ
          → TypClosed (Γ ,^)
   clo-S= : TypClosed Γ
-         → (cloA : Γ ⊢c A)
+--         → (cloA : Γ ⊢c¹ A) -- we dont care, since we shouldn't access this entry, just skipping
          → TypClosed (Γ ,= A)
 
 data SubClosed : Env n m → Set where
   clo-Z : TypClosed Γ
         → SubClosed (Γ ⋈)
   clo-S, : SubClosed Γ
-         → (cloA : Γ ⊢c A)
+         → (cloA : Γ ⊢c¹ A)
          → SubClosed (Γ , A)
   clo-S∙ : SubClosed Γ
          → SubClosed (Γ ,∙)
   clo-S^ : SubClosed Γ
          → SubClosed (Γ ,^)
   clo-S= : SubClosed Γ
-         → (cloA : Γ ⊢c A)
+         → (cloA : Γ ⊢c¹ A)
          → SubClosed (Γ ,= A)

@@ -11,7 +11,7 @@ data _⊢_#_⌞_⌝_ : Env n m → Counter → Type m → Polar → Type m → S
   s-refl :
       (cloΓ : SubClosed Γ)
     → (cloA : Γ ⊢c A)
-    → (grd : Γ ≫² A ⇘ A%)
+    → (grd : Γ ≫ A ⇘ A%)
     → Γ ⊢ Z # A ⌞ ≤⁺ ⌝ A%
   s-int :
       (cloΓ : SubClosed Γ)
@@ -20,22 +20,17 @@ data _⊢_#_⌞_⌝_ : Env n m → Counter → Type m → Polar → Type m → S
       (cloΓ : SubClosed Γ)
     → (inΓ : Γ ∋∙ X)
     → Γ ⊢ ∞ # ‶ X ⌞ ≤ ⌝ ‶ X
-  s-var-= :  -- this rule can subsumed by last two rules, but requiring finding a good measure, keep them now
-      (cloΓ : SubClosed Γ)
-    → (inΓ : Γ ∋=¹ X)
-    → Γ ⊢ ∞ # ‶ X ⌞ ≤ ⌝ ‶ X
   s-arr₁ :
       Γ ⊢ ∞ # C ⌞ ⋆ ≤ ⌝ A
     → Γ ⊢ ∞ # B ⌞ ≤ ⌝ D
     → Γ ⊢ ∞ # A `→ B ⌞ ≤ ⌝ C `→ D
   s-arr₂ :
---      (opnA : Γ ⊢o²' A)
       Γ ⊢ ∞ # C ⌞ ≤⁻ ⌝ A
     → Γ ⊢ j # B ⌞ ≤⁺ ⌝ D
     → Γ ⊢ 𝕚 j # A `→ B ⌞ ≤⁺ ⌝ C `→ D
   s-arr₃ :
       (cloA : Γ ⊢c A)
-    → (grd : Γ ≫² A ⇘ A%)
+    → (grd : Γ ≫ A ⇘ A%)
     → Γ ⊢ j # B ⌞ ≤⁺ ⌝ D
     → Γ ⊢ 𝕔 j # A `→ B ⌞ ≤⁺ ⌝ A% `→ D
   s-∀ :
@@ -43,8 +38,6 @@ data _⊢_#_⌞_⌝_ : Env n m → Counter → Type m → Polar → Type m → S
     → Γ ⊢ ∞ # `∀ A ⌞ ≤ ⌝ `∀ B
   s-∀l :
       Γ ,= B ⊢ j # A ⌞ ≤⁺ ⌝ C' `→ D'
-  -- we guess a solution of B here, we must make sure this B is provided from the counter
-  -- what we does is to make sure the all inputs matching the counter should at least have the quantifer contained
     → (ic : (𝕚𝕔 j))
     → (fd : find A #0 j)
     → (upC : ↑ty0 C ⇘ C')
@@ -54,28 +47,17 @@ data _⊢_#_⌞_⌝_ : Env n m → Counter → Type m → Polar → Type m → S
   s-var-sub-l : ∀ {X A}
     → (cloA : Γ ⊢c¹ A)
     → (inΓ : Γ ∋ X :=² A)
---    → Γ ⊢ ∞ # B ⌞ ≤⁺ ⌝ A
     → Γ ⊢ ∞ # ‶ X ⌞ ≤⁺ ⌝ A
   s-var-sub-r : ∀ {X A}
     → (cloA : Γ ⊢c¹ A)
     → (inΓ : Γ ∋ X :=² A)
---    → Γ ⊢ ∞ # A ⌞ ≤⁻ ⌝ B
     → Γ ⊢ ∞ # A ⌞ ≤⁻ ⌝ ‶ X
-  s-var-typ-l : ∀ {X A B}
-    → (inΓ : Γ ∋ X :=¹ B)
-    → Γ ⊢ ∞ # B ⌞ ≤ ⌝ A
-    → Γ ⊢ ∞ # ‶ X ⌞ ≤ ⌝ A
-  s-var-typ-r : ∀ {X A B}
-    → (inΓ : Γ ∋ X :=¹ B)
-    → Γ ⊢ ∞ # A ⌞ ≤ ⌝ B
-    → Γ ⊢ ∞ # A ⌞ ≤ ⌝ ‶ X
 
 s-refl-∞ : SubClosed Γ
          → Γ ⊢c¹ A
          → Γ ⊢ ∞ # A ⌞ ≤ ⌝ A
 s-refl-∞ cloΓ ⊢c¹-int = s-int cloΓ
 s-refl-∞ cloΓ (⊢c¹-var-∙ inΓ) = s-var-∙ cloΓ inΓ
-s-refl-∞ cloΓ (⊢c¹-var-= inΓ) = s-var-= cloΓ inΓ
 s-refl-∞ cloΓ (⊢c¹-arr cloA cloA₁) = s-arr₁ (s-refl-∞ cloΓ cloA) (s-refl-∞ cloΓ cloA₁)
 s-refl-∞ cloΓ (⊢c¹-∀ cloA) = s-∀ (s-refl-∞ (clo-S∙ cloΓ) cloA)
 

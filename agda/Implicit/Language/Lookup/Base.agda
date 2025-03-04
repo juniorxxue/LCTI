@@ -85,7 +85,8 @@ data _∋=_ : Env n m → Fin m → Set where
   S⋈ : Γ ∋= k
      → Γ ⋈ ∋= k
 
--- lookup an entry: solution in the typing environment.
+-- this lookup works on the subtyping environment;
+-- but lookup an entry: solution in the (inner) typing environment.
 infix 3 _∋=¹_
 data _∋=¹_ : Env n m → Fin m → Set where
 {-
