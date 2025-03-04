@@ -122,7 +122,8 @@
 \section{Interm.}
 
 \begin{align*}
-&\text{Environments} \quad\quad &\Gamma::=&~ . \mid \Gamma, x : A \mid \Gamma, a \mid \Gamma, \hat{a} = A\\
+&\text{Typing Environments} \quad\quad &\Gamma::=&~ . \mid \Gamma, x : A \mid \Gamma, a\\
+&\text{Subtyping Environments} \quad\quad &\Gamma, \Omega, \Delta ::=&~ . \mid \Gamma, x : A \mid \Gamma, a \mid \Gamma, \hat{a} = A\\
 &\text{Counters} \quad\quad &n ::=&~ 0 \mid \infty \mid I~n \mid C~n
 \end{align*}
 
@@ -182,10 +183,7 @@
     \inferrule*[right=\texttt{S-Var}]
     { }
     {\Gamma \vdash_\infty a <: a}
-    
-    \inferrule*[right=\texttt{S-Var-Slv}]
-    {\hat{a} = A \in \Gamma}
-    {\Gamma \vdash_\infty \hat{a} <: \hat{a}}
+  
 
     \inferrule*[right=\texttt{S-Arr}]
     {\Gamma \vdash_{\infty} C <: A \\
@@ -200,22 +198,22 @@
     {\Gamma \vdash B \\
      a \in \texttt{freevars}(I/C~n , A) \\
      \Gamma, \hat{a} = B \vdash_{I/C~n}  A <: C \to D}
-    {\Gamma \vdash_{I/C~n} \forall a. ~A <: [B/\hat{a}]C \to [B/\hat{a}]D}
+    {\Gamma \vdash_{I/C~n} \forall a. ~A <: C \to D}
     \\    
     
     \inferrule*[right=\texttt{S-var-l}]
-    {\hat{a} = B \in \Gamma \\ \Gamma \vdash_\infty B <: A}
+    {\hat{a} = A \in \Gamma}
     {\Gamma \vdash_\infty \hat{a} <: A}
     
      \inferrule*[right=\texttt{S-var-r}]
-    {\hat{a} = B \in \Gamma \\ \Gamma \vdash_\infty A <: B}
+    {\hat{a} = A \in \Gamma}
     {\Gamma \vdash_\infty A <: \hat{a}}
 \end{mathpar}
 
 \section{Algo.}
 
 \begin{align*}
-&\text{Typing Environments} \quad\quad &\Gamma::=&~ . \mid \Gamma, x : A \mid \Gamma, a \mid \Gamma, \hat{a} = A\\
+&\text{Typing Environments} \quad\quad &\Gamma::=&~ . \mid \Gamma, x : A \mid \Gamma, a\\
 &\text{Subtyping Environments} \quad\quad &\Gamma, \Omega, \Delta ::=&~ . \mid \Gamma, x : A \mid \Gamma, a \mid \Gamma , \hat{a} \mid \Gamma, \hat{a} = A\\
     &\text{Contexts} \quad\quad &\Sigma ::=&~  \square  \mid A \mid \boxed{e} \leadsto \Sigma\\
     &\text{Generic Consumers} \quad \quad &g::=&~ i \mid x \mid e : A \mid \Lambda a.~e
@@ -327,25 +325,11 @@
 \inferrule*[right=\texttt{S-Empty}]
 {\Gamma; \Delta \vdash_{close}A}
 {\Gamma; \Delta \vdash A \leq^+ \square \dashv \Gamma; \Delta \rightsquigarrow \Delta(A)}
-
 \\
 \inferrule*[right=\texttt{S-UVar}]
 { }
 {\Gamma; \Delta \vdash a \leq a \dashv \Gamma; \Delta \rightsquigarrow a}
-
-
-\inferrule*[right=\texttt{S-Sol}]
-{ }
-{\Gamma[\hat{a}=A]; \Delta \vdash a \leq a \dashv \Gamma[\hat{a}=A];  \Delta \rightsquigarrow a}
-
-\inferrule*[right=\texttt{S-Sol-L}]
-{\Gamma [\hat{a}=B]; \Delta \vdash B <: A \dashv \Gamma [\hat{a}=B]; \Delta'\rightsquigarrow A'}
-{\Gamma [\hat{a}=B]; \Delta \vdash \hat{a} \leq A \dashv \Gamma [\hat{a}=B]; \Delta'\rightsquigarrow A'}
-
-\inferrule*[right=\texttt{S-Sol-R}]
-{\Gamma [\hat{a}=B]; \Delta \vdash A <: B \dashv \Gamma [\hat{a}=B]; \Delta'\rightsquigarrow B'}
-{\Gamma [\hat{a}=B]; \Delta \vdash A \leq \hat{a} \dashv \Gamma [\hat{a}=B]; \Delta'\rightsquigarrow B'}
-
+\\
 \inferrule*[right=\texttt{S-Ex-L}]
 { }
 {\Gamma; \Delta[\hat{a}] \vdash \hat{a} \leq^+ A \dashv \Gamma; \Delta[\hat{a} = A] \rightsquigarrow A}
@@ -362,7 +346,7 @@
 \inferrule*[right=\texttt{S-Ex-Eq-R}]
 {\Gamma; \Delta[\hat{a:=A}] \vdash  B \leq^- A \dashv \Gamma; \Delta[\hat{a} = A] \rightsquigarrow B}
 {\Gamma; \Delta[\hat{a:=A}] \vdash B \leq^- \hat{a}  \dashv \Gamma; \Delta[\hat{a} = A] \rightsquigarrow B}
-
+\\
 \inferrule*[right=\texttt{S-Arr}]
 {\Gamma; \Delta \vdash C \leq^* A \dashv \Gamma; \Omega \rightsquigarrow C' \\
  \Gamma; \Omega \vdash B \leq D \dashv \Gamma; \Delta' \rightsquigarrow D'}
