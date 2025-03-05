@@ -1,4 +1,4 @@
-module Implicit.Algo.Syntax where
+module Implicit.Algo.Constructs.Syntax where
 
 open import Implicit.Language.All
 
@@ -15,4 +15,3 @@ variable
 data NonEmpty : Context n m → Set where
   ne-τ    : ∀ {A : Type m} → NonEmpty (Context n m ∋⦂ τ A)
   ne-app  : ∀ {e} {Σ : Context n m} → NonEmpty ([ e ]↝ Σ)
-

@@ -59,7 +59,7 @@ s-refl-∞ : SRegular Γ
 s-refl-∞ regΓ ⊢r-int = s-int regΓ
 s-refl-∞ regΓ (⊢r-var-∙ inΓ) = s-var-∙ regΓ inΓ
 s-refl-∞ regΓ (⊢r-arr regA regA₁) = s-arr₁ (s-refl-∞ regΓ regA) (s-refl-∞ regΓ regA₁)
-s-refl-∞ regΓ (⊢r-∀ regA) = s-∀ (s-refl-∞ (clo-S∙ regΓ) regA)
+s-refl-∞ regΓ (⊢r-∀ regA) = s-∀ (s-refl-∞ (reg-S∙ regΓ) regA)
 
 ----------------------------------------------------------------------
 --+                             Typing                             +--

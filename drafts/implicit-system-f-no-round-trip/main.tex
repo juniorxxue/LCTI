@@ -4,6 +4,10 @@
 %\usepackage[tt=false, type1=true]{libertine} 
 \RequirePackage[varqu]{zi4} 
 \RequirePackage[libertine]{newtxmath}
+\usepackage{xcolor}
+
+\newcommand{\grey}[1]{\textcolor{grey}{#1}}
+\newcommand{\mgrey}[1]{\mathcolor{grey}{#1}}
 
 \usepackage{comment}
 
@@ -23,7 +27,7 @@
 % \usepackage{amsthm}
 %\usepackage{amsthm}
 \newtheorem{lemma}{Lemma}
-
+\newcommand{\highlight}{\colorbox{lightgray}}
 
 \title{Contextual Typing (No-round-trip; dual environments)}
 \author{Xu Xue}
@@ -320,60 +324,60 @@
 \begin{mathpar}
 \inferrule*[right=\texttt{\texttt{S-Int}}]
 { }
-{\Gamma; \Delta \vdash \mathtt{Int} \leq \mathtt{Int} \dashv \Gamma; \Delta \rightsquigarrow \mathtt{Int}}
+{\Gamma; \Delta \vdash \mathtt{Int} \leq \mathtt{Int} \dashv \Gamma; \Delta  ~\cdots}
+
+\inferrule*[right=\texttt{S-UVar}]
+{ }
+{\Gamma; \Delta \vdash a \leq a \dashv \Gamma; \Delta ~\cdots}
+\\
+\inferrule*[right=\texttt{S-Ex-L}]
+{ }
+{\Gamma; \Delta[\hat{a}] \vdash \hat{a} \leq^+ A \dashv \Gamma; \Delta[\hat{a} = A] ~\cdots}
+
+\inferrule*[right=\texttt{S-Ex-R}]
+{ }
+{\Gamma; \Delta[\hat{a}] \vdash A \leq^- \hat{a} \dashv \Gamma; \Delta[\hat{a} = A] ~\cdots}
+
+\inferrule*[right=\texttt{S-Ex-Eq-L}]
+{ }
+{\Gamma; \Delta[\hat{a:=A}] \vdash \hat{a} \leq^+ A \dashv \Gamma; \Delta[\hat{a} = A] ~\cdots}
+
+\inferrule*[right=\texttt{S-Ex-Eq-R}]
+{ }
+{\Gamma; \Delta[\hat{a:=A}] \vdash A \leq^- \hat{a}  \dashv \Gamma; \Delta[\hat{a} = A] ~\cdots}
+
+\inferrule*[right=\texttt{S-Arr}]
+{\Gamma; \Delta \vdash C \leq^* A \dashv \Gamma; \Omega ~\cdots \\
+ \Gamma; \Omega \vdash B \leq D \dashv \Gamma; \Delta' ~\cdots}
+{\Gamma; \Delta \vdash A \rightarrow B \leq C \rightarrow D \dashv \Gamma; \Delta' ~\cdots}
+
+\inferrule*[right=\texttt{S-$\forall$}]
+{\Gamma; \Delta, a \vdash A \leq B \dashv \Gamma; \Delta', a ~\cdots}
+{\Gamma; \Delta \vdash \forall a.A \leq \forall a.~B \dashv \Gamma; \Delta' ~\cdots}
+
+\noindent\makebox[\linewidth]{\rule{16cm}{0.4pt}}
 
 \inferrule*[right=\texttt{S-Empty}]
 {\Gamma; \Delta \vdash_{close}A}
 {\Gamma; \Delta \vdash A \leq^+ \square \dashv \Gamma; \Delta \rightsquigarrow \Delta(A)}
-\\
-\inferrule*[right=\texttt{S-UVar}]
-{ }
-{\Gamma; \Delta \vdash a \leq a \dashv \Gamma; \Delta \rightsquigarrow a}
-\\
-\inferrule*[right=\texttt{S-Ex-L}]
-{ }
-{\Gamma; \Delta[\hat{a}] \vdash \hat{a} \leq^+ A \dashv \Gamma; \Delta[\hat{a} = A] \rightsquigarrow A}
-
-\inferrule*[right=\texttt{S-Ex-R}]
-{ }
-{\Gamma; \Delta[\hat{a}] \vdash A \leq^- \hat{a} \dashv \Gamma; \Delta[\hat{a} = A] \rightsquigarrow A}
-
-\inferrule*[right=\texttt{S-Ex-Eq-L}]
-{\Gamma; \Delta[\hat{a:=A}] \vdash  A \leq^+ B \dashv \Gamma; \Delta[\hat{a} = A] \rightsquigarrow B}
-{\Gamma; \Delta[\hat{a:=A}] \vdash \hat{a} \leq^+ B \dashv \Gamma; \Delta[\hat{a} = A] \rightsquigarrow B}
-
-
-\inferrule*[right=\texttt{S-Ex-Eq-R}]
-{\Gamma; \Delta[\hat{a:=A}] \vdash  B \leq^- A \dashv \Gamma; \Delta[\hat{a} = A] \rightsquigarrow B}
-{\Gamma; \Delta[\hat{a:=A}] \vdash B \leq^- \hat{a}  \dashv \Gamma; \Delta[\hat{a} = A] \rightsquigarrow B}
-\\
-\inferrule*[right=\texttt{S-Arr}]
-{\Gamma; \Delta \vdash C \leq^* A \dashv \Gamma; \Omega \rightsquigarrow C' \\
- \Gamma; \Omega \vdash B \leq D \dashv \Gamma; \Delta' \rightsquigarrow D'}
-{\Gamma; \Delta \vdash A \rightarrow B \leq C \rightarrow D \dashv \Gamma; \Delta' \rightsquigarrow C' \rightarrow D'}
-\\
 
 \inferrule*[right=\texttt{S-Term-Close}]
 { \Delta \vdash_{close} A \\
 \Gamma \vdash \Delta(A) \Rightarrow e \Rightarrow A'\\
- \Gamma \vdash B \leq^+ \Sigma \dashv \Delta \rightsquigarrow D}
-{\Gamma; \Delta \vdash A \rightarrow B \leq^+ \boxed{e} \leadsto \Sigma \dashv \Gamma; \Delta \rightsquigarrow \Delta(A) \rightarrow D}
+ \Gamma; \Delta \vdash B \leq^+ \Sigma \dashv \Gamma; \Delta' \rightsquigarrow D}
+{\Gamma; \Delta \vdash A \rightarrow B \leq^+ \boxed{e} \leadsto \Sigma \dashv \Gamma; \Delta' \rightsquigarrow \Delta(A) \rightarrow D}
 
 \inferrule*[right=\texttt{S-Term-Open}]
 { \Delta \vdash_{open} A \\
 \Gamma \vdash \square \Rightarrow e \Rightarrow C\\
-\Gamma \vdash C \leq^- A \dashv \Omega \rightsquigarrow A' \\
-\Omega \vdash B \leq^+ \Sigma \dashv \Delta \rightsquigarrow D}
-{\Gamma \vdash A \rightarrow B \leq^+ \boxed{e} \leadsto \Sigma \dashv \Delta \rightsquigarrow C \rightarrow D}
-\\
-
-\inferrule*[right=\texttt{S-$\forall$}]
-{\Gamma; \Delta, a \vdash A \leq B \dashv \Gamma; \Delta', a\rightsquigarrow C}
-{\Gamma; \Delta \vdash \forall a.A \leq \forall a.~B \dashv \Gamma; \Delta' \rightsquigarrow \forall a. C}
+\Gamma; \Delta \vdash C \leq^- A \dashv \Gamma; \Omega ~\cdots\\
+\Gamma; \Omega \vdash B \leq^+ \Sigma \dashv \Gamma; \Delta' \rightsquigarrow D}
+{\Gamma; \Delta \vdash A \rightarrow B \leq^+ \boxed{e} \leadsto \Sigma \dashv \Gamma; \Delta' \rightsquigarrow C \rightarrow D}
 
 \inferrule*[right=\texttt{S-$\forall$L}]
 {\Gamma; \Delta, \hat{a} \vdash A \leq^+ \boxed{e} \leadsto \Sigma \dashv \Gamma; \Delta', \hat{a}=C \rightsquigarrow B}
 {\Gamma; \Delta \vdash \forall a. A \leq^+ \boxed{e} \leadsto \Sigma \dashv \Gamma; \Delta' \rightsquigarrow B}
+
 \end{mathpar}
 
 \end{document}

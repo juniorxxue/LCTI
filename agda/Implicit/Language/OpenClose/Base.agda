@@ -36,28 +36,3 @@ data _⊢c_ : Env n m → Type m → Set where
   ⊢c-∀ :
       Δ ,∙ ⊢c A
     → Δ ⊢c `∀ A
-
-infix 3 _⊢cᵉ_
-data _⊢cᵉ_ : Env n m → Term n m → Set where
-  ⊢c-lit : ∀ {num} → Γ ⊢cᵉ (lit num)
-  ⊢c-var : Γ ⊢cᵉ (` x)
-  ⊢c-lam : Γ , A ⊢cᵉ e
-         → Γ ⊢cᵉ (ƛ e)
-  ⊢c-app : Γ ⊢cᵉ e₁ → Γ ⊢cᵉ e₂ → Γ ⊢cᵉ (e₁ · e₂)
-  ⊢c-ann : (cloA : Γ ⊢c A) → Γ ⊢cᵉ e → Γ ⊢cᵉ (e ⦂ A)
-  ⊢c-tlam : Γ ,∙ ⊢cᵉ e → Γ ⊢cᵉ (Λ e)
-
-data Closed : Env n m → Set where
-  clo-Z : Closed ∅
-  clo-S, : Closed Γ
-         → (cloA : Γ ⊢c A)
-         → Closed (Γ , A)
-  clo-S∙ : Closed Γ
-         → Closed (Γ ,∙)
-  clo-S^ : Closed Γ
-         → Closed (Γ ,^)
-  clo-S= : Closed Γ
-         → (cloA : Γ ⊢c A)
-         → Closed (Γ ,= A)
-  clo-S⋈ : Closed Γ
-         → Closed (Γ ⋈)

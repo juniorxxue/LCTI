@@ -1,7 +1,7 @@
-module Implicit.Algo.Lookup where
+module Implicit.Algo.Constructs.Lookup where
 
 open import Implicit.Language.All
-open import Implicit.Algo.Syntax
+open import Implicit.Algo.Constructs.Syntax
 
 infix 3 _εᶜ_
 data _εᶜ_ : Fin m → Context n m → Set where

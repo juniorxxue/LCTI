@@ -74,7 +74,7 @@ complete (⊢lit cloΓ) ~Z = ⊢lit cloΓ
 complete (⊢var cloΓ x∈Γ) ~Z = ⊢var cloΓ x∈Γ
 complete (⊢ann ⊢e) ~Z = ⊢ann (complete ⊢e ~∞)
 complete (⊢lam₁ ⊢e) ~∞ = ⊢lam₁ (complete ⊢e ~∞)
-complete (⊢lam₂ ⊢e) (~I ⊢e₁ x ~j) = ⊢lam₂ ⊢e₁ _ (complete ⊢e _)
+complete (⊢lam₂ ⊢e) (~I ⊢e₁ x ~j) = ⊢lam₂ ⊢e₁ {!!} (complete ⊢e {!!})
 complete (⊢app₁ ⊢e ⊢e₁) ~j = ⊢app (complete ⊢e (~C (complete ⊢e₁ ~∞) ~j))
 complete (⊢app₂ ⊢e ⊢e₁) ~j = ⊢app (complete ⊢e (~I (complete ⊢e₁ ~Z) (reg-⊆/ (Z⋈ {!!}) {!!}) ~j))
 complete (⊢sub ⊢e B≤A x j≢Z) ~j = ⊢sub (complete ⊢e ~Z) _ x (complete-s0 B≤A ~j) where postulate
@@ -128,7 +128,6 @@ complete-s {j = 𝕚 j} (s-arr₂ s s₁) (⊆I ext ext₁) (~I ⊢e x j~Σ) = s
 complete-s (s-∀l s ic fd upC upD) (⊆∀-I ext) j~ = {!!}
 complete-s (s-∀l s ic fd upC upD) (⊆∀-C ext) j~ = {!!}
 complete-s {j = 𝕔 j} (s-arr₃ cloA grd s) (⊆C cloA' ext) (~C ⊢e j~Σ) = s-term-c cloA' {!!} ⊢e (complete-s s ext j~Σ)
-
 
 complete-s0 : Γ ⋈ ⊢ j # A ⌞ ≤⁺ ⌝ B
             → Γ ⊢ ⟨ j , B ⟩ ~ Σ

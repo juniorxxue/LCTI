@@ -2,22 +2,20 @@ module Implicit.Algo.Base where
 
 open import Implicit.Language.All
 
-open import Implicit.Algo.Syntax public
-open import Implicit.Algo.Shift public
-open import Implicit.Algo.Subst public
-open import Implicit.Algo.OpenClose public
-open import Implicit.Algo.Lookup public
-open import Implicit.Algo.Split public
--- open import Implicit.Algo.Polarity public
+open import Implicit.Algo.Constructs.Syntax public
+open import Implicit.Algo.Constructs.Shift public
+open import Implicit.Algo.Constructs.Subst public
+open import Implicit.Algo.Constructs.Lookup public
+open import Implicit.Algo.Constructs.Split public
 
 infix 3 _⊢_⌞_⌝_⊣_
 data _⊢_⌞_⌝_⊣_ : Env n m → Type m → Polar → Type m → Env n m → Set where
   s-int :
-      (regΓ : SRegular Γ)
+      (regΓ : SRegular Δ)
     → Δ ⊢ Int ⌞ ≤ ⌝ Int ⊣ Δ
 
   s-var-∙ :
-      (regΓ : SRegular Γ)
+      (regΓ : SRegular Δ)
     → Δ ∋∙ X
     → Δ ⊢ (‶ X) ⌞ ≤ ⌝ (‶ X) ⊣ Δ
 
@@ -65,7 +63,7 @@ data _⊢_⇒_⇒_ where
     → Γ ⊢ □ ⇒ lit num ⇒ Int
 
   ⊢var :
-      (cloΓ : TRegular Γ)
+      (regΓ : TRegular Γ)
     → (x∈Γ : Γ ∋ x ⦂ A)
     → Γ ⊢ □ ⇒ ` x ⇒ A
 
@@ -101,7 +99,7 @@ data _⊢_⇒_⇒_ where
 data _⊢_≤⁺_⊣_↪_ where
 
   s-empty :
-      (cloΓ : SRegular Δ)
+      (regΓ : SRegular Δ)
     → (cloA : Δ ⊢c A)
     → Δ ≫ A ⇘ A%
     → Δ ⊢ A ≤⁺ □ ⊣ Δ ↪ A%

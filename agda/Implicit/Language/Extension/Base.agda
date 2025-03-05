@@ -1,7 +1,7 @@
 module Implicit.Language.Extension.Base where
 
 open import Implicit.Language.Base
-open import Implicit.Language.OpenClose.Base
+open import Implicit.Language.Regular.Base
 open import Implicit.Language.Lookup.Base
 
 infix 3 _⊆_
@@ -9,20 +9,18 @@ data _⊆_ : Env n m → Env n m → Set where
   uvar :
       Γ ⊆ Δ
     → Γ ,∙ ⊆ Δ ,∙
-  var :
-      Γ ⊆ Δ
-    → Γ , A ⊆ Δ , A
   evar :
       Γ ⊆ Δ
     → Γ ,^ ⊆ Δ ,^
   evar-sol :
       Γ ⊆ Δ
-    → (cloA : Δ ⊢c A)
+    → (regA : Δ ⊢r A)
     → Γ ,^ ⊆ Δ ,= A
   svar :
       Γ ⊆ Δ
+    → (regA : Γ ⊢r A)
     → Γ ,= A ⊆ Δ ,= A
-  mark : TEnv Γ
+  mark : TRegular Γ
     → Γ ⋈ ⊆ Γ ⋈
 
 data ExSol (Γ : Env n m) (k : Fin m) : Set where
@@ -33,7 +31,7 @@ data ExSol (Γ : Env n m) (k : Fin m) : Set where
 
 infix 3 _⊆_w/v_
 data _⊆_w/v_ : Env n m → Env n m → Fin m → Set where
-  ext-Z^ : (cloA : Γ ⊢c A)
+  ext-Z^ : (cloA : Γ ⊢r A)
          → Γ ,^ ⊆ Γ ,= A w/v #0
   ext-Z∙ : Γ ,∙ ⊆ Γ ,∙ w/v #0
   ext-S, : Γ ⊆ Δ w/v k

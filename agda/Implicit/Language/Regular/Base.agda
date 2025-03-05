@@ -19,6 +19,16 @@ data _⊢r_ : Env n m → Type m → Set where
       Γ ,∙ ⊢r A
     → Γ ⊢r `∀ A
 
+infix 3 _⊢rᵉ_
+data _⊢rᵉ_ : Env n m → Term n m → Set where
+  ⊢r-lit : ∀ {num} → Γ ⊢rᵉ (lit num)
+  ⊢r-var : Γ ⊢rᵉ (` x)
+  ⊢r-lam : Γ , A ⊢rᵉ e
+         → Γ ⊢rᵉ (ƛ e)
+  ⊢r-app : Γ ⊢rᵉ e₁ → Γ ⊢rᵉ e₂ → Γ ⊢rᵉ (e₁ · e₂)
+  ⊢r-ann : (cloA : Γ ⊢r A) → Γ ⊢rᵉ e → Γ ⊢rᵉ (e ⦂ A)
+  ⊢r-tlam : Γ ,∙ ⊢rᵉ e → Γ ⊢rᵉ (Λ e)
+
 data Regular : Env n m → Set where
   reg-Z : Regular ∅
   reg-S, : Regular Γ
@@ -48,11 +58,8 @@ data TRegular : Env n m → Set where
          → TRegular (Γ ,= A)
 
 data SRegular : Env n m → Set where
-  reg-Z : TRegular Γ
+  reg-Z : (regΓ : TRegular Γ)
         → SRegular (Γ ⋈)
-  reg-S, : SRegular Δ
-         → (regA : Δ ⊢r A)
-         → SRegular (Δ , A)
   reg-S∙ : SRegular Δ
          → SRegular (Δ ,∙)
   reg-S^ : SRegular Δ

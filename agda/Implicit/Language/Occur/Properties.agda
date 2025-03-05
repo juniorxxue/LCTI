@@ -56,12 +56,12 @@ open import Implicit.Language.Occur.Base
          → k ¬ε A
 εᵍ-:=-¬ε Z^ (S^ inΓ up) = ↑ty-¬ε up
 εᵍ-:=-¬ε Z∙ (S∙ inΓ up) = ↑ty-¬ε up
-εᵍ-:=-¬ε (Z= x x₁) (Z up) = ↑ty-¬ε up
+εᵍ-:=-¬ε (Z= x x₁) (Z env up) = ↑ty-¬ε up
 εᵍ-:=-¬ε (Z= x x₁) (S= inΓ up) = ↑ty-¬ε up
 εᵍ-:=-¬ε (S, x ninΓ) (S, inΓ) = εᵍ-:=-¬ε ninΓ inΓ
 εᵍ-:=-¬ε (S∙ ninΓ) (S∙ inΓ up) = ¬ε-↑ty0 (εᵍ-:=-¬ε ninΓ inΓ) up
 εᵍ-:=-¬ε (S^ ninΓ) (S^ inΓ up) = ¬ε-↑ty0 (εᵍ-:=-¬ε ninΓ inΓ) up
-εᵍ-:=-¬ε (S= ninΓ x x₁) (Z up) with ↑ty-unique up x
+εᵍ-:=-¬ε (S= ninΓ x x₁) (Z env up) with ↑ty-unique up x
 ... | refl = x₁
 εᵍ-:=-¬ε (S= ninΓ x x₁) (S= inΓ up) = ¬ε-↑ty0 (εᵍ-:=-¬ε ninΓ inΓ) up
 
@@ -85,3 +85,18 @@ open import Implicit.Language.Occur.Base
 ε-dec {k = k} {A = `∀ A} with ε-dec {k = #S k} {A = A}
 ... | inj₁ p = inj₁ (ε-∀ p)
 ... | inj₂ p = inj₂ (¬ε-∀ p)
+
+
+ε-↑ty : k₁ ε A
+      → A ↑ty k₂ ⇘ A'
+      → k₂ #≤ k₁
+      → #S k₁ ε A'
+ε-↑ty ε-var ↑ty-var sm rewrite punchIn-≤ sm = ε-var
+ε-↑ty (ε-arr-l kε) (↑ty-arr ↑ty ↑ty₁) sm = ε-arr-l (ε-↑ty kε ↑ty sm)
+ε-↑ty (ε-arr-r kε) (↑ty-arr ↑ty ↑ty₁) sm = ε-arr-r (ε-↑ty kε ↑ty₁ sm)
+ε-↑ty (ε-∀ kε) (↑ty-∀ ↑ty) sm = ε-∀ (ε-↑ty kε ↑ty (s≤s sm))
+
+ε-↑ty0 : k ε A
+       → ↑ty0 A ⇘ A'
+       → #S k ε A'
+ε-↑ty0 inA ↑ty = ε-↑ty inA ↑ty z≤n

@@ -99,7 +99,7 @@ data _◀_:=_⇘_ : Env n (1 + m) → Fin (1 + m) → Type m → Env n m → Set
 
 infix 3 _▶_,_⇘_
 data _▶_,_⇘_ : Env n m → Fin (1 + n) → Type m → Env (1 + n) m → Set where
-  ▶Z  : (cloA : Γ ⊢c A)
+  ▶Z  : (cloA : Γ ⊢r A)
      → Γ ▶ #0 , A ⇘ Γ , A
   ▶S, : Γ ▶ k , A ⇘ Γ'
       → (Γ , B) ▶ #S k , A ⇘ Γ' , B
@@ -118,8 +118,8 @@ data _▶_,_⇘_ : Env n m → Fin (1 + n) → Type m → Env (1 + n) m → Set 
 
 infix 3 _⨟_▶_,_⇘_⨟_
 data _⨟_▶_,_⇘_⨟_ : Env n m → Env n m → Fin (1 + n) → Type m → Env (1 + n) m → Env (1 + n) m → Set where
-  ▶Z  : (cloA : Γ ⊢c A)
-      → (cloA' : Δ ⊢c A)
+  ▶Z  : (cloA : Γ ⊢r A)
+      → (cloA' : Δ ⊢r A)
       → Γ ⨟ Δ ▶ #0 , A ⇘ Γ , A ⨟ Δ , A
   ▶S, : Γ ⨟ Δ ▶ k , A ⇘ Γ' ⨟ Δ'
       → Γ , B ⨟ Δ , B ▶ #S k , A ⇘ Γ' , B ⨟ Δ' , B
@@ -172,7 +172,7 @@ data _▶_,∙⇘_ : Env n m → Fin (1 + m) → Env n (1 + m) → Set where
 
 infix 3 _▶_,=_⇘_
 data _▶_,=_⇘_ : Env n m → Fin (1 + m) → Type m → Env n (1 + m) → Set where
-  ▶Z  : (cloA : Γ ⊢c A)
+  ▶Z  : (cloA : Γ ⊢r A)
       → Γ ▶ #0 ,= A ⇘ Γ ,= A
   ▶S, : Γ ▶ k ,= A ⇘ Γ'
       → (up : B ↑ty k ⇘ B')
@@ -201,7 +201,7 @@ infix 3 [_/_]_⟹_
 data [_/_]_⟹_ : Type m → Fin m → Env n m → Env n m → Set where
   ⟹^0 : (up : ↑ty0 A ⇘ A')
         → (regA : Γ ⊢r A)
-        → (env : SEnv Γ)
+        → (env : SRegular Γ)
         → [ A' / #0 ] (Γ ,^) ⟹ (Γ ,= A)
 
   ⟹^S : [ A / k ] Γ ⟹ Γ'
@@ -212,13 +212,10 @@ data [_/_]_⟹_ : Type m → Fin m → Env n m → Env n m → Set where
         → (up1 : ↑ty0 A ⇘ A')
         → [ A' / #S k ] (Γ ,∙) ⟹ (Γ' ,∙)
 
-  ⟹,S : [ A / k ] Γ ⟹ Γ'
-       → [ A / k ] (Γ , B) ⟹ (Γ' , B)
-
   ⟹=S : [ A / k ] Γ ⟹ Γ'
         → (up1 : ↑ty0 A ⇘ A')
+        → (regB : Γ ⊢r B)
         → [ A' / #S k ] (Γ ,= B) ⟹ (Γ' ,= B)
-
 
 
 -- replace entry a with a solution ^a=A in an environment

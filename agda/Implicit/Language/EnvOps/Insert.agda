@@ -9,8 +9,8 @@ open import Implicit.Language.EnvOps.Base
      → Γ ▶ k ,^⇘ Γ'
      → A ↑ty k ⇘ A'
      → Γ' ∋ punchIn k X := A'
-▶^-∋:= (Z up) ▶Z upA = S^ (Z up) upA
-▶^-∋:= (Z up) (▶S= newΓ x) upA = Z (↑ty-comm0 up upA x)
+▶^-∋:= (Z senv up) ▶Z upA = S^ (Z senv up) upA
+▶^-∋:= (Z senv up) (▶S= newΓ x) upA = Z ? (↑ty-comm0 up upA x)
 ▶^-∋:= (S, inΓ) ▶Z upA = S^ (S, inΓ) upA
 ▶^-∋:= (S, inΓ) (▶S, newΓ x) upA = S, (▶^-∋:= inΓ newΓ upA)
 ▶^-∋:= (S∙ inΓ up) ▶Z upA = S^ (S∙ inΓ up) upA
@@ -27,8 +27,8 @@ open import Implicit.Language.EnvOps.Base
      → Γ ▶ k ,∙⇘ Γ'
      → A ↑ty k ⇘ A'
      → Γ' ∋ punchIn k X := A'
-▶∙-∋:= (Z up) ▶Z upA = S∙ (Z up) upA
-▶∙-∋:= (Z up) (▶S= newΓ x) upA = Z (↑ty-comm0 up upA x)
+▶∙-∋:= (Z senv up) ▶Z upA = S∙ (Z senv up) upA
+▶∙-∋:= (Z senv up) (▶S= newΓ x) upA = Z ? (↑ty-comm0 up upA x)
 ▶∙-∋:= (S, inΓ) ▶Z upA = S∙ (S, inΓ) upA
 ▶∙-∋:= (S, inΓ) (▶S, newΓ x) upA = S, (▶∙-∋:= inΓ newΓ upA)
 ▶∙-∋:= (S∙ inΓ up) ▶Z upA = S∙ (S∙ inΓ up) upA
@@ -45,8 +45,8 @@ open import Implicit.Language.EnvOps.Base
        → Γ ▶ k ,= T ⇘ Γ'
        → A ↑ty k ⇘ A'
        → Γ' ∋ punchIn k X := A'
-▶=-∋:= (Z up) (▶Z cloA) upA = S= (Z up) upA
-▶=-∋:= (Z up) (▶S= newΓ x x₁) upA = Z (↑ty-comm0 up upA x₁)
+▶=-∋:= (Z senv up) (▶Z cloA) upA = S= (Z senv up) upA
+▶=-∋:= (Z senv up) (▶S= newΓ x x₁) upA = Z ? (↑ty-comm0 up upA x₁)
 ▶=-∋:= (S, inΓ) (▶Z cloA) upA = S= (S, inΓ) upA
 ▶=-∋:= (S, inΓ) (▶S, newΓ x) upA = S, (▶=-∋:= inΓ newΓ upA)
 ▶=-∋:= (S∙ inΓ up) (▶Z cloA) upA = S= (S∙ inΓ up) upA
@@ -63,7 +63,7 @@ open import Implicit.Language.EnvOps.Base
 ▶,-∋:= : Γ ∋ X := A
        → Γ ▶ k , T ⇘ Γ'
        → Γ' ∋ X := A
-▶,-∋:= (Z up) (▶Z cloA) = S, (Z up)
+▶,-∋:= (Z env up) (▶Z cloA) = S, (Z up)
 ▶,-∋:= (Z up) (▶S= newΓ x) = Z up
 ▶,-∋:= (S, inΓ) (▶Z cloA) = S, (S, inΓ)
 ▶,-∋:= (S, inΓ) (▶S, newΓ) = S, (▶,-∋:= inΓ newΓ)

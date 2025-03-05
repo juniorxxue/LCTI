@@ -1,7 +1,7 @@
-module Implicit.Algo.Subst where
+module Implicit.Algo.Constructs.Subst where
 
 open import Implicit.Language.All
-open import Implicit.Algo.Syntax
+open import Implicit.Algo.Constructs.Syntax
 
 -- subst a type in context
 infix 3 ⟦_/_⟧ᶜ_⇘_

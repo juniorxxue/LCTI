@@ -5,7 +5,6 @@ open import Implicit.Language.Shift.Base
 open import Implicit.Language.Lookup.Base
 open import Implicit.Language.EnvOps.Base
 
-
 -- this only works on the subtyping environment
 infix 3 _≫_⇘_
 data _≫_⇘_ : Env n m → Type m → Type m → Set

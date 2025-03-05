@@ -4,23 +4,6 @@ open import Implicit.Language.All hiding (_⊆_)
 open import Implicit.Algo.Base
 
 
-⊆-refl : SubEnv Γ
-       → Γ ⊆ Γ
-⊆-refl (Z⋈ x) = mark x
-⊆-refl (S, se) = var (⊆-refl se)
-⊆-refl (S= se) = svar (⊆-refl se)
-⊆-refl (S∙ se) = uvar (⊆-refl se)
-⊆-refl (S^ se) = evar (⊆-refl se)
-
-⊆-senv : Γ ⊆ Γ'
-       → SubEnv Γ
-⊆-senv (uvar ext) = S∙ (⊆-senv ext)
-⊆-senv (var ext) = S, (⊆-senv ext)
-⊆-senv (evar ext) = S^ (⊆-senv ext)
-⊆-senv (evar-sol ext cloA) = S^ (⊆-senv ext)
-⊆-senv (svar ext) = S= (⊆-senv ext)
-⊆-senv (mark x) = Z⋈ x
-
 postulate
   ⊆-∋∙ : Γ ∋∙ X
        → Γ ⊆ Δ

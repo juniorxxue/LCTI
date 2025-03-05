@@ -1,9 +1,9 @@
-module Implicit.Algo.Shift where
+module Implicit.Algo.Constructs.Shift where
 
 -- a module for shifting in new syntax of algorithmic system
 
 open import Implicit.Language.All
-open import Implicit.Algo.Syntax
+open import Implicit.Algo.Constructs.Syntax
 
 infix 3 _↑tmᶜ_⇘_
 data _↑tmᶜ_⇘_ : Context n m → Fin (1 + n) → Context (1 + n) m → Set where
