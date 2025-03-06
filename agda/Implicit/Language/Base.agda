@@ -64,7 +64,7 @@ data Env : ℕ → ℕ → Set where
 
 variable
   Γ Γ' Γ'' Γ₁ Γ₂ Γ₃ Γ* Γ% : Env n m -- typing env
-  Δ Δ' Δ₁ Δ₂ Ψ Ω : Env n m -- subtyping env
+  Δ Δ' Δ₁ Δ₂ Ψ Ω Ψ' Ω' : Env n m -- subtyping env
 
 data TEnv : Env n m → Set where
   Z⋈ : TEnv ∅

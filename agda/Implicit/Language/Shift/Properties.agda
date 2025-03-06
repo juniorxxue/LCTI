@@ -175,3 +175,26 @@ private variable
          → A ↑ty #S k ⇘ A'
          → #0 ¬ε A'
 ¬ε-↑ty0' ¬inA upA = ¬ε-↑ty' ¬inA upA (s≤s z≤n)
+
+----------------------------------------------------------------------
+--+                    type shifting for terms                     +--
+----------------------------------------------------------------------
+
+↑tyᵉ-total : ∀ (e : Term n m) k
+  → ∃ λ e'
+  → e ↑tyᵉ k ⇘ e'
+↑tyᵉ-total (lit i) k = ⟨ lit i , ↑tyᵉ-lit ⟩
+↑tyᵉ-total (` x) k = ⟨ ` x , ↑tyᵉ-var ⟩
+↑tyᵉ-total (ƛ e) k = ⟨ ƛ ↑tyᵉ-total e k .proj₁ , ↑tyᵉ-ƛ (↑tyᵉ-total e k .proj₂) ⟩
+↑tyᵉ-total (e · e₁) k = ⟨ ↑tyᵉ-total e k .proj₁ · ↑tyᵉ-total e₁ k .proj₁ ,
+                         ↑tyᵉ-app (↑tyᵉ-total e k .proj₂) (↑tyᵉ-total e₁ k .proj₂) ⟩
+↑tyᵉ-total (e ⦂ A) k with ↑tyᵉ-total e k | ↑ty-total A k
+... | ⟨ e' , upe ⟩ | ⟨ A' , upA ⟩ = ⟨ e' ⦂ A' , ↑tyᵉ-⦂ upe upA ⟩
+↑tyᵉ-total (Λ e) k = ⟨ Λ ↑tyᵉ-total e (#S k) .proj₁ ,
+                      ↑tyᵉ-Λ (↑tyᵉ-total e (#S k) .proj₂) ⟩
+
+
+↑tyᵉ0-total : ∀ (e : Term n m)
+  → ∃ λ e'
+  → ↑tyᵉ0 e ⇘ e'
+↑tyᵉ0-total e = ↑tyᵉ-total e #0

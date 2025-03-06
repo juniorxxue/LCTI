@@ -56,12 +56,11 @@ open import Implicit.Language.Occur.Base
          → k ¬ε A
 εᵍ-:=-¬ε Z^ (S^ inΓ up) = ↑ty-¬ε up
 εᵍ-:=-¬ε Z∙ (S∙ inΓ up) = ↑ty-¬ε up
-εᵍ-:=-¬ε (Z= x x₁) (Z env up) = ↑ty-¬ε up
+εᵍ-:=-¬ε (Z= x x₁) (Z up) = ↑ty-¬ε up
 εᵍ-:=-¬ε (Z= x x₁) (S= inΓ up) = ↑ty-¬ε up
-εᵍ-:=-¬ε (S, x ninΓ) (S, inΓ) = εᵍ-:=-¬ε ninΓ inΓ
 εᵍ-:=-¬ε (S∙ ninΓ) (S∙ inΓ up) = ¬ε-↑ty0 (εᵍ-:=-¬ε ninΓ inΓ) up
 εᵍ-:=-¬ε (S^ ninΓ) (S^ inΓ up) = ¬ε-↑ty0 (εᵍ-:=-¬ε ninΓ inΓ) up
-εᵍ-:=-¬ε (S= ninΓ x x₁) (Z env up) with ↑ty-unique up x
+εᵍ-:=-¬ε (S= ninΓ x x₁) (Z up) with ↑ty-unique up x
 ... | refl = x₁
 εᵍ-:=-¬ε (S= ninΓ x x₁) (S= inΓ up) = ¬ε-↑ty0 (εᵍ-:=-¬ε ninΓ inΓ) up
 

@@ -1,11 +1,18 @@
-module Implicit.Algo.New.Subsumption where
+module Implicit.Algo.Properties.Subsumption where
 
-open import Implicit.Language.All hiding (_⊆_)
+open import Implicit.Language.All
 open import Implicit.Algo.Base
+open import Implicit.Algo.Properties.Id
+open import Implicit.Algo.Properties.Reflexivity
+open import Implicit.Algo.Properties.Extension
+open import Implicit.Algo.Properties.Regularity
+open import Implicit.Algo.Properties.Polarity
+
 
 postulate
-  ⊢id0 : Γ ⊢ τ A ⇒ e ⇒ B
-       → A ≡ B
+  t-irrev-⊆ : 𝕣 Γ ⊢ Σ ⇒ e ⇒ A
+            → Γ ⊆ Δ
+            → 𝕣 Δ ⊢ Σ ⇒ e ⇒ A
 
 ⊢to≤ : Γ ⊢ Σ ⇒ e ⇒ A
      → Γ ⋈ ⊢ A ≤⁺ Σ ⊣ Γ ⋈ ↪ A
@@ -17,19 +24,20 @@ subsumption :  Γ ⊢ Σ ⇒ e ⇒ A
 
 subsumption0 : Γ ⊢ □ ⇒ e ⇒ A
              → Γ ⊢ τ A ⇒ e ⇒ A
-subsumption0 ⊢e = subsumption ⊢e ≊Z {!!}
+subsumption0 ⊢e = subsumption ⊢e ≊Z (s-type (s-refl (reg-Z (t-env ⊢e)) (⊢r-weaken⋈0 (t-⊢r ⊢e))))
 
 
 s-refined-p : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
             → Δ ⊢ B ≤⁺ Σ ⊣ Δ ↪ B
-s-refined-p (s-empty cloΓ cloA x) = s-empty cloΓ {!!} {!!}
-s-refined-p (s-type ss) = s-type {!!}
+s-refined-p (s-empty cloΓ cloA x) = let regB = (⊢c-≫-⊢r cloΓ cloA x) in s-empty cloΓ (⊢r-⊢c regB ) (⊢r-≫-eq regB)
+s-refined-p (s-type ss) = s-type (s-refl (ss-env-out ss) (ss-polarity+-out ss))
 s-refined-p (s-term-c cloA ap ⊢e s) with ⊢id0 ⊢e
-... | refl = s-term-c {!!} {!!} {!!} (s-refined-p s)
-s-refined-p (s-term-o opnA ⊢e x s) with subsumption0 ⊢e
-... | ih = s-term-c {!!} {!!} {!!} (s-refined-p s)
+... | refl = let regA = ⊆-⊢r (⊢c-≫-⊢r (s-env-in s) cloA ap) (s-⊆ s)
+             in s-term-c (⊢r-⊢c regA) (⊢r-≫-eq regA) (t-irrev-⊆ ⊢e (s-⊆ s)) (s-refined-p s)
+s-refined-p s'@(s-term-o opnA ⊢e ss s) with subsumption0 ⊢e
+... | ih = let regA = ⊆-⊢r (ss-polarity- ss) (s-⊆ s')
+         in s-term-c (⊢r-⊢c regA) (⊢r-≫-eq regA) (t-irrev-⊆ ih (s-⊆ s')) (s-refined-p s)
 s-refined-p (s-∀l s upᶜ upᵉ upC upD) = {!s-refined-p s!}
-
 
 ⊢to≤ (⊢lit regΓ) = s-empty (reg-Z regΓ) ⊢c-int grd-int
 ⊢to≤ (⊢var cloΓ x∈Γ) = s-empty (reg-Z cloΓ) {!!} {!!}

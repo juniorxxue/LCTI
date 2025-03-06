@@ -2,7 +2,7 @@ module Implicit.Algo.Properties.Weaken where
 
 open import Implicit.Language.All
 open import Implicit.Algo.Base
-
+{-
 ▶⨟-unique : Γ ⨟ Γ ▶ k , T ⇘ Γ' ⨟ Δ'
           → Γ' ≡ Δ'
 ▶⨟-unique (▶Z cloA cloA') = refl
@@ -33,7 +33,8 @@ open import Implicit.Algo.Base
           → Γ ∋ X := A
           → Γ' ∋ X := A
 ▶⨟,-∋:=-l newΓ inΓ = ▶,-∋:= inΓ (▶⨟-▶-l newΓ)
-
+-}
+{-
 inst-weaken, : [ B / X ] Γ ⟹ Δ
              → Γ ⨟ Δ ▶ k , T ⇘ Γ' ⨟ Δ'
              → [ B / X ] Γ' ⟹ Δ'
@@ -48,6 +49,7 @@ inst-weaken, (⟹,S inst) (▶Z cloA cloA') = ⟹,S (⟹,S inst)
 inst-weaken, (⟹,S inst) (▶S, newΓ) = ⟹,S (inst-weaken, inst newΓ)
 inst-weaken, (⟹=S inst up1) (▶Z cloA cloA') = ⟹,S (⟹=S inst up1)
 inst-weaken, (⟹=S inst up1) (▶S= newΓ x) = ⟹=S (inst-weaken, inst newΓ) up1
+-}
 
 
 -- s-weaken, : Γ ⊢ A ⌞ ≤ ⌝ Σ ⊣ Δ ↪ B
@@ -78,8 +80,20 @@ inst-weaken, (⟹=S inst up1) (▶S= newΓ x) = ⟹=S (inst-weaken, inst newΓ) 
 -- s-weaken,0 s upΣ cloT cloT' = s-weaken, s (▶Z cloT cloT') upΣ
 
 postulate
-  s-weaken,0 : Γ ⊢ A ⌞ ≤ ⌝ Σ ⊣ Δ ↪ B
+  s-weaken,0 : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
              → ↑tmᶜ0 Σ ⇘ Σ'
              → Γ ⊢c T
              → Δ ⊢c T
-             → Γ , T ⊢ A ⌞ ≤ ⌝ Σ' ⊣ Δ , T ↪ B
+             → Γ , T ⊢ A ≤⁺ Σ' ⊣ Δ , T ↪ B
+
+  s-weaken^0 : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
+             → ↑ty0 A ⇘ A'
+             → ↑tyᶜ0 Σ ⇘ Σ'
+             → ↑ty0 B ⇘ B'
+             → Γ ,^ ⊢ A' ≤⁺ Σ' ⊣ Δ ,^ ↪ B'
+
+  s-weaken=0 : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
+             → ↑ty0 A ⇘ A'
+             → ↑tyᶜ0 Σ ⇘ Σ'
+             → ↑ty0 B ⇘ B'
+             → Γ ,= T ⊢ A' ≤⁺ Σ' ⊣ Δ ,= T ↪ B'

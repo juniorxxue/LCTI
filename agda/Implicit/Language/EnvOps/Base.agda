@@ -4,7 +4,7 @@ open import Implicit.Language.Base
 open import Implicit.Language.Shift.All
 open import Implicit.Language.Subst.All
 open import Implicit.Language.OpenClose.Base
-open import Implicit.Language.Regular.Base
+open import Implicit.Language.Regular.All
 
 ----------------------------------------------------------------------
 --+                         Entry Removal                          +--
@@ -217,6 +217,12 @@ data [_/_]_⟹_ : Type m → Fin m → Env n m → Env n m → Set where
         → (regB : Γ ⊢r B)
         → [ A' / #S k ] (Γ ,= B) ⟹ (Γ' ,= B)
 
+inst-⊢r : [ A / k ] Γ ⟹ Δ
+        → Γ ⊢r A
+inst-⊢r (⟹^0 up regA env) = ⊢r-weaken^0 regA up
+inst-⊢r (⟹^S inst up1) = ⊢r-weaken^0 (inst-⊢r inst) up1
+inst-⊢r (⟹∙S inst up1) = ⊢r-weaken∙0 (inst-⊢r inst) up1
+inst-⊢r (⟹=S inst up1 regB) = ⊢r-weaken=0 (inst-⊢r inst) up1 regB
 
 -- replace entry a with a solution ^a=A in an environment
 infix 3 [_/_]_∙⟹_

@@ -23,11 +23,8 @@ data _∋_⦂_ : Env n m → Fin n → Type m → Set where
 -- lookup an entry in subtyping env : solution
 infix 3 _∋_:=_
 data _∋_:=_ : Env n m → Fin m → Type m → Set where
-  Z  : SEnv Δ
-     → (up : ↑ty0 A ⇘ A')
+  Z  : (up : ↑ty0 A ⇘ A')
      → Δ ,= A ∋ #0 := A'
-  S, : Δ ∋ k := A
-     → Δ , B ∋ k := A
   S∙ : Δ ∋ k := A
      → (up : ↑ty0 A ⇘ A')
      → Δ ,∙ ∋ #S k := A'
@@ -41,10 +38,7 @@ data _∋_:=_ : Env n m → Fin m → Type m → Set where
 -- lookup an entry in subtyping env: solution (simpler ver.)
 infix 3 _∋=_
 data _∋=_ : Env n m → Fin m → Set where
-  Z  : SEnv Δ
-     → Δ ,= A ∋= #0
-  S, : Δ ∋= k
-     → Δ , B ∋= k
+  Z  : Δ ,= A ∋= #0
   S∙ : Δ ∋= k
      → Δ ,∙ ∋= #S k
   S^ : Δ ∋= k
@@ -55,10 +49,7 @@ data _∋=_ : Env n m → Fin m → Set where
 -- lookup an entry in subtyping env: (unsolved) existential variable
 infix 3 _∋^_
 data _∋^_ : Env n m → Fin m → Set where
-  Z  : SEnv Δ
-     → Δ ,^ ∋^ #0
-  S, : Δ ∋^ k
-     → Δ , A ∋^ k
+  Z  : Δ ,^ ∋^ #0
   S∙ : Δ ∋^ k
      → Δ ,∙ ∋^ #S k
   S= : Δ ∋^ k
