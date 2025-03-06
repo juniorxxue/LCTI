@@ -34,3 +34,10 @@ spl-↑ty0 : ⟦ Σ , A ⟧→⟦ τ T , B ⟧
 spl-↑ty0 none-τ (↑tyᶜ-τ up-t) up2 up3 up4 with ↑ty-unique up-t up3 | ↑ty-unique up2 up4
 ... | refl | refl = none-τ
 spl-↑ty0 (have-e spl) (↑tyᶜ-e up-e up1) (↑ty-arr up2 up5) up3 up4 = have-e (spl-↑ty0 spl up1 up5 up3 up4)
+
+≊-↑ty0 : Σ₁ ≊ Σ₂
+       → ↑tyᶜ0 Σ₁ ⇘ Σ₁'
+       → ↑tyᶜ0 Σ₂ ⇘ Σ₂'
+       → Σ₁' ≊ Σ₂'
+≊-↑ty0 ≊Z ↑tyᶜ-□ (↑tyᶜ-τ up-t) = ≊Z
+≊-↑ty0 (≊S newΣ) (↑tyᶜ-e up-e up1) (↑tyᶜ-e up-e₁ up2) with refl ← ↑tyᵉ-unique up-e up-e₁ = ≊S (≊-↑ty0 newΣ up1 up2)

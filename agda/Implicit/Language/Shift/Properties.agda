@@ -198,3 +198,19 @@ private variable
   → ∃ λ e'
   → ↑tyᵉ0 e ⇘ e'
 ↑tyᵉ0-total e = ↑tyᵉ-total e #0
+
+
+↑tyᵉ-unique : e ↑tyᵉ k ⇘ e₁
+            → e ↑tyᵉ k ⇘ e₂
+            → e₁ ≡ e₂
+↑tyᵉ-unique ↑tyᵉ-lit ↑tyᵉ-lit = refl
+↑tyᵉ-unique ↑tyᵉ-var ↑tyᵉ-var = refl
+↑tyᵉ-unique (↑tyᵉ-ƛ up1) (↑tyᵉ-ƛ up2) with refl ← ↑tyᵉ-unique up1 up2 = refl
+↑tyᵉ-unique (↑tyᵉ-app up1 up3) (↑tyᵉ-app up2 up4)
+  with refl ← ↑tyᵉ-unique up1 up2
+  with refl ← ↑tyᵉ-unique up3 up4 = refl
+↑tyᵉ-unique (↑tyᵉ-⦂ up1 up) (↑tyᵉ-⦂ up2 up₁)
+  with refl ← ↑tyᵉ-unique up1 up2
+  with refl ← ↑ty-unique up up₁ = refl
+↑tyᵉ-unique (↑tyᵉ-Λ up1) (↑tyᵉ-Λ up2)
+  with refl ← ↑tyᵉ-unique up1 up2 = refl

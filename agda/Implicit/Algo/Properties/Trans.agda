@@ -4,8 +4,11 @@ open import Implicit.Language.All hiding (_⊆_)
 open import Implicit.Algo.Base
 open import Implicit.Algo.Properties.Id
 open import Implicit.Algo.Properties.Shift
+open import Implicit.Algo.Properties.Split
 open import Implicit.Algo.Properties.Extension
 open import Implicit.Algo.Properties.Weaken
+open import Implicit.Algo.Properties.Regularity
+open import Implicit.Algo.Properties.Polarity
 
 ss-grd+ : SRegular Γ
        → Γ ⊢c A
@@ -38,27 +41,40 @@ ss-⊢r-eq- : Γ ⊢ A ⌞ ≤⁻ ⌝ B ⊣ Γ
 
 ss-⊢r-eq+ (s-int regΓ) regA = refl
 ss-⊢r-eq+ (s-var-∙ regΓ x) regA = refl
-ss-⊢r-eq+ (s-ex-l^ inst) (⊢r-var-∙ inΓ) = ⊥-elim {!!}
-ss-⊢r-eq+ (s-ex-l= regΓ x-in) (⊢r-var-∙ inΓ) = ⊥-elim {!!}
+ss-⊢r-eq+ (s-ex-l^ inst) (⊢r-var-∙ inΓ) = ⊥-elim (∋^-∋∙-false (inst-∋^ inst) inΓ)
+ss-⊢r-eq+ (s-ex-l= regΓ x-in) (⊢r-var-∙ inΓ) = ⊥-elim (∋∙-∋:=-false inΓ x-in)
 ss-⊢r-eq+ (s-arr s s₁) (⊢r-arr regA regA₁)
   with refl ← ⊆-antisymm (ss-⊆ s) (ss-⊆ s₁)
   with refl ← ss-⊢r-eq- s regA
   with refl ← ss-⊢r-eq+ s₁ regA₁ = refl
 ss-⊢r-eq+ (s-∀ s) (⊢r-∀ regA) with refl ← ss-⊢r-eq+ s regA = refl
 
+ss-⊢r-eq- (s-int regΓ) regA = refl
+ss-⊢r-eq- (s-var-∙ regΓ x) regA = refl
+ss-⊢r-eq- (s-ex-r^ inst) (⊢r-var-∙ inΓ) = ⊥-elim (∋^-∋∙-false (inst-∋^ inst) inΓ)
+ss-⊢r-eq- (s-ex-r= regΓ x-in) (⊢r-var-∙ inΓ) = ⊥-elim (∋∙-∋:=-false inΓ x-in)
+ss-⊢r-eq- (s-arr s s₁) (⊢r-arr regA regA₁)
+  with refl ← ⊆-antisymm (ss-⊆ s) (ss-⊆ s₁) = cong₂ _`→_ (sym (ss-⊢r-eq+ s regA)) (ss-⊢r-eq- s₁ regA₁)
+ss-⊢r-eq- (s-∀ s) (⊢r-∀ regA) = cong `∀_ (ss-⊢r-eq- s regA)
+
 s-trans : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
         → Δ ⊢ B ≤⁺ Σ' ⊣ Δ ↪ C
         → Σ ≊ Σ'
         → Γ ⊢ A ≤⁺ Σ' ⊣ Δ ↪ C
-s-trans (s-empty cloΓ cloA x) (s-type ss) ≊Z = s-type {!!}
-s-trans (s-term-c cloA ap ⊢e s1) (s-term-c cloA₁ ap₁ ⊢e₁ s2) (≊S newΣ) with ⊢id0 ⊢e | ⊢id0 ⊢e₁
-... | refl | refl = s-term-c cloA {!!} {!!} (s-trans s1 s2 newΣ)
+s-trans (s-empty cloΓ cloA x) (s-type ss) ≊Z with ss-⊢r-eq+ ss (⊢c-≫-⊢r cloΓ cloA x)
+... | refl = s-type (ss-grd+ cloΓ cloA x)
+s-trans (s-term-c cloA ap ⊢e s1) (s-term-c cloA₁ ap₁ ⊢e₁ s2) (≊S newΣ)
+  with regA% ← ⊢c-≫-⊢r (s-env-in s1) cloA ap
+  with relf ← ⊢id0 ⊢e
+  with refl ← ⊢id0 ⊢e₁
+  with refl ← ⊢r-≫-eq' (⊆-⊢r regA% (s-⊆ s1)) ap₁ = s-term-c cloA ap ⊢e (s-trans s1 s2 newΣ)
 s-trans (s-term-c cloA ap ⊢e s1) (s-term-o opnA ⊢e₁ x s2) (≊S newΣ) = ⊥-elim {!!}
-s-trans (s-term-o opnA ⊢e x s1) (s-term-c cloA ap ⊢e₁ s2) (≊S newΣ) = s-term-o opnA {!!} {!!} (s-trans s1 s2 newΣ)
+s-trans s'@(s-term-o opnA ⊢e x s1) (s-term-c cloA ap ⊢e₁ s2) (≊S newΣ)
+  with refl ← ⊢r-≫-eq' (⊆-⊢r (ss-polarity- x) (s-⊆ s')) ap = s-term-o opnA ⊢e x (s-trans s1 s2 newΣ)
 s-trans (s-term-o opnA ⊢e x s1) (s-term-o opnA₁ ⊢e₁ x₁ s2) newΣ = ⊥-elim {!!}
 s-trans (s-∀l s1 upᶜ upᵉ upC upD) s'@(s-term-c {A% = A%} {Σ = Σ′} {D = D} cloA ap ⊢e s2) (≊S newΣ) =
   let ⟨ Σ″ , upΣ′ ⟩ = ↑tyᶜ0-total Σ′
       ⟨ A%' , upA%' ⟩ = ↑ty0-total A%
       ⟨ D' , upD' ⟩ = ↑ty0-total D
-  in s-∀l (s-trans s1 (s-weaken=0 s' (↑ty-arr upC upD) (↑tyᶜ-e upᵉ upΣ′) (↑ty-arr upA%' upD')) (≊S {!!})) upΣ′ upᵉ upA%' upD'
+  in s-∀l (s-trans s1 (s-weaken=0 s' (↑ty-arr upC upD) (↑tyᶜ-e upᵉ upΣ′) (↑ty-arr upA%' upD')) (≊S (≊-↑ty0 newΣ upᶜ upΣ′))) upΣ′ upᵉ upA%' upD'
 s-trans (s-∀l s1 upᶜ upᵉ upC upD) (s-term-o opnA ⊢e x s2) (≊S newΣ) = ⊥-elim {!!}

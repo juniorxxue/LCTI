@@ -5,6 +5,7 @@ open import Implicit.Language.Shift.All
 open import Implicit.Language.Subst.All
 open import Implicit.Language.OpenClose.Base
 open import Implicit.Language.Regular.All
+open import Implicit.Language.Lookup.Base
 
 ----------------------------------------------------------------------
 --+                         Entry Removal                          +--
@@ -223,6 +224,13 @@ inst-⊢r (⟹^0 up regA env) = ⊢r-weaken^0 regA up
 inst-⊢r (⟹^S inst up1) = ⊢r-weaken^0 (inst-⊢r inst) up1
 inst-⊢r (⟹∙S inst up1) = ⊢r-weaken∙0 (inst-⊢r inst) up1
 inst-⊢r (⟹=S inst up1 regB) = ⊢r-weaken=0 (inst-⊢r inst) up1 regB
+
+inst-∋^ : [ A / k ] Γ ⟹ Δ
+        → Γ ∋^ k
+inst-∋^ (⟹^0 up regA env) = Z
+inst-∋^ (⟹^S inst up1) = S^ (inst-∋^ inst)
+inst-∋^ (⟹∙S inst up1) = S∙ (inst-∋^ inst)
+inst-∋^ (⟹=S inst up1 regB) = S= (inst-∋^ inst)
 
 -- replace entry a with a solution ^a=A in an environment
 infix 3 [_/_]_∙⟹_

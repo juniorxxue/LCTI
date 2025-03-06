@@ -27,6 +27,15 @@ open import Implicit.Language.Ground.Base
 ⊢r-≫-eq (⊢r-arr regA regA₁) = grd-arr (⊢r-≫-eq regA) (⊢r-≫-eq regA₁)
 ⊢r-≫-eq (⊢r-∀ regA) = grd-∀ (⊢r-≫-eq regA)
 
+⊢r-≫-eq' : Γ ⊢r A
+         → Γ ≫ A ⇘ A%
+         → A ≡ A%
+⊢r-≫-eq' ⊢r-int grd-int = refl
+⊢r-≫-eq' (⊢r-var-∙ inΓ) (grd-var= x) = ⊥-elim (∋∙-∋:=-false inΓ x)
+⊢r-≫-eq' (⊢r-var-∙ inΓ) (grd-var∙ x) = refl
+⊢r-≫-eq' (⊢r-arr regA regA₁) (grd-arr grd grd₁) = cong₂ _`→_ (⊢r-≫-eq' regA grd) (⊢r-≫-eq' regA₁ grd₁)
+⊢r-≫-eq' (⊢r-∀ regA) (grd-∀ grd) = cong `∀_ (⊢r-≫-eq' regA grd)
+
 ⊢c-≫-⊢c : SRegular Γ
           → Γ ⊢c A
           → Γ ≫ A ⇘ A%

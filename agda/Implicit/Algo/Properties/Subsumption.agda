@@ -14,6 +14,11 @@ postulate
             → Γ ⊆ Δ
             → 𝕣 Δ ⊢ Σ ⇒ e ⇒ A
 
+  s-trans : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
+        → Δ ⊢ B ≤⁺ Σ' ⊣ Δ ↪ C
+        → Σ ≊ Σ'
+        → Γ ⊢ A ≤⁺ Σ' ⊣ Δ ↪ C
+
 ⊢to≤ : Γ ⊢ Σ ⇒ e ⇒ A
      → Γ ⋈ ⊢ A ≤⁺ Σ ⊣ Γ ⋈ ↪ A
 
@@ -60,6 +65,6 @@ subsumption {Σ' = τ A} (⊢tabs ⊢e) ≊Z s = ⊢sub (⊢tabs ⊢e) ne-τ gc-
 subsumption {Σ' = [ e ]↝ Σ'} (⊢app ⊢e) (≊S newΣ) s with ⊢to≤ ⊢e
 ... | s-term-c cloA ap ⊢e₁ r = ⊢app (subsumption ⊢e (≊S (≊S newΣ)) (s-term-c cloA ap ⊢e₁ s))
 ... | s-term-o opnA ⊢e₁ x r = ⊥-elim {!!}
-subsumption {Σ' = [ e ]↝ Σ'} (⊢lam₂ ⊢e up-c ⊢e₁) (≊S newΣ) (s-term-c cloA ap ⊢e₂ s) = ⊢lam₂ {!!} {!!} (subsumption {!⊢e₁!} {!!} {!!})
+subsumption {Σ' = [ e ]↝ Σ'} (⊢lam₂ ⊢e up-c ⊢e₁) (≊S newΣ) (s-term-c cloA ap ⊢e₂ s) = ⊢lam₂ {!!} {!!} (subsumption {!⊢e₁!} ≊Z {!!})
 subsumption {Σ' = [ e ]↝ Σ'} (⊢lam₂ ⊢e up-c ⊢e₁) (≊S newΣ) (s-term-o opnA ⊢e₂ x s) = ⊥-elim {!!}
-subsumption {Σ' = [ e ]↝ Σ'} (⊢sub ⊢e ne gc s₁) (≊S newΣ) s = ⊢sub ⊢e ne-app gc {!!}
+subsumption {Σ' = [ e ]↝ Σ'} (⊢sub ⊢e ne gc s₁) (≊S newΣ) s = ⊢sub ⊢e ne-app gc (s-trans s₁ s (≊S newΣ))
