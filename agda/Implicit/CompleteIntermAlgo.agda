@@ -48,6 +48,10 @@ data _⊆_w/t_ : Env n m → Env n m → Type m → Set where
   ext-∀   : Γ ,∙ ⊆ Δ ,∙ w/t A
           → Γ ⊆ Δ w/t `∀ A
 
+postulate
+  subsumption0 : Γ ⊢ □ ⇒ e ⇒ A
+             → Γ ⊢ τ A ⇒ e ⇒ A
+
 complete-≤⁺ : Δ ⊢ j # A ⌞ ≤⁺ ⌝ B
             → Γ ⊆ Δ w/t A
             → Γ ⊢ ⟨ j , B ⟩ ~ Σ
