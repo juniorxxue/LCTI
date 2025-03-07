@@ -86,6 +86,11 @@ postulate
              → Δ ⊢c T
              → Γ , T ⊢ A ≤⁺ Σ' ⊣ Δ , T ↪ B
 
+  t-weaken,0 : Γ ⊢ Σ ⇒ e ⇒ A
+             → ↑tmᶜ0 Σ ⇘ Σ'
+             → ↑tm0 e ⇘ e'
+             → Γ , T ⊢ Σ' ⇒ e' ⇒ A
+
   s-weaken^0 : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
              → ↑ty0 A ⇘ A'
              → ↑tyᶜ0 Σ ⇘ Σ'

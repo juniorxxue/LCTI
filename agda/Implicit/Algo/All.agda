@@ -2,6 +2,9 @@ module Implicit.Algo.All where
 
 open import Implicit.Algo.Base public
 open import Implicit.Algo.Properties.Shift public
+
+open import Implicit.Algo.Properties.Weaken public
+
 open import Implicit.Algo.Properties.Id public
 open import Implicit.Algo.Properties.Subst public
 open import Implicit.Algo.Properties.Polarity public

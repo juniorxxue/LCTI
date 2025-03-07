@@ -28,6 +28,7 @@ data _⇌_ : Env n m → Env n m → Set where
     → Γ ,^ ⇌ Δ ,= A
   sol-changed :
       Γ ⇌ Δ
+    → (regA : Γ ⊢r A)
     → Γ ,= A ⇌ Δ ,^
 
 -- this is total on (Γ ⊆ Δ) and unique
@@ -83,7 +84,7 @@ data _&_⇌s_&_ : Env n m → Env n m → Env n m → Env n m → Set where
 ⇌-∋∙ (S, inΓ) (var s) = S, (⇌-∋∙ inΓ s)
 ⇌-∋∙ (S∙ inΓ) (uvar tf) = S∙ (⇌-∋∙ inΓ tf)
 ⇌-∋∙ (S= inΓ) (svar tf) = S= (⇌-∋∙ inΓ tf)
-⇌-∋∙ (S= inΓ) (sol-changed tf) = S^ (⇌-∋∙ inΓ tf)
+⇌-∋∙ (S= inΓ) (sol-changed tf regA) = S^ (⇌-∋∙ inΓ tf)
 ⇌-∋∙ (S^ inΓ) (evar tf) = S^ (⇌-∋∙ inΓ tf)
 ⇌-∋∙ (S^ inΓ) (evar-changed tf regA) = S= (⇌-∋∙ inΓ tf)
 
@@ -104,7 +105,7 @@ data _&_⇌s_&_ : Env n m → Env n m → Env n m → Env n m → Set where
 ⇌-tregular (reg-S^ regΓ) (evar tf) = reg-S^ (⇌-tregular regΓ tf)
 ⇌-tregular (reg-S^ regΓ) (evar-changed tf regA) = reg-S= (⇌-tregular regΓ tf) (⇌-⊢r regA tf)
 ⇌-tregular (reg-S= regΓ regA) (svar tf) = reg-S= (⇌-tregular regΓ tf) (⇌-⊢r regA tf)
-⇌-tregular (reg-S= regΓ regA) (sol-changed tf) = reg-S^ (⇌-tregular regΓ tf)
+⇌-tregular (reg-S= regΓ regA) (sol-changed tf regA') = reg-S^ (⇌-tregular regΓ tf)
 
 ss-irrev : Γ ⊢ A ⌞ ≤ ⌝ B ⊣ Δ
          → Γ & Δ ⇌s Γ' & Δ'
@@ -163,7 +164,22 @@ s-irrev (s-∀l s upᶜ upᵉ upC upD) tf = s-∀l (s-irrev s (evar-sol tf)) up�
 ⊆-⇌ (svar ext regA) = svar (⊆-⇌ ext)
 ⊆-⇌ (mark x) = ⇌-refl x
 
+⇌-symm : Γ ⇌ Δ
+       → Δ ⇌ Γ
+⇌-symm empty = empty
+⇌-symm (var ext) = var (⇌-symm ext)
+⇌-symm (uvar ext) = uvar (⇌-symm ext)
+⇌-symm (evar ext) = evar (⇌-symm ext)
+⇌-symm (svar ext) = svar (⇌-symm ext)
+⇌-symm (evar-changed ext regA) = sol-changed (⇌-symm ext) (⇌-⊢r regA ext)
+⇌-symm (sol-changed ext regA) = evar-changed (⇌-symm ext) (⇌-⊢r regA ext)
+
 t-irrev-⊆ : 𝕣 Γ ⊢ Σ ⇒ e ⇒ A
           → Γ ⊆ Δ
           → 𝕣 Δ ⊢ Σ ⇒ e ⇒ A
 t-irrev-⊆ ⊢e ext = t-irrev ⊢e (⊆-⇌ ext)
+
+t-irrev-⊆' : 𝕣 Δ ⊢ Σ ⇒ e ⇒ A
+           → Γ ⊆ Δ
+           → 𝕣 Γ ⊢ Σ ⇒ e ⇒ A
+t-irrev-⊆' ⊢e ext = t-irrev ⊢e (⇌-symm (⊆-⇌ ext))
