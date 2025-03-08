@@ -56,7 +56,7 @@ complete-s {j = 𝕚 j} {Γ = Γ} (s-arr₂ {A = A} s s₁) (⊆I ext ext₁) (~
 complete-s {j = 𝕔 j} (s-arr₃ cloA grd s) (⊆C cloA' ext) (~C ⊢e j~Σ) = s-term-c cloA' (⊆-⊢c-≫ (⊆/c-⊆ ext) cloA' grd) ⊢e (complete-s s ext j~Σ)
 complete-s (s-∀l s ic fd upC upD) (⊆∀-I ext) j~'@(~I {Σ = Σ} {e = e} ⊢e j~) with ↑tyᶜ0-total Σ | ↑tyᵉ0-total e
 ... | ⟨ Σ' , upΣ ⟩ | ⟨ e' , upe ⟩ = let weaken-j~ = (~weaken^0 (~I ⊢e j~) (↑ty-arr upC upD) (↑tyᶜ-e upe upΣ))
-                                    in s-∀l (complete-s s {!!} weaken-j~ ) upΣ upe upC upD
+                                    in s-∀l (complete-s s (⊆/c-∙-^= ext fd) weaken-j~ ) upΣ upe upC upD
 complete-s (s-∀l s ic fd upC upD) (⊆∀-C ext) j~'@(~C {Σ = Σ} {e = e} ⊢e j~) with ↑tyᶜ0-total Σ | ↑tyᵉ0-total e
 ... | ⟨ Σ' , upΣ ⟩ | ⟨ e' , upe ⟩ = let weaken-j~ = (~weaken^0 (~C ⊢e j~) (↑ty-arr upC upD) (↑tyᶜ-e upe upΣ))
                                     in s-∀l (complete-s s {!!} weaken-j~) upΣ upe upC upD
@@ -80,13 +80,12 @@ s+-⊆/ (s-∀ s) with s+-⊆/ s
 s+-⊆/ (s-∀l s ic fd upC upD) with s+-⊆/ s
 s+-⊆/ (s-∀l s case-𝕚 fd upC upD) | r = ⊆∀-I {!!}
 s+-⊆/ (s-∀l s case-𝕔 fd upC upD) | r = ⊆∀-C {!!}
-s+-⊆/ (s-var-sub-l x inΔ) = ⊆∞ (ext-var {!!})
+s+-⊆/ (s-var-sub-l x inΔ) = ⊆∞ (ext-var (⊆/x-⊢c x (⊢c-var-= (∋:=to∋= inΔ))))
 
 complete-s0 : Γ ⋈ ⊢ j # A ⌞ ≤⁺ ⌝ B
             → Γ ⊢ ⟨ j , B ⟩ ~t Σ
             → Γ ⋈ ⊢ A ≤⁺ Σ ⊣ Γ ⋈ ↪ B
-complete-s0 s j~Σ = complete-s s {!!} {!!}
--- (s+-⊆/ s) (~t-~s j~Σ)
+complete-s0 s j~Σ = complete-s s (s+-⊆/ s) (~t-~s j~Σ)
 
 complete : Γ ⊢ j # e ⦂ A
          → Γ ⊢ ⟨ j , A ⟩ ~t Σ

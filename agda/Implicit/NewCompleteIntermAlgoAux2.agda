@@ -10,7 +10,7 @@ infix 3 _⊆_w/t_w/c_
 data _⊆_w/t_w/c_ : Env n m → Env n m → Type m → Counter → Set where
   ⊆Z : (regΓ : SRegular Γ)
      → Γ ⊆ Γ w/t A w/c Z
-  ⊆∞ : Γ ⊆ Δ w/t A
+  ⊆∞ : (ext : Γ ⊆ Δ w/t A)
      → Γ ⊆ Δ w/t A w/c ∞
   ⊆I : (ext : Γ ⊆ Ω w/t A)
      → Ω ⊆ Δ w/t B w/c j
@@ -65,18 +65,20 @@ data _⊢wf_#_ : Env n m → Counter → Type m → Set where
 ----------------------------------------------------------------------
 --+                     extension with counter                     +--
 ----------------------------------------------------------------------
-{-
+{- seems doable, come back later, 03/08/25 2:41 PM
 ⊆/-=-∙ : Δ ,= B ⊆ Δ ,= B w/t A
        → Δ ,∙ ⊆ Δ ,∙ w/t A
 
 ⊆/c-=-∙ : Δ ,= B ⊆ Δ ,= B w/t A w/c j
+        → find A #0 j
         → Δ ,∙ ⊆ Δ ,∙ w/t A w/c j
-⊆/c-=-∙ (⊆Z (reg-S= regΓ regA)) = ⊆Z (reg-S∙ regΓ)
-⊆/c-=-∙ (⊆∞ x) = ⊆∞ (⊆/-=-∙ x)
-⊆/c-=-∙ (⊆I ext ext₁) = ⊆I {!!} {!!}
-⊆/c-=-∙ (⊆C x ext) = {!!}
-⊆/c-=-∙ (⊆∀-I ext) = {!!}
-⊆/c-=-∙ (⊆∀-C ext) = {!!}
+⊆/c-=-∙ (⊆Z (reg-S= regΓ regA)) (f-∀ fd) = ⊆Z (reg-S∙ regΓ)
+⊆/c-=-∙ (⊆∞ x) fd = ⊆∞ {!!}
+⊆/c-=-∙ (⊆I ext ext₁) (f-arr-𝕚-l x) = ⊆I {!!} {!!}
+⊆/c-=-∙ (⊆I ext ext₁) (f-arr-𝕚-r fd) = ⊆I {!!} {!!}
+⊆/c-=-∙ (⊆C x ext) (f-arr-𝕔 ¬inA fd) = ⊆C {!!} (⊆/c-=-∙ ext fd)
+⊆/c-=-∙ (⊆∀-I ext) (f-∀ fd) = ⊆∀-I {!!}
+⊆/c-=-∙ (⊆∀-C ext) (f-∀ fd) = ⊆∀-C {!!}
 -}
 
 ⊆/x-⊢c : SRegular Γ
@@ -100,3 +102,23 @@ data _⊢wf_#_ : Env n m → Counter → Type m → Set where
 ⊆/c-⊢c regΓ (⊢c-var-= inΔ) = ext-var (⊆/x-⊢c regΓ (⊢c-var-= inΔ))
 ⊆/c-⊢c regΓ (⊢c-arr cloA cloA₁) = ext-arr (⊆/c-⊢c regΓ cloA) (⊆/c-⊢c regΓ cloA₁)
 ⊆/c-⊢c regΓ (⊢c-∀ cloA) = ext-∀ (⊆/c-⊢c (reg-S∙ regΓ) cloA)
+
+
+⊆/c-∙-^=-gen : Γ ⊆ Δ w/t A w/c j
+             → find A k j
+             → Γ ◈ k ⇘ Γ'
+             → [ B / k ] Δ ∙⟹ Δ'
+             → Γ' ⊆ Δ' w/t A w/c j
+⊆/c-∙-^=-gen (⊆Z regΓ) fd newΓ newΔ = ⊥-elim {!!}
+⊆/c-∙-^=-gen (⊆∞ ext) fd newΓ newΔ = ⊆∞ {!!}
+⊆/c-∙-^=-gen (⊆I ext ext₁) (f-arr-𝕚-l x) newΓ newΔ = ⊆I {!!} {!!}
+⊆/c-∙-^=-gen (⊆I ext ext₁) (f-arr-𝕚-r fd) newΓ newΔ = ⊆I {!!} {!!}
+⊆/c-∙-^=-gen (⊆C x ext) fd newΓ newΔ = {!!}
+⊆/c-∙-^=-gen (⊆∀-I ext) fd newΓ newΔ = {!!}
+⊆/c-∙-^=-gen (⊆∀-C ext) fd newΓ newΔ = {!!}
+
+
+⊆/c-∙-^= : Γ ,∙ ⊆ Δ ,∙ w/t A w/c j
+         → find A #0 j
+         → Γ ,^ ⊆ Δ ,= B w/t A w/c j
+⊆/c-∙-^= {B = B} ext fd = ⊆/c-∙-^=-gen ext fd ◈Z (∙⟹^0 (proj₂ (↑ty0-total B)))
