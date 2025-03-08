@@ -18,9 +18,9 @@ data _⊆_w/t_w/c_ : Env n m → Env n m → Type m → Counter → Set where
   ⊆C : (Γ ⊢c A)
      → Γ ⊆ Δ w/t B w/c j
      → Γ ⊆ Δ w/t (A `→ B) w/c (𝕔 j)
-  ⊆∀-I : Γ ,∙ ⊆ Δ ,∙ w/t A w/c (𝕚 j)
+  ⊆∀-I : Γ ,^ ⊆ Δ ,= B w/t A w/c (𝕚 j)
      → Γ ⊆ Δ w/t `∀ A w/c (𝕚 j)
-  ⊆∀-C : Γ ,∙ ⊆ Δ ,∙ w/t A w/c (𝕔 j)
+  ⊆∀-C : Γ ,^ ⊆ Δ ,= B w/t A w/c (𝕔 j)
      → Γ ⊆ Δ w/t `∀ A w/c (𝕔 j)
 {-
 -- a wf relation between j, Γ and A
@@ -44,9 +44,9 @@ data _⊢wf_#_ : Env n m → Counter → Type m → Set where
 ⊆/c-⊆ (⊆I ext ext₁) = ⊆-trans (⊆/-⊆ ext) (⊆/c-⊆ ext₁)
 ⊆/c-⊆ (⊆C x ext) = ⊆/c-⊆ ext
 ⊆/c-⊆ (⊆∀-I ext) with ⊆/c-⊆ ext
-... | uvar r = r
+... | evar-sol r regA = r
 ⊆/c-⊆ (⊆∀-C ext) with ⊆/c-⊆ ext
-... | uvar r = r
+... | evar-sol r regA = r
 
 ----------------------------------------------------------------------
 --+                              inst                              +--
@@ -103,12 +103,13 @@ data _⊢wf_#_ : Env n m → Counter → Type m → Set where
 ⊆/c-⊢c regΓ (⊢c-arr cloA cloA₁) = ext-arr (⊆/c-⊢c regΓ cloA) (⊆/c-⊢c regΓ cloA₁)
 ⊆/c-⊢c regΓ (⊢c-∀ cloA) = ext-∀ (⊆/c-⊢c (reg-S∙ regΓ) cloA)
 
-
-⊆/c-∙-^=-gen : Γ ⊆ Δ w/t A w/c j
+postulate
+  ⊆/c-∙-^=-gen : Γ ⊆ Δ w/t A w/c j
              → find A k j
              → Γ ◈ k ⇘ Γ'
              → [ B / k ] Δ ∙⟹ Δ'
              → Γ' ⊆ Δ' w/t A w/c j
+{-
 ⊆/c-∙-^=-gen (⊆Z regΓ) fd newΓ newΔ = ⊥-elim {!!}
 ⊆/c-∙-^=-gen (⊆∞ ext) fd newΓ newΔ = ⊆∞ {!!}
 ⊆/c-∙-^=-gen (⊆I ext ext₁) (f-arr-𝕚-l x) newΓ newΔ = ⊆I {!!} {!!}
@@ -116,9 +117,73 @@ data _⊢wf_#_ : Env n m → Counter → Type m → Set where
 ⊆/c-∙-^=-gen (⊆C x ext) fd newΓ newΔ = {!!}
 ⊆/c-∙-^=-gen (⊆∀-I ext) fd newΓ newΔ = {!!}
 ⊆/c-∙-^=-gen (⊆∀-C ext) fd newΓ newΔ = {!!}
-
+-}
 
 ⊆/c-∙-^= : Γ ,∙ ⊆ Δ ,∙ w/t A w/c j
          → find A #0 j
          → Γ ,^ ⊆ Δ ,= B w/t A w/c j
 ⊆/c-∙-^= {B = B} ext fd = ⊆/c-∙-^=-gen ext fd ◈Z (∙⟹^0 (proj₂ (↑ty0-total B)))
+
+
+⊆/c-=-irrev-gen : Γ ⊆ Δ w/t A w/c j
+                → Γ ∋^ k
+                → [ B / k ] Δ =⟹ Δ'
+                → Γ ⊆ Δ' w/t A w/c j
+⊆/c-=-irrev-gen (⊆Z regΓ) inΓ newΔ = ⊥-elim {!!}
+⊆/c-=-irrev-gen (⊆∞ ext) inΓ newΔ = ⊆∞ {!!}
+⊆/c-=-irrev-gen (⊆I ext ext₁) inΓ newΔ = ⊆I {!!} {!!}
+⊆/c-=-irrev-gen (⊆C x ext) inΓ newΔ = ⊆C x (⊆/c-=-irrev-gen ext inΓ newΔ)
+⊆/c-=-irrev-gen {B = B} (⊆∀-I ext) inΓ newΔ = ⊆∀-I (⊆/c-=-irrev-gen ext (S^ inΓ) (=⟹=S newΔ (proj₂ (↑ty0-total B))))
+⊆/c-=-irrev-gen {B = B} (⊆∀-C ext) inΓ newΔ = ⊆∀-C (⊆/c-=-irrev-gen ext (S^ inΓ) (=⟹=S newΔ (proj₂ (↑ty0-total B))))
+
+⊆/c-=-irrev : Γ ,^ ⊆ Δ ,= B₁ w/t A w/c j
+            → Γ ,^ ⊆ Δ ,= B₂ w/t A w/c j
+⊆/c-=-irrev {B₂ = B₂} ext = ⊆/c-=-irrev-gen ext Z (=⟹^0 (proj₂ (↑ty0-total B₂)))
+
+⊆/c-=-irrev-gen-gen : Γ ⊆ Δ w/t A w/c j
+                    → [ B / k ] Δ =⟹ Δ'
+                    → Γ ⊆ Δ' w/t A w/c j
+⊆/c-=-irrev-gen-gen (⊆Z regΓ) newΔ = {!!}
+⊆/c-=-irrev-gen-gen (⊆∞ ext) newΔ = {!!}
+⊆/c-=-irrev-gen-gen (⊆I ext ext₁) newΔ = ⊆I ext (⊆/c-=-irrev-gen-gen ext₁ newΔ)
+⊆/c-=-irrev-gen-gen (⊆C x ext) newΔ = ⊆C x (⊆/c-=-irrev-gen-gen ext newΔ)
+⊆/c-=-irrev-gen-gen {B = B} (⊆∀-I ext) newΔ = ⊆∀-I (⊆/c-=-irrev-gen-gen ext (=⟹=S newΔ (proj₂ (↑ty0-total B))))
+⊆/c-=-irrev-gen-gen {B = B} (⊆∀-C ext) newΔ = ⊆∀-C (⊆/c-=-irrev-gen-gen ext (=⟹=S newΔ (proj₂ (↑ty0-total B))))
+
+----------------------------------------------------------------------
+--+                           new logic                            +--
+----------------------------------------------------------------------
+
+⊆/c-=-irrev-fd-gen' : Γ ⊆ Δ w/t A w/c j
+                    → [ B / k ] Γ =⟹ Γ'
+                    → [ B / k ] Δ =⟹ Δ'
+                    → Γ' ⊆ Δ' w/t A w/c j
+⊆/c-=-irrev-fd-gen' (⊆Z regΓ) newΓ newΔ = {!!}
+⊆/c-=-irrev-fd-gen' (⊆∞ ext) newΓ newΔ = {!!}
+⊆/c-=-irrev-fd-gen' (⊆I ext ext₁) newΓ newΔ = {!!}
+⊆/c-=-irrev-fd-gen' (⊆C x ext) newΓ newΔ = {!!}
+⊆/c-=-irrev-fd-gen' (⊆∀-I ext) newΓ newΔ = {!!}
+⊆/c-=-irrev-fd-gen' (⊆∀-C ext) newΓ newΔ = {!!}
+
+⊆/c-=-irrev-fd-gen-s : Γ ⊆ Δ w/t A
+                   → Γ ∋^ k
+                   → [ B / k ] Δ =⟹ Δ'
+                   → k ε A
+                   → Γ ⊆ Δ' w/t A
+
+⊆/c-=-irrev-fd-gen : Γ ⊆ Δ w/t A w/c j
+                   → Γ ∋^ k
+                   → [ B / k ] Δ =⟹ Δ'
+                   → find A k j
+                   → Γ ⊆ Δ' w/t A w/c j
+⊆/c-=-irrev-fd-gen (⊆Z regΓ) inΓ newΔ fd = ⊥-elim {!!}
+⊆/c-=-irrev-fd-gen (⊆∞ ext) inΓ newΔ fd = ⊆∞ {!!}
+⊆/c-=-irrev-fd-gen (⊆I ext ext₁) inΓ newΔ (f-arr-𝕚-l x) =
+  ⊆I (⊆/c-=-irrev-fd-gen-s ext inΓ {!!} x) (⊆/c-=-irrev-fd-gen' ext₁ {!!} newΔ)
+⊆/c-=-irrev-fd-gen (⊆I ext ext₁) inΓ newΔ (f-arr-𝕚-r fd) =
+  ⊆I {!!} {!!}
+⊆/c-=-irrev-fd-gen (⊆C x ext) inΓ newΔ (f-arr-𝕔 ¬inA fd) = ⊆C x (⊆/c-=-irrev-fd-gen ext inΓ newΔ fd)
+⊆/c-=-irrev-fd-gen {B = B} (⊆∀-I ext) inΓ newΔ (f-∀ fd) =
+  ⊆∀-I (⊆/c-=-irrev-fd-gen ext (S^ inΓ) (=⟹=S newΔ (proj₂ (↑ty0-total B))) fd)
+⊆/c-=-irrev-fd-gen {B = B} (⊆∀-C ext) inΓ newΔ (f-∀ fd) =
+  ⊆∀-C (⊆/c-=-irrev-fd-gen ext (S^ inΓ) (=⟹=S newΔ (proj₂ (↑ty0-total B))) fd)

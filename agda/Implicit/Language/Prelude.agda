@@ -71,7 +71,7 @@ m+n<o⇒n<o {m} {n} {o} m+n<o = ≤-trans (s≤s (m≤n+m n m)) m+n<o
 
 variable
   x y : Fin n
-  k k' k₁ k₂ X Y : Fin m
+  k k' k₁ k₂ k₃ X Y : Fin m
 
 inject₂ : Fin n → Fin (suc (suc n))
 inject₂ #0 = #0
@@ -133,3 +133,10 @@ punchIn-≢ : k₁ ≢ k₂
 punchIn-≢ {k₁ = k₁} {k₂} {#0} neq refl = neq refl
 punchIn-≢ {k₁ = #0} {#0} {#S k} neq peq = neq refl
 punchIn-≢ {k₁ = #S k₁} {#S k₂} {#S k} neq peq = punchIn-≢ (≢-pred neq) (#S-injective peq)
+
+#≤-#<-≢ : k₁ #≤ k₂
+        → k₂ #< k₃
+        → k₁ ≢ k₃
+#≤-#<-≢ {k₁ = #0} {k₂ = #0} {k₃ = #S k₃} z≤n lt2 = λ ()
+#≤-#<-≢ {k₁ = #0} {k₂ = #S k₂} {k₃ = #S k₃} z≤n lt2 = λ ()
+#≤-#<-≢ {k₁ = #S k₁} {k₂ = #S k₂} {k₃ = #S k₃} (s≤s lt1) (s≤s lt2) = ≢-suc (#≤-#<-≢ lt1 lt2)

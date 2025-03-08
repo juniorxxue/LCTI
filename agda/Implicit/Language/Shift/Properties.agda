@@ -148,6 +148,45 @@ private variable
 ↑ty-surjective (¬ε-∀ ¬inA') = ⟨ `∀ ↑ty-surjective ¬inA' .proj₁ ,
                                ↑ty-∀ (↑ty-surjective ¬inA' .proj₂) ⟩
 
+
+↑ty-surjective⋆ : k ¬ε⋆ A'
+                → k' #≤ k
+                → ∃[ A ](A ↑ty k' ⇘ A')
+↑ty-surjective⋆ ¬ε⋆-int lt = ⟨ Int , ↑ty-int ⟩
+↑ty-surjective⋆ {k' = k'} (¬ε⋆-var {k' = k''} x) lt = ⟨ (‶ punchOut helper) , (↑ty-punchOut helper) ⟩
+  where helper : k' ≢ k''
+        helper = #≤-#<-≢ lt x
+↑ty-surjective⋆ (¬ε⋆-arr ninA ninA₁) lt = ⟨ ↑ty-surjective⋆ ninA lt .proj₁ `→ ↑ty-surjective⋆ ninA₁ lt .proj₁
+                                           , ↑ty-arr (↑ty-surjective⋆ ninA lt .proj₂)
+                                           (↑ty-surjective⋆ ninA₁ lt .proj₂) ⟩
+↑ty-surjective⋆ (¬ε⋆-∀ ninA) lt = ⟨ `∀ ↑ty-surjective⋆ ninA (s≤s lt) .proj₁ ,
+                                   ↑ty-∀ (↑ty-surjective⋆ ninA (s≤s lt) .proj₂) ⟩
+
+
+
+¬ε⋆-↑ty' : #S k₁ ¬ε⋆ A'
+        → A ↑ty k₂ ⇘ A'
+        → k₂ #≤ k₁
+        → k₁ ¬ε⋆ A
+¬ε⋆-↑ty' ¬ε⋆-int ↑ty-int lt = ¬ε⋆-int
+¬ε⋆-↑ty' (¬ε⋆-var x) ↑ty-var lt = ¬ε⋆-var (helper x lt)
+  where helper : ∀ {k₁ : Fin m} {k₂ : Fin (1 + m)} {X}
+               → #S k₁ #< punchIn k₂ X
+               → k₂ #≤ k₁
+               → k₁ #< X
+        helper {k₁ = #0} {k₂ = #0} {X = #0} (s≤s ()) lt2
+        helper {k₁ = #0} {k₂ = #0} {X = #S X} lt1 lt2 = s≤s z≤n
+        helper {k₁ = #S k₁} {k₂ = #0} {X = #0} (s≤s ()) lt2
+        helper {k₁ = #S k₁} {k₂ = #0} {X = #S X} (s≤s (s≤s lt1)) lt2 = s≤s lt1
+        helper {k₁ = #S k₁} {k₂ = #S k₂} {X = #S X} (s≤s lt1) (s≤s lt2) = s≤s (helper lt1 lt2)
+¬ε⋆-↑ty' (¬ε⋆-arr ninA' ninA'') (↑ty-arr upA upA₁) lt = ¬ε⋆-arr (¬ε⋆-↑ty' ninA' upA lt) (¬ε⋆-↑ty' ninA'' upA₁ lt)
+¬ε⋆-↑ty' (¬ε⋆-∀ ninA') (↑ty-∀ upA) lt = ¬ε⋆-∀ (¬ε⋆-↑ty' ninA' upA (s≤s lt))
+
+¬ε⋆-↑ty'0 : #S k ¬ε⋆ A'
+         → ↑ty0 A ⇘ A'
+         → k ¬ε⋆ A
+¬ε⋆-↑ty'0 ninA' upA = ¬ε⋆-↑ty' ninA' upA z≤n
+
 ¬ε-↑ty : k₁ ¬ε T
        → T ↑ty k₂ ⇘ T'
        → k₂ #≤ k₁
@@ -175,6 +214,7 @@ private variable
          → A ↑ty #S k ⇘ A'
          → #0 ¬ε A'
 ¬ε-↑ty0' ¬inA upA = ¬ε-↑ty' ¬inA upA (s≤s z≤n)
+
 
 ----------------------------------------------------------------------
 --+                    type shifting for terms                     +--

@@ -132,3 +132,18 @@ data _¬ε_ : Fin m → Type m → Set where
   ¬ε-∀ :
       #S k ¬ε A
     → k ¬ε `∀ A
+
+infix 3 _¬ε⋆_
+data _¬ε⋆_ : Fin m → Type m → Set where
+  ¬ε⋆-int :
+      k ¬ε⋆ Int
+  ¬ε⋆-var :
+      k #< k'
+    → k ¬ε⋆ (‶ k')
+  ¬ε⋆-arr :
+      k ¬ε⋆ A
+    → k ¬ε⋆ B
+    → k ¬ε⋆ A `→ B
+  ¬ε⋆-∀ :
+      #S k ¬ε⋆ A
+    → k ¬ε⋆ `∀ A
