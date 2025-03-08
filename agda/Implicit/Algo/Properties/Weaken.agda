@@ -91,6 +91,12 @@ postulate
              → ↑tm0 e ⇘ e'
              → Γ , T ⊢ Σ' ⇒ e' ⇒ A
 
+  t-weaken^0 : Γ ⊢ Σ ⇒ e ⇒ A
+             → ↑tyᶜ0 Σ ⇘ Σ'
+             → ↑tyᵉ0 e ⇘ e'
+             → ↑ty0 A ⇘ A'
+             → Γ ,^ ⊢ Σ' ⇒ e' ⇒ A'
+
   s-weaken^0 : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
              → ↑ty0 A ⇘ A'
              → ↑tyᶜ0 Σ ⇘ Σ'

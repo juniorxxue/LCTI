@@ -77,6 +77,15 @@ data _⊢_~t_ : Env n m → Counter × Type m → Context n m → Set where
 ~weaken,0 (~I ⊢e j~Σ) (↑tmᶜ-e up-e upΣ) = ~I (t-weaken,0 ⊢e ↑tmᶜ-□ up-e) (~weaken,0 j~Σ upΣ)
 ~weaken,0 (~C ⊢e j~Σ) (↑tmᶜ-e up-e upΣ) = ~C (t-weaken,0 ⊢e ↑tmᶜ-τ up-e) (~weaken,0 j~Σ upΣ)
 
+~weaken^0 : Γ ⊢ ⟨ j , A ⟩ ~s Σ
+          → ↑ty0 A ⇘ A'
+          → ↑tyᶜ0 Σ ⇘ Σ'
+          → Γ ,^ ⊢ ⟨ j , A' ⟩ ~s Σ'
+~weaken^0 ~Z upA ↑tyᶜ-□ = ~Z
+~weaken^0 ~∞ upA (↑tyᶜ-τ up-t) with refl ← ↑ty-unique upA up-t = ~∞
+~weaken^0 (~I ⊢e ~j) (↑ty-arr upA upA₁) (↑tyᶜ-e up-e upΣ) = ~I (t-weaken^0 ⊢e ↑tyᶜ-□ up-e upA) (~weaken^0 ~j upA₁ upΣ)
+~weaken^0 (~C ⊢e ~j) (↑ty-arr upA upA₁) (↑tyᶜ-e up-e upΣ) = ~C (t-weaken^0 ⊢e (↑tyᶜ-τ upA) up-e upA) (~weaken^0 ~j upA₁ upΣ)
+
 ~t-~s : Γ ⊢ ⟨ j , B ⟩ ~t Σ
       → Γ ⋈ ⊢ ⟨ j , B ⟩ ~s Σ
 ~t-~s ~Z = ~Z

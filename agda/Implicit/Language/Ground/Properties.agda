@@ -7,6 +7,7 @@ open import Implicit.Language.Occur.All
 open import Implicit.Language.OpenClose.Base
 open import Implicit.Language.Regular.All
 open import Implicit.Language.Ground.Base
+open import Implicit.Language.Extension.All
 
 ⊢c-≫-⊢r : SRegular Γ
           → Γ ⊢c A
@@ -41,3 +42,25 @@ open import Implicit.Language.Ground.Base
           → Γ ≫ A ⇘ A%
           → Γ ⊢c A%
 ⊢c-≫-⊢c regΓ cloA grd = ⊢r-⊢c (⊢c-≫-⊢r regΓ cloA grd)
+
+
+⊆-⊢c-≫ : Γ ⊆ Δ
+       → Γ ⊢c A
+       → Δ ≫ A ⇘ A%
+       → Γ ≫ A ⇘ A%
+⊆-⊢c-≫ ext ⊢c-int grd-int = grd-int
+⊆-⊢c-≫ ext (⊢c-var-∙ inΔ) (grd-var= x) = ⊥-elim (∋∙-∋:=-false (⊆-∋∙ inΔ ext) x)
+⊆-⊢c-≫ ext (⊢c-var-∙ inΔ) (grd-var∙ x) = grd-var∙ inΔ
+⊆-⊢c-≫ ext (⊢c-var-= inΔ) (grd-var= x) = grd-var= (helper x ext inΔ)
+  where helper : Δ ∋ X := A%
+               → Γ ⊆ Δ
+               → Γ ∋= X
+               → Γ ∋ X := A%
+        helper (Z up) (svar ext regA) Z = Z up
+        helper (S∙ inΔ up) (uvar ext) (S∙ inΓ) = S∙ (helper inΔ ext inΓ) up
+        helper (S^ inΔ up) (evar ext) (S^ inΓ) = S^ (helper inΔ ext inΓ) up
+        helper (S= inΔ up) (evar-sol ext regA) (S^ inΓ) = S^ (helper inΔ ext inΓ) up
+        helper (S= inΔ up) (svar ext regA) (S= inΓ) = S= (helper inΔ ext inΓ) up
+⊆-⊢c-≫ ext (⊢c-var-= inΔ) (grd-var∙ x) = ⊥-elim (∋∙-∋=-false (⊆-∋∙' x ext) inΔ)
+⊆-⊢c-≫ ext (⊢c-arr cloA cloA₁) (grd-arr grd grd₁) = grd-arr (⊆-⊢c-≫ ext cloA grd) (⊆-⊢c-≫ ext cloA₁ grd₁)
+⊆-⊢c-≫ ext (⊢c-∀ cloA) (grd-∀ grd) = grd-∀ (⊆-⊢c-≫ (uvar ext) cloA grd)
