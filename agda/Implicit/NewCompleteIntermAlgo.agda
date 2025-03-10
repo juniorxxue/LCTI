@@ -41,7 +41,7 @@ complete-ss- (s-int regΔ) ext with ⊆/-⊢c-eq ext ⊢c-int
 complete-ss- (s-var-∙ regΔ inΔ) (ext-var x) with ⊆/-⊢c-eq (ext-var x) (⊢c-var-∙ (⊆/-∙out-∙in inΔ x))
 ... | refl = s-var-∙ regΔ inΔ
 complete-ss- (s-arr₁ s s₁) (ext-arr ext ext₁) with ⅆ-total (⊆/-⊆ ext) (⊆/-⊆ ext₁)
-... | ⟨ Ψ , diff ⟩ = s-arr {!complete-ss- s!} (complete-ss- s₁ ext₁)
+... | ⟨ Ψ , diff ⟩ = s-arr {!complete-ss+ s!} (complete-ss- s₁ ext₁)
 complete-ss- (s-∀ s) (ext-∀ ext) = s-∀ (complete-ss- s ext)
 complete-ss- (s-var-sub-r x inΔ) ext'@(ext-var x₁) with ⊆/x-=out-in x₁ (∋:=to∋= inΔ)
 ... | is-ex inΓ = s-ex-r^ (⊆/x-^in-=out-inst inΓ inΔ x₁)
@@ -52,14 +52,14 @@ complete-s {j = ∞} s (⊆∞ x) ~∞ = s-type (complete-ss+ s x)
 complete-s {j = 𝕚 j} {Γ = Γ} (s-arr₂ {A = A} s s₁) (⊆I ext ext₁) (~I ⊢e j~Σ) with open-close Γ A
 ... | inj₁ cloA
   with refl ← ⊆/-⊢c-eq ext cloA = s-term-c cloA (⊆-⊢c-≫ (⊆/c-⊆ ext₁) cloA (s--≫ s)) (subsumption0 ⊢e) (complete-s s₁ ext₁ j~Σ)
-... | inj₂ opnA = s-term-o opnA ⊢e {!complete-ss- !} (complete-s s₁ ext₁ (~irrev j~Σ (⊆/-⊆ ext)))
+... | inj₂ opnA = s-term-o opnA ⊢e {!complete-ss- s !} (complete-s s₁ ext₁ (~irrev j~Σ (⊆/-⊆ ext)))
 complete-s {j = 𝕔 j} (s-arr₃ cloA grd s) (⊆C cloA' ext) (~C ⊢e j~Σ) = s-term-c cloA' (⊆-⊢c-≫ (⊆/c-⊆ ext) cloA' grd) ⊢e (complete-s s ext j~Σ)
 complete-s (s-∀l s ic fd upC upD) (⊆∀-I ext) j~'@(~I {Σ = Σ} {e = e} ⊢e j~) with ↑tyᶜ0-total Σ | ↑tyᵉ0-total e
 ... | ⟨ Σ' , upΣ ⟩ | ⟨ e' , upe ⟩ = let weaken-j~ = (~weaken^0 (~I ⊢e j~) (↑ty-arr upC upD) (↑tyᶜ-e upe upΣ))
-                                    in s-∀l (complete-s s {!!} weaken-j~ ) upΣ upe upC upD
+                                    in s-∀l (complete-s s (⊆/c-=-irrev-fd ext fd) weaken-j~ ) upΣ upe upC upD
 complete-s (s-∀l s ic fd upC upD) (⊆∀-C ext) j~'@(~C {Σ = Σ} {e = e} ⊢e j~) with ↑tyᶜ0-total Σ | ↑tyᵉ0-total e
 ... | ⟨ Σ' , upΣ ⟩ | ⟨ e' , upe ⟩ = let weaken-j~ = (~weaken^0 (~C ⊢e j~) (↑ty-arr upC upD) (↑tyᶜ-e upe upΣ))
-                                    in s-∀l (complete-s s {!!} weaken-j~) upΣ upe upC upD
+                                    in s-∀l (complete-s s (⊆/c-=-irrev-fd ext fd) weaken-j~) upΣ upe upC upD
 
 
 s+-⊆/ : Δ ⊢ j # A ⌞ ≤⁺ ⌝ B
@@ -78,8 +78,8 @@ s+-⊆/ (s-arr₃ cloA grd s) = ⊆C cloA (s+-⊆/ s)
 s+-⊆/ (s-∀ s) with s+-⊆/ s
 ... | ⊆∞ x = ⊆∞ (ext-∀ x)
 s+-⊆/ (s-∀l s ic fd upC upD) with s+-⊆/ s
-s+-⊆/ (s-∀l s case-𝕚 fd upC upD) | r = ⊆∀-I {!!}
-s+-⊆/ (s-∀l s case-𝕔 fd upC upD) | r = ⊆∀-C {!!}
+s+-⊆/ (s-∀l s case-𝕚 fd upC upD) | r = ⊆∀-I (⊆/c-^-irrev-fd r fd)
+s+-⊆/ (s-∀l s case-𝕔 fd upC upD) | r = ⊆∀-C (⊆/c-^-irrev-fd r fd)
 s+-⊆/ (s-var-sub-l x inΔ) = ⊆∞ (ext-var (⊆/x-⊢c x (⊢c-var-= (∋:=to∋= inΔ))))
 
 complete-s0 : Γ ⋈ ⊢ j # A ⌞ ≤⁺ ⌝ B

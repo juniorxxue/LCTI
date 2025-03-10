@@ -159,7 +159,7 @@ postulate
 ----------------------------------------------------------------------
 
 postulate
-  ⊆/c-=-irrev-fd-gen-s' : Γ ⊆ Δ w/t A
+  ⊆/-=-irrev-fd-gen-s' : Γ ⊆ Δ w/t A
                       → [ B / k ] Γ =⟹ Γ'
                       → [ B / k ] Δ =⟹ Δ'
                       → Γ' ⊆ Δ' w/t A
@@ -174,16 +174,16 @@ postulate
                      → [ B / k ] Δ =⟹ Δ'
                      → Γ ⊆ Δ' w/v k
 
-⊆/c-=-irrev-fd-gen-s : Γ ⊆ Δ w/t A
+⊆/-=-irrev-fd-gen-s : Γ ⊆ Δ w/t A
                    → Γ ∋^ k
                    → [ B / k ] Δ =⟹ Δ'
                    → k ε A
                    → Γ ⊆ Δ' w/t A
-⊆/c-=-irrev-fd-gen-s (ext-var x) inΓ newΔ ε-var = ext-var (⊆/v-=-irrev-fd-gen-s x inΓ newΔ)
-⊆/c-=-irrev-fd-gen-s (ext-arr ext ext₁) inΓ newΔ (ε-arr-l inA) with inst-exist newΔ (⊆/-⊆ ext₁) (⊆/-^in-=out ext inA inΓ)
-... | ⟨ Ω' , newΩ ⟩ = ext-arr (⊆/c-=-irrev-fd-gen-s ext inΓ newΩ inA) (⊆/c-=-irrev-fd-gen-s' ext₁ newΩ newΔ)
-⊆/c-=-irrev-fd-gen-s (ext-arr ext ext₁) inΓ newΔ (ε-arr-r ¬inA inB) = ext-arr ext (⊆/c-=-irrev-fd-gen-s ext₁ (⊆/-^in-^out ext ¬inA inΓ) newΔ inB)
-⊆/c-=-irrev-fd-gen-s {B = B} (ext-∀ ext) inΓ newΔ (ε-∀ inA) = ext-∀ (⊆/c-=-irrev-fd-gen-s ext (S∙ inΓ) (=⟹∙S newΔ (proj₂ (↑ty0-total B))) inA)
+⊆/-=-irrev-fd-gen-s (ext-var x) inΓ newΔ ε-var = ext-var (⊆/v-=-irrev-fd-gen-s x inΓ newΔ)
+⊆/-=-irrev-fd-gen-s (ext-arr ext ext₁) inΓ newΔ (ε-arr-l inA) with inst-exist newΔ (⊆/-⊆ ext₁) (⊆/-^in-=out ext inA inΓ)
+... | ⟨ Ω' , newΩ ⟩ = ext-arr (⊆/-=-irrev-fd-gen-s ext inΓ newΩ inA) (⊆/-=-irrev-fd-gen-s' ext₁ newΩ newΔ)
+⊆/-=-irrev-fd-gen-s (ext-arr ext ext₁) inΓ newΔ (ε-arr-r ¬inA inB) = ext-arr ext (⊆/-=-irrev-fd-gen-s ext₁ (⊆/-^in-^out ext ¬inA inΓ) newΔ inB)
+⊆/-=-irrev-fd-gen-s {B = B} (ext-∀ ext) inΓ newΔ (ε-∀ inA) = ext-∀ (⊆/-=-irrev-fd-gen-s ext (S∙ inΓ) (=⟹∙S newΔ (proj₂ (↑ty0-total B))) inA)
 
 ⊆/c-=-irrev-fd-gen : Γ ⊆ Δ w/t A w/c j
                    → Γ ∋^ k
@@ -191,9 +191,9 @@ postulate
                    → find A k j
                    → Γ ⊆ Δ' w/t A w/c j
 ⊆/c-=-irrev-fd-gen (⊆Z regΓ) inΓ newΔ fd = ⊥-elim (∋^-∋=-false inΓ (=⟹-∋= newΔ))
-⊆/c-=-irrev-fd-gen (⊆∞ ext) inΓ newΔ fd = ⊆∞ (⊆/c-=-irrev-fd-gen-s ext inΓ newΔ (find-ε fd))
+⊆/c-=-irrev-fd-gen (⊆∞ ext) inΓ newΔ fd = ⊆∞ (⊆/-=-irrev-fd-gen-s ext inΓ newΔ (find-ε fd))
 ⊆/c-=-irrev-fd-gen (⊆I ext ext₁) inΓ newΔ (f-arr-𝕚-l x) with inst-exist newΔ (⊆/c-⊆ ext₁) (⊆/-^in-=out ext x inΓ)
-... | ⟨ Ω' , inst-Ω ⟩ = ⊆I (⊆/c-=-irrev-fd-gen-s ext inΓ inst-Ω x) (⊆/c-=-irrev-fd-gen' ext₁ inst-Ω newΔ)
+... | ⟨ Ω' , inst-Ω ⟩ = ⊆I (⊆/-=-irrev-fd-gen-s ext inΓ inst-Ω x) (⊆/c-=-irrev-fd-gen' ext₁ inst-Ω newΔ)
 ⊆/c-=-irrev-fd-gen (⊆I ext ext₁) inΓ newΔ (f-arr-𝕚-r ¬inA fd) =
   ⊆I ext (⊆/c-=-irrev-fd-gen ext₁ (⊆/-^in-^out ext ¬inA inΓ) newΔ fd)
 ⊆/c-=-irrev-fd-gen (⊆C x ext) inΓ newΔ (f-arr-𝕔 ¬inA fd) = ⊆C x (⊆/c-=-irrev-fd-gen ext inΓ newΔ fd)
@@ -201,3 +201,49 @@ postulate
   ⊆∀-I (⊆/c-=-irrev-fd-gen ext (S^ inΓ) (=⟹=S newΔ (proj₂ (↑ty0-total B))) fd)
 ⊆/c-=-irrev-fd-gen {B = B} (⊆∀-C ext) inΓ newΔ (f-∀ fd) =
   ⊆∀-C (⊆/c-=-irrev-fd-gen ext (S^ inΓ) (=⟹=S newΔ (proj₂ (↑ty0-total B))) fd)
+
+
+⊆/c-=-irrev-fd : Γ ,^ ⊆ Δ ,= B₁ w/t A w/c j
+               → find A #0 j
+               → Γ ,^ ⊆ Δ ,= B₂ w/t A w/c j
+⊆/c-=-irrev-fd {B₂ = B₂} ext fd = ⊆/c-=-irrev-fd-gen ext Z (=⟹=0 (proj₂ (↑ty0-total B₂))) fd
+
+----------------------------------------------------------------------
+--+                       another transform                        +--
+----------------------------------------------------------------------
+
+postulate
+  ⊆/-^^-irrev-gen : Γ ⊆ Δ w/t A
+               → k ¬ε A
+               → Γ ◎ k ⇘ Γ'
+               → Γ' ◎ k ⇘ Δ'
+               → Γ' ⊆ Δ' w/t A
+
+  ⊆/-^-irrev-gen : Γ ⊆ Δ w/t A
+               → k ε A
+               → Γ ◎ k ⇘ Γ'
+               → Γ' ⊆ Δ w/t A
+
+  ⊆/c-^-irrev-fd-gen : Γ ⊆ Δ w/t A w/c j
+                     → find A k j
+                     → Γ ◎ k ⇘ Γ'
+                     → Γ' ⊆ Δ w/t A w/c j
+
+{- the proof is good, will come back later, 03/10/25 2:33 PM
+   postulate it for the moment
+
+⊆/c-^-irrev-fd-gen (⊆Z regΓ) fd newΓ = ⊥-elim (find-Z-false fd)
+⊆/c-^-irrev-fd-gen (⊆∞ ext) fd newΓ = ⊆∞ (⊆/-^-irrev-gen ext (find-ε fd) newΓ)
+⊆/c-^-irrev-fd-gen (⊆I ext ext₁) (f-arr-𝕚-l x) newΓ = ⊆I (⊆/-^-irrev-gen ext x newΓ) ext₁
+⊆/c-^-irrev-fd-gen (⊆I ext ext₁) (f-arr-𝕚-r ¬inA fd) newΓ = ⊆I {!!} (⊆/c-^-irrev-fd-gen ext₁ fd {!!})
+⊆/c-^-irrev-fd-gen (⊆C x ext) fd newΓ = {!!}
+⊆/c-^-irrev-fd-gen (⊆∀-I ext) fd newΓ = {!!}
+⊆/c-^-irrev-fd-gen (⊆∀-C ext) fd newΓ = {!!}
+
+
+-}
+
+⊆/c-^-irrev-fd : Γ ,= B ⊆ Δ ,= B w/t A w/c j
+                 → find A #0 j
+                 → Γ ,^ ⊆ Δ ,= B w/t A w/c j
+⊆/c-^-irrev-fd ext fd = ⊆/c-^-irrev-fd-gen ext fd ◎Z

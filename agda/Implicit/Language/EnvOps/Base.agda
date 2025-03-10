@@ -315,7 +315,6 @@ data [_/_]_=⟹_ : Type m → Fin m → Env n m → Env n m → Set where
 =⟹-¬ε⋆ (=⟹=S inst up1) = ¬ε⋆-↑ty (=⟹-¬ε⋆ inst) up1 z≤n
 -}
 
-
 ----------------------------------------------------------------------
 --+                          replacement                           +--
 ----------------------------------------------------------------------
@@ -332,6 +331,17 @@ data _◆_⇘_ : Env n m → Fin m → Env n m → Set where
       → Γ ,= A ◆ #S k ⇘ Γ' ,= A
   ◆S^ : Γ ◆ k ⇘ Γ'
       → Γ ,^ ◆ #S k ⇘ Γ' ,^
+
+-- in k position, we replace a ,= B with ,^
+infix 3 _◎_⇘_
+data _◎_⇘_ : Env n m → Fin m → Env n m → Set where
+  ◎Z : Γ ,= A ◎ #0 ⇘ Γ ,^
+  ◎S∙ : Γ ◎ k ⇘ Γ'
+      → Γ ,∙ ◎ #S k ⇘ Γ' ,∙
+  ◎S= : Γ ◎ k ⇘ Γ'
+      → Γ ,= A ◎ #S k ⇘ Γ' ,= A
+  ◎S^ : Γ ◎ k ⇘ Γ'
+      → Γ ,^ ◎ #S k ⇘ Γ' ,^
 
 -- in k position, we replace a ,^ with ,∙
 infix 3 _◇_⇘_

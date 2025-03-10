@@ -35,3 +35,8 @@ find-arr-r fd = f-∞ (ε-arr-r {!!} (find-ε fd))
 find-arr-l : find A k ∞
            → find (A `→ B) k ∞
 find-arr-l fd = f-∞ (ε-arr-l (find-ε fd))
+
+
+find-Z-false : find A k Z
+             → ⊥
+find-Z-false (f-∀ fd) = find-Z-false fd
