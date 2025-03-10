@@ -158,31 +158,31 @@ postulate
 --+                           new logic                            +--
 ----------------------------------------------------------------------
 
-⊆/c-=-irrev-fd-gen-s' : Γ ⊆ Δ w/t A
+postulate
+  ⊆/c-=-irrev-fd-gen-s' : Γ ⊆ Δ w/t A
                       → [ B / k ] Γ =⟹ Γ'
                       → [ B / k ] Δ =⟹ Δ'
                       → Γ' ⊆ Δ' w/t A
 
-⊆/c-=-irrev-fd-gen' : Γ ⊆ Δ w/t A w/c j
+  ⊆/c-=-irrev-fd-gen' : Γ ⊆ Δ w/t A w/c j
                     → [ B / k ] Γ =⟹ Γ'
                     → [ B / k ] Δ =⟹ Δ'
                     → Γ' ⊆ Δ' w/t A w/c j
-⊆/c-=-irrev-fd-gen' (⊆Z regΓ) newΓ newΔ = {!!}
-⊆/c-=-irrev-fd-gen' (⊆∞ ext) newΓ newΔ = ⊆∞ {!!}
-⊆/c-=-irrev-fd-gen' (⊆I ext ext₁) newΓ newΔ = {!!}
-⊆/c-=-irrev-fd-gen' (⊆C x ext) newΓ newΔ = {!!}
-⊆/c-=-irrev-fd-gen' (⊆∀-I ext) newΓ newΔ = {!!}
-⊆/c-=-irrev-fd-gen' (⊆∀-C ext) newΓ newΔ = {!!}
 
+  ⊆/v-=-irrev-fd-gen-s : Γ ⊆ Δ w/v k
+                     → Γ ∋^ k
+                     → [ B / k ] Δ =⟹ Δ'
+                     → Γ ⊆ Δ' w/v k
 
 ⊆/c-=-irrev-fd-gen-s : Γ ⊆ Δ w/t A
                    → Γ ∋^ k
                    → [ B / k ] Δ =⟹ Δ'
                    → k ε A
                    → Γ ⊆ Δ' w/t A
-⊆/c-=-irrev-fd-gen-s (ext-var x) inΓ newΔ ε-var = ext-var {!!}
-⊆/c-=-irrev-fd-gen-s (ext-arr ext ext₁) inΓ newΔ (ε-arr-l inA) = {!!}
-⊆/c-=-irrev-fd-gen-s (ext-arr ext ext₁) inΓ newΔ (ε-arr-r ¬inA inB) = {!!}
+⊆/c-=-irrev-fd-gen-s (ext-var x) inΓ newΔ ε-var = ext-var (⊆/v-=-irrev-fd-gen-s x inΓ newΔ)
+⊆/c-=-irrev-fd-gen-s (ext-arr ext ext₁) inΓ newΔ (ε-arr-l inA) with inst-exist newΔ (⊆/-⊆ ext₁) (⊆/-^in-=out ext inA inΓ)
+... | ⟨ Ω' , newΩ ⟩ = ext-arr (⊆/c-=-irrev-fd-gen-s ext inΓ newΩ inA) (⊆/c-=-irrev-fd-gen-s' ext₁ newΩ newΔ)
+⊆/c-=-irrev-fd-gen-s (ext-arr ext ext₁) inΓ newΔ (ε-arr-r ¬inA inB) = ext-arr ext (⊆/c-=-irrev-fd-gen-s ext₁ (⊆/-^in-^out ext ¬inA inΓ) newΔ inB)
 ⊆/c-=-irrev-fd-gen-s {B = B} (ext-∀ ext) inΓ newΔ (ε-∀ inA) = ext-∀ (⊆/c-=-irrev-fd-gen-s ext (S∙ inΓ) (=⟹∙S newΔ (proj₂ (↑ty0-total B))) inA)
 
 ⊆/c-=-irrev-fd-gen : Γ ⊆ Δ w/t A w/c j
