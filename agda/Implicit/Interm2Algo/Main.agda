@@ -1,11 +1,11 @@
-module Implicit.NewCompleteIntermAlgo where
+module Implicit.Interm2Algo.Main where
 
 open import Implicit.Language.All
 open import Implicit.Algo.All
 open import Implicit.Interm.Base
 open import Implicit.Interm.Ground
-open import Implicit.NewCompleteIntermAlgoAux
-open import Implicit.NewCompleteIntermAlgoAux2
+open import Implicit.Interm2Algo.Aux1
+open import Implicit.Interm2Algo.Aux2
 
 postulate
   open-close : ∀ (Γ : Env n m) A → Γ ⊢c A ⊎ Γ ⊢o A
@@ -29,8 +29,15 @@ complete-ss+ (s-int regΔ) ext with ⊆/-⊢c-eq ext ⊢c-int
 ... | refl = s-int regΔ
 complete-ss+ (s-var-∙ regΔ inΔ) (ext-var x) with ⊆/-⊢c-eq (ext-var x) (⊢c-var-∙ (⊆/-∙out-∙in inΔ x))
 ... | refl = s-var-∙ regΔ inΔ
-complete-ss+ (s-arr₁ s s₁) (ext-arr ext ext₁) with ⅆ-total (⊆/-⊆ ext) (⊆/-⊆ ext₁)
-... | ⟨ Ψ , diff ⟩ = s-arr {!complete-ss- s!} (complete-ss+ s₁ ext₁)
+complete-ss+ (s-arr₁ s s₁) (ext-arr ext ext₁)
+  with ⟨ Ψ , diff ⟩ ← ⅆ-total (⊆/-⊆ ext) (⊆/-⊆ ext₁)
+  with ih ← complete-ss- {Γ = Ψ} s {!!}
+  = s-arr (s-subirrev ih diff (⊆/-⊢c ext)) (complete-ss+ s₁ ext₁)
+    where postulate
+      s-subirrev : Ψ ⊢ A ⌞ ≤⁻ ⌝ B ⊣ Δ
+           → Δ ⅆ Ω ≋ Ψ ⅆ Γ
+           → Ω ⊢c B
+           → Γ ⊢ A ⌞ ≤⁻ ⌝ B ⊣ Ω
 complete-ss+ (s-∀ s) (ext-∀ ext) = s-∀ (complete-ss+ s ext)
 complete-ss+ (s-var-sub-l x inΔ) ext'@(ext-var x₁) with ⊆/x-=out-in x₁ (∋:=to∋= inΔ)
 ... | is-ex inΓ = s-ex-l^ (⊆/x-^in-=out-inst inΓ inΔ x₁)
@@ -67,6 +74,12 @@ s+-⊆/ : Δ ⊢ j # A ⌞ ≤⁺ ⌝ B
 
 s--⊆/ : Δ ⊢ ∞ # A ⌞ ≤⁻ ⌝ B
       → Δ ⊆ Δ w/t B
+s--⊆/ (s-int regΔ) = ext-int regΔ
+s--⊆/ (s-var-∙ regΔ inΔ) = ext-var (reg-⊆/x∙ regΔ inΔ)
+s--⊆/ (s-arr₁ s s₁) with s+-⊆/ s
+... | ⊆∞ ext = ext-arr ext (s--⊆/ s₁)
+s--⊆/ (s-∀ s) = ext-∀ (s--⊆/ s)
+s--⊆/ (s-var-sub-r x inΔ) = ext-var (⊆/x-refl x (⊢c-var-= (∋:=to∋= inΔ)))
 
 s+-⊆/ (s-refl regΔ cloA grd) = (⊆Z regΔ)
 s+-⊆/ (s-int regΔ) = ⊆∞ (ext-int regΔ)
@@ -80,7 +93,7 @@ s+-⊆/ (s-∀ s) with s+-⊆/ s
 s+-⊆/ (s-∀l s ic fd upC upD) with s+-⊆/ s
 s+-⊆/ (s-∀l s case-𝕚 fd upC upD) | r = ⊆∀-I (⊆/c-^-irrev-fd r fd)
 s+-⊆/ (s-∀l s case-𝕔 fd upC upD) | r = ⊆∀-C (⊆/c-^-irrev-fd r fd)
-s+-⊆/ (s-var-sub-l x inΔ) = ⊆∞ (ext-var (⊆/x-⊢c x (⊢c-var-= (∋:=to∋= inΔ))))
+s+-⊆/ (s-var-sub-l x inΔ) = ⊆∞ (ext-var (⊆/x-refl x (⊢c-var-= (∋:=to∋= inΔ))))
 
 complete-s0 : Γ ⋈ ⊢ j # A ⌞ ≤⁺ ⌝ B
             → Γ ⊢ ⟨ j , B ⟩ ~t Σ

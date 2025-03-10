@@ -20,7 +20,7 @@ data _⊆_ : Env n m → Env n m → Set where
       Γ ⊆ Δ
     → (regA : Γ ⊢r A)
     → Γ ,= A ⊆ Δ ,= A
-  mark : TRegular Γ
+  mark : (regΓ : TRegular Γ)
     → Γ ⋈ ⊆ Γ ⋈
 
 data ExSol (Γ : Env n m) (k : Fin m) : Set where
@@ -47,7 +47,8 @@ data _⊆_w/v_ : Env n m → Env n m → Fin m → Set where
          → (regA : Γ ⊢r A)
          → Γ ,= A ⊆ Δ ,= A w/v #S k
   ext-mark : TRegular Γ
-         → Γ ⋈ ⊆ Γ ⋈ w/v k
+           → Γ ∋∙ k
+           → Γ ⋈ ⊆ Γ ⋈ w/v k
 
 infix 3 _⊆_w/t_
 data _⊆_w/t_ : Env n m → Env n m → Type m → Set where

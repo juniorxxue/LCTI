@@ -1,5 +1,7 @@
 module Implicit.Algo.Properties.Irrelevance where
 
+-- the irrelevance in altering (solutions and ex-vars in) typing environments
+
 open import Implicit.Language.All
 open import Implicit.Algo.Base
 open import Implicit.Algo.Properties.Extension

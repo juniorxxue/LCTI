@@ -1,11 +1,11 @@
-module Implicit.NewCompleteIntermAlgoAux2 where
+module Implicit.Interm2Algo.Aux2 where
 
 open import Implicit.Language.All
 open import Implicit.Algo.All
 open import Implicit.Interm.Base
 
 open import Implicit.AuxLemmas
-open import Implicit.NewCompleteIntermAlgoAux
+open import Implicit.Interm2Algo.Aux1
 
 infix 3 _⊆_w/t_w/c_
 data _⊆_w/t_w/c_ : Env n m → Env n m → Type m → Counter → Set where
@@ -82,27 +82,6 @@ data _⊢wf_#_ : Env n m → Counter → Type m → Set where
 ⊆/c-=-∙ (⊆∀-C ext) (f-∀ fd) = ⊆∀-C {!!}
 -}
 
-⊆/x-⊢c : SRegular Γ
-       → Γ ⊢c ‶ X
-       → Γ ⊆ Γ w/v X
-⊆/x-⊢c (reg-Z regΓ) (⊢c-var-∙ inΔ) = ext-mark regΓ
-⊆/x-⊢c (reg-S∙ regΓ) (⊢c-var-∙ Z) = ext-Z∙ regΓ
-⊆/x-⊢c (reg-S∙ regΓ) (⊢c-var-∙ (S∙ inΔ)) = ext-S∙ (⊆/x-⊢c regΓ (⊢c-var-∙ inΔ))
-⊆/x-⊢c (reg-S^ regΓ) (⊢c-var-∙ (S^ inΔ)) = ext-S^ (⊆/x-⊢c regΓ (⊢c-var-∙ inΔ))
-⊆/x-⊢c (reg-S= regΓ regA) (⊢c-var-∙ (S= inΔ)) = ext-S= (⊆/x-⊢c regΓ (⊢c-var-∙ inΔ)) regA
-⊆/x-⊢c (reg-S∙ regΓ) (⊢c-var-= (S∙ inΔ)) = ext-S∙ (⊆/x-⊢c regΓ (⊢c-var-= inΔ))
-⊆/x-⊢c (reg-S^ regΓ) (⊢c-var-= (S^ inΔ)) = ext-S^ (⊆/x-⊢c regΓ (⊢c-var-= inΔ))
-⊆/x-⊢c (reg-S= regΓ regA) (⊢c-var-= Z) = ext-Z= regΓ regA
-⊆/x-⊢c (reg-S= regΓ regA) (⊢c-var-= (S= inΔ)) = ext-S= (⊆/x-⊢c regΓ (⊢c-var-= inΔ)) regA
-
-⊆/c-⊢c : SRegular Γ
-       → Γ ⊢c A
-       → Γ ⊆ Γ w/t A
-⊆/c-⊢c regΓ ⊢c-int = ext-int regΓ
-⊆/c-⊢c regΓ (⊢c-var-∙ inΔ) = ext-var (⊆/x-⊢c regΓ (⊢c-var-∙ inΔ))
-⊆/c-⊢c regΓ (⊢c-var-= inΔ) = ext-var (⊆/x-⊢c regΓ (⊢c-var-= inΔ))
-⊆/c-⊢c regΓ (⊢c-arr cloA cloA₁) = ext-arr (⊆/c-⊢c regΓ cloA) (⊆/c-⊢c regΓ cloA₁)
-⊆/c-⊢c regΓ (⊢c-∀ cloA) = ext-∀ (⊆/c-⊢c (reg-S∙ regΓ) cloA)
 
 postulate
   ⊆/c-∙-^=-gen : Γ ⊆ Δ w/t A w/c j
@@ -153,6 +132,8 @@ postulate
 ⊆/c-=-irrev-gen-gen {B = B} (⊆∀-I ext) newΔ = ⊆∀-I (⊆/c-=-irrev-gen-gen ext (=⟹=S newΔ (proj₂ (↑ty0-total B))))
 ⊆/c-=-irrev-gen-gen {B = B} (⊆∀-C ext) newΔ = ⊆∀-C (⊆/c-=-irrev-gen-gen ext (=⟹=S newΔ (proj₂ (↑ty0-total B))))
 -}
+
+
 
 ----------------------------------------------------------------------
 --+                           new logic                            +--

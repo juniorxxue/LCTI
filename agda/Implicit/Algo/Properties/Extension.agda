@@ -30,12 +30,3 @@ s-⊆ (s-term-c cloA ap ⊢e s) = s-⊆ s
 s-⊆ (s-term-o opnA ⊢e x s) = ⊆-trans (ss-⊆ x) (s-⊆ s)
 s-⊆ (s-∀l s upᶜ upᵉ upC upD) with s-⊆ s
 ... | evar-sol r regA = r
-
-⊆-regular : SRegular Γ
-          → Γ ⊆ Δ
-          → SRegular Δ
-⊆-regular (reg-Z regΓ) (mark x) = reg-Z regΓ
-⊆-regular (reg-S∙ regΓ) (uvar ext) = reg-S∙ (⊆-regular regΓ ext)
-⊆-regular (reg-S^ regΓ) (evar ext) = reg-S^ (⊆-regular regΓ ext)
-⊆-regular (reg-S^ regΓ) (evar-sol ext regA) = reg-S= (⊆-regular regΓ ext) regA
-⊆-regular (reg-S= regΓ regA) (svar ext regA₁) = reg-S= (⊆-regular regΓ ext) (⊆-⊢r regA ext)
