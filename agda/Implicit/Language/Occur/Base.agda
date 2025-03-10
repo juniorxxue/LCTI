@@ -12,7 +12,8 @@ data _ε_ : Fin m → Type m → Set where
       k ε A
     → k ε A `→ B
   ε-arr-r :
-      k ε B
+      (k ¬ε A)
+    → k ε B
     → k ε A `→ B
   ε-∀ :
       #S k ε A

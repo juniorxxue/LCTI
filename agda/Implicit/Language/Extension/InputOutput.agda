@@ -58,9 +58,9 @@ open import Implicit.Language.Extension.Base
 
 ⊆/-^in-=out (ext-var x) ε-var inΓ = ⊆/x-^in-=out x inΓ
 ⊆/-^in-=out (ext-arr ext ext₁) (ε-arr-l inA) inΓ = ⊆/-=in-=out ext₁ (⊆/-^in-=out ext inA inΓ)
-⊆/-^in-=out {A = A `→ B} {k = k} (ext-arr ext ext₁) (ε-arr-r inA) inΓ with ε-dec {k = k} {A = A}
+⊆/-^in-=out {A = A `→ B} {k = k} (ext-arr ext ext₁) (ε-arr-r ¬inA inB) inΓ with ε-dec {k = k} {A = A}
 ... | inj₁ init = ⊆/-=in-=out ext₁ (⊆/-^in-=out ext init inΓ)
-... | inj₂ nint = ⊆/-^in-=out ext₁ inA (⊆/-^in-^out ext nint inΓ)
+... | inj₂ nint = ⊆/-^in-=out ext₁ inB (⊆/-^in-^out ext nint inΓ)
 ⊆/-^in-=out (ext-∀ ext) (ε-∀ inA) inΓ with ⊆/-^in-=out ext inA (S∙ inΓ)
 ... | S∙ r = r
 

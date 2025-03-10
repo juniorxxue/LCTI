@@ -12,7 +12,8 @@ data find : Type m → Fin m → Counter → Set where
             → find A k ∞
   f-arr-𝕚-l : k ε A
             → find (A `→ B) k (𝕚 j)
-  f-arr-𝕚-r : find B k j
+  f-arr-𝕚-r : (¬inA : k ¬ε A)
+            → find B k j
             → find (A `→ B) k (𝕚 j)
   f-arr-𝕔   : (¬inA : k ¬ε A)
             → find B k j
@@ -25,9 +26,11 @@ find-ε : find A k ∞
 find-ε (f-∞ x) = x
 find-ε (f-∀ fd) = ε-∀ (find-ε fd)
 
+{-
 find-arr-r : find B k ∞
          → find (A `→ B) k ∞
-find-arr-r fd = f-∞ (ε-arr-r (find-ε fd))
+find-arr-r fd = f-∞ (ε-arr-r {!!} (find-ε fd))
+-}
 
 find-arr-l : find A k ∞
            → find (A `→ B) k ∞

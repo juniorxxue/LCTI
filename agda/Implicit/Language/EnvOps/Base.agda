@@ -258,7 +258,7 @@ data [_/_]_∙⟹_ : Type m → Fin m → Env n m → Env n m → Set where
 -- replace entry a with a solution ^a=A in an environment
 infix 3 [_/_]_=⟹_
 data [_/_]_=⟹_ : Type m → Fin m → Env n m → Env n m → Set where
-  =⟹^0 : (up : ↑ty0 A ⇘ A')
+  =⟹=0 : (up : ↑ty0 A ⇘ A')
         → [ A' / #0 ] (Γ ,= B) =⟹ (Γ ,= A)
 
   =⟹^S : [ A / k ] Γ =⟹ Γ'
@@ -277,6 +277,14 @@ data [_/_]_=⟹_ : Type m → Fin m → Env n m → Env n m → Set where
         → (up1 : ↑ty0 A ⇘ A')
         → [ A' / #S k ] (Γ ,= B) =⟹ (Γ' ,= B)
 
+=⟹-∋= : [ A / k ] Γ =⟹ Γ'
+      → Γ ∋= k
+=⟹-∋= (=⟹=0 up) = Z
+=⟹-∋= (=⟹^S inst up1) = S^ (=⟹-∋= inst)
+=⟹-∋= (=⟹∙S inst up1) = S∙ (=⟹-∋= inst)
+=⟹-∋= (=⟹=S inst up1) = S= (=⟹-∋= inst)
+
+{-
 =⟹-total : Γ ∋= k
           → k ¬ε⋆ A
           → ∃[ Γ' ]([ A / k ] Γ =⟹ Γ')
@@ -286,9 +294,26 @@ data [_/_]_=⟹_ : Type m → Fin m → Env n m → Env n m → Set where
   with ⟨ A' , upA ⟩ ← ↑ty-surjective⋆ ninA z≤n
   with ⟨ Γ' , newΓ ⟩ ← =⟹-total inΓ (¬ε⋆-↑ty'0 ninA upA) = ⟨ Γ' ,∙ , =⟹∙S newΓ upA ⟩
 =⟹-total {Γ = Γ} (S^ inΓ) ninA with ⟨ A' , upA ⟩ ← ↑ty-surjective⋆ ninA z≤n
-  with ⟨ Γ' , newΓ ⟩ ← =⟹-total inΓ (¬ε⋆-↑ty'0 ninA upA) = ⟨ Γ' ,^ , =⟹^S newΓ upA ⟩
+  with ⟨ Γ' , newΓ ⟩ ← =⟹-total infΓ (¬ε⋆-↑ty'0 ninA upA) = ⟨ Γ' ,^ , =⟹^S newΓ upA ⟩
 =⟹-total {Γ = Γ ,= B} (S= inΓ) ninA with ⟨ A' , upA ⟩ ← ↑ty-surjective⋆ ninA z≤n
   with ⟨ Γ' , newΓ ⟩ ← =⟹-total inΓ (¬ε⋆-↑ty'0 ninA upA) = ⟨ Γ' ,= B , =⟹=S newΓ upA ⟩
+
+
+
+↑ty-¬ε⋆ : ↑ty0 A ⇘ A'
+        → #0 ¬ε⋆ A' by #0
+↑ty-¬ε⋆ ↑ty-int = ¬ε⋆-int
+↑ty-¬ε⋆ ↑ty-var = ¬ε⋆-var-f (s≤s z≤n)
+↑ty-¬ε⋆ (↑ty-arr upA upA₁) = ¬ε⋆-arr (↑ty-¬ε⋆ upA) (↑ty-¬ε⋆ upA₁)
+↑ty-¬ε⋆ (↑ty-∀ upA) = ¬ε⋆-∀ {!!}
+
+=⟹-¬ε⋆ : [ A / k ] Γ =⟹ Γ'
+       → k ¬ε⋆ A
+=⟹-¬ε⋆ (=⟹^0 up) = {!!}
+=⟹-¬ε⋆ (=⟹^S inst up1) = ¬ε⋆-↑ty (=⟹-¬ε⋆ inst) up1 z≤n
+=⟹-¬ε⋆ (=⟹∙S inst up1) = ¬ε⋆-↑ty (=⟹-¬ε⋆ inst) up1 z≤n
+=⟹-¬ε⋆ (=⟹=S inst up1) = ¬ε⋆-↑ty (=⟹-¬ε⋆ inst) up1 z≤n
+-}
 
 
 ----------------------------------------------------------------------

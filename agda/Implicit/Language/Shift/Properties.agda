@@ -163,6 +163,22 @@ private variable
                                    ↑ty-∀ (↑ty-surjective⋆ ninA (s≤s lt) .proj₂) ⟩
 
 
+¬ε⋆-↑ty : k₁ ¬ε⋆ A
+        → A ↑ty k₂ ⇘ A'
+        → k₂ #≤ k₁
+        → #S k₁ ¬ε⋆ A'
+¬ε⋆-↑ty ¬ε⋆-int ↑ty-int lt = ¬ε⋆-int
+¬ε⋆-↑ty (¬ε⋆-var x) ↑ty-var lt = ¬ε⋆-var (helper lt x)
+  where
+    helper : ∀ {k₁ : Fin m} {k₂ : Fin (1 + m)} {X}
+                    → k₂ #≤ k₁
+                    → k₁ #< X
+                    → #S k₁ #< punchIn k₂ X
+    helper {k₁ = #0} {k₂ = #0} {X = #S X} lt1 lt2 = s≤s lt2
+    helper {k₁ = #S k₁} {k₂ = #0} {X = X} lt1 lt2 = s≤s lt2
+    helper {k₁ = #S k₁} {k₂ = #S k₂} {X = #S X} (s≤s lt1) (s≤s lt2) = s≤s (helper lt1 lt2)
+¬ε⋆-↑ty (¬ε⋆-arr ninA ninA₁) (↑ty-arr upA upA₁) lt = ¬ε⋆-arr (¬ε⋆-↑ty ninA upA lt) (¬ε⋆-↑ty ninA₁ upA₁ lt)
+¬ε⋆-↑ty (¬ε⋆-∀ ninA) (↑ty-∀ upA) lt = ¬ε⋆-∀ (¬ε⋆-↑ty ninA upA (s≤s lt))
 
 ¬ε⋆-↑ty' : #S k₁ ¬ε⋆ A'
         → A ↑ty k₂ ⇘ A'
@@ -187,6 +203,17 @@ private variable
          → k ¬ε⋆ A
 ¬ε⋆-↑ty'0 ninA' upA = ¬ε⋆-↑ty' ninA' upA z≤n
 
+{-
+
+↑ty0ₙ-¬ε⋆ : ∀ {m} {A : Type m} {n} {B : Type (n + m)}
+          → A ↑ty0ₙ n ⇘ B
+          → (lt : m < n + m)
+          → (fromℕ< lt) ¬ε⋆ B
+↑ty0ₙ-¬ε⋆ {zero} {A} {n = 1} {B} (↑ty0ₙ-0 x) lt = {!!}
+↑ty0ₙ-¬ε⋆ {suc m} {A} {n = 1} {B} (↑ty0ₙ-0 x) lt = {!!}
+↑ty0ₙ-¬ε⋆ {m} {A} {n} {B} (↑ty0ₙ-S upA x) lt = {!!}
+-}
+
 ¬ε-↑ty : k₁ ¬ε T
        → T ↑ty k₂ ⇘ T'
        → k₂ #≤ k₁
@@ -200,6 +227,26 @@ private variable
         → ↑ty0 T ⇘ T'
         → #S k ¬ε T'
 ¬ε-↑ty0 ¬inT upT = ¬ε-↑ty ¬inT upT z≤n
+
+
+¬ε-↑ty-≤ : (#S k₁) ¬ε T'
+         → T ↑ty k₂ ⇘ T'
+         → k₂ #≤ k₁
+         → k₁ ¬ε T
+¬ε-↑ty-≤ ¬ε-int ↑ty-int lt = ¬ε-int
+¬ε-↑ty-≤ (¬ε-var x) ↑ty-var lt = ¬ε-var (helper lt x)
+  where helper : ∀ {m} {k₁ : Fin m} {k₂ X}
+               → k₂ #≤ k₁
+               → punchIn k₂ X ≢ #S k₁
+               → X ≢ k₁
+        helper {k₁ = #0} {k₂ = #0} {X = #0} lt neq = λ z → neq refl
+        helper {k₁ = #0} {k₂ = #0} {X = #S X} lt neq = λ ()
+        helper {k₁ = #S k₁} {k₂ = #0} {X = #0} lt neq = λ ()
+        helper {k₁ = #S k₁} {k₂ = #0} {X = #S X} lt neq = ≢-pred neq
+        helper {k₁ = #S k₁} {k₂ = #S k₂} {X = #0} lt neq = λ ()
+        helper {k₁ = #S k₁} {k₂ = #S k₂} {X = #S X} (s≤s lt) neq = ≢-suc (helper lt (≢-pred neq))
+¬ε-↑ty-≤ (¬ε-arr ninT' ninT'') (↑ty-arr upT upT₁) lt = ¬ε-arr (¬ε-↑ty-≤ ninT' upT lt) (¬ε-↑ty-≤ ninT'' upT₁ lt)
+¬ε-↑ty-≤ (¬ε-∀ ninT') (↑ty-∀ upT) lt = ¬ε-∀ (¬ε-↑ty-≤ ninT' upT (s≤s lt))
 
 ¬ε-↑ty' : X ¬ε A
       → A ↑ty k ⇘ A'

@@ -86,6 +86,22 @@ infix 3 ↑ty0_⇘_
 ↑ty0_⇘_ : Type m → Type (1 + m) → Set
 ↑ty0_⇘_ A = _↑ty_⇘_ A #0
 
+{-
+infix 3 _↑ty_⊕_⇘_
+data _↑ty_⊕_⇘_ : Type m → Fin (1 + m) → (l : ℕ) → Type (l + m) → Set where
+  ↑ty-int :
+      Int ↑ty k ⊕ l ⇘ Int
+  ↑ty-var :
+      (‶ X) ↑ty k ⊕ l ⇘ ‶ {!!}
+  ↑ty-arr :
+      A ↑ty k ⊕ l ⇘ A'
+    → B ↑ty k ⊕ l ⇘ B'
+    → A `→ B ↑ty k ⊕ l ⇘ A' `→ B'
+  ↑ty-∀ :
+      A ↑ty #S k ⊕ l ⇘ A'
+    → (`∀ A) ↑ty k ⊕ l ⇘ `∀ {!!}
+-}
+
 infix 3 _↑tyᵉ_⇘_
 data _↑tyᵉ_⇘_ : Term n m → Fin (1 + m) → Term n (1 + m) → Set where
   ↑tyᵉ-lit : ∀ {num : ℕ}
@@ -133,6 +149,7 @@ data _¬ε_ : Fin m → Type m → Set where
       #S k ¬ε A
     → k ¬ε `∀ A
 
+-- looks like a wrong version, we need a level l to distinguish freevars and bound vars
 infix 3 _¬ε⋆_
 data _¬ε⋆_ : Fin m → Type m → Set where
   ¬ε⋆-int :
@@ -147,3 +164,32 @@ data _¬ε⋆_ : Fin m → Type m → Set where
   ¬ε⋆-∀ :
       #S k ¬ε⋆ A
     → k ¬ε⋆ `∀ A
+
+{-
+infix 3 _¬ε⋆_by_
+data _¬ε⋆_by_ : Fin m → Type m → Fin m → Set where
+  ¬ε⋆-int :
+      k ¬ε⋆ Int by l
+  ¬ε⋆-var-f :
+      k #< k'
+    → k ¬ε⋆ (‶ k') by l
+  ¬ε⋆-var-b :
+      k' #≤ l
+    → k ¬ε⋆ (‶ k') by l
+  ¬ε⋆-arr :
+      k ¬ε⋆ A by l
+    → k ¬ε⋆ B by l
+    → k ¬ε⋆ A `→ B by l
+  ¬ε⋆-∀ :
+      #S k ¬ε⋆ A by #S l
+    → k ¬ε⋆ `∀ A by l
+-}
+
+
+infix 3 _↑ty0ₙ_⇘_
+data _↑ty0ₙ_⇘_ : Type m → (k : ℕ) → Type (k + m) → Set where
+  ↑ty0ₙ-0 : ↑ty0 A ⇘ A'
+          → A ↑ty0ₙ 1 ⇘ A'
+  ↑ty0ₙ-S : A ↑ty0ₙ n ⇘ B
+          → ↑ty0 B ⇘ B'
+          → A ↑ty0ₙ (suc n) ⇘ B'

@@ -14,12 +14,13 @@ open import Data.List using (List; []; _∷_; _++_; reverse; map; foldr; downFro
 open import Data.List.Properties using (map-++) public
 open import Data.Maybe using (Maybe; just; nothing) renaming (map to mmap) public
 open import Data.Sum using (_⊎_; inj₁; inj₂) renaming ([_,_] to case-⊎) public
-open import Data.Fin using (Fin; punchIn; punchOut; toℕ; inject₁) renaming (zero to #0; suc to #S; pred to #pred; _<_ to _#<_; _≤_ to _#≤_) public
+open import Data.Fin using (Fin; punchIn; punchOut; toℕ; inject₁; fromℕ<; fromℕ<″ ) renaming (zero to #0; suc to #S; pred to #pred; _<_ to _#<_; _≤_ to _#≤_) public
 open import Data.Fin.Properties using (punchIn-injective; punchInᵢ≢i; punchIn-punchOut; punchOut-punchIn) renaming (<-cmp to #<-cmp; _≟_ to _#≟_) public
 open import Function renaming (_∋_ to _∋⦂_) public
 
 variable
   m m' n n' o : ℕ
+  l : ℕ
 
 m+1≤n→m≤n : suc m ≤ n
           → m ≤ n
