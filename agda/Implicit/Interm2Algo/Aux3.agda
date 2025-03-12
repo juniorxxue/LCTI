@@ -127,6 +127,7 @@ helper' {H = hit H} (ⅆS^ dd) fv cloB = ⊥-elim {!!}
 helper' {H = mis H} (ⅆS^ dd) fv cloB = ⅆS^^-mis (helper' dd {!!} {!!})
 helper' {H = hit H} (ⅆS=^ dd regA) fv cloB = ⊥-elim {!!}
 helper' {H = mis H} (ⅆS=^ dd regA) fv cloB = ⅆS==-mis-2 (helper' dd {!!} {!!}) {!!}
-helper' {H = hit H} (ⅆS==1 dd regA) fv cloB = ⅆS==-hit (helper' dd {!!} {!!}) {!!}
-helper' {H = mis H} (ⅆS==1 dd regA) fv cloB = {!!}
-helper' (ⅆS==2 dd regA) fv cloB = {!!}
+helper' {A = B} {H = hit H} (ⅆS==1 {A = A} dd regA) fv cloB = ⅆS==-hit (helper' dd (fv-∀-h fv) (⊢c-∀ {!!})) {!!}
+helper' {H = mis H} (ⅆS==1 dd regA) fv cloB = ⅆS==-mis-1 (helper' dd (fv-∀-m fv) (⊢c-∀ {!!})) {!!}
+helper' {H = hit H} (ⅆS==2 dd regA) fv cloB = ⅆS^=-hit (helper' dd (fv-∀-h fv) (⊢c-∀ {!!}))
+helper' {H = mis H} (ⅆS==2 dd regA) fv cloB = ⅆS^=-mis (helper' dd (fv-∀-m fv) (⊢c-∀ {!!}))
