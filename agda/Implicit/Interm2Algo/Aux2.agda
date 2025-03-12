@@ -37,7 +37,6 @@ data _⊢wf_#_ : Env n m → Counter → Type m → Set where
 -}
 
 
-
 ⊆/c-⊆ : Γ ⊆ Δ w/t A w/c j
       → Γ ⊆ Δ
 ⊆/c-⊆ (⊆Z regΓ) = ⊆-refl regΓ

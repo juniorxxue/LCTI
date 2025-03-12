@@ -187,17 +187,18 @@ postulate
 ⅆ-inst (ⅆS==1 dd regA) (⟹=S inst up1 regB) = ⟹=S (ⅆ-inst dd inst) up1 (⊆-⊢r' regB (ⅆ-r-⊆ dd))
 ⅆ-inst (ⅆS==2 dd regA) (⟹^0 up regA₁ env) with refl ← ⅆ-unique dd = ⟹^0 up (⊆-⊢r' regA (ⅆ-l-⊆ dd)) (⊆-regular' env (ⅆ-r-⊆ dd))
 
+postulate
 
-s+-subirrev : Ψ ⊢ A ⌞ ≤⁺ ⌝ B ⊣ Δ
+  s+-subirrev : Ψ ⊢ A ⌞ ≤⁺ ⌝ B ⊣ Δ
            → Δ ⅆ Ω ≋ Ψ ⅆ Γ
            → Ω ⊢c A -- this is required for a case like a=Int |- a <: Int -| a =Int, will become ^a |- ^a <: Int -| ^a, it's wrong
            → Γ ⊢ A ⌞ ≤⁺ ⌝ B ⊣ Ω
 
-s--subirrev : Ψ ⊢ A ⌞ ≤⁻ ⌝ B ⊣ Δ
+  s--subirrev : Ψ ⊢ A ⌞ ≤⁻ ⌝ B ⊣ Δ
            → Δ ⅆ Ω ≋ Ψ ⅆ Γ
            → Ω ⊢c B
            → Γ ⊢ A ⌞ ≤⁻ ⌝ B ⊣ Ω
-
+{-
 s+-subirrev (s-int regΓ) dd ⊢c-int with refl ← ⅆ-unique dd = s-int (⊆-regular' regΓ (ⅆ-l-⊆ dd))
 s+-subirrev (s-var-∙ regΓ x) dd (⊢c-var-∙ inΔ) with refl ← ⅆ-unique dd = s-var-∙ (⊆-regular' regΓ (ⅆ-l-⊆ dd)) inΔ
 s+-subirrev (s-var-∙ regΓ x) dd (⊢c-var-= inΔ) = ⊥-elim (∋∙-∋=-false x (⊆-∋= inΔ (ⅆ-l-⊆ dd)))
@@ -205,8 +206,10 @@ s+-subirrev (s-ex-l^ inst) dd (⊢c-var-∙ inΔ) = ⊥-elim (∋∙-∋=-false 
 s+-subirrev (s-ex-l^ inst) dd (⊢c-var-= inΔ) = s-ex-l^ (ⅆ-inst dd inst)
 s+-subirrev (s-ex-l= regΓ x-in) dd (⊢c-var-∙ inΔ) = ⊥-elim {!!}
 s+-subirrev (s-ex-l= regΓ x-in) dd (⊢c-var-= inΔ) with refl ← ⅆ-unique dd = s-ex-l= {!!} {!!}
-s+-subirrev (s-arr s s₁) dd (⊢c-arr cloA cloA₁) = s-arr (s--subirrev s {!!} cloA) (s+-subirrev s₁ {!!} cloA₁)
+s+-subirrev (s-arr {Ω = Ω'} s s₁) dd (⊢c-arr cloA cloA₁) = s-arr (s--subirrev s {!!} {!!}) (s+-subirrev s₁ {!!} cloA₁)
+-- (s--subirrev s {!!} cloA) (s+-subirrev s₁ {!!} cloA₁)
 s+-subirrev (s-∀ s) dd (⊢c-∀ cloA) = s-∀ (s+-subirrev s (ⅆS∙ dd) cloA)
+-}
 
 {- considered as wrong, 03/10/25 11:52 PM
 s-subirrev : Ψ ⊢ A ⌞ ≤ ⌝ B ⊣ Δ
@@ -220,4 +223,47 @@ s-subirrev (s-ex-l= regΓ x-in) dd with refl ← ⅆ-unique dd = s-ex-l= {!!} {!
 s-subirrev (s-ex-r= regΓ x-in) dd = {!!}
 s-subirrev (s-arr s s₁) dd = {!!}
 s-subirrev (s-∀ s) dd = {!!}
+-}
+
+{-
+freevars A ~> [...]
+
+Γ ⊆ Ω ~~> [...]
+Γ ⊆ Ω
+-}
+
+{-
+s--subirrev' : Ψ ⊢ A ⌞ ≤⁻ ⌝ B ⊣ Δ
+             → Δ ⅆ Ω ≋ Ψ ⅆ Γ
+             → Γ ⊆ Ω w/t B
+             → Γ ⊢ A ⌞ ≤⁻ ⌝ B ⊣ Ω
+
+s+-subirrev' : Ψ ⊢ A ⌞ ≤⁺ ⌝ B ⊣ Δ
+             → Δ ⅆ Ω ≋ Ψ ⅆ Γ
+             → Γ ⊆ Ω w/t A
+             → Γ ⊢ A ⌞ ≤⁺ ⌝ B ⊣ Ω
+s+-subirrev' (s-int regΓ) dd ext = {!!}
+s+-subirrev' (s-var-∙ regΓ x) dd ext = {!!}
+s+-subirrev' (s-ex-l^ inst) dd ext = {!!}
+s+-subirrev' (s-ex-l= regΓ x-in) dd ext = {!!}
+s+-subirrev' (s-arr {Ω = Ω'} s s₁) dd (ext-arr ext ext₁) = s-arr (s--subirrev' s {!!} ext) (s+-subirrev' s₁ {!!} ext₁)
+s+-subirrev' (s-∀ s) dd ext = {!!}
+
+
+helper : Γ ⊆ Ψ
+       → Ψ ⊆ Ω' w/t A
+       → Γ ⊆ Ω w/t A
+       → Ω' ⅆ Ω ≋ Ψ ⅆ Γ
+helper ext (ext-int x) (ext-int x₁) = {!!}
+
+helper (uvar ext) (ext-var (ext-Z∙ regΓ)) (ext-var (ext-Z∙ regΓ₁)) = ⅆS∙ (helper ext (ext-int regΓ) (ext-int regΓ₁))
+helper (uvar ext) (ext-var (ext-S∙ x)) (ext-var (ext-S∙ x₁)) = ⅆS∙ (helper ext (ext-var x) (ext-var x₁))
+helper (evar ext) (ext-var (ext-Z^ regΓ regA)) (ext-var (ext-Z^ regΓ₁ regA₁)) = {!!}
+helper (evar ext) (ext-var (ext-S^ x)) (ext-var x₁) = {!!}
+helper (evar-sol ext regA) (ext-var x) (ext-var x₁) = {!!}
+helper (svar ext regA) (ext-var x) (ext-var x₁) = {!!}
+helper (mark regΓ) (ext-var x) (ext-var x₁) = {!!}
+
+helper ext (ext-arr ext1 ext3) (ext-arr ext2 ext4) = {!!}
+helper ext (ext-∀ ext1) (ext-∀ ext2) = {!!}
 -}

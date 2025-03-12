@@ -33,6 +33,7 @@ complete-ss+ (s-arr₁ s s₁) (ext-arr ext ext₁)
   with ⟨ Ψ , diff ⟩ ← ⅆ-total (⊆/-⊆ ext) (⊆/-⊆ ext₁)
   with ih ← complete-ss- {Γ = Ψ} s {!!}
   = s-arr (s-subirrev ih diff (⊆/-⊢c ext)) (complete-ss+ s₁ ext₁)
+--  (s-subirrev ih diff (⊆/-⊢c ext)) (complete-ss+ s₁ ext₁)
     where postulate
       s-subirrev : Ψ ⊢ A ⌞ ≤⁻ ⌝ B ⊣ Δ
            → Δ ⅆ Ω ≋ Ψ ⅆ Γ
