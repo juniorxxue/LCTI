@@ -1,4 +1,3 @@
-{-# OPTIONS --allow-unsolved-metas #-}
 module Implicit.Interm2Algo.Aux1 where
 
 open import Implicit.Language.All
@@ -78,12 +77,6 @@ data _⊢_~t_ : Env n m → Counter × Type m → Context n m → Set where
 ~t-~s ~∞ = ~∞
 ~t-~s (~I ⊢e j~Σ) = ~I ⊢e (~t-~s j~Σ)
 ~t-~s (~C ⊢e j~Σ) = ~C ⊢e (~t-~s j~Σ)
-
-----------------------------------------------------------------------
---+                           extension                            +--
-----------------------------------------------------------------------
-
-
 
 ----------------------------------------------------------------------
 --+                       env extension diff                       +--
@@ -229,19 +222,19 @@ postulate
       → Γ' ⊆ Δ' w/v X
       → Γ ⊆ Δ w/v X
 ⅆ-⊆/x (ⅆ⋈ regΓ) ext = ext
-ⅆ-⊆/x (ⅆS∙ dd) (ext-Z∙ regΓ) with refl ← ⅆ-out-eq dd = ext-Z∙ {!!}
+ⅆ-⊆/x (ⅆS∙ dd) (ext-Z∙ regΓ) with refl ← ⅆ-out-eq dd = ext-Z∙ (⊆-regular regΓ (ⅆ-l-⊆ dd))
 ⅆ-⊆/x (ⅆS∙ dd) (ext-S∙ ext) = ext-S∙ (ⅆ-⊆/x dd ext)
 ⅆ-⊆/x (ⅆS^ dd) (ext-S^ ext) = ext-S^ (ⅆ-⊆/x dd ext)
-ⅆ-⊆/x (ⅆS=^ dd regA) (ext-S^ ext) = ext-S= (ⅆ-⊆/x dd ext) {!!}
-ⅆ-⊆/x (ⅆS==1 dd regA) (ext-Z= regΓ regA₁) with refl ← ⅆ-out-eq dd = ext-Z= {!!} regA
+ⅆ-⊆/x (ⅆS=^ dd regA) (ext-S^ ext) = ext-S= (ⅆ-⊆/x dd ext) (⊆-⊢r' regA (ⅆ-⊆ dd))
+ⅆ-⊆/x (ⅆS==1 dd regA) (ext-Z= regΓ regA₁) with refl ← ⅆ-out-eq dd = ext-Z= (⊆-regular regΓ (ⅆ-l-⊆ dd)) regA
 ⅆ-⊆/x (ⅆS==1 dd regA) (ext-S= ext regA₁) = ext-S= (ⅆ-⊆/x dd ext) (⊆-⊢r regA₁ (ⅆ-r-⊆ dd))
-ⅆ-⊆/x (ⅆS==2 dd regA) (ext-Z^ regΓ regA₁) with refl ← ⅆ-out-eq dd = ext-Z^ {!!} regA
+ⅆ-⊆/x (ⅆS==2 dd regA) (ext-Z^ regΓ regA₁) with refl ← ⅆ-out-eq dd = ext-Z^ (⊆-regular regΓ (ⅆ-l-⊆ dd)) regA
 
 
 ⅆ-⊆/ : Δ ⅆ Δ' ≋ Γ ⅆ Γ'
      → Γ' ⊆ Δ' w/t A
      → Γ ⊆ Δ w/t A
-ⅆ-⊆/ dd (ext-int x) with refl ← ⅆ-out-eq dd = ⊆/-refl {!!} ⊢c-int
+ⅆ-⊆/ dd (ext-int x) with refl ← ⅆ-out-eq dd = ⊆/-refl (⊆-regular x (ⅆ-l-⊆ dd)) ⊢c-int
 ⅆ-⊆/ dd (ext-var x) = ext-var (ⅆ-⊆/x dd x)
 ⅆ-⊆/ dd (ext-arr ext ext₁) with ⅆ-total-mid dd (⊆/-⊆ ext) (⊆/-⊆ ext₁)
 ... | ⟨ Ω' , ⟨ dd1 , dd2 ⟩ ⟩ = ext-arr (ⅆ-⊆/ dd1 ext) (ⅆ-⊆/ dd2 ext₁)

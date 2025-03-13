@@ -56,9 +56,18 @@ data orHit : HitEnv m → HitEnv m → HitEnv m → Set where
   s-mm : orHit H₁ H₂ H
     → orHit (mis H₁) (mis H₂) (mis H)
 
+orHit-total : ∀ (H₁ H₂ : HitEnv m)
+  → ∃[ H ](orHit H₁ H₂ H)
+orHit-total ∅ ∅ = ⟨ ∅ , Z ⟩
+orHit-total (hit H₁) (hit H₂) = ⟨ hit (orHit-total H₁ H₂ .proj₁) , S-hh (orHit-total H₁ H₂ .proj₂) ⟩
+orHit-total (hit H₁) (mis H₂) = ⟨ hit (orHit-total H₁ H₂ .proj₁) , S-hm (orHit-total H₁ H₂ .proj₂) ⟩
+orHit-total (mis H₁) (hit H₂) = ⟨ hit (orHit-total H₁ H₂ .proj₁) , S-mh (orHit-total H₁ H₂ .proj₂) ⟩
+orHit-total (mis H₁) (mis H₂) = ⟨ mis (orHit-total H₁ H₂ .proj₁) , s-mm (orHit-total H₁ H₂ .proj₂) ⟩
+
+
 infix 3 _𝕗𝕧_
 data _𝕗𝕧_ : Type m → HitEnv m → Set where
-  fv-Int : Int 𝕗𝕧 ∅
+  fv-Int : ∀ {m} → (Type m ∋⦂ Int) 𝕗𝕧 mkMis {m}
   fv-var : (‶ X) 𝕗𝕧 mkHit X
   fv-arr : A 𝕗𝕧 H₁
          → B 𝕗𝕧 H₂
@@ -68,6 +77,20 @@ data _𝕗𝕧_ : Type m → HitEnv m → Set where
          → `∀ A 𝕗𝕧 H
   fv-∀-m : A 𝕗𝕧 (mis H)
          → `∀ A 𝕗𝕧 H
+
+𝕗𝕧-total : ∀ {m} (A : Type m)
+         → ∃[ H ](A 𝕗𝕧 H)
+𝕗𝕧-total {m} Int = ⟨ mkMis , fv-Int ⟩
+𝕗𝕧-total (‶ X) = ⟨ mkHit X , fv-var ⟩
+𝕗𝕧-total (A `→ B)
+  with ⟨ H1 , fv1 ⟩ ← 𝕗𝕧-total A
+  with ⟨ H2 , fv2 ⟩ ← 𝕗𝕧-total B
+  with ⟨ H , or-hit ⟩ ← orHit-total H1 H2
+  = ⟨ H , fv-arr fv1 fv2 or-hit ⟩
+𝕗𝕧-total (`∀ A) with 𝕗𝕧-total A
+... | ⟨ hit H , fv ⟩ = ⟨ H , fv-∀-h fv ⟩
+... | ⟨ mis H , fv ⟩ = ⟨ H , fv-∀-m fv ⟩
+
 
 {-
 infix 3 _ⅆ_≋_ⅆ_
@@ -120,72 +143,98 @@ data _ⅆ_⊆_ⅆ_kp_ : Env n m → Env n m → Env n m → Env n m → HitEnv m
              → (regA : Γ ⊢r A)
              → Γ ,= A ⅆ Γ' ,^ ⊆ Δ ,= A ⅆ Δ' ,^ kp (mis H)
 
-ⅆ-⊆-l : Γ ⅆ Γ' ⊆ Δ ⅆ Δ' kp H
+ⅆk-⊆-l : Γ ⅆ Γ' ⊆ Δ ⅆ Δ' kp H
       → Γ' ⊆ Γ -- not essential
-ⅆ-⊆-l (ⅆ⋈ regΓ) = mark regΓ
-ⅆ-⊆-l (ⅆS∙∙-hit dd) = uvar (ⅆ-⊆-l dd)
-ⅆ-⊆-l (ⅆS∙∙-mis dd) = uvar (ⅆ-⊆-l dd)
-ⅆ-⊆-l (ⅆS^=-hit dd) = evar (ⅆ-⊆-l dd)
-ⅆ-⊆-l (ⅆS^=-mis dd) = evar (ⅆ-⊆-l dd)
-ⅆ-⊆-l (ⅆS^^-hit dd) = evar (ⅆ-⊆-l dd)
-ⅆ-⊆-l (ⅆS^^-mis dd) = evar (ⅆ-⊆-l dd)
-ⅆ-⊆-l (ⅆS==-hit dd regA) = svar (ⅆ-⊆-l dd) (⊆-⊢r' regA (ⅆ-⊆-l dd))
-ⅆ-⊆-l (ⅆS==-mis-1 dd regA) = svar (ⅆ-⊆-l dd) (⊆-⊢r' regA (ⅆ-⊆-l dd))
-ⅆ-⊆-l (ⅆS==-mis-2 dd regA) = evar-sol (ⅆ-⊆-l dd) regA
+ⅆk-⊆-l (ⅆ⋈ regΓ) = mark regΓ
+ⅆk-⊆-l (ⅆS∙∙-hit dd) = uvar (ⅆk-⊆-l dd)
+ⅆk-⊆-l (ⅆS∙∙-mis dd) = uvar (ⅆk-⊆-l dd)
+ⅆk-⊆-l (ⅆS^=-hit dd) = evar (ⅆk-⊆-l dd)
+ⅆk-⊆-l (ⅆS^=-mis dd) = evar (ⅆk-⊆-l dd)
+ⅆk-⊆-l (ⅆS^^-hit dd) = evar (ⅆk-⊆-l dd)
+ⅆk-⊆-l (ⅆS^^-mis dd) = evar (ⅆk-⊆-l dd)
+ⅆk-⊆-l (ⅆS==-hit dd regA) = svar (ⅆk-⊆-l dd) (⊆-⊢r' regA (ⅆk-⊆-l dd))
+ⅆk-⊆-l (ⅆS==-mis-1 dd regA) = svar (ⅆk-⊆-l dd) (⊆-⊢r' regA (ⅆk-⊆-l dd))
+ⅆk-⊆-l (ⅆS==-mis-2 dd regA) = evar-sol (ⅆk-⊆-l dd) regA
 
 
-ⅆ-input-eq : Γ ⅆ Γ' ⊆ Γ ⅆ Δ' kp H
+ⅆk-input-eq : Γ ⅆ Γ' ⊆ Γ ⅆ Δ' kp H
            → Γ' ≡ Δ'
-ⅆ-input-eq (ⅆ⋈ regΓ) = refl
-ⅆ-input-eq (ⅆS∙∙-hit dd) = cong _,∙ (ⅆ-input-eq dd)
-ⅆ-input-eq (ⅆS∙∙-mis dd) = cong _,∙ (ⅆ-input-eq dd)
-ⅆ-input-eq (ⅆS^^-hit dd) = cong _,^ (ⅆ-input-eq dd)
-ⅆ-input-eq (ⅆS^^-mis dd) = cong _,^ (ⅆ-input-eq dd)
-ⅆ-input-eq (ⅆS==-hit dd regA) = cong₂ _,=_ (ⅆ-input-eq dd) refl
-ⅆ-input-eq (ⅆS==-mis-1 dd regA) = cong₂ _,=_ (ⅆ-input-eq dd) refl
-ⅆ-input-eq (ⅆS==-mis-2 dd regA) = cong _,^ (ⅆ-input-eq dd)
+ⅆk-input-eq (ⅆ⋈ regΓ) = refl
+ⅆk-input-eq (ⅆS∙∙-hit dd) = cong _,∙ (ⅆk-input-eq dd)
+ⅆk-input-eq (ⅆS∙∙-mis dd) = cong _,∙ (ⅆk-input-eq dd)
+ⅆk-input-eq (ⅆS^^-hit dd) = cong _,^ (ⅆk-input-eq dd)
+ⅆk-input-eq (ⅆS^^-mis dd) = cong _,^ (ⅆk-input-eq dd)
+ⅆk-input-eq (ⅆS==-hit dd regA) = cong₂ _,=_ (ⅆk-input-eq dd) refl
+ⅆk-input-eq (ⅆS==-mis-1 dd regA) = cong₂ _,=_ (ⅆk-input-eq dd) refl
+ⅆk-input-eq (ⅆS==-mis-2 dd regA) = cong _,^ (ⅆk-input-eq dd)
 
 
-ⅆ-or-l : Γ ⅆ Γ' ⊆ Δ ⅆ Δ' kp H
+ⅆk-or-l : Γ ⅆ Γ' ⊆ Δ ⅆ Δ' kp H
          → orHit H₁ H₂ H
          → Γ ⅆ Γ' ⊆ Δ ⅆ Δ' kp H₁
-ⅆ-or-l (ⅆ⋈ regΓ) or = ⅆ⋈ regΓ
-ⅆ-or-l (ⅆS∙∙-hit dd) (S-hm or) = ⅆS∙∙-hit (ⅆ-or-l dd or)
-ⅆ-or-l (ⅆS∙∙-hit dd) (S-mh or) = ⅆS∙∙-mis (ⅆ-or-l dd or)
-ⅆ-or-l (ⅆS∙∙-hit dd) (S-hh or) = ⅆS∙∙-hit (ⅆ-or-l dd or)
-ⅆ-or-l (ⅆS∙∙-mis dd) (s-mm or) = ⅆS∙∙-mis (ⅆ-or-l dd or)
-ⅆ-or-l (ⅆS^=-hit dd) (S-hm or) = ⅆS^=-hit (ⅆ-or-l dd or)
-ⅆ-or-l (ⅆS^=-hit dd) (S-mh or) = ⅆS^=-mis (ⅆ-or-l dd or)
-ⅆ-or-l (ⅆS^=-hit dd) (S-hh or) = ⅆS^=-hit (ⅆ-or-l dd or)
-ⅆ-or-l (ⅆS^=-mis dd) (s-mm or) = ⅆS^=-mis (ⅆ-or-l dd or)
-ⅆ-or-l (ⅆS^^-hit dd) (S-hm or) = ⅆS^^-hit (ⅆ-or-l dd or)
-ⅆ-or-l (ⅆS^^-hit dd) (S-mh or) = ⅆS^^-mis (ⅆ-or-l dd or)
-ⅆ-or-l (ⅆS^^-hit dd) (S-hh or) = ⅆS^^-hit (ⅆ-or-l dd or)
-ⅆ-or-l (ⅆS^^-mis dd) (s-mm or) = ⅆS^^-mis (ⅆ-or-l dd or)
-ⅆ-or-l (ⅆS==-hit dd regA) (S-hm or) = ⅆS==-hit (ⅆ-or-l dd or) regA
-ⅆ-or-l (ⅆS==-hit dd regA) (S-mh or) = ⅆS==-mis-1 (ⅆ-or-l dd or) regA
-ⅆ-or-l (ⅆS==-hit dd regA) (S-hh or) = ⅆS==-hit (ⅆ-or-l dd or) regA
-ⅆ-or-l (ⅆS==-mis-1 dd regA) (s-mm or) = ⅆS==-mis-1 (ⅆ-or-l dd or) regA
-ⅆ-or-l (ⅆS==-mis-2 dd regA) (s-mm or) = ⅆS==-mis-2 (ⅆ-or-l dd or) regA
+ⅆk-or-l (ⅆ⋈ regΓ) or = ⅆ⋈ regΓ
+ⅆk-or-l (ⅆS∙∙-hit dd) (S-hm or) = ⅆS∙∙-hit (ⅆk-or-l dd or)
+ⅆk-or-l (ⅆS∙∙-hit dd) (S-mh or) = ⅆS∙∙-mis (ⅆk-or-l dd or)
+ⅆk-or-l (ⅆS∙∙-hit dd) (S-hh or) = ⅆS∙∙-hit (ⅆk-or-l dd or)
+ⅆk-or-l (ⅆS∙∙-mis dd) (s-mm or) = ⅆS∙∙-mis (ⅆk-or-l dd or)
+ⅆk-or-l (ⅆS^=-hit dd) (S-hm or) = ⅆS^=-hit (ⅆk-or-l dd or)
+ⅆk-or-l (ⅆS^=-hit dd) (S-mh or) = ⅆS^=-mis (ⅆk-or-l dd or)
+ⅆk-or-l (ⅆS^=-hit dd) (S-hh or) = ⅆS^=-hit (ⅆk-or-l dd or)
+ⅆk-or-l (ⅆS^=-mis dd) (s-mm or) = ⅆS^=-mis (ⅆk-or-l dd or)
+ⅆk-or-l (ⅆS^^-hit dd) (S-hm or) = ⅆS^^-hit (ⅆk-or-l dd or)
+ⅆk-or-l (ⅆS^^-hit dd) (S-mh or) = ⅆS^^-mis (ⅆk-or-l dd or)
+ⅆk-or-l (ⅆS^^-hit dd) (S-hh or) = ⅆS^^-hit (ⅆk-or-l dd or)
+ⅆk-or-l (ⅆS^^-mis dd) (s-mm or) = ⅆS^^-mis (ⅆk-or-l dd or)
+ⅆk-or-l (ⅆS==-hit dd regA) (S-hm or) = ⅆS==-hit (ⅆk-or-l dd or) regA
+ⅆk-or-l (ⅆS==-hit dd regA) (S-mh or) = ⅆS==-mis-1 (ⅆk-or-l dd or) regA
+ⅆk-or-l (ⅆS==-hit dd regA) (S-hh or) = ⅆS==-hit (ⅆk-or-l dd or) regA
+ⅆk-or-l (ⅆS==-mis-1 dd regA) (s-mm or) = ⅆS==-mis-1 (ⅆk-or-l dd or) regA
+ⅆk-or-l (ⅆS==-mis-2 dd regA) (s-mm or) = ⅆS==-mis-2 (ⅆk-or-l dd or) regA
 
-ⅆ-or-r : Γ ⅆ Γ' ⊆ Δ ⅆ Δ' kp H
+ⅆk-or-r : Γ ⅆ Γ' ⊆ Δ ⅆ Δ' kp H
          → orHit H₁ H₂ H
          → Γ ⅆ Γ' ⊆ Δ ⅆ Δ' kp H₂
-ⅆ-or-r (ⅆ⋈ regΓ) or = ⅆ⋈ regΓ
-ⅆ-or-r (ⅆS∙∙-hit dd) (S-hm or) = ⅆS∙∙-mis (ⅆ-or-r dd or)
-ⅆ-or-r (ⅆS∙∙-hit dd) (S-mh or) = ⅆS∙∙-hit (ⅆ-or-r dd or)
-ⅆ-or-r (ⅆS∙∙-hit dd) (S-hh or) = ⅆS∙∙-hit (ⅆ-or-r dd or)
-ⅆ-or-r (ⅆS∙∙-mis dd) (s-mm or) = ⅆS∙∙-mis (ⅆ-or-r dd or)
-ⅆ-or-r (ⅆS^=-hit dd) (S-hm or) = ⅆS^=-mis (ⅆ-or-r dd or)
-ⅆ-or-r (ⅆS^=-hit dd) (S-mh or) = ⅆS^=-hit (ⅆ-or-r dd or)
-ⅆ-or-r (ⅆS^=-hit dd) (S-hh or) = ⅆS^=-hit (ⅆ-or-r dd or)
-ⅆ-or-r (ⅆS^=-mis dd) (s-mm or) = ⅆS^=-mis (ⅆ-or-r dd or)
-ⅆ-or-r (ⅆS^^-hit dd) (S-hm or) = ⅆS^^-mis (ⅆ-or-r dd or)
-ⅆ-or-r (ⅆS^^-hit dd) (S-mh or) = ⅆS^^-hit (ⅆ-or-r dd or)
-ⅆ-or-r (ⅆS^^-hit dd) (S-hh or) = ⅆS^^-hit (ⅆ-or-r dd or)
-ⅆ-or-r (ⅆS^^-mis dd) (s-mm or) = ⅆS^^-mis (ⅆ-or-r dd or)
-ⅆ-or-r (ⅆS==-hit dd regA) (S-hm or) = ⅆS==-mis-1 (ⅆ-or-r dd or) regA
-ⅆ-or-r (ⅆS==-hit dd regA) (S-mh or) = ⅆS==-hit (ⅆ-or-r dd or) regA
-ⅆ-or-r (ⅆS==-hit dd regA) (S-hh or) = ⅆS==-hit (ⅆ-or-r dd or) regA
-ⅆ-or-r (ⅆS==-mis-1 dd regA) (s-mm or) = ⅆS==-mis-1 (ⅆ-or-r dd or) regA
-ⅆ-or-r (ⅆS==-mis-2 dd regA) (s-mm or) = ⅆS==-mis-2 (ⅆ-or-r dd or) regA
+ⅆk-or-r (ⅆ⋈ regΓ) or = ⅆ⋈ regΓ
+ⅆk-or-r (ⅆS∙∙-hit dd) (S-hm or) = ⅆS∙∙-mis (ⅆk-or-r dd or)
+ⅆk-or-r (ⅆS∙∙-hit dd) (S-mh or) = ⅆS∙∙-hit (ⅆk-or-r dd or)
+ⅆk-or-r (ⅆS∙∙-hit dd) (S-hh or) = ⅆS∙∙-hit (ⅆk-or-r dd or)
+ⅆk-or-r (ⅆS∙∙-mis dd) (s-mm or) = ⅆS∙∙-mis (ⅆk-or-r dd or)
+ⅆk-or-r (ⅆS^=-hit dd) (S-hm or) = ⅆS^=-mis (ⅆk-or-r dd or)
+ⅆk-or-r (ⅆS^=-hit dd) (S-mh or) = ⅆS^=-hit (ⅆk-or-r dd or)
+ⅆk-or-r (ⅆS^=-hit dd) (S-hh or) = ⅆS^=-hit (ⅆk-or-r dd or)
+ⅆk-or-r (ⅆS^=-mis dd) (s-mm or) = ⅆS^=-mis (ⅆk-or-r dd or)
+ⅆk-or-r (ⅆS^^-hit dd) (S-hm or) = ⅆS^^-mis (ⅆk-or-r dd or)
+ⅆk-or-r (ⅆS^^-hit dd) (S-mh or) = ⅆS^^-hit (ⅆk-or-r dd or)
+ⅆk-or-r (ⅆS^^-hit dd) (S-hh or) = ⅆS^^-hit (ⅆk-or-r dd or)
+ⅆk-or-r (ⅆS^^-mis dd) (s-mm or) = ⅆS^^-mis (ⅆk-or-r dd or)
+ⅆk-or-r (ⅆS==-hit dd regA) (S-hm or) = ⅆS==-mis-1 (ⅆk-or-r dd or) regA
+ⅆk-or-r (ⅆS==-hit dd regA) (S-mh or) = ⅆS==-hit (ⅆk-or-r dd or) regA
+ⅆk-or-r (ⅆS==-hit dd regA) (S-hh or) = ⅆS==-hit (ⅆk-or-r dd or) regA
+ⅆk-or-r (ⅆS==-mis-1 dd regA) (s-mm or) = ⅆS==-mis-1 (ⅆk-or-r dd or) regA
+ⅆk-or-r (ⅆS==-mis-2 dd regA) (s-mm or) = ⅆS==-mis-2 (ⅆk-or-r dd or) regA
+
+
+ⅆk-∋∙ : Γ ⅆ Γ' ⊆ Γ ⅆ Γ' kp H
+      → H ≡ mkHit X
+      → Γ ∋∙ X
+      → Γ' ∋∙ X
+ⅆk-∋∙ (ⅆ⋈ regΓ) eq inΓ = inΓ
+ⅆk-∋∙ (ⅆS∙∙-hit dd) eq Z = Z
+ⅆk-∋∙ (ⅆS∙∙-mis dd) refl (S∙ inΓ) = S∙ (ⅆk-∋∙ dd refl inΓ)
+ⅆk-∋∙ (ⅆS^^-hit dd) () (S^ inΓ)
+ⅆk-∋∙ (ⅆS^^-mis dd) refl (S^ inΓ) = S^ (ⅆk-∋∙ dd refl inΓ)
+ⅆk-∋∙ (ⅆS==-hit dd regA) () (S= inΓ)
+ⅆk-∋∙ (ⅆS==-mis-1 dd regA) refl (S= inΓ) = S= (ⅆk-∋∙ dd refl inΓ)
+ⅆk-∋∙ (ⅆS==-mis-2 dd regA) refl (S= inΓ) = S^ (ⅆk-∋∙ dd refl inΓ)
+
+ⅆk-∋:= : Γ ⅆ Γ' ⊆ Γ ⅆ Γ' kp H
+      → H ≡ mkHit X
+      → Γ ∋ X := A
+      → Γ' ∋ X := A
+ⅆk-∋:= (ⅆS∙∙-hit dd) () (S∙ inΓ up)
+ⅆk-∋:= (ⅆS∙∙-mis dd) refl (S∙ inΓ up) = S∙ (ⅆk-∋:= dd refl inΓ) up
+ⅆk-∋:= (ⅆS^^-hit dd) () (S^ inΓ up)
+ⅆk-∋:= (ⅆS^^-mis dd) refl (S^ inΓ up) = S^ (ⅆk-∋:= dd refl inΓ) up
+ⅆk-∋:= (ⅆS==-hit dd regA) refl (Z up) = Z up
+ⅆk-∋:= (ⅆS==-mis-1 dd regA) refl (S= inΓ up) = S= (ⅆk-∋:= dd refl inΓ) up
+ⅆk-∋:= (ⅆS==-mis-2 dd regA) refl (S= inΓ up) = S^ (ⅆk-∋:= dd refl inΓ) up
