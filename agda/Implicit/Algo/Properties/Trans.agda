@@ -1,6 +1,6 @@
 module Implicit.Algo.Properties.Trans where
 
-open import Implicit.Language.All hiding (_⊆_)
+open import Implicit.Language.All
 open import Implicit.Algo.Base
 open import Implicit.Algo.Properties.Id
 open import Implicit.Algo.Properties.Shift

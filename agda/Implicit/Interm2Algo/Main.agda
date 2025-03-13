@@ -6,7 +6,7 @@ open import Implicit.Interm.Base
 open import Implicit.Interm.Ground
 open import Implicit.Interm2Algo.Aux1
 open import Implicit.Interm2Algo.Aux2
-open import Implicit.Interm2Algo.Aux3 hiding (ⅆ-total)
+open import Implicit.Interm2Algo.Aux3
 
 postulate
   open-close : ∀ (Γ : Env n m) A → Γ ⊢c A ⊎ Γ ⊢o A

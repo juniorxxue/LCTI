@@ -19,33 +19,24 @@ inst-exist (=⟹=S inst up1) (evar-sol ext regA) (S^ inΩ) = ⟨ inst-exist inst
 inst-exist (=⟹=S inst up1) (svar {A = A} ext regA) (S= inΩ) = ⟨ inst-exist inst ext inΩ .proj₁ ,= A ,
                                                        =⟹=S (inst-exist inst ext inΩ .proj₂) up1 ⟩
 
-{-
-data Env : ℕ → ℕ → Set where
-  ∅     : Env 0 0
-  _,_   : Env n m → (A : Type m) → Env (1 + n) m
-  _,^   : Env n m → Env n (1 + m)
-  _,∙   : Env n m → Env n (1 + m)
-  _,=_  : Env n m → (A : Type m) → Env n (1 + m)
-  _⋈    : Env n m → Env n m
--}
 
-data HitEnv : ℕ → Set where
-  ∅ : HitEnv 0
-  hit : HitEnv m → HitEnv (1 + m)
-  mis : HitEnv m → HitEnv (1 + m)
+data HitMis : ℕ → Set where
+  ∅ : HitMis 0
+  hit : HitMis m → HitMis (1 + m)
+  mis : HitMis m → HitMis (1 + m)
 
 variable
-  H H₁ H₂ : HitEnv m
+  H H₁ H₂ : HitMis m
 
-mkMis : ∀ {m} → HitEnv m
+mkMis : ∀ {m} → HitMis m
 mkMis {zero} = ∅
 mkMis {suc m} = mis (mkMis {m})
 
-mkHit : ∀ {m} → Fin m → HitEnv m
+mkHit : ∀ {m} → Fin m → HitMis m
 mkHit {suc m} #0 = hit (mkMis {m})
 mkHit {suc m} (#S k) = mis (mkHit {m} k)
 
-data orHit : HitEnv m → HitEnv m → HitEnv m → Set where
+data orHit : HitMis m → HitMis m → HitMis m → Set where
   Z : orHit ∅ ∅ ∅
   S-hm : orHit H₁ H₂ H
     → orHit (hit H₁) (mis H₂) (hit H)
@@ -56,7 +47,7 @@ data orHit : HitEnv m → HitEnv m → HitEnv m → Set where
   s-mm : orHit H₁ H₂ H
     → orHit (mis H₁) (mis H₂) (mis H)
 
-orHit-total : ∀ (H₁ H₂ : HitEnv m)
+orHit-total : ∀ (H₁ H₂ : HitMis m)
   → ∃[ H ](orHit H₁ H₂ H)
 orHit-total ∅ ∅ = ⟨ ∅ , Z ⟩
 orHit-total (hit H₁) (hit H₂) = ⟨ hit (orHit-total H₁ H₂ .proj₁) , S-hh (orHit-total H₁ H₂ .proj₂) ⟩
@@ -64,9 +55,8 @@ orHit-total (hit H₁) (mis H₂) = ⟨ hit (orHit-total H₁ H₂ .proj₁) , S
 orHit-total (mis H₁) (hit H₂) = ⟨ hit (orHit-total H₁ H₂ .proj₁) , S-mh (orHit-total H₁ H₂ .proj₂) ⟩
 orHit-total (mis H₁) (mis H₂) = ⟨ mis (orHit-total H₁ H₂ .proj₁) , s-mm (orHit-total H₁ H₂ .proj₂) ⟩
 
-
 infix 3 _𝕗𝕧_
-data _𝕗𝕧_ : Type m → HitEnv m → Set where
+data _𝕗𝕧_ : Type m → HitMis m → Set where
   fv-Int : ∀ {m} → (Type m ∋⦂ Int) 𝕗𝕧 mkMis {m}
   fv-var : (‶ X) 𝕗𝕧 mkHit X
   fv-arr : A 𝕗𝕧 H₁
@@ -91,30 +81,8 @@ data _𝕗𝕧_ : Type m → HitEnv m → Set where
 ... | ⟨ hit H , fv ⟩ = ⟨ H , fv-∀-h fv ⟩
 ... | ⟨ mis H , fv ⟩ = ⟨ H , fv-∀-m fv ⟩
 
-
-{-
-infix 3 _ⅆ_≋_ⅆ_
-
-data _ⅆ_≋_ⅆ_ : Env n m → Env n m → Env n m → Env n m → Set where
-  ⅆ⋈ : (regΓ : TRegular Γ)
-     → Γ ⋈ ⅆ Γ ⋈ ≋ Γ ⋈ ⅆ Γ ⋈
-  ⅆS∙ : Δ ⅆ Ω ≋ Ψ ⅆ Γ
-      → Δ ,∙ ⅆ Ω ,∙  ≋ Ψ ,∙ ⅆ Γ ,∙
-  ⅆS^ : Δ ⅆ Ω ≋ Ψ ⅆ Γ
-      → Δ ,^ ⅆ Ω ,^  ≋ Ψ ,^ ⅆ Γ ,^
-  ⅆS=^ : Δ ⅆ Ω ≋ Ψ ⅆ Γ
-       → (regA : Δ ⊢r A)
-       → Δ ,= A ⅆ Ω ,^  ≋ Ψ ,= A ⅆ Γ ,^
-  ⅆS==1 : Δ ⅆ Ω ≋ Ψ ⅆ Γ
-        → (regA : Δ ⊢r A)
-      → Δ ,= A ⅆ Ω ,= A  ≋ Ψ ,= A ⅆ Γ ,= A
-  ⅆS==2 : Δ ⅆ Ω ≋ Ψ ⅆ Γ
-        → (regA : Δ ⊢r A)
-      → Δ ,= A ⅆ Ω ,= A  ≋ Ψ ,^ ⅆ Γ ,^
--}
-
 infix 3 _ⅆ_⊆_ⅆ_kp_
-data _ⅆ_⊆_ⅆ_kp_ : Env n m → Env n m → Env n m → Env n m → HitEnv m → Set where
+data _ⅆ_⊆_ⅆ_kp_ : Env n m → Env n m → Env n m → Env n m → HitMis m → Set where
   ⅆ⋈ : (regΓ : TRegular Γ)
      → Γ ⋈ ⅆ Γ ⋈ ⊆ Γ ⋈ ⅆ Γ ⋈ kp H
   ⅆS∙∙-hit : Γ ⅆ Γ' ⊆ Δ ⅆ Δ' kp H
