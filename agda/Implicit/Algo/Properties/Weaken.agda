@@ -80,11 +80,11 @@ inst-weaken, (⟹=S inst up1) (▶S= newΓ x) = ⟹=S (inst-weaken, inst newΓ) 
 -- s-weaken,0 s upΣ cloT cloT' = s-weaken, s (▶Z cloT cloT') upΣ
 
 postulate
-  s-weaken,0 : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
+  s-weaken,0 : Γ ⋈ ⊢ A ≤⁺ Σ ⊣ Δ ⋈ ↪ B
              → ↑tmᶜ0 Σ ⇘ Σ'
-             → Γ ⊢c T
-             → Δ ⊢c T
-             → Γ , T ⊢ A ≤⁺ Σ' ⊣ Δ , T ↪ B
+             → Γ ⊢r T
+             → Δ ⊢r T
+             → Γ , T ⋈ ⊢ A ≤⁺ Σ' ⊣ Δ , T ⋈  ↪ B
 
   t-weaken,0 : Γ ⊢ Σ ⇒ e ⇒ A
              → ↑tmᶜ0 Σ ⇘ Σ'

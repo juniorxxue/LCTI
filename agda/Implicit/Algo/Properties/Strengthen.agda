@@ -10,3 +10,9 @@ postulate
                  → ↑ty0 A ⇘ A'
                  → ↑tyᶜ0 Σ ⇘ Σ'
                  → Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
+
+  s-strengthen,0 : Γ , T ⋈ ⊢ A ≤⁺ Σ' ⊣ Δ , T ⋈  ↪ B
+                 → ↑tmᶜ0 Σ ⇘ Σ'
+                 → Γ ⋈ ⊢r T
+                 → Δ ⋈ ⊢r T
+                 → Γ ⋈ ⊢ A ≤⁺ Σ ⊣ Δ ⋈ ↪ B
