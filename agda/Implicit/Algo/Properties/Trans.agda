@@ -68,13 +68,16 @@ s-trans (s-term-c cloA ap ⊢e s1) (s-term-c cloA₁ ap₁ ⊢e₁ s2) (≊S new
   with relf ← ⊢id0 ⊢e
   with refl ← ⊢id0 ⊢e₁
   with refl ← ⊢r-≫-eq' (⊆-⊢r regA% (s-⊆ s1)) ap₁ = s-term-c cloA ap ⊢e (s-trans s1 s2 newΣ)
-s-trans (s-term-c cloA ap ⊢e s1) (s-term-o opnA ⊢e₁ x s2) (≊S newΣ) = ⊥-elim {!!}
+s-trans (s-term-c cloA ap ⊢e s1) (s-term-o opnA ⊢e₁ x s2) (≊S newΣ) = let regA = ⊆-⊢r (⊢c-≫-⊢r (s-env-in s1) cloA ap) (s-⊆ s1)
+                                                                      in ⊥-elim (⊢r-⊢o-false regA opnA)
 s-trans s'@(s-term-o opnA ⊢e x s1) (s-term-c cloA ap ⊢e₁ s2) (≊S newΣ)
   with refl ← ⊢r-≫-eq' (⊆-⊢r (ss-polarity- x) (s-⊆ s')) ap = s-term-o opnA ⊢e x (s-trans s1 s2 newΣ)
-s-trans (s-term-o opnA ⊢e x s1) (s-term-o opnA₁ ⊢e₁ x₁ s2) newΣ = ⊥-elim {!!}
+s-trans s'@(s-term-o opnA ⊢e x s1) (s-term-o opnA₁ ⊢e₁ x₁ s2) (≊S newΣ) = let regA = ⊆-⊢r (⊢r-𝕣 (t-⊢r ⊢e)) (s-⊆ s')
+                                                                          in ⊥-elim (⊢r-⊢o-false regA opnA₁)
 s-trans (s-∀l s1 upᶜ upᵉ upC upD) s'@(s-term-c {A% = A%} {Σ = Σ′} {D = D} cloA ap ⊢e s2) (≊S newΣ) =
   let ⟨ Σ″ , upΣ′ ⟩ = ↑tyᶜ0-total Σ′
       ⟨ A%' , upA%' ⟩ = ↑ty0-total A%
       ⟨ D' , upD' ⟩ = ↑ty0-total D
   in s-∀l (s-trans s1 (s-weaken=0 s' (↑ty-arr upC upD) (↑tyᶜ-e upᵉ upΣ′) (↑ty-arr upA%' upD')) (≊S (≊-↑ty0 newΣ upᶜ upΣ′))) upΣ′ upᵉ upA%' upD'
-s-trans (s-∀l s1 upᶜ upᵉ upC upD) (s-term-o opnA ⊢e x s2) (≊S newΣ) = ⊥-elim {!!}
+s-trans s'@(s-∀l s1 upᶜ upᵉ upC upD) (s-term-o opnA ⊢e x s2) (≊S newΣ)
+  with (⊢r-arr regC regD) ← s-⊢r s' = let regA = ⊆-⊢r regC (s-⊆ s') in ⊥-elim (⊢r-⊢o-false regA opnA)

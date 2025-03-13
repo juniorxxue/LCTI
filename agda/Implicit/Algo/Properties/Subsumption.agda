@@ -8,17 +8,8 @@ open import Implicit.Algo.Properties.Extension
 open import Implicit.Algo.Properties.Regularity
 open import Implicit.Algo.Properties.Polarity
 open import Implicit.Algo.Properties.Strengthen
-
-
-postulate
-  t-irrev-⊆ : 𝕣 Γ ⊢ Σ ⇒ e ⇒ A
-            → Γ ⊆ Δ
-            → 𝕣 Δ ⊢ Σ ⇒ e ⇒ A
-
-  s-trans : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
-        → Δ ⊢ B ≤⁺ Σ' ⊣ Δ ↪ C
-        → Σ ≊ Σ'
-        → Γ ⊢ A ≤⁺ Σ' ⊣ Δ ↪ C
+open import Implicit.Algo.Properties.Irrelevance
+open import Implicit.Algo.Properties.Trans
 
 ⊢to≤ : Γ ⊢ Σ ⇒ e ⇒ A
      → Γ ⋈ ⊢ A ≤⁺ Σ ⊣ Γ ⋈ ↪ A
