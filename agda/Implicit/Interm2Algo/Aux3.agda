@@ -6,7 +6,7 @@ open import Implicit.Language.All
 open import Implicit.Algo.All
 open import Implicit.AuxLemmas
 
-open import Implicit.Interm2Algo.Aux1 hiding (ⅆ-total; ⅆ-inst; s+-subirrev; s--subirrev)
+open import Implicit.Interm2Algo.Aux1 hiding (ⅆ-total)
 
 ⅆ-total :  Γ ⅆ Γ' ⊆ Δ ⅆ Δ' kp H
          → Γ ⊆ Ω
@@ -89,45 +89,40 @@ s+-subirrev (s-arr s s₁) (fv-arr fv fv₁ cb) tf with ⅆ-total tf (ss-⊆ s) 
 s+-subirrev (s-∀ s) (fv-∀-h fv) tf = s-∀ (s+-subirrev s fv (ⅆS∙∙-hit tf))
 s+-subirrev (s-∀ s) (fv-∀-m fv) tf = s-∀ (s+-subirrev s fv (ⅆS∙∙-mis tf))
 
+s--subirrev s fv ext = {!!}
+
 𝕗𝕧-total : ∀ (A : Type m)
          → ∃[ H ](A 𝕗𝕧 H)
-
-s-subirrev : Ψ ⊢ A ⌞ ≤⁻ ⌝ B ⊣ Δ
-           → Δ ⅆ Ω ≋ Ψ ⅆ Γ
-           → Γ ⊆ Ω w/t B -- or Ω ⊢c B
-           → Γ ⊢ A ⌞ ≤⁻ ⌝ B ⊣ Ω
-s-subirrev {B = B} s dd cloB with 𝕗𝕧-total B
-... | ⟨ H , fv ⟩ = s--subirrev s fv {!zm!}
-
-helper : Δ ⅆ Ω ≋ Ψ ⅆ Γ
-       → B 𝕗𝕧 H
-       → Γ ⊆ Ω w/t B
-       → Ψ ⅆ Γ ⊆ Δ ⅆ Ω kp H
-helper (ⅆ⋈ regΓ) fvB extB = ⅆ⋈ regΓ
-helper {H = hit H} (ⅆS∙ dd) fvB extB = ⅆS∙∙-hit (helper dd (fv-∀-h fvB) (ext-∀ extB))
-helper {H = mis H} (ⅆS∙ dd) fvB extB = ⅆS∙∙-mis (helper dd (fv-∀-m fvB) (ext-∀ extB))
-helper {H = hit H} (ⅆS^ dd) fvB extB = ⊥-elim {!!}
-helper {H = mis H} (ⅆS^ dd) fvB extB = ⅆS^^-mis (helper dd {!!} {!!})
-helper {H = hit H} (ⅆS=^ dd regA) fvB extB = ⊥-elim {!!}
-helper {H = mis H} (ⅆS=^ dd regA) fvB extB = ⅆS==-mis-2 {!!} {!!}
-helper {H = hit H} (ⅆS==1 dd regA) fvB extB = ⅆS==-hit (helper dd {!!} {!!}) {!!}
-helper {H = mis H} (ⅆS==1 dd regA) fvB extB = ⅆS==-mis-1 (helper dd {!!} {!!}) {!!}
-helper {H = hit H} (ⅆS==2 dd regA) fvB extB = ⅆS^=-hit (helper dd {!!} {!!})
-helper {H = mis H} (ⅆS==2 dd regA) fvB extB = ⊥-elim {!!}
+𝕗𝕧-total = {!!}
 
 
-helper' : Δ ⅆ Ω ≋ Ψ ⅆ Γ
+ⅆ-ⅆ-gen : Δ ⅆ Ω ≋ Ψ ⅆ Γ
        → A 𝕗𝕧 H
        → Ω ⊢c A
        → Ψ ⅆ Γ ⊆ Δ ⅆ Ω kp H
-helper' (ⅆ⋈ regΓ) fv cloB = ⅆ⋈ regΓ
-helper' {H = hit H} (ⅆS∙ dd) fv cloB = ⅆS∙∙-hit (helper' dd (fv-∀-h fv) (⊢c-∀ cloB))
-helper' {H = mis H} (ⅆS∙ dd) fv cloB = ⅆS∙∙-mis (helper' dd (fv-∀-m fv) (⊢c-∀ cloB))
-helper' {H = hit H} (ⅆS^ dd) fv cloB = ⊥-elim {!!}
-helper' {H = mis H} (ⅆS^ dd) fv cloB = ⅆS^^-mis (helper' dd {!!} {!!})
-helper' {H = hit H} (ⅆS=^ dd regA) fv cloB = ⊥-elim {!!}
-helper' {H = mis H} (ⅆS=^ dd regA) fv cloB = ⅆS==-mis-2 (helper' dd {!!} {!!}) {!!}
-helper' {A = B} {H = hit H} (ⅆS==1 {A = A} dd regA) fv cloB = ⅆS==-hit (helper' dd (fv-∀-h fv) (⊢c-∀ {!!})) {!!}
-helper' {H = mis H} (ⅆS==1 dd regA) fv cloB = ⅆS==-mis-1 (helper' dd (fv-∀-m fv) (⊢c-∀ {!!})) {!!}
-helper' {H = hit H} (ⅆS==2 dd regA) fv cloB = ⅆS^=-hit (helper' dd (fv-∀-h fv) (⊢c-∀ {!!}))
-helper' {H = mis H} (ⅆS==2 dd regA) fv cloB = ⅆS^=-mis (helper' dd (fv-∀-m fv) (⊢c-∀ {!!}))
+ⅆ-ⅆ-gen (ⅆ⋈ regΓ) fv cloB = ⅆ⋈ regΓ
+ⅆ-ⅆ-gen {H = hit H} (ⅆS∙ dd) fv cloB = ⅆS∙∙-hit (ⅆ-ⅆ-gen dd (fv-∀-h fv) (⊢c-∀ cloB))
+ⅆ-ⅆ-gen {H = mis H} (ⅆS∙ dd) fv cloB = ⅆS∙∙-mis (ⅆ-ⅆ-gen dd (fv-∀-m fv) (⊢c-∀ cloB))
+ⅆ-ⅆ-gen {H = hit H} (ⅆS^ dd) fv cloB = ⊥-elim {!!}
+ⅆ-ⅆ-gen {H = mis H} (ⅆS^ dd) fv cloB = ⅆS^^-mis (ⅆ-ⅆ-gen dd {!!} {!!})
+ⅆ-ⅆ-gen {H = hit H} (ⅆS=^ dd regA) fv cloB = ⊥-elim {!!}
+ⅆ-ⅆ-gen {H = mis H} (ⅆS=^ dd regA) fv cloB = ⅆS==-mis-2 (ⅆ-ⅆ-gen dd {!!} {!!}) {!!}
+ⅆ-ⅆ-gen {A = B} {H = hit H} (ⅆS==1 {A = A} dd regA) fv cloB = ⅆS==-hit (ⅆ-ⅆ-gen dd (fv-∀-h fv) (⊢c-∀ {!!})) {!!}
+ⅆ-ⅆ-gen {H = mis H} (ⅆS==1 dd regA) fv cloB = ⅆS==-mis-1 (ⅆ-ⅆ-gen dd (fv-∀-m fv) (⊢c-∀ {!!})) {!!}
+ⅆ-ⅆ-gen {H = hit H} (ⅆS==2 dd regA) fv cloB = ⅆS^=-hit (ⅆ-ⅆ-gen dd (fv-∀-h fv) (⊢c-∀ {!!}))
+ⅆ-ⅆ-gen {H = mis H} (ⅆS==2 dd regA) fv cloB = ⅆS^=-mis (ⅆ-ⅆ-gen dd (fv-∀-m fv) (⊢c-∀ {!!}))
+
+
+s--subirrev-final : Ψ ⊢ A ⌞ ≤⁻ ⌝ B ⊣ Δ
+           → Δ ⅆ Ω ≋ Ψ ⅆ Γ
+           → Ω ⊢c B
+           → Γ ⊢ A ⌞ ≤⁻ ⌝ B ⊣ Ω
+s--subirrev-final {B = B} s dd cloB with 𝕗𝕧-total B
+... | ⟨ H , fv ⟩ = s--subirrev s fv (ⅆ-ⅆ-gen dd fv cloB)
+
+s+-subirrev-final : Ψ ⊢ A ⌞ ≤⁺ ⌝ B ⊣ Δ
+           → Δ ⅆ Ω ≋ Ψ ⅆ Γ
+           → Ω ⊢c A
+           → Γ ⊢ A ⌞ ≤⁺ ⌝ B ⊣ Ω
+s+-subirrev-final {A = A} s dd cloB with 𝕗𝕧-total A
+... | ⟨ H , fv ⟩ = s+-subirrev s fv (ⅆ-ⅆ-gen dd fv cloB)

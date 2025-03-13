@@ -6,6 +6,7 @@ open import Implicit.Interm.Base
 open import Implicit.Interm.Ground
 open import Implicit.Interm2Algo.Aux1
 open import Implicit.Interm2Algo.Aux2
+open import Implicit.Interm2Algo.Aux3 hiding (ⅆ-total)
 
 postulate
   open-close : ∀ (Γ : Env n m) A → Γ ⊢c A ⊎ Γ ⊢o A
@@ -31,14 +32,8 @@ complete-ss+ (s-var-∙ regΔ inΔ) (ext-var x) with ⊆/-⊢c-eq (ext-var x) (�
 ... | refl = s-var-∙ regΔ inΔ
 complete-ss+ (s-arr₁ s s₁) (ext-arr ext ext₁)
   with ⟨ Ψ , diff ⟩ ← ⅆ-total (⊆/-⊆ ext) (⊆/-⊆ ext₁)
-  with ih ← complete-ss- {Γ = Ψ} s {!!}
-  = s-arr (s-subirrev ih diff (⊆/-⊢c ext)) (complete-ss+ s₁ ext₁)
---  (s-subirrev ih diff (⊆/-⊢c ext)) (complete-ss+ s₁ ext₁)
-    where postulate
-      s-subirrev : Ψ ⊢ A ⌞ ≤⁻ ⌝ B ⊣ Δ
-           → Δ ⅆ Ω ≋ Ψ ⅆ Γ
-           → Ω ⊢c B
-           → Γ ⊢ A ⌞ ≤⁻ ⌝ B ⊣ Ω
+  with ih ← complete-ss- {Γ = Ψ} s (ⅆ-⊆/ diff ext)
+  = s-arr (s--subirrev-final ih diff (⊆/-⊢c ext)) (complete-ss+ s₁ ext₁)
 complete-ss+ (s-∀ s) (ext-∀ ext) = s-∀ (complete-ss+ s ext)
 complete-ss+ (s-var-sub-l x inΔ) ext'@(ext-var x₁) with ⊆/x-=out-in x₁ (∋:=to∋= inΔ)
 ... | is-ex inΓ = s-ex-l^ (⊆/x-^in-=out-inst inΓ inΔ x₁)
@@ -48,8 +43,10 @@ complete-ss- (s-int regΔ) ext with ⊆/-⊢c-eq ext ⊢c-int
 ... | refl = s-int regΔ
 complete-ss- (s-var-∙ regΔ inΔ) (ext-var x) with ⊆/-⊢c-eq (ext-var x) (⊢c-var-∙ (⊆/-∙out-∙in inΔ x))
 ... | refl = s-var-∙ regΔ inΔ
-complete-ss- (s-arr₁ s s₁) (ext-arr ext ext₁) with ⅆ-total (⊆/-⊆ ext) (⊆/-⊆ ext₁)
-... | ⟨ Ψ , diff ⟩ = s-arr {!complete-ss+ s!} (complete-ss- s₁ ext₁)
+complete-ss- (s-arr₁ s s₁) (ext-arr ext ext₁)
+  with ⟨ Ψ , diff ⟩  ← ⅆ-total (⊆/-⊆ ext) (⊆/-⊆ ext₁)
+  with ih ← complete-ss+ {Γ = Ψ} s (ⅆ-⊆/ diff ext)
+  = s-arr (s+-subirrev-final ih diff (⊆/-⊢c ext)) (complete-ss- s₁ ext₁)
 complete-ss- (s-∀ s) (ext-∀ ext) = s-∀ (complete-ss- s ext)
 complete-ss- (s-var-sub-r x inΔ) ext'@(ext-var x₁) with ⊆/x-=out-in x₁ (∋:=to∋= inΔ)
 ... | is-ex inΓ = s-ex-r^ (⊆/x-^in-=out-inst inΓ inΔ x₁)
@@ -60,7 +57,10 @@ complete-s {j = ∞} s (⊆∞ x) ~∞ = s-type (complete-ss+ s x)
 complete-s {j = 𝕚 j} {Γ = Γ} (s-arr₂ {A = A} s s₁) (⊆I ext ext₁) (~I ⊢e j~Σ) with open-close Γ A
 ... | inj₁ cloA
   with refl ← ⊆/-⊢c-eq ext cloA = s-term-c cloA (⊆-⊢c-≫ (⊆/c-⊆ ext₁) cloA (s--≫ s)) (subsumption0 ⊢e) (complete-s s₁ ext₁ j~Σ)
-... | inj₂ opnA = s-term-o opnA ⊢e {!complete-ss- s !} (complete-s s₁ ext₁ (~irrev j~Σ (⊆/-⊆ ext)))
+... | inj₂ opnA
+  with ⟨ Ψ , diff ⟩ ← ⅆ-total (⊆/-⊆ ext) (⊆/c-⊆ ext₁)
+  with ih ← complete-ss- {Γ = Ψ} s (ⅆ-⊆/ diff ext)
+  = s-term-o opnA ⊢e (s--subirrev-final ih diff (⊆/-⊢c ext)) (complete-s s₁ ext₁ (~irrev j~Σ (⊆/-⊆ ext)))
 complete-s {j = 𝕔 j} (s-arr₃ cloA grd s) (⊆C cloA' ext) (~C ⊢e j~Σ) = s-term-c cloA' (⊆-⊢c-≫ (⊆/c-⊆ ext) cloA' grd) ⊢e (complete-s s ext j~Σ)
 complete-s (s-∀l s ic fd upC upD) (⊆∀-I ext) j~'@(~I {Σ = Σ} {e = e} ⊢e j~) with ↑tyᶜ0-total Σ | ↑tyᵉ0-total e
 ... | ⟨ Σ' , upΣ ⟩ | ⟨ e' , upe ⟩ = let weaken-j~ = (~weaken^0 (~I ⊢e j~) (↑ty-arr upC upD) (↑tyᶜ-e upe upΣ))
