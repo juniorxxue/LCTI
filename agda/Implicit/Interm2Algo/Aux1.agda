@@ -167,12 +167,6 @@ data _ⅆ_≋_ⅆ_ : Env n m → Env n m → Env n m → Env n m → Set where
 --+                             Irrev                              +--
 ----------------------------------------------------------------------
 
-postulate
-  t-irrev-⊆ : 𝕣 Γ ⊢ Σ ⇒ e ⇒ A
-            → Γ ⊆ Δ
-            → 𝕣 Δ ⊢ Σ ⇒ e ⇒ A
-
-
 ~irrev : Γ ⊢ ⟨ j , D ⟩ ~s Σ
         → Γ ⊆ Ω
         → Ω ⊢ ⟨ j , D ⟩ ~s Σ

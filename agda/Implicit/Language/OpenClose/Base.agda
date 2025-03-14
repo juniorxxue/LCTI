@@ -46,3 +46,36 @@ data _⊢c_ : Env n m → Type m → Set where
   ⊢c-∀ :
       Δ ,∙ ⊢c A
     → Δ ⊢c `∀ A
+{-
+
+data Vars (Γ : Env n m) (X : Fin m) : Set where
+  is-ex : Γ ∋^ X
+        → Vars Γ X
+  is-sol : Γ ∋= X
+         → Vars Γ X
+  is-uni : Γ ∋∙ X
+         → Vars Γ X
+
+vars-total : ∀ (Γ : Env n m) (X : Fin m)
+           → SRegular Γ
+           → Vars Γ X
+vars-total (Γ ,^) #0 (reg-S^ regΓ) = is-ex Z
+vars-total (Γ ,^) (#S X) (reg-S^ regΓ) with vars-total Γ X regΓ
+... | is-ex x = is-ex (S^ x)
+... | is-sol x = is-sol (S^ x)
+... | is-uni x = is-uni (S^ x)
+vars-total (Γ ,∙) X regΓ = {!!}
+vars-total (Γ ,= A) X regΓ = {!!}
+vars-total (Γ ⋈) X (reg-Z regΓ) = {!!}
+
+open-close : ∀ (Γ : Env n m) A → Γ ⊢c A ⊎ Γ ⊢o A
+open-close Γ Int = inj₁ ⊢c-int
+open-close Γ (‶ X) = {!!}
+open-close Γ (A `→ B) with open-close Γ A | open-close Γ B
+... | inj₁ x | inj₁ x₁ = inj₁ (⊢c-arr x x₁)
+... | inj₁ x | inj₂ y = inj₂ (⊢o-arr-r y)
+... | inj₂ y | r2 = inj₂ (⊢o-arr-l y)
+open-close Γ (`∀ A) with open-close (Γ ,∙) A
+... | inj₁ x = inj₁ (⊢c-∀ x)
+... | inj₂ y = inj₂ (⊢o-∀ y)
+-}

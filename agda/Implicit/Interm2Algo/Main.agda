@@ -7,11 +7,7 @@ open import Implicit.Interm.Ground
 open import Implicit.Interm2Algo.Aux1
 open import Implicit.Interm2Algo.Aux2
 open import Implicit.Interm2Algo.Aux3
-
-postulate
-  open-close : ∀ (Γ : Env n m) A → Γ ⊢c A ⊎ Γ ⊢o A
-  subsumption0 : Γ ⊢ □ ⇒ e ⇒ A
-             → Γ ⊢ τ A ⇒ e ⇒ A
+open import Implicit.Interm2Algo.OpenClose
 
 complete-ss+ : Δ ⊢ ∞ # A ⌞ ≤⁺ ⌝ B
              → Γ ⊆ Δ w/t A
@@ -54,13 +50,13 @@ complete-ss- (s-var-sub-r x inΔ) ext'@(ext-var x₁) with ⊆/x-=out-in x₁ (�
 
 complete-s {j = Z} (s-refl regΔ cloA grd) (⊆Z regΓ) ~Z = s-empty regΔ cloA grd
 complete-s {j = ∞} s (⊆∞ x) ~∞ = s-type (complete-ss+ s x)
-complete-s {j = 𝕚 j} {Γ = Γ} (s-arr₂ {A = A} s s₁) (⊆I ext ext₁) (~I ⊢e j~Σ) with open-close Γ A
-... | inj₁ cloA
-  with refl ← ⊆/-⊢c-eq ext cloA = s-term-c cloA (⊆-⊢c-≫ (⊆/c-⊆ ext₁) cloA (s--≫ s)) (subsumption0 ⊢e) (complete-s s₁ ext₁ j~Σ)
-... | inj₂ opnA
+complete-s {j = 𝕚 j} {Γ = Γ} (s-arr₂ {A = A} s s₁) (⊆I ext ext₁) (~I ⊢e j~Σ) with ⊆/-openclose ext
+... | inj₁ opnA
   with ⟨ Ψ , diff ⟩ ← ⅆ-total (⊆/-⊆ ext) (⊆/c-⊆ ext₁)
   with ih ← complete-ss- {Γ = Ψ} s (ⅆ-⊆/ diff ext)
   = s-term-o opnA ⊢e (s--subirrev-final ih diff (⊆/-⊢c ext)) (complete-s s₁ ext₁ (~irrev j~Σ (⊆/-⊆ ext)))
+... | inj₂ cloA
+  with refl ← ⊆/-⊢c-eq ext cloA = s-term-c cloA (⊆-⊢c-≫ (⊆/c-⊆ ext₁) cloA (s--≫ s)) (subsumption0 ⊢e) (complete-s s₁ ext₁ j~Σ)
 complete-s {j = 𝕔 j} (s-arr₃ cloA grd s) (⊆C cloA' ext) (~C ⊢e j~Σ) = s-term-c cloA' (⊆-⊢c-≫ (⊆/c-⊆ ext) cloA' grd) ⊢e (complete-s s ext j~Σ)
 complete-s (s-∀l s ic fd upC upD) (⊆∀-I ext) j~'@(~I {Σ = Σ} {e = e} ⊢e j~) with ↑tyᶜ0-total Σ | ↑tyᵉ0-total e
 ... | ⟨ Σ' , upΣ ⟩ | ⟨ e' , upe ⟩ = let weaken-j~ = (~weaken^0 (~I ⊢e j~) (↑ty-arr upC upD) (↑tyᶜ-e upe upΣ))
