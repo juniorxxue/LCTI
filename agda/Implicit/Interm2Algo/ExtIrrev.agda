@@ -1,11 +1,10 @@
-module Implicit.Interm2Algo.Aux2 where
+module Implicit.Interm2Algo.ExtIrrev where
 
 open import Implicit.Language.All
 open import Implicit.Algo.All
 open import Implicit.Interm.Base
 
 open import Implicit.AuxLemmas
-open import Implicit.Interm2Algo.Aux1
 
 infix 3 _⊆_w/t_w/c_
 data _⊆_w/t_w/c_ : Env n m → Env n m → Type m → Counter → Set where
