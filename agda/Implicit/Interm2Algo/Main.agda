@@ -3,6 +3,7 @@ module Implicit.Interm2Algo.Main where
 open import Implicit.Language.All
 open import Implicit.Algo.All
 open import Implicit.Interm.Base
+open import Implicit.Interm.Properties.Regularity
 open import Implicit.Interm.Ground
 open import Implicit.Interm2Algo.Counter2Context
 open import Implicit.Interm2Algo.ExtIrrev
@@ -58,12 +59,12 @@ complete-s {j = 𝕚 j} {Γ = Γ} (s-arr₂ {A = A} s s₁) (⊆I ext ext₁) (~
 ... | inj₂ cloA
   with refl ← ⊆/-⊢c-eq ext cloA = s-term-c cloA (⊆-⊢c-≫ (⊆/c-⊆ ext₁) cloA (s--≫ s)) (subsumption0 ⊢e) (complete-s s₁ ext₁ j~Σ)
 complete-s {j = 𝕔 j} (s-arr₃ cloA grd s) (⊆C cloA' ext) (~C ⊢e j~Σ) = s-term-c cloA' (⊆-⊢c-≫ (⊆/c-⊆ ext) cloA' grd) ⊢e (complete-s s ext j~Σ)
-complete-s (s-∀l s ic fd upC upD) (⊆∀-I ext) j~'@(~I {Σ = Σ} {e = e} ⊢e j~) with ↑tyᶜ0-total Σ | ↑tyᵉ0-total e
-... | ⟨ Σ' , upΣ ⟩ | ⟨ e' , upe ⟩ = let weaken-j~ = (~weaken^0 (~I ⊢e j~) (↑ty-arr upC upD) (↑tyᶜ-e upe upΣ))
-                                    in s-∀l (complete-s s (⊆/c-irrev-^=0 ext fd {!!}) weaken-j~ ) upΣ upe upC upD
-complete-s (s-∀l s ic fd upC upD) (⊆∀-C ext) j~'@(~C {Σ = Σ} {e = e} ⊢e j~) with ↑tyᶜ0-total Σ | ↑tyᵉ0-total e
-... | ⟨ Σ' , upΣ ⟩ | ⟨ e' , upe ⟩ = let weaken-j~ = (~weaken^0 (~C ⊢e j~) (↑ty-arr upC upD) (↑tyᶜ-e upe upΣ))
-                                    in s-∀l (complete-s s (⊆/c-irrev-^=0 ext fd {!!}) weaken-j~) upΣ upe upC upD
+complete-s (s-∀l s ic fd upC upD) (⊆∀-I ext) j~'@(~I {Σ = Σ} {e = e} ⊢e j~) with ↑tyᶜ0-total Σ | ↑tyᵉ0-total e | s-sregular s
+... | ⟨ Σ' , upΣ ⟩ | ⟨ e' , upe ⟩ | reg-S= r regA = let weaken-j~ = (~weaken^0 (~I ⊢e j~) (↑ty-arr upC upD) (↑tyᶜ-e upe upΣ))
+                                      in s-∀l (complete-s s (⊆/c-irrev-^=0 ext fd regA) weaken-j~ ) upΣ upe upC upD
+complete-s (s-∀l s ic fd upC upD) (⊆∀-C ext) j~'@(~C {Σ = Σ} {e = e} ⊢e j~) with ↑tyᶜ0-total Σ | ↑tyᵉ0-total e | s-sregular s
+... | ⟨ Σ' , upΣ ⟩ | ⟨ e' , upe ⟩ | reg-S= r regA = let weaken-j~ = (~weaken^0 (~C ⊢e j~) (↑ty-arr upC upD) (↑tyᶜ-e upe upΣ))
+                                    in s-∀l (complete-s s (⊆/c-irrev-^=0 ext fd regA) weaken-j~) upΣ upe upC upD
 
 
 s+-⊆/ : Δ ⊢ j # A ⌞ ≤⁺ ⌝ B

@@ -1,4 +1,3 @@
-{-# OPTIONS --allow-unsolved-metas #-}
 module Implicit.Language.EnvOps.Base where
 
 open import Implicit.Language.Base
