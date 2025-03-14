@@ -1,3 +1,4 @@
+{-# OPTIONS --allow-unsolved-metas #-}
 module Implicit.Language.EnvOps.Base where
 
 open import Implicit.Language.Base
@@ -262,10 +263,12 @@ data [_/_]_∙⟹_ : Type m → Fin m → Env n m → Env n m → Set where
         → (up1 : ↑ty0 A ⇘ A')
         → [ A' / #S k ] (Γ ,= B) ∙⟹ (Γ' ,= B)
 
--- replace entry a with a solution ^a=A in an environment
+-- replace entry a=A with a solution a=B in an environment
 infix 3 [_/_]_=⟹_
 data [_/_]_=⟹_ : Type m → Fin m → Env n m → Env n m → Set where
   =⟹=0 : (up : ↑ty0 A ⇘ A')
+         → (regA : Γ ⊢r A)
+         → (env : SRegular Γ)
         → [ A' / #0 ] (Γ ,= B) =⟹ (Γ ,= A)
 
   =⟹^S : [ A / k ] Γ =⟹ Γ'
@@ -282,14 +285,15 @@ data [_/_]_=⟹_ : Type m → Fin m → Env n m → Env n m → Set where
 
   =⟹=S : [ A / k ] Γ =⟹ Γ'
         → (up1 : ↑ty0 A ⇘ A')
+        → (regB : Γ ⊢r B)
         → [ A' / #S k ] (Γ ,= B) =⟹ (Γ' ,= B)
 
 =⟹-∋= : [ A / k ] Γ =⟹ Γ'
       → Γ ∋= k
-=⟹-∋= (=⟹=0 up) = Z
+=⟹-∋= (=⟹=0 up regA regΓ) = Z
 =⟹-∋= (=⟹^S inst up1) = S^ (=⟹-∋= inst)
 =⟹-∋= (=⟹∙S inst up1) = S∙ (=⟹-∋= inst)
-=⟹-∋= (=⟹=S inst up1) = S= (=⟹-∋= inst)
+=⟹-∋= (=⟹=S inst up1 regB) = S= (=⟹-∋= inst)
 
 {-
 =⟹-total : Γ ∋= k

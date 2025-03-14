@@ -231,3 +231,20 @@ reg-⊆/ senv (⊢r-∀ regA) = ext-∀ (reg-⊆/ (reg-S∙ senv) regA)
 ⊆-regular' (reg-S^ reg) (evar ext) = reg-S^ (⊆-regular' reg ext)
 ⊆-regular' (reg-S= reg regA) (evar-sol ext regA₁) = reg-S^ (⊆-regular' reg ext)
 ⊆-regular' (reg-S= reg regA) (svar ext regA₁) = reg-S= (⊆-regular' reg ext) regA₁
+
+
+⊆-sregular : Γ ⊆ Δ
+           → SRegular Γ
+⊆-sregular (uvar ext) = reg-S∙ (⊆-sregular ext)
+⊆-sregular (evar ext) = reg-S^ (⊆-sregular ext)
+⊆-sregular (evar-sol ext regA) = reg-S^ (⊆-sregular ext)
+⊆-sregular (svar ext regA) = reg-S= (⊆-sregular ext) regA
+⊆-sregular (mark regΓ) = reg-Z regΓ
+
+⊆-sregular' : Γ ⊆ Δ
+            → SRegular Δ
+⊆-sregular' (uvar ext) = reg-S∙ (⊆-sregular' ext)
+⊆-sregular' (evar ext) = reg-S^ (⊆-sregular' ext)
+⊆-sregular' (evar-sol ext regA) = reg-S= (⊆-sregular' ext) regA
+⊆-sregular' (svar ext regA) = reg-S= (⊆-sregular' ext) (⊆-⊢r regA ext)
+⊆-sregular' (mark regΓ) = reg-Z regΓ

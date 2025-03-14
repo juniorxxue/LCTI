@@ -9,15 +9,29 @@ inst-exist : [ B / k ] Δ =⟹ Δ'
            → Ω ⊆ Δ
            → Ω ∋= k
            → ∃[ Ω' ]( [ B / k ] Ω =⟹ Ω')
-inst-exist (=⟹=0  {A = A} up) (svar {Γ = Γ} ext regA) Z = ⟨ Γ ,= A , =⟹=0 up ⟩
+inst-exist (=⟹=0  {A = A} up regA' regΓ) (svar {Γ = Γ} ext regA) Z = ⟨ Γ ,= A , =⟹=0 up (⊆-⊢r' regA' ext) (⊆-regular' regΓ ext) ⟩
 inst-exist (=⟹^S inst up1) (evar ext) (S^ inΩ) = ⟨ inst-exist inst ext inΩ .proj₁ ,^ ,
                                                   =⟹^S (inst-exist inst ext inΩ .proj₂) up1 ⟩
 inst-exist (=⟹∙S inst up1) (uvar ext) (S∙ inΩ) = ⟨ inst-exist inst ext inΩ .proj₁ ,∙ ,
                                                   =⟹∙S (inst-exist inst ext inΩ .proj₂) up1 ⟩
-inst-exist (=⟹=S inst up1) (evar-sol ext regA) (S^ inΩ) = ⟨ inst-exist inst ext inΩ .proj₁ ,^ ,
+inst-exist (=⟹=S inst up1 regB) (evar-sol ext regA) (S^ inΩ) = ⟨ inst-exist inst ext inΩ .proj₁ ,^ ,
                                                            =⟹^S (inst-exist inst ext inΩ .proj₂) up1 ⟩
-inst-exist (=⟹=S inst up1) (svar {A = A} ext regA) (S= inΩ) = ⟨ inst-exist inst ext inΩ .proj₁ ,= A ,
-                                                       =⟹=S (inst-exist inst ext inΩ .proj₂) up1 ⟩
+inst-exist (=⟹=S inst up1 regB) (svar {A = A} ext regA) (S= inΩ) = ⟨ inst-exist inst ext inΩ .proj₁ ,= A ,
+                                                       =⟹=S (inst-exist inst ext inΩ .proj₂) up1 regA ⟩
+
+inst-exist' : [ B / k ] Γ =⟹ Γ'
+            → Γ ⊆ Ω
+            → ∃[ Ω' ]( [ B / k ] Ω =⟹ Ω')
+inst-exist' (=⟹=0 {A = A} up regA' reΓ) (svar {Δ = Δ} ext regA) = ⟨ Δ ,= A , =⟹=0 up (⊆-⊢r regA' ext) (⊆-regular reΓ ext) ⟩
+inst-exist' (=⟹^S inst up1) (evar ext) = ⟨ inst-exist' inst ext .proj₁ ,^ ,
+                                          =⟹^S (inst-exist' inst ext .proj₂) up1 ⟩
+inst-exist' (=⟹^S inst up1) (evar-sol {A = A} ext regA) = ⟨ inst-exist' inst ext .proj₁ ,= A ,
+                                                   =⟹=S (inst-exist' inst ext .proj₂) up1 regA ⟩
+inst-exist' (=⟹∙S inst up1) (uvar ext) = ⟨ inst-exist' inst ext .proj₁ ,∙ ,
+                                          =⟹∙S (inst-exist' inst ext .proj₂) up1 ⟩
+inst-exist' (=⟹=S inst up1 regB) (svar {A = A} ext regA) = ⟨ inst-exist' inst ext .proj₁ ,= A ,
+                                               =⟹=S (inst-exist' inst ext .proj₂) up1 (⊆-⊢r regB ext) ⟩
+
 
 
 data HitMis : ℕ → Set where
@@ -112,7 +126,7 @@ data _ⅆ_⊆_ⅆ_kp_ : Env n m → Env n m → Env n m → Env n m → HitMis m
              → Γ ,= A ⅆ Γ' ,^ ⊆ Δ ,= A ⅆ Δ' ,^ kp (mis H)
 
 ⅆk-⊆-l : Γ ⅆ Γ' ⊆ Δ ⅆ Δ' kp H
-      → Γ' ⊆ Γ -- not essential
+      → Γ' ⊆ Γ
 ⅆk-⊆-l (ⅆ⋈ regΓ) = mark regΓ
 ⅆk-⊆-l (ⅆS∙∙-hit dd) = uvar (ⅆk-⊆-l dd)
 ⅆk-⊆-l (ⅆS∙∙-mis dd) = uvar (ⅆk-⊆-l dd)

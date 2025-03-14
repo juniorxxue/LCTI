@@ -60,10 +60,10 @@ complete-s {j = 𝕚 j} {Γ = Γ} (s-arr₂ {A = A} s s₁) (⊆I ext ext₁) (~
 complete-s {j = 𝕔 j} (s-arr₃ cloA grd s) (⊆C cloA' ext) (~C ⊢e j~Σ) = s-term-c cloA' (⊆-⊢c-≫ (⊆/c-⊆ ext) cloA' grd) ⊢e (complete-s s ext j~Σ)
 complete-s (s-∀l s ic fd upC upD) (⊆∀-I ext) j~'@(~I {Σ = Σ} {e = e} ⊢e j~) with ↑tyᶜ0-total Σ | ↑tyᵉ0-total e
 ... | ⟨ Σ' , upΣ ⟩ | ⟨ e' , upe ⟩ = let weaken-j~ = (~weaken^0 (~I ⊢e j~) (↑ty-arr upC upD) (↑tyᶜ-e upe upΣ))
-                                    in s-∀l (complete-s s (⊆/c-=-irrev-fd ext fd) weaken-j~ ) upΣ upe upC upD
+                                    in s-∀l (complete-s s (⊆/c-irrev-^=0 ext fd {!!}) weaken-j~ ) upΣ upe upC upD
 complete-s (s-∀l s ic fd upC upD) (⊆∀-C ext) j~'@(~C {Σ = Σ} {e = e} ⊢e j~) with ↑tyᶜ0-total Σ | ↑tyᵉ0-total e
 ... | ⟨ Σ' , upΣ ⟩ | ⟨ e' , upe ⟩ = let weaken-j~ = (~weaken^0 (~C ⊢e j~) (↑ty-arr upC upD) (↑tyᶜ-e upe upΣ))
-                                    in s-∀l (complete-s s (⊆/c-=-irrev-fd ext fd) weaken-j~) upΣ upe upC upD
+                                    in s-∀l (complete-s s (⊆/c-irrev-^=0 ext fd {!!}) weaken-j~) upΣ upe upC upD
 
 
 s+-⊆/ : Δ ⊢ j # A ⌞ ≤⁺ ⌝ B
@@ -88,8 +88,8 @@ s+-⊆/ (s-arr₃ cloA grd s) = ⊆C cloA (s+-⊆/ s)
 s+-⊆/ (s-∀ s) with s+-⊆/ s
 ... | ⊆∞ x = ⊆∞ (ext-∀ x)
 s+-⊆/ (s-∀l s ic fd upC upD) with s+-⊆/ s
-s+-⊆/ (s-∀l s case-𝕚 fd upC upD) | r = ⊆∀-I (⊆/c-^-irrev-fd r fd)
-s+-⊆/ (s-∀l s case-𝕔 fd upC upD) | r = ⊆∀-C (⊆/c-^-irrev-fd r fd)
+s+-⊆/ (s-∀l s case-𝕚 fd upC upD) | r = ⊆∀-I (⊆/c-irrev-^0 r fd)
+s+-⊆/ (s-∀l s case-𝕔 fd upC upD) | r = ⊆∀-C (⊆/c-irrev-^0 r fd)
 s+-⊆/ (s-var-sub-l x inΔ) = ⊆∞ (ext-var (⊆/x-refl x (⊢c-var-= (∋:=to∋= inΔ))))
 
 complete-s0 : Γ ⋈ ⊢ j # A ⌞ ≤⁺ ⌝ B
