@@ -5,33 +5,6 @@ open import Implicit.Interm.All
 open import Implicit.Algo.All
 open import Implicit.AlgoCounter.All
 
-infix 3 _⊢_~_
-data _⊢_~_ : Env n m → Counter × Type m → Context n m → Set where
-
-  ~Z : ∀ {Γ : Env n m} {A}
-    → Γ ⊢ ⟨ Z , A ⟩ ~ □
-
-  ~∞ : ∀ {Γ : Env n m} {A }
-    → Γ ⊢ ⟨ ∞ , A ⟩ ~ τ A
-
-  ~I : ∀ {Γ : Env n m} {j A B Σ e}
-    → (⊢e : Γ ⊢ Z # e ⦂ A)
-    → Γ ⊢ ⟨ j , B ⟩ ~ Σ
-    → Γ ⊢ ⟨ 𝕚 j , A `→ B ⟩ ~ ([ e ]↝ Σ)
-
-  ~C : ∀ {Γ : Env n m} {j A B Σ e}
-    (⊢e : Γ ⊢ ∞ # e ⦂ A)
-    → Γ ⊢ ⟨ j , B ⟩ ~ Σ
-    → Γ ⊢ ⟨ 𝕔 j , A `→ B ⟩ ~ ([ e ]↝ Σ)
-
-
-NonEmpty-NonZ : NonEmpty Σ
-              → Γ ⊢ ⟨ j , A ⟩ ~ Σ
-              → NonZ j
-NonEmpty-NonZ ne-τ ~∞ = nz-∞
-NonEmpty-NonZ ne-app (~I ⊢e j~Σ) = nz-I
-NonEmpty-NonZ ne-app (~C ⊢e j~Σ) = nz-C
-
 ~subst0 : (Γ ,= B) ⊢ ⟨ j , A ⟩ ~ Σ
         → ⟦ B ⟧ᶜ Σ ⇘ Σ*
         → ⟦ B ⟧ A ⇘ A*

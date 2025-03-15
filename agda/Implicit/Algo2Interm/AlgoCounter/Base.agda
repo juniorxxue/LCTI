@@ -1,4 +1,4 @@
-module Implicit.AlgoCounter.Base where
+module Implicit.Algo2Interm.AlgoCounter.Base where
 
 open import Implicit.Language.All
 open import Implicit.Algo.Base
@@ -10,19 +10,19 @@ open import Implicit.Algo.Base
 ✫ (𝕔 j) = j
 
 infix 3 _⊢_⇒_⇒_↡_
-infix 3 _⊢_⌞_⌝_⊣_↪_↡_
+infix 3 _⊢_≤⁺_⊣_↪_↡_
 
 data _⊢_⇒_⇒_↡_ : Env n m → Context n m → Term n m → Type m → Counter → Set
-data _⊢_⌞_⌝_⊣_↪_↡_ : Env n m → Type m → Polar → Context n m → Env n m → Type m → Counter → Set
+data _⊢_≤⁺_⊣_↪_↡_ : Env n m → Type m → Context n m → Env n m → Type m → Counter → Set
+
 
 data _⊢_⇒_⇒_↡_ where
-
   ⊢lit : ∀ {num : ℕ}
-    → (cloΓ : TypClosed Γ)
+    → (regΓ : TRegular Γ)
     → Γ ⊢ □ ⇒ lit num ⇒ Int ↡ Z
 
   ⊢var :
-      (cloΓ : TypClosed Γ)
+      (regΓ : TRegular Γ)
     → (x∈Γ : Γ ∋ x ⦂ A)
     → Γ ⊢ □ ⇒ ` x ⇒ A ↡ Z
 
@@ -48,94 +48,43 @@ data _⊢_⇒_⇒_↡_ where
       Γ ⊢ □ ⇒ g ⇒ A ↡ Z
     → (ne : NonEmpty Σ)
     → (gc : GenericConsumer g)
-    → (cloΣ : Γ ⊢cᶜ Σ)
-    → (s : Γ ⋈ ⊢ A ⌞ ≤⁺ ⌝ Σ ⊣ Γ ⋈ ↪ B ↡ j)
+    → (s : Γ ⋈ ⊢ A ≤⁺ Σ ⊣ Γ ⋈ ↪ B ↡ j)
     → Γ ⊢ Σ ⇒ g ⇒ B ↡ j
 
   ⊢tabs :
       Γ ,∙ ⊢ □ ⇒ e ⇒ A ↡ Z
     → Γ ⊢ □ ⇒ Λ e ⇒ `∀ A ↡ Z
 
-
-data _⊢_⌞_⌝_⊣_↪_↡_ where
-  s-int :
-     (cloΓ : SubClosed Γ)
-    → Γ ⊢ Int ⌞ ≤ ⌝ τ Int ⊣ Γ ↪ Int ↡ ∞
+data _⊢_≤⁺_⊣_↪_↡_ where
 
   s-empty :
-     (cloΓ : SubClosed Γ)
-    → (clo : Γ ⊢c A)
-    → Γ ⊢ A ⌞ ≤⁺ ⌝ □ ⊣ Γ ↪ A ↡ Z
+      (regΓ : SRegular Δ)
+    → (cloA : Δ ⊢c A)
+    → Δ ≫ A ⇘ A%
+    → Δ ⊢ A ≤⁺ □ ⊣ Δ ↪ A% ↡ Z
 
-  s-var-∙ :
-          (cloΓ : SubClosed Γ)
-    → Γ ∋∙ X
-    → Γ ⊢ (‶ X) ⌞ ≤ ⌝ τ (‶ X) ⊣ Γ ↪ ‶ X ↡ ∞
-
-  s-var-= :
-      (cloΓ : SubClosed Γ)
-    → Γ ∋=¹ X
-    → Γ ⊢ (‶ X) ⌞ ≤ ⌝ τ (‶ X) ⊣ Γ ↪ ‶ X ↡ ∞
-
-  s-ex-l^ :
-      (cloA : Γ ⊢c¹ A)
-      → (cloΓ : SubClosed Γ)
-    → (inst : [ A / X ] Γ ⟹ Γ')
-    → Γ ⊢ ‶ X ⌞ ≤⁺ ⌝ τ A ⊣ Γ' ↪ A ↡ ∞
-
-  s-ex-l= :
-      (x-in : Γ ∋ X := B)
-    → Γ ⊢ B ⌞ ≤⁺ ⌝ τ A ⊣ Γ' ↪ A' ↡ ∞
-    → Γ ⊢ ‶ X ⌞ ≤⁺ ⌝ τ A ⊣ Γ' ↪ A ↡ ∞
-
-  s-ex-typ-l= :
-      (x-in : Γ ∋ X :=¹ B)
-    → Γ ⊢ B ⌞ ≤ ⌝ τ A ⊣ Γ' ↪ A' ↡ ∞
-    → Γ ⊢ ‶ X ⌞ ≤ ⌝ τ A ⊣ Γ' ↪ A ↡ ∞
-
-  s-ex-r^ :
-      (cloA : Γ ⊢c¹ A)
-    → (cloΓ : SubClosed Γ)
-    → (inst : [ A / X ] Γ ⟹ Γ')
-    → Γ ⊢ A ⌞ ≤⁻ ⌝ τ (‶ X) ⊣ Γ' ↪ ‶ X ↡ ∞
-
-  s-ex-r= :
-      (x-in : Γ ∋ X := B)
-    → Γ ⊢ A ⌞ ≤⁻ ⌝ τ B ⊣ Γ' ↪ A' ↡ ∞
-    → Γ ⊢ A ⌞ ≤⁻ ⌝ τ (‶ X) ⊣ Γ' ↪ (‶ X) ↡ ∞
-
-  s-ex-typ-r= :
-      (x-in : Γ ∋ X :=¹ B)
-    → Γ ⊢ A ⌞ ≤ ⌝ τ B ⊣ Γ' ↪ A' ↡ ∞
-    → Γ ⊢ A ⌞ ≤ ⌝ τ (‶ X) ⊣ Γ' ↪ (‶ X) ↡ ∞
-
-  s-arr :
-      Γ₁ ⊢ C ⌞ ⋆ ≤ ⌝ τ A ⊣ Γ₂ ↪ A' ↡ ∞
-    → Γ₂ ⊢ B ⌞ ≤ ⌝ τ D ⊣ Γ₃ ↪ D' ↡ ∞
-    → Γ₁ ⊢ A `→ B ⌞ ≤ ⌝ τ (C `→ D) ⊣ Γ₃ ↪ (C `→ D) ↡ ∞
+  s-type :
+      (ss : Δ ⊢ A ⌞ ≤⁺ ⌝ B ⊣ Ψ)
+    → Δ ⊢ A ≤⁺ (τ B) ⊣ Ψ ↪ B ↡ ∞
 
   s-term-c :
---      (cloA : Γ ⊢c A)
--- comment this one, if we restrict such condition on the typing
-      (⊢e : 𝕣 Γ ⊢ τ A ⇒ e ⇒ A' ↡ ∞)
-    → Γ ⊢ B ⌞ ≤⁺ ⌝ Σ ⊣ Γ' ↪ D ↡ j
-    → Γ ⊢ (A `→ B) ⌞ ≤⁺ ⌝ ([ e ]↝ Σ) ⊣ Γ' ↪ A' `→ D ↡ (𝕔 j)
+      (cloA : Δ ⊢c A)
+    → (ap : Δ ≫ A ⇘ A%)
+    → (⊢e : 𝕣 Δ ⊢ τ A% ⇒ e ⇒ A' ↡ ∞)
+    → Δ ⊢ B ≤⁺ Σ ⊣ Ψ ↪ D ↡ j
+    → Δ ⊢ (A `→ B) ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ A% `→ D ↡ 𝕔 j
 
   s-term-o :
-      (opnA : Γ ⊢o² A)
-    → (⊢e : 𝕣 Γ ⊢ □ ⇒ e ⇒ C ↡ Z)
-    → Γ ⊢ C ⌞ ≤⁻ ⌝ τ A ⊣ Γ₁ ↪ A' ↡ ∞
-    → Γ₁ ⊢ B ⌞ ≤⁺ ⌝ Σ ⊣ Γ₂ ↪ D ↡ j
-    → Γ ⊢ A `→ B ⌞ ≤⁺ ⌝ ([ e ]↝ Σ) ⊣ Γ₂ ↪ C `→ D ↡ (𝕚 j)
-
-  s-∀ :
-      Γ ,∙ ⊢ A ⌞ ≤ ⌝ τ B ⊣ Γ' ,∙ ↪ C ↡ ∞
-    → Γ ⊢ `∀ A ⌞ ≤ ⌝ τ (`∀ B) ⊣ Γ' ↪ `∀ C ↡ ∞
+      (opnA : Δ ⊢o A)
+    → (⊢e : 𝕣 Δ ⊢ □ ⇒ e ⇒ C ↡ Z)
+    → (ss : Δ ⊢ C ⌞ ≤⁻ ⌝ A ⊣ Ω)
+    → Ω ⊢ B ≤⁺ Σ ⊣ Ψ ↪ D ↡ j
+    → Δ ⊢ A `→ B ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ C `→ D ↡ 𝕚 j
 
   s-∀l :
-      Γ ,^ ⊢ A ⌞ ≤⁺ ⌝ ([ e' ]↝ Σ') ⊣ Γ' ,= B ↪ (C `→ D) ↡ j
+      Δ ,^ ⊢ A ≤⁺ ([ e' ]↝ Σ') ⊣ Ψ ,= B ↪ (C' `→ D') ↡ j
     → (upᶜ : ↑tyᶜ0 Σ ⇘ Σ')
     → (upᵉ : ↑tyᵉ0 e ⇘ e')
-    → (st₁ : ⟦ B ⟧ C ⇘ C')
-    → (st₂ : ⟦ B ⟧ D ⇘ D')
-    → Γ ⊢ `∀ A ⌞ ≤⁺ ⌝ ([ e ]↝ Σ) ⊣ Γ' ↪ C' `→ D' ↡ j
+    → (upC : ↑ty0 C ⇘ C')
+    → (upD : ↑ty0 D ⇘ D')
+    → Δ ⊢ `∀ A ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ C `→ D ↡ j
