@@ -64,3 +64,16 @@ open import Implicit.Language.Extension.All
 ⊆-⊢c-≫ ext (⊢c-var-= inΔ) (grd-var∙ x) = ⊥-elim (∋∙-∋=-false (⊆-∋∙' x ext) inΔ)
 ⊆-⊢c-≫ ext (⊢c-arr cloA cloA₁) (grd-arr grd grd₁) = grd-arr (⊆-⊢c-≫ ext cloA grd) (⊆-⊢c-≫ ext cloA₁ grd₁)
 ⊆-⊢c-≫ ext (⊢c-∀ cloA) (grd-∀ grd) = grd-∀ (⊆-⊢c-≫ (uvar ext) cloA grd)
+
+
+⊆-⊢c-≫' : Γ ⊆ Δ
+        → Γ ⊢c A
+        → Γ ≫ A ⇘ A%
+        → Δ ≫ A ⇘ A%
+⊆-⊢c-≫' ext ⊢c-int grd-int = grd-int
+⊆-⊢c-≫' ext (⊢c-var-∙ inΔ) (grd-var= x) = ⊥-elim (∋∙-∋:=-false inΔ x)
+⊆-⊢c-≫' ext (⊢c-var-∙ inΔ) (grd-var∙ x) = grd-var∙ (⊆-∋∙ inΔ ext)
+⊆-⊢c-≫' ext (⊢c-var-= inΔ) (grd-var= x) = grd-var= (⊆-∋:= x ext)
+⊆-⊢c-≫' ext (⊢c-var-= inΔ) (grd-var∙ x) = ⊥-elim (∋∙-∋=-false x inΔ)
+⊆-⊢c-≫' ext (⊢c-arr cloA cloA₁) (grd-arr grd grd₁) = grd-arr (⊆-⊢c-≫' ext cloA grd) (⊆-⊢c-≫' ext cloA₁ grd₁)
+⊆-⊢c-≫' ext (⊢c-∀ cloA) (grd-∀ grd) = grd-∀ (⊆-⊢c-≫' (uvar ext) cloA grd)

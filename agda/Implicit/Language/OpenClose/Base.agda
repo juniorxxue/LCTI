@@ -3,6 +3,7 @@ module Implicit.Language.OpenClose.Base where
 open import Implicit.Language.Base
 open import Implicit.Language.Lookup.All
 open import Implicit.Language.Regular.Base
+open import Implicit.Language.Shift.Base
 
 infix 3 _⊢o_
 -- open: have free existential variables
@@ -79,3 +80,12 @@ open-close Γ (`∀ A) with open-close (Γ ,∙) A
 ... | inj₁ x = inj₁ (⊢c-∀ x)
 ... | inj₂ y = inj₂ (⊢o-∀ y)
 -}
+
+⊢c-^∈-¬ε : Γ ⊢c A
+         → Γ ∋^ k
+         → k ¬ε A
+⊢c-^∈-¬ε ⊢c-int inΓ = ¬ε-int
+⊢c-^∈-¬ε (⊢c-var-∙ inΓ₁) inΓ = ¬ε-var (∋∙-∋^-≢ inΓ₁ inΓ)
+⊢c-^∈-¬ε (⊢c-var-= inΓ₁) inΓ = ¬ε-var (∋=-∋^-≢ inΓ₁ inΓ)
+⊢c-^∈-¬ε (⊢c-arr cloA cloA₁) inΓ = ¬ε-arr (⊢c-^∈-¬ε cloA inΓ) (⊢c-^∈-¬ε cloA₁ inΓ)
+⊢c-^∈-¬ε (⊢c-∀ cloA) inΓ = ¬ε-∀ (⊢c-^∈-¬ε cloA (S∙ inΓ))

@@ -27,6 +27,14 @@ open import Implicit.Language.OpenClose.Base
 ⊆-∋∙ (S^ inΓ) (evar-sol ext regA) = S= (⊆-∋∙ inΓ ext)
 ⊆-∋∙ (S⋈ inΓ) (mark x) = S⋈ inΓ
 
+⊆-∋:= : Γ ∋ X := A
+      → Γ ⊆ Δ
+      → Δ ∋ X := A
+⊆-∋:= (Z up) (svar ext regA) = Z up
+⊆-∋:= (S∙ inΓ up) (uvar ext) = S∙ (⊆-∋:= inΓ ext) up
+⊆-∋:= (S^ inΓ up) (evar ext) = S^ (⊆-∋:= inΓ ext) up
+⊆-∋:= (S^ inΓ up) (evar-sol ext regA) = S= (⊆-∋:= inΓ ext) up
+⊆-∋:= (S= inΓ up) (svar ext regA) = S= (⊆-∋:= inΓ ext) up
 
 ⊆-∋= : Γ ∋= X
      → Γ ⊆ Δ

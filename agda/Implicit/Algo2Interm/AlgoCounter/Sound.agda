@@ -2,7 +2,7 @@ module Implicit.Algo2Interm.AlgoCounter.Sound where
 
 open import Implicit.Language.All
 open import Implicit.Algo2Interm.AlgoCounter.Base
-open import Implicit.Algo.Base
+open import Implicit.Algo.All
 
 -- counter based is sound
 tc-sound : Γ ⊢ Σ ⇒ e ⇒ A ↡ j
@@ -25,3 +25,16 @@ sc-sound (s-type ss) = s-type ss
 sc-sound (s-term-c cloA ap ⊢e s) = s-term-c cloA ap (tc-sound ⊢e) (sc-sound s)
 sc-sound (s-term-o opnA ⊢e ss s) = s-term-o opnA (tc-sound ⊢e) ss (sc-sound s)
 sc-sound (s-∀l s upᶜ upᵉ upC upD) = s-∀l (sc-sound s) upᶜ upᵉ upC upD
+
+----------------------------------------------------------------------
+--+                         useful lemmas                          +--
+----------------------------------------------------------------------
+
+
+tc-id0 : Γ ⊢ τ B ⇒ e ⇒ A ↡ j
+       → B ≡ A
+tc-id0 ⊢e = ⊢id0 (tc-sound ⊢e)
+
+sc-⊆ : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B ↡ j
+     → Γ ⊆ Δ
+sc-⊆ s = s-⊆ (sc-sound s)

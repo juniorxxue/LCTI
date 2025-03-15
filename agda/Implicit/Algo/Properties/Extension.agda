@@ -30,3 +30,31 @@ s-⊆ (s-term-c cloA ap ⊢e s) = s-⊆ s
 s-⊆ (s-term-o opnA ⊢e x s) = ⊆-trans (ss-⊆ x) (s-⊆ s)
 s-⊆ (s-∀l s upᶜ upᵉ upC upD) with s-⊆ s
 ... | evar-sol r regA = r
+
+inst-⊆/x : [ A / X ] Γ ⟹ Δ
+         → Γ ⊆ Δ w/v X
+inst-⊆/x (⟹^0 up regA env) = ext-Z^ env regA
+inst-⊆/x (⟹^S inst up1) = ext-S^ (inst-⊆/x inst)
+inst-⊆/x (⟹∙S inst up1) = ext-S∙ (inst-⊆/x inst)
+inst-⊆/x (⟹=S inst up1 regB) = ext-S= (inst-⊆/x inst) regB
+
+
+ss+-⊆/ : Γ ⊢ A ⌞ ≤⁺ ⌝ B ⊣ Δ
+       → Γ ⊆ Δ w/t A
+
+ss--⊆/ : Γ ⊢ A ⌞ ≤⁻ ⌝ B ⊣ Δ
+      → Γ ⊆ Δ w/t B
+
+ss+-⊆/ (s-int regΓ) = ext-int regΓ
+ss+-⊆/ (s-var-∙ regΓ x) = ext-var (⊆/x-refl regΓ (⊢c-var-∙ x))
+ss+-⊆/ (s-ex-l^ inst) = ext-var (inst-⊆/x inst)
+ss+-⊆/ (s-ex-l= regΓ x-in) = ext-var (⊆/x-refl regΓ (⊢c-var-= (∋:=to∋= x-in)))
+ss+-⊆/ (s-arr s s₁) = ext-arr (ss--⊆/ s) (ss+-⊆/ s₁)
+ss+-⊆/ (s-∀ s) = ext-∀ (ss+-⊆/ s)
+
+ss--⊆/ (s-int regΓ) = ext-int regΓ
+ss--⊆/ (s-var-∙ regΓ x) = ext-var (⊆/x-refl regΓ (⊢c-var-∙ x))
+ss--⊆/ (s-ex-r^ inst) = ext-var (inst-⊆/x inst)
+ss--⊆/ (s-ex-r= regΓ x-in) = ext-var (⊆/x-refl regΓ (⊢c-var-= (∋:=to∋= x-in)))
+ss--⊆/ (s-arr s s₁) = ext-arr (ss+-⊆/ s) (ss--⊆/ s₁)
+ss--⊆/ (s-∀ s) = ext-∀ (ss--⊆/ s)

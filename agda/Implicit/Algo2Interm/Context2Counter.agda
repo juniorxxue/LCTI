@@ -43,6 +43,13 @@ data _⊢_~s_ : Env n m → Counter × Type m → Context n m → Set where
     → Γ ⊢ ⟨ j , B ⟩ ~s Σ
     → Γ ⊢ ⟨ 𝕔 j , A `→ B ⟩ ~s ([ e ]↝ Σ)
 
+~s-~t : Γ ⊢ ⟨ j , A ⟩ ~s Σ
+      → 𝕣 Γ ⊢ ⟨ j , A ⟩ ~t Σ
+~s-~t ~sZ = ~tZ
+~s-~t ~s∞ = ~t∞
+~s-~t (~sI ⊢e ~s) = ~tI ⊢e (~s-~t ~s)
+~s-~t (~sC ⊢e ~s) = ~tC ⊢e (~s-~t ~s)
+
 
 NonEmpty-NonZ : NonEmpty Σ
               → Γ ⊢ ⟨ j , A ⟩ ~t Σ
@@ -50,3 +57,13 @@ NonEmpty-NonZ : NonEmpty Σ
 NonEmpty-NonZ ne-τ ~t∞ = nz-∞
 NonEmpty-NonZ ne-app (~tI ⊢e j~Σ) = nz-I
 NonEmpty-NonZ ne-app (~tC ⊢e j~Σ) = nz-C
+
+postulate
+  ~t-strengthen,0 : Γ , A ⊢ ⟨ j , B ⟩ ~t Σ'
+                → ↑tmᶜ0 Σ ⇘ Σ'
+                → Γ ⊢ ⟨ j , B ⟩ ~t Σ
+
+  ~s-strengthen=0 : Γ ,= T ⊢ ⟨ j , A' ⟩ ~s Σ'
+                 → ↑ty0 A ⇘ A'
+                 → ↑tyᶜ0 Σ ⇘ Σ'
+                 → Γ ⊢ ⟨ j , A ⟩ ~s Σ

@@ -239,6 +239,14 @@ inst-∋= (⟹^S inst up1) = S^ (inst-∋= inst)
 inst-∋= (⟹∙S inst up1) = S∙ (inst-∋= inst)
 inst-∋= (⟹=S inst up1 regB) = S= (inst-∋= inst)
 
+inst-∋:= : [ A / k ] Γ ⟹ Δ
+         → Δ ∋ k := A
+inst-∋:= (⟹^0 up regA env) = Z up
+inst-∋:= (⟹^S inst up1) = S^ (inst-∋:= inst) up1
+inst-∋:= (⟹∙S inst up1) = S∙ (inst-∋:= inst) up1
+inst-∋:= (⟹=S inst up1 regB) = S= (inst-∋:= inst) up1
+
+
 -- replace entry a with a solution ^a=A in an environment
 infix 3 [_/_]_∙⟹_
 data [_/_]_∙⟹_ : Type m → Fin m → Env n m → Env n m → Set where
