@@ -12,10 +12,10 @@ sound-ss : Γ ⊢ A ⌞ ≤ ⌝ B ⊣ Δ
          → Δ ⊢ ∞ # A ⌞ ≤ ⌝ B
 sound-ss (s-int regΓ) = s-int regΓ
 sound-ss (s-var-∙ regΓ x) = s-var-∙ regΓ x
-sound-ss (s-ex-l^ inst) = s-var-sub-l (⊆-sregular' (inst-⊆ inst)) (inst-∋:= inst)
-sound-ss (s-ex-r^ inst) = s-var-sub-r (⊆-sregular' (inst-⊆ inst)) (inst-∋:= inst)
-sound-ss (s-ex-l= regΓ x-in) = s-var-sub-l regΓ x-in
-sound-ss (s-ex-r= regΓ x-in) = s-var-sub-r regΓ x-in
+sound-ss (s-ex-l^ inst) = s-svar-l (⊆-sregular' (inst-⊆ inst)) (inst-∋:= inst)
+sound-ss (s-ex-r^ inst) = s-svar-r (⊆-sregular' (inst-⊆ inst)) (inst-∋:= inst)
+sound-ss (s-ex-l= regΓ x-in) = s-svar-l regΓ x-in
+sound-ss (s-ex-r= regΓ x-in) = s-svar-r regΓ x-in
 sound-ss (s-arr s s₁) = s-arr₁ (s-⊆-prv (sound-ss s) (ss-⊆ s₁)) (sound-ss s₁)
 sound-ss (s-∀ s) = s-∀ (sound-ss s)
 

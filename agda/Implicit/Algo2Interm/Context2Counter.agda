@@ -59,11 +59,15 @@ NonEmpty-NonZ ne-app (~tI ⊢e j~Σ) = nz-I
 NonEmpty-NonZ ne-app (~tC ⊢e j~Σ) = nz-C
 
 postulate
-  ~t-strengthen,0 : Γ , A ⊢ ⟨ j , B ⟩ ~t Σ'
-                → ↑tmᶜ0 Σ ⇘ Σ'
-                → Γ ⊢ ⟨ j , B ⟩ ~t Σ
-
   ~s-strengthen=0 : Γ ,= T ⊢ ⟨ j , A' ⟩ ~s Σ'
                  → ↑ty0 A ⇘ A'
                  → ↑tyᶜ0 Σ ⇘ Σ'
                  → Γ ⊢ ⟨ j , A ⟩ ~s Σ
+
+~t-strengthen,0 : Γ , A ⊢ ⟨ j , B ⟩ ~t Σ'
+                → ↑tmᶜ0 Σ ⇘ Σ'
+                → Γ ⊢ ⟨ j , B ⟩ ~t Σ
+~t-strengthen,0 ~tZ ↑tmᶜ-□ = ~tZ
+~t-strengthen,0 ~t∞ ↑tmᶜ-τ = ~t∞
+~t-strengthen,0 (~tI ⊢e ~t) (↑tmᶜ-e up-e upΣ) = ~tI (t-strengthen,0 ⊢e up-e) (~t-strengthen,0 ~t upΣ)
+~t-strengthen,0 (~tC ⊢e ~t) (↑tmᶜ-e up-e upΣ) = ~tC (t-strengthen,0 ⊢e up-e) (~t-strengthen,0 ~t upΣ)

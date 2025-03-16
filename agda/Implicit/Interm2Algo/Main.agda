@@ -32,7 +32,7 @@ complete-ss+ (s-arr₁ s s₁) (ext-arr ext ext₁)
   with ih ← complete-ss- {Γ = Ψ} s (ⅆ-⊆/ diff ext)
   = s-arr (s--subirrev-final ih diff (⊆/-⊢c ext)) (complete-ss+ s₁ ext₁)
 complete-ss+ (s-∀ s) (ext-∀ ext) = s-∀ (complete-ss+ s ext)
-complete-ss+ (s-var-sub-l x inΔ) ext'@(ext-var x₁) with ⊆/x-=out-in x₁ (∋:=to∋= inΔ)
+complete-ss+ (s-svar-l x inΔ) ext'@(ext-var x₁) with ⊆/x-=out-in x₁ (∋:=to∋= inΔ)
 ... | is-ex inΓ = s-ex-l^ (⊆/x-^in-=out-inst inΓ inΔ x₁)
 ... | is-sol inΓ with refl ← ⊆/-⊢c-eq ext' (⊢c-var-= inΓ) = s-ex-l= x inΔ
 
@@ -45,7 +45,7 @@ complete-ss- (s-arr₁ s s₁) (ext-arr ext ext₁)
   with ih ← complete-ss+ {Γ = Ψ} s (ⅆ-⊆/ diff ext)
   = s-arr (s+-subirrev-final ih diff (⊆/-⊢c ext)) (complete-ss- s₁ ext₁)
 complete-ss- (s-∀ s) (ext-∀ ext) = s-∀ (complete-ss- s ext)
-complete-ss- (s-var-sub-r x inΔ) ext'@(ext-var x₁) with ⊆/x-=out-in x₁ (∋:=to∋= inΔ)
+complete-ss- (s-svar-r x inΔ) ext'@(ext-var x₁) with ⊆/x-=out-in x₁ (∋:=to∋= inΔ)
 ... | is-ex inΓ = s-ex-r^ (⊆/x-^in-=out-inst inΓ inΔ x₁)
 ... | is-sol inΓ with refl ← ⊆/-⊢c-eq ext' (⊢c-var-= inΓ) = s-ex-r= x inΔ
 
@@ -76,7 +76,7 @@ s--⊆/ (s-var-∙ regΔ inΔ) = ext-var (reg-⊆/x∙ regΔ inΔ)
 s--⊆/ (s-arr₁ s s₁) with s+-⊆/ s
 ... | ⊆∞ ext = ext-arr ext (s--⊆/ s₁)
 s--⊆/ (s-∀ s) = ext-∀ (s--⊆/ s)
-s--⊆/ (s-var-sub-r x inΔ) = ext-var (⊆/x-refl x (⊢c-var-= (∋:=to∋= inΔ)))
+s--⊆/ (s-svar-r x inΔ) = ext-var (⊆/x-refl x (⊢c-var-= (∋:=to∋= inΔ)))
 
 s+-⊆/ (s-refl regΔ cloA grd) = (⊆Z regΔ)
 s+-⊆/ (s-int regΔ) = ⊆∞ (ext-int regΔ)
@@ -90,7 +90,7 @@ s+-⊆/ (s-∀ s) with s+-⊆/ s
 s+-⊆/ (s-∀l s ic fd upC upD) with s+-⊆/ s
 s+-⊆/ (s-∀l s case-𝕚 fd upC upD) | r = ⊆∀-I (⊆/c-irrev-^0 r fd)
 s+-⊆/ (s-∀l s case-𝕔 fd upC upD) | r = ⊆∀-C (⊆/c-irrev-^0 r fd)
-s+-⊆/ (s-var-sub-l x inΔ) = ⊆∞ (ext-var (⊆/x-refl x (⊢c-var-= (∋:=to∋= inΔ))))
+s+-⊆/ (s-svar-l x inΔ) = ⊆∞ (ext-var (⊆/x-refl x (⊢c-var-= (∋:=to∋= inΔ))))
 
 complete-s0 : Γ ⋈ ⊢ j # A ⌞ ≤⁺ ⌝ B
             → Γ ⊢ ⟨ j , B ⟩ ~t Σ

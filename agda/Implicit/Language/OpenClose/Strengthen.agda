@@ -14,8 +14,8 @@ open import Implicit.Language.EnvOps.Remove
                → Γ ◀ k ,⇘ Γ'
                → Γ' ⊢c A
 ⊢c-strengthen, ⊢c-int newΓ' = ⊢c-int
-⊢c-strengthen, (⊢c-var-∙ inΓ) newΓ' = ⊢c-var-∙ (◀,-∋∙ inΓ newΓ')
-⊢c-strengthen, (⊢c-var-= inΓ) newΓ' = ⊢c-var-= (◀,-∋= inΓ newΓ')
+⊢c-strengthen, (⊢c-var-∙ inΓ) newΓ' = ⊢c-var-∙ (∋∙-strengthen, inΓ newΓ')
+⊢c-strengthen, (⊢c-var-= inΓ) newΓ' = ⊢c-var-= (∋=-strengthen, inΓ newΓ')
 ⊢c-strengthen, (⊢c-arr clo clo₁) newΓ' = ⊢c-arr (⊢c-strengthen, clo newΓ') (⊢c-strengthen, clo₁ newΓ')
 ⊢c-strengthen, (⊢c-∀ clo) newΓ' = ⊢c-∀ (⊢c-strengthen, clo (◀S∙ newΓ'))
 
@@ -64,8 +64,8 @@ open import Implicit.Language.EnvOps.Remove
                → A ↑ty k ⇘ A'
                → Γ' ⊢c A
 ⊢c-strengthen= ⊢c-int newΓ ↑ty-int = ⊢c-int
-⊢c-strengthen= (⊢c-var-∙ inΓ) newΓ ↑ty-var = ⊢c-var-∙ (◀=-∋∙ inΓ newΓ)
-⊢c-strengthen= (⊢c-var-= inΓ) newΓ ↑ty-var = ⊢c-var-= (◀=-∋= inΓ newΓ)
+⊢c-strengthen= (⊢c-var-∙ inΓ) newΓ ↑ty-var = ⊢c-var-∙ (∋∙-strengthen= inΓ newΓ)
+⊢c-strengthen= (⊢c-var-= inΓ) newΓ ↑ty-var = ⊢c-var-= (∋=-strengthen= inΓ newΓ)
 ⊢c-strengthen= (⊢c-arr cloA cloA₁) newΓ (↑ty-arr upA upA₁) = ⊢c-arr (⊢c-strengthen= cloA newΓ upA)
                                                                     (⊢c-strengthen= cloA₁ newΓ upA₁)
 ⊢c-strengthen= (⊢c-∀ cloA) newΓ (↑ty-∀ upA) = ⊢c-∀ (⊢c-strengthen= cloA (◀S∙ newΓ) upA)

@@ -3,37 +3,84 @@ module Implicit.Interm.Properties.Strengthen where
 open import Implicit.Language.All
 open import Implicit.Interm.Base
 
-s-strengthen, : Γ ⊢ j # A ≤ B
+s-strengthen, : Γ ⊢ j # A ⌞ ≤ ⌝ B
               → Γ ◀ k ,⇘ Γ'
-              → Γ' ⊢ j # A ≤ B
-s-strengthen, (s-refl cloΓ cloA) newΓ = s-refl (closed-strengthen, cloΓ newΓ) (⊢c-strengthen, cloA newΓ)
-s-strengthen, (s-int cloΓ) newΓ = s-int (closed-strengthen, cloΓ newΓ)
-s-strengthen, (s-var-∙ cloΓ inΓ) newΓ = s-var-∙ (closed-strengthen, cloΓ newΓ) (◀,-∋∙ inΓ newΓ)
-s-strengthen, (s-var-= cloΓ inΓ) newΓ = s-var-= (closed-strengthen, cloΓ newΓ) (◀,-∋= inΓ newΓ)
+              → Γ' ⊢ j # A ⌞ ≤ ⌝ B
+s-strengthen, (s-refl regΔ cloA grd) newΓ = s-refl (sregular-strengthen, regΔ newΓ) (⊢c-strengthen, cloA newΓ) (≫-strengthen, grd newΓ)
+s-strengthen, (s-int regΔ) newΓ = s-int (sregular-strengthen, regΔ newΓ)
+s-strengthen, (s-var-∙ regΔ inΔ) newΓ = s-var-∙ (sregular-strengthen, regΔ newΓ) (∋∙-strengthen, inΔ newΓ)
 s-strengthen, (s-arr₁ s s₁) newΓ = s-arr₁ (s-strengthen, s newΓ) (s-strengthen, s₁ newΓ)
 s-strengthen, (s-arr₂ s s₁) newΓ = s-arr₂ (s-strengthen, s newΓ) (s-strengthen, s₁ newΓ)
-s-strengthen, (s-arr₃ cloA s) newΓ = s-arr₃ (⊢c-strengthen, cloA newΓ) (s-strengthen, s newΓ)
+s-strengthen, (s-arr₃ cloA grd s) newΓ = s-arr₃ (⊢c-strengthen, cloA newΓ) (≫-strengthen, grd newΓ) (s-strengthen, s newΓ)
 s-strengthen, (s-∀ s) newΓ = s-∀ (s-strengthen, s (◀S∙ newΓ))
-s-strengthen, (s-∀l s ic fd st₁ st₂) newΓ = s-∀l (s-strengthen, s (◀S= newΓ)) ic fd st₁ st₂
-s-strengthen, (s-var-l inΓ s) newΓ = s-var-l (◀,-∋:= inΓ newΓ) (s-strengthen, s newΓ)
-s-strengthen, (s-var-r inΓ s) newΓ = s-var-r (◀,-∋:= inΓ newΓ) (s-strengthen, s newΓ)
+s-strengthen, (s-∀l s ic fd upC upD) newΓ = s-∀l (s-strengthen, s (◀S= newΓ)) ic fd upC upD
+s-strengthen, (s-svar-l x inΔ) newΓ = s-svar-l (sregular-strengthen, x newΓ) (∋:=-strengthen, inΔ newΓ)
+s-strengthen, (s-svar-r x inΔ) newΓ = s-svar-r (sregular-strengthen, x newΓ) (∋:=-strengthen, inΔ newΓ)
+
 
 t-strengthen, : Γ ⊢ j # e' ⦂ A
               → Γ ◀ k ,⇘ Γ'
               → e ↑tm k ⇘ e'
               → Γ' ⊢ j # e ⦂ A
-t-strengthen, (⊢lit cloΣ) newΓ ↑tm-lit = ⊢lit (closed-strengthen, cloΣ newΓ)
-t-strengthen, (⊢var cloΣ x∈Γ) newΓ ↑tm-var = ⊢var (closed-strengthen, cloΣ newΓ) (◀,-∋⦂ x∈Γ newΓ)
-t-strengthen, (⊢ann ⊢e) newΓ (↑tm-⦂ up-e) = ⊢ann (t-strengthen, ⊢e newΓ up-e)
-t-strengthen, (⊢lam₁ ⊢e) newΓ (↑tm-ƛ up-e) = ⊢lam₁ (t-strengthen, ⊢e (◀S, newΓ) up-e)
-t-strengthen, (⊢lam₂ ⊢e) newΓ (↑tm-ƛ up-e) = ⊢lam₂ (t-strengthen, ⊢e (◀S, newΓ) up-e)
-t-strengthen, (⊢app₁ ⊢e ⊢e₁) newΓ (↑tm-app up-e up-e₁) = ⊢app₁ (t-strengthen, ⊢e newΓ up-e) (t-strengthen, ⊢e₁ newΓ up-e₁)
-t-strengthen, (⊢app₂ ⊢e ⊢e₁) newΓ (↑tm-app up-e up-e₁) = ⊢app₂ (t-strengthen, ⊢e newΓ up-e) (t-strengthen, ⊢e₁ newΓ up-e₁)
-t-strengthen, (⊢sub ⊢e B≤A j≢Z) newΓ up-e = ⊢sub (t-strengthen, ⊢e newΓ up-e) (s-strengthen, B≤A newΓ) j≢Z
-t-strengthen, (⊢tabs ⊢e) newΓ (↑tm-Λ up-e) = ⊢tabs (t-strengthen, ⊢e (◀S∙ newΓ) up-e)
-
+t-strengthen, (⊢lit cloΓ) newΓ ↑tm-lit = ⊢lit (tregular-strengthen, cloΓ newΓ)
+t-strengthen, (⊢var cloΓ x∈Γ) newΓ ↑tm-var = ⊢var (tregular-strengthen, cloΓ newΓ) (∋⦂-strengthen, x∈Γ newΓ)
+t-strengthen, (⊢ann ⊢e) newΓ (↑tm-⦂ upe) = ⊢ann (t-strengthen, ⊢e newΓ upe)
+t-strengthen, (⊢lam₁ ⊢e) newΓ (↑tm-ƛ upe) = ⊢lam₁ (t-strengthen, ⊢e (◀S, newΓ) upe)
+t-strengthen, (⊢lam₂ ⊢e) newΓ (↑tm-ƛ upe) = ⊢lam₂ (t-strengthen, ⊢e (◀S, newΓ) upe)
+t-strengthen, (⊢app₁ ⊢e ⊢e₁) newΓ (↑tm-app upe upe₁) = ⊢app₁ (t-strengthen, ⊢e newΓ upe) (t-strengthen, ⊢e₁ newΓ upe₁)
+t-strengthen, (⊢app₂ ⊢e ⊢e₁) newΓ (↑tm-app upe upe₁) = ⊢app₂ (t-strengthen, ⊢e newΓ upe) (t-strengthen, ⊢e₁ newΓ upe₁)
+t-strengthen, (⊢sub ⊢e B≤A gc j≢Z) newΓ upe = ⊢sub (t-strengthen, ⊢e newΓ upe) (s-strengthen, B≤A (◀S⋈ newΓ)) (↑tm-gc' gc upe) j≢Z
+t-strengthen, (⊢tabs ⊢e) newΓ (↑tm-Λ upe) = ⊢tabs (t-strengthen, ⊢e (◀S∙ newΓ) upe)
 
 t-strengthen,0 : Γ , T ⊢ j # e' ⦂ A
                → ↑tm0 e ⇘ e'
                → Γ ⊢ j # e ⦂ A
 t-strengthen,0 ⊢e up = t-strengthen, ⊢e ◀Z up
+
+sregular-strengthen= : SRegular Γ
+                     → Γ ◀ k =⇘ Γ'
+                     → SRegular Γ'
+
+⊢c-strengthen= : Γ ⊢c A'
+               → Γ ◀ k =⇘ Γ'
+               → A ↑ty k ⇘ A'
+               → Γ' ⊢c A
+
+≫-strengthen= : Γ ≫ A' ⇘ B'
+              → Γ ◀ k =⇘ Γ'
+              → A ↑ty k ⇘ A'
+              → B ↑ty k ⇘ B'
+              → Γ' ≫ A ⇘ B
+
+
+
+↑ty-var-inv : ∀ {m} {X Y : Fin m} {re k : Fin (1 + m)}
+               → ‶ X ↑ty k ⇘ ‶ re
+               → re ≡ punchIn k Y
+               → X ≡ Y
+↑ty-var-inv {X = X} {Y = Y} {k = k} ↑ty-var eq = punchIn-injective k X Y eq
+
+s-strengthen= : Γ ⊢ j # A' ⌞ ≤ ⌝ B'
+              → Γ ◀ k =⇘ Γ'
+              → A ↑ty k ⇘ A'
+              → B ↑ty k ⇘ B'
+              → Γ' ⊢ j # A ⌞ ≤ ⌝ B
+s-strengthen= (s-refl regΔ cloA grd) newΓ upA upB = s-refl (sregular-strengthen= regΔ newΓ)
+                                                           (⊢c-strengthen= cloA newΓ upA)
+                                                           (≫-strengthen= grd newΓ upA upB)
+s-strengthen= (s-int regΔ) newΓ ↑ty-int ↑ty-int = s-int (sregular-strengthen= regΔ newΓ)
+s-strengthen= {B = ‶ X} (s-var-∙ regΔ inΔ) newΓ ↑ty-var upB with refl ← ↑ty-var-inv upB refl
+  = s-var-∙ (sregular-strengthen= regΔ newΓ) (∋∙-strengthen= inΔ newΓ)
+s-strengthen= (s-arr₁ s s₁) newΓ (↑ty-arr upA upA₁) (↑ty-arr upB upB₁) = s-arr₁ (s-strengthen= s newΓ upB upA)
+                                                                                (s-strengthen= s₁ newΓ upA₁ upB₁)
+s-strengthen= (s-arr₂ s s₁) newΓ (↑ty-arr upA upA₁) (↑ty-arr upB upB₁) = s-arr₂ (s-strengthen= s newΓ upB upA)
+                                                                                (s-strengthen= s₁ newΓ upA₁ upB₁)
+s-strengthen= (s-arr₃ cloA grd s) newΓ (↑ty-arr upA upA₁) (↑ty-arr upB upB₁) = s-arr₃ (⊢c-strengthen= cloA newΓ upA)
+                                                                                      (≫-strengthen= grd newΓ upA upB)
+                                                                                      (s-strengthen= s newΓ upA₁ upB₁)
+s-strengthen= (s-∀ s) newΓ (↑ty-∀ upA) (↑ty-∀ upB) = s-∀ (s-strengthen= s (◀S∙ newΓ) upA upB)
+s-strengthen= (s-∀l s ic fd upC upD) newΓ (↑ty-∀ upA) (↑ty-arr upB upB₁) =
+  s-∀l (s-strengthen= s (◀S= newΓ {!!}) upA
+    (↑ty-arr (↑ty-comm0' upB upC {!!}) (↑ty-comm0' upB₁ upD {!!}))) ic {!!} {!!} {!!}
+s-strengthen= (s-svar-l x inΔ) newΓ ↑ty-var upB = s-svar-l (sregular-strengthen= x newΓ) {!!}
+s-strengthen= (s-svar-r x inΔ) newΓ upA ↑ty-var = s-svar-r (sregular-strengthen= x newΓ) {!!}

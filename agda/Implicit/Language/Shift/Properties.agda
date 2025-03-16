@@ -301,3 +301,13 @@ private variable
   with refl ← ↑ty-unique up up₁ = refl
 ↑tyᵉ-unique (↑tyᵉ-Λ up1) (↑tyᵉ-Λ up2)
   with refl ← ↑tyᵉ-unique up1 up2 = refl
+
+
+-- generic consumer
+↑tm-gc' : GenericConsumer e'
+        → e ↑tm k ⇘ e'
+        → GenericConsumer e
+↑tm-gc' gc-i ↑tm-lit = gc-i
+↑tm-gc' gc-var ↑tm-var = gc-var
+↑tm-gc' gc-ann (↑tm-⦂ upe) = gc-ann
+↑tm-gc' gc-tlam (↑tm-Λ upe) = gc-tlam

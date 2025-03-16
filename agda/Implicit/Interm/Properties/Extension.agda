@@ -16,8 +16,8 @@ s-⊆-prv (s-arr₃ cloA grd s) ext = s-arr₃ (⊆-⊢c cloA ext) (⊆-⊢c-≫
 s-⊆-prv (s-∀ s) ext = s-∀ (s-⊆-prv s (uvar ext))
 s-⊆-prv (s-∀l s ic fd upC upD) ext with s-sregular s
 ... | reg-S= r regA = s-∀l (s-⊆-prv s (svar ext regA)) ic fd upC upD
-s-⊆-prv (s-var-sub-l x inΔ) ext = s-var-sub-l (⊆-sregular' ext) (⊆-∋:= inΔ ext)
-s-⊆-prv (s-var-sub-r x inΔ) ext = s-var-sub-r (⊆-sregular' ext) (⊆-∋:= inΔ ext)
+s-⊆-prv (s-svar-l x inΔ) ext = s-svar-l (⊆-sregular' ext) (⊆-∋:= inΔ ext)
+s-⊆-prv (s-svar-r x inΔ) ext = s-svar-r (⊆-sregular' ext) (⊆-∋:= inΔ ext)
 
 infix 3 _⊆t_
 data _⊆t_ : Env n m → Env n m → Set where
@@ -142,8 +142,8 @@ s-⊆-prv-gen (s-arr₃ cloA grd s) ext = s-arr₃ (⊆t-⊢c cloA ext) (⊆t-�
 s-⊆-prv-gen (s-∀ s) ext = s-∀ (s-⊆-prv-gen s (uvar ext))
 s-⊆-prv-gen (s-∀l s ic fd upC upD) ext with s-sregular s
 ... | reg-S= r regA = s-∀l (s-⊆-prv-gen s (svar ext regA)) ic fd upC upD
-s-⊆-prv-gen (s-var-sub-l x inΔ) ext = s-var-sub-l (⊆t-sregular x ext) (⊆t-∋:= inΔ ext)
-s-⊆-prv-gen (s-var-sub-r x inΔ) ext = s-var-sub-r (⊆t-sregular x ext) (⊆t-∋:= inΔ ext)
+s-⊆-prv-gen (s-svar-l x inΔ) ext = s-svar-l (⊆t-sregular x ext) (⊆t-∋:= inΔ ext)
+s-⊆-prv-gen (s-svar-r x inΔ) ext = s-svar-r (⊆t-sregular x ext) (⊆t-∋:= inΔ ext)
 
 t-⊆-prv-gen : Γ ⊢ j # e ⦂ A
         → Γ ⊆t Δ

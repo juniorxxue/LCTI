@@ -15,8 +15,8 @@ s-sregular (s-∀ s) with s-sregular s
 ... | reg-S∙ r = r
 s-sregular (s-∀l s ic fd upC upD) with s-sregular s
 ... | reg-S= r regA = r
-s-sregular (s-var-sub-l x inΔ) = x
-s-sregular (s-var-sub-r x inΔ) = x
+s-sregular (s-svar-l x inΔ) = x
+s-sregular (s-svar-r x inΔ) = x
 
 t-tregular : Γ ⊢ j # e ⦂ A
            → TRegular Γ

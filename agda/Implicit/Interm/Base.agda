@@ -44,11 +44,11 @@ data _⊢_#_⌞_⌝_ : Env n m → Counter → Type m → Polar → Type m → S
     → (upD : ↑ty0 D ⇘ D')
     → Δ ⊢ j # `∀ A ⌞ ≤⁺ ⌝ C `→ D
   -- two atomic rules
-  s-var-sub-l : ∀ {X A}
+  s-svar-l : ∀ {X A}
     → (SRegular Δ)
     → (inΔ : Δ ∋ X := A)
     → Δ ⊢ ∞ # ‶ X ⌞ ≤⁺ ⌝ A
-  s-var-sub-r : ∀ {X A}
+  s-svar-r : ∀ {X A}
     → (SRegular Δ)
     → (inΔ : Δ ∋ X := A)
     → Δ ⊢ ∞ # A ⌞ ≤⁻ ⌝ ‶ X
