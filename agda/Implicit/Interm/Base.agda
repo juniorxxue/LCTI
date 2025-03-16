@@ -94,7 +94,7 @@ data _⊢_#_⦂_ : Env n m → Counter → Term n m → Type m → Set where
   ⊢sub :
       Γ ⊢ Z # g ⦂ A
     → (B≤A : Γ ⋈ ⊢ j # A ⌞ ≤⁺ ⌝ B)
-    → GenericConsumer g
+    → (gc : GenericConsumer g)
     → (j≢Z : NonZ j)
     → Γ ⊢ j # g ⦂ B
   ⊢tabs :
