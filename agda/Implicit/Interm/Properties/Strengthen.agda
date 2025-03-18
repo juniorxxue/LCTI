@@ -79,8 +79,10 @@ s-strengthen= (s-arr₃ cloA grd s) newΓ (↑ty-arr upA upA₁) (↑ty-arr upB 
                                                                                       (≫-strengthen= grd newΓ upA upB)
                                                                                       (s-strengthen= s newΓ upA₁ upB₁)
 s-strengthen= (s-∀ s) newΓ (↑ty-∀ upA) (↑ty-∀ upB) = s-∀ (s-strengthen= s (◀S∙ newΓ) upA upB)
-s-strengthen= (s-∀l s ic fd upC upD) newΓ (↑ty-∀ upA) (↑ty-arr upB upB₁) =
-  s-∀l (s-strengthen= s (◀S= newΓ {!!}) upA
-    (↑ty-arr (↑ty-comm0' upB upC {!!}) (↑ty-comm0' upB₁ upD {!!}))) ic {!!} {!!} {!!}
+s-strengthen= (s-∀l s ic fd upC upD) newΓ (↑ty-∀ upA) (↑ty-arr {A = A′} {B = B′} upB upB₁)
+  with ⟨ A″ , upA′ ⟩ ← ↑ty0-total A′
+  with ⟨ B″ , upB′ ⟩ ← ↑ty0-total B′
+  = s-∀l (s-strengthen= s (◀S= newΓ {!!}) upA
+    (↑ty-arr (↑ty-comm0' upB upC upA′) (↑ty-comm0' upB₁ upD upB′))) ic {!!} upA′ upB′
 s-strengthen= (s-svar-l x inΔ) newΓ ↑ty-var upB = s-svar-l (sregular-strengthen= x newΓ) {!!}
 s-strengthen= (s-svar-r x inΔ) newΓ upA ↑ty-var = s-svar-r (sregular-strengthen= x newΓ) {!!}
