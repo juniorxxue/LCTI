@@ -29,8 +29,6 @@ postulate
               → Γ ⋈ ⊢r A
 
 
-  ⊢r-strengthen,0 : Γ , A ⊢r B
-                  → Γ ⊢r B
 
   ⊢r-strengthen^0 : Γ ,^ ⊢r A'
                   → ↑ty0 A ⇘ A'
