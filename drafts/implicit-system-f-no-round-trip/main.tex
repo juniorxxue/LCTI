@@ -45,7 +45,8 @@
 
 \begin{align*}
 &\text{Environments} \quad\quad &\Gamma::=&~ . \mid \Gamma, x : A \mid \Gamma, a \\
-&\text{Counters} \quad\quad &n ::=&~ 0 \mid \infty \mid I~n \mid C~n
+&\text{Counters} \quad\quad &n ::=&~ 0 \mid \infty \mid S~n\\
+&\text{Successor Counters} \quad\quad &S ::=&~ C \mid I
 \end{align*}
 
 
@@ -117,9 +118,9 @@
 
     \inferrule*[right=\texttt{S-$\forall$L}]
     {\Gamma \vdash B \\
-     a \in \texttt{freevars}(I/C~n, A) \\
-     \Gamma \vdash_{I/C~n}  [B/a]A <: C \to D}
-    {\Gamma \vdash_{I/C~n} \forall a. ~A <: C \to D}
+    a \in \texttt{FV}_{(S~n)}(A)\\
+     \Gamma \vdash_{S~n}  [B/a]A <: C \to D}
+    {\Gamma \vdash_{S~n} \forall a. ~A <: C \to D}
 \end{mathpar}
 
 
@@ -128,7 +129,8 @@
 \begin{align*}
 &\text{Typing Environments} \quad\quad &\Gamma::=&~ . \mid \Gamma, x : A \mid \Gamma, a\\
 &\text{Subtyping Environments} \quad\quad &\Gamma, \Omega, \Delta ::=&~ . \mid \Gamma, x : A \mid \Gamma, a \mid \Gamma, \hat{a} = A\\
-&\text{Counters} \quad\quad &n ::=&~ 0 \mid \infty \mid I~n \mid C~n
+&\text{Counters} \quad\quad &n ::=&~ 0 \mid \infty \mid S~n\\
+&\text{Successor Counters} \quad\quad &S ::=&~ C \mid I
 \end{align*}
 
 \subsection{Typing: $\Gamma \vdash_n e : A$}
@@ -178,40 +180,40 @@
 \begin{mathpar}
     \inferrule*[right=\texttt{S-Refl}]
     { }
-    {\Gamma \shortmid \Delta \vdash_0 A <:^{+} A}
+    {\Gamma \shortmid \Delta \vdash_0 A <:^{+} \Delta(A)}
 
     \inferrule*[right=\texttt{S-Int}]
     { }
-    {\Gamma \vdash_{\infty} \mathtt{Int} <: \mathtt{Int}}
+    {\Gamma ; \Delta\vdash_{\infty} \mathtt{Int} <: \mathtt{Int}}
     
     \inferrule*[right=\texttt{S-Var}]
     { }
-    {\Gamma \vdash_\infty a <: a}
+    {\Gamma; \Delta \vdash_\infty a <: a}
   
 
     \inferrule*[right=\texttt{S-Arr}]
-    {\Gamma \vdash_{\infty} C <: A \\
-     \Gamma \vdash_{n-} B <: D}
-    {\Gamma \vdash_n A \rightarrow B <:C \rightarrow D}
+    {\Gamma; \Delta \vdash_{\infty} C <:^* A \\
+     \Gamma; \Delta \vdash_{n-} B <: D}
+    {\Gamma; \Delta \vdash_n A \rightarrow B <:C \rightarrow D}
 
     \inferrule*[right=\texttt{S-$\forall$}]
-    {\Gamma , a \vdash_{\infty} A <: B}
-    {\Gamma \vdash_{\infty} \forall a.~A <: \forall a.~B}
+    {\Gamma; \Delta , a \vdash_{\infty} A <: B}
+    {\Gamma; \Delta \vdash_{\infty} \forall a.~A <: \forall a.~B}
 
     \inferrule*[right=\texttt{S-$\forall$L}]
     {\Gamma \vdash B \\
-     a \in \texttt{freevars}(I/C~n , A) \\
-     \Gamma, \hat{a} = B \vdash_{I/C~n}  A <: C \to D}
-    {\Gamma \vdash_{I/C~n} \forall a. ~A <: C \to D}
+     a \in \texttt{FV}_{(S~n)}(A)\\
+     \Gamma; \Delta, \hat{a} = B \vdash_{S~n}  A <:^+ C \to D}
+    {\Gamma; \Delta \vdash_{S~n} \forall a. ~A <:^+ C \to D}
     \\    
     
-    \inferrule*[right=\texttt{S-var-l}]
-    {\hat{a} = A \in \Gamma}
-    {\Gamma \vdash_\infty \hat{a} <: A}
+    \inferrule*[right=\texttt{S-Var-L}]
+    { }
+    {\Gamma; \Delta [\hat{a} := A] \vdash_\infty \hat{a} <:^+ A}
     
-     \inferrule*[right=\texttt{S-var-r}]
-    {\hat{a} = A \in \Gamma}
-    {\Gamma \vdash_\infty A <: \hat{a}}
+     \inferrule*[right=\texttt{S-Var-R}]
+   { }
+    {\Gamma; \Delta [\hat{a} := A] \vdash_\infty A <:^- \hat{a}}
 \end{mathpar}
 
 \section{Algo.}
