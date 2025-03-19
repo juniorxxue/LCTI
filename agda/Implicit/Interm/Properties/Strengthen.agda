@@ -2,6 +2,8 @@ module Implicit.Interm.Properties.Strengthen where
 
 open import Implicit.Language.All
 open import Implicit.Interm.Base
+open import Implicit.Interm.Properties.Regularity
+open import Implicit.Interm.Properties.Find
 
 s-strengthen, : Γ ⊢ j # A ⌞ ≤ ⌝ B
               → Γ ◀ k ,⇘ Γ'
@@ -53,6 +55,25 @@ sregular-strengthen= : SRegular Γ
               → Γ' ≫ A ⇘ B
 
 
+∋∙-∋='-≢ : Γ ∋=' k
+         → Γ ∋∙ X
+         → X ≢ k
+∋∙-∋='-≢ Z (S= inΓ2) = λ ()
+∋∙-∋='-≢ (S∙ inΓ1) Z = λ ()
+∋∙-∋='-≢ (S∙ inΓ1) (S∙ inΓ2) = ≢-suc (∋∙-∋='-≢ inΓ1 inΓ2)
+∋∙-∋='-≢ (S^ inΓ1) (S^ inΓ2) = ≢-suc (∋∙-∋='-≢ inΓ1 inΓ2)
+∋∙-∋='-≢ (S= inΓ1) (S= inΓ2) = ≢-suc (∋∙-∋='-≢ inΓ1 inΓ2)
+∋∙-∋='-≢ (S, inΓ1) (S, inΓ2) = ∋∙-∋='-≢ inΓ1 inΓ2
+∋∙-∋='-≢ (S⋈ inΓ1) (S⋈ inΓ2) = ∋∙-∋='-≢ inΓ1 inΓ2
+
+⊢r-¬ε : Γ ⊢r A
+        → Γ ∋=' k
+        → k ¬ε A
+⊢r-¬ε ⊢r-int inΓ = ¬ε-int
+⊢r-¬ε (⊢r-var-∙ inΓ₁) inΓ = ¬ε-var (∋∙-∋='-≢ inΓ inΓ₁)
+⊢r-¬ε (⊢r-arr regA regA₁) inΓ = ¬ε-arr (⊢r-¬ε regA inΓ) (⊢r-¬ε regA₁ inΓ)
+⊢r-¬ε (⊢r-∀ regA) inΓ = ¬ε-∀ (⊢r-¬ε regA (S∙ inΓ))
+
 
 ↑ty-var-inv : ∀ {m} {X Y : Fin m} {re k : Fin (1 + m)}
                → ‶ X ↑ty k ⇘ ‶ re
@@ -79,10 +100,13 @@ s-strengthen= (s-arr₃ cloA grd s) newΓ (↑ty-arr upA upA₁) (↑ty-arr upB 
                                                                                       (≫-strengthen= grd newΓ upA upB)
                                                                                       (s-strengthen= s newΓ upA₁ upB₁)
 s-strengthen= (s-∀ s) newΓ (↑ty-∀ upA) (↑ty-∀ upB) = s-∀ (s-strengthen= s (◀S∙ newΓ) upA upB)
-s-strengthen= (s-∀l s ic fd upC upD) newΓ (↑ty-∀ upA) (↑ty-arr {A = A′} {B = B′} upB upB₁)
+s-strengthen= (s-∀l {B = B} s ic fd upC upD) newΓ (↑ty-∀ upA) (↑ty-arr {A = A′} {B = B′} upB upB₁)
   with ⟨ A″ , upA′ ⟩ ← ↑ty0-total A′
   with ⟨ B″ , upB′ ⟩ ← ↑ty0-total B′
-  = s-∀l (s-strengthen= s (◀S= newΓ {!!}) upA
-    (↑ty-arr (↑ty-comm0' upB upC upA′) (↑ty-comm0' upB₁ upD upB′))) ic {!!} upA′ upB′
+  with reg-S= regΓ regA ← s-sregular s
+  with k¬εB ← ⊢r-¬ε regA (◀=-∋=' newΓ)
+  with ⟨ preB , upB' ⟩ ← ↑ty-surjective k¬εB
+    = s-∀l (s-strengthen= s (◀S= newΓ upB') upA
+      (↑ty-arr (↑ty-comm0' upB upC upA′) (↑ty-comm0' upB₁ upD upB′))) ic (↑ty-find0' fd upA) upA′ upB′
 s-strengthen= (s-svar-l x inΔ) newΓ ↑ty-var upB = s-svar-l (sregular-strengthen= x newΓ) {!!}
 s-strengthen= (s-svar-r x inΔ) newΓ upA ↑ty-var = s-svar-r (sregular-strengthen= x newΓ) {!!}

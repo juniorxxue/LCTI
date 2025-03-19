@@ -41,7 +41,7 @@ s-strengthen= (s-arr₂ s s₁) ¬inΓ newΓ upA upB = {!!}
 s-strengthen= (s-arr₃ cloA grd s) ¬inΓ newΓ upA upB = {!!}
 s-strengthen= (s-∀ s) ¬inΓ newΓ upA upB = {!!}
 s-strengthen= (s-∀l s ic fd upC upD) ¬inΓ newΓ (↑ty-∀ upA) (↑ty-arr upB upB₁)
-  = s-∀l (s-strengthen= s (S= ¬inΓ {!!} {!!}) (◀S= newΓ {!!}) {!!} {!!}) {!!} {!!} {!!} {!!}
+  = s-∀l (s-strengthen= s (S= ¬inΓ {!!} {!!}) (◀S= newΓ {!!}) {!!} {!!}) ic {!!} {!!} {!!}
 s-strengthen= (s-svar-l x inΔ) ¬inΓ newΓ upA upB = {!!}
 s-strengthen= (s-svar-r x inΔ) ¬inΓ newΓ upA upB = {!!}
 
@@ -50,4 +50,5 @@ s-strengthen=0 : Γ ,= T ⊢ j # A' ⌞ ≤ ⌝ B'
                → ↑ty0 A ⇘ A'
                → ↑ty0 B ⇘ B'
                → Γ ⊢ j # A  ⌞ ≤ ⌝ B
-s-strengthen=0 s upA upB = s-strengthen= s (Z= {!!} {!!}) ◀Z upA upB
+s-strengthen=0 {T = T} s upA upB
+  with ⟨ T' , upT ⟩ ← ↑ty0-total T = s-strengthen= s (Z= upT (↑ty-¬ε upT)) ◀Z upA upB

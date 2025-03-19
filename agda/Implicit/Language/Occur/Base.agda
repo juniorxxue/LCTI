@@ -24,8 +24,8 @@ data _¬εᵍ_ : Fin m → Env n m → Set where
   Z : k ¬εᵍ ∅
   Z^ : #0 ¬εᵍ Γ ,^
   Z∙ : #0 ¬εᵍ Γ ,∙
-  Z= : ↑ty0 A ⇘ A'
-     → (#0 ¬ε A')
+  Z= : (upA : ↑ty0 A ⇘ A')
+     → (¬inA : #0 ¬ε A')
      → #0 ¬εᵍ Γ ,= A
   S, : (k ¬ε A)
        → k ¬εᵍ Γ
@@ -35,6 +35,6 @@ data _¬εᵍ_ : Fin m → Env n m → Set where
   S^ : k ¬εᵍ Γ
      → #S k ¬εᵍ Γ ,^
   S= : k ¬εᵍ Γ
-     → ↑ty0 A ⇘ A'
-     → (#S k ¬ε A')
+     → (upA : ↑ty0 A ⇘ A')
+     → (¬inA : k ¬ε A)
      → #S k ¬εᵍ Γ ,= A

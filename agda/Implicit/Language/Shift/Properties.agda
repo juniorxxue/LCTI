@@ -103,6 +103,35 @@ private variable
           → ↑ty0 Aₖ ⇘ Aₖ₊₁
 ↑ty-comm0 up1 up2 up3 = ↑ty-comm {k₁ = #0} z≤n up1 up2 up3
 
+↑ty-var-eq : Y ≡ punchIn k X
+           → (‶ X) ↑ty k ⇘ ‶ Y
+↑ty-var-eq refl = ↑ty-var
+
+↑ty-var-inv-eq : (‶ X) ↑ty k ⇘ ‶ Y
+               → Y ≡ punchIn k X
+↑ty-var-inv-eq ↑ty-var = refl
+
+↑ty-comm-v2 : k₁ #≤ k₂
+            → B ↑ty #S k₂ ⇘ C
+            → D ↑ty (inject₁ k₁) ⇘ C
+            → A ↑ty k₂ ⇘ D
+            ------------------
+            → A ↑ty k₁ ⇘ B
+↑ty-comm-v2 lt ↑ty-int ↑ty-int ↑ty-int = ↑ty-int
+↑ty-comm-v2 {k₁ = k₁} {k₂} lt (↑ty-var {X = X}) up2 (↑ty-var {X = Y})
+  with eq1 ← ↑ty-var-inv-eq up2
+  with eq2 ← punchIn-comm {x = Y} {j = k₁} {k = k₂} lt
+    = ↑ty-var-eq (punchIn-injective (#S k₂) X (punchIn k₁ Y)(trans eq1 eq2))
+↑ty-comm-v2 lt (↑ty-arr up1 up4) (↑ty-arr up2 up5) (↑ty-arr up3 up6) = ↑ty-arr (↑ty-comm-v2 lt up1 up2 up3) (↑ty-comm-v2 lt up4 up5 up6)
+↑ty-comm-v2 lt (↑ty-∀ up1) (↑ty-∀ up2) (↑ty-∀ up3) = ↑ty-∀ (↑ty-comm-v2 (s≤s lt) up1 up2 up3)
+
+  -- follows the ↑ty-comm0, but swap the conclusion with a premise
+↑ty-comm1 : A₀ ↑ty #S k ⇘ Aₖ₊₁
+              → ↑ty0 Aₖ ⇘ Aₖ₊₁
+                → A ↑ty k ⇘ Aₖ
+              → ↑ty0 A ⇘ A₀
+↑ty-comm1 up1 up2 up3 = ↑ty-comm-v2 z≤n up1 up2 up3
+
 -- ↑ty-comm describes a equal relation, and have another interpreation
 
 ↑ty-comm' : k₁ #≤ k₂
@@ -119,13 +148,13 @@ private variable
 ↑ty-comm' k₁≤k₂ (↑ty-∀ up1) (↑ty-∀ up2) (↑ty-∀ up3) = ↑ty-∀ (↑ty-comm' (s≤s k₁≤k₂) up1 up2 up3)
 
 
+
 ↑ty-comm0' : A ↑ty k ⇘ Aₖ
            → ↑ty0 Aₖ ⇘ Aₖ₊₁
            ---------------------
            → ↑ty0 A ⇘ A₀
            → A₀ ↑ty #S k ⇘ Aₖ₊₁
 ↑ty-comm0' up1 up2 up3 = ↑ty-comm' z≤n up1 up2 up3
-
 
 
 ↑ty-punchOut : (¬p : k ≢ X)

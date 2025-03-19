@@ -51,25 +51,6 @@ open import Implicit.Language.Occur.Base
 ε-¬ε-false (ε-arr-r ninA inA) (¬ε-arr ¬inA ¬inA₁) = ε-¬ε-false inA ¬inA₁
 ε-¬ε-false (ε-∀ inA) (¬ε-∀ ¬inA) = ε-¬ε-false inA ¬inA
 
-εᵍ-:=-¬ε : k ¬εᵍ Γ
-         → Γ ∋ X := A
-         → k ¬ε A
-εᵍ-:=-¬ε Z^ (S^ inΓ up) = ↑ty-¬ε up
-εᵍ-:=-¬ε Z∙ (S∙ inΓ up) = ↑ty-¬ε up
-εᵍ-:=-¬ε (Z= x x₁) (Z up) = ↑ty-¬ε up
-εᵍ-:=-¬ε (Z= x x₁) (S= inΓ up) = ↑ty-¬ε up
-εᵍ-:=-¬ε (S∙ ninΓ) (S∙ inΓ up) = ¬ε-↑ty0 (εᵍ-:=-¬ε ninΓ inΓ) up
-εᵍ-:=-¬ε (S^ ninΓ) (S^ inΓ up) = ¬ε-↑ty0 (εᵍ-:=-¬ε ninΓ inΓ) up
-εᵍ-:=-¬ε (S= ninΓ x x₁) (Z up) with ↑ty-unique up x
-... | refl = x₁
-εᵍ-:=-¬ε (S= ninΓ x x₁) (S= inΓ up) = ¬ε-↑ty0 (εᵍ-:=-¬ε ninΓ inΓ) up
-
-
-εᵍ-:=-false : Γ ∋ X := A
-            → k ε A
-            → k ¬εᵍ Γ
-            → ⊥
-εᵍ-:=-false inΓ inA ¬inΓ = ε-¬ε-false inA (εᵍ-:=-¬ε ¬inΓ inΓ)
 
 
 ε-dec : (k ε A) ⊎ (k ¬ε A)
@@ -99,3 +80,27 @@ open import Implicit.Language.Occur.Base
        → ↑ty0 A ⇘ A'
        → #S k ε A'
 ε-↑ty0 inA ↑ty = ε-↑ty inA ↑ty z≤n
+
+----------------------------------------------------------------------
+--+                        not occur in env                        +--
+----------------------------------------------------------------------
+
+εᵍ-:=-¬ε : k ¬εᵍ Γ
+         → Γ ∋ X := A
+         → k ¬ε A
+εᵍ-:=-¬ε Z^ (S^ inΓ up) = ↑ty-¬ε up
+εᵍ-:=-¬ε Z∙ (S∙ inΓ up) = ↑ty-¬ε up
+εᵍ-:=-¬ε (Z= x x₁) (Z up) = ↑ty-¬ε up
+εᵍ-:=-¬ε (Z= x x₁) (S= inΓ up) = ↑ty-¬ε up
+εᵍ-:=-¬ε (S∙ ninΓ) (S∙ inΓ up) = ¬ε-↑ty0 (εᵍ-:=-¬ε ninΓ inΓ) up
+εᵍ-:=-¬ε (S^ ninΓ) (S^ inΓ up) = ¬ε-↑ty0 (εᵍ-:=-¬ε ninΓ inΓ) up
+εᵍ-:=-¬ε (S= ninΓ x x₁) (Z up) with ↑ty-unique up x
+... | refl = ¬ε-↑ty0 x₁ x
+εᵍ-:=-¬ε (S= ninΓ x x₁) (S= inΓ up) = ¬ε-↑ty0 (εᵍ-:=-¬ε ninΓ inΓ) up
+
+
+εᵍ-:=-false : Γ ∋ X := A
+            → k ε A
+            → k ¬εᵍ Γ
+            → ⊥
+εᵍ-:=-false inΓ inA ¬inΓ = ε-¬ε-false inA (εᵍ-:=-¬ε ¬inΓ inΓ)
