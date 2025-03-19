@@ -28,6 +28,7 @@ postulate
   ⊢r-weaken⋈0 : Γ ⊢r A
               → Γ ⋈ ⊢r A
 
+
   ⊢r-strengthen,0 : Γ , A ⊢r B
                   → Γ ⊢r B
 
@@ -42,9 +43,6 @@ postulate
                   → ↑ty0 A ⇘ A'
                   → Γ ⊢r A
 
-  ⊢r-strengthen=0 : Γ ,= T ⊢r A'
-                  → ↑ty0 A ⇘ A'
-                  → Γ ⊢r A
 
 ∋:=-⊢r : SRegular Γ
          → Γ ∋ X := A

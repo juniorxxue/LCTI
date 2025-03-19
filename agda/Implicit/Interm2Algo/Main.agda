@@ -116,3 +116,12 @@ complete (⊢sub ⊢e B≤A x j≢Z) j~Σ = ⊢sub (complete ⊢e ~Z) (nonempty 
         nonempty nz-I (~I ⊢e j~Σ) = ne-app
         nonempty nz-C (~C ⊢e j~Σ) = ne-app
 complete (⊢tabs ⊢e) ~Z = ⊢tabs (complete ⊢e ~Z)
+
+-- corollaries
+complete-0 : Γ ⊢ Z # e ⦂ A
+           → Γ ⊢ □ ⇒ e ⇒ A
+complete-0 ⊢e = complete ⊢e ~Z
+
+complete-∞ : Γ ⊢ ∞ # e ⦂ A
+           → Γ ⊢ τ A ⇒ e ⇒ A
+complete-∞ ⊢e = complete ⊢e ~∞
