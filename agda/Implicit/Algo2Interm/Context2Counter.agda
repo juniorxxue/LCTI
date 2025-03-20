@@ -58,11 +58,15 @@ NonEmpty-NonZ ne-τ ~t∞ = nz-∞
 NonEmpty-NonZ ne-app (~tI ⊢e j~Σ) = nz-I
 NonEmpty-NonZ ne-app (~tC ⊢e j~Σ) = nz-C
 
-postulate
-  ~s-strengthen=0 : Γ ,= T ⊢ ⟨ j , A' ⟩ ~s Σ'
+
+~s-strengthen=0 : Γ ,= T ⊢ ⟨ j , A' ⟩ ~s Σ'
                  → ↑ty0 A ⇘ A'
                  → ↑tyᶜ0 Σ ⇘ Σ'
                  → Γ ⊢ ⟨ j , A ⟩ ~s Σ
+~s-strengthen=0 ~sZ upA ↑tyᶜ-□ = ~sZ
+~s-strengthen=0 ~s∞ upA (↑tyᶜ-τ up-t) with refl ← ↑ty-unique-inver upA up-t = ~s∞
+~s-strengthen=0 (~sI ⊢e ~s) (↑ty-arr upA upA₁) (↑tyᶜ-e up-e upΣ) = ~sI (t-strengthen= ⊢e ◀Z up-e upA) (~s-strengthen=0 ~s upA₁ upΣ)
+~s-strengthen=0 (~sC ⊢e ~s) (↑ty-arr upA upA₁) (↑tyᶜ-e up-e upΣ) = ~sC (t-strengthen= ⊢e ◀Z up-e upA) (~s-strengthen=0 ~s upA₁ upΣ)
 
 ~t-strengthen,0 : Γ , A ⊢ ⟨ j , B ⟩ ~t Σ'
                 → ↑tmᶜ0 Σ ⇘ Σ'

@@ -292,6 +292,31 @@ private variable
 ¬ε-↑ty0' ¬inA upA = ¬ε-↑ty' ¬inA upA (s≤s z≤n)
 
 
+¬ε-↑ty'-inv : inject₁ X ¬ε A'
+            → A ↑ty k ⇘ A'
+            → X #< k
+            → X ¬ε A
+¬ε-↑ty'-inv ¬ε-int ↑ty-int lt = ¬ε-int
+¬ε-↑ty'-inv (¬ε-var x) ↑ty-var lt = ¬ε-var λ where
+  refl → x (sym (punchIn-inject lt))
+¬ε-↑ty'-inv (¬ε-arr ninA ninA₁) (↑ty-arr upA upA₁) lt = ¬ε-arr (¬ε-↑ty'-inv ninA upA lt) (¬ε-↑ty'-inv ninA₁ upA₁ lt)
+¬ε-↑ty'-inv (¬ε-∀ ninA) (↑ty-∀ upA) lt = ¬ε-∀ (¬ε-↑ty'-inv ninA upA (s≤s lt))
+
+¬ε-↑ty'-inv0 : #0 ¬ε A'
+              → A ↑ty #S k ⇘ A'
+              → #0 ¬ε A
+¬ε-↑ty'-inv0 ninA upA = ¬ε-↑ty'-inv ninA upA (s≤s z≤n)
+
+
+↑ty-¬ε-prv : X ¬ε A
+           → A ↑ty k ⇘ A'
+           → X #< k
+           → inject₁ X ¬ε A'
+↑ty-¬ε-prv ¬ε-int ↑ty-int lt = ¬ε-int
+↑ty-¬ε-prv (¬ε-var x) ↑ty-var lt = ¬ε-var (≢-sym (punchIn-inject-neq lt (≢-sym x)))
+↑ty-¬ε-prv (¬ε-arr ¬inA ¬inA₁) (↑ty-arr upA upA₁) lt = ¬ε-arr (↑ty-¬ε-prv ¬inA upA lt) (↑ty-¬ε-prv ¬inA₁ upA₁ lt)
+↑ty-¬ε-prv (¬ε-∀ ¬inA) (↑ty-∀ upA) lt = ¬ε-∀ (↑ty-¬ε-prv ¬inA upA (s≤s lt))
+
 ----------------------------------------------------------------------
 --+                    type shifting for terms                     +--
 ----------------------------------------------------------------------
@@ -340,3 +365,17 @@ private variable
 ↑tm-gc' gc-var ↑tm-var = gc-var
 ↑tm-gc' gc-ann (↑tm-⦂ upe) = gc-ann
 ↑tm-gc' gc-tlam (↑tm-Λ upe) = gc-tlam
+
+↑ty-gc' : GenericConsumer e'
+        → e ↑tyᵉ k ⇘ e'
+        → GenericConsumer e
+↑ty-gc' gc-i ↑tyᵉ-lit = gc-i
+↑ty-gc' gc-var ↑tyᵉ-var = gc-var
+↑ty-gc' gc-ann (↑tyᵉ-⦂ up up₁) = gc-ann
+↑ty-gc' gc-tlam (↑tyᵉ-Λ up) = gc-tlam
+
+↑ty-var-inv-helper : ∀ {B : Type m} {k Y X}
+           → B ↑ty k ⇘ ‶ Y
+           → Y ≡ punchIn k X
+           → B ≡ ‶ X
+↑ty-var-inv-helper {B = B} {k = k} {Y = Y} {X = X} (↑ty-var {X = X'}) eq = cong ‶_ (punchIn-injective k X' X eq)

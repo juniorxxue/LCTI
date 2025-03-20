@@ -34,14 +34,16 @@ open import Implicit.Language.Occur.Base
 ↑ty-ε (ε-arr-r ninA inA) (↑ty-arr up up₁) lt = ε-arr-r (¬ε-↑ty' ninA up lt) (↑ty-ε inA up₁ lt)
 ↑ty-ε (ε-∀ inA) (↑ty-∀ up) lt = ε-∀ (↑ty-ε inA up (s≤s lt))
 
-↑ty-¬ε-prv : X ¬ε A
-           → A ↑ty k ⇘ A'
-           → X #< k
-           → inject₁ X ¬ε A'
-↑ty-¬ε-prv ¬ε-int ↑ty-int lt = ¬ε-int
-↑ty-¬ε-prv (¬ε-var x) ↑ty-var lt = ¬ε-var (≢-sym (punchIn-inject-neq lt (≢-sym x)))
-↑ty-¬ε-prv (¬ε-arr ¬inA ¬inA₁) (↑ty-arr upA upA₁) lt = ¬ε-arr (↑ty-¬ε-prv ¬inA upA lt) (↑ty-¬ε-prv ¬inA₁ upA₁ lt)
-↑ty-¬ε-prv (¬ε-∀ ¬inA) (↑ty-∀ upA) lt = ¬ε-∀ (↑ty-¬ε-prv ¬inA upA (s≤s lt))
+↑ty-ε' : inject₁ X ε A'
+       → X #< k
+       → A ↑ty k ⇘ A'
+       → X ε A
+↑ty-ε' ε-var lt upA rewrite punchIn-inject lt with ↑ty-var-inv-helper upA refl
+... | refl = ε-var
+↑ty-ε' (ε-arr-l inA) lt (↑ty-arr upA upA₁) = ε-arr-l (↑ty-ε' inA lt upA)
+↑ty-ε' (ε-arr-r ¬inA inA) lt (↑ty-arr upA upA₁) = ε-arr-r (¬ε-↑ty'-inv ¬inA upA lt) (↑ty-ε' inA lt upA₁)
+↑ty-ε' (ε-∀ inA) lt (↑ty-∀ upA) = ε-∀ (↑ty-ε' inA (s≤s lt) upA)
+
 
 ε-¬ε-false : k ε A
            → k ¬ε A

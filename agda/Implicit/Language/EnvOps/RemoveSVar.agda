@@ -13,7 +13,7 @@ infix 3 _◀_=⇘_
 data _◀_=⇘_ : Env n (1 + m) → Fin (1 + m) → Env n m → Set where
   ◀Z  : Γ ,= T ◀ #0 =⇘ Γ
   ◀S, : Γ ◀ k =⇘ Γ'
-      → B ↑ty k ⇘ B'
+      → (up : B ↑ty k ⇘ B')
       → Γ , B' ◀ k =⇘ Γ' , B
   ◀S^ : Γ ◀ k =⇘ Γ'
       → Γ ,^ ◀ #S k =⇘ Γ' ,^
@@ -191,11 +191,6 @@ sregular-strengthen= (reg-S^ sreg) (◀S^ newΓ) = reg-S^ (sregular-strengthen= 
 sregular-strengthen= (reg-S= sreg regA) ◀Z = sreg
 sregular-strengthen= (reg-S= sreg regA) (◀S= newΓ x) = reg-S= (sregular-strengthen= sreg newΓ) (⊢r-strengthen= regA newΓ x)
 
-↑ty-var-inv-helper : ∀ {B : Type m} {k Y X}
-           → B ↑ty k ⇘ ‶ Y
-           → Y ≡ punchIn k X
-           → B ≡ ‶ X
-↑ty-var-inv-helper {B = B} {k = k} {Y = Y} {X = X} (↑ty-var {X = X'}) eq = cong ‶_ (punchIn-injective k X' X eq)
 
 ≫-strengthen= : Γ ≫ A' ⇘ B'
               → SRegular Γ

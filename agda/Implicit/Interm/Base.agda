@@ -68,10 +68,10 @@ s-refl-∞ regΓ (⊢r-∀ regA) = s-∀ (s-refl-∞ (reg-S∙ regΓ) regA)
 infix 3 _⊢_#_⦂_
 data _⊢_#_⦂_ : Env n m → Counter → Term n m → Type m → Set where
   ⊢lit : ∀ {num : ℕ}
-    → (cloΓ : TRegular Γ)
+    → (regΓ : TRegular Γ)
     → Γ ⊢ Z # (lit num) ⦂ Int
   ⊢var :
-      (cloΓ : TRegular Γ)
+      (regΓ : TRegular Γ)
     → (x∈Γ : Γ ∋ x ⦂ A)
     → Γ ⊢ Z # ` x ⦂ A
   ⊢ann :

@@ -20,7 +20,17 @@ open import Implicit.Interm.Base
 ↑ty-find0 fd up = ↑ty-find fd up (s≤s z≤n)
 
 
-postulate
-  ↑ty-find0' : find A' #0 j
+↑ty-find' : find A' (inject₁ X) j
+          → X #< k
+          → A ↑ty k ⇘ A'
+          → find A X j
+↑ty-find' (f-∞ x) lt up = f-∞ (↑ty-ε' x lt up)
+↑ty-find' (f-arr-𝕚-l x) lt (↑ty-arr up up₁) = f-arr-𝕚-l (↑ty-ε' x lt up)
+↑ty-find' (f-arr-𝕚-r ¬inA fd) lt (↑ty-arr up up₁) = f-arr-𝕚-r (¬ε-↑ty'-inv ¬inA up lt) (↑ty-find' fd lt up₁)
+↑ty-find' (f-arr-𝕔 ¬inA fd) lt (↑ty-arr up up₁) = f-arr-𝕔 (¬ε-↑ty'-inv ¬inA up lt) (↑ty-find' fd lt up₁)
+↑ty-find' (f-∀ fd) lt (↑ty-∀ up) = f-∀ (↑ty-find' fd (s≤s lt) up)
+
+↑ty-find0' : find A' #0 j
              → A ↑ty (#S k) ⇘ A'
              → find A #0 j
+↑ty-find0' fd up = ↑ty-find' fd (s≤s z≤n) up

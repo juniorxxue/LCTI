@@ -25,3 +25,20 @@ s--polarity (s-var-∙ regΔ inΔ) = ⊢r-var-∙ inΔ
 s--polarity (s-arr₁ s s₁) = ⊢r-arr (s+-polarity s) (s--polarity s₁)
 s--polarity (s-∀ s) = ⊢r-∀ (s--polarity s)
 s--polarity (s-svar-r x inΔ) = ∋:=-⊢r x inΔ
+
+
+t-⊢r : Γ ⊢ j # e ⦂ A
+     → Γ ⊢r A
+t-⊢r (⊢lit regΓ) = ⊢r-int
+t-⊢r (⊢var regΓ x∈Γ) = ∋⦂-⊢r regΓ x∈Γ
+t-⊢r (⊢ann ⊢e) = t-⊢r ⊢e
+t-⊢r (⊢lam₁ ⊢e) with t-tregular ⊢e
+... | reg-S, r regA = ⊢r-arr regA (⊢r-strengthen,0 (t-⊢r ⊢e))
+t-⊢r (⊢lam₂ ⊢e) with t-tregular ⊢e
+... | reg-S, r regA = ⊢r-arr regA (⊢r-strengthen,0 (t-⊢r ⊢e))
+t-⊢r (⊢app₁ ⊢e ⊢e₁) with t-⊢r ⊢e
+... | ⊢r-arr r r₁ = r₁
+t-⊢r (⊢app₂ ⊢e ⊢e₁) with t-⊢r ⊢e
+... | ⊢r-arr r r₁ = r₁
+t-⊢r (⊢sub ⊢e B≤A gc j≢Z) = ⊢r-𝕣' (s+-polarity B≤A)
+t-⊢r (⊢tabs ⊢e) = ⊢r-∀ (t-⊢r ⊢e)
