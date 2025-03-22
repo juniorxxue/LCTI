@@ -148,7 +148,6 @@ private variable
 ↑ty-comm' k₁≤k₂ (↑ty-∀ up1) (↑ty-∀ up2) (↑ty-∀ up3) = ↑ty-∀ (↑ty-comm' (s≤s k₁≤k₂) up1 up2 up3)
 
 
-
 ↑ty-comm0' : A ↑ty k ⇘ Aₖ
            → ↑ty0 Aₖ ⇘ Aₖ₊₁
            ---------------------
@@ -156,6 +155,19 @@ private variable
            → A₀ ↑ty #S k ⇘ Aₖ₊₁
 ↑ty-comm0' up1 up2 up3 = ↑ty-comm' z≤n up1 up2 up3
 
+↑tm-comm' : k₁ #≤ k₂
+         → e ↑tm k₂ ⇘ e₁
+         → e₁ ↑tm (inject₁ k₁) ⇘ e₂
+         ----------------
+         → e ↑tm k₁ ⇘ e'
+         → e' ↑tm #S k₂ ⇘ e₂
+↑tm-comm' lt ↑tm-lit ↑tm-lit ↑tm-lit = ↑tm-lit
+↑tm-comm' {k₁ = k₁} {k₂} lt(↑tm-var {x = x}) ↑tm-var ↑tm-var
+  rewrite punchIn-comm {x = x} {j = k₁} {k = k₂} lt = ↑tm-var
+↑tm-comm' lt (↑tm-ƛ up1) (↑tm-ƛ up2) (↑tm-ƛ up3) = ↑tm-ƛ (↑tm-comm' (s≤s lt) up1 up2 up3)
+↑tm-comm' lt (↑tm-app up1 up4) (↑tm-app up2 up5) (↑tm-app up3 up6) = ↑tm-app (↑tm-comm' lt up1 up2 up3) (↑tm-comm' lt up4 up5 up6)
+↑tm-comm' lt (↑tm-⦂ up1) (↑tm-⦂ up2) (↑tm-⦂ up3) = ↑tm-⦂ (↑tm-comm' lt up1 up2 up3)
+↑tm-comm' lt (↑tm-Λ up1) (↑tm-Λ up2) (↑tm-Λ up3) = ↑tm-Λ (↑tm-comm' lt up1 up2 up3)
 
 ↑ty-punchOut : (¬p : k ≢ X)
              → ‶ punchOut ¬p ↑ty k ⇘ ‶ X

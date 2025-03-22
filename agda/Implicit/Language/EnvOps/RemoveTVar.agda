@@ -61,6 +61,14 @@ data _◀_,⇘_ : Env (1 + n) m → Fin (1 + n) → Env n m → Set where
 ∋∙-strengthen, (S^ inΓ) (◀S^ newΓ') = S^ (∋∙-strengthen, inΓ newΓ')
 ∋∙-strengthen, (S⋈ inΓ) (◀S⋈ newΓ') = S⋈ (∋∙-strengthen, inΓ newΓ')
 
+∋^-strengthen, : Γ ∋^ X
+               → Γ ◀ k ,⇘ Γ'
+               → Γ' ∋^ X
+∋^-strengthen, Z (◀S^ newΓ) = Z
+∋^-strengthen, (S∙ inΓ) (◀S∙ newΓ) = S∙ (∋^-strengthen, inΓ newΓ)
+∋^-strengthen, (S= inΓ) (◀S= newΓ) = S= (∋^-strengthen, inΓ newΓ)
+∋^-strengthen, (S^ inΓ) (◀S^ newΓ) = S^ (∋^-strengthen, inΓ newΓ)
+
 ∋=-strengthen, : Γ ∋= X
        → Γ ◀ k ,⇘ Γ'
        → Γ' ∋= X
@@ -107,6 +115,14 @@ sregular-strengthen, (reg-S= regΓ regA) (◀S= newΓ) = reg-S= (sregular-streng
 ⊢c-strengthen, (⊢c-var-= inΔ) newΓ = ⊢c-var-= (∋=-strengthen, inΔ newΓ)
 ⊢c-strengthen, (⊢c-arr cloA cloA₁) newΓ = ⊢c-arr (⊢c-strengthen, cloA newΓ) (⊢c-strengthen, cloA₁ newΓ)
 ⊢c-strengthen, (⊢c-∀ cloA) newΓ = ⊢c-∀ (⊢c-strengthen, cloA (◀S∙ newΓ))
+
+⊢o-strengthen, : Γ ⊢o A
+               → Γ ◀ k ,⇘ Γ'
+               → Γ' ⊢o A
+⊢o-strengthen, (⊢o-var-^ x) newΓ = ⊢o-var-^ (∋^-strengthen, x newΓ)
+⊢o-strengthen, (⊢o-arr-l opnA) newΓ = ⊢o-arr-l (⊢o-strengthen, opnA newΓ)
+⊢o-strengthen, (⊢o-arr-r opnA) newΓ = ⊢o-arr-r (⊢o-strengthen, opnA newΓ)
+⊢o-strengthen, (⊢o-∀ opnA) newΓ = ⊢o-∀ (⊢o-strengthen, opnA (◀S∙ newΓ))
 
 ≫-strengthen, : Γ ≫ A ⇘ B
               → Γ ◀ k ,⇘ Γ'

@@ -86,5 +86,5 @@ t-⊢r (⊢app ⊢e) with t-⊢r ⊢e
 t-⊢r (⊢lam₁ ⊢e) with t-env ⊢e
 ... | reg-S, r regA = ⊢r-arr regA (⊢r-strengthen,0 (t-⊢r ⊢e))
 t-⊢r (⊢lam₂ ⊢e up-c ⊢e₁) = ⊢r-arr (t-⊢r ⊢e) (⊢r-strengthen,0 (t-⊢r ⊢e₁))
-t-⊢r (⊢sub ⊢e ne gc s) = ⊢r-strengthen⋈0 (s-⊢r s)
+t-⊢r (⊢sub ⊢e ne gc s) = ⊢r-𝕣' (s-⊢r s)
 t-⊢r (⊢tabs ⊢e) = ⊢r-∀ (t-⊢r ⊢e)

@@ -28,15 +28,10 @@ postulate
   ⊢r-weaken⋈0 : Γ ⊢r A
               → Γ ⋈ ⊢r A
 
-
-
   ⊢r-strengthen^0 : Γ ,^ ⊢r A'
                   → ↑ty0 A ⇘ A'
                   → Γ ⊢r A
-
-  ⊢r-strengthen⋈0 : Γ ⋈ ⊢r A
-                 → Γ ⊢r A
-
+                  
   ⊢r-strengthen∙0 : Γ ,∙ ⊢r A'
                   → ↑ty0 A ⇘ A'
                   → Γ ⊢r A
