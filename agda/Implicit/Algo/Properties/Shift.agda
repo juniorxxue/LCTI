@@ -37,3 +37,34 @@ open import Implicit.Algo.Base
   → ∃ λ Σ'
   → ↑tyᶜ0 Σ ⇘ Σ'
 ↑tyᶜ0-total Σ = ↑tyᶜ-total Σ #0
+
+
+↑tm-↑tyᵉ-comm' : e ↑tm k₁ ⇘ e₁
+                → e ↑tyᵉ k₂ ⇘ e'
+                → e' ↑tm k₁ ⇘ e₂
+                → e₁ ↑tyᵉ k₂ ⇘ e₂
+↑tm-↑tyᵉ-comm' ↑tm-lit ↑tyᵉ-lit ↑tm-lit = ↑tyᵉ-lit
+↑tm-↑tyᵉ-comm' ↑tm-var ↑tyᵉ-var ↑tm-var = ↑tyᵉ-var
+↑tm-↑tyᵉ-comm' (↑tm-ƛ up1) (↑tyᵉ-ƛ up2) (↑tm-ƛ up3) = ↑tyᵉ-ƛ (↑tm-↑tyᵉ-comm' up1 up2 up3)
+↑tm-↑tyᵉ-comm' (↑tm-app up1 up4) (↑tyᵉ-app up2 up5) (↑tm-app up3 up6) = ↑tyᵉ-app (↑tm-↑tyᵉ-comm' up1 up2 up3) (↑tm-↑tyᵉ-comm' up4 up5 up6)
+↑tm-↑tyᵉ-comm' (↑tm-⦂ up1) (↑tyᵉ-⦂ up2 up) (↑tm-⦂ up3) = ↑tyᵉ-⦂ (↑tm-↑tyᵉ-comm' up1 up2 up3) up
+↑tm-↑tyᵉ-comm' (↑tm-Λ up1) (↑tyᵉ-Λ up2) (↑tm-Λ up3) = ↑tyᵉ-Λ (↑tm-↑tyᵉ-comm' up1 up2 up3)
+
+↑tmᶜ-↑tyᶜ-comm' : Σ ↑tmᶜ k₁ ⇘ Σ₁
+                → Σ ↑tyᶜ k₂ ⇘ Σ'
+                → Σ' ↑tmᶜ k₁ ⇘ Σ₂
+                → Σ₁ ↑tyᶜ k₂ ⇘ Σ₂
+↑tmᶜ-↑tyᶜ-comm' ↑tmᶜ-□ ↑tyᶜ-□ ↑tmᶜ-□ = ↑tyᶜ-□
+↑tmᶜ-↑tyᶜ-comm' ↑tmᶜ-τ (↑tyᶜ-τ up-t) ↑tmᶜ-τ = ↑tyᶜ-τ up-t
+↑tmᶜ-↑tyᶜ-comm' (↑tmᶜ-e up-e up1) (↑tyᶜ-e up-e₁ up2) (↑tmᶜ-e up-e₂ up3) = ↑tyᶜ-e (↑tm-↑tyᵉ-comm' up-e up-e₁ up-e₂) (↑tmᶜ-↑tyᶜ-comm' up1 up2 up3)
+
+
+↑tyᶜ-comm0' : ∀ {Σ : Context n m} {Σₖ Σₖ₊₁ Σ₀ k}
+              → Σ ↑tyᶜ k ⇘ Σₖ
+              → ↑tyᶜ0 Σₖ ⇘ Σₖ₊₁
+              ---------------------
+              → ↑tyᶜ0 Σ ⇘ Σ₀
+              → Σ₀ ↑tyᶜ #S k ⇘ Σₖ₊₁
+↑tyᶜ-comm0' ↑tyᶜ-□ ↑tyᶜ-□ ↑tyᶜ-□ = ↑tyᶜ-□
+↑tyᶜ-comm0' (↑tyᶜ-τ up-t) (↑tyᶜ-τ up-t₁) (↑tyᶜ-τ up-t₂) = ↑tyᶜ-τ (↑ty-comm0' up-t up-t₁ up-t₂)
+↑tyᶜ-comm0' (↑tyᶜ-e up-e up1) (↑tyᶜ-e up-e₁ up2) (↑tyᶜ-e up-e₂ up3) = ↑tyᶜ-e (↑tyᵉ-comm0' up-e up-e₁ up-e₂) (↑tyᶜ-comm0' up1 up2 up3)

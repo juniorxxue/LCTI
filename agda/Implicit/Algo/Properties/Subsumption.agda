@@ -9,7 +9,8 @@ open import Implicit.Algo.Properties.Reflexivity
 open import Implicit.Algo.Properties.Extension
 open import Implicit.Algo.Properties.Regularity
 open import Implicit.Algo.Properties.Polarity
-open import Implicit.Algo.Properties.Strengthen
+open import Implicit.Algo.Properties.StrengthenTVar
+open import Implicit.Algo.Properties.StrengthenSVar
 open import Implicit.Algo.Properties.Weaken
 open import Implicit.Algo.Properties.Irrelevance
 open import Implicit.Algo.Properties.Trans

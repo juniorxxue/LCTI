@@ -155,6 +155,29 @@ private variable
            → A₀ ↑ty #S k ⇘ Aₖ₊₁
 ↑ty-comm0' up1 up2 up3 = ↑ty-comm' z≤n up1 up2 up3
 
+
+↑tyᵉ-comm' : k₁ #≤ k₂
+         → e₁ ↑tyᵉ k₂ ⇘ e₄
+         → e₄ ↑tyᵉ (inject₁ k₁) ⇘ e₃
+         ----------------
+         → e₁ ↑tyᵉ k₁ ⇘ e₂
+         → e₂ ↑tyᵉ #S k₂ ⇘ e₃
+↑tyᵉ-comm' lt ↑tyᵉ-lit ↑tyᵉ-lit ↑tyᵉ-lit = ↑tyᵉ-lit
+↑tyᵉ-comm' lt ↑tyᵉ-var ↑tyᵉ-var ↑tyᵉ-var = ↑tyᵉ-var
+↑tyᵉ-comm' lt (↑tyᵉ-ƛ up1) (↑tyᵉ-ƛ up2) (↑tyᵉ-ƛ up3) = ↑tyᵉ-ƛ (↑tyᵉ-comm' lt up1 up2 up3)
+↑tyᵉ-comm' lt (↑tyᵉ-app up1 up4) (↑tyᵉ-app up2 up5) (↑tyᵉ-app up3 up6) = ↑tyᵉ-app (↑tyᵉ-comm' lt up1 up2 up3) (↑tyᵉ-comm' lt up4 up5 up6)
+↑tyᵉ-comm' lt (↑tyᵉ-⦂ up1 up) (↑tyᵉ-⦂ up2 up₁) (↑tyᵉ-⦂ up3 up₂) = ↑tyᵉ-⦂ (↑tyᵉ-comm' lt up1 up2 up3) (↑ty-comm' lt up up₁ up₂)
+↑tyᵉ-comm' lt (↑tyᵉ-Λ up1) (↑tyᵉ-Λ up2) (↑tyᵉ-Λ up3) = ↑tyᵉ-Λ (↑tyᵉ-comm' (s≤s lt) up1 up2 up3)
+
+
+↑tyᵉ-comm0' : ∀ {e : Term n m} {eₖ eₖ₊₁ e₀ k}
+              → e ↑tyᵉ k ⇘ eₖ
+              → ↑tyᵉ0 eₖ ⇘ eₖ₊₁
+              ---------------------
+              → ↑tyᵉ0 e ⇘ e₀
+              → e₀ ↑tyᵉ #S k ⇘ eₖ₊₁
+↑tyᵉ-comm0' up1 up2 up3 = ↑tyᵉ-comm' z≤n up1 up2 up3
+
 ↑tm-comm' : k₁ #≤ k₂
          → e ↑tm k₂ ⇘ e₁
          → e₁ ↑tm (inject₁ k₁) ⇘ e₂
@@ -391,3 +414,10 @@ private variable
            → Y ≡ punchIn k X
            → B ≡ ‶ X
 ↑ty-var-inv-helper {B = B} {k = k} {Y = Y} {X = X} (↑ty-var {X = X'}) eq = cong ‶_ (punchIn-injective k X' X eq)
+
+
+↑ty-var-inv : ∀ {m} {X Y : Fin m} {re k : Fin (1 + m)}
+               → ‶ X ↑ty k ⇘ ‶ re
+               → re ≡ punchIn k Y
+               → X ≡ Y
+↑ty-var-inv {X = X} {Y = Y} {k = k} ↑ty-var eq = punchIn-injective k X Y eq

@@ -1,4 +1,4 @@
-module Implicit.Algo.Properties.Strengthen where
+module Implicit.Algo.Properties.StrengthenTVar where
 
 open import Implicit.Language.All
 open import Implicit.Algo.Base
@@ -6,14 +6,6 @@ open import Implicit.Algo.Properties.Extension
 open import Implicit.Algo.Properties.Shift
 open import Implicit.Algo.Properties.Id
 open import Implicit.Algo.Properties.Regularity
-
-
-postulate
-  s-strengthen=0 : Γ ,= T ⊢ A' ≤⁺ Σ' ⊣ Δ ,= T ↪ B'
-                 → ↑ty0 B ⇘ B'
-                 → ↑ty0 A ⇘ A'
-                 → ↑tyᶜ0 Σ ⇘ Σ'
-                 → Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
 
 ↑tm-↑tyᵉ-comm : e ↑tm k₁ ⇘ e₁
              → e₁ ↑tyᵉ k₂ ⇘ e₂
@@ -145,46 +137,3 @@ s-strengthen,0 : Γ , T ⋈ ⊢ A ≤⁺ Σ' ⊣ Δ , T ⋈  ↪ B
                  → ↑tmᶜ0 Σ ⇘ Σ'
                  → Γ ⋈ ⊢ A ≤⁺ Σ ⊣ Δ ⋈ ↪ B
 s-strengthen,0 s up  = s-strengthen, s (◀S⋈ ◀Z) (◀S⋈ ◀Z) up
-
-
-
-◀=-unique : Γ ◀ k =⇘ Γ'
-          → Γ ◀ k =⇘ Δ'
-          → Γ' ≡ Δ'
-◀=-unique ◀Z ◀Z = refl
-◀=-unique (◀S, new1 up) (◀S, new2 up₁) with refl ← ◀=-unique new1 new2
-                                       with refl ← ↑ty-unique-inver up up₁ = refl
-◀=-unique (◀S^ new1) (◀S^ new2) with refl ← ◀=-unique new1 new2 = refl
-◀=-unique (◀S∙ new1) (◀S∙ new2) with refl ← ◀=-unique new1 new2 = refl
-◀=-unique (◀S= new1 x) (◀S= new2 x₁) with refl ← ◀=-unique new1 new2
-                                     with refl ← ↑ty-unique-inver x x₁ = refl
-◀=-unique (◀S⋈ new1) (◀S⋈ new2) with refl ← ◀=-unique new1 new2 = refl
-
-ss-strengthen= : Γ ⊢ A' ⌞ ≤ ⌝ B' ⊣ Δ
-               → Γ ◀ k =⇘ Γ'
-              → Δ ◀ k =⇘ Δ'
-              → A ↑ty k ⇘ A'
-              → B ↑ty k ⇘ B'
-              → Γ' ⊢ A ⌞ ≤ ⌝ B ⊣ Δ'
-
-ss-strengthen= ss newΓ newΔ upA upB = {!!}
-
-
-s-strengthen= : Γ ⊢ A' ≤⁺ Σ' ⊣ Δ ↪ B'
-              → Γ ◀ k =⇘ Γ'
-              → Δ ◀ k =⇘ Δ'
-              → A ↑ty k ⇘ A'
-              → B ↑ty k ⇘ B'
-              → Σ ↑tyᶜ k ⇘ Σ'
-              → Γ' ⊢ A ≤⁺ Σ ⊣ Δ' ↪ B
-s-strengthen= (s-empty regΓ cloA x) newΓ newΔ upA upB ↑tyᶜ-□
-  with refl ← ◀=-unique newΓ newΔ = s-empty (sregular-strengthen= regΓ newΓ) (⊢c-strengthen= cloA newΓ upA) (≫-strengthen= x regΓ newΔ upA upB)
-s-strengthen= (s-type ss) newΓ newΔ upA upB (↑tyᶜ-τ up-t)
-  with refl ← ↑ty-unique-inver upB up-t = s-type (ss-strengthen= ss newΓ newΔ upA up-t)
-s-strengthen= (s-term-c cloA ap ⊢e s) newΓ newΔ (↑ty-arr upA upA₁) (↑ty-arr upB upB₁) (↑tyᶜ-e up-e upΣ)
-  with refl ← ⊢id0 ⊢e
-  = s-term-c (⊢c-strengthen= cloA newΓ upA) (≫-strengthen= ap (s-env-in s) newΓ upA upB) {!!} (s-strengthen= s newΓ newΔ upA₁ upB₁ upΣ)
-s-strengthen= (s-term-o opnA ⊢e ss s) newΓ newΔ (↑ty-arr upA upA₁) (↑ty-arr upB upB₁) (↑tyᶜ-e up-e upΣ)
-  = s-term-o {!⊢o-strengthen=!} {!!} {!!} {!!}
-s-strengthen= (s-∀l s upᶜ upᵉ upC upD) newΓ newΔ (↑ty-∀ upA) (↑ty-arr upB upB₁) (↑tyᶜ-e up-e upΣ)
-  = s-∀l (s-strengthen= s (◀S^ newΓ) (◀S= newΔ {!!}) upA {!!} {!!}) {!!} {!!} {!!} {!!}

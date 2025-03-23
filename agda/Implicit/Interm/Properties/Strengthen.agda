@@ -40,11 +40,6 @@ t-strengthen,0 : Γ , T ⊢ j # e' ⦂ A
                → Γ ⊢ j # e ⦂ A
 t-strengthen,0 ⊢e up = t-strengthen, ⊢e ◀Z up
 
-↑ty-var-inv : ∀ {m} {X Y : Fin m} {re k : Fin (1 + m)}
-               → ‶ X ↑ty k ⇘ ‶ re
-               → re ≡ punchIn k Y
-               → X ≡ Y
-↑ty-var-inv {X = X} {Y = Y} {k = k} ↑ty-var eq = punchIn-injective k X Y eq
 
 -- sometimes, we need a shifted over environments, k εᵍ Γ
 s-strengthen= : Γ ⊢ j # A' ⌞ ≤ ⌝ B'
@@ -77,29 +72,6 @@ s-strengthen= (s-∀l {B = B} s ic fd upC upD) newΓ (↑ty-∀ upA) (↑ty-arr 
       (↑ty-arr (↑ty-comm0' upB upC upA′) (↑ty-comm0' upB₁ upD upB′))) ic (↑ty-find0' fd upA) upA′ upB′
 s-strengthen= (s-svar-l x inΔ) newΓ ↑ty-var upB = s-svar-l (sregular-strengthen= x newΓ) (∋:=-strengthen=-reg x inΔ newΓ upB)
 s-strengthen= (s-svar-r x inΔ) newΓ upA ↑ty-var = s-svar-r (sregular-strengthen= x newΓ) (∋:=-strengthen=-reg x inΔ newΓ upA)
-
-⊢r-◀-↑ty-surjective : Γ ⊢r A
-                    → Γ ◀ k =⇘ Γ'
-                    → ∃[ pA ](pA ↑ty k ⇘ A)
-⊢r-◀-↑ty-surjective regA newΓ = ↑ty-surjective (⊢r-¬ε regA (◀=-∋=' newΓ))
-
-∋⦂-strengthen= : Γ ∋ x ⦂ A'
-               → TRegular Γ
-              → Γ ◀ k =⇘ Γ'
-              → A ↑ty k ⇘ A'
-              → Γ' ∋ x ⦂ A
-∋⦂-strengthen= Z (reg-S, regΓ regA) (◀S, newΓ up) upA with refl ← ↑ty-unique-inver upA up = Z
-∋⦂-strengthen= (S, inΓ) (reg-S, regΓ regA) (◀S, newΓ up) upA = S, (∋⦂-strengthen= inΓ regΓ newΓ upA)
-∋⦂-strengthen= (S∙ inΓ up) (reg-S∙ regΓ) (◀S∙ newΓ) upA
-  with regA ← ∋⦂-⊢r regΓ inΓ
-  with ⟨ pA , uppA ⟩ ← ⊢r-◀-↑ty-surjective regA newΓ = S∙ (∋⦂-strengthen= inΓ regΓ newΓ uppA) (↑ty-comm1 upA up uppA)
-∋⦂-strengthen= (S^ inΓ up) (reg-S^ regΓ) (◀S^ newΓ) upA
-  with regA ← ∋⦂-⊢r regΓ inΓ
-  with ⟨ pA , uppA ⟩ ← ⊢r-◀-↑ty-surjective regA newΓ = S^ (∋⦂-strengthen= inΓ regΓ newΓ uppA) (↑ty-comm1 upA up uppA)
-∋⦂-strengthen= (S= inΓ up) (reg-S= regΓ regA) ◀Z upA with refl ← ↑ty-unique-inver up upA = inΓ
-∋⦂-strengthen= (S= inΓ up) (reg-S= regΓ regA) (◀S= newΓ x) upA
-  with regA ← ∋⦂-⊢r regΓ inΓ
-  with ⟨ pA , uppA ⟩ ← ⊢r-◀-↑ty-surjective regA newΓ = S= (∋⦂-strengthen= inΓ regΓ newΓ uppA) (↑ty-comm1 upA up uppA)
 
 
 t-strengthen= : Γ ⊢ j # e' ⦂ A'

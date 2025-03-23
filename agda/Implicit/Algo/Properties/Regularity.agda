@@ -55,6 +55,10 @@ s-env-in (s-term-o opnA ⊢e x s) = ss-env-in x
 s-env-in (s-∀l s upᶜ upᵉ upC upD) with s-env-in s
 ... | reg-S^ r = r
 
+s-env-out : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
+          → SRegular Δ
+s-env-out s = ⊆-regular (s-env-in s) (s-⊆ s)
+
 inst-env-out : [ A / X ] Γ ⟹ Δ
              → SRegular Δ
 inst-env-out (⟹^0 up regA env) = reg-S= env regA

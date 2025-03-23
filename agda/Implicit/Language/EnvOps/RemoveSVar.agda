@@ -64,6 +64,8 @@ data _∋='_ : Env n m → Fin m → Set where
 ∋∙-strengthen= {k = #S k} {#S X} (S^ inΓ) (◀S^ newΓ) = S^ (∋∙-strengthen= inΓ newΓ)
 ∋∙-strengthen= (S⋈ inΓ) (◀S⋈ newΓ) = S⋈ (∋∙-strengthen= inΓ newΓ)
 
+
+
 ∋=-strengthen= : Γ ∋= punchIn k X
       → Γ ◀ k =⇘ Γ'
       → Γ' ∋= X
@@ -73,6 +75,16 @@ data _∋='_ : Env n m → Fin m → Set where
 ∋=-strengthen= {k = #S k} {#S X} (S∙ inΓ) (◀S∙ newΓ) = S∙ (∋=-strengthen= inΓ newΓ)
 ∋=-strengthen= {k = #S k} {#S X} (S^ inΓ) (◀S^ newΓ) = S^ (∋=-strengthen= inΓ newΓ)
 ∋=-strengthen= {k = #S k} {#S X} (S= inΓ) (◀S= newΓ x) = S= (∋=-strengthen= inΓ newΓ)
+
+∋^-strengthen= : Γ ∋^ punchIn k X
+      → Γ ◀ k =⇘ Γ'
+      → Γ' ∋^ X
+∋^-strengthen= {k = #0} {#0} (S= inΓ) ◀Z = inΓ
+∋^-strengthen= {k = #0} {#S X} (S= inΓ) ◀Z = inΓ
+∋^-strengthen= {k = #S k} {#0} Z (◀S^ newΓ) = Z
+∋^-strengthen= {k = #S k} {#S X} (S∙ inΓ) (◀S∙ newΓ) = S∙ (∋^-strengthen= inΓ newΓ)
+∋^-strengthen= {k = #S k} {#S X} (S^ inΓ) (◀S^ newΓ) = S^ (∋^-strengthen= inΓ newΓ)
+∋^-strengthen= {k = #S k} {#S X} (S= inΓ) (◀S= newΓ x) = S= (∋^-strengthen= inΓ newΓ)
 
 ∋:=-strengthen=' : Γ ∋ punchIn k X := A'
         → Γ ◀ k =⇘ Γ'
@@ -146,6 +158,8 @@ data _∋='_ : Env n m → Fin m → Set where
   with k¬inA ← εᵍ-:=-¬ε ninΓ inΓ
   with ⟨ preA , uptoA ⟩ ← ↑ty-surjective k¬inA = S= (∋:=-strengthen= inΓ ninΓ upΓ uptoA) (↑ty-comm1 upA up uptoA)
 
+
+
 ⊢r-strengthen= : Γ ⊢r A'
                → Γ ◀ k =⇘ Γ'
                → A ↑ty k ⇘ A'
@@ -172,6 +186,15 @@ data _∋='_ : Env n m → Fin m → Set where
 ⊢c-strengthen= (⊢c-arr cloA cloA₁) newΓ (↑ty-arr upA upA₁) = ⊢c-arr (⊢c-strengthen= cloA newΓ upA)
                                                                     (⊢c-strengthen= cloA₁ newΓ upA₁)
 ⊢c-strengthen= (⊢c-∀ cloA) newΓ (↑ty-∀ upA) = ⊢c-∀ (⊢c-strengthen= cloA (◀S∙ newΓ) upA)
+
+⊢o-strengthen= : Γ ⊢o A'
+               → Γ ◀ k =⇘ Γ'
+               → A ↑ty k ⇘ A'
+               → Γ' ⊢o A
+⊢o-strengthen= (⊢o-var-^ x) newΓ ↑ty-var = ⊢o-var-^ (∋^-strengthen= x newΓ)
+⊢o-strengthen= (⊢o-arr-l opnA) newΓ (↑ty-arr upA upA₁) = ⊢o-arr-l (⊢o-strengthen= opnA newΓ upA)
+⊢o-strengthen= (⊢o-arr-r opnA) newΓ (↑ty-arr upA upA₁) = ⊢o-arr-r (⊢o-strengthen= opnA newΓ upA₁)
+⊢o-strengthen= (⊢o-∀ opnA) newΓ (↑ty-∀ upA) = ⊢o-∀ (⊢o-strengthen= opnA (◀S∙ newΓ) upA)
 
 tregular-strengthen= : TRegular Γ
                      → Γ ◀ k =⇘ Γ'
@@ -205,3 +228,28 @@ sregular-strengthen= (reg-S= sreg regA) (◀S= newΓ x) = reg-S= (sregular-stren
 ≫-strengthen= (grd-arr grd grd₁) regΓ newΓ (↑ty-arr upA upA₁) (↑ty-arr upB upB₁) = grd-arr (≫-strengthen= grd regΓ newΓ upA upB)
                                                                                            (≫-strengthen= grd₁ regΓ newΓ upA₁ upB₁)
 ≫-strengthen= (grd-∀ grd) regΓ newΓ (↑ty-∀ upA) (↑ty-∀ upB) = grd-∀ (≫-strengthen= grd (reg-S∙ regΓ) (◀S∙ newΓ) upA upB)
+
+-- aux lemmas
+⊢r-◀-↑ty-surjective : Γ ⊢r A
+                    → Γ ◀ k =⇘ Γ'
+                    → ∃[ pA ](pA ↑ty k ⇘ A)
+⊢r-◀-↑ty-surjective regA newΓ = ↑ty-surjective (⊢r-¬ε regA (◀=-∋=' newΓ))
+
+
+∋⦂-strengthen= : Γ ∋ x ⦂ A'
+               → TRegular Γ
+              → Γ ◀ k =⇘ Γ'
+              → A ↑ty k ⇘ A'
+              → Γ' ∋ x ⦂ A
+∋⦂-strengthen= Z (reg-S, regΓ regA) (◀S, newΓ up) upA with refl ← ↑ty-unique-inver upA up = Z
+∋⦂-strengthen= (S, inΓ) (reg-S, regΓ regA) (◀S, newΓ up) upA = S, (∋⦂-strengthen= inΓ regΓ newΓ upA)
+∋⦂-strengthen= (S∙ inΓ up) (reg-S∙ regΓ) (◀S∙ newΓ) upA
+  with regA ← ∋⦂-⊢r regΓ inΓ
+  with ⟨ pA , uppA ⟩ ← ⊢r-◀-↑ty-surjective regA newΓ = S∙ (∋⦂-strengthen= inΓ regΓ newΓ uppA) (↑ty-comm1 upA up uppA)
+∋⦂-strengthen= (S^ inΓ up) (reg-S^ regΓ) (◀S^ newΓ) upA
+  with regA ← ∋⦂-⊢r regΓ inΓ
+  with ⟨ pA , uppA ⟩ ← ⊢r-◀-↑ty-surjective regA newΓ = S^ (∋⦂-strengthen= inΓ regΓ newΓ uppA) (↑ty-comm1 upA up uppA)
+∋⦂-strengthen= (S= inΓ up) (reg-S= regΓ regA) ◀Z upA with refl ← ↑ty-unique-inver up upA = inΓ
+∋⦂-strengthen= (S= inΓ up) (reg-S= regΓ regA) (◀S= newΓ x) upA
+  with regA ← ∋⦂-⊢r regΓ inΓ
+  with ⟨ pA , uppA ⟩ ← ⊢r-◀-↑ty-surjective regA newΓ = S= (∋⦂-strengthen= inΓ regΓ newΓ uppA) (↑ty-comm1 upA up uppA)

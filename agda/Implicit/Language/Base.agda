@@ -40,7 +40,7 @@ data Term : ℕ → ℕ → Set where
 variable
   e  e' e* : Term n m
   e% e%' e₁% e₂% : Term n m
-  e₁  e₂  : Term n m
+  e₁  e₂  e₃ e₄ : Term n m
   e₁' e₂' : Term n m
   g : Term n m -- reserved for generic consumers
 
