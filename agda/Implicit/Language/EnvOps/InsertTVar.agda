@@ -46,3 +46,77 @@ data _⨟_▶_,_⇘_⨟_ : Env n m → Env n m → Fin (1 + n) → Type m → En
       → Γ ,^ ⨟ Δ ,= A ▶ k , T' ⇘ Γ' ,^ ⨟ Δ' ,= A
   ▶S⋈ : Γ ⨟ Δ ▶ k , T  ⇘ Γ' ⨟ Δ'
       → Γ ⋈ ⨟ Δ ⋈ ▶ k , T  ⇘ Γ' ⋈ ⨟ Δ' ⋈
+
+∋∙-weaken, : Γ ∋∙ X
+           → Γ ▶ k , T ⇘ Γ'
+           → Γ' ∋∙ X
+∋∙-weaken, Z (▶Z regA) = S, Z
+∋∙-weaken, Z (▶S∙ new x) = Z
+∋∙-weaken, (S, inΓ) (▶Z regA) = S, (S, inΓ)
+∋∙-weaken, (S, inΓ) (▶S, new) = S, (∋∙-weaken, inΓ new)
+∋∙-weaken, (S∙ inΓ) (▶Z regA) = S, (S∙ inΓ)
+∋∙-weaken, (S∙ inΓ) (▶S∙ new x) = S∙ (∋∙-weaken, inΓ new)
+∋∙-weaken, (S= inΓ) (▶Z regA) = S, (S= inΓ)
+∋∙-weaken, (S= inΓ) (▶S= new x) = S= (∋∙-weaken, inΓ new)
+∋∙-weaken, (S^ inΓ) (▶Z regA) = S, (S^ inΓ)
+∋∙-weaken, (S^ inΓ) (▶S^ new x) = S^ (∋∙-weaken, inΓ new)
+∋∙-weaken, (S⋈ inΓ) (▶Z regA) = S, (S⋈ inΓ)
+∋∙-weaken, (S⋈ inΓ) (▶S⋈ new) = S⋈ (∋∙-weaken, inΓ new)
+
+
+∋:=-weaken, : Γ ∋ X := A
+            → Γ ▶ k , T ⇘ Γ'
+            → Γ' ∋ X := A
+∋:=-weaken, (Z up) (▶Z regA) = {!!}
+∋:=-weaken, (Z up) (▶S= new x) = Z up
+∋:=-weaken, (S∙ inΓ up) (▶Z regA) = {!!}
+∋:=-weaken, (S∙ inΓ up) (▶S∙ new x) = S∙ (∋:=-weaken, inΓ new) up
+∋:=-weaken, (S^ inΓ up) (▶Z regA) = {!!}
+∋:=-weaken, (S^ inΓ up) (▶S^ new x) = S^ (∋:=-weaken, inΓ new) up
+∋:=-weaken, (S= inΓ up) (▶Z regA) = {!!}
+∋:=-weaken, (S= inΓ up) (▶S= new x) = S= (∋:=-weaken, inΓ new) up
+
+∋⦂-weaken, : Γ ∋ x ⦂ A
+           → Γ ▶ k , T ⇘ Γ'
+           → Γ' ∋ punchIn k x ⦂ A
+
+
+⊢r-weaken, : Γ ⊢r A
+           → Γ ▶ k , T ⇘ Γ'
+           → Γ' ⊢r A
+
+
+⊢c-weaken, : Γ ⊢c A
+           → Γ ▶ k , T ⇘ Γ'
+           → Γ' ⊢c A
+
+⊢o-weaken, : Γ ⊢o A
+           → Γ ▶ k , T ⇘ Γ'
+           → Γ' ⊢o A
+
+tregular-weaken, : TRegular Γ
+                 → Γ ▶ k , T ⇘ Γ'
+                 → TRegular Γ'
+tregular-weaken, reg-Z (▶Z regA) = reg-S, reg-Z regA
+tregular-weaken, (reg-S, regΓ regA) (▶Z regA₁) = reg-S, (reg-S, regΓ regA) regA₁
+tregular-weaken, (reg-S, regΓ regA) (▶S, new) = reg-S, (tregular-weaken, regΓ new) (⊢r-weaken, regA new)
+tregular-weaken, (reg-S∙ regΓ) (▶Z regA) = reg-S, (reg-S∙ regΓ) regA
+tregular-weaken, (reg-S∙ regΓ) (▶S∙ new x) = reg-S∙ (tregular-weaken, regΓ new)
+tregular-weaken, (reg-S^ regΓ) (▶Z regA) = reg-S, (reg-S^ regΓ) regA
+tregular-weaken, (reg-S^ regΓ) (▶S^ new x) = reg-S^ (tregular-weaken, regΓ new)
+tregular-weaken, (reg-S= regΓ regA) (▶Z regA₁) = reg-S, (reg-S= regΓ regA) regA₁
+tregular-weaken, (reg-S= regΓ regA) (▶S= new x) = reg-S= (tregular-weaken, regΓ new) (⊢r-weaken, regA new)
+
+
+sregular-weaken, : SRegular Γ
+                 → Γ ▶ k , T ⇘ Γ'
+                 → SRegular Γ'
+
+
+≫-weaken, : Γ ≫ A ⇘ B
+          → Γ ▶ k , T ⇘ Γ'
+          → Γ' ≫ A ⇘ B
+
+inst-weaken, : [ A / X ] Γ ⟹ Δ
+             → Γ ⨟ Δ ▶ k , T ⇘ Γ' ⨟ Δ'
+             → [ A / X ] Γ' ⟹ Δ'

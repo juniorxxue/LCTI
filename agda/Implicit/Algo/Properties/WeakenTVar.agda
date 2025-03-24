@@ -43,42 +43,6 @@ open import Implicit.Algo.Properties.Id
 ▶,-𝕣 (▶S= new x) = ▶S= (▶,-𝕣 new) x
 ▶,-𝕣 (▶S⋈ new) = new
 
-tregular-weaken, : TRegular Γ
-                 → Γ ▶ k , T ⇘ Γ'
-                 → TRegular Γ'
-
-
-sregular-weaken, : SRegular Γ
-                 → Γ ▶ k , T ⇘ Γ'
-                 → SRegular Γ'
-
-∋∙-weaken, : Γ ∋∙ X
-           → Γ ▶ k , T ⇘ Γ'
-           → Γ' ∋∙ X
-
-∋:=-weaken, : Γ ∋ X := A
-            → Γ ▶ k , T ⇘ Γ'
-            → Γ' ∋ X := A
-
-∋⦂-weaken, : Γ ∋ x ⦂ A
-           → Γ ▶ k , T ⇘ Γ'
-           → Γ' ∋ punchIn k x ⦂ A
-
-⊢c-weaken, : Γ ⊢c A
-           → Γ ▶ k , T ⇘ Γ'
-           → Γ' ⊢c A
-
-⊢o-weaken, : Γ ⊢o A
-           → Γ ▶ k , T ⇘ Γ'
-           → Γ' ⊢o A
-
-≫-weaken, : Γ ≫ A ⇘ B
-          → Γ ▶ k , T ⇘ Γ'
-          → Γ' ≫ A ⇘ B
-
-inst-weaken, : [ A / X ] Γ ⟹ Δ
-             → Γ ⨟ Δ ▶ k , T ⇘ Γ' ⨟ Δ'
-             → [ A / X ] Γ' ⟹ Δ'
 
 ▶⨟,-Ω-exist : Γ ⨟ Δ ▶ k , T ⇘ Γ' ⨟ Δ'
             → Γ ⊆ Ω
@@ -160,7 +124,11 @@ s-weaken, (s-term-o opnA ⊢e ss s) (↑tmᶜ-e up-e upΣ) new
              (t-weaken, ⊢e (▶,-𝕣 (▶⨟,-▶,-l new)) ↑tmᶜ-□ up-e)
              (ss-weaken, ss new1)
              (s-weaken, s upΣ new2)
-s-weaken, (s-∀l s upᶜ upᵉ upC upD) upΣ new = {!!}
+s-weaken, {T = T} (s-∀l s upᶜ upᵉ upC upD) (↑tmᶜ-e {e' = e'} {Σ' = Σ'} up-e upΣ) new
+  with ⟨ T' , upT ⟩ ← ↑ty0-total T
+  with ⟨ Σ″ , upΣ' ⟩ ← ↑tyᶜ0-total Σ'
+  with ⟨ e″ , upe' ⟩ ← ↑tyᵉ0-total e'
+  = s-∀l (s-weaken, s (↑tmᶜ-e (↑tm-↑tyᵉ-comm up-e upe' upᵉ) (↑tmᶜ-↑tyᶜ-comm upΣ upΣ' upᶜ)) (▶S^= new upT)) upΣ' upe' upC upD
 
 s-weaken,0 : Γ ⋈ ⊢ A ≤⁺ Σ ⊣ Δ ⋈ ↪ B
            → ↑tmᶜ0 Σ ⇘ Σ'
