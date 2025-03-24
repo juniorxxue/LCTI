@@ -135,17 +135,26 @@ def print_lemmas(lemmas_dict, search_substr):
         console.print("[bold red]No lemmas found matching your criteria.[/bold red]")
         return
 
-    sorted_lemmas = sorted(filtered.items(), key=lambda x: x[0])
+    # Sort lemmas based on the first occurrence's file (and line number)
+    sorted_lemmas = sorted(
+        filtered.items(),
+        key=lambda item: min(item[1], key=lambda occ: (occ[0], occ[1]))
+    )
 
     table = Table(box=box.SQUARE, show_header=True, show_lines=True)
     table.add_column("No.", style="dim", no_wrap=True, justify="right")
     table.add_column("Lemma Statement", style="white")
     table.add_column("Occurrences", style="green")
 
+    # Prefix to cut from the file path
+    path_prefix = "/Users/xuxue/Dropbox/research/contextual-polymorphic/agda/Implicit/"
     idx = 1
     for stmt, occs in sorted_lemmas:
         styled = parse_lemma_text(stmt)
-        occ_str = "\n".join(f"{p}:{ln}" for p, ln in occs)
+        occ_str = "\n".join(
+            f"{p[len(path_prefix):] if p.startswith(path_prefix) else p}:{ln}"
+            for p, ln in occs
+        )
         table.add_row(str(idx), styled, occ_str)
         idx += 1
 
