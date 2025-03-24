@@ -118,6 +118,8 @@ data _⨟_▶_,^⇘_⨟_ : Env n m → Env n m → Fin (1 + m) → Env n (1 + m)
 ∋^-weaken^ (S^ inΓ) (▶S^ newΓ) = S^ (∋^-weaken^ inΓ newΓ)
 ∋^-weaken^ (S= inΓ) ▶Z = S^ (S= inΓ)
 ∋^-weaken^ (S= inΓ) (▶S= newΓ upA) = S= (∋^-weaken^ inΓ newΓ)
+∋^-weaken^ (S, inΓ) ▶Z = S^ (S, inΓ)
+∋^-weaken^ (S, inΓ) (▶S, new upA) = S, (∋^-weaken^ inΓ new)
 
 
 ∋∙-weaken^ : Γ ∋∙ X

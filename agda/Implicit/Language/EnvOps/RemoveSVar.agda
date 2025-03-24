@@ -87,6 +87,7 @@ data _∋='_ : Env n m → Fin m → Set where
 ∋^-strengthen= {k = #S k} {#S X} (S∙ inΓ) (◀S∙ newΓ) = S∙ (∋^-strengthen= inΓ newΓ)
 ∋^-strengthen= {k = #S k} {#S X} (S^ inΓ) (◀S^ newΓ) = S^ (∋^-strengthen= inΓ newΓ)
 ∋^-strengthen= {k = #S k} {#S X} (S= inΓ) (◀S= newΓ x) = S= (∋^-strengthen= inΓ newΓ)
+∋^-strengthen= (S, inΓ) (◀S, new up) = S, (∋^-strengthen= inΓ new)
 
 ∋:=-strengthen=' : Γ ∋ punchIn k X := A'
         → Γ ◀ k =⇘ Γ'

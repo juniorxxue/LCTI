@@ -60,6 +60,8 @@ data _∋^_ : Env n m → Fin m → Set where
      → Δ ,= B ∋^ #S k
   S^ : Δ ∋^ k
      → Δ ,^ ∋^ #S k
+  S, : Δ ∋^ k  -- this entry is used for proving weakening of term variables in subtyping
+     → Δ , A ∋^ k
 
 -- lookup an entry: universal variable
 -- works on either typing or subtyping env

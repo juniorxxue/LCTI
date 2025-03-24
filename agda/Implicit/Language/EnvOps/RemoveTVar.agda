@@ -92,6 +92,8 @@ data _◀_,⇘_ : Env (1 + n) m → Fin (1 + n) → Env n m → Set where
 ∋^-strengthen, (S∙ inΓ) (◀S∙ newΓ) = S∙ (∋^-strengthen, inΓ newΓ)
 ∋^-strengthen, (S= inΓ) (◀S= newΓ) = S= (∋^-strengthen, inΓ newΓ)
 ∋^-strengthen, (S^ inΓ) (◀S^ newΓ) = S^ (∋^-strengthen, inΓ newΓ)
+∋^-strengthen, (S, inΓ) ◀Z = inΓ
+∋^-strengthen, (S, inΓ) (◀S, new) = S, (∋^-strengthen, inΓ new)
 
 ∋=-strengthen, : Γ ∋= X
        → Γ ◀ k ,⇘ Γ'
