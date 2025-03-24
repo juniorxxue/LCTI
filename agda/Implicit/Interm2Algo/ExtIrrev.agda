@@ -211,6 +211,9 @@ data _⊆_w/t_w/c_ : Env n m → Env n m → Type m → Counter → Set where
 ◎-∋∙ (S= inΓ) ◎Z = S^ inΓ
 ◎-∋∙ (S= inΓ) (◎S= newΓ) = S= (◎-∋∙ inΓ newΓ)
 ◎-∋∙ (S^ inΓ) (◎S^ newΓ) = S^ (◎-∋∙ inΓ newΓ)
+◎-∋∙ (S, inΓ) (◎S, newΓ) = S, (◎-∋∙ inΓ newΓ)
+
+
 
 ◎-∋=-≢ : Γ ∋= X
        → Γ ◎ k ⇘ Γ'
@@ -222,6 +225,7 @@ data _⊆_w/t_w/c_ : Env n m → Env n m → Type m → Counter → Set where
 ◎-∋=-≢ (S^ inΓ) (◎S^ newΓ) neq = S^ (◎-∋=-≢ inΓ newΓ (≢-pred neq))
 ◎-∋=-≢ (S= inΓ) ◎Z neq = S^ inΓ
 ◎-∋=-≢ (S= inΓ) (◎S= newΓ) neq = S= (◎-∋=-≢ inΓ newΓ (≢-pred neq))
+◎-∋=-≢ (S, inΓ) (◎S, newΓ) neq = S, (◎-∋=-≢ inΓ newΓ neq)
 
 ◎-⊢c : Γ ⊢c A
      → Γ ◎ k ⇘ Γ'
@@ -240,6 +244,7 @@ data _⊆_w/t_w/c_ : Env n m → Env n m → Type m → Counter → Set where
 ◎-total (S∙ inΩ) = ⟨ ◎-total inΩ .proj₁ ,∙ , ◎S∙ (◎-total inΩ .proj₂) ⟩
 ◎-total (S^ inΩ) = ⟨ ◎-total inΩ .proj₁ ,^ , ◎S^ (◎-total inΩ .proj₂) ⟩
 ◎-total (S= {B = B} inΩ) = ⟨ ◎-total inΩ .proj₁ ,= B , ◎S= (◎-total inΩ .proj₂) ⟩
+◎-total (S, {A = A} inΩ) = ⟨ (◎-total inΩ .proj₁ , A) , ◎S, (◎-total inΩ .proj₂) ⟩
 
 ◎-∋= : Γ ◎ k ⇘ Γ'
      → Γ ∋= k
@@ -247,6 +252,7 @@ data _⊆_w/t_w/c_ : Env n m → Env n m → Type m → Counter → Set where
 ◎-∋= (◎S∙ newΓ) = S∙ (◎-∋= newΓ)
 ◎-∋= (◎S= newΓ) = S= (◎-∋= newΓ)
 ◎-∋= (◎S^ newΓ) = S^ (◎-∋= newΓ)
+◎-∋= (◎S, newΓ) = S, (◎-∋= newΓ)
 
 ◎-⊢r : Γ ⊢r A
      → Γ ◎ k ⇘ Γ'
@@ -271,6 +277,7 @@ data _⊆_w/t_w/c_ : Env n m → Env n m → Type m → Counter → Set where
 ◎-unique (◎S∙ new1) (◎S∙ new2) = cong _,∙ (◎-unique new1 new2)
 ◎-unique (◎S= new1) (◎S= new2) = cong₂ _,=_ (◎-unique new1 new2) refl
 ◎-unique (◎S^ new1) (◎S^ new2) = cong _,^ (◎-unique new1 new2)
+◎-unique (◎S, new1) (◎S, new2) = cong₂ _,_ (◎-unique new1 new2) refl
 
 ⊆/v-irrev-^^ : Γ ⊆ Δ w/v X
              → Γ ◎ k ⇘ Γ'

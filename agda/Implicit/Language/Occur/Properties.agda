@@ -99,6 +99,7 @@ open import Implicit.Language.Occur.Base
 εᵍ-:=-¬ε (S= ninΓ x x₁) (Z up) with ↑ty-unique up x
 ... | refl = ¬ε-↑ty0 x₁ x
 εᵍ-:=-¬ε (S= ninΓ x x₁) (S= inΓ up) = ¬ε-↑ty0 (εᵍ-:=-¬ε ninΓ inΓ) up
+εᵍ-:=-¬ε (S, x ninΓ) (S, inΓ) = εᵍ-:=-¬ε ninΓ inΓ
 
 
 εᵍ-:=-false : Γ ∋ X := A

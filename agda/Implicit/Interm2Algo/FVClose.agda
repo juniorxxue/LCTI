@@ -54,6 +54,7 @@ mkMis-hclose {m = suc m} {Γ = Γ ⋈} = hclo-S⋈ mkMis-hclose
 ∋=-hclose (S∙ inΓ) = hclo-S∙-mis (∋=-hclose inΓ)
 ∋=-hclose (S^ inΓ) = hclo-S^ (∋=-hclose inΓ)
 ∋=-hclose (S= inΓ) = hclo-S=-mis (∋=-hclose inΓ)
+∋=-hclose (S, inΓ) = hclo-S, (∋=-hclose inΓ)
 
 orHit-hclose : HClosed Γ H₁
              → HClosed Γ H₂

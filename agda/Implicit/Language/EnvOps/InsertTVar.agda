@@ -67,30 +67,33 @@ data _⨟_▶_,_⇘_⨟_ : Env n m → Env n m → Fin (1 + n) → Type m → En
 ∋:=-weaken, : Γ ∋ X := A
             → Γ ▶ k , T ⇘ Γ'
             → Γ' ∋ X := A
-∋:=-weaken, (Z up) (▶Z regA) = {!!}
+∋:=-weaken, (Z up) (▶Z regA) = S, (Z up)
 ∋:=-weaken, (Z up) (▶S= new x) = Z up
-∋:=-weaken, (S∙ inΓ up) (▶Z regA) = {!!}
+∋:=-weaken, (S∙ inΓ up) (▶Z regA) = S, (S∙ inΓ up)
 ∋:=-weaken, (S∙ inΓ up) (▶S∙ new x) = S∙ (∋:=-weaken, inΓ new) up
-∋:=-weaken, (S^ inΓ up) (▶Z regA) = {!!}
+∋:=-weaken, (S^ inΓ up) (▶Z regA) = S, (S^ inΓ up)
 ∋:=-weaken, (S^ inΓ up) (▶S^ new x) = S^ (∋:=-weaken, inΓ new) up
-∋:=-weaken, (S= inΓ up) (▶Z regA) = {!!}
+∋:=-weaken, (S= inΓ up) (▶Z regA) = S, (S= inΓ up)
 ∋:=-weaken, (S= inΓ up) (▶S= new x) = S= (∋:=-weaken, inΓ new) up
+∋:=-weaken, (S, inΓ) (▶Z regA) = S, (S, inΓ)
+∋:=-weaken, (S, inΓ) (▶S, new) = S, (∋:=-weaken, inΓ new)
 
-∋⦂-weaken, : Γ ∋ x ⦂ A
+postulate
+  ∋⦂-weaken, : Γ ∋ x ⦂ A
            → Γ ▶ k , T ⇘ Γ'
            → Γ' ∋ punchIn k x ⦂ A
 
 
-⊢r-weaken, : Γ ⊢r A
+  ⊢r-weaken, : Γ ⊢r A
            → Γ ▶ k , T ⇘ Γ'
            → Γ' ⊢r A
 
 
-⊢c-weaken, : Γ ⊢c A
+  ⊢c-weaken, : Γ ⊢c A
            → Γ ▶ k , T ⇘ Γ'
            → Γ' ⊢c A
 
-⊢o-weaken, : Γ ⊢o A
+  ⊢o-weaken, : Γ ⊢o A
            → Γ ▶ k , T ⇘ Γ'
            → Γ' ⊢o A
 
@@ -107,16 +110,16 @@ tregular-weaken, (reg-S^ regΓ) (▶S^ new x) = reg-S^ (tregular-weaken, regΓ n
 tregular-weaken, (reg-S= regΓ regA) (▶Z regA₁) = reg-S, (reg-S= regΓ regA) regA₁
 tregular-weaken, (reg-S= regΓ regA) (▶S= new x) = reg-S= (tregular-weaken, regΓ new) (⊢r-weaken, regA new)
 
-
-sregular-weaken, : SRegular Γ
+postulate
+  sregular-weaken, : SRegular Γ
                  → Γ ▶ k , T ⇘ Γ'
                  → SRegular Γ'
 
 
-≫-weaken, : Γ ≫ A ⇘ B
+  ≫-weaken, : Γ ≫ A ⇘ B
           → Γ ▶ k , T ⇘ Γ'
           → Γ' ≫ A ⇘ B
 
-inst-weaken, : [ A / X ] Γ ⟹ Δ
+  inst-weaken, : [ A / X ] Γ ⟹ Δ
              → Γ ⨟ Δ ▶ k , T ⇘ Γ' ⨟ Δ'
              → [ A / X ] Γ' ⟹ Δ'

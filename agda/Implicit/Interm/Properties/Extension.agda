@@ -71,6 +71,7 @@ data _⊆t_ : Env n m → Env n m → Set where
 ⊆t-∋:= (S^ inΓ up) (evar ext) = S^ (⊆t-∋:= inΓ ext) up
 ⊆t-∋:= (S^ inΓ up) (evar-sol ext regA) = S= (⊆t-∋:= inΓ ext) up
 ⊆t-∋:= (S= inΓ up) (svar ext regA) = S= (⊆t-∋:= inΓ ext) up
+⊆t-∋:= (S, inΓ) (tvar ext regA) = S, (⊆t-∋:= inΓ ext)
 
 ⊆t-∋= : Γ ∋= k
        → Γ ⊆t Δ
@@ -80,6 +81,7 @@ data _⊆t_ : Env n m → Env n m → Set where
 ⊆t-∋= (S^ inΓ) (evar ext) = S^ (⊆t-∋= inΓ ext)
 ⊆t-∋= (S^ inΓ) (evar-sol ext regA) = S= (⊆t-∋= inΓ ext)
 ⊆t-∋= (S= inΓ) (svar ext regA) = S= (⊆t-∋= inΓ ext)
+⊆t-∋= (S, inΓ) (tvar ext regA) = S, (⊆t-∋= inΓ ext)
 
 
 ⊆t-⊢r : Γ ⊢r A

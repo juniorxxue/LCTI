@@ -34,6 +34,8 @@ data _∋_:=_ : Env n m → Fin m → Type m → Set where
   S= : Δ ∋ k := A
      → (up : ↑ty0 A ⇘ A')
      → Δ ,= B ∋ #S k := A'
+  S, : Δ ∋ k := A
+     → Δ , B ∋ k := A
 
 -- lookup an entry in subtyping env: solution (simpler ver.)
 infix 3 _∋=_
@@ -45,10 +47,8 @@ data _∋=_ : Env n m → Fin m → Set where
      → Δ ,^ ∋= #S k
   S= : Δ ∋= k
      → Δ ,= B ∋= #S k
-{-
   S, : Δ ∋= k
-     → Δ , A ∋ S k
--}     
+     → Δ , A ∋= k
 
 -- lookup an entry in subtyping env: (unsolved) existential variable
 infix 3 _∋^_

@@ -75,6 +75,8 @@ data _∋='_ : Env n m → Fin m → Set where
 ∋=-strengthen= {k = #S k} {#S X} (S∙ inΓ) (◀S∙ newΓ) = S∙ (∋=-strengthen= inΓ newΓ)
 ∋=-strengthen= {k = #S k} {#S X} (S^ inΓ) (◀S^ newΓ) = S^ (∋=-strengthen= inΓ newΓ)
 ∋=-strengthen= {k = #S k} {#S X} (S= inΓ) (◀S= newΓ x) = S= (∋=-strengthen= inΓ newΓ)
+∋=-strengthen= (S, inΓ) (◀S, new up) = S, (∋=-strengthen= inΓ new)
+
 
 ∋^-strengthen= : Γ ∋^ punchIn k X
       → Γ ◀ k =⇘ Γ'
@@ -98,6 +100,8 @@ data _∋='_ : Env n m → Fin m → Set where
 ∋:=-strengthen=' {k = #S k} {#S X} (S∙ inΓ up) (◀S∙ newΓ) (S∙ inΓ' up₁) = ↑ty-comm' z≤n (∋:=-strengthen=' inΓ newΓ inΓ') up up₁
 ∋:=-strengthen=' {k = #S k} {#S X} (S^ inΓ up) (◀S^ newΓ) (S^ inΓ' up₁) = ↑ty-comm' z≤n (∋:=-strengthen=' inΓ newΓ inΓ') up up₁
 ∋:=-strengthen=' {k = #S k} {#S X} (S= inΓ up) (◀S= newΓ x) (S= inΓ' up₁) = ↑ty-comm' z≤n (∋:=-strengthen=' inΓ newΓ inΓ') up up₁
+∋:=-strengthen=' {k = #0} {#0} (S= (S, x₁) up) ◀Z (S, inΓ') with refl ← ∋:=-unique x₁ inΓ' = up
+∋:=-strengthen=' (S, inΓ) (◀S, new up) (S, inΓ') = ∋:=-strengthen=' inΓ new inΓ'
 
 ∋∙-∋='-≢ : Γ ∋=' k
          → Γ ∋∙ X
@@ -157,7 +161,7 @@ data _∋='_ : Env n m → Fin m → Set where
 ∋:=-strengthen= {k = #S k} {X = #S X} (S= inΓ up) (S= ninΓ upA₁ ¬inA) (◀S= upΓ x) upA
   with k¬inA ← εᵍ-:=-¬ε ninΓ inΓ
   with ⟨ preA , uptoA ⟩ ← ↑ty-surjective k¬inA = S= (∋:=-strengthen= inΓ ninΓ upΓ uptoA) (↑ty-comm1 upA up uptoA)
-
+∋:=-strengthen= {Γ = Γ , A} {k = k} {X = X} (S, inΓ) (S, x ¬inA) (◀S, new up) upA = S, (∋:=-strengthen= inΓ ¬inA new upA)
 
 
 ⊢r-strengthen= : Γ ⊢r A'

@@ -104,6 +104,8 @@ data _⨟_▶_,^⇘_⨟_ : Env n m → Env n m → Fin (1 + m) → Env n (1 + m)
 ∋=-weaken^ (S^ inΓ) (▶S^ newΓ) = S^ (∋=-weaken^ inΓ newΓ)
 ∋=-weaken^ (S= inΓ) ▶Z = S^ (S= inΓ)
 ∋=-weaken^ (S= inΓ) (▶S= newΓ upA) = S= (∋=-weaken^ inΓ newΓ)
+∋=-weaken^ (S, inΓ) ▶Z = S^ (S, inΓ)
+∋=-weaken^ (S, inΓ) (▶S, new upA) = S, (∋=-weaken^ inΓ new)
 
 ∋^-weaken^ : Γ ∋^ X
            → Γ ▶ k ,^⇘ Γ'
@@ -149,6 +151,8 @@ data _⨟_▶_,^⇘_⨟_ : Env n m → Env n m → Fin (1 + m) → Env n (1 + m)
 ∋:=-weaken^ (S= inΓ up) upA ▶Z = S^ (S= inΓ up) upA
 ∋:=-weaken^ (S= {A = A} inΓ up) upA (▶S= {k = k} newΓ upA₁)
   with ⟨ A' , upA' ⟩ ← ↑ty-total A k = S= (∋:=-weaken^ inΓ upA' newΓ) (↑ty-comm0 up upA upA')
+∋:=-weaken^ (S, inΓ) upA ▶Z = S^ (S, inΓ) upA
+∋:=-weaken^ (S, inΓ) upA (▶S, new upA₁) = S, (∋:=-weaken^ inΓ upA new)
 
 ⊢r-weaken^ : Γ ⊢r A
             → Γ ▶ k ,^⇘ Γ'
