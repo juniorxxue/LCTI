@@ -101,7 +101,7 @@ data _⊢_≤⁺_⊣_↪_ where
   s-empty :
       (regΓ : SRegular Δ)
     → (cloA : Δ ⊢c A)
-    → Δ ≫ A ⇘ A%
+    → (grd : Δ ≫ A ⇘ A%)
     → Δ ⊢ A ≤⁺ □ ⊣ Δ ↪ A%
 
   s-type :

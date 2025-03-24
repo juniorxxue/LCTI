@@ -68,3 +68,45 @@ open import Implicit.Algo.Base
 ↑tyᶜ-comm0' ↑tyᶜ-□ ↑tyᶜ-□ ↑tyᶜ-□ = ↑tyᶜ-□
 ↑tyᶜ-comm0' (↑tyᶜ-τ up-t) (↑tyᶜ-τ up-t₁) (↑tyᶜ-τ up-t₂) = ↑tyᶜ-τ (↑ty-comm0' up-t up-t₁ up-t₂)
 ↑tyᶜ-comm0' (↑tyᶜ-e up-e up1) (↑tyᶜ-e up-e₁ up2) (↑tyᶜ-e up-e₂ up3) = ↑tyᶜ-e (↑tyᵉ-comm0' up-e up-e₁ up-e₂) (↑tyᶜ-comm0' up1 up2 up3)
+
+
+↑tm-↑tyᵉ-comm : e ↑tm k₁ ⇘ e₁
+             → e₁ ↑tyᵉ k₂ ⇘ e₂
+             → e ↑tyᵉ k₂ ⇘ e'
+             → e' ↑tm k₁ ⇘ e₂
+↑tm-↑tyᵉ-comm ↑tm-lit ↑tyᵉ-lit ↑tyᵉ-lit = ↑tm-lit
+↑tm-↑tyᵉ-comm ↑tm-var ↑tyᵉ-var ↑tyᵉ-var = ↑tm-var
+↑tm-↑tyᵉ-comm (↑tm-ƛ up1) (↑tyᵉ-ƛ up2) (↑tyᵉ-ƛ up3) = ↑tm-ƛ (↑tm-↑tyᵉ-comm up1 up2 up3)
+↑tm-↑tyᵉ-comm (↑tm-app up1 up4) (↑tyᵉ-app up2 up5) (↑tyᵉ-app up3 up6) = ↑tm-app (↑tm-↑tyᵉ-comm up1 up2 up3) (↑tm-↑tyᵉ-comm up4 up5 up6)
+↑tm-↑tyᵉ-comm (↑tm-⦂ up1) (↑tyᵉ-⦂ up2 up) (↑tyᵉ-⦂ up3 up₁) with refl ← ↑ty-unique up₁ up = ↑tm-⦂ (↑tm-↑tyᵉ-comm up1 up2 up3)
+↑tm-↑tyᵉ-comm (↑tm-Λ up1) (↑tyᵉ-Λ up2) (↑tyᵉ-Λ up3) = ↑tm-Λ (↑tm-↑tyᵉ-comm up1 up2 up3)
+
+↑tmᶜ-↑tyᶜ-comm : Σ ↑tmᶜ k₁ ⇘ Σ₁
+               → Σ₁ ↑tyᶜ k₂ ⇘ Σ₂
+               → Σ ↑tyᶜ k₂ ⇘ Σ'
+               → Σ' ↑tmᶜ k₁ ⇘ Σ₂
+↑tmᶜ-↑tyᶜ-comm ↑tmᶜ-□ ↑tyᶜ-□ ↑tyᶜ-□ = ↑tmᶜ-□
+↑tmᶜ-↑tyᶜ-comm ↑tmᶜ-τ (↑tyᶜ-τ up-t) (↑tyᶜ-τ up-t₁) with refl ← ↑ty-unique up-t up-t₁ = ↑tmᶜ-τ
+↑tmᶜ-↑tyᶜ-comm (↑tmᶜ-e up-e up1) (↑tyᶜ-e up-e₁ up2) (↑tyᶜ-e up-e₂ up3) = ↑tmᶜ-e (↑tm-↑tyᵉ-comm up-e up-e₁ up-e₂) (↑tmᶜ-↑tyᶜ-comm up1 up2 up3)
+
+↑tmᶜ-comm' : k₁ #≤ k₂
+           → Σ ↑tmᶜ k₂ ⇘ Σ₁
+           → Σ₁ ↑tmᶜ (inject₁ k₁) ⇘ Σ₂
+           ----------------
+           → Σ ↑tmᶜ k₁ ⇘ Σ'
+           → Σ' ↑tmᶜ #S k₂ ⇘ Σ₂
+↑tmᶜ-comm' lt ↑tmᶜ-□ ↑tmᶜ-□ ↑tmᶜ-□ = ↑tmᶜ-□
+↑tmᶜ-comm' lt ↑tmᶜ-τ ↑tmᶜ-τ ↑tmᶜ-τ = ↑tmᶜ-τ
+↑tmᶜ-comm' lt (↑tmᶜ-e up-e up1) (↑tmᶜ-e up-e₁ up2) (↑tmᶜ-e up-e₂ up3) = ↑tmᶜ-e (↑tm-comm' lt up-e up-e₁ up-e₂) (↑tmᶜ-comm' lt up1 up2 up3)
+
+nonempty-↑tmᶜ' : NonEmpty Σ'
+              → Σ ↑tmᶜ k ⇘ Σ'
+              → NonEmpty Σ
+nonempty-↑tmᶜ' ne-τ ↑tmᶜ-τ = ne-τ
+nonempty-↑tmᶜ' ne-app (↑tmᶜ-e up-e upΣ) = ne-app
+
+nonempty-↑tmᶜ : NonEmpty Σ
+              → Σ ↑tmᶜ k ⇘ Σ'
+              → NonEmpty Σ'
+nonempty-↑tmᶜ ne-τ ↑tmᶜ-τ = ne-τ
+nonempty-↑tmᶜ ne-app (↑tmᶜ-e up-e upΣ) = ne-app

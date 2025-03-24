@@ -393,6 +393,15 @@ private variable
 
 
 -- generic consumer
+
+↑tm-gc : GenericConsumer e
+        → e ↑tm k ⇘ e'
+        → GenericConsumer e'
+↑tm-gc gc-i ↑tm-lit = gc-i
+↑tm-gc gc-var ↑tm-var = gc-var
+↑tm-gc gc-ann (↑tm-⦂ upe) = gc-ann
+↑tm-gc gc-tlam (↑tm-Λ upe) = gc-tlam
+
 ↑tm-gc' : GenericConsumer e'
         → e ↑tm k ⇘ e'
         → GenericConsumer e

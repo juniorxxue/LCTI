@@ -50,11 +50,12 @@ data _⊢_~t_ : Env n m → Counter × Type m → Context n m → Set where
 
 ~weaken,0 : Γ ⊢ ⟨ j , B ⟩ ~t Σ
           → ↑tmᶜ0 Σ ⇘ Σ'
+          → Γ ⊢r A
           → Γ , A ⊢ ⟨ j , B ⟩ ~t Σ'
-~weaken,0 ~Z ↑tmᶜ-□ = ~Z
-~weaken,0 ~∞ ↑tmᶜ-τ = ~∞
-~weaken,0 (~I ⊢e j~Σ) (↑tmᶜ-e up-e upΣ) = ~I (t-weaken,0 ⊢e ↑tmᶜ-□ up-e) (~weaken,0 j~Σ upΣ)
-~weaken,0 (~C ⊢e j~Σ) (↑tmᶜ-e up-e upΣ) = ~C (t-weaken,0 ⊢e ↑tmᶜ-τ up-e) (~weaken,0 j~Σ upΣ)
+~weaken,0 ~Z ↑tmᶜ-□ regA = ~Z
+~weaken,0 ~∞ ↑tmᶜ-τ regA = ~∞
+~weaken,0 (~I ⊢e j~Σ) (↑tmᶜ-e up-e upΣ) regA = ~I (t-weaken,0 ⊢e ↑tmᶜ-□ up-e regA) (~weaken,0 j~Σ upΣ regA)
+~weaken,0 (~C ⊢e j~Σ) (↑tmᶜ-e up-e upΣ) regA = ~C (t-weaken,0 ⊢e ↑tmᶜ-τ up-e regA) (~weaken,0 j~Σ upΣ regA)
 
 ~weaken^0 : Γ ⊢ ⟨ j , A ⟩ ~s Σ
           → ↑ty0 A ⇘ A'

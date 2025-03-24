@@ -7,51 +7,6 @@ open import Implicit.Algo.Properties.Shift
 open import Implicit.Algo.Properties.Id
 open import Implicit.Algo.Properties.Regularity
 
-↑tm-↑tyᵉ-comm : e ↑tm k₁ ⇘ e₁
-             → e₁ ↑tyᵉ k₂ ⇘ e₂
-             → e ↑tyᵉ k₂ ⇘ e'
-             → e' ↑tm k₁ ⇘ e₂
-↑tm-↑tyᵉ-comm ↑tm-lit ↑tyᵉ-lit ↑tyᵉ-lit = ↑tm-lit
-↑tm-↑tyᵉ-comm ↑tm-var ↑tyᵉ-var ↑tyᵉ-var = ↑tm-var
-↑tm-↑tyᵉ-comm (↑tm-ƛ up1) (↑tyᵉ-ƛ up2) (↑tyᵉ-ƛ up3) = ↑tm-ƛ (↑tm-↑tyᵉ-comm up1 up2 up3)
-↑tm-↑tyᵉ-comm (↑tm-app up1 up4) (↑tyᵉ-app up2 up5) (↑tyᵉ-app up3 up6) = ↑tm-app (↑tm-↑tyᵉ-comm up1 up2 up3) (↑tm-↑tyᵉ-comm up4 up5 up6)
-↑tm-↑tyᵉ-comm (↑tm-⦂ up1) (↑tyᵉ-⦂ up2 up) (↑tyᵉ-⦂ up3 up₁) with refl ← ↑ty-unique up₁ up = ↑tm-⦂ (↑tm-↑tyᵉ-comm up1 up2 up3)
-↑tm-↑tyᵉ-comm (↑tm-Λ up1) (↑tyᵉ-Λ up2) (↑tyᵉ-Λ up3) = ↑tm-Λ (↑tm-↑tyᵉ-comm up1 up2 up3)
-
-↑tmᶜ-↑tyᶜ-comm : Σ ↑tmᶜ k₁ ⇘ Σ₁
-               → Σ₁ ↑tyᶜ k₂ ⇘ Σ₂
-               → Σ ↑tyᶜ k₂ ⇘ Σ'
-               → Σ' ↑tmᶜ k₁ ⇘ Σ₂
-↑tmᶜ-↑tyᶜ-comm ↑tmᶜ-□ ↑tyᶜ-□ ↑tyᶜ-□ = ↑tmᶜ-□
-↑tmᶜ-↑tyᶜ-comm ↑tmᶜ-τ (↑tyᶜ-τ up-t) (↑tyᶜ-τ up-t₁) with refl ← ↑ty-unique up-t up-t₁ = ↑tmᶜ-τ
-↑tmᶜ-↑tyᶜ-comm (↑tmᶜ-e up-e up1) (↑tyᶜ-e up-e₁ up2) (↑tyᶜ-e up-e₂ up3) = ↑tmᶜ-e (↑tm-↑tyᵉ-comm up-e up-e₁ up-e₂) (↑tmᶜ-↑tyᶜ-comm up1 up2 up3)
-
-↑tmᶜ-comm' : k₁ #≤ k₂
-           → Σ ↑tmᶜ k₂ ⇘ Σ₁
-           → Σ₁ ↑tmᶜ (inject₁ k₁) ⇘ Σ₂
-           ----------------
-           → Σ ↑tmᶜ k₁ ⇘ Σ'
-           → Σ' ↑tmᶜ #S k₂ ⇘ Σ₂
-↑tmᶜ-comm' lt ↑tmᶜ-□ ↑tmᶜ-□ ↑tmᶜ-□ = ↑tmᶜ-□
-↑tmᶜ-comm' lt ↑tmᶜ-τ ↑tmᶜ-τ ↑tmᶜ-τ = ↑tmᶜ-τ
-↑tmᶜ-comm' lt (↑tmᶜ-e up-e up1) (↑tmᶜ-e up-e₁ up2) (↑tmᶜ-e up-e₂ up3) = ↑tmᶜ-e (↑tm-comm' lt up-e up-e₁ up-e₂) (↑tmᶜ-comm' lt up1 up2 up3)
-
-nonempty-↑tmᶜ : NonEmpty Σ'
-              → Σ ↑tmᶜ k ⇘ Σ'
-              → NonEmpty Σ
-nonempty-↑tmᶜ ne-τ ↑tmᶜ-τ = ne-τ
-nonempty-↑tmᶜ ne-app (↑tmᶜ-e up-e upΣ) = ne-app
-
-
-◀,-unique : Γ ◀ k ,⇘ Γ'
-         → Γ ◀ k ,⇘ Δ'
-         → Γ' ≡ Δ'
-◀,-unique ◀Z ◀Z = refl
-◀,-unique (◀S, newΓ) (◀S, newΔ) rewrite ◀,-unique newΓ newΔ = refl
-◀,-unique (◀S^ newΓ) (◀S^ newΔ) rewrite ◀,-unique newΓ newΔ = refl
-◀,-unique (◀S∙ newΓ) (◀S∙ newΔ) rewrite ◀,-unique newΓ newΔ = refl
-◀,-unique (◀S= newΓ) (◀S= newΔ) rewrite ◀,-unique newΓ newΔ = refl
-◀,-unique (◀S⋈ newΓ) (◀S⋈ newΔ) rewrite ◀,-unique newΓ newΔ = refl
 
 ◀,-⊆-total : Γ ⊆ Δ
            → Γ ◀ k ,⇘ Γ'
@@ -87,15 +42,6 @@ ss-strengthen, (s-arr ss ss₁) newΓ newΔ with ◀,-⊆-total (ss-⊆ ss) new�
 ss-strengthen, (s-∀ ss) newΓ newΔ = s-∀ (ss-strengthen, ss (◀S∙ newΓ) (◀S∙ newΔ))
 
 
-◀,-𝕣 : Γ ◀ k ,⇘ Γ'
-     → 𝕣 Γ ◀ k ,⇘ 𝕣 Γ'
-◀,-𝕣 ◀Z = ◀Z
-◀,-𝕣 (◀S, newΓ) = ◀S, (◀,-𝕣 newΓ)
-◀,-𝕣 (◀S^ newΓ) = ◀S^ (◀,-𝕣 newΓ)
-◀,-𝕣 (◀S∙ newΓ) = ◀S∙ (◀,-𝕣 newΓ)
-◀,-𝕣 (◀S= newΓ) = ◀S= (◀,-𝕣 newΓ)
-◀,-𝕣 (◀S⋈ newΓ) = newΓ
-
 t-strengthen, : Γ ⊢ Σ' ⇒ e' ⇒ A
               → Γ ◀ k ,⇘ Γ'
               → Σ ↑tmᶜ k ⇘ Σ'
@@ -115,7 +61,7 @@ t-strengthen, (⊢app ⊢e) newΓ upΣ (↑tm-app upe upe₁) = ⊢app (t-streng
 t-strengthen, (⊢lam₁ ⊢e) newΓ ↑tmᶜ-τ (↑tm-ƛ upe) = ⊢lam₁ (t-strengthen, ⊢e (◀S, newΓ) ↑tmᶜ-τ upe)
 t-strengthen, (⊢lam₂ ⊢e up-c ⊢e₁) newΓ (↑tmᶜ-e {Σ = Σ} up-e upΣ) (↑tm-ƛ upe) with ↑tmᶜ0-total Σ
 ... | ⟨ Σ' , upΣ' ⟩ = ⊢lam₂ (t-strengthen, ⊢e newΓ ↑tmᶜ-□ up-e) upΣ' (t-strengthen, ⊢e₁ (◀S, newΓ) (↑tmᶜ-comm' z≤n upΣ up-c upΣ') upe)
-t-strengthen, (⊢sub ⊢e ne gc s) newΓ upΣ upe = ⊢sub (t-strengthen, ⊢e newΓ ↑tmᶜ-□ upe) (nonempty-↑tmᶜ ne upΣ) (↑tm-gc' gc upe) (s-strengthen, s (◀S⋈ newΓ) (◀S⋈ newΓ) upΣ)
+t-strengthen, (⊢sub ⊢e ne gc s) newΓ upΣ upe = ⊢sub (t-strengthen, ⊢e newΓ ↑tmᶜ-□ upe) (nonempty-↑tmᶜ' ne upΣ) (↑tm-gc' gc upe) (s-strengthen, s (◀S⋈ newΓ) (◀S⋈ newΓ) upΣ)
 t-strengthen, (⊢tabs ⊢e) newΓ ↑tmᶜ-□ (↑tm-Λ upe) = ⊢tabs (t-strengthen, ⊢e (◀S∙ newΓ) ↑tmᶜ-□ upe)
 
 s-strengthen, (s-empty regΓ cloA x) newΓ newΔ ↑tmᶜ-□ with refl ← ◀,-unique newΓ newΔ = s-empty (sregular-strengthen, regΓ newΓ)

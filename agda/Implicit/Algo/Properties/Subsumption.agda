@@ -78,6 +78,6 @@ subsumption {Σ' = [ e ]↝ Σ'} (⊢lam₂ ⊢e up-c ⊢e₁) (≊S newΣ) (s-t
   with relf ← ⊢id0 ⊢e₂
   with reg-S, regΓ regA ← t-env ⊢e₁
   with refl ← ⊢r-≫-eq' (⊢r-𝕣 regA) ap
-  with ⟨ nΣ' , upΣ ⟩ ← ↑tmᶜ0-total Σ' = ⊢lam₂ ⊢e upΣ (subsumption ⊢e₁ (≊-weaken newΣ up-c upΣ) (s-weaken,0 s upΣ regA regA))
+  with ⟨ nΣ' , upΣ ⟩ ← ↑tmᶜ0-total Σ' = ⊢lam₂ ⊢e upΣ (subsumption ⊢e₁ (≊-weaken newΣ up-c upΣ) (s-weaken,0 s upΣ regA))
 subsumption {Σ' = [ e ]↝ Σ'} (⊢lam₂ ⊢e up-c ⊢e₁) (≊S newΣ) (s-term-o opnA ⊢e₂ x s) = ⊥-elim (t-inf-open-false ⊢e opnA)
 subsumption {Σ' = [ e ]↝ Σ'} (⊢sub ⊢e ne gc s₁) (≊S newΣ) s = ⊢sub ⊢e ne-app gc (s-trans s₁ s (≊S newΣ))

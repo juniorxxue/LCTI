@@ -104,8 +104,10 @@ complete (⊢lit cloΓ) ~Z = ⊢lit cloΓ
 complete (⊢var cloΓ x∈Γ) ~Z = ⊢var cloΓ x∈Γ
 complete (⊢ann ⊢e) ~Z = ⊢ann (complete ⊢e ~∞)
 complete (⊢lam₁ ⊢e) ~∞ = ⊢lam₁ (complete ⊢e ~∞)
-complete (⊢lam₂ ⊢e) (~I {Σ = Σ} ⊢e₁ j~Σ) with ↑tmᶜ0-total Σ
-... | ⟨ Σ' , upΣ ⟩ = ⊢lam₂ ⊢e₁ upΣ (complete ⊢e (~weaken,0 j~Σ upΣ))
+complete (⊢lam₂ ⊢e) (~I {Σ = Σ} ⊢e₁ j~Σ)
+  with reg-S, regΓ regA ← t-tregular ⊢e
+  with ⟨ Σ' , upΣ ⟩ ← ↑tmᶜ0-total Σ
+  = ⊢lam₂ ⊢e₁ upΣ (complete ⊢e (~weaken,0 j~Σ upΣ regA))
 complete (⊢app₁ ⊢e ⊢e₁) j~Σ = ⊢app (complete ⊢e (~C (complete ⊢e₁ ~∞) j~Σ))
 complete (⊢app₂ ⊢e ⊢e₁) j~Σ = ⊢app (complete ⊢e (~I (complete ⊢e₁ ~Z) j~Σ))
 complete (⊢sub ⊢e B≤A x j≢Z) j~Σ = ⊢sub (complete ⊢e ~Z) (nonempty j≢Z j~Σ) x (complete-s0 B≤A j~Σ)

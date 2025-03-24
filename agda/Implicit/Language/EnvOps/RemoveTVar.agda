@@ -22,6 +22,28 @@ data _◀_,⇘_ : Env (1 + n) m → Fin (1 + n) → Env n m → Set where
   ◀S⋈ : Γ ◀ k ,⇘ Γ'
       → Γ ⋈ ◀ k ,⇘ Γ' ⋈
 
+
+◀,-𝕣 : Γ ◀ k ,⇘ Γ'
+     → 𝕣 Γ ◀ k ,⇘ 𝕣 Γ'
+◀,-𝕣 ◀Z = ◀Z
+◀,-𝕣 (◀S, newΓ) = ◀S, (◀,-𝕣 newΓ)
+◀,-𝕣 (◀S^ newΓ) = ◀S^ (◀,-𝕣 newΓ)
+◀,-𝕣 (◀S∙ newΓ) = ◀S∙ (◀,-𝕣 newΓ)
+◀,-𝕣 (◀S= newΓ) = ◀S= (◀,-𝕣 newΓ)
+◀,-𝕣 (◀S⋈ newΓ) = newΓ
+
+
+◀,-unique : Γ ◀ k ,⇘ Γ'
+         → Γ ◀ k ,⇘ Δ'
+         → Γ' ≡ Δ'
+◀,-unique ◀Z ◀Z = refl
+◀,-unique (◀S, newΓ) (◀S, newΔ) rewrite ◀,-unique newΓ newΔ = refl
+◀,-unique (◀S^ newΓ) (◀S^ newΔ) rewrite ◀,-unique newΓ newΔ = refl
+◀,-unique (◀S∙ newΓ) (◀S∙ newΔ) rewrite ◀,-unique newΓ newΔ = refl
+◀,-unique (◀S= newΓ) (◀S= newΔ) rewrite ◀,-unique newΓ newΔ = refl
+◀,-unique (◀S⋈ newΓ) (◀S⋈ newΔ) rewrite ◀,-unique newΓ newΔ = refl
+
+
 ∋⦂-strengthen, : Γ ∋ punchIn k x ⦂ A
       → Γ ◀ k ,⇘ Γ'
       → Γ' ∋ x ⦂ A
