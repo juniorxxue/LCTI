@@ -137,13 +137,6 @@ data [_/_]_⟹_ : Type m → Fin m → Env n m → Env n m → Set where
         → (regB : Γ ⊢r B)
         → [ A' / #S k ] (Γ ,= B) ⟹ (Γ' ,= B)
 
-inst-⊢r : [ A / k ] Γ ⟹ Δ
-        → Γ ⊢r A
-inst-⊢r (⟹^0 up regA env) = ⊢r-weaken^0 regA up
-inst-⊢r (⟹^S inst up1) = ⊢r-weaken^0 (inst-⊢r inst) up1
-inst-⊢r (⟹∙S inst up1) = ⊢r-weaken∙0 (inst-⊢r inst) up1
-inst-⊢r (⟹=S inst up1 regB) = ⊢r-weaken=0 (inst-⊢r inst) up1 regB
-
 inst-∋^ : [ A / k ] Γ ⟹ Δ
         → Γ ∋^ k
 inst-∋^ (⟹^0 up regA env) = Z

@@ -8,3 +8,4 @@ open import Implicit.Language.EnvOps.InsertTVar public
 -- open import Implicit.Language.EnvOps.Remove public
 -- open import Implicit.Language.EnvOps.Replace public
 -- open import Implicit.Language.EnvOps.Properties public
+open import Implicit.Language.EnvOps.Regular public

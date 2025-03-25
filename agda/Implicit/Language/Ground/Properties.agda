@@ -8,6 +8,7 @@ open import Implicit.Language.OpenClose.Base
 open import Implicit.Language.Regular.All
 open import Implicit.Language.Ground.Base
 open import Implicit.Language.Extension.All
+open import Implicit.Language.EnvOps.All
 
 ⊢c-≫-⊢r : SRegular Γ
           → Γ ⊢c A

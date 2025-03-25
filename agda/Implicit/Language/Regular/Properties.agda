@@ -7,54 +7,6 @@ open import Implicit.Language.OpenClose.Base
 open import Implicit.Language.Regular.Base
 
 
-postulate
-  ⊢r-weaken,0 : Γ ⊢r A
-              → Γ ⊢r T
-              → Γ , T ⊢r A
-
-  ⊢r-weaken∙0 : Γ ⊢r A
-              → ↑ty0 A ⇘ A'
-              → Γ ,∙ ⊢r A'
-
-  ⊢r-weaken^0 : Γ ⊢r A
-              → ↑ty0 A ⇘ A'
-              → Γ ,^ ⊢r A'
-
-  ⊢r-weaken=0 : Γ ⊢r A
-              → ↑ty0 A ⇘ A'
-              → Γ ⊢r T
-              → Γ ,= T ⊢r A'
-
-  ⊢r-weaken⋈0 : Γ ⊢r A
-              → Γ ⋈ ⊢r A
-
-  ⊢r-strengthen^0 : Γ ,^ ⊢r A'
-                  → ↑ty0 A ⇘ A'
-                  → Γ ⊢r A
-                  
-  ⊢r-strengthen∙0 : Γ ,∙ ⊢r A'
-                  → ↑ty0 A ⇘ A'
-                  → Γ ⊢r A
-
-
-∋:=-⊢r : SRegular Γ
-         → Γ ∋ X := A
-         → Γ ⊢r A
-∋:=-⊢r (reg-S= senv regA) (Z up) = ⊢r-weaken=0 regA up regA
-∋:=-⊢r (reg-S∙ senv) (S∙ inΓ up) = ⊢r-weaken∙0 (∋:=-⊢r senv inΓ) up
-∋:=-⊢r (reg-S^ senv) (S^ inΓ up) = ⊢r-weaken^0 (∋:=-⊢r senv inΓ) up
-∋:=-⊢r (reg-S= senv regA) (S= inΓ up) = ⊢r-weaken=0 (∋:=-⊢r senv inΓ) up regA
-
-∋⦂-⊢r : TRegular Γ
-      → Γ ∋ x ⦂ A
-      → Γ ⊢r A
-∋⦂-⊢r (reg-S, regΓ regA) Z = ⊢r-weaken,0 regA regA
-∋⦂-⊢r (reg-S, regΓ regA) (S, inΓ) = ⊢r-weaken,0 (∋⦂-⊢r regΓ inΓ) regA
-∋⦂-⊢r (reg-S∙ regΓ) (S∙ inΓ up) = ⊢r-weaken∙0 (∋⦂-⊢r regΓ inΓ) up
-∋⦂-⊢r (reg-S^ regΓ) (S^ inΓ up) = ⊢r-weaken^0 (∋⦂-⊢r regΓ inΓ) up
-∋⦂-⊢r (reg-S= regΓ regA) (S= inΓ up) = ⊢r-weaken=0 (∋⦂-⊢r regΓ inΓ) up regA
-
-
 ∋∙-𝕣 : 𝕣 Γ ∋∙ X
      → Γ ∋∙ X
 ∋∙-𝕣 {Γ = Γ , A} (S, inΓ) = S, (∋∙-𝕣 inΓ)

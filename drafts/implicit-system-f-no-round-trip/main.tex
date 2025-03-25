@@ -38,7 +38,7 @@
 
 \begin{align*}
 &\text{Types} \quad\quad &A, B, C, D ::=&~ a \mid \mathtt{Int} \mid A \rightarrow B \mid \forall a.~A\\
-&\text{Expressions} \quad \quad &e::=&~ i \mid x \mid \lambda x . ~e \mid e_1~e_2 \mid e : A \mid \Lambda a.~e
+&\text{Expressions} \quad \quad &e::=&~ i \mid x \mid \lambda x . ~e \mid e_1~e_2 \mid e : A \mid \Lambda a.~e \mid e ~@~ A
 \end{align*}
 
 \section{Decl.}
@@ -46,7 +46,7 @@
 \begin{align*}
 &\text{Environments} \quad\quad &\Gamma::=&~ . \mid \Gamma, x : A \mid \Gamma, a \\
 &\text{Counters} \quad\quad &n ::=&~ 0 \mid \infty \mid S~n\\
-&\text{Successor Counters} \quad\quad &S ::=&~ C \mid I
+&\text{Successor Counters} \quad\quad &S ::=&~ C \mid I \mid T
 \end{align*}
 
 
@@ -90,6 +90,10 @@
     \inferrule*[right=\texttt{TAbs}]
     {\Gamma, a \vdash_0 e : A}
     {\Gamma \vdash_0 \Lambda a.~e : \forall a.~A}
+
+    \inferrule*[right=\texttt{TApp}]
+    {\Gamma \vdash_{T~n} e : B}
+    {\Gamma \vdash_n e ~@~ A :  B}    
 \end{mathpar}
 
 \subsection{Subtyping: $\Gamma \vdash_n A <: B$}

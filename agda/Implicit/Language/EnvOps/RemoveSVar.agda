@@ -8,6 +8,8 @@ open import Implicit.Language.OpenClose.Base
 open import Implicit.Language.Ground.Base
 open import Implicit.Language.Occur.All
 
+open import Implicit.Language.EnvOps.Regular -- may refactor if there're some circular dependency
+
 -- remove solution entry, without doing subst
 infix 3 _◀_=⇘_
 data _◀_=⇘_ : Env n (1 + m) → Fin (1 + m) → Env n m → Set where
