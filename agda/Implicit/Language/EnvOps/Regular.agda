@@ -11,28 +11,33 @@ open import Implicit.Language.EnvOps.Base
 open import Implicit.Language.EnvOps.Inst
 open import Implicit.Language.EnvOps.InsertTVar
 open import Implicit.Language.EnvOps.InsertEVar
+open import Implicit.Language.EnvOps.InsertUVar
+open import Implicit.Language.EnvOps.InsertSVar
+open import Implicit.Language.EnvOps.RemoveEVar
+open import Implicit.Language.EnvOps.RemoveUVar
 
-postulate
+⊢r-strengthen∙0 : Γ ,∙ ⊢r A'
+                  → ↑ty0 A ⇘ A'
+                  → Γ ⊢r A
+⊢r-strengthen∙0 regA upA = ⊢r-strengthen∙ regA ◀Z upA
 
-  ⊢r-weaken∙0 : Γ ⊢r A
-              → ↑ty0 A ⇘ A'
-              → Γ ,∙ ⊢r A'
 
+⊢r-strengthen^0 : Γ ,^ ⊢r A'
+                  → ↑ty0 A ⇘ A'
+                  → Γ ⊢r A
+⊢r-strengthen^0 regA upA = ⊢r-strengthen^ regA ◀Z upA
 
-  ⊢r-weaken=0 : Γ ⊢r A
+⊢r-weaken=0 : Γ ⊢r A
               → ↑ty0 A ⇘ A'
               → Γ ⊢r T
               → Γ ,= T ⊢r A'
+⊢r-weaken=0 regA upA regT = ⊢r-weaken= regA (▶Z regT) upA
 
 
-  ⊢r-strengthen^0 : Γ ,^ ⊢r A'
-                  → ↑ty0 A ⇘ A'
-                  → Γ ⊢r A
-
-  ⊢r-strengthen∙0 : Γ ,∙ ⊢r A'
-                  → ↑ty0 A ⇘ A'
-                  → Γ ⊢r A
-
+⊢r-weaken∙0 : Γ ⊢r A
+              → ↑ty0 A ⇘ A'
+              → Γ ,∙ ⊢r A'
+⊢r-weaken∙0 regA upA = ⊢r-weaken∙ regA ▶Z upA
 
 ⊢r-weaken⋈0 : Γ ⊢r A
             → Γ ⋈ ⊢r A

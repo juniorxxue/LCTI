@@ -127,8 +127,8 @@ s-weaken∙ : Γ ⊢ j # A ≤ B
 s-weaken∙ (s-refl cloΓ cloA) newΓ upA upB with ↑ty-unique upA upB
 ... | refl = s-refl (closed-weaken∙ cloΓ newΓ) (⊢c-weaken∙ cloA newΓ upB)
 s-weaken∙ (s-int cloΓ) newΓ ↑ty-int ↑ty-int = s-int (closed-weaken∙ cloΓ newΓ)
-s-weaken∙ (s-var-∙ inΓ cloΓ) newΓ ↑ty-var ↑ty-var = s-var-∙ (closed-weaken∙ inΓ newΓ) (▶∙-∋∙ cloΓ newΓ)
-s-weaken∙ (s-var-= inΓ cloΓ) newΓ ↑ty-var ↑ty-var = s-var-= (closed-weaken∙ inΓ newΓ) (▶∙-∋= cloΓ newΓ)
+s-weaken∙ (s-var-∙ inΓ cloΓ) newΓ ↑ty-var ↑ty-var = s-var-∙ (closed-weaken∙ inΓ newΓ) (∋∙-weaken∙ cloΓ newΓ)
+s-weaken∙ (s-var-= inΓ cloΓ) newΓ ↑ty-var ↑ty-var = s-var-= (closed-weaken∙ inΓ newΓ) (∋=-weaken∙ cloΓ newΓ)
 s-weaken∙ (s-arr₁ s s₁) upΓ (↑ty-arr upA upA₁) (↑ty-arr upB upB₁) = s-arr₁ (s-weaken∙ s upΓ upB upA) (s-weaken∙ s₁ upΓ upA₁ upB₁)
 s-weaken∙ (s-arr₂ s s₁) upΓ (↑ty-arr upA upA₁) (↑ty-arr upB upB₁) = s-arr₂ (s-weaken∙ s upΓ upB upA) (s-weaken∙ s₁ upΓ upA₁ upB₁)
 s-weaken∙ (s-arr₃ cloA s) upΓ (↑ty-arr upA upA₁) (↑ty-arr upB upB₁) rewrite ↑ty-unique upA upB = s-arr₃ (⊢c-weaken∙ cloA upΓ upB) (s-weaken∙ s upΓ upA₁ upB₁)
@@ -138,9 +138,9 @@ s-weaken∙ {k = k} (s-∀l {B = B} {C' = C'} {D'} s x fd st₁ st₂) upΓ (↑
 ... | ⟨ B' , upB' ⟩ | ⟨ C' , upC' ⟩ | ⟨ D' , upD' ⟩
   = s-∀l (s-weaken∙ s (▶S= upΓ upB') upA (↑ty-arr upC' upD')) x (↑ty-find0 fd upA) (↑ty-comm0 st₁ upC' upB) (↑ty-comm0 st₂ upD' upB₁)
 s-weaken∙ {k = k} (s-var-l {B = B} x s) upΓ ↑ty-var upB with ↑ty-total B k
-... | ⟨ B' , upB' ⟩ = s-var-l (▶∙-∋:= x upΓ upB') (s-weaken∙ s upΓ upB' upB)
+... | ⟨ B' , upB' ⟩ = s-var-l (∋:=-weaken∙ x upΓ upB') (s-weaken∙ s upΓ upB' upB)
 s-weaken∙ {k = k} (s-var-r {B = B} x s) upΓ upA ↑ty-var with ↑ty-total B k
-... | ⟨ B' , upB' ⟩ = s-var-r (▶∙-∋:= x upΓ upB') (s-weaken∙ s upΓ upA upB')
+... | ⟨ B' , upB' ⟩ = s-var-r (∋:=-weaken∙ x upΓ upB') (s-weaken∙ s upΓ upA upB')
 
 
 s-weaken∙0 : Γ ⊢ j # A ≤ B
@@ -161,8 +161,8 @@ s-weaken= : Γ ⊢ j # A ≤ B
 s-weaken= (s-refl cloΓ cloA) newΓ upA upB with ↑ty-unique upA upB
 ... | refl = s-refl (closed-weaken= cloΓ newΓ) (⊢c-weaken= cloA newΓ upB)
 s-weaken= (s-int cloΓ) newΓ ↑ty-int ↑ty-int = s-int (closed-weaken= cloΓ newΓ)
-s-weaken= (s-var-∙ inΓ cloΓ) newΓ ↑ty-var ↑ty-var = s-var-∙ (closed-weaken= inΓ newΓ) (▶=-∋∙ cloΓ newΓ)
-s-weaken= (s-var-= inΓ cloΓ) newΓ ↑ty-var ↑ty-var = s-var-= (closed-weaken= inΓ newΓ) (▶=-∋= cloΓ newΓ)
+s-weaken= (s-var-∙ inΓ cloΓ) newΓ ↑ty-var ↑ty-var = s-var-∙ (closed-weaken= inΓ newΓ) (∋∙-weaken= cloΓ newΓ)
+s-weaken= (s-var-= inΓ cloΓ) newΓ ↑ty-var ↑ty-var = s-var-= (closed-weaken= inΓ newΓ) (∋=-weaken= cloΓ newΓ)
 s-weaken= (s-arr₁ s s₁) upΓ (↑ty-arr upA upA₁) (↑ty-arr upB upB₁) = s-arr₁ (s-weaken= s upΓ upB upA) (s-weaken= s₁ upΓ upA₁ upB₁)
 s-weaken= (s-arr₂ s s₁) upΓ (↑ty-arr upA upA₁) (↑ty-arr upB upB₁) = s-arr₂ (s-weaken= s upΓ upB upA) (s-weaken= s₁ upΓ upA₁ upB₁)
 s-weaken= (s-arr₃ cloA s) upΓ (↑ty-arr upA upA₁) (↑ty-arr upB upB₁) rewrite ↑ty-unique upA upB = s-arr₃ (⊢c-weaken= cloA upΓ upB) (s-weaken= s upΓ upA₁ upB₁)
@@ -173,9 +173,9 @@ s-weaken= {k = k} {T = T} (s-∀l {B = B} {C' = C'} {D'} s x fd st₁ st₂) up�
   = s-∀l (s-weaken= s (▶S= upΓ (proj₂ (↑ty0-total T)) upB')
          upA (↑ty-arr upC' upD')) x (↑ty-find0 fd upA) (↑ty-comm0 st₁ upC' upB) (↑ty-comm0 st₂ upD' upB₁)
 s-weaken= {k = k} (s-var-l {B = B} x s) upΓ ↑ty-var upB with ↑ty-total B k
-... | ⟨ B' , upB' ⟩ = s-var-l (▶=-∋:= x upΓ upB') (s-weaken= s upΓ upB' upB)
+... | ⟨ B' , upB' ⟩ = s-var-l (∋:=-weaken= x upΓ upB') (s-weaken= s upΓ upB' upB)
 s-weaken= {k = k} (s-var-r {B = B} x s) upΓ upA ↑ty-var with ↑ty-total B k
-... | ⟨ B' , upB' ⟩ = s-var-r (▶=-∋:= x upΓ upB') (s-weaken= s upΓ upA upB')
+... | ⟨ B' , upB' ⟩ = s-var-r (∋:=-weaken= x upΓ upB') (s-weaken= s upΓ upA upB')
 
 s-weaken=0 : Γ ⊢ j # A ≤ B
            → ↑ty0 A ⇘ A'

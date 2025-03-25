@@ -42,8 +42,8 @@ open import Implicit.Language.EnvOps.All
            → A ↑ty k ⇘ A'
            → Γ' ⊢c A'
 ⊢c-weaken∙ ⊢c-int extΓ' ↑ty-int = ⊢c-int
-⊢c-weaken∙ (⊢c-var-∙ inΓ) extΓ' ↑ty-var = ⊢c-var-∙ (▶∙-∋∙ inΓ extΓ')
-⊢c-weaken∙ (⊢c-var-= inΓ) extΓ' ↑ty-var = ⊢c-var-= (▶∙-∋= inΓ extΓ')
+⊢c-weaken∙ (⊢c-var-∙ inΓ) extΓ' ↑ty-var = ⊢c-var-∙ (∋∙-weaken∙ inΓ extΓ')
+⊢c-weaken∙ (⊢c-var-= inΓ) extΓ' ↑ty-var = ⊢c-var-= (∋=-weaken∙ inΓ extΓ')
 ⊢c-weaken∙ (⊢c-arr clo clo₁) extΓ' (↑ty-arr upA upA₁) = ⊢c-arr (⊢c-weaken∙ clo extΓ' upA) (⊢c-weaken∙ clo₁ extΓ' upA₁)
 ⊢c-weaken∙ (⊢c-∀ clo) extΓ' (↑ty-∀ upA) = ⊢c-∀ (⊢c-weaken∙ clo (▶S∙ extΓ') upA)
 
@@ -57,8 +57,8 @@ open import Implicit.Language.EnvOps.All
            → A ↑ty k ⇘ A'
            → Γ' ⊢c A'
 ⊢c-weaken= ⊢c-int newΓ ↑ty-int = ⊢c-int
-⊢c-weaken= (⊢c-var-∙ inΓ) newΓ ↑ty-var = ⊢c-var-∙ (▶=-∋∙ inΓ newΓ)
-⊢c-weaken= (⊢c-var-= inΓ) newΓ ↑ty-var = ⊢c-var-= (▶=-∋= inΓ newΓ)
+⊢c-weaken= (⊢c-var-∙ inΓ) newΓ ↑ty-var = ⊢c-var-∙ (∋∙-weaken= inΓ newΓ)
+⊢c-weaken= (⊢c-var-= inΓ) newΓ ↑ty-var = ⊢c-var-= (∋=-weaken= inΓ newΓ)
 ⊢c-weaken= (⊢c-arr cloA cloA₁) newΓ (↑ty-arr upA upA₁) = ⊢c-arr (⊢c-weaken= cloA newΓ upA) (⊢c-weaken= cloA₁ newΓ upA₁)
 ⊢c-weaken= {T = T} (⊢c-∀ cloA) newΓ (↑ty-∀ upA) = ⊢c-∀ (⊢c-weaken= cloA (▶S∙ newΓ (proj₂ (↑ty0-total T))) upA)
 

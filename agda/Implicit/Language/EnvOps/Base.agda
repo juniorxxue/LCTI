@@ -11,36 +11,6 @@ open import Implicit.Language.Lookup.Base
 --+                         Entry Removal                          +--
 ----------------------------------------------------------------------
 
--- remove exsitential variable â from k-th posititon
-infix 3 _◀_^⇘_
-data _◀_^⇘_ : Env n (1 + m) → Fin (1 + m) → Env n m → Set where
-  ◀Z  : Γ ,^ ◀ #0 ^⇘ Γ
-  ◀S, : Γ ◀ k ^⇘ Γ'
-      → B ↑ty k ⇘ B'
-      → Γ , B' ◀ k ^⇘ Γ' , B
-  ◀S^ : Γ ◀ k ^⇘ Γ'
-      → Γ ,^ ◀ #S k ^⇘ Γ' ,^
-  ◀S∙ : Γ ◀ k ^⇘ Γ'
-      → Γ ,∙ ◀ #S k ^⇘ Γ' ,∙
-  ◀S= : Γ ◀ k ^⇘ Γ'
-      → A ↑ty k ⇘ A'
-      → Γ ,= A' ◀ #S k ^⇘ Γ' ,= A
-
--- remove type variable a from k-th posititon
-infix 3 _◀_∙⇘_
-data _◀_∙⇘_ : Env n (1 + m) → Fin (1 + m) → Env n m → Set where
-  ◀Z  : Γ ,∙ ◀ #0 ∙⇘ Γ
-  ◀S, : Γ ◀ k ∙⇘ Γ'
-      → A ↑ty k ⇘ A'
-      → Γ , A' ◀ k ∙⇘ Γ' , A
-  ◀S^ : Γ ◀ k ∙⇘ Γ'
-      → Γ ,^ ◀ #S k ∙⇘ Γ' ,^
-  ◀S∙ : Γ ◀ k ∙⇘ Γ'
-      → Γ ,∙ ◀ #S k ∙⇘ Γ' ,∙
-  ◀S= : Γ ◀ k ∙⇘ Γ'
-      → A ↑ty k ⇘ A'
-      → Γ ,= A' ◀ #S k ∙⇘ Γ' ,= A
-
 
 
 
