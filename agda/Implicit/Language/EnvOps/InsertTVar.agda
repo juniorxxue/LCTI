@@ -7,6 +7,7 @@ open import Implicit.Language.Regular.All
 open import Implicit.Language.OpenClose.Base
 open import Implicit.Language.Ground.Base
 open import Implicit.Language.EnvOps.Base
+open import Implicit.Language.EnvOps.Inst
 
 -- insert into typing env
 infix 3 _▶_,_⇘_

@@ -8,6 +8,7 @@ open import Implicit.Language.Lookup.All
 open import Implicit.Language.Regular.All
 
 open import Implicit.Language.EnvOps.Base
+open import Implicit.Language.EnvOps.Inst
 open import Implicit.Language.EnvOps.InsertTVar
 open import Implicit.Language.EnvOps.InsertEVar
 

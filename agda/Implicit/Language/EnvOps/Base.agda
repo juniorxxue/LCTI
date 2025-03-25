@@ -4,7 +4,7 @@ open import Implicit.Language.Base
 open import Implicit.Language.Shift.All
 open import Implicit.Language.Subst.All
 open import Implicit.Language.OpenClose.Base
-open import Implicit.Language.Regular.All
+open import Implicit.Language.Regular.Base
 open import Implicit.Language.Lookup.Base
 
 ----------------------------------------------------------------------
@@ -67,96 +67,12 @@ data _◀_:=_⇘_ : Env n (1 + m) → Fin (1 + m) → Type m → Env n m → Set
       → ⟦ k / A ⟧ B ⇘ B*
       → Γ ,= B ◀ #S k := A' ⇘ Γ' ,= B*
 
-
-----------------------------------------------------------------------
---+                         Entry Insertion                        +--
-----------------------------------------------------------------------
-
-
-
-infix 3 _▶_,∙⇘_
-data _▶_,∙⇘_ : Env n m → Fin (1 + m) → Env n (1 + m) → Set where
-  ▶Z : Γ ▶ #0 ,∙⇘ Γ ,∙
-  ▶S, : Γ ▶ k ,∙⇘ Γ'
-      → A ↑ty k ⇘ A'
-      → Γ , A ▶ k ,∙⇘ Γ' , A'
-  ▶S^ : Γ ▶ k ,∙⇘ Γ'
-      → Γ ,^ ▶ #S k ,∙⇘ Γ' ,^
-  ▶S∙ : Γ ▶ k ,∙⇘ Γ'
-      → Γ ,∙ ▶ #S k ,∙⇘ Γ' ,∙
-  ▶S= : Γ ▶ k ,∙⇘ Γ'
-      → B ↑ty k ⇘ B'
-      → Γ ,= B ▶ #S k ,∙⇘ Γ' ,= B'
-  ▶S⋈ : Γ ▶ k ,∙⇘ Γ'
-      → Γ ⋈ ▶ k ,∙⇘ Γ' ⋈
-
-infix 3 _▶_,=_⇘_
-data _▶_,=_⇘_ : Env n m → Fin (1 + m) → Type m → Env n (1 + m) → Set where
-  ▶Z  : (cloA : Γ ⊢r A)
-      → Γ ▶ #0 ,= A ⇘ Γ ,= A
-  ▶S, : Γ ▶ k ,= A ⇘ Γ'
-      → (up : B ↑ty k ⇘ B')
-      → Γ , B ▶ k ,= A ⇘ Γ' , B'
-  ▶S^ : Γ ▶ k ,= A ⇘ Γ'
-      → ↑ty0 A ⇘ A' -- an alternative is defining an unshift
-      → Γ ,^ ▶ #S k ,= A' ⇘ Γ' ,^
-  ▶S∙ : Γ ▶ k ,= A ⇘ Γ'
-      → ↑ty0 A ⇘ A'
-      → Γ ,∙ ▶ #S k ,= A' ⇘ Γ' ,∙
-  ▶S= : Γ ▶ k ,= A ⇘ Γ'
-      → ↑ty0 A ⇘ A'
-      → B ↑ty k ⇘ B'
-      → Γ ,= B ▶ #S k ,= A' ⇘ Γ' ,= B'
-  ▶S⋈ : Γ ▶ k ,= A ⇘ Γ'
-      → Γ ⋈ ▶ k ,= A ⇘ Γ' ⋈
-
 ----------------------------------------------------------------------
 --+                       Entry Replacement                        +--
 ----------------------------------------------------------------------
 
 -- could be a combination of weaken and strengthen
 
--- replace entry ^a with a solution ^a=A in an environment
-infix 3 [_/_]_⟹_
-data [_/_]_⟹_ : Type m → Fin m → Env n m → Env n m → Set where
-  ⟹^0 : (up : ↑ty0 A ⇘ A')
-        → (regA : Γ ⊢r A)
-        → (env : SRegular Γ)
-        → [ A' / #0 ] (Γ ,^) ⟹ (Γ ,= A)
-
-  ⟹^S : [ A / k ] Γ ⟹ Γ'
-        → (up1 : ↑ty0 A ⇘ A')
-        → [ A' / #S k ] (Γ ,^) ⟹ Γ' ,^
-
-  ⟹∙S : [ A / k ] Γ ⟹ Γ'
-        → (up1 : ↑ty0 A ⇘ A')
-        → [ A' / #S k ] (Γ ,∙) ⟹ (Γ' ,∙)
-
-  ⟹=S : [ A / k ] Γ ⟹ Γ'
-        → (up1 : ↑ty0 A ⇘ A')
-        → (regB : Γ ⊢r B)
-        → [ A' / #S k ] (Γ ,= B) ⟹ (Γ' ,= B)
-
-inst-∋^ : [ A / k ] Γ ⟹ Δ
-        → Γ ∋^ k
-inst-∋^ (⟹^0 up regA env) = Z
-inst-∋^ (⟹^S inst up1) = S^ (inst-∋^ inst)
-inst-∋^ (⟹∙S inst up1) = S∙ (inst-∋^ inst)
-inst-∋^ (⟹=S inst up1 regB) = S= (inst-∋^ inst)
-
-inst-∋= : [ A / k ] Γ ⟹ Δ
-        → Δ ∋= k
-inst-∋= (⟹^0 up regA env) = Z
-inst-∋= (⟹^S inst up1) = S^ (inst-∋= inst)
-inst-∋= (⟹∙S inst up1) = S∙ (inst-∋= inst)
-inst-∋= (⟹=S inst up1 regB) = S= (inst-∋= inst)
-
-inst-∋:= : [ A / k ] Γ ⟹ Δ
-         → Δ ∋ k := A
-inst-∋:= (⟹^0 up regA env) = Z up
-inst-∋:= (⟹^S inst up1) = S^ (inst-∋:= inst) up1
-inst-∋:= (⟹∙S inst up1) = S∙ (inst-∋:= inst) up1
-inst-∋:= (⟹=S inst up1 regB) = S= (inst-∋:= inst) up1
 
 
 -- replace entry a with a solution ^a=A in an environment

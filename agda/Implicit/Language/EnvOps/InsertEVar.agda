@@ -7,6 +7,7 @@ open import Implicit.Language.Regular.Base
 open import Implicit.Language.OpenClose.Base
 open import Implicit.Language.Ground.Base
 open import Implicit.Language.EnvOps.Base
+open import Implicit.Language.EnvOps.Inst
 
 infix 3 _▶_,^⇘_
 data _▶_,^⇘_ : Env n m → Fin (1 + m) → Env n (1 + m) → Set where
