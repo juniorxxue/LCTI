@@ -50,20 +50,6 @@ ss-weaken^ (s-arr ss ss₁) new (↑ty-arr upA upA₁) (↑ty-arr upB upB₁)
   = s-arr (ss-weaken^ ss new1 upB upA) (ss-weaken^ ss₁ new2 upA₁ upB₁)
 ss-weaken^ (s-∀ ss) new (↑ty-∀ upA) (↑ty-∀ upB) = s-∀ (ss-weaken^ ss (▶S∙ new) upA upB)
 
-nonempty-↑tyᶜ' : NonEmpty Σ
-               → Σ ↑tyᶜ k ⇘ Σ'
-               → NonEmpty Σ'
-nonempty-↑tyᶜ' ne-τ (↑tyᶜ-τ up-t) = ne-τ
-nonempty-↑tyᶜ' ne-app (↑tyᶜ-e up-e upΣ) = ne-app
-
-gc-↑tyᵉ : GenericConsumer e
-        → e ↑tyᵉ k ⇘ e'
-        → GenericConsumer e'
-gc-↑tyᵉ gc-i ↑tyᵉ-lit = gc-i
-gc-↑tyᵉ gc-var ↑tyᵉ-var = gc-var
-gc-↑tyᵉ gc-ann (↑tyᵉ-⦂ upe up) = gc-ann
-gc-↑tyᵉ gc-tlam (↑tyᵉ-Λ upe) = gc-tlam
-
 ▶^-𝕣 : Γ ▶ k ,^⇘ Γ'
      → 𝕣 Γ ▶ k ,^⇘ 𝕣 Γ'
 ▶^-𝕣 ▶Z = ▶Z

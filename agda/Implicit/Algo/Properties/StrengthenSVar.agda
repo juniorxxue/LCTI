@@ -89,12 +89,6 @@ ss-strengthen= (s-∀ ss) newΓ newΔ (↑ty-∀ upA) (↑ty-∀ upB) = s-∀ (s
 ◀=-𝕣 (◀S⋈ newΓ) = newΓ
 
 
-nonempty-↑tyᶜ : NonEmpty Σ'
-              → Σ ↑tyᶜ k ⇘ Σ'
-              → NonEmpty Σ
-nonempty-↑tyᶜ ne-τ (↑tyᶜ-τ up-t) = ne-τ
-nonempty-↑tyᶜ ne-app (↑tyᶜ-e up-e upΣ) = ne-app
-
 t-strengthen= : Γ ⊢ Σ' ⇒ e' ⇒ A'
               → Γ ◀ k =⇘ Γ'
               → A ↑ty k ⇘ A'
