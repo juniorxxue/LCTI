@@ -45,8 +45,8 @@
 
 \begin{align*}
 &\text{Environments} \quad\quad &\Gamma::=&~ . \mid \Gamma, x : A \mid \Gamma, a \\
-&\text{Counters} \quad\quad &n ::=&~ 0 \mid \infty \mid S~n\\
-&\text{Successor Counters} \quad\quad &S ::=&~ C \mid I \mid T
+&\text{Counters} \quad\quad &n ::=&~ 0 \mid \infty \mid S~n \mid T~n\\
+&\text{Successor Counters} \quad\quad &S ::=&~ C \mid I
 \end{align*}
 
 
@@ -92,8 +92,8 @@
     {\Gamma \vdash_0 \Lambda a.~e : \forall a.~A}
 
     \inferrule*[right=\texttt{TApp}]
-    {\Gamma \vdash_{T~n} e : B}
-    {\Gamma \vdash_n e ~@~ A :  B}    
+    {\Gamma \vdash_{T~n} e : \forall a. ~B}
+    {\Gamma \vdash_n e ~@~ A :  [a/A]~B}    
 \end{mathpar}
 
 \subsection{Subtyping: $\Gamma \vdash_n A <: B$}
@@ -125,6 +125,10 @@
     a \in \texttt{FV}_{(S~n)}(A)\\
      \Gamma \vdash_{S~n}  [B/a]A <: C \to D}
     {\Gamma \vdash_{S~n} \forall a. ~A <: C \to D}
+    
+    \inferrule*[right=\texttt{S-TApp}]
+    {\Gamma \vdash_n [B/a]~A <: [B/a]~C}
+    {\Gamma \vdash_{T~n} \forall a. ~A <: \forall a. ~C}
 \end{mathpar}
 
 
@@ -132,8 +136,8 @@
 
 \begin{align*}
 &\text{Typing Environments} \quad\quad &\Gamma::=&~ . \mid \Gamma, x : A \mid \Gamma, a\\
-&\text{Subtyping Environments} \quad\quad &\Gamma, \Omega, \Delta ::=&~ . \mid \Gamma, x : A \mid \Gamma, a \mid \Gamma, \hat{a} = A\\
-&\text{Counters} \quad\quad &n ::=&~ 0 \mid \infty \mid S~n\\
+&\text{Subtyping Environments} \quad\quad &\Gamma, \Omega, \Delta ::=&~ . \mid \Gamma, x : A \mid \Gamma, a \mid \Gamma, \hat{a} = A \mid \Gamma, a := A\\
+&\text{Counters} \quad\quad &n ::=&~ 0 \mid \infty \mid S~n \mid T~n\\
 &\text{Successor Counters} \quad\quad &S ::=&~ C \mid I
 \end{align*}
 
@@ -177,6 +181,10 @@
     \inferrule*[right=\texttt{TAbs}]
     {\Gamma, a \vdash_0 e : A}
     {\Gamma \vdash_0 \Lambda a.~e : \forall a.~A}
+    
+    \inferrule*[right=\texttt{TApp}]
+    {\Gamma \vdash_{T~n} e : \forall a. ~B}
+    {\Gamma \vdash_n e ~@~ A :  [a/A]~B}    
 \end{mathpar}
 
 \subsection{Subtyping: $\Gamma \shortmid \Delta \vdash_n A <:^{\pm} B$}
@@ -210,6 +218,10 @@
      \Gamma; \Delta, \hat{a} = B \vdash_{S~n}  A <:^+ C \to D}
     {\Gamma; \Delta \vdash_{S~n} \forall a. ~A <:^+ C \to D}
     \\    
+      \inferrule*[right=\texttt{S-TApp}]
+    {\Gamma ,a:= B \vdash_n A <: C}
+    {\Gamma \vdash_{T~n} \forall a. ~A <: \forall a. ~C}
+    \\
     
     \inferrule*[right=\texttt{S-Var-L}]
     { }
@@ -225,7 +237,7 @@
 \begin{align*}
 &\text{Typing Environments} \quad\quad &\Gamma::=&~ . \mid \Gamma, x : A \mid \Gamma, a\\
 &\text{Subtyping Environments} \quad\quad &\Gamma, \Omega, \Delta ::=&~ . \mid \Gamma, x : A \mid \Gamma, a \mid \Gamma , \hat{a} \mid \Gamma, \hat{a} = A\\
-    &\text{Contexts} \quad\quad &\Sigma ::=&~  \square  \mid A \mid \boxed{e} \leadsto \Sigma\\
+    &\text{Contexts} \quad\quad &\Sigma ::=&~  \square  \mid A \mid \boxed{e} \leadsto \Sigma \mid \boxed{A} \leadsto \Sigma\\
     &\text{Generic Consumers} \quad \quad &g::=&~ i \mid x \mid e : A \mid \Lambda a.~e
 \end{align*}
 
@@ -271,10 +283,10 @@
 %{\Gamma, a \vdash \Sigma  \Rightarrow e \Rightarrow B}
 %{\Gamma \vdash \boxed{A} \leadsto \Sigma \Rightarrow \Lambda a. ~e \Rightarrow [A/a]B}
 
-%\inferrule*[right=\texttt{T-TApp}]
-%%{\Gamma \vdash H \Rightarrow e \Rightarrow \forall X.~B}
-%{\Gamma \vdash \boxed{A} \leadsto \Sigma \Rightarrow e \Rightarrow B}
-%{\Gamma \vdash  \Sigma \Rightarrow e[A] \Rightarrow B}
+\inferrule*[right=\texttt{T-TApp}]
+%{\Gamma \vdash H \Rightarrow e \Rightarrow \forall X.~B}
+{\Gamma \vdash \boxed{A} \leadsto \Sigma \Rightarrow e \Rightarrow \forall a.~B}
+{\Gamma \vdash  \Sigma \Rightarrow e ~@~A \Rightarrow [A/a]B}
 \end{mathpar}
 
 \begin{comment}
@@ -387,6 +399,10 @@
 \inferrule*[right=\texttt{S-$\forall$L}]
 {\Gamma; \Delta, \hat{a} \vdash A \leq^+ \boxed{e} \leadsto \Sigma \dashv \Delta', \hat{a}=C \rightsquigarrow B}
 {\Gamma; \Delta \vdash \forall a. A \leq^+ \boxed{e} \leadsto \Sigma \dashv \Delta' \rightsquigarrow B}
+
+\inferrule*[right=\texttt{S-TApp}]
+{ \Gamma; \Delta, a:=B \vdash A \leq^+ \Sigma \dashv \Delta, a := B \rightsquigarrow C}
+{\Gamma; \Delta \vdash \forall a. A \leq^+ \boxed{B} \leadsto \Sigma \dashv \Delta \rightsquigarrow \forall a. C}
 
 \end{mathpar}
 
