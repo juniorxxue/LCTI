@@ -50,13 +50,13 @@ Notation "τ~ A" := (ctxType A) (at level 50).
 Notation "[ e ]↝ Sigma" := (ctxTerm e Sigma) (at level 53, right associativity).
 Notation "⟦ A ⟧↝ Sigma" := (ctxTApp A Sigma) (at level 54, right associativity).
 
-Inductive nonEmpty : context -> Set :=
+Inductive nonEmpty : context -> Prop :=
 | neType : forall {A}, nonEmpty (ctxType A)
 | neTerm : forall {e Sigma}, nonEmpty (ctxTerm e Sigma)
 | neTApp : forall {A Sigma}, nonEmpty (ctxTApp A Sigma)
 .
 
-Inductive genericConsumer : term -> Set :=
+Inductive genericConsumer : term -> Prop :=
 | gcLit : forall {n}, genericConsumer (Lit n)
 | gcVar : forall {x}, genericConsumer (Var x)
 | gcAnn : forall {e A}, genericConsumer (Ann e A)
@@ -116,7 +116,7 @@ Fixpoint ctxtmshift (Sigma : context) (k : nat) : context :=
   end.
 
 (* (x : A) in Gamma*)
-Inductive lookup : env -> nat -> type -> Set :=
+Inductive lookup : env -> nat -> type -> Prop :=
 | lkZ : forall {Gamma A}, lookup (TBCons Gamma A) 0 A
 | lkSTB : forall {Gamma A B x}, lookup Gamma x A -> lookup (TBCons Gamma B) (S x) A
 | lkSTy : forall {Gamma A x},

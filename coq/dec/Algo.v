@@ -1,6 +1,6 @@
 Require Import Syntax.
 
-Inductive ty : env -> context -> term -> type -> Set :=
+Inductive ty : env -> context -> term -> type -> Prop :=
 | tyInt : forall {Gamma n}, ty Gamma ctxEmpty (Lit n) Int
 | tyVar : forall {Gamma x A},
     lookup Gamma x A ->
@@ -10,7 +10,7 @@ Inductive ty : env -> context -> term -> type -> Set :=
     ty Gamma ctxEmpty (Ann e A) A
 | tyApp : forall {Gamma Sigma e1 e2 A B},
     ty Gamma (ctxTerm e2 Sigma) e1 (Arr A B) ->
-    ty Gamma Sigma e2 B
+    ty Gamma Sigma (App e1 e2) B
 | tyLam1 : forall {Gamma A B C e},
     ty (TBCons Gamma A) (ctxType B) e C ->
     ty Gamma (ctxType (Arr A B)) (Lam e) (Arr A C)
@@ -30,7 +30,7 @@ Inductive ty : env -> context -> term -> type -> Set :=
 | tyTApp : forall {Gamma Sigma e A B},
     ty Gamma (ctxTApp A Sigma) e (Fall B) ->
     ty Gamma Sigma (TApp e A) (subst B 0 A)
-with sub : env -> type -> context -> Set :=
+with sub : env -> type -> context -> Prop :=
 | subEmpty : forall {Gamma A},
     sub Gamma A ctxEmpty
 | subRefl : forall {Gamma A},
