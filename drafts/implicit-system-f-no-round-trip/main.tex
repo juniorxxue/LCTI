@@ -38,7 +38,7 @@
 
 \begin{align*}
 &\text{Types} \quad\quad &A, B, C, D ::=&~ a \mid \mathtt{Int} \mid A \rightarrow B \mid \forall a.~A\\
-&\text{Expressions} \quad \quad &e::=&~ i \mid x \mid \lambda x . ~e \mid e_1~e_2 \mid e : A \mid \Lambda a.~e \mid e ~@~ A
+&\text{Expressions} \quad \quad &e::=&~ i \mid x \mid \lambda x . ~e \mid e_1~e_2 \mid e : A \mid \Lambda a.~e \mid e ~@ A
 \end{align*}
 
 \section{Decl.}
@@ -93,7 +93,7 @@
 
     \inferrule*[right=\texttt{TApp}]
     {\Gamma \vdash_{T~n} e : \forall a. ~B}
-    {\Gamma \vdash_n e ~@~ A :  [a/A]~B}    
+    {\Gamma \vdash_n e ~@ A :  [a/A]~B}    
 \end{mathpar}
 
 \subsection{Subtyping: $\Gamma \vdash_n A <: B$}
@@ -184,7 +184,7 @@
     
     \inferrule*[right=\texttt{TApp}]
     {\Gamma \vdash_{T~n} e : \forall a. ~B}
-    {\Gamma \vdash_n e ~@~ A :  [a/A]~B}    
+    {\Gamma \vdash_n e ~@ A :  [a/A]~B}    
 \end{mathpar}
 
 \subsection{Subtyping: $\Gamma \shortmid \Delta \vdash_n A <:^{\pm} B$}
@@ -286,7 +286,7 @@
 \inferrule*[right=\texttt{T-TApp}]
 %{\Gamma \vdash H \Rightarrow e \Rightarrow \forall X.~B}
 {\Gamma \vdash \boxed{A} \leadsto \Sigma \Rightarrow e \Rightarrow \forall a.~B}
-{\Gamma \vdash  \Sigma \Rightarrow e ~@~A \Rightarrow [A/a]B}
+{\Gamma \vdash  \Sigma \Rightarrow e ~@A \Rightarrow [A/a]B}
 \end{mathpar}
 
 \begin{comment}
