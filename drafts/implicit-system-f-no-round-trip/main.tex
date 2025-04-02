@@ -225,11 +225,20 @@
     
     \inferrule*[right=\texttt{S-Var-L}]
     { }
+    {\Gamma; \Delta [\hat{a} = A] \vdash_\infty \hat{a} <:^+ A}
+    
+     \inferrule*[right=\texttt{S-Var-R}]
+   { }
+    {\Gamma; \Delta [\hat{a} = A] \vdash_\infty A <:^- \hat{a}}
+    \\
+    
+    \inferrule*[right=\texttt{S-Var-L}]
+    { }
     {\Gamma; \Delta [\hat{a} := A] \vdash_\infty \hat{a} <:^+ A}
     
      \inferrule*[right=\texttt{S-Var-R}]
    { }
-    {\Gamma; \Delta [\hat{a} := A] \vdash_\infty A <:^- \hat{a}}
+    {\Gamma; \Delta [\hat{a} := A] \vdash_\infty A <:^- \hat{a}}    
 \end{mathpar}
 
 \section{Algo.}
