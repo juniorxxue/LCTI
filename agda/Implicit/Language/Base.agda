@@ -104,21 +104,24 @@ data SEnv : Env n m → Set where
             → X ≡ Y
 ‶-injective refl = refl
 
-data Counter : Set where
-  Z : Counter
-  ∞ : Counter
-  𝕚 : Counter → Counter
-  𝕔 : Counter → Counter
+infixr 9 𝕥₍_₎_
+data Counter : ℕ → Set where
+  Z : Counter m
+  ∞ : Counter m
+  𝕚 : Counter m → Counter m
+  𝕔 : Counter m → Counter m
+  𝕥₍_₎_ : Type m → Counter m → Counter m
 
 variable
-  j j′ j″ : Counter
+  j j′ j″  : Counter m
+  j' j'' : Counter m
 
-data NonZ : Counter → Set where
-  nz-∞ : NonZ ∞
+data NonZ : Counter m → Set where
+  nz-∞ : NonZ (Counter m ∋⦂ ∞)
   nz-I : NonZ (𝕚 j)
   nz-C : NonZ (𝕔 j)
 
-data 𝕚𝕔 : Counter → Set where
+data 𝕚𝕔 : Counter m → Set where
   case-𝕚 : 𝕚𝕔 (𝕚 j)
   case-𝕔 : 𝕚𝕔 (𝕔 j)
 

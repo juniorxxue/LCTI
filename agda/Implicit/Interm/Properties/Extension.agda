@@ -14,10 +14,12 @@ s-⊆-prv (s-arr₁ s s₁) ext = s-arr₁ (s-⊆-prv s ext) (s-⊆-prv s₁ ext
 s-⊆-prv (s-arr₂ s s₁) ext = s-arr₂ (s-⊆-prv s ext) (s-⊆-prv s₁ ext)
 s-⊆-prv (s-arr₃ cloA grd s) ext = s-arr₃ (⊆-⊢c cloA ext) (⊆-⊢c-≫' ext cloA grd) (s-⊆-prv s ext)
 s-⊆-prv (s-∀ s) ext = s-∀ (s-⊆-prv s (uvar ext))
-s-⊆-prv (s-∀l s ic fd upC upD) ext with s-sregular s
-... | reg-S= r regA = s-∀l (s-⊆-prv s (svar ext regA)) ic fd upC upD
+s-⊆-prv (s-∀l s ic fd upC upD upj) ext with s-sregular s
+... | reg-S= r regA = s-∀l (s-⊆-prv s (svar ext regA)) ic fd upC upD upj
 s-⊆-prv (s-svar-l x inΔ) ext = s-svar-l (⊆-sregular' ext) (⊆-∋:= inΔ ext)
 s-⊆-prv (s-svar-r x inΔ) ext = s-svar-r (⊆-sregular' ext) (⊆-∋:= inΔ ext)
+s-⊆-prv (s-tapp s upj) ext with s-sregular s
+... | reg-S= r regA = s-tapp (s-⊆-prv s (svar ext regA)) upj
 
 infix 3 _⊆t_
 data _⊆t_ : Env n m → Env n m → Set where
@@ -142,10 +144,12 @@ s-⊆-prv-gen (s-arr₁ s s₁) ext = s-arr₁ (s-⊆-prv-gen s ext) (s-⊆-prv-
 s-⊆-prv-gen (s-arr₂ s s₁) ext = s-arr₂ (s-⊆-prv-gen s ext) (s-⊆-prv-gen s₁ ext)
 s-⊆-prv-gen (s-arr₃ cloA grd s) ext = s-arr₃ (⊆t-⊢c cloA ext) (⊆t-⊢c-≫ grd ext cloA) (s-⊆-prv-gen s ext)
 s-⊆-prv-gen (s-∀ s) ext = s-∀ (s-⊆-prv-gen s (uvar ext))
-s-⊆-prv-gen (s-∀l s ic fd upC upD) ext with s-sregular s
-... | reg-S= r regA = s-∀l (s-⊆-prv-gen s (svar ext regA)) ic fd upC upD
+s-⊆-prv-gen (s-∀l s ic fd upC upD upj) ext with s-sregular s
+... | reg-S= r regA = s-∀l (s-⊆-prv-gen s (svar ext regA)) ic fd upC upD upj
 s-⊆-prv-gen (s-svar-l x inΔ) ext = s-svar-l (⊆t-sregular x ext) (⊆t-∋:= inΔ ext)
 s-⊆-prv-gen (s-svar-r x inΔ) ext = s-svar-r (⊆t-sregular x ext) (⊆t-∋:= inΔ ext)
+s-⊆-prv-gen (s-tapp s st) ext with s-sregular s
+... | reg-S= r regA = s-tapp (s-⊆-prv-gen s (svar ext regA)) st
 
 t-⊆-prv-gen : Γ ⊢ j # e ⦂ A
         → Γ ⊆t Δ
@@ -161,6 +165,7 @@ t-⊆-prv-gen (⊢app₁ ⊢e ⊢e₁) ext = ⊢app₁ (t-⊆-prv-gen ⊢e ext) 
 t-⊆-prv-gen (⊢app₂ ⊢e ⊢e₁) ext = ⊢app₂ (t-⊆-prv-gen ⊢e ext) (t-⊆-prv-gen ⊢e₁ ext)
 t-⊆-prv-gen (⊢sub ⊢e B≤A x j≢Z) ext = ⊢sub (t-⊆-prv-gen ⊢e ext) (s-⊆-prv-gen B≤A (mark ext)) x j≢Z
 t-⊆-prv-gen (⊢tabs ⊢e) ext = ⊢tabs (t-⊆-prv-gen ⊢e (uvar ext))
+t-⊆-prv-gen (⊢tapp ⊢e st) ext = ⊢tapp (t-⊆-prv-gen ⊢e ext) st
 
 ----------------------------------------------------------------------
 --+                          corollaries                           +--

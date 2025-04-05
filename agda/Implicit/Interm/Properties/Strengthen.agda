@@ -1,3 +1,4 @@
+{-# OPTIONS --allow-unsolved-metas #-}
 module Implicit.Interm.Properties.Strengthen where
 
 open import Implicit.Language.All
@@ -16,9 +17,10 @@ s-strengthen, (s-arr₁ s s₁) newΓ = s-arr₁ (s-strengthen, s newΓ) (s-stre
 s-strengthen, (s-arr₂ s s₁) newΓ = s-arr₂ (s-strengthen, s newΓ) (s-strengthen, s₁ newΓ)
 s-strengthen, (s-arr₃ cloA grd s) newΓ = s-arr₃ (⊢c-strengthen, cloA newΓ) (≫-strengthen, grd newΓ) (s-strengthen, s newΓ)
 s-strengthen, (s-∀ s) newΓ = s-∀ (s-strengthen, s (◀S∙ newΓ))
-s-strengthen, (s-∀l s ic fd upC upD) newΓ = s-∀l (s-strengthen, s (◀S= newΓ)) ic fd upC upD
+s-strengthen, (s-∀l s ic fd upC upD upj) newΓ = s-∀l (s-strengthen, s (◀S= newΓ)) ic fd upC upD upj
 s-strengthen, (s-svar-l x inΔ) newΓ = s-svar-l (sregular-strengthen, x newΓ) (∋:=-strengthen, inΔ newΓ)
 s-strengthen, (s-svar-r x inΔ) newΓ = s-svar-r (sregular-strengthen, x newΓ) (∋:=-strengthen, inΔ newΓ)
+s-strengthen, (s-tapp s upj) = {!!}
 
 
 t-strengthen, : Γ ⊢ j # e' ⦂ A
@@ -34,20 +36,22 @@ t-strengthen, (⊢app₁ ⊢e ⊢e₁) newΓ (↑tm-app upe upe₁) = ⊢app₁ 
 t-strengthen, (⊢app₂ ⊢e ⊢e₁) newΓ (↑tm-app upe upe₁) = ⊢app₂ (t-strengthen, ⊢e newΓ upe) (t-strengthen, ⊢e₁ newΓ upe₁)
 t-strengthen, (⊢sub ⊢e B≤A gc j≢Z) newΓ upe = ⊢sub (t-strengthen, ⊢e newΓ upe) (s-strengthen, B≤A (◀S⋈ newΓ)) (↑tm-gc' gc upe) j≢Z
 t-strengthen, (⊢tabs ⊢e) newΓ (↑tm-Λ upe) = ⊢tabs (t-strengthen, ⊢e (◀S∙ newΓ) upe)
+t-strengthen, (⊢tapp ⊢e st) = {!!}
 
 t-strengthen,0 : Γ , T ⊢ j # e' ⦂ A
                → ↑tm0 e ⇘ e'
                → Γ ⊢ j # e ⦂ A
 t-strengthen,0 ⊢e up = t-strengthen, ⊢e ◀Z up
 
-
+postulate
 -- sometimes, we need a shifted over environments, k εᵍ Γ
-s-strengthen= : Γ ⊢ j # A' ⌞ ≤ ⌝ B'
+  s-strengthen= : Γ ⊢ j' # A' ⌞ ≤ ⌝ B'
               → Γ ◀ k =⇘ Γ'
               → A ↑ty k ⇘ A'
               → B ↑ty k ⇘ B'
+              → j ↑tyʲ k ⇘ j'
               → Γ' ⊢ j # A ⌞ ≤ ⌝ B
-
+{-
 s-strengthen= (s-refl regΔ cloA grd) newΓ upA upB = s-refl (sregular-strengthen= regΔ newΓ)
                                                            (⊢c-strengthen= cloA newΓ upA)
                                                            (≫-strengthen= grd regΔ newΓ upA upB)
@@ -72,13 +76,17 @@ s-strengthen= (s-∀l {B = B} s ic fd upC upD) newΓ (↑ty-∀ upA) (↑ty-arr 
       (↑ty-arr (↑ty-comm0' upB upC upA′) (↑ty-comm0' upB₁ upD upB′))) ic (↑ty-find0' fd upA) upA′ upB′
 s-strengthen= (s-svar-l x inΔ) newΓ ↑ty-var upB = s-svar-l (sregular-strengthen= x newΓ) (∋:=-strengthen=-reg x inΔ newΓ upB)
 s-strengthen= (s-svar-r x inΔ) newΓ upA ↑ty-var = s-svar-r (sregular-strengthen= x newΓ) (∋:=-strengthen=-reg x inΔ newΓ upA)
+-}
 
+postulate
 
-t-strengthen= : Γ ⊢ j # e' ⦂ A'
+  t-strengthen= : Γ ⊢ j' # e' ⦂ A'
                 → Γ ◀ k =⇘ Γ'
                 → e ↑tyᵉ k ⇘ e'
                 → A ↑ty k ⇘ A'
+                → j ↑tyʲ k ⇘ j'
                 → Γ' ⊢ j # e ⦂ A
+{-
 t-strengthen= (⊢lit cloΓ) newΓ ↑tyᵉ-lit ↑ty-int = ⊢lit (tregular-strengthen= cloΓ newΓ)
 t-strengthen= (⊢var cloΓ x∈Γ) newΓ ↑tyᵉ-var upA = ⊢var (tregular-strengthen= cloΓ newΓ) (∋⦂-strengthen= x∈Γ cloΓ newΓ upA)
 t-strengthen= (⊢ann ⊢e) newΓ (↑tyᵉ-⦂ upe up) upA with ↑ty-unique-inver up upA
@@ -95,3 +103,4 @@ t-strengthen= (⊢sub ⊢e B≤A gc j≢Z) newΓ upe upA
   with r ← t-⊢r ⊢e
   with ⟨ preA , upp ⟩ ← ⊢r-◀-↑ty-surjective r newΓ = ⊢sub (t-strengthen= ⊢e newΓ upe upp) (s-strengthen= B≤A (◀S⋈ newΓ) upp upA) (↑ty-gc' gc upe) j≢Z
 t-strengthen= (⊢tabs ⊢e) newΓ (↑tyᵉ-Λ upe) (↑ty-∀ upA) = ⊢tabs (t-strengthen= ⊢e (◀S∙ newΓ) upe upA)
+-}
