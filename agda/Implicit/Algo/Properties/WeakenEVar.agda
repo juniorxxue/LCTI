@@ -98,7 +98,7 @@ s-weaken^ {k = k} (s-∀l {B = B} s upᶜ upᵉ upC upD) new (↑ty-∀ upA) (�
          (↑tyᶜ-comm0' (↑tyᶜ-e up-e upΣ) (↑tyᶜ-e upe″ upΣ″) (↑tyᶜ-e upᵉ upᶜ))
          (↑ty-arr (↑ty-comm0' upC' upC″ upC) (↑ty-comm0' upD' upD″ upD)))
          upΣ″ upe″ upC″ upD″
-s-weaken^ (s-tapp s upᶜ upC) new upA (↑tyᶜ-⓪ upA' upΣ) upB = {!!}
+s-weaken^ (s-tapp s upᶜ) new upA (↑tyᶜ-⓪ upA' upΣ) upB = {!!}
 
 t-weaken^ (⊢lit regΓ) newΓ ↑tyᶜ-□ ↑tyᵉ-lit ↑ty-int = ⊢lit (tregular-weaken^ regΓ newΓ)
 t-weaken^ (⊢var regΓ x∈Γ) newΓ ↑tyᶜ-□ ↑tyᵉ-var upA = ⊢var (tregular-weaken^ regΓ newΓ) (∋⦂-weaken^ x∈Γ newΓ upA)
@@ -119,7 +119,7 @@ t-weaken^ {k = k} (⊢sub {A = A} ⊢e ne gc s) newΓ upΣ upe upA
   = ⊢sub (t-weaken^ ⊢e newΓ ↑tyᶜ-□ upe upA')
          (nonempty-↑tyᶜ' ne upΣ) (gc-↑tyᵉ gc upe) (s-weaken^ s (▶S⋈ (▶^-▶⨟^ newΓ)) upA' upΣ upA)
 t-weaken^ (⊢tabs ⊢e) newΓ ↑tyᶜ-□ (↑tyᵉ-Λ upe) (↑ty-∀ upA) = ⊢tabs (t-weaken^ ⊢e (▶S∙ newΓ) ↑tyᶜ-□ upe upA)
-t-weaken^ (⊢tapp x₂) newΓ upΣ (↑tyᵉ-⓪ upe upA₁) upA = ⊢tapp (t-weaken^ x₂ newΓ (↑tyᶜ-⓪ upA₁ upΣ) upe upA)
+t-weaken^ (⊢tapp x₂ st) newΓ upΣ (↑tyᵉ-⓪ upe upA₁) upA = {!!}
 
 t-weaken^0 : Γ ⊢ Σ ⇒ e ⇒ A
            → ↑tyᶜ0 Σ ⇘ Σ'

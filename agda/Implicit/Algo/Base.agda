@@ -96,8 +96,8 @@ data _⊢_⇒_⇒_ where
     → Γ ⊢ □ ⇒ Λ e ⇒ `∀ A
 
   ⊢tapp :
-       Γ ⊢ A ⓪↝ Σ ⇒ e ⇒ `∀ B
-    → ⟦ A ⟧ B ⇘ B*
+      Γ ⊢ A ⓪↝ Σ ⇒ e ⇒ `∀ B
+    → (st : ⟦ A ⟧ B ⇘ B*)
     → Γ ⊢ Σ ⇒ e ⓪ A ⇒ B*
 
 data _⊢_≤⁺_⊣_↪_ where

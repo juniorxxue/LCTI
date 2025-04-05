@@ -64,7 +64,7 @@ t-strengthen, (⊢lam₂ ⊢e up-c ⊢e₁) newΓ (↑tmᶜ-e {Σ = Σ} up-e up�
 ... | ⟨ Σ' , upΣ' ⟩ = ⊢lam₂ (t-strengthen, ⊢e newΓ ↑tmᶜ-□ up-e) upΣ' (t-strengthen, ⊢e₁ (◀S, newΓ) (↑tmᶜ-comm' z≤n upΣ up-c upΣ') upe)
 t-strengthen, (⊢sub ⊢e ne gc s) newΓ upΣ upe = ⊢sub (t-strengthen, ⊢e newΓ ↑tmᶜ-□ upe) (nonempty-↑tmᶜ' ne upΣ) (↑tm-gc' gc upe) (s-strengthen, s (◀S⋈ newΓ) (◀S⋈ newΓ) upΣ)
 t-strengthen, (⊢tabs ⊢e) newΓ ↑tmᶜ-□ (↑tm-Λ upe) = ⊢tabs (t-strengthen, ⊢e (◀S∙ newΓ) ↑tmᶜ-□ upe)
-t-strengthen, (⊢tapp ⊢e) = {!!}
+t-strengthen, (⊢tapp ⊢e st) = {!!}
 
 s-strengthen, (s-empty regΓ cloA x) newΓ newΔ ↑tmᶜ-□ with refl ← ◀,-unique newΓ newΔ = s-empty (sregular-strengthen, regΓ newΓ)
                                                                                                (⊢c-strengthen, cloA newΓ)
@@ -78,7 +78,7 @@ s-strengthen, (s-∀l s upᶜ upᵉ upC upD) newΓ newΔ (↑tmᶜ-e {e = e} {Σ
   with ⟨ Σ' , upΣ' ⟩ ← ↑tyᶜ0-total Σ
   with ⟨ e' , upe ⟩ ← ↑tyᵉ0-total e
   = s-∀l (s-strengthen, s (◀S^ newΓ) (◀S= newΔ) (↑tmᶜ-e (↑tm-↑tyᵉ-comm up-e upᵉ upe) (↑tmᶜ-↑tyᶜ-comm upΣ upᶜ upΣ'))) upΣ' upe upC upD
-s-strengthen, (s-tapp s upᶜ upC) = {!!}
+s-strengthen, (s-tapp s upᶜ) = {!!}
 
 
 -- corollaries

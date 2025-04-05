@@ -72,7 +72,7 @@ t-weaken, (⊢lam₂ ⊢e up-c ⊢e₁) new (↑tmᶜ-e {Σ' = Σ'} up-e upΣ) (
 t-weaken, (⊢sub ⊢e ne gc s) new upΣ upe = ⊢sub (t-weaken, ⊢e new ↑tmᶜ-□ upe) (nonempty-↑tmᶜ ne upΣ) (↑tm-gc gc upe) (s-weaken, s upΣ (▶sS⋈ (▶,-▶⨟, new)))
 t-weaken, {T = T} (⊢tabs ⊢e) new ↑tmᶜ-□ (↑tm-Λ upe)
   with ⟨ T' , upT ⟩ ← ↑ty0-total T = ⊢tabs (t-weaken, ⊢e (▶S∙ new upT) ↑tmᶜ-□ upe)
-t-weaken, (⊢tapp ⊢e) new upΣ (↑tm-⓪ upe) = ⊢tapp (t-weaken, ⊢e new (↑tmᶜ-⓪ upΣ) upe)
+t-weaken, (⊢tapp ⊢e st) new upΣ (↑tm-⓪ upe) = ⊢tapp (t-weaken, ⊢e new (↑tmᶜ-⓪ upΣ) upe) st
 
 s-weaken, (s-empty regΓ cloA grd) ↑tmᶜ-□ new
    with refl ← ▶s⨟,-unique new = s-empty (sregular-weaken,s regΓ (▶s⨟,-▶s,-l new)) (⊢c-weaken,s cloA (▶s⨟,-▶s,-l new)) (≫-weaken,s grd (▶s⨟,-▶s,-l new))
@@ -92,7 +92,7 @@ s-weaken, {T = T} (s-∀l s upᶜ upᵉ upC upD) (↑tmᶜ-e {e' = e'} {Σ' = Σ
   with ⟨ Σ″ , upΣ' ⟩ ← ↑tyᶜ0-total Σ'
   with ⟨ e″ , upe' ⟩ ← ↑tyᵉ0-total e'
   = s-∀l (s-weaken, s (↑tmᶜ-e (↑tm-↑tyᵉ-comm up-e upe' upᵉ) (↑tmᶜ-↑tyᶜ-comm upΣ upΣ' upᶜ)) (▶sS^= new upT)) upΣ' upe' upC upD
-s-weaken, (s-tapp s upᶜ upC) upΣ new = {!!}
+s-weaken, (s-tapp s upᶜ) upΣ new = {!!}
 
 s-weaken,0 : Γ ⋈ ⊢ A ≤⁺ Σ ⊣ Δ ⋈ ↪ B
            → ↑tmᶜ0 Σ ⇘ Σ'
