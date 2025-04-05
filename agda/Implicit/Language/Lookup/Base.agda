@@ -19,6 +19,9 @@ data _∋_⦂_ : Env n m → Fin n → Type m → Set where
   S= : Γ ∋ x ⦂ A
      → (up : ↑ty0 A ⇘ A')
      → Γ ,= B ∋ x ⦂ A'
+  S≝ : Γ ∋ x ⦂ A
+     → (up : ↑ty0 A ⇘ A')
+     → Γ ,≝ B ∋ x ⦂ A'
 
 -- lookup an entry in subtyping env : solution
 infix 3 _∋_:=_
@@ -34,8 +37,31 @@ data _∋_:=_ : Env n m → Fin m → Type m → Set where
   S= : Δ ∋ k := A
      → (up : ↑ty0 A ⇘ A')
      → Δ ,= B ∋ #S k := A'
+  S≝ : Δ ∋ k := A
+     → (up : ↑ty0 A ⇘ A')
+     → Δ ,≝ B ∋ #S k := A'
   S, : Δ ∋ k := A
      → Δ , B ∋ k := A
+
+-- lookup an entry in subtyping env : solution
+infix 3 _∋_≝_
+data _∋_≝_ : Env n m → Fin m → Type m → Set where
+  Z  : (up : ↑ty0 A ⇘ A')
+     → Δ ,≝ A ∋ #0 ≝ A'
+  S∙ : Δ ∋ k ≝ A
+     → (up : ↑ty0 A ⇘ A')
+     → Δ ,∙ ∋ #S k ≝ A'
+  S^ : Δ ∋ k ≝ A
+     → (up : ↑ty0 A ⇘ A')
+     → Δ ,^ ∋ #S k ≝ A'
+  S= : Δ ∋ k ≝ A
+     → (up : ↑ty0 A ⇘ A')
+     → Δ ,= B ∋ #S k ≝ A'
+  S≝ : Δ ∋ k ≝ A
+     → (up : ↑ty0 A ⇘ A')
+     → Δ ,≝ B ∋ #S k ≝ A'
+  S, : Δ ∋ k ≝ A
+     → Δ , B ∋ k ≝ A
 
 -- lookup an entry in subtyping env: solution (simpler ver.)
 infix 3 _∋=_
@@ -47,8 +73,27 @@ data _∋=_ : Env n m → Fin m → Set where
      → Δ ,^ ∋= #S k
   S= : Δ ∋= k
      → Δ ,= B ∋= #S k
+  S≝ : Δ ∋= k
+     → Δ ,≝ B ∋= #S k
   S, : Δ ∋= k
      → Δ , A ∋= k
+
+
+infix 3 _∋≝_
+data _∋≝_ : Env n m → Fin m → Set where
+  Z  : Δ ,≝ A ∋≝ #0
+  S∙ : Δ ∋≝ k
+     → Δ ,∙ ∋≝ #S k
+  S^ : Δ ∋≝ k
+     → Δ ,^ ∋≝ #S k
+  S≝ : Δ ∋≝ k
+     → Δ ,≝ B ∋≝ #S k
+  S= : Δ ∋≝ k
+     → Δ ,= B ∋≝ #S k
+  S, : Δ ∋≝ k
+     → Δ , A ∋≝ k
+  S⋈ : Γ ∋≝ k
+     → Γ ⋈ ∋≝ k
 
 -- lookup an entry in subtyping env: (unsolved) existential variable
 infix 3 _∋^_
@@ -58,6 +103,8 @@ data _∋^_ : Env n m → Fin m → Set where
      → Δ ,∙ ∋^ #S k
   S= : Δ ∋^ k
      → Δ ,= B ∋^ #S k
+  S≝ : Δ ∋^ k
+     → Δ ,≝ B ∋^ #S k
   S^ : Δ ∋^ k
      → Δ ,^ ∋^ #S k
   S, : Δ ∋^ k  -- this entry is used for proving weakening of term variables in subtyping
@@ -74,6 +121,8 @@ data _∋∙_ : Env n m → Fin m → Set where
      → Γ ,∙ ∋∙ #S k
   S= : Γ ∋∙ k
      → Γ ,= B ∋∙ #S k
+  S≝ : Γ ∋∙ k
+     → Γ ,≝ B ∋∙ #S k
   S^ : Γ ∋∙ k
      → Γ ,^ ∋∙ #S k
   S⋈ : Γ ∋∙ k

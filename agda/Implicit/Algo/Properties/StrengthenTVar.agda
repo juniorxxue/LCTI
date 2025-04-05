@@ -7,7 +7,7 @@ open import Implicit.Algo.Properties.Shift
 open import Implicit.Algo.Properties.Id
 open import Implicit.Algo.Properties.Regularity
 
-
+{-
 ◀,-⊆-total : Γ ⊆ Δ
            → Γ ◀ k ,⇘ Γ'
            → ∃[ Δ' ](Δ ◀ k ,⇘ Δ')
@@ -25,11 +25,15 @@ inst-strengthen, (⟹^0 up regA env) (◀S^ newΓ) (◀S= newΔ) with refl ← �
 inst-strengthen, (⟹^S inst up1) (◀S^ newΓ) (◀S^ newΔ) = ⟹^S (inst-strengthen, inst newΓ newΔ) up1
 inst-strengthen, (⟹∙S inst up1) (◀S∙ newΓ) (◀S∙ newΔ) = ⟹∙S (inst-strengthen, inst newΓ newΔ) up1
 inst-strengthen, (⟹=S inst up1 regB) (◀S= newΓ) (◀S= newΔ) = ⟹=S (inst-strengthen, inst newΓ newΔ) up1 (⊢r-strengthen, regB newΓ)
+-}
 
-ss-strengthen, : Γ ⊢ A ⌞ ≤ ⌝ B ⊣ Δ
+postulate
+
+  ss-strengthen, : Γ ⊢ A ⌞ ≤ ⌝ B ⊣ Δ
                → Γ ◀ k ,⇘ Γ'
                → Δ ◀ k ,⇘ Δ'
                → Γ' ⊢ A ⌞ ≤ ⌝ B ⊣ Δ'
+{-
 ss-strengthen, (s-int regΓ) newΓ newΔ with refl ← ◀,-unique newΓ newΔ = s-int (sregular-strengthen, regΓ newΔ)
 ss-strengthen, (s-var-∙ regΓ x) newΓ newΔ
   with refl ← ◀,-unique newΓ newΔ = s-var-∙ (sregular-strengthen, regΓ newΓ) (∋∙-strengthen, x newΓ)
@@ -40,20 +44,21 @@ ss-strengthen, (s-ex-r= regΓ x-in) newΓ newΔ with refl ← ◀,-unique newΓ 
 ss-strengthen, (s-arr ss ss₁) newΓ newΔ with ◀,-⊆-total (ss-⊆ ss) newΓ
 ... | ⟨ Ω' , newΩ ⟩ = s-arr (ss-strengthen, ss newΓ newΩ) (ss-strengthen, ss₁ newΩ newΔ)
 ss-strengthen, (s-∀ ss) newΓ newΔ = s-∀ (ss-strengthen, ss (◀S∙ newΓ) (◀S∙ newΔ))
+-}
 
-
-t-strengthen, : Γ ⊢ Σ' ⇒ e' ⇒ A
+postulate
+  t-strengthen, : Γ ⊢ Σ' ⇒ e' ⇒ A
               → Γ ◀ k ,⇘ Γ'
               → Σ ↑tmᶜ k ⇘ Σ'
               → e ↑tm k ⇘ e'
               → Γ' ⊢ Σ ⇒ e ⇒ A
 
-s-strengthen, : Γ ⊢ A ≤⁺ Σ' ⊣ Δ ↪ B
+  s-strengthen, : Γ ⊢ A ≤⁺ Σ' ⊣ Δ ↪ B
               → Γ ◀ k ,⇘ Γ'
               → Δ ◀ k ,⇘ Δ'
               → Σ ↑tmᶜ k ⇘ Σ'
               → Γ' ⊢ A ≤⁺ Σ ⊣ Δ' ↪ B
-
+{-
 t-strengthen, (⊢lit regΓ) newΓ ↑tmᶜ-□ ↑tm-lit = ⊢lit (tregular-strengthen, regΓ newΓ)
 t-strengthen, (⊢var regΓ x∈Γ) newΓ ↑tmᶜ-□ ↑tm-var = ⊢var (tregular-strengthen, regΓ newΓ) (∋⦂-strengthen, x∈Γ newΓ)
 t-strengthen, (⊢ann ⊢e) newΓ ↑tmᶜ-□ (↑tm-⦂ upe) = ⊢ann (t-strengthen, ⊢e newΓ ↑tmᶜ-τ upe)
@@ -76,7 +81,7 @@ s-strengthen, (s-∀l s upᶜ upᵉ upC upD) newΓ newΔ (↑tmᶜ-e {e = e} {Σ
   with ⟨ Σ' , upΣ' ⟩ ← ↑tyᶜ0-total Σ
   with ⟨ e' , upe ⟩ ← ↑tyᵉ0-total e
   = s-∀l (s-strengthen, s (◀S^ newΓ) (◀S= newΔ) (↑tmᶜ-e (↑tm-↑tyᵉ-comm up-e upᵉ upe) (↑tmᶜ-↑tyᶜ-comm upΣ upᶜ upΣ'))) upΣ' upe upC upD
-
+-}
 
 -- corollaries
 s-strengthen,0 : Γ , T ⋈ ⊢ A ≤⁺ Σ' ⊣ Δ , T ⋈  ↪ B

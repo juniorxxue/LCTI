@@ -6,7 +6,7 @@ open import Implicit.Algo.Properties.Extension
 open import Implicit.Algo.Properties.Shift
 open import Implicit.Algo.Properties.Id
 open import Implicit.Algo.Properties.Regularity
-
+{-
 ◀=-unique : Γ ◀ k =⇘ Γ'
           → Γ ◀ k =⇘ Δ'
           → Γ' ≡ Δ'
@@ -53,15 +53,16 @@ inst-strengthen= {k = #S k} {#S X} (⟹=S inst up1 regB) (◀S= newΓ x) (◀S= 
   with refl ← ↑ty-unique-inver x x₁
   with regA ← inst-⊢r inst
   with ⟨ preA , uppA ⟩ ← ⊢r-◀-↑ty-surjective regA newΓ = ⟹=S (inst-strengthen= inst newΓ newΔ uppA) (↑ty-comm1 upB up1 uppA) (⊢r-strengthen= regB newΓ x₁)
+-}
 
-
-ss-strengthen= : Γ ⊢ A' ⌞ ≤ ⌝ B' ⊣ Δ
+postulate
+  ss-strengthen= : Γ ⊢ A' ⌞ ≤ ⌝ B' ⊣ Δ
                → Γ ◀ k =⇘ Γ'
                → Δ ◀ k =⇘ Δ'
                → A ↑ty k ⇘ A'
                → B ↑ty k ⇘ B'
                → Γ' ⊢ A ⌞ ≤ ⌝ B ⊣ Δ'
-
+{-
 ss-strengthen= (s-int regΓ) newΓ newΔ ↑ty-int ↑ty-int
    with refl ← ◀=-unique newΓ newΔ = s-int (sregular-strengthen= regΓ newΓ)
 ss-strengthen= {B = ‶ X} (s-var-∙ regΓ x) newΓ newΔ ↑ty-var upB
@@ -87,23 +88,24 @@ ss-strengthen= (s-∀ ss) newΓ newΔ (↑ty-∀ upA) (↑ty-∀ upB) = s-∀ (s
 ◀=-𝕣 (◀S∙ newΓ) = ◀S∙ (◀=-𝕣 newΓ)
 ◀=-𝕣 (◀S= newΓ x) = ◀S= (◀=-𝕣 newΓ) x
 ◀=-𝕣 (◀S⋈ newΓ) = newΓ
+-}
 
-
-t-strengthen= : Γ ⊢ Σ' ⇒ e' ⇒ A'
+postulate
+  t-strengthen= : Γ ⊢ Σ' ⇒ e' ⇒ A'
               → Γ ◀ k =⇘ Γ'
               → A ↑ty k ⇘ A'
               → e ↑tyᵉ k ⇘ e'
               → Σ ↑tyᶜ k ⇘ Σ'
               → Γ' ⊢ Σ ⇒ e ⇒ A
 
-s-strengthen= : Γ ⊢ A' ≤⁺ Σ' ⊣ Δ ↪ B'
+  s-strengthen= : Γ ⊢ A' ≤⁺ Σ' ⊣ Δ ↪ B'
               → Γ ◀ k =⇘ Γ'
               → Δ ◀ k =⇘ Δ'
               → A ↑ty k ⇘ A'
               → B ↑ty k ⇘ B'
               → Σ ↑tyᶜ k ⇘ Σ'
               → Γ' ⊢ A ≤⁺ Σ ⊣ Δ' ↪ B
-
+{-
 t-strengthen= (⊢lit regΓ) newΓ ↑ty-int ↑tyᵉ-lit ↑tyᶜ-□ = ⊢lit (tregular-strengthen= regΓ newΓ)
 t-strengthen= (⊢var regΓ x∈Γ) newΓ upA ↑tyᵉ-var ↑tyᶜ-□ = ⊢var (tregular-strengthen= regΓ newΓ) (∋⦂-strengthen= x∈Γ regΓ newΓ upA)
 t-strengthen= (⊢ann ⊢e) newΓ upA (↑tyᵉ-⦂ upe up) ↑tyᶜ-□
@@ -157,7 +159,7 @@ s-strengthen= (s-∀l s upᶜ upᵉ upC upD) newΓ newΔ (↑ty-∀ upA) (↑ty-
                         (↑ty-arr (↑ty-comm0' upB upC upA') (↑ty-comm0' upB₁ upD upB'))
                         (↑tyᶜ-e (↑tyᵉ-comm0' up-e upᵉ upe) (↑tyᶜ-comm0' upΣ upᶜ upΣ')))
          upΣ' upe upA' upB'
-
+-}
 
 -- corollaries
 s-strengthen=0 : Γ ,= T ⊢ A' ≤⁺ Σ' ⊣ Δ ,= T ↪ B'

@@ -6,6 +6,7 @@ infixr 5  ƛ_
 infixl 7  _·_
 infix  9  `_
 infixr 5  Λ_
+infixr 5  _⓪_
 infix  5  _⦂_
 
 infix  9  ‶_
@@ -36,6 +37,7 @@ data Term : ℕ → ℕ → Set where
   _·_      : (e₁ : Term n m) → (e₂ : Term n m) → Term n m
   _⦂_      : (e : Term n m) → (A : Type m) → Term n m
   Λ_       : (e : Term n (1 + m)) → Term n m
+  _⓪_      : (e : Term n m) → (A : Type m) → Term n m
 
 variable
   e  e' e* : Term n m
@@ -52,6 +54,7 @@ infixl 4 _,_
 infixl 4 _,∙
 infixl 4 _,^
 infixl 4 _,=_
+infixl 4 _,≝_
 infixl 4 _⋈
 
 data Env : ℕ → ℕ → Set where
@@ -60,6 +63,7 @@ data Env : ℕ → ℕ → Set where
   _,^   : Env n m → Env n (1 + m)
   _,∙   : Env n m → Env n (1 + m)
   _,=_  : Env n m → (A : Type m) → Env n (1 + m)
+  _,≝_  : Env n m → (A : Type m) → Env n (1 + m)
   _⋈    : Env n m → Env n m
 
 variable
@@ -76,6 +80,8 @@ data TEnv : Env n m → Set where
      → TEnv (Γ ,∙)
   S^ : TEnv Γ
      → TEnv (Γ ,^)
+  S≝ : TEnv Γ
+     → TEnv (Γ ,≝ A)
 
 data SEnv : Env n m → Set where
   Z⋈ : TEnv Γ
@@ -88,6 +94,8 @@ data SEnv : Env n m → Set where
      → SEnv (Δ ,∙)
   S^ : SEnv Δ
      → SEnv (Δ ,^)
+  S≝ : SEnv Γ
+     → SEnv (Γ ,≝ A)
 
 𝕣 : Env n m → Env n m
 𝕣 ∅ = ∅
@@ -95,6 +103,7 @@ data SEnv : Env n m → Set where
 𝕣 (Γ ,^) = 𝕣 Γ ,^
 𝕣 (Γ ,∙) = 𝕣 Γ ,∙
 𝕣 (Γ ,= A) = 𝕣 Γ ,= A
+𝕣 (Γ ,≝ A) = 𝕣 Γ ,≝ A
 𝕣 (Γ ⋈) = Γ
 
 ‶-injective : ‶ X ≡ ‶ Y
@@ -106,6 +115,7 @@ data Counter : Set where
   ∞ : Counter
   𝕚 : Counter → Counter
   𝕔 : Counter → Counter
+  𝕥 : Counter → Counter
 
 variable
   j j′ j″ : Counter
@@ -114,6 +124,7 @@ data NonZ : Counter → Set where
   nz-∞ : NonZ ∞
   nz-I : NonZ (𝕚 j)
   nz-C : NonZ (𝕔 j)
+  nz-T : NonZ (𝕥 j)
 
 data 𝕚𝕔 : Counter → Set where
   case-𝕚 : 𝕚𝕔 (𝕚 j)

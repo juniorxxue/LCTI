@@ -18,6 +18,11 @@ s-⊆-prv (s-∀l s ic fd upC upD) ext with s-sregular s
 ... | reg-S= r regA = s-∀l (s-⊆-prv s (svar ext regA)) ic fd upC upD
 s-⊆-prv (s-svar-l x inΔ) ext = s-svar-l (⊆-sregular' ext) (⊆-∋:= inΔ ext)
 s-⊆-prv (s-svar-r x inΔ) ext = s-svar-r (⊆-sregular' ext) (⊆-∋:= inΔ ext)
+s-⊆-prv (s-tapp s) ext with s-sregular s
+... | reg-S≝ r regA = s-tapp (s-⊆-prv s (dvar ext regA))
+s-⊆-prv (s-var-≝ regΔ inΔ) ext = s-var-≝ (⊆-sregular' ext) (⊆-∋≝ inΔ ext)
+s-⊆-prv (s-dvar-l x₁ inΔ) ext = s-dvar-l (⊆-sregular' ext) (⊆-∋:≝ inΔ ext)
+s-⊆-prv (s-dvar-r x₁ inΔ) ext = s-dvar-r (⊆-sregular' ext) (⊆-∋:≝ inΔ ext)
 
 infix 3 _⊆t_
 data _⊆t_ : Env n m → Env n m → Set where
@@ -39,6 +44,10 @@ data _⊆t_ : Env n m → Env n m → Set where
       Γ ⊆t Δ
     → (regA : Γ ⊢r A)
     → Γ ,= A ⊆t Δ ,= A
+  dvar :
+      Γ ⊆t Δ
+    → (regA : Γ ⊢r A)
+    → Γ ,≝ A ⊆t Δ ,≝ A
   mark : Γ ⊆t Δ
        → Γ ⋈ ⊆t Δ ⋈
 
@@ -51,6 +60,7 @@ data _⊆t_ : Env n m → Env n m → Set where
 ⊆t-∋⦂ (S^ inΓ up) (evar ext) = S^ (⊆t-∋⦂ inΓ ext) up
 ⊆t-∋⦂ (S^ inΓ up) (evar-sol ext regA) = S= (⊆t-∋⦂ inΓ ext) up
 ⊆t-∋⦂ (S= inΓ up) (svar ext regA) = S= (⊆t-∋⦂ inΓ ext) up
+⊆t-∋⦂ (S≝ inΓ up) (dvar ext regA) = S≝ (⊆t-∋⦂ inΓ ext) up
 
 ⊆t-∋∙ : Γ ∋∙ X
       → Γ ⊆t Δ
@@ -59,9 +69,33 @@ data _⊆t_ : Env n m → Env n m → Set where
 ⊆t-∋∙ (S, inΓ) (tvar ext regA) = S, (⊆t-∋∙ inΓ ext)
 ⊆t-∋∙ (S∙ inΓ) (uvar ext) = S∙ (⊆t-∋∙ inΓ ext)
 ⊆t-∋∙ (S= inΓ) (svar ext regA) = S= (⊆t-∋∙ inΓ ext)
+⊆t-∋∙ (S≝ inΓ) (dvar ext regA) = S≝ (⊆t-∋∙ inΓ ext)
 ⊆t-∋∙ (S^ inΓ) (evar ext) = S^ (⊆t-∋∙ inΓ ext)
 ⊆t-∋∙ (S^ inΓ) (evar-sol ext regA) = S= (⊆t-∋∙ inΓ ext)
 ⊆t-∋∙ (S⋈ inΓ) (mark ext) = S⋈ (⊆t-∋∙ inΓ ext)
+
+⊆t-∋≝ : Γ ∋≝ X
+      → Γ ⊆t Δ
+      → Δ ∋≝ X
+⊆t-∋≝ Z (dvar ext regA) = Z
+⊆t-∋≝ (S∙ inΓ) (uvar ext) = S∙ (⊆t-∋≝ inΓ ext)
+⊆t-∋≝ (S^ inΓ) (evar ext) = S^ (⊆t-∋≝ inΓ ext)
+⊆t-∋≝ (S^ inΓ) (evar-sol ext regA) = S= (⊆t-∋≝ inΓ ext)
+⊆t-∋≝ (S≝ inΓ) (dvar ext regA) = S≝ (⊆t-∋≝ inΓ ext)
+⊆t-∋≝ (S= inΓ) (svar ext regA) = S= (⊆t-∋≝ inΓ ext)
+⊆t-∋≝ (S, inΓ) (tvar ext regA) = S, (⊆t-∋≝ inΓ ext)
+⊆t-∋≝ (S⋈ inΓ) (mark ext) = S⋈ (⊆t-∋≝ inΓ ext)
+
+⊆t-∋:≝ : Γ ∋ X ≝ A
+       → Γ ⊆t Δ
+       → Δ ∋ X ≝ A
+⊆t-∋:≝ (Z up) (dvar ext regA) = Z up
+⊆t-∋:≝ (S∙ in1 up) (uvar ext) = S∙ (⊆t-∋:≝ in1 ext) up
+⊆t-∋:≝ (S^ in1 up) (evar ext) = S^ (⊆t-∋:≝ in1 ext) up
+⊆t-∋:≝ (S^ in1 up) (evar-sol ext regA) = S= (⊆t-∋:≝ in1 ext) up
+⊆t-∋:≝ (S= in1 up) (svar ext regA) = S= (⊆t-∋:≝ in1 ext) up
+⊆t-∋:≝ (S≝ in1 up) (dvar ext regA) = S≝ (⊆t-∋:≝ in1 ext) up
+⊆t-∋:≝ (S, in1) (tvar ext regA) = S, (⊆t-∋:≝ in1 ext)
 
 ⊆t-∋:= : Γ ∋ k := A
        → Γ ⊆t Δ
@@ -71,6 +105,7 @@ data _⊆t_ : Env n m → Env n m → Set where
 ⊆t-∋:= (S^ inΓ up) (evar ext) = S^ (⊆t-∋:= inΓ ext) up
 ⊆t-∋:= (S^ inΓ up) (evar-sol ext regA) = S= (⊆t-∋:= inΓ ext) up
 ⊆t-∋:= (S= inΓ up) (svar ext regA) = S= (⊆t-∋:= inΓ ext) up
+⊆t-∋:= (S≝ inΓ up) (dvar ext regA) = S≝ (⊆t-∋:= inΓ ext) up
 ⊆t-∋:= (S, inΓ) (tvar ext regA) = S, (⊆t-∋:= inΓ ext)
 
 ⊆t-∋= : Γ ∋= k
@@ -81,6 +116,7 @@ data _⊆t_ : Env n m → Env n m → Set where
 ⊆t-∋= (S^ inΓ) (evar ext) = S^ (⊆t-∋= inΓ ext)
 ⊆t-∋= (S^ inΓ) (evar-sol ext regA) = S= (⊆t-∋= inΓ ext)
 ⊆t-∋= (S= inΓ) (svar ext regA) = S= (⊆t-∋= inΓ ext)
+⊆t-∋= (S≝ inΓ) (dvar ext regA) = S≝ (⊆t-∋= inΓ ext)
 ⊆t-∋= (S, inΓ) (tvar ext regA) = S, (⊆t-∋= inΓ ext)
 
 
@@ -91,6 +127,7 @@ data _⊆t_ : Env n m → Env n m → Set where
 ⊆t-⊢r (⊢r-var-∙ inΓ) ext = ⊢r-var-∙ (⊆t-∋∙ inΓ ext)
 ⊆t-⊢r (⊢r-arr regA regA₁) ext = ⊢r-arr (⊆t-⊢r regA ext) (⊆t-⊢r regA₁ ext)
 ⊆t-⊢r (⊢r-∀ regA) ext = ⊢r-∀ (⊆t-⊢r regA (uvar ext))
+⊆t-⊢r (⊢r-var-≝ inΓ) ext = ⊢r-var-≝ (⊆t-∋≝ inΓ ext)
 
 ⊆t-⊢c : Γ ⊢c A
       → Γ ⊆t Δ
@@ -100,6 +137,7 @@ data _⊆t_ : Env n m → Env n m → Set where
 ⊆t-⊢c (⊢c-var-= inΔ) ext = ⊢c-var-= (⊆t-∋= inΔ ext)
 ⊆t-⊢c (⊢c-arr cloA cloA₁) ext = ⊢c-arr (⊆t-⊢c cloA ext) (⊆t-⊢c cloA₁ ext)
 ⊆t-⊢c (⊢c-∀ cloA) ext = ⊢c-∀ (⊆t-⊢c cloA (uvar ext))
+⊆t-⊢c (⊢c-var-≝ inΔ) ext = ⊢c-var-≝ (⊆t-∋≝ inΔ ext)
 
 ⊆t-tregular : TRegular Γ
             → Γ ⊆t Δ
@@ -110,6 +148,7 @@ data _⊆t_ : Env n m → Env n m → Set where
 ⊆t-tregular (reg-S^ regΓ) (evar ext) = reg-S^ (⊆t-tregular regΓ ext)
 ⊆t-tregular (reg-S^ regΓ) (evar-sol ext regA) = reg-S= (⊆t-tregular regΓ ext) regA
 ⊆t-tregular (reg-S= regΓ regA) (svar ext regA₁) = reg-S= (⊆t-tregular regΓ ext) (⊆t-⊢r regA ext)
+⊆t-tregular (reg-S≝ regΓ regA) (dvar ext regA₁) = reg-S≝ (⊆t-tregular regΓ ext) (⊆t-⊢r regA ext)
 
 ⊆t-sregular : SRegular Γ
             → Γ ⊆t Δ
@@ -119,6 +158,7 @@ data _⊆t_ : Env n m → Env n m → Set where
 ⊆t-sregular (reg-S^ regΓ) (evar ext) = reg-S^ (⊆t-sregular regΓ ext)
 ⊆t-sregular (reg-S^ regΓ) (evar-sol ext regA) = reg-S= (⊆t-sregular regΓ ext) regA
 ⊆t-sregular (reg-S= regΓ regA) (svar ext regA₁) = reg-S= (⊆t-sregular regΓ ext) (⊆t-⊢r regA ext)
+⊆t-sregular (reg-S≝ regΓ regA) (dvar ext regA₁) = reg-S≝ (⊆t-sregular regΓ ext) (⊆t-⊢r regA ext)
 
 ⊆t-⊢c-≫ : Γ ≫ A ⇘ B
         → Γ ⊆t Δ
@@ -131,6 +171,11 @@ data _⊆t_ : Env n m → Env n m → Set where
 ⊆t-⊢c-≫ (grd-var∙ x) ext (⊢c-var-= inΔ) = ⊥-elim (∋∙-∋=-false x inΔ)
 ⊆t-⊢c-≫ (grd-arr grd grd₁) ext (⊢c-arr cloA cloA₁) = grd-arr (⊆t-⊢c-≫ grd ext cloA) (⊆t-⊢c-≫ grd₁ ext cloA₁)
 ⊆t-⊢c-≫ (grd-∀ grd) ext (⊢c-∀ cloA) = grd-∀ (⊆t-⊢c-≫ grd (uvar ext) cloA)
+⊆t-⊢c-≫ (grd-var≝ x₁) ext (⊢c-var-∙ inΔ) = grd-var≝ (⊆t-∋≝ x₁ ext)
+⊆t-⊢c-≫ (grd-var≝ x₁) ext (⊢c-var-= inΔ) = grd-var≝ (⊆t-∋≝ x₁ ext)
+⊆t-⊢c-≫ (grd-var= x) ext (⊢c-var-≝ inΔ) = ⊥-elim (∋:=-∋≝-false x inΔ)
+⊆t-⊢c-≫ (grd-var≝ x) ext (⊢c-var-≝ inΔ) = grd-var≝ (⊆t-∋≝ x ext)
+⊆t-⊢c-≫ (grd-var∙ x) ext (⊢c-var-≝ inΔ) = ⊥-elim (∋∙-∋≝-false x inΔ)
 
 s-⊆-prv-gen : Γ ⊢ j # A ⌞ ≤ ⌝ B
          → Γ ⊆t Δ
@@ -146,6 +191,11 @@ s-⊆-prv-gen (s-∀l s ic fd upC upD) ext with s-sregular s
 ... | reg-S= r regA = s-∀l (s-⊆-prv-gen s (svar ext regA)) ic fd upC upD
 s-⊆-prv-gen (s-svar-l x inΔ) ext = s-svar-l (⊆t-sregular x ext) (⊆t-∋:= inΔ ext)
 s-⊆-prv-gen (s-svar-r x inΔ) ext = s-svar-r (⊆t-sregular x ext) (⊆t-∋:= inΔ ext)
+s-⊆-prv-gen (s-tapp s) ext with s-sregular s
+... | reg-S≝ r regA = s-tapp (s-⊆-prv-gen s (dvar ext regA))
+s-⊆-prv-gen (s-var-≝ regΔ inΔ) ext = s-var-≝ (⊆t-sregular regΔ ext) (⊆t-∋≝ inΔ ext)
+s-⊆-prv-gen (s-dvar-l s inΔ) ext = s-dvar-l (⊆t-sregular s ext) (⊆t-∋:≝ inΔ ext)
+s-⊆-prv-gen (s-dvar-r s inΔ) ext = s-dvar-r (⊆t-sregular s ext) (⊆t-∋:≝ inΔ ext)
 
 t-⊆-prv-gen : Γ ⊢ j # e ⦂ A
         → Γ ⊆t Δ
@@ -161,6 +211,7 @@ t-⊆-prv-gen (⊢app₁ ⊢e ⊢e₁) ext = ⊢app₁ (t-⊆-prv-gen ⊢e ext) 
 t-⊆-prv-gen (⊢app₂ ⊢e ⊢e₁) ext = ⊢app₂ (t-⊆-prv-gen ⊢e ext) (t-⊆-prv-gen ⊢e₁ ext)
 t-⊆-prv-gen (⊢sub ⊢e B≤A x j≢Z) ext = ⊢sub (t-⊆-prv-gen ⊢e ext) (s-⊆-prv-gen B≤A (mark ext)) x j≢Z
 t-⊆-prv-gen (⊢tabs ⊢e) ext = ⊢tabs (t-⊆-prv-gen ⊢e (uvar ext))
+t-⊆-prv-gen (⊢tapp ⊢e regA st) ext = ⊢tapp (t-⊆-prv-gen ⊢e ext) (⊆t-⊢r regA ext) st
 
 ----------------------------------------------------------------------
 --+                          corollaries                           +--
@@ -173,6 +224,7 @@ t-⊆-prv-gen (⊢tabs ⊢e) ext = ⊢tabs (t-⊆-prv-gen ⊢e (uvar ext))
 ⊆-refl-tregular (reg-S∙ treg) = uvar (⊆-refl-tregular treg)
 ⊆-refl-tregular (reg-S^ treg) = evar (⊆-refl-tregular treg)
 ⊆-refl-tregular (reg-S= treg regA) = svar (⊆-refl-tregular treg) regA
+⊆-refl-tregular (reg-S≝ x regA) = dvar (⊆-refl-tregular x) regA
 
 ⊆-refl-sregular : SRegular Γ
                 → Γ ⊆t Γ
@@ -180,6 +232,7 @@ t-⊆-prv-gen (⊢tabs ⊢e) ext = ⊢tabs (t-⊆-prv-gen ⊢e (uvar ext))
 ⊆-refl-sregular (reg-S∙ sreg) = uvar (⊆-refl-sregular sreg)
 ⊆-refl-sregular (reg-S^ sreg) = evar (⊆-refl-sregular sreg)
 ⊆-refl-sregular (reg-S= sreg regA) = svar (⊆-refl-sregular sreg) regA
+⊆-refl-sregular (reg-S≝ x regA) = dvar (⊆-refl-sregular x) regA
 
 
 ⊆-⊆t : Γ ⊆ Δ
@@ -189,6 +242,7 @@ t-⊆-prv-gen (⊢tabs ⊢e) ext = ⊢tabs (t-⊆-prv-gen ⊢e (uvar ext))
 ⊆-⊆t (evar-sol ext regA) = evar-sol (⊆-⊆t ext) regA
 ⊆-⊆t (svar ext regA) = svar (⊆-⊆t ext) regA
 ⊆-⊆t (mark regΓ) = mark (⊆-refl-tregular regΓ)
+⊆-⊆t (dvar ext regA) = dvar (⊆-⊆t ext) regA
 
 ⊆-⊆t-𝕣 : Γ ⊆ Δ
       → 𝕣 Γ ⊆t 𝕣 Δ
@@ -197,6 +251,7 @@ t-⊆-prv-gen (⊢tabs ⊢e) ext = ⊢tabs (t-⊆-prv-gen ⊢e (uvar ext))
 ⊆-⊆t-𝕣 (evar-sol ext regA) = evar-sol (⊆-⊆t-𝕣 ext) (⊢r-𝕣' regA)
 ⊆-⊆t-𝕣 (svar ext regA) = svar (⊆-⊆t-𝕣 ext) (⊢r-𝕣' regA)
 ⊆-⊆t-𝕣 (mark regΓ) = ⊆-refl-tregular regΓ
+⊆-⊆t-𝕣 (dvar ext regA) = dvar (⊆-⊆t-𝕣 ext) (⊢r-𝕣' regA)
 
 t-⊆-prv : 𝕣 Γ ⊢ j # e ⦂ A
          → Γ ⊆ Δ

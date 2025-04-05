@@ -24,6 +24,9 @@ data _◀_=⇘_ : Env n (1 + m) → Fin (1 + m) → Env n m → Set where
   ◀S= : Γ ◀ k =⇘ Γ'
       → A ↑ty k ⇘ A'
       → Γ ,= A' ◀ #S k =⇘ Γ' ,= A
+  ◀S≝ : Γ ◀ k =⇘ Γ'
+      → A ↑ty k ⇘ A'
+      → Γ ,≝ A' ◀ #S k =⇘ Γ' ,≝ A
   ◀S⋈ : Γ ◀ k =⇘ Γ'
       → Γ ⋈ ◀ k =⇘ Γ' ⋈
 
@@ -37,6 +40,8 @@ data _∋='_ : Env n m → Fin m → Set where
      → Δ ,^ ∋=' #S k
   S= : Δ ∋=' k
      → Δ ,= B ∋=' #S k
+  S≝ : Δ ∋=' k
+     → Δ ,≝ B ∋=' #S k
   S, : Δ ∋=' k
      → Δ , A ∋=' k
   S⋈ : Δ ∋=' k
@@ -49,6 +54,7 @@ data _∋='_ : Env n m → Fin m → Set where
 ◀=-∋=' (◀S^ newΓ) = S^ (◀=-∋=' newΓ)
 ◀=-∋=' (◀S∙ newΓ) = S∙ (◀=-∋=' newΓ)
 ◀=-∋=' (◀S= newΓ x) = S= (◀=-∋=' newΓ)
+◀=-∋=' (◀S≝ newΓ x) = S≝ (◀=-∋=' newΓ)
 ◀=-∋=' (◀S⋈ newΓ) = S⋈ (◀=-∋=' newΓ)
 
 ∋∙-strengthen= : Γ ∋∙ punchIn k X
@@ -63,6 +69,7 @@ data _∋='_ : Env n m → Fin m → Set where
 ∋∙-strengthen= {k = #S k} {#S X} (S, inΓ) (◀S, newΓ x) = S, (∋∙-strengthen= inΓ newΓ)
 ∋∙-strengthen= {k = #S k} {#S X} (S∙ inΓ) (◀S∙ newΓ) = S∙ (∋∙-strengthen= inΓ newΓ)
 ∋∙-strengthen= {k = #S k} {#S X} (S= inΓ) (◀S= newΓ x) = S= (∋∙-strengthen= inΓ newΓ)
+∋∙-strengthen= {k = #S k} {#S X} (S≝ inΓ) (◀S≝ newΓ x) = S≝ (∋∙-strengthen= inΓ newΓ)
 ∋∙-strengthen= {k = #S k} {#S X} (S^ inΓ) (◀S^ newΓ) = S^ (∋∙-strengthen= inΓ newΓ)
 ∋∙-strengthen= (S⋈ inΓ) (◀S⋈ newΓ) = S⋈ (∋∙-strengthen= inΓ newΓ)
 
@@ -77,7 +84,21 @@ data _∋='_ : Env n m → Fin m → Set where
 ∋=-strengthen= {k = #S k} {#S X} (S∙ inΓ) (◀S∙ newΓ) = S∙ (∋=-strengthen= inΓ newΓ)
 ∋=-strengthen= {k = #S k} {#S X} (S^ inΓ) (◀S^ newΓ) = S^ (∋=-strengthen= inΓ newΓ)
 ∋=-strengthen= {k = #S k} {#S X} (S= inΓ) (◀S= newΓ x) = S= (∋=-strengthen= inΓ newΓ)
+∋=-strengthen= {k = #S k} {#S X} (S≝ inΓ) (◀S≝ new x) = S≝ (∋=-strengthen= inΓ new)
 ∋=-strengthen= (S, inΓ) (◀S, new up) = S, (∋=-strengthen= inΓ new)
+
+∋≝-strengthen= : Γ ∋≝ punchIn k X
+      → Γ ◀ k =⇘ Γ'
+      → Γ' ∋≝ X
+∋≝-strengthen= {k = #0} {#0} (S= inΓ) ◀Z = inΓ
+∋≝-strengthen= {k = #0} {#S X} (S= inΓ) ◀Z = inΓ
+∋≝-strengthen= {k = #S k} {#0} Z (◀S≝ newΓ x) = Z
+∋≝-strengthen= {k = #S k} {#S X} (S∙ inΓ) (◀S∙ newΓ) = S∙ (∋≝-strengthen= inΓ newΓ)
+∋≝-strengthen= {k = #S k} {#S X} (S^ inΓ) (◀S^ newΓ) = S^ (∋≝-strengthen= inΓ newΓ)
+∋≝-strengthen= {k = #S k} {#S X} (S= inΓ) (◀S= newΓ x) = S= (∋≝-strengthen= inΓ newΓ)
+∋≝-strengthen= {k = #S k} {#S X} (S≝ inΓ) (◀S≝ new x) = S≝ (∋≝-strengthen= inΓ new)
+∋≝-strengthen= (S, inΓ) (◀S, new up) = S, (∋≝-strengthen= inΓ new)
+∋≝-strengthen= (S⋈ inΓ) (◀S⋈ new) = S⋈ (∋≝-strengthen= inΓ new)
 
 
 ∋^-strengthen= : Γ ∋^ punchIn k X
@@ -89,6 +110,7 @@ data _∋='_ : Env n m → Fin m → Set where
 ∋^-strengthen= {k = #S k} {#S X} (S∙ inΓ) (◀S∙ newΓ) = S∙ (∋^-strengthen= inΓ newΓ)
 ∋^-strengthen= {k = #S k} {#S X} (S^ inΓ) (◀S^ newΓ) = S^ (∋^-strengthen= inΓ newΓ)
 ∋^-strengthen= {k = #S k} {#S X} (S= inΓ) (◀S= newΓ x) = S= (∋^-strengthen= inΓ newΓ)
+∋^-strengthen= {k = #S k} {#S X} (S≝ inΓ) (◀S≝ newΓ x) = S≝ (∋^-strengthen= inΓ newΓ)
 ∋^-strengthen= (S, inΓ) (◀S, new up) = S, (∋^-strengthen= inΓ new)
 
 ∋:=-strengthen=' : Γ ∋ punchIn k X := A'
@@ -103,6 +125,7 @@ data _∋='_ : Env n m → Fin m → Set where
 ∋:=-strengthen=' {k = #S k} {#S X} (S∙ inΓ up) (◀S∙ newΓ) (S∙ inΓ' up₁) = ↑ty-comm' z≤n (∋:=-strengthen=' inΓ newΓ inΓ') up up₁
 ∋:=-strengthen=' {k = #S k} {#S X} (S^ inΓ up) (◀S^ newΓ) (S^ inΓ' up₁) = ↑ty-comm' z≤n (∋:=-strengthen=' inΓ newΓ inΓ') up up₁
 ∋:=-strengthen=' {k = #S k} {#S X} (S= inΓ up) (◀S= newΓ x) (S= inΓ' up₁) = ↑ty-comm' z≤n (∋:=-strengthen=' inΓ newΓ inΓ') up up₁
+∋:=-strengthen=' {k = #S k} {#S X} (S≝ inΓ up) (◀S≝ newΓ x) (S≝ inΓ' up₁) = ↑ty-comm' z≤n (∋:=-strengthen=' inΓ newΓ inΓ') up up₁
 ∋:=-strengthen=' {k = #0} {#0} (S= (S, x₁) up) ◀Z (S, inΓ') with refl ← ∋:=-unique x₁ inΓ' = up
 ∋:=-strengthen=' (S, inΓ) (◀S, new up) (S, inΓ') = ∋:=-strengthen=' inΓ new inΓ'
 
@@ -114,14 +137,28 @@ data _∋='_ : Env n m → Fin m → Set where
 ∋∙-∋='-≢ (S∙ inΓ1) (S∙ inΓ2) = ≢-suc (∋∙-∋='-≢ inΓ1 inΓ2)
 ∋∙-∋='-≢ (S^ inΓ1) (S^ inΓ2) = ≢-suc (∋∙-∋='-≢ inΓ1 inΓ2)
 ∋∙-∋='-≢ (S= inΓ1) (S= inΓ2) = ≢-suc (∋∙-∋='-≢ inΓ1 inΓ2)
+∋∙-∋='-≢ (S≝ inΓ1) (S≝ inΓ2) = ≢-suc (∋∙-∋='-≢ inΓ1 inΓ2)
 ∋∙-∋='-≢ (S, inΓ1) (S, inΓ2) = ∋∙-∋='-≢ inΓ1 inΓ2
 ∋∙-∋='-≢ (S⋈ inΓ1) (S⋈ inΓ2) = ∋∙-∋='-≢ inΓ1 inΓ2
+
+∋≝-∋='-≢ : Γ ∋=' k
+         → Γ ∋≝ X
+         → X ≢ k
+∋≝-∋='-≢ Z (S= in2) = λ ()
+∋≝-∋='-≢ (S∙ in1) (S∙ in2) = ≢-suc (∋≝-∋='-≢ in1 in2)
+∋≝-∋='-≢ (S^ in1) (S^ in2) = ≢-suc (∋≝-∋='-≢ in1 in2)
+∋≝-∋='-≢ (S= in1) (S= in2) = ≢-suc (∋≝-∋='-≢ in1 in2)
+∋≝-∋='-≢ (S≝ in1) Z = λ ()
+∋≝-∋='-≢ (S≝ in1) (S≝ in2) = ≢-suc (∋≝-∋='-≢ in1 in2)
+∋≝-∋='-≢ (S, in1) (S, in2) = ∋≝-∋='-≢ in1 in2
+∋≝-∋='-≢ (S⋈ in1) (S⋈ in2) = ∋≝-∋='-≢ in1 in2
 
 ⊢r-¬ε : Γ ⊢r A
         → Γ ∋=' k
         → k ¬ε A
 ⊢r-¬ε ⊢r-int inΓ = ¬ε-int
 ⊢r-¬ε (⊢r-var-∙ inΓ₁) inΓ = ¬ε-var (∋∙-∋='-≢ inΓ inΓ₁)
+⊢r-¬ε (⊢r-var-≝ inΓ₁) inΓ = ¬ε-var (∋≝-∋='-≢ inΓ inΓ₁)
 ⊢r-¬ε (⊢r-arr regA regA₁) inΓ = ¬ε-arr (⊢r-¬ε regA inΓ) (⊢r-¬ε regA₁ inΓ)
 ⊢r-¬ε (⊢r-∀ regA) inΓ = ¬ε-∀ (⊢r-¬ε regA (S∙ inΓ))
 
@@ -145,6 +182,35 @@ data _∋='_ : Env n m → Fin m → Set where
   with ¬inA ← ⊢r-¬ε (∋:=-⊢r regΓ inΓ) (◀=-∋=' newΓ)
   with ⟨ preA , pupA ⟩ ← ↑ty-surjective ¬inA
   = S= (∋:=-strengthen=-reg regΓ inΓ newΓ pupA) (↑ty-comm1 upA up pupA)
+∋:=-strengthen=-reg {k = #S k} {X = #S X} (reg-S≝ regΓ regA) (S≝ inΓ up) (◀S≝ newΓ x) upA
+  with ¬inA ← ⊢r-¬ε (∋:=-⊢r regΓ inΓ) (◀=-∋=' newΓ)
+  with ⟨ preA , pupA ⟩ ← ↑ty-surjective ¬inA
+  = S≝ (∋:=-strengthen=-reg regΓ inΓ newΓ pupA) (↑ty-comm1 upA up pupA)
+
+∋:≝-strengthen=-reg : SRegular Γ
+                    → Γ ∋ punchIn k X ≝ A'
+                    → Γ ◀ k =⇘ Γ'
+                    → A ↑ty k ⇘ A'
+                    → Γ' ∋ X ≝ A
+∋:≝-strengthen=-reg {k = #0} {X = #0} (reg-S= regΓ regA) (S= inΓ up) ◀Z upA with refl ← ↑ty-unique-inver up upA = inΓ
+∋:≝-strengthen=-reg {k = #0} {X = #S X} (reg-S= regΓ regA) (S= inΓ up) ◀Z upA with refl ← ↑ty-unique-inver up upA = inΓ
+∋:≝-strengthen=-reg {k = #S k} {X = #S X} (reg-S∙ regΓ) (S∙ inΓ up) (◀S∙ newΓ) upA
+  with ¬inA ← ⊢r-¬ε (∋:≝-⊢r regΓ inΓ) (◀=-∋=' newΓ)
+  with ⟨ preA , pupA ⟩ ← ↑ty-surjective ¬inA
+  = S∙ (∋:≝-strengthen=-reg regΓ inΓ newΓ pupA) (↑ty-comm1 upA up pupA)
+∋:≝-strengthen=-reg {k = #S k} {X = #S X} (reg-S^ regΓ) (S^ inΓ up) (◀S^ newΓ) upA
+  with ¬inA ← ⊢r-¬ε (∋:≝-⊢r regΓ inΓ) (◀=-∋=' newΓ)
+  with ⟨ preA , pupA ⟩ ← ↑ty-surjective ¬inA
+  = S^ (∋:≝-strengthen=-reg regΓ inΓ newΓ pupA) (↑ty-comm1 upA up pupA)
+∋:≝-strengthen=-reg {k = #S k} {X = #0} (reg-S≝ regΓ regA) (Z up) (◀S≝ newΓ x) upA = Z (↑ty-comm1 upA up x)
+∋:≝-strengthen=-reg {k = #S k} {X = #S X} (reg-S= regΓ regA) (S= inΓ up) (◀S= newΓ x) upA
+  with ¬inA ← ⊢r-¬ε (∋:≝-⊢r regΓ inΓ) (◀=-∋=' newΓ)
+  with ⟨ preA , pupA ⟩ ← ↑ty-surjective ¬inA
+  = S= (∋:≝-strengthen=-reg regΓ inΓ newΓ pupA) (↑ty-comm1 upA up pupA)
+∋:≝-strengthen=-reg {k = #S k} {X = #S X} (reg-S≝ regΓ regA) (S≝ inΓ up) (◀S≝ newΓ x) upA
+  with ¬inA ← ⊢r-¬ε (∋:≝-⊢r regΓ inΓ) (◀=-∋=' newΓ)
+  with ⟨ preA , pupA ⟩ ← ↑ty-surjective ¬inA
+  = S≝ (∋:≝-strengthen=-reg regΓ inΓ newΓ pupA) (↑ty-comm1 upA up pupA)
 
 -- this is the standard way to prove
 ∋:=-strengthen= : Γ ∋ punchIn k X := A'
@@ -173,6 +239,7 @@ data _∋='_ : Env n m → Fin m → Set where
                → Γ' ⊢r A
 ⊢r-strengthen= ⊢r-int newΓ ↑ty-int = ⊢r-int
 ⊢r-strengthen= (⊢r-var-∙ inΓ) newΓ ↑ty-var = ⊢r-var-∙ (∋∙-strengthen= inΓ newΓ)
+⊢r-strengthen= (⊢r-var-≝ inΓ) newΓ ↑ty-var = ⊢r-var-≝ (∋≝-strengthen= inΓ newΓ)
 ⊢r-strengthen= (⊢r-arr regA regA₁) newΓ (↑ty-arr upA upA₁) = ⊢r-arr (⊢r-strengthen= regA newΓ upA)
                                                                     (⊢r-strengthen= regA₁ newΓ upA₁)
 ⊢r-strengthen= (⊢r-∀ regA) newΓ (↑ty-∀ upA) = ⊢r-∀ (⊢r-strengthen= regA (◀S∙ newΓ) upA)
@@ -190,6 +257,7 @@ data _∋='_ : Env n m → Fin m → Set where
 ⊢c-strengthen= ⊢c-int newΓ ↑ty-int = ⊢c-int
 ⊢c-strengthen= (⊢c-var-∙ inΔ) newΓ ↑ty-var = ⊢c-var-∙ (∋∙-strengthen= inΔ newΓ)
 ⊢c-strengthen= (⊢c-var-= inΔ) newΓ ↑ty-var = ⊢c-var-= (∋=-strengthen= inΔ newΓ)
+⊢c-strengthen= (⊢c-var-≝ inΔ) newΓ ↑ty-var = ⊢c-var-≝ (∋≝-strengthen= inΔ newΓ)
 ⊢c-strengthen= (⊢c-arr cloA cloA₁) newΓ (↑ty-arr upA upA₁) = ⊢c-arr (⊢c-strengthen= cloA newΓ upA)
                                                                     (⊢c-strengthen= cloA₁ newΓ upA₁)
 ⊢c-strengthen= (⊢c-∀ cloA) newΓ (↑ty-∀ upA) = ⊢c-∀ (⊢c-strengthen= cloA (◀S∙ newΓ) upA)
@@ -211,6 +279,7 @@ tregular-strengthen= (reg-S∙ regΓ) (◀S∙ newΓ) = reg-S∙ (tregular-stren
 tregular-strengthen= (reg-S^ regΓ) (◀S^ newΓ) = reg-S^ (tregular-strengthen= regΓ newΓ)
 tregular-strengthen= (reg-S= regΓ regA) ◀Z = regΓ
 tregular-strengthen= (reg-S= regΓ regA) (◀S= newΓ x) = reg-S= (tregular-strengthen= regΓ newΓ) (⊢r-strengthen= regA newΓ x)
+tregular-strengthen= (reg-S≝ regΓ regA) (◀S≝ newΓ x) = reg-S≝ (tregular-strengthen= regΓ newΓ) (⊢r-strengthen= regA newΓ x)
 
 sregular-strengthen= : SRegular Γ
                      → Γ ◀ k =⇘ Γ'
@@ -220,7 +289,7 @@ sregular-strengthen= (reg-S∙ sreg) (◀S∙ newΓ) = reg-S∙ (sregular-streng
 sregular-strengthen= (reg-S^ sreg) (◀S^ newΓ) = reg-S^ (sregular-strengthen= sreg newΓ)
 sregular-strengthen= (reg-S= sreg regA) ◀Z = sreg
 sregular-strengthen= (reg-S= sreg regA) (◀S= newΓ x) = reg-S= (sregular-strengthen= sreg newΓ) (⊢r-strengthen= regA newΓ x)
-
+sregular-strengthen= (reg-S≝ sreg regA) (◀S≝ newΓ x) = reg-S≝ (sregular-strengthen= sreg newΓ) (⊢r-strengthen= regA newΓ x)
 
 ≫-strengthen= : Γ ≫ A' ⇘ B'
               → SRegular Γ
@@ -230,6 +299,7 @@ sregular-strengthen= (reg-S= sreg regA) (◀S= newΓ x) = reg-S= (sregular-stren
               → Γ' ≫ A ⇘ B
 ≫-strengthen= grd-int regΓ newΓ ↑ty-int ↑ty-int = grd-int
 ≫-strengthen= (grd-var= x) regΓ newΓ ↑ty-var upB = grd-var= (∋:=-strengthen=-reg regΓ x newΓ upB)
+≫-strengthen= (grd-var≝ inΓ) regΓ newΓ ↑ty-var upB with refl ← ↑ty-var-inv-helper upB refl = grd-var≝ (∋≝-strengthen= inΓ newΓ)
 ≫-strengthen= (grd-var∙ x) regΓ newΓ (↑ty-var  {X = X} {k = k}) upB with ↑ty-var-inv-helper upB refl
 ... | refl = grd-var∙ (∋∙-strengthen= x newΓ)
 ≫-strengthen= (grd-arr grd grd₁) regΓ newΓ (↑ty-arr upA upA₁) (↑ty-arr upB upB₁) = grd-arr (≫-strengthen= grd regΓ newΓ upA upB)
@@ -260,3 +330,6 @@ sregular-strengthen= (reg-S= sreg regA) (◀S= newΓ x) = reg-S= (sregular-stren
 ∋⦂-strengthen= (S= inΓ up) (reg-S= regΓ regA) (◀S= newΓ x) upA
   with regA ← ∋⦂-⊢r regΓ inΓ
   with ⟨ pA , uppA ⟩ ← ⊢r-◀-↑ty-surjective regA newΓ = S= (∋⦂-strengthen= inΓ regΓ newΓ uppA) (↑ty-comm1 upA up uppA)
+∋⦂-strengthen= (S≝ inΓ up) (reg-S≝ regΓ regA) (◀S≝ newΓ x) upA
+  with regA ← ∋⦂-⊢r regΓ inΓ
+  with ⟨ pA , uppA ⟩ ← ⊢r-◀-↑ty-surjective regA newΓ = S≝ (∋⦂-strengthen= inΓ regΓ newΓ uppA) (↑ty-comm1 upA up uppA)

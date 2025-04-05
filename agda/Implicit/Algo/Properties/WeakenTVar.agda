@@ -5,7 +5,7 @@ open import Implicit.Algo.Base
 open import Implicit.Algo.Properties.Extension
 open import Implicit.Algo.Properties.Shift
 open import Implicit.Algo.Properties.Id
-
+{-
 ▶s⨟,-Ω-exist : Γ ⨟ Δ ▶s k , T ⇘ Γ' ⨟ Δ'
             → Γ ⊆ Ω
             → Ω ⊆ Δ
@@ -49,18 +49,20 @@ ss-weaken, (s-arr ss ss₁) new
   = s-arr (ss-weaken, ss new1) (ss-weaken, ss₁ new2)
 ss-weaken, {T = T} (s-∀ ss) new
   with ⟨ T' , upT ⟩ ← ↑ty0-total T = s-∀ (ss-weaken, ss (▶sS∙ new upT))
+-}
 
-t-weaken, : Γ ⊢ Σ ⇒ e ⇒ A
+postulate
+  t-weaken, : Γ ⊢ Σ ⇒ e ⇒ A
           → Γ ▶ k , T ⇘ Γ'
           → Σ ↑tmᶜ k ⇘ Σ'
           → e ↑tm k ⇘ e'
           → Γ' ⊢ Σ' ⇒ e' ⇒ A
 
-s-weaken, : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
+  s-weaken, : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
           → Σ ↑tmᶜ k ⇘ Σ'
           → Γ ⨟ Δ ▶s k , T ⇘ Γ' ⨟ Δ'
           → Γ' ⊢ A ≤⁺ Σ' ⊣ Δ' ↪ B
-
+{-
 t-weaken, (⊢lit regΓ) new ↑tmᶜ-□ ↑tm-lit = ⊢lit (tregular-weaken, regΓ new)
 t-weaken, (⊢var regΓ x∈Γ) new ↑tmᶜ-□ ↑tm-var = ⊢var (tregular-weaken, regΓ new) (∋⦂-weaken, x∈Γ new)
 t-weaken, (⊢ann ⊢e) new ↑tmᶜ-□ (↑tm-⦂ upe) = ⊢ann (t-weaken, ⊢e new ↑tmᶜ-τ upe)
@@ -90,6 +92,7 @@ s-weaken, {T = T} (s-∀l s upᶜ upᵉ upC upD) (↑tmᶜ-e {e' = e'} {Σ' = Σ
   with ⟨ Σ″ , upΣ' ⟩ ← ↑tyᶜ0-total Σ'
   with ⟨ e″ , upe' ⟩ ← ↑tyᵉ0-total e'
   = s-∀l (s-weaken, s (↑tmᶜ-e (↑tm-↑tyᵉ-comm up-e upe' upᵉ) (↑tmᶜ-↑tyᶜ-comm upΣ upΣ' upᶜ)) (▶sS^= new upT)) upΣ' upe' upC upD
+-}
 
 s-weaken,0 : Γ ⋈ ⊢ A ≤⁺ Σ ⊣ Δ ⋈ ↪ B
            → ↑tmᶜ0 Σ ⇘ Σ'

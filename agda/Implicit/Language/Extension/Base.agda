@@ -20,6 +20,10 @@ data _⊆_ : Env n m → Env n m → Set where
       Γ ⊆ Δ
     → (regA : Γ ⊢r A)
     → Γ ,= A ⊆ Δ ,= A
+  dvar :
+      Γ ⊆ Δ
+    → (regA : Γ ⊢r A)
+    → Γ ,≝ A ⊆ Δ ,≝ A
   mark : (regΓ : TRegular Γ)
     → Γ ⋈ ⊆ Γ ⋈
 
@@ -39,6 +43,9 @@ data _⊆_w/v_ : Env n m → Env n m → Fin m → Set where
   ext-Z= : (regΓ : SRegular Γ)
          → (regA : Γ ⊢r A)
          → Γ ,= A ⊆ Γ ,= A w/v #0
+  ext-Z≝ : (regΓ : SRegular Γ)
+         → (regA : Γ ⊢r A)
+         → Γ ,≝ A ⊆ Γ ,≝ A w/v #0
   ext-S^ : Γ ⊆ Δ w/v k
          → Γ ,^ ⊆ Δ ,^ w/v #S k
   ext-S∙ : Γ ⊆ Δ w/v k
@@ -46,9 +53,15 @@ data _⊆_w/v_ : Env n m → Env n m → Fin m → Set where
   ext-S= : Γ ⊆ Δ w/v k
          → (regA : Γ ⊢r A)
          → Γ ,= A ⊆ Δ ,= A w/v #S k
+  ext-S≝ : Γ ⊆ Δ w/v k
+         → (regA : Γ ⊢r A)
+         → Γ ,≝ A ⊆ Δ ,≝ A w/v #S k
   ext-mark : TRegular Γ
            → Γ ∋∙ k
            → Γ ⋈ ⊆ Γ ⋈ w/v k
+  ext-mark≝ : TRegular Γ
+             → Γ ∋≝ k
+             → Γ ⋈ ⊆ Γ ⋈ w/v k
 
 infix 3 _⊆_w/t_
 data _⊆_w/t_ : Env n m → Env n m → Type m → Set where

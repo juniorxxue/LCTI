@@ -10,6 +10,45 @@ open import Implicit.Language.Ground.Base
 open import Implicit.Language.Extension.All
 open import Implicit.Language.EnvOps.All
 
+∋=-∋:≝-false : Γ ∋= X
+             → Γ ∋ X ≝ A
+             → ⊥
+∋=-∋:≝-false (S∙ in1) (S∙ in2 up) = ∋=-∋:≝-false in1 in2
+∋=-∋:≝-false (S^ in1) (S^ in2 up) = ∋=-∋:≝-false in1 in2
+∋=-∋:≝-false (S= in1) (S= in2 up) = ∋=-∋:≝-false in1 in2
+∋=-∋:≝-false (S≝ in1) (S≝ in2 up) = ∋=-∋:≝-false in1 in2
+∋=-∋:≝-false (S, in1) (S, in2) = ∋=-∋:≝-false in1 in2
+
+∋=-∋≝-false : Γ ∋= X
+            → Γ ∋≝ X
+            → ⊥
+∋=-∋≝-false (S∙ in1) (S∙ in2) = ∋=-∋≝-false in1 in2
+∋=-∋≝-false (S^ in1) (S^ in2) = ∋=-∋≝-false in1 in2
+∋=-∋≝-false (S= in1) (S= in2) = ∋=-∋≝-false in1 in2
+∋=-∋≝-false (S≝ in1) (S≝ in2) = ∋=-∋≝-false in1 in2
+∋=-∋≝-false (S, in1) (S, in2) = ∋=-∋≝-false in1 in2
+
+∋:=-∋≝-false : Γ ∋ X := A%
+              → Γ ∋≝ X
+              → ⊥
+∋:=-∋≝-false (S∙ in1 up) (S∙ in2) = ∋:=-∋≝-false in1 in2
+∋:=-∋≝-false (S^ in1 up) (S^ in2) = ∋:=-∋≝-false in1 in2
+∋:=-∋≝-false (S= in1 up) (S= in2) = ∋:=-∋≝-false in1 in2
+∋:=-∋≝-false (S≝ in1 up) (S≝ in2) = ∋:=-∋≝-false in1 in2
+∋:=-∋≝-false (S, in1) (S, in2) = ∋:=-∋≝-false in1 in2
+
+∋∙-∋≝-false : Γ ∋∙ X
+            → Γ ∋≝ X
+            → ⊥
+∋∙-∋≝-false (S, in1) (S, in2) = ∋∙-∋≝-false in1 in2
+∋∙-∋≝-false (S∙ in1) (S∙ in2) = ∋∙-∋≝-false in1 in2
+∋∙-∋≝-false (S= in1) (S= in2) = ∋∙-∋≝-false in1 in2
+∋∙-∋≝-false (S≝ in1) (S≝ in2) = ∋∙-∋≝-false in1 in2
+∋∙-∋≝-false (S^ in1) (S^ in2) = ∋∙-∋≝-false in1 in2
+∋∙-∋≝-false (S⋈ in1) (S⋈ in2) = ∋∙-∋≝-false in1 in2
+
+--- above to be put into Lookup file
+
 ⊢c-≫-⊢r : SRegular Γ
           → Γ ⊢c A
           → Γ ≫ A ⇘ A%
@@ -17,15 +56,22 @@ open import Implicit.Language.EnvOps.All
 ⊢c-≫-⊢r regΓ ⊢c-int grd-int = ⊢r-int
 ⊢c-≫-⊢r regΓ (⊢c-var-∙ inΔ) (grd-var= x) = ⊥-elim (∋∙-∋:=-false inΔ x)
 ⊢c-≫-⊢r regΓ (⊢c-var-∙ inΔ) (grd-var∙ x) = ⊢r-var-∙ inΔ
+⊢c-≫-⊢r regΓ (⊢c-var-∙ inΔ) (grd-var≝ x) = ⊥-elim (∋∙-∋≝-false inΔ x)
 ⊢c-≫-⊢r regΓ (⊢c-var-= inΔ) (grd-var= x) = ∋:=-⊢r regΓ x
 ⊢c-≫-⊢r regΓ (⊢c-var-= inΔ) (grd-var∙ x) = ⊥-elim (∋∙-∋=-false x inΔ)
+⊢c-≫-⊢r regΓ (⊢c-var-= inΔ) (grd-var≝ x) = ⊥-elim (∋=-∋≝-false inΔ x)
+⊢c-≫-⊢r regΓ (⊢c-var-≝ inΔ) (grd-var= x) = ⊥-elim (∋:=-∋≝-false x inΔ)
+⊢c-≫-⊢r regΓ (⊢c-var-≝ inΔ) (grd-var≝ x) = ⊢r-var-≝ inΔ
+⊢c-≫-⊢r regΓ (⊢c-var-≝ inΔ) (grd-var∙ x) = ⊥-elim (∋∙-∋≝-false x inΔ)
 ⊢c-≫-⊢r regΓ (⊢c-arr cloA cloA₁) (grd-arr grd grd₁) = ⊢r-arr (⊢c-≫-⊢r regΓ cloA grd) (⊢c-≫-⊢r regΓ cloA₁ grd₁)
 ⊢c-≫-⊢r regΓ (⊢c-∀ cloA) (grd-∀ grd) = ⊢r-∀ (⊢c-≫-⊢r (reg-S∙ regΓ) cloA grd)
+
 
 ⊢r-≫-eq : Γ ⊢r A
         → Γ ≫ A ⇘ A
 ⊢r-≫-eq ⊢r-int = grd-int
 ⊢r-≫-eq (⊢r-var-∙ inΓ) = grd-var∙ inΓ
+⊢r-≫-eq (⊢r-var-≝ inΓ) = grd-var≝ inΓ
 ⊢r-≫-eq (⊢r-arr regA regA₁) = grd-arr (⊢r-≫-eq regA) (⊢r-≫-eq regA₁)
 ⊢r-≫-eq (⊢r-∀ regA) = grd-∀ (⊢r-≫-eq regA)
 
@@ -35,6 +81,10 @@ open import Implicit.Language.EnvOps.All
 ⊢r-≫-eq' ⊢r-int grd-int = refl
 ⊢r-≫-eq' (⊢r-var-∙ inΓ) (grd-var= x) = ⊥-elim (∋∙-∋:=-false inΓ x)
 ⊢r-≫-eq' (⊢r-var-∙ inΓ) (grd-var∙ x) = refl
+⊢r-≫-eq' (⊢r-var-∙ inΓ) (grd-var≝ x) = refl
+⊢r-≫-eq' (⊢r-var-≝ inΓ) (grd-var= x) = ⊥-elim (∋:=-∋≝-false x inΓ)
+⊢r-≫-eq' (⊢r-var-≝ inΓ) (grd-var≝ x) = refl
+⊢r-≫-eq' (⊢r-var-≝ inΓ) (grd-var∙ x) = ⊥-elim (∋∙-∋≝-false x inΓ)
 ⊢r-≫-eq' (⊢r-arr regA regA₁) (grd-arr grd grd₁) = cong₂ _`→_ (⊢r-≫-eq' regA grd) (⊢r-≫-eq' regA₁ grd₁)
 ⊢r-≫-eq' (⊢r-∀ regA) (grd-∀ grd) = cong `∀_ (⊢r-≫-eq' regA grd)
 
@@ -52,6 +102,7 @@ open import Implicit.Language.EnvOps.All
 ⊆-⊢c-≫ ext ⊢c-int grd-int = grd-int
 ⊆-⊢c-≫ ext (⊢c-var-∙ inΔ) (grd-var= x) = ⊥-elim (∋∙-∋:=-false (⊆-∋∙ inΔ ext) x)
 ⊆-⊢c-≫ ext (⊢c-var-∙ inΔ) (grd-var∙ x) = grd-var∙ inΔ
+⊆-⊢c-≫ ext (⊢c-var-∙ inΔ) (grd-var≝ x₁) = ⊥-elim (∋∙-∋≝-false (⊆-∋∙ inΔ ext) x₁)
 ⊆-⊢c-≫ ext (⊢c-var-= inΔ) (grd-var= x) = grd-var= (helper x ext inΔ)
   where helper : Δ ∋ X := A%
                → Γ ⊆ Δ
@@ -62,7 +113,12 @@ open import Implicit.Language.EnvOps.All
         helper (S^ inΔ up) (evar ext) (S^ inΓ) = S^ (helper inΔ ext inΓ) up
         helper (S= inΔ up) (evar-sol ext regA) (S^ inΓ) = S^ (helper inΔ ext inΓ) up
         helper (S= inΔ up) (svar ext regA) (S= inΓ) = S= (helper inΔ ext inΓ) up
+        helper (S≝ inΔ up) (dvar ext regA) (S≝ inΓ) = S≝ (helper inΔ ext inΓ) up
 ⊆-⊢c-≫ ext (⊢c-var-= inΔ) (grd-var∙ x) = ⊥-elim (∋∙-∋=-false (⊆-∋∙' x ext) inΔ)
+⊆-⊢c-≫ ext (⊢c-var-= inΔ) (grd-var≝ x₁) = ⊥-elim (∋=-∋≝-false (⊆-∋= inΔ ext) x₁)
+⊆-⊢c-≫ ext (⊢c-var-≝ inΔ) (grd-var= x) = ⊥-elim (∋:=-∋≝-false x (⊆-∋≝ inΔ ext))
+⊆-⊢c-≫ ext (⊢c-var-≝ inΔ) (grd-var≝ x) = grd-var≝ inΔ
+⊆-⊢c-≫ ext (⊢c-var-≝ inΔ) (grd-var∙ x) = ⊥-elim (∋∙-∋≝-false x (⊆-∋≝ inΔ ext))
 ⊆-⊢c-≫ ext (⊢c-arr cloA cloA₁) (grd-arr grd grd₁) = grd-arr (⊆-⊢c-≫ ext cloA grd) (⊆-⊢c-≫ ext cloA₁ grd₁)
 ⊆-⊢c-≫ ext (⊢c-∀ cloA) (grd-∀ grd) = grd-∀ (⊆-⊢c-≫ (uvar ext) cloA grd)
 
@@ -74,7 +130,12 @@ open import Implicit.Language.EnvOps.All
 ⊆-⊢c-≫' ext ⊢c-int grd-int = grd-int
 ⊆-⊢c-≫' ext (⊢c-var-∙ inΔ) (grd-var= x) = ⊥-elim (∋∙-∋:=-false inΔ x)
 ⊆-⊢c-≫' ext (⊢c-var-∙ inΔ) (grd-var∙ x) = grd-var∙ (⊆-∋∙ inΔ ext)
+⊆-⊢c-≫' ext (⊢c-var-∙ inΔ) (grd-var≝ x) = ⊥-elim (∋∙-∋≝-false inΔ x)
 ⊆-⊢c-≫' ext (⊢c-var-= inΔ) (grd-var= x) = grd-var= (⊆-∋:= x ext)
 ⊆-⊢c-≫' ext (⊢c-var-= inΔ) (grd-var∙ x) = ⊥-elim (∋∙-∋=-false x inΔ)
+⊆-⊢c-≫' ext (⊢c-var-= inΔ) (grd-var≝ x) = ⊥-elim (∋=-∋≝-false inΔ x)
+⊆-⊢c-≫' ext (⊢c-var-≝ inΔ) (grd-var= x) = ⊥-elim (∋:=-∋≝-false x inΔ)
+⊆-⊢c-≫' ext (⊢c-var-≝ inΔ) (grd-var≝ x) = grd-var≝ (⊆-∋≝ inΔ ext)
+⊆-⊢c-≫' ext (⊢c-var-≝ inΔ) (grd-var∙ x) = ⊥-elim (∋∙-∋≝-false x inΔ)
 ⊆-⊢c-≫' ext (⊢c-arr cloA cloA₁) (grd-arr grd grd₁) = grd-arr (⊆-⊢c-≫' ext cloA grd) (⊆-⊢c-≫' ext cloA₁ grd₁)
 ⊆-⊢c-≫' ext (⊢c-∀ cloA) (grd-∀ grd) = grd-∀ (⊆-⊢c-≫' (uvar ext) cloA grd)

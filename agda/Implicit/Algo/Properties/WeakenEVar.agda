@@ -5,7 +5,7 @@ open import Implicit.Algo.Base
 open import Implicit.Algo.Properties.Extension
 open import Implicit.Algo.Properties.Shift
 open import Implicit.Algo.Properties.Id
-
+{-
 ▶⨟^-Ω-exist : Γ ⨟ Δ ▶ k ,^⇘ Γ' ⨟ Δ'
             → Γ ⊆ Ω
             → Ω ⊆ Δ
@@ -58,21 +58,24 @@ ss-weaken^ (s-∀ ss) new (↑ty-∀ upA) (↑ty-∀ upB) = s-∀ (ss-weaken^ ss
 ▶^-𝕣 (▶S∙ new) = ▶S∙ (▶^-𝕣 new)
 ▶^-𝕣 (▶S= new upA) = ▶S= (▶^-𝕣 new) upA
 ▶^-𝕣 (▶S⋈ new) = new
+-}
 
-
-t-weaken^ : Γ ⊢ Σ ⇒ e ⇒ A
+postulate
+  t-weaken^ : Γ ⊢ Σ ⇒ e ⇒ A
           → Γ ▶ k ,^⇘ Γ'
           → Σ ↑tyᶜ k ⇘ Σ'
           → e ↑tyᵉ k ⇘ e'
           → A ↑ty k ⇘ A'
           → Γ' ⊢ Σ' ⇒ e' ⇒ A'
 
-s-weaken^ : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
+  s-weaken^ : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
           → Γ ⨟ Δ ▶ k ,^⇘ Γ' ⨟ Δ'
           → A ↑ty k ⇘ A'
           → Σ ↑tyᶜ k ⇘ Σ'
           → B ↑ty k ⇘ B'
           → Γ' ⊢ A' ≤⁺ Σ' ⊣ Δ' ↪ B'
+
+{-
 s-weaken^ (s-empty regΓ cloA x) new upA ↑tyᶜ-□ upB
   with refl ← ▶⨟^-unique new = s-empty (sregular-weaken^ regΓ (▶⨟^-▶^-l new)) (⊢c-weaken^ cloA (▶⨟^-▶^-l new) upA) (≫-weaken^ x (▶⨟^-▶^-l new) upA upB)
 s-weaken^ (s-type ss) new upA (↑tyᶜ-τ up-t) upB
@@ -117,7 +120,7 @@ t-weaken^ {k = k} (⊢sub {A = A} ⊢e ne gc s) newΓ upΣ upe upA
   = ⊢sub (t-weaken^ ⊢e newΓ ↑tyᶜ-□ upe upA')
          (nonempty-↑tyᶜ' ne upΣ) (gc-↑tyᵉ gc upe) (s-weaken^ s (▶S⋈ (▶^-▶⨟^ newΓ)) upA' upΣ upA)
 t-weaken^ (⊢tabs ⊢e) newΓ ↑tyᶜ-□ (↑tyᵉ-Λ upe) (↑ty-∀ upA) = ⊢tabs (t-weaken^ ⊢e (▶S∙ newΓ) ↑tyᶜ-□ upe upA)
-
+-}
 
 t-weaken^0 : Γ ⊢ Σ ⇒ e ⇒ A
            → ↑tyᶜ0 Σ ⇘ Σ'

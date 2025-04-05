@@ -11,6 +11,9 @@ data _⊢r_ : Env n m → Type m → Set where
   ⊢r-var-∙ :
       (inΓ : Γ ∋∙ X)
     → Γ ⊢r ‶ X
+  ⊢r-var-≝ :
+      (inΓ : Γ ∋≝ X)
+    → Γ ⊢r ‶ X
   ⊢r-arr :
       Γ ⊢r A
     → Γ ⊢r B
@@ -28,6 +31,7 @@ data _⊢rᵉ_ : Env n m → Term n m → Set where
   ⊢r-app : Γ ⊢rᵉ e₁ → Γ ⊢rᵉ e₂ → Γ ⊢rᵉ (e₁ · e₂)
   ⊢r-ann : (cloA : Γ ⊢r A) → Γ ⊢rᵉ e → Γ ⊢rᵉ (e ⦂ A)
   ⊢r-tlam : Γ ,∙ ⊢rᵉ e → Γ ⊢rᵉ (Λ e)
+  ⊢r-tapp : Γ ⊢rᵉ e → (cloA : Γ ⊢r A) → Γ ⊢rᵉ (e ⓪ A)
 
 data Regular : Env n m → Set where
   reg-Z : Regular ∅
@@ -41,6 +45,9 @@ data Regular : Env n m → Set where
   reg-S= : Regular Γ
          → (regA : Γ ⊢r A)
          → Regular (Γ ,= A)
+  reg-S≝ : Regular Γ
+         → (regA : Γ ⊢r A)
+         → Regular (Γ ,≝ A)
   reg-S⋈ : Regular Γ
          → Regular (Γ ⋈)
 
@@ -56,6 +63,9 @@ data TRegular : Env n m → Set where
   reg-S= : TRegular Γ
          → (regA : Γ ⊢r A) -- we never access this entry, it's only created by initials
          → TRegular (Γ ,= A)
+  reg-S≝ : TRegular Γ
+         → (regA : Γ ⊢r A)
+         → TRegular (Γ ,≝ A)
 
 data SRegular : Env n m → Set where
   reg-Z : (regΓ : TRegular Γ)
@@ -67,3 +77,6 @@ data SRegular : Env n m → Set where
   reg-S= : SRegular Δ
          → (regA : Δ ⊢r A)
          → SRegular (Δ ,= A)
+  reg-S≝ : SRegular Δ
+         → (regA : Δ ⊢r A)
+         → SRegular (Δ ,≝ A)

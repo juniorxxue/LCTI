@@ -20,6 +20,9 @@ data _⇌_ : Env n m → Env n m → Set where
   svar :
       Γ ⇌ Δ
     → Γ ,= A ⇌ Δ ,= A
+  dvar :
+      Γ ⇌ Δ
+    → Γ ,≝ A ⇌ Δ ,≝ A
   evar-changed :
       Γ ⇌ Δ
     → (regA : Γ ⊢r A)
@@ -43,6 +46,9 @@ data _&_⇌s_&_ : Env n m → Env n m → Env n m → Env n m → Set where
   svar :
       Γ & Δ ⇌s Γ' & Δ'
     → Γ ,= A & Δ ,= A ⇌s Γ' ,= A & Δ' ,= A
+  dvar :
+      Γ & Δ ⇌s Γ' & Δ'
+    → Γ ,≝ A & Δ ,≝ A ⇌s Γ' ,≝ A & Δ' ,≝ A
   mark : Γ ⇌ Δ
        → Γ ⋈ & Γ ⋈ ⇌s Δ ⋈ & Δ ⋈
 
@@ -51,6 +57,7 @@ data _&_⇌s_&_ : Env n m → Env n m → Env n m → Env n m → Set where
 ⇌s-eq (uvar tf) rewrite ⇌s-eq tf = refl
 ⇌s-eq (evar tf) rewrite ⇌s-eq tf = refl
 ⇌s-eq (svar tf) rewrite ⇌s-eq tf = refl
+⇌s-eq (dvar tf) rewrite ⇌s-eq tf = refl
 ⇌s-eq (mark x) = refl
 
 ⇌s-Ω : Γ ⊆ Ω
@@ -62,6 +69,7 @@ data _&_⇌s_&_ : Env n m → Env n m → Env n m → Env n m → Set where
 ⇌s-Ω (evar-sol {A = A} ext regA) (evar tf) = ⟨ ⇌s-Ω ext tf .proj₁ ,= A , evar-sol (⇌s-Ω ext tf .proj₂) ⟩
 ⇌s-Ω (evar-sol {A = A} ext regA) (evar-sol tf) = ⟨ ⇌s-Ω ext tf .proj₁ ,= A , evar-sol (⇌s-Ω ext tf .proj₂) ⟩
 ⇌s-Ω (svar {A = A} ext regA) (svar tf) = ⟨ ⇌s-Ω ext tf .proj₁ ,= A , svar (⇌s-Ω ext tf .proj₂) ⟩
+⇌s-Ω (dvar {A = A} ext regA) (dvar tf) = ⟨ ⇌s-Ω ext tf .proj₁ ,≝ A , dvar (⇌s-Ω ext tf .proj₂) ⟩
 ⇌s-Ω (mark x) (mark {Δ = Δ} x₁) = ⟨ Δ ⋈ , mark x₁ ⟩
 
 ⇌s-arr : Γ & Δ ⇌s Γ' & Δ'
@@ -73,6 +81,7 @@ data _&_⇌s_&_ : Env n m → Env n m → Env n m → Env n m → Set where
 ⇌s-arr (evar-sol tf1) (evar tf2) (evar-sol ext regA) = evar-sol (⇌s-arr tf1 tf2 ext)
 ⇌s-arr (evar-sol tf1) (evar-sol tf2) (svar ext regA) = svar (⇌s-arr tf1 tf2 ext)
 ⇌s-arr (svar tf1) (svar tf2) (svar ext regA) = svar (⇌s-arr tf1 tf2 ext)
+⇌s-arr (dvar tf1) (dvar tf2) (dvar ext regA) = dvar (⇌s-arr tf1 tf2 ext)
 ⇌s-arr (mark x) (mark x₁) (mark x₂) = mark x
 
 ⇌-∋∙ : Γ ∋∙ X
@@ -85,6 +94,19 @@ data _&_⇌s_&_ : Env n m → Env n m → Env n m → Env n m → Set where
 ⇌-∋∙ (S= inΓ) (sol-changed tf regA) = S^ (⇌-∋∙ inΓ tf)
 ⇌-∋∙ (S^ inΓ) (evar tf) = S^ (⇌-∋∙ inΓ tf)
 ⇌-∋∙ (S^ inΓ) (evar-changed tf regA) = S= (⇌-∋∙ inΓ tf)
+⇌-∋∙ (S≝ inΓ) (dvar tf) = S≝ (⇌-∋∙ inΓ tf)
+
+⇌-∋≝ : Γ ∋≝ X
+     → Γ ⇌ Δ
+     → Δ ∋≝ X
+⇌-∋≝ Z (dvar tf) = Z
+⇌-∋≝ (S∙ in1) (uvar tf) = S∙ (⇌-∋≝ in1 tf)
+⇌-∋≝ (S^ in1) (evar tf) = S^ (⇌-∋≝ in1 tf)
+⇌-∋≝ (S^ in1) (evar-changed tf regA) = S= (⇌-∋≝ in1 tf)
+⇌-∋≝ (S≝ in1) (dvar tf) = S≝ (⇌-∋≝ in1 tf)
+⇌-∋≝ (S= in1) (svar tf) = S= (⇌-∋≝ in1 tf)
+⇌-∋≝ (S= in1) (sol-changed tf regA) = S^ (⇌-∋≝ in1 tf)
+⇌-∋≝ (S, in1) (var tf) = S, (⇌-∋≝ in1 tf)
 
 ⇌-∋⦂ : Γ ∋ x ⦂ A
      → Γ ⇌ Δ
@@ -96,6 +118,7 @@ data _&_⇌s_&_ : Env n m → Env n m → Env n m → Env n m → Set where
 ⇌-∋⦂ (S^ inΓ up) (evar-changed tf regA) = S= (⇌-∋⦂ inΓ tf) up
 ⇌-∋⦂ (S= inΓ up) (svar tf) = S= (⇌-∋⦂ inΓ tf) up
 ⇌-∋⦂ (S= inΓ up) (sol-changed tf regA) = S^ (⇌-∋⦂ inΓ tf) up
+⇌-∋⦂ (S≝ inΓ up) (dvar tf) = S≝ (⇌-∋⦂ inΓ tf) up
 
 
 ⇌-⊢r : Γ ⊢r A
@@ -103,6 +126,7 @@ data _&_⇌s_&_ : Env n m → Env n m → Env n m → Env n m → Set where
      → Δ ⊢r A
 ⇌-⊢r ⊢r-int tf = ⊢r-int
 ⇌-⊢r (⊢r-var-∙ inΓ) tf = ⊢r-var-∙ (⇌-∋∙ inΓ tf)
+⇌-⊢r (⊢r-var-≝ inΓ) tf = ⊢r-var-≝ (⇌-∋≝ inΓ tf)
 ⇌-⊢r (⊢r-arr regA regA₁) tf = ⊢r-arr (⇌-⊢r regA tf) (⇌-⊢r regA₁ tf)
 ⇌-⊢r (⊢r-∀ regA) tf = ⊢r-∀ (⇌-⊢r regA (uvar tf))
 
@@ -116,6 +140,7 @@ data _&_⇌s_&_ : Env n m → Env n m → Env n m → Env n m → Set where
 ⇌-tregular (reg-S^ regΓ) (evar-changed tf regA) = reg-S= (⇌-tregular regΓ tf) (⇌-⊢r regA tf)
 ⇌-tregular (reg-S= regΓ regA) (svar tf) = reg-S= (⇌-tregular regΓ tf) (⇌-⊢r regA tf)
 ⇌-tregular (reg-S= regΓ regA) (sol-changed tf regA') = reg-S^ (⇌-tregular regΓ tf)
+⇌-tregular (reg-S≝ reg regA) (dvar tf) = reg-S≝ (⇌-tregular reg tf) (⇌-⊢r regA tf)
 
 ⇌s-∋∙-l : Γ ∋∙ X
         → Γ & Δ ⇌s Γ' & Δ'
@@ -123,9 +148,21 @@ data _&_⇌s_&_ : Env n m → Env n m → Env n m → Env n m → Set where
 ⇌s-∋∙-l Z (uvar tf) = Z
 ⇌s-∋∙-l (S∙ inΓ) (uvar tf) = S∙ (⇌s-∋∙-l inΓ tf)
 ⇌s-∋∙-l (S= inΓ) (svar tf) = S= (⇌s-∋∙-l inΓ tf)
+⇌s-∋∙-l (S≝ inΓ) (dvar tf) = S≝ (⇌s-∋∙-l inΓ tf)
 ⇌s-∋∙-l (S^ inΓ) (evar tf) = S^ (⇌s-∋∙-l inΓ tf)
 ⇌s-∋∙-l (S^ inΓ) (evar-sol tf) = S^ (⇌s-∋∙-l inΓ tf)
 ⇌s-∋∙-l (S⋈ inΓ) (mark x) = S⋈ (⇌-∋∙ inΓ x)
+
+⇌s-∋≝-l : Γ ∋≝ X
+        → Γ & Δ ⇌s Γ' & Δ'
+        → Γ' ∋≝ X
+⇌s-∋≝-l Z (dvar tf) = Z
+⇌s-∋≝-l (S∙ in1) (uvar tf) = S∙ (⇌s-∋≝-l in1 tf)
+⇌s-∋≝-l (S^ in1) (evar tf) = S^ (⇌s-∋≝-l in1 tf)
+⇌s-∋≝-l (S^ in1) (evar-sol tf) = S^ (⇌s-∋≝-l in1 tf)
+⇌s-∋≝-l (S≝ in1) (dvar tf) = S≝ (⇌s-∋≝-l in1 tf)
+⇌s-∋≝-l (S= in1) (svar tf) = S= (⇌s-∋≝-l in1 tf)
+⇌s-∋≝-l (S⋈ in1) (mark x) = S⋈ (⇌-∋≝ in1 x)
 
 ⇌s-∋=-l : Γ ∋= X
         → Γ & Δ ⇌s Γ' & Δ'
@@ -135,6 +172,7 @@ data _&_⇌s_&_ : Env n m → Env n m → Env n m → Env n m → Set where
 ⇌s-∋=-l (S^ inΓ) (evar tf) = S^ (⇌s-∋=-l inΓ tf)
 ⇌s-∋=-l (S^ inΓ) (evar-sol tf) = S^ (⇌s-∋=-l inΓ tf)
 ⇌s-∋=-l (S= inΓ) (svar tf) = S= (⇌s-∋=-l inΓ tf)
+⇌s-∋=-l (S≝ inΓ) (dvar tf) = S≝ (⇌s-∋=-l inΓ tf)
 
 ⇌s-∋^-l : Γ ∋^ X
         → Γ & Δ ⇌s Γ' & Δ'
@@ -145,7 +183,7 @@ data _&_⇌s_&_ : Env n m → Env n m → Env n m → Env n m → Set where
 ⇌s-∋^-l (S= inΓ) (svar tf) = S= (⇌s-∋^-l inΓ tf)
 ⇌s-∋^-l (S^ inΓ) (evar tf) = S^ (⇌s-∋^-l inΓ tf)
 ⇌s-∋^-l (S^ inΓ) (evar-sol tf) = S^ (⇌s-∋^-l inΓ tf)
-
+⇌s-∋^-l (S≝ inΓ) (dvar tf) = S≝ (⇌s-∋^-l inΓ tf)
 
 ⇌s-∋:=-l : Γ ∋ X := A
         → Γ & Δ ⇌s Γ' & Δ'
@@ -155,6 +193,17 @@ data _&_⇌s_&_ : Env n m → Env n m → Env n m → Env n m → Set where
 ⇌s-∋:=-l (S^ inΓ up) (evar tf) = S^ (⇌s-∋:=-l inΓ tf) up
 ⇌s-∋:=-l (S^ inΓ up) (evar-sol tf) = S^ (⇌s-∋:=-l inΓ tf) up
 ⇌s-∋:=-l (S= inΓ up) (svar tf) = S= (⇌s-∋:=-l inΓ tf) up
+⇌s-∋:=-l (S≝ inΓ up) (dvar tf) = S≝ (⇌s-∋:=-l inΓ tf) up
+
+⇌s-∋:≝-l : Γ ∋ X ≝ A
+        → Γ & Δ ⇌s Γ' & Δ'
+        → Γ' ∋ X ≝ A
+⇌s-∋:≝-l (Z up) (dvar tf) = Z up
+⇌s-∋:≝-l (S∙ in1 up) (uvar tf) = S∙ (⇌s-∋:≝-l in1 tf) up
+⇌s-∋:≝-l (S^ in1 up) (evar tf) = S^ (⇌s-∋:≝-l in1 tf) up
+⇌s-∋:≝-l (S^ in1 up) (evar-sol tf) = S^ (⇌s-∋:≝-l in1 tf) up
+⇌s-∋:≝-l (S= in1 up) (svar tf) = S= (⇌s-∋:≝-l in1 tf) up
+⇌s-∋:≝-l (S≝ in1 up) (dvar tf) = S≝ (⇌s-∋:≝-l in1 tf) up
 
 
 ⇌s-⊢r-l : Γ ⊢r A
@@ -162,6 +211,7 @@ data _&_⇌s_&_ : Env n m → Env n m → Env n m → Env n m → Set where
         → Γ' ⊢r A
 ⇌s-⊢r-l ⊢r-int tf = ⊢r-int
 ⇌s-⊢r-l (⊢r-var-∙ inΓ) tf = ⊢r-var-∙ (⇌s-∋∙-l inΓ tf)
+⇌s-⊢r-l (⊢r-var-≝ inΓ) tf = ⊢r-var-≝ (⇌s-∋≝-l inΓ tf)
 ⇌s-⊢r-l (⊢r-arr regA regA₁) tf = ⊢r-arr (⇌s-⊢r-l regA tf) (⇌s-⊢r-l regA₁ tf)
 ⇌s-⊢r-l (⊢r-∀ regA) tf = ⊢r-∀ (⇌s-⊢r-l regA (uvar tf))
 
@@ -171,6 +221,7 @@ data _&_⇌s_&_ : Env n m → Env n m → Env n m → Env n m → Set where
 ⇌s-⊢c-l ⊢c-int tf = ⊢c-int
 ⇌s-⊢c-l (⊢c-var-∙ inΔ) tf = ⊢c-var-∙ (⇌s-∋∙-l inΔ tf)
 ⇌s-⊢c-l (⊢c-var-= inΔ) tf = ⊢c-var-= (⇌s-∋=-l inΔ tf)
+⇌s-⊢c-l (⊢c-var-≝ inΔ) tf = ⊢c-var-≝ (⇌s-∋≝-l inΔ tf)
 ⇌s-⊢c-l (⊢c-arr cloA cloA₁) tf = ⊢c-arr (⇌s-⊢c-l cloA tf) (⇌s-⊢c-l cloA₁ tf)
 ⇌s-⊢c-l (⊢c-∀ cloA) tf = ⊢c-∀ (⇌s-⊢c-l cloA (uvar tf))
 
@@ -191,6 +242,7 @@ data _&_⇌s_&_ : Env n m → Env n m → Env n m → Env n m → Set where
 ⇌s-sregular-l (reg-S^ regΓ) (evar tf) = reg-S^ (⇌s-sregular-l regΓ tf)
 ⇌s-sregular-l (reg-S^ regΓ) (evar-sol tf) = reg-S^ (⇌s-sregular-l regΓ tf)
 ⇌s-sregular-l (reg-S= regΓ regA) (svar tf) = reg-S= (⇌s-sregular-l regΓ tf) (⇌s-⊢r-l regA tf)
+⇌s-sregular-l (reg-S≝ regΓ regA) (dvar tf) = reg-S≝ (⇌s-sregular-l regΓ tf) (⇌s-⊢r-l regA tf)
 
 ⇌s-≫-l : Γ ≫ A ⇘ B
        → Γ & Δ ⇌s Γ' & Δ'
@@ -198,6 +250,7 @@ data _&_⇌s_&_ : Env n m → Env n m → Env n m → Env n m → Set where
 ⇌s-≫-l grd-int tf = grd-int
 ⇌s-≫-l (grd-var= x) tf = grd-var= (⇌s-∋:=-l x tf)
 ⇌s-≫-l (grd-var∙ x) tf = grd-var∙ (⇌s-∋∙-l x tf)
+⇌s-≫-l (grd-var≝ x) tf = grd-var≝ (⇌s-∋≝-l x tf)
 ⇌s-≫-l (grd-arr grd grd₁) tf = grd-arr (⇌s-≫-l grd tf) (⇌s-≫-l grd₁ tf)
 ⇌s-≫-l (grd-∀ grd) tf = grd-∀ (⇌s-≫-l grd (uvar tf))
 
@@ -207,12 +260,13 @@ data _&_⇌s_&_ : Env n m → Env n m → Env n m → Env n m → Set where
 ⇌s-⇌-l (evar tf) = evar (⇌s-⇌-l tf)
 ⇌s-⇌-l (evar-sol tf) = evar (⇌s-⇌-l tf)
 ⇌s-⇌-l (svar tf) = svar (⇌s-⇌-l tf)
+⇌s-⇌-l (dvar tf) = dvar (⇌s-⇌-l tf)
 ⇌s-⇌-l (mark x) = x
 
 
-----------------------------------------------------------------------
---+                           main logic                           +--
-----------------------------------------------------------------------
+
+-- main logic
+
 
 ⇌s-inst : Γ & Δ ⇌s Γ' & Δ'
         → [ B / X ] Γ ⟹ Δ
@@ -221,6 +275,7 @@ data _&_⇌s_&_ : Env n m → Env n m → Env n m → Env n m → Set where
 ⇌s-inst (evar tf) (⟹^S inst up1) = ⟹^S (⇌s-inst tf inst) up1
 ⇌s-inst (uvar tf) (⟹∙S inst up1) = ⟹∙S (⇌s-inst tf inst) up1
 ⇌s-inst (svar tf) (⟹=S inst up1 regB) = ⟹=S (⇌s-inst tf inst) up1 (⇌s-⊢r-l regB tf)
+⇌s-inst (dvar tf) (⟹≝S inst up1 regB) = ⟹≝S (⇌s-inst tf inst) up1 (⇌s-⊢r-l regB tf)
 
 ss-irrev : Γ ⊢ A ⌞ ≤ ⌝ B ⊣ Δ
          → Γ & Δ ⇌s Γ' & Δ'
@@ -234,7 +289,9 @@ ss-irrev (s-ex-r= regΓ x-in) tf with refl ← ⇌s-eq tf = s-ex-r= (⇌s-sregul
 ss-irrev (s-arr s s₁) tf with ⇌s-Ω (ss-⊆ s) tf
 ... | ⟨ Ω' , tf' ⟩ = s-arr (ss-irrev s tf') (ss-irrev s₁ (⇌s-arr tf tf' (ss-⊆ s₁)))
 ss-irrev (s-∀ s) tf = s-∀ (ss-irrev s (uvar tf))
-
+ss-irrev (s-var-≝ regΓ x₁) tf with refl ← ⇌s-eq tf = s-var-≝ (⇌s-sregular-l regΓ tf) (⇌s-∋≝-l x₁ tf)
+ss-irrev (s-def-l= regΓ x-in) tf with refl ← ⇌s-eq tf = s-def-l= (⇌s-sregular-l regΓ tf) (⇌s-∋:≝-l x-in tf)
+ss-irrev (s-def-r= regΓ x-in) tf with refl ← ⇌s-eq tf = s-def-r= (⇌s-sregular-l regΓ tf) (⇌s-∋:≝-l x-in tf)
 
 t-irrev : Γ ⊢ Σ ⇒ e ⇒ A
         → Γ ⇌ Δ
@@ -252,6 +309,7 @@ t-irrev (⊢lam₁ ⊢e) tf = ⊢lam₁ (t-irrev ⊢e (var tf))
 t-irrev (⊢lam₂ ⊢e up-c ⊢e₁) tf = ⊢lam₂ (t-irrev ⊢e tf) up-c (t-irrev ⊢e₁ (var tf))
 t-irrev (⊢sub ⊢e ne gc s) tf = ⊢sub (t-irrev ⊢e tf) ne gc (s-irrev s (mark tf))
 t-irrev (⊢tabs ⊢e) tf = ⊢tabs (t-irrev ⊢e (uvar tf))
+t-irrev (⊢tapp ⊢e st) tf = ⊢tapp (t-irrev ⊢e tf) st
 
 s-irrev (s-empty regΓ cloA x) tf with refl ← ⇌s-eq tf = s-empty (⇌s-sregular-l regΓ tf) (⇌s-⊢c-l cloA tf) (⇌s-≫-l x tf)
 s-irrev (s-type ss) tf = s-type (ss-irrev ss tf)
@@ -259,10 +317,10 @@ s-irrev (s-term-c cloA ap ⊢e s) tf = s-term-c (⇌s-⊢c-l cloA tf) (⇌s-≫-
 s-irrev (s-term-o opnA ⊢e ss s) tf with ⇌s-Ω (ss-⊆ ss) tf
 ... | ⟨ Ω' , tf' ⟩ = s-term-o (⇌s-⊢o-l opnA tf) (t-irrev ⊢e (⇌s-⇌-l tf)) (ss-irrev ss tf') (s-irrev s (⇌s-arr tf tf' (s-⊆ s)))
 s-irrev (s-∀l s upᶜ upᵉ upC upD) tf = s-∀l (s-irrev s (evar-sol tf)) upᶜ upᵉ upC upD
+s-irrev (s-tapp s upᶜ) tf = s-tapp (s-irrev s (dvar tf)) upᶜ
 
-----------------------------------------------------------------------
---+                           corollary                            +--
-----------------------------------------------------------------------
+
+-- corollary
 
 ⇌-refl : TRegular Γ
        → Γ ⇌ Γ
@@ -271,6 +329,7 @@ s-irrev (s-∀l s upᶜ upᵉ upC upD) tf = s-∀l (s-irrev s (evar-sol tf)) up�
 ⇌-refl (reg-S∙ regΓ) = uvar (⇌-refl regΓ)
 ⇌-refl (reg-S^ regΓ) = evar (⇌-refl regΓ)
 ⇌-refl (reg-S= regΓ regA) = svar (⇌-refl regΓ)
+⇌-refl (reg-S≝ x regA) = dvar (⇌-refl x)
 
 ⊆-⇌ : Γ ⊆ Δ
     → 𝕣 Γ ⇌ 𝕣 Δ
@@ -278,6 +337,7 @@ s-irrev (s-∀l s upᶜ upᵉ upC upD) tf = s-∀l (s-irrev s (evar-sol tf)) up�
 ⊆-⇌ (evar ext) = evar (⊆-⇌ ext)
 ⊆-⇌ (evar-sol ext regA) = evar-changed (⊆-⇌ ext) (⊢r-𝕣' (⊆-⊢r' regA ext))
 ⊆-⇌ (svar ext regA) = svar (⊆-⇌ ext)
+⊆-⇌ (dvar ext regA) = dvar (⊆-⇌ ext)
 ⊆-⇌ (mark x) = ⇌-refl x
 
 ⇌-symm : Γ ⇌ Δ
@@ -287,6 +347,7 @@ s-irrev (s-∀l s upᶜ upᵉ upC upD) tf = s-∀l (s-irrev s (evar-sol tf)) up�
 ⇌-symm (uvar ext) = uvar (⇌-symm ext)
 ⇌-symm (evar ext) = evar (⇌-symm ext)
 ⇌-symm (svar ext) = svar (⇌-symm ext)
+⇌-symm (dvar ext) = dvar (⇌-symm ext)
 ⇌-symm (evar-changed ext regA) = sol-changed (⇌-symm ext) (⇌-⊢r regA ext)
 ⇌-symm (sol-changed ext regA) = evar-changed (⇌-symm ext) (⇌-⊢r regA ext)
 

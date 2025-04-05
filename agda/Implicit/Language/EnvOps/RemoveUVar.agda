@@ -22,6 +22,9 @@ data _◀_∙⇘_ : Env n (1 + m) → Fin (1 + m) → Env n m → Set where
   ◀S= : Γ ◀ k ∙⇘ Γ'
       → A ↑ty k ⇘ A'
       → Γ ,= A' ◀ #S k ∙⇘ Γ' ,= A
+  ◀S≝ : Γ ◀ k ∙⇘ Γ'
+      → A ↑ty k ⇘ A'
+      → Γ ,≝ A' ◀ #S k ∙⇘ Γ' ,≝ A
   ◀S⋈ : Γ ◀ k ∙⇘ Γ'
       → Γ ⋈ ◀ k ∙⇘ Γ' ⋈
 
@@ -36,6 +39,7 @@ data _◀_∙⇘_ : Env n (1 + m) → Fin (1 + m) → Env n m → Set where
 ∋∙-strengthen∙ {k = #S k} {#S X} (S, inΓ) (◀S, newΓ x) = S, (∋∙-strengthen∙ inΓ newΓ)
 ∋∙-strengthen∙ {k = #S k} {#S X} (S∙ inΓ) (◀S∙ newΓ) = S∙ (∋∙-strengthen∙ inΓ newΓ)
 ∋∙-strengthen∙ {k = #S k} {#S X} (S= inΓ) (◀S= newΓ x) = S= (∋∙-strengthen∙ inΓ newΓ)
+∋∙-strengthen∙ {k = #S k} {#S X} (S≝ inΓ) (◀S≝ newΓ x) = S≝ (∋∙-strengthen∙ inΓ newΓ)
 ∋∙-strengthen∙ {k = #S k} {#S X} (S^ inΓ) (◀S^ newΓ) = S^ (∋∙-strengthen∙ inΓ newΓ)
 ∋∙-strengthen∙ (S⋈ inΓ) (◀S⋈ newΓ) = S⋈ (∋∙-strengthen∙ inΓ newΓ)
 
@@ -49,7 +53,22 @@ data _◀_∙⇘_ : Env n (1 + m) → Fin (1 + m) → Env n m → Set where
 ∋=-strengthen∙ {k = #S k} {#S X} (S, inΓ) (◀S, newΓ x) = S, (∋=-strengthen∙ inΓ newΓ)
 ∋=-strengthen∙ {k = #S k} {#S X} (S∙ inΓ) (◀S∙ newΓ) = S∙ (∋=-strengthen∙ inΓ newΓ)
 ∋=-strengthen∙ {k = #S k} {#S X} (S= inΓ) (◀S= newΓ x) = S= (∋=-strengthen∙ inΓ newΓ)
+∋=-strengthen∙ {k = #S k} {#S X} (S≝ inΓ) (◀S≝ newΓ x) = S≝ (∋=-strengthen∙ inΓ newΓ)
 ∋=-strengthen∙ {k = #S k} {#S X} (S^ inΓ) (◀S^ newΓ) = S^ (∋=-strengthen∙ inΓ newΓ)
+
+∋≝-strengthen∙ : Γ ∋≝ punchIn k X
+      → Γ ◀ k ∙⇘ Γ'
+      → Γ' ∋≝ X
+∋≝-strengthen∙ {k = #0} (S, inΓ) (◀S, newΓ x) = S, (∋≝-strengthen∙ inΓ newΓ)
+∋≝-strengthen∙ {k = #0} (S∙ inΓ) ◀Z = inΓ
+∋≝-strengthen∙ {k = #S k} {#0} Z (◀S≝ new x) = Z
+∋≝-strengthen∙ {k = #S k} {#0} (S, inΓ) (◀S, newΓ x) = S, (∋≝-strengthen∙ inΓ newΓ)
+∋≝-strengthen∙ {k = #S k} {#S X} (S, inΓ) (◀S, newΓ x) = S, (∋≝-strengthen∙ inΓ newΓ)
+∋≝-strengthen∙ {k = #S k} {#S X} (S∙ inΓ) (◀S∙ newΓ) = S∙ (∋≝-strengthen∙ inΓ newΓ)
+∋≝-strengthen∙ {k = #S k} {#S X} (S= inΓ) (◀S= newΓ x) = S= (∋≝-strengthen∙ inΓ newΓ)
+∋≝-strengthen∙ {k = #S k} {#S X} (S≝ inΓ) (◀S≝ newΓ x) = S≝ (∋≝-strengthen∙ inΓ newΓ)
+∋≝-strengthen∙ {k = #S k} {#S X} (S^ inΓ) (◀S^ newΓ) = S^ (∋≝-strengthen∙ inΓ newΓ)
+∋≝-strengthen∙ (S⋈ inΓ) (◀S⋈ newΓ) = S⋈ (∋≝-strengthen∙ inΓ newΓ)
 {-
 ◀∙-∋:=' : Γ ∋ punchIn k X := A'
         → Γ ◀ k ∙⇘ Γ'
@@ -77,6 +96,7 @@ data _◀_∙⇘_ : Env n (1 + m) → Fin (1 + m) → Env n m → Set where
                → Γ' ⊢r A
 ⊢r-strengthen∙ ⊢r-int new ↑ty-int = ⊢r-int
 ⊢r-strengthen∙ (⊢r-var-∙ inΓ) new ↑ty-var = ⊢r-var-∙ (∋∙-strengthen∙ inΓ new)
+⊢r-strengthen∙ (⊢r-var-≝ inΓ) new ↑ty-var = ⊢r-var-≝ (∋≝-strengthen∙ inΓ new)
 ⊢r-strengthen∙ (⊢r-arr regA regA₁) new (↑ty-arr upA upA₁) = ⊢r-arr (⊢r-strengthen∙ regA new upA)
                                                                    (⊢r-strengthen∙ regA₁ new upA₁)
 ⊢r-strengthen∙ (⊢r-∀ regA) new (↑ty-∀ upA) = ⊢r-∀ (⊢r-strengthen∙ regA (◀S∙ new) upA)

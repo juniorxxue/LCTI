@@ -17,6 +17,7 @@ open import Implicit.Language.Extension.Base
 ⊆/x-^in-=out (ext-S^ ext) (S^ inΓ) = S^ (⊆/x-^in-=out ext inΓ)
 ⊆/x-^in-=out (ext-S∙ ext) (S∙ inΓ) = S∙ (⊆/x-^in-=out ext inΓ)
 ⊆/x-^in-=out (ext-S= ext _) (S= inΓ) = S= (⊆/x-^in-=out ext inΓ)
+⊆/x-^in-=out (ext-S≝ ext _) (S≝ inΓ) = S≝ (⊆/x-^in-=out ext inΓ)
 
 ⊆/x-^in-^out : Γ ⊆ Δ w/v X
               → X ≢ k
@@ -26,10 +27,12 @@ open import Implicit.Language.Extension.Base
 ⊆/x-^in-^out (ext-Z^ _ cloA) neq (S^ inΓ) = S= inΓ
 ⊆/x-^in-^out (ext-Z∙ _) neq inΓ = inΓ
 ⊆/x-^in-^out (ext-Z= _ _) neq inΓ = inΓ
+⊆/x-^in-^out (ext-Z≝ _ _) neq inΓ = inΓ
 ⊆/x-^in-^out (ext-S^ ext) neq Z = Z
 ⊆/x-^in-^out (ext-S^ ext) neq (S^ inΓ) = S^ (⊆/x-^in-^out ext (≢-pred neq) inΓ)
 ⊆/x-^in-^out (ext-S∙ ext) neq (S∙ inΓ) = S∙ (⊆/x-^in-^out ext (≢-pred neq) inΓ)
 ⊆/x-^in-^out (ext-S= ext _) neq (S= inΓ) = S= (⊆/x-^in-^out ext (≢-pred neq) inΓ)
+⊆/x-^in-^out (ext-S≝ ext _) neq (S≝ inΓ) = S≝ (⊆/x-^in-^out ext (≢-pred neq) inΓ)
 
 ⊆/x-=in-=out : Γ ⊆ Δ w/v X
               → Γ ∋= k
@@ -37,10 +40,12 @@ open import Implicit.Language.Extension.Base
 ⊆/x-=in-=out (ext-Z^ _ cloA) (S^ inΓ) = S= inΓ
 ⊆/x-=in-=out (ext-Z∙ _) inΓ = inΓ
 ⊆/x-=in-=out (ext-Z= _ _) inΓ = inΓ
+⊆/x-=in-=out (ext-Z≝ _ _) inΓ = inΓ
 ⊆/x-=in-=out (ext-S^ extx) (S^ inΓ) = S^ (⊆/x-=in-=out extx inΓ)
 ⊆/x-=in-=out (ext-S∙ extx) (S∙ inΓ) = S∙ (⊆/x-=in-=out extx inΓ)
 ⊆/x-=in-=out (ext-S= _ extx) Z = Z
 ⊆/x-=in-=out (ext-S= extx _) (S= inΓ) = S= (⊆/x-=in-=out extx inΓ)
+⊆/x-=in-=out (ext-S≝ extx _) (S≝ inΓ) = S≝ (⊆/x-=in-=out extx inΓ)
 
 ⊆/-^in-=out : Γ ⊆ Δ w/t A
              → k ε A
@@ -84,9 +89,11 @@ open import Implicit.Language.Extension.Base
 ⊆/x-^in-=out-eq (ext-Z^ _ cloA) (S^ inΓ) (S= inΔ) = ⊥-elim (∋^-∋=-false inΓ inΔ)
 ⊆/x-^in-=out-eq (ext-Z∙ _) inΓ inΔ = ⊥-elim (∋^-∋=-false inΓ inΔ)
 ⊆/x-^in-=out-eq (ext-Z= _ _) inΓ inΔ = ⊥-elim (∋^-∋=-false inΓ inΔ)
+⊆/x-^in-=out-eq (ext-Z≝ _ _) inΓ inΔ = ⊥-elim (∋^-∋=-false inΓ inΔ)
 ⊆/x-^in-=out-eq (ext-S^ ext) (S^ inΓ) (S^ inΔ) = cong #S (⊆/x-^in-=out-eq ext inΓ inΔ)
 ⊆/x-^in-=out-eq (ext-S∙ ext) (S∙ inΓ) (S∙ inΔ) = cong #S (⊆/x-^in-=out-eq ext inΓ inΔ)
 ⊆/x-^in-=out-eq (ext-S= ext _) (S= inΓ) (S= inΔ) = cong #S (⊆/x-^in-=out-eq ext inΓ inΔ)
+⊆/x-^in-=out-eq (ext-S≝ ext _) (S≝ inΓ) (S≝ inΔ) = cong #S (⊆/x-^in-=out-eq ext inΓ inΔ)
 
 ⊆/x-=out-in : Γ ⊆ Δ w/v k
             → Δ ∋= k
@@ -102,3 +109,6 @@ open import Implicit.Language.Extension.Base
 ⊆/x-=out-in (ext-S= ext regA) (S= inΔ) with ⊆/x-=out-in ext inΔ
 ... | is-ex inΓ = is-ex (S= inΓ)
 ... | is-sol inΓ = is-sol (S= inΓ)
+⊆/x-=out-in (ext-S≝ ext regA) (S≝ inΔ) with ⊆/x-=out-in ext inΔ
+... | is-ex inΓ = is-ex (S≝ inΓ)
+... | is-sol inΓ = is-sol (S≝ inΓ)

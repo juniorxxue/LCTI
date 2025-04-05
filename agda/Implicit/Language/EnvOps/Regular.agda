@@ -54,6 +54,12 @@ open import Implicit.Language.EnvOps.RemoveUVar
 ⊢r-weaken^0 regA up = ⊢r-weaken^ regA ▶Z up
 
 
+postulate
+  ⊢r-weaken≝0 : Δ ⊢r A
+                → Δ ⊢r T
+                → ↑ty0 A ⇘ A'
+                → Δ ,≝ T ⊢r A'
+
 ∋:=-⊢r : SRegular Γ
         → Γ ∋ X := A
         → Γ ⊢r A
@@ -61,6 +67,16 @@ open import Implicit.Language.EnvOps.RemoveUVar
 ∋:=-⊢r (reg-S∙ senv) (S∙ inΓ up) = ⊢r-weaken∙0 (∋:=-⊢r senv inΓ) up
 ∋:=-⊢r (reg-S^ senv) (S^ inΓ up) = ⊢r-weaken^0 (∋:=-⊢r senv inΓ) up
 ∋:=-⊢r (reg-S= senv regA) (S= inΓ up) = ⊢r-weaken=0 (∋:=-⊢r senv inΓ) up regA
+∋:=-⊢r (reg-S≝ senv regA) (S≝ inΓ up) = ⊢r-weaken≝0 (∋:=-⊢r senv inΓ) regA up
+
+∋:≝-⊢r : SRegular Γ
+        → Γ ∋ X ≝ A
+        → Γ ⊢r A
+∋:≝-⊢r (reg-S≝ senv regA) (Z up) = ⊢r-weaken≝0 regA regA up
+∋:≝-⊢r (reg-S∙ senv) (S∙ inΓ up) = ⊢r-weaken∙0 (∋:≝-⊢r senv inΓ) up
+∋:≝-⊢r (reg-S^ senv) (S^ inΓ up) = ⊢r-weaken^0 (∋:≝-⊢r senv inΓ) up
+∋:≝-⊢r (reg-S= senv regA) (S= inΓ up) = ⊢r-weaken=0 (∋:≝-⊢r senv inΓ) up regA
+∋:≝-⊢r (reg-S≝ senv regA) (S≝ inΓ up) = ⊢r-weaken≝0 (∋:≝-⊢r senv inΓ) regA up
 
 ∋⦂-⊢r : TRegular Γ
       → Γ ∋ x ⦂ A
@@ -70,6 +86,7 @@ open import Implicit.Language.EnvOps.RemoveUVar
 ∋⦂-⊢r (reg-S∙ regΓ) (S∙ inΓ up) = ⊢r-weaken∙0 (∋⦂-⊢r regΓ inΓ) up
 ∋⦂-⊢r (reg-S^ regΓ) (S^ inΓ up) = ⊢r-weaken^0 (∋⦂-⊢r regΓ inΓ) up
 ∋⦂-⊢r (reg-S= regΓ regA) (S= inΓ up) = ⊢r-weaken=0 (∋⦂-⊢r regΓ inΓ) up regA
+∋⦂-⊢r (reg-S≝ regΓ regA) (S≝ inΓ up) = ⊢r-weaken≝0 (∋⦂-⊢r regΓ inΓ) regA up
 
 inst-⊢r : [ A / k ] Γ ⟹ Δ
         → Γ ⊢r A
@@ -77,3 +94,4 @@ inst-⊢r (⟹^0 up regA env) = ⊢r-weaken^0 regA up
 inst-⊢r (⟹^S inst up1) = ⊢r-weaken^0 (inst-⊢r inst) up1
 inst-⊢r (⟹∙S inst up1) = ⊢r-weaken∙0 (inst-⊢r inst) up1
 inst-⊢r (⟹=S inst up1 regB) = ⊢r-weaken=0 (inst-⊢r inst) up1 regB
+inst-⊢r (⟹≝S inst up1 regB) = ⊢r-weaken≝0 (inst-⊢r inst) regB up1

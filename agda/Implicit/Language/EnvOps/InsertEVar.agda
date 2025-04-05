@@ -22,6 +22,9 @@ data _▶_,^⇘_ : Env n m → Fin (1 + m) → Env n (1 + m) → Set where
   ▶S= : Γ ▶ k ,^⇘ Γ'
       → (upA : A ↑ty k ⇘ A')
       → Γ ,= A ▶ #S k ,^⇘ Γ' ,= A'
+  ▶S≝ : Γ ▶ k ,^⇘ Γ'
+      → (upA : A ↑ty k ⇘ A')
+      → Γ ,≝ A ▶ #S k ,^⇘ Γ' ,≝ A'
   ▶S⋈ : Γ ▶ k ,^⇘ Γ'
       → Γ ⋈ ▶ k ,^⇘ Γ' ⋈
 
@@ -42,6 +45,9 @@ data _⨟_▶_,^⇘_⨟_ : Env n m → Env n m → Fin (1 + m) → Env n (1 + m)
   ▶S= : Γ ⨟ Δ ▶ k ,^⇘ Γ' ⨟ Δ'
       → (upA : A ↑ty k ⇘ A')
       → Γ ,= A ⨟ Δ ,= A ▶ #S k ,^⇘ Γ' ,= A' ⨟ Δ' ,= A'
+  ▶S≝ : Γ ⨟ Δ ▶ k ,^⇘ Γ' ⨟ Δ'
+      → (upA : A ↑ty k ⇘ A')
+      → Γ ,≝ A ⨟ Δ ,≝ A ▶ #S k ,^⇘ Γ' ,≝ A' ⨟ Δ' ,≝ A'
   ▶S⋈ : Γ ⨟ Δ ▶ k ,^⇘ Γ' ⨟ Δ'
       → Γ ⋈ ⨟ Δ ⋈ ▶ k ,^⇘ Γ' ⋈ ⨟ Δ' ⋈
 
@@ -53,6 +59,7 @@ data _⨟_▶_,^⇘_⨟_ : Env n m → Env n m → Fin (1 + m) → Env n (1 + m)
 ▶^-▶⨟^ (▶S^ newΓ) = ▶S^ (▶^-▶⨟^ newΓ)
 ▶^-▶⨟^ (▶S∙ newΓ) = ▶S∙ (▶^-▶⨟^ newΓ)
 ▶^-▶⨟^ (▶S= newΓ upA) = ▶S= (▶^-▶⨟^ newΓ) upA
+▶^-▶⨟^ (▶S≝ newΓ upA) = ▶S≝ (▶^-▶⨟^ newΓ) upA
 ▶^-▶⨟^ (▶S⋈ newΓ) = ▶S⋈ (▶^-▶⨟^ newΓ)
 
 ▶⨟^-▶^-l : Γ ⨟ Δ ▶ k ,^⇘ Γ' ⨟ Δ'
@@ -63,6 +70,7 @@ data _⨟_▶_,^⇘_⨟_ : Env n m → Env n m → Fin (1 + m) → Env n (1 + m)
 ▶⨟^-▶^-l (▶S^= new upA) = ▶S^ (▶⨟^-▶^-l new)
 ▶⨟^-▶^-l (▶S∙ new) = ▶S∙ (▶⨟^-▶^-l new)
 ▶⨟^-▶^-l (▶S= new upA) = ▶S= (▶⨟^-▶^-l new) upA
+▶⨟^-▶^-l (▶S≝ new upA) = ▶S≝ (▶⨟^-▶^-l new) upA
 ▶⨟^-▶^-l (▶S⋈ new) = ▶S⋈ (▶⨟^-▶^-l new)
 
 ▶⨟^-unique : Γ ⨟ Γ ▶ k ,^⇘ Γ' ⨟ Δ'
@@ -72,6 +80,7 @@ data _⨟_▶_,^⇘_⨟_ : Env n m → Env n m → Fin (1 + m) → Env n (1 + m)
 ▶⨟^-unique (▶S^ ss) with refl ← ▶⨟^-unique ss = refl
 ▶⨟^-unique (▶S∙ ss) with refl ← ▶⨟^-unique ss = refl
 ▶⨟^-unique (▶S= ss upA) with refl ← ▶⨟^-unique ss = refl
+▶⨟^-unique (▶S≝ ss upA) with refl ← ▶⨟^-unique ss = refl
 ▶⨟^-unique (▶S⋈ ss) with refl ← ▶⨟^-unique ss = refl
 
 
@@ -93,6 +102,9 @@ data _⨟_▶_,^⇘_⨟_ : Env n m → Env n m → Fin (1 + m) → Env n (1 + m)
 ∋⦂-weaken^ (S= inΓ up) ▶Z upA = S^ (S= inΓ up) upA
 ∋⦂-weaken^ {k = #S k} (S= {A = A} inΓ up) (▶S= newΓ upA₁) upA
   with ⟨ A' , upA' ⟩ ← ↑ty-total A k = S= (∋⦂-weaken^ inΓ newΓ upA') (↑ty-comm0 up upA upA')
+∋⦂-weaken^ (S≝ inΓ up) ▶Z upA = S^ (S≝ inΓ up) upA
+∋⦂-weaken^ {k = #S k} (S≝ {A = A} inΓ up) (▶S≝ newΓ upA₁) upA
+  with ⟨ A' , upA' ⟩ ← ↑ty-total A k = S≝ (∋⦂-weaken^ inΓ newΓ upA') (↑ty-comm0 up upA upA')
 
 ∋=-weaken^ : Γ ∋= X
            → Γ ▶ k ,^⇘ Γ'
@@ -105,8 +117,28 @@ data _⨟_▶_,^⇘_⨟_ : Env n m → Env n m → Fin (1 + m) → Env n (1 + m)
 ∋=-weaken^ (S^ inΓ) (▶S^ newΓ) = S^ (∋=-weaken^ inΓ newΓ)
 ∋=-weaken^ (S= inΓ) ▶Z = S^ (S= inΓ)
 ∋=-weaken^ (S= inΓ) (▶S= newΓ upA) = S= (∋=-weaken^ inΓ newΓ)
+∋=-weaken^ (S≝ inΓ) ▶Z = S^ (S≝ inΓ)
+∋=-weaken^ (S≝ inΓ) (▶S≝ newΓ upA) = S≝ (∋=-weaken^ inΓ newΓ)
 ∋=-weaken^ (S, inΓ) ▶Z = S^ (S, inΓ)
 ∋=-weaken^ (S, inΓ) (▶S, new upA) = S, (∋=-weaken^ inΓ new)
+
+∋≝-weaken^ : Γ ∋≝ X
+           → Γ ▶ k ,^⇘ Γ'
+           → Γ' ∋≝ punchIn k X
+∋≝-weaken^ Z ▶Z = S^ Z
+∋≝-weaken^ Z (▶S≝ newΓ upA) = Z
+∋≝-weaken^ (S∙ inΓ) ▶Z = S^ (S∙ inΓ)
+∋≝-weaken^ (S∙ inΓ) (▶S∙ newΓ) = S∙ (∋≝-weaken^ inΓ newΓ)
+∋≝-weaken^ (S^ inΓ) ▶Z = S^ (S^ inΓ)
+∋≝-weaken^ (S^ inΓ) (▶S^ newΓ) = S^ (∋≝-weaken^ inΓ newΓ)
+∋≝-weaken^ (S= inΓ) ▶Z = S^ (S= inΓ)
+∋≝-weaken^ (S= inΓ) (▶S= newΓ upA) = S= (∋≝-weaken^ inΓ newΓ)
+∋≝-weaken^ (S≝ inΓ) ▶Z = S^ (S≝ inΓ)
+∋≝-weaken^ (S≝ inΓ) (▶S≝ newΓ upA) = S≝ (∋≝-weaken^ inΓ newΓ)
+∋≝-weaken^ (S, inΓ) ▶Z = S^ (S, inΓ)
+∋≝-weaken^ (S, inΓ) (▶S, new upA) = S, (∋≝-weaken^ inΓ new)
+∋≝-weaken^ (S⋈ inΓ) ▶Z = S^ (S⋈ inΓ)
+∋≝-weaken^ (S⋈ inΓ) (▶S⋈ new) = S⋈ (∋≝-weaken^ inΓ new)
 
 ∋^-weaken^ : Γ ∋^ X
            → Γ ▶ k ,^⇘ Γ'
@@ -119,6 +151,8 @@ data _⨟_▶_,^⇘_⨟_ : Env n m → Env n m → Fin (1 + m) → Env n (1 + m)
 ∋^-weaken^ (S^ inΓ) (▶S^ newΓ) = S^ (∋^-weaken^ inΓ newΓ)
 ∋^-weaken^ (S= inΓ) ▶Z = S^ (S= inΓ)
 ∋^-weaken^ (S= inΓ) (▶S= newΓ upA) = S= (∋^-weaken^ inΓ newΓ)
+∋^-weaken^ (S≝ inΓ) ▶Z = S^ (S≝ inΓ)
+∋^-weaken^ (S≝ inΓ) (▶S≝ newΓ upA) = S≝ (∋^-weaken^ inΓ newΓ)
 ∋^-weaken^ (S, inΓ) ▶Z = S^ (S, inΓ)
 ∋^-weaken^ (S, inΓ) (▶S, new upA) = S, (∋^-weaken^ inΓ new)
 
@@ -134,6 +168,8 @@ data _⨟_▶_,^⇘_⨟_ : Env n m → Env n m → Fin (1 + m) → Env n (1 + m)
 ∋∙-weaken^ (S∙ inΓ) (▶S∙ newΓ) = S∙ (∋∙-weaken^ inΓ newΓ)
 ∋∙-weaken^ (S= inΓ) ▶Z = S^ (S= inΓ)
 ∋∙-weaken^ (S= inΓ) (▶S= newΓ upA) = S= (∋∙-weaken^ inΓ newΓ)
+∋∙-weaken^ (S≝ inΓ) ▶Z = S^ (S≝ inΓ)
+∋∙-weaken^ (S≝ inΓ) (▶S≝ newΓ upA) = S≝ (∋∙-weaken^ inΓ newΓ)
 ∋∙-weaken^ (S^ inΓ) ▶Z = S^ (S^ inΓ)
 ∋∙-weaken^ (S^ inΓ) (▶S^ newΓ) = S^ (∋∙-weaken^ inΓ newΓ)
 ∋∙-weaken^ (S⋈ inΓ) ▶Z = S^ (S⋈ inΓ)
@@ -154,8 +190,32 @@ data _⨟_▶_,^⇘_⨟_ : Env n m → Env n m → Fin (1 + m) → Env n (1 + m)
 ∋:=-weaken^ (S= inΓ up) upA ▶Z = S^ (S= inΓ up) upA
 ∋:=-weaken^ (S= {A = A} inΓ up) upA (▶S= {k = k} newΓ upA₁)
   with ⟨ A' , upA' ⟩ ← ↑ty-total A k = S= (∋:=-weaken^ inΓ upA' newΓ) (↑ty-comm0 up upA upA')
+∋:=-weaken^ (S≝ inΓ up) upA ▶Z = S^ (S≝ inΓ up) upA
+∋:=-weaken^ (S≝ {A = A} inΓ up) upA (▶S≝ {k = k} newΓ upA₁)
+  with ⟨ A' , upA' ⟩ ← ↑ty-total A k = S≝ (∋:=-weaken^ inΓ upA' newΓ) (↑ty-comm0 up upA upA')
 ∋:=-weaken^ (S, inΓ) upA ▶Z = S^ (S, inΓ) upA
 ∋:=-weaken^ (S, inΓ) upA (▶S, new upA₁) = S, (∋:=-weaken^ inΓ upA new)
+
+∋:≝-weaken^ : Γ ∋ X ≝ A
+            → A ↑ty k ⇘ A'
+            → Γ ▶ k ,^⇘ Γ'
+            → Γ' ∋ punchIn k X ≝ A'
+∋:≝-weaken^ (Z up) upA ▶Z = S^ (Z up) upA
+∋:≝-weaken^ (Z up) upA (▶S≝ newΓ upA₁) = Z (↑ty-comm0 up upA upA₁)
+∋:≝-weaken^ (S∙ inΓ up) upA ▶Z = S^ (S∙ inΓ up) upA
+∋:≝-weaken^ (S∙ {A = A} inΓ up) upA (▶S∙ {k = k} newΓ)
+  with ⟨ A' , upA' ⟩ ← ↑ty-total A k = S∙ (∋:≝-weaken^ inΓ upA' newΓ) (↑ty-comm0 up upA upA')
+∋:≝-weaken^ (S^ inΓ up) upA ▶Z = S^ (S^ inΓ up) upA
+∋:≝-weaken^ (S^ {A = A} inΓ up) upA (▶S^ {k = k} newΓ)
+  with ⟨ A' , upA' ⟩ ← ↑ty-total A k = S^ (∋:≝-weaken^ inΓ upA' newΓ) (↑ty-comm0 up upA upA')
+∋:≝-weaken^ (S= inΓ up) upA ▶Z = S^ (S= inΓ up) upA
+∋:≝-weaken^ (S= {A = A} inΓ up) upA (▶S= {k = k} newΓ upA₁)
+  with ⟨ A' , upA' ⟩ ← ↑ty-total A k = S= (∋:≝-weaken^ inΓ upA' newΓ) (↑ty-comm0 up upA upA')
+∋:≝-weaken^ (S≝ inΓ up) upA ▶Z = S^ (S≝ inΓ up) upA
+∋:≝-weaken^ (S≝ {A = A} inΓ up) upA (▶S≝ {k = k} newΓ upA₁)
+  with ⟨ A' , upA' ⟩ ← ↑ty-total A k = S≝ (∋:≝-weaken^ inΓ upA' newΓ) (↑ty-comm0 up upA upA')
+∋:≝-weaken^ (S, inΓ) upA ▶Z = S^ (S, inΓ) upA
+∋:≝-weaken^ (S, inΓ) upA (▶S, new upA₁) = S, (∋:≝-weaken^ inΓ upA new)
 
 ⊢r-weaken^ : Γ ⊢r A
             → Γ ▶ k ,^⇘ Γ'
@@ -163,6 +223,7 @@ data _⨟_▶_,^⇘_⨟_ : Env n m → Env n m → Fin (1 + m) → Env n (1 + m)
             → Γ' ⊢r A'
 ⊢r-weaken^ ⊢r-int newΓ ↑ty-int = ⊢r-int
 ⊢r-weaken^ (⊢r-var-∙ inΓ) newΓ ↑ty-var = ⊢r-var-∙ (∋∙-weaken^ inΓ newΓ)
+⊢r-weaken^ (⊢r-var-≝ inΓ) newΓ ↑ty-var = ⊢r-var-≝ (∋≝-weaken^ inΓ newΓ)
 ⊢r-weaken^ (⊢r-arr regA regA₁) newΓ (↑ty-arr upA upA₁) = ⊢r-arr (⊢r-weaken^ regA newΓ upA) (⊢r-weaken^ regA₁ newΓ upA₁)
 ⊢r-weaken^ (⊢r-∀ regA) newΓ (↑ty-∀ upA) = ⊢r-∀ (⊢r-weaken^ regA (▶S∙ newΓ) upA)
 
@@ -173,6 +234,7 @@ data _⨟_▶_,^⇘_⨟_ : Env n m → Env n m → Fin (1 + m) → Env n (1 + m)
 ⊢c-weaken^ ⊢c-int newΓ ↑ty-int = ⊢c-int
 ⊢c-weaken^ (⊢c-var-∙ inΔ) newΓ ↑ty-var = ⊢c-var-∙ (∋∙-weaken^ inΔ newΓ)
 ⊢c-weaken^ (⊢c-var-= inΔ) newΓ ↑ty-var = ⊢c-var-= (∋=-weaken^ inΔ newΓ)
+⊢c-weaken^ (⊢c-var-≝ inΔ) newΓ ↑ty-var = ⊢c-var-≝ (∋≝-weaken^ inΔ newΓ)
 ⊢c-weaken^ (⊢c-arr cloA cloA₁) newΓ (↑ty-arr upA upA₁) = ⊢c-arr (⊢c-weaken^ cloA newΓ upA) (⊢c-weaken^ cloA₁ newΓ upA₁)
 ⊢c-weaken^ (⊢c-∀ cloA) newΓ (↑ty-∀ upA) = ⊢c-∀ (⊢c-weaken^ cloA (▶S∙ newΓ) upA)
 
@@ -192,6 +254,7 @@ data _⨟_▶_,^⇘_⨟_ : Env n m → Env n m → Fin (1 + m) → Env n (1 + m)
           → Γ' ≫ A' ⇘ B'
 ≫-weaken^ grd-int newΓ ↑ty-int ↑ty-int = grd-int
 ≫-weaken^ (grd-var= x) newΓ ↑ty-var upB = grd-var= (∋:=-weaken^ x upB newΓ)
+≫-weaken^ {k = k} (grd-var≝ x) newΓ ↑ty-var ↑ty-var = grd-var≝ (∋≝-weaken^ x newΓ)
 ≫-weaken^ (grd-var∙ x) newΓ ↑ty-var ↑ty-var = grd-var∙ (∋∙-weaken^ x newΓ)
 ≫-weaken^ (grd-arr grd grd₁) newΓ (↑ty-arr upA upA₁) (↑ty-arr upB upB₁) = grd-arr (≫-weaken^ grd newΓ upA upB)
                                                                                   (≫-weaken^ grd₁ newΓ upA₁ upB₁)
@@ -209,6 +272,8 @@ tregular-weaken^ (reg-S^ regΓ) ▶Z = reg-S^ (reg-S^ regΓ)
 tregular-weaken^ (reg-S^ regΓ) (▶S^ newΓ) = reg-S^ (tregular-weaken^ regΓ newΓ)
 tregular-weaken^ (reg-S= regΓ regA) ▶Z = reg-S^ (reg-S= regΓ regA)
 tregular-weaken^ (reg-S= regΓ regA) (▶S= newΓ upA) = reg-S= (tregular-weaken^ regΓ newΓ) (⊢r-weaken^ regA newΓ upA)
+tregular-weaken^ (reg-S≝ regΓ regA) ▶Z = reg-S^ (reg-S≝ regΓ regA)
+tregular-weaken^ (reg-S≝ regΓ regA) (▶S≝ newΓ upA) = reg-S≝ (tregular-weaken^ regΓ newΓ) (⊢r-weaken^ regA newΓ upA)
 
 sregular-weaken^ : SRegular Γ
                  → Γ ▶ k ,^⇘ Γ'
@@ -221,6 +286,8 @@ sregular-weaken^ (reg-S^ regΓ) ▶Z = reg-S^ (reg-S^ regΓ)
 sregular-weaken^ (reg-S^ regΓ) (▶S^ newΓ) = reg-S^ (sregular-weaken^ regΓ newΓ)
 sregular-weaken^ (reg-S= regΓ regA) ▶Z = reg-S^ (reg-S= regΓ regA)
 sregular-weaken^ (reg-S= regΓ regA) (▶S= newΓ upA) = reg-S= (sregular-weaken^ regΓ newΓ) (⊢r-weaken^ regA newΓ upA)
+sregular-weaken^ (reg-S≝ regΓ regA) ▶Z = reg-S^ (reg-S≝ regΓ regA)
+sregular-weaken^ (reg-S≝ regΓ regA) (▶S≝ newΓ upA) = reg-S≝ (sregular-weaken^ regΓ newΓ) (⊢r-weaken^ regA newΓ upA)
 
 
 inst-weaken^ : [ A / X ] Γ ⟹ Δ
@@ -239,3 +306,6 @@ inst-weaken^ {k = #S k} (⟹∙S {A = A} inst up1) (▶S∙ new) upA
 inst-weaken^ (⟹=S inst up1 regB) ▶Z upA = ⟹^S (⟹=S inst up1 regB) upA
 inst-weaken^ {k = #S k} (⟹=S {A = A} inst up1 regB) (▶S= new upA₁) upA
    with ⟨ A' , upA' ⟩ ← ↑ty-total A k = ⟹=S (inst-weaken^ inst new upA') (↑ty-comm0 up1 upA upA') (⊢r-weaken^ regB (▶⨟^-▶^-l new) upA₁)
+inst-weaken^ (⟹≝S inst up1 regB) ▶Z upA = ⟹^S (⟹≝S inst up1 regB) upA
+inst-weaken^ {k = #S k} (⟹≝S {A = A} inst up1 regB) (▶S≝ new upA₁) upA
+   with ⟨ A' , upA' ⟩ ← ↑ty-total A k = ⟹≝S (inst-weaken^ inst new upA') (↑ty-comm0 up1 upA upA') (⊢r-weaken^ regB (▶⨟^-▶^-l new) upA₁)

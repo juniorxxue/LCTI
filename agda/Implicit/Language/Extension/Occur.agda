@@ -16,6 +16,7 @@ open import Implicit.Language.Extension.Properties
 ⊆/x-≢ (ext-S^ ext) (S^ inΓ) (S^ inΔ) refl = ⊆/x-≢ ext inΓ inΔ refl
 ⊆/x-≢ (ext-S∙ ext) (S∙ inΓ) (S∙ inΔ) refl = ⊆/x-≢ ext inΓ inΔ refl
 ⊆/x-≢ (ext-S= ext regA) (S= inΓ) (S= inΔ) refl = ⊆/x-≢ ext inΓ inΔ refl
+⊆/x-≢ (ext-S≝ ext regA) (S≝ inΓ) (S≝ inΔ) refl = ⊆/x-≢ ext inΓ inΔ refl
 
 ⊆-∋^-middle : Γ ∋^ k
             → Δ ∋^ k
@@ -23,18 +24,25 @@ open import Implicit.Language.Extension.Properties
             → Ω ⊆ Δ
             → Ω ∋^ k
 ⊆-∋^-middle Z Z (evar ext1) (evar ext2) = Z
-⊆-∋^-middle (S∙ inΓ) (S∙ inΔ) (uvar ext1) (uvar ext2) = S∙ (⊆-∋^-middle inΓ inΔ ext1 ext2)
-⊆-∋^-middle (S∙ inΓ) (S= inΔ) (uvar ext1) ()
-⊆-∋^-middle (S∙ inΓ) (S^ inΔ) (uvar ext1) ()
-⊆-∋^-middle (S= inΓ) (S∙ inΔ) (svar ext1 regA) ()
-⊆-∋^-middle (S= inΓ) (S= inΔ) (svar ext1 regA) (svar ext2 regA₁) = S= (⊆-∋^-middle inΓ inΔ ext1 ext2)
-⊆-∋^-middle (S= inΓ) (S^ inΔ) (svar ext1 regA) ()
-⊆-∋^-middle (S^ inΓ) (S∙ inΔ) (evar ext1) ()
-⊆-∋^-middle (S^ inΓ) (S∙ inΔ) (evar-sol ext1 regA) ()
-⊆-∋^-middle (S^ inΓ) (S= inΔ) (evar ext1) (evar-sol ext2 regA) = S^ (⊆-∋^-middle inΓ inΔ ext1 ext2)
-⊆-∋^-middle (S^ inΓ) (S= inΔ) (evar-sol ext1 regA) (svar ext2 regA₁) = S= (⊆-∋^-middle inΓ inΔ ext1 ext2)
-⊆-∋^-middle (S^ inΓ) (S^ inΔ) (evar ext1) (evar ext2) = S^ (⊆-∋^-middle inΓ inΔ ext1 ext2)
-
+⊆-∋^-middle (S∙ in1) (S∙ in2) (uvar ext1) (uvar ext2) = S∙ (⊆-∋^-middle in1 in2 ext1 ext2)
+⊆-∋^-middle (S∙ in1) (S= in2) (uvar ext1) ()
+⊆-∋^-middle (S∙ in1) (S≝ in2) (uvar ext1) ()
+⊆-∋^-middle (S∙ in1) (S^ in2) (uvar ext1) ()
+⊆-∋^-middle (S= in1) (S∙ in2) (svar ext1 regA) ()
+⊆-∋^-middle (S= in1) (S= in2) (svar ext1 regA) (svar ext2 regA₁) = S= (⊆-∋^-middle in1 in2 ext1 ext2)
+⊆-∋^-middle (S= in1) (S≝ in2) (svar ext1 regA) ()
+⊆-∋^-middle (S= in1) (S^ in2) (svar ext1 regA) ()
+⊆-∋^-middle (S≝ in1) (S∙ in2) (dvar ext1 regA) ()
+⊆-∋^-middle (S≝ in1) (S= in2) (dvar ext1 regA) ()
+⊆-∋^-middle (S≝ in1) (S≝ in2) (dvar ext1 regA) (dvar ext2 regA₁) = S≝ (⊆-∋^-middle in1 in2 ext1 ext2)
+⊆-∋^-middle (S≝ in1) (S^ in2) (dvar ext1 regA) ()
+⊆-∋^-middle (S^ in1) (S∙ in2) (evar ext1) ()
+⊆-∋^-middle (S^ in1) (S∙ in2) (evar-sol ext1 regA) ()
+⊆-∋^-middle (S^ in1) (S= in2) (evar ext1) (evar-sol ext2 regA) = S^ (⊆-∋^-middle in1 in2 ext1 ext2)
+⊆-∋^-middle (S^ in1) (S= in2) (evar-sol ext1 regA) (svar ext2 regA₁) = S= (⊆-∋^-middle in1 in2 ext1 ext2)
+⊆-∋^-middle (S^ in1) (S≝ in2) (evar ext1) ()
+⊆-∋^-middle (S^ in1) (S≝ in2) (evar-sol ext1 regA) ()
+⊆-∋^-middle (S^ in1) (S^ in2) (evar ext1) (evar ext2) = S^ (⊆-∋^-middle in1 in2 ext1 ext2)
 
 ^in-^out-¬ε : Γ ⊆ Δ w/t A
             → Γ ∋^ k

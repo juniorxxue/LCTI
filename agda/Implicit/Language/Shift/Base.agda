@@ -24,6 +24,7 @@ open import Implicit.Language.Base
 ↑tm k (e₁ · e₂)  = ↑tm k e₁ · ↑tm k e₂
 ↑tm k (e ⦂ A)    = (↑tm k e) ⦂ A
 ↑tm k (Λ e)      = Λ (↑tm k e)
+↑tm k (e ⓪ A)    = (↑tm k e) ⓪ A
 
 ↑tm0 : Term n m → Term (1 + n) m
 ↑tm0 = ↑tm #0
@@ -36,6 +37,7 @@ open import Implicit.Language.Base
 ↑tyᵉ k (e₁ · e₂)  = ↑tyᵉ k e₁ · ↑tyᵉ k e₂
 ↑tyᵉ k (e ⦂ A)    = (↑tyᵉ k e) ⦂ (↑ty k A)
 ↑tyᵉ k (Λ e)      = Λ (↑tyᵉ (#S k) e)
+↑tyᵉ k (e ⓪ A)    = (↑tyᵉ k e) ⓪ (↑ty k A)
 
 ↑tyᵉ0 : Term n m → Term n (1 + m)
 ↑tyᵉ0 = ↑tyᵉ #0
@@ -63,6 +65,9 @@ data _↑tm_⇘_ : Term n m → Fin (1 + n) → Term (1 + n) m → Set where
   ↑tm-Λ :
       e ↑tm k ⇘ e'
     → (Λ e) ↑tm k ⇘ Λ e'
+  ↑tm-⓪ :
+      e ↑tm k ⇘ e'
+    → (e ⓪ A) ↑tm k ⇘ (e' ⓪ A)
 
 infix 3 ↑tm0_⇘_
 ↑tm0_⇘_ : Term n m → Term (1 + n) m → Set
@@ -122,6 +127,10 @@ data _↑tyᵉ_⇘_ : Term n m → Fin (1 + m) → Term n (1 + m) → Set where
   ↑tyᵉ-Λ :
       e ↑tyᵉ #S k ⇘ e'
     → (Λ e) ↑tyᵉ k ⇘ Λ e'
+  ↑tyᵉ-⓪ :
+      e ↑tyᵉ k ⇘ e'
+    → (upA : A ↑ty k ⇘ A')
+    → (e ⓪ A) ↑tyᵉ k ⇘ (e' ⓪ A')
 
 infix 3 ↑tyᵉ0_⇘_
 ↑tyᵉ0_⇘_ : Term n m → Term n (1 + m) → Set

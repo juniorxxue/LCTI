@@ -19,12 +19,17 @@ s+-polarity (s-arr₃ cloA grd s) = ⊢r-arr (⊢c-≫-⊢r (s-sregular s) cloA 
 s+-polarity (s-∀ s) = ⊢r-∀ (s+-polarity s)
 s+-polarity (s-∀l s ic fd upC upD) = ⊢r-strengthen=0 (s+-polarity s) (↑ty-arr upC upD)
 s+-polarity (s-svar-l x inΔ) = ∋:=-⊢r x inΔ
+s+-polarity (s-tapp x) = ⊢r-∀ (⊢r-≝-∙0 (s+-polarity x))
+s+-polarity (s-var-≝ regΔ inΔ) = ⊢r-var-≝ inΔ
+s+-polarity (s-dvar-l x inΔ) = ∋:≝-⊢r x inΔ
 
 s--polarity (s-int regΔ) = ⊢r-int
 s--polarity (s-var-∙ regΔ inΔ) = ⊢r-var-∙ inΔ
 s--polarity (s-arr₁ s s₁) = ⊢r-arr (s+-polarity s) (s--polarity s₁)
 s--polarity (s-∀ s) = ⊢r-∀ (s--polarity s)
 s--polarity (s-svar-r x inΔ) = ∋:=-⊢r x inΔ
+s--polarity (s-var-≝ regΔ inΔ) = ⊢r-var-≝ inΔ
+s--polarity (s-dvar-r x inΔ) = ∋:≝-⊢r x inΔ
 
 
 t-⊢r : Γ ⊢ j # e ⦂ A
@@ -42,3 +47,4 @@ t-⊢r (⊢app₂ ⊢e ⊢e₁) with t-⊢r ⊢e
 ... | ⊢r-arr r r₁ = r₁
 t-⊢r (⊢sub ⊢e B≤A gc j≢Z) = ⊢r-𝕣' (s+-polarity B≤A)
 t-⊢r (⊢tabs ⊢e) = ⊢r-∀ (t-⊢r ⊢e)
+t-⊢r (⊢tapp ⊢e regA st) = st0-⊢r (t-⊢r ⊢e) regA st

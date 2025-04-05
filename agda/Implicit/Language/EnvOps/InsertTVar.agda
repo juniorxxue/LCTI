@@ -25,6 +25,9 @@ data _▶_,_⇘_ : Env n m → Fin (1 + n) → Type m → Env (1 + n) m → Set 
   ▶S= : Γ ▶ k , A  ⇘ Γ'
       → ↑ty0 A ⇘ A'
       → (Γ ,= B) ▶ k , A' ⇘ Γ' ,= B
+  ▶S≝ : Γ ▶ k , A  ⇘ Γ'
+      → ↑ty0 A ⇘ A'
+      → (Γ ,≝ B) ▶ k , A' ⇘ Γ' ,≝ B
 
 -- insert into subtyping env
 infix 3 _▶s_,_⇘_
@@ -42,6 +45,9 @@ data _▶s_,_⇘_ : Env n m → Fin (1 + n) → Type m → Env (1 + n) m → Set
   ▶sS= : Γ ▶s k , A  ⇘ Γ'
       → ↑ty0 A ⇘ A'
       → (Γ ,= B) ▶s k , A' ⇘ Γ' ,= B
+  ▶sS≝ : Γ ▶s k , A  ⇘ Γ'
+      → ↑ty0 A ⇘ A'
+      → (Γ ,≝ B) ▶s k , A' ⇘ Γ' ,≝ B
 
 infix 3 _⨟_▶_,_⇘_⨟_
 data _⨟_▶_,_⇘_⨟_ : Env n m → Env n m → Fin (1 + n) → Type m → Env (1 + n) m → Env (1 + n) m → Set where
@@ -58,6 +64,9 @@ data _⨟_▶_,_⇘_⨟_ : Env n m → Env n m → Fin (1 + n) → Type m → En
   ▶S= : Γ ⨟ Δ ▶ k , T  ⇘ Γ' ⨟ Δ'
       → ↑ty0 T ⇘ T'
       → Γ ,= A ⨟ Δ ,= A ▶ k , T' ⇘ Γ' ,= A ⨟ Δ' ,= A
+  ▶S≝ : Γ ⨟ Δ ▶ k , T  ⇘ Γ' ⨟ Δ'
+      → ↑ty0 T ⇘ T'
+      → Γ ,≝ A ⨟ Δ ,≝ A ▶ k , T' ⇘ Γ' ,≝ A ⨟ Δ' ,≝ A
   ▶S^= : Γ ⨟ Δ ▶ k , T  ⇘ Γ' ⨟ Δ'
       → ↑ty0 T ⇘ T'
       → Γ ,^ ⨟ Δ ,= A ▶ k , T' ⇘ Γ' ,^ ⨟ Δ' ,= A
@@ -77,6 +86,9 @@ data _⨟_▶s_,_⇘_⨟_ : Env n m → Env n m → Fin (1 + n) → Type m → E
   ▶sS= : Γ ⨟ Δ ▶s k , T  ⇘ Γ' ⨟ Δ'
       → ↑ty0 T ⇘ T'
       → Γ ,= A ⨟ Δ ,= A ▶s k , T' ⇘ Γ' ,= A ⨟ Δ' ,= A
+  ▶sS≝ : Γ ⨟ Δ ▶s k , T  ⇘ Γ' ⨟ Δ'
+      → ↑ty0 T ⇘ T'
+      → Γ ,≝ A ⨟ Δ ,≝ A ▶s k , T' ⇘ Γ' ,≝ A ⨟ Δ' ,≝ A
   ▶sS^= : Γ ⨟ Δ ▶s k , T  ⇘ Γ' ⨟ Δ'
       → ↑ty0 T ⇘ T'
       → Γ ,^ ⨟ Δ ,= A ▶s k , T' ⇘ Γ' ,^ ⨟ Δ' ,= A
@@ -88,6 +100,7 @@ data _⨟_▶s_,_⇘_⨟_ : Env n m → Env n m → Fin (1 + n) → Type m → E
 ▶⨟,-unique (▶S^ new x) rewrite ▶⨟,-unique new = refl
 ▶⨟,-unique (▶S∙ new x) rewrite ▶⨟,-unique new = refl
 ▶⨟,-unique (▶S= new x) rewrite ▶⨟,-unique new = refl
+▶⨟,-unique (▶S≝ new x) rewrite ▶⨟,-unique new = refl
 
 
 ▶s⨟,-unique : Γ ⨟ Γ ▶s k , T ⇘ Γ' ⨟ Δ'
@@ -97,7 +110,7 @@ data _⨟_▶s_,_⇘_⨟_ : Env n m → Env n m → Fin (1 + n) → Type m → E
 ▶s⨟,-unique (▶sS^ new x) rewrite ▶s⨟,-unique new = refl
 ▶s⨟,-unique (▶sS∙ new x) rewrite ▶s⨟,-unique new = refl
 ▶s⨟,-unique (▶sS= new x) rewrite ▶s⨟,-unique new = refl
-
+▶s⨟,-unique (▶sS≝ new x) rewrite ▶s⨟,-unique new = refl
 
 ▶⨟,-▶,-l : Γ ⨟ Δ ▶ k , T ⇘ Γ' ⨟ Δ'
          → Γ ▶ k , T ⇘ Γ'
@@ -106,6 +119,7 @@ data _⨟_▶s_,_⇘_⨟_ : Env n m → Env n m → Fin (1 + n) → Type m → E
 ▶⨟,-▶,-l (▶S^ new x) = ▶S^ (▶⨟,-▶,-l new) x
 ▶⨟,-▶,-l (▶S∙ new x) = ▶S∙ (▶⨟,-▶,-l new) x
 ▶⨟,-▶,-l (▶S= new x) = ▶S= (▶⨟,-▶,-l new) x
+▶⨟,-▶,-l (▶S≝ new x) = ▶S≝ (▶⨟,-▶,-l new) x
 ▶⨟,-▶,-l (▶S^= new x) = ▶S^ (▶⨟,-▶,-l new) x
 
 ▶s⨟,-▶s,-l : Γ ⨟ Δ ▶s k , T ⇘ Γ' ⨟ Δ'
@@ -115,6 +129,7 @@ data _⨟_▶s_,_⇘_⨟_ : Env n m → Env n m → Fin (1 + n) → Type m → E
 ▶s⨟,-▶s,-l (▶sS^ new x) = ▶sS^ (▶s⨟,-▶s,-l new) x
 ▶s⨟,-▶s,-l (▶sS∙ new x) = ▶sS∙ (▶s⨟,-▶s,-l new) x
 ▶s⨟,-▶s,-l (▶sS= new x) = ▶sS= (▶s⨟,-▶s,-l new) x
+▶s⨟,-▶s,-l (▶sS≝ new x) = ▶sS≝ (▶s⨟,-▶s,-l new) x
 ▶s⨟,-▶s,-l (▶sS^= new x) = ▶sS^ (▶s⨟,-▶s,-l new) x
 
 ▶,-▶⨟, : Γ ▶ k , T ⇘ Γ'
@@ -124,6 +139,7 @@ data _⨟_▶s_,_⇘_⨟_ : Env n m → Env n m → Fin (1 + n) → Type m → E
 ▶,-▶⨟, (▶S^ new x) = ▶S^ (▶,-▶⨟, new) x
 ▶,-▶⨟, (▶S∙ new x) = ▶S∙ (▶,-▶⨟, new) x
 ▶,-▶⨟, (▶S= new x) = ▶S= (▶,-▶⨟, new) x
+▶,-▶⨟, (▶S≝ new x) = ▶S≝ (▶,-▶⨟, new) x
 
 ▶,-𝕣 : Γ ▶ k , T ⇘ Γ'
      → 𝕣 Γ ▶ k , T ⇘ 𝕣 Γ'
@@ -132,6 +148,7 @@ data _⨟_▶s_,_⇘_⨟_ : Env n m → Env n m → Fin (1 + n) → Type m → E
 ▶,-𝕣 (▶S^ new x) = ▶S^ (▶,-𝕣 new) x
 ▶,-𝕣 (▶S∙ new x) = ▶S∙ (▶,-𝕣 new) x
 ▶,-𝕣 (▶S= new x) = ▶S= (▶,-𝕣 new) x
+▶,-𝕣 (▶S≝ new x) = ▶S≝ (▶,-𝕣 new) x
 
 ▶,-▶s,-𝕣 : Γ ▶s k , T ⇘ Γ'
          → 𝕣 Γ ▶ k , T ⇘ 𝕣 Γ'
@@ -140,7 +157,7 @@ data _⨟_▶s_,_⇘_⨟_ : Env n m → Env n m → Fin (1 + n) → Type m → E
 ▶,-▶s,-𝕣 (▶sS^ new x) = ▶S^ (▶,-▶s,-𝕣 new) x
 ▶,-▶s,-𝕣 (▶sS∙ new x) = ▶S∙ (▶,-▶s,-𝕣 new) x
 ▶,-▶s,-𝕣 (▶sS= new x) = ▶S= (▶,-▶s,-𝕣 new) x
-
+▶,-▶s,-𝕣 (▶sS≝ new x) = ▶S≝ (▶,-▶s,-𝕣 new) x
 
 ∋∙-weaken, : Γ ∋∙ X
            → Γ ▶ k , T ⇘ Γ'
@@ -153,6 +170,8 @@ data _⨟_▶s_,_⇘_⨟_ : Env n m → Env n m → Fin (1 + n) → Type m → E
 ∋∙-weaken, (S∙ inΓ) (▶S∙ new x) = S∙ (∋∙-weaken, inΓ new)
 ∋∙-weaken, (S= inΓ) (▶Z regA) = S, (S= inΓ)
 ∋∙-weaken, (S= inΓ) (▶S= new x) = S= (∋∙-weaken, inΓ new)
+∋∙-weaken, (S≝ inΓ) (▶Z regA) = S, (S≝ inΓ)
+∋∙-weaken, (S≝ inΓ) (▶S≝ new x) = S≝ (∋∙-weaken, inΓ new)
 ∋∙-weaken, (S^ inΓ) (▶Z regA) = S, (S^ inΓ)
 ∋∙-weaken, (S^ inΓ) (▶S^ new x) = S^ (∋∙-weaken, inΓ new)
 ∋∙-weaken, (S⋈ inΓ) (▶Z regA) = S, (S⋈ inΓ)
@@ -164,6 +183,7 @@ data _⨟_▶s_,_⇘_⨟_ : Env n m → Env n m → Fin (1 + n) → Type m → E
 ∋∙-weaken,s (S, inΓ) (▶sS, new) = S, (∋∙-weaken,s inΓ new)
 ∋∙-weaken,s (S∙ inΓ) (▶sS∙ new x) = S∙ (∋∙-weaken,s inΓ new)
 ∋∙-weaken,s (S= inΓ) (▶sS= new x) = S= (∋∙-weaken,s inΓ new)
+∋∙-weaken,s (S≝ inΓ) (▶sS≝ new x) = S≝ (∋∙-weaken,s inΓ new)
 ∋∙-weaken,s (S^ inΓ) (▶sS^ new x) = S^ (∋∙-weaken,s inΓ new)
 ∋∙-weaken,s (S⋈ inΓ) (▶sS⋈ x) = S⋈ (∋∙-weaken, inΓ x)
 
@@ -179,8 +199,11 @@ data _⨟_▶s_,_⇘_⨟_ : Env n m → Env n m → Fin (1 + n) → Type m → E
 ∋=-weaken, (S^ inΓ) (▶S^ new x) = S^ (∋=-weaken, inΓ new)
 ∋=-weaken, (S= inΓ) (▶Z regA) = S, (S= inΓ)
 ∋=-weaken, (S= inΓ) (▶S= new x) = S= (∋=-weaken, inΓ new)
+∋=-weaken, (S≝ inΓ) (▶Z regA) = S, (S≝ inΓ)
+∋=-weaken, (S≝ inΓ) (▶S≝ new x) = S≝ (∋=-weaken, inΓ new)
 ∋=-weaken, (S, inΓ) (▶Z regA) = S, (S, inΓ)
 ∋=-weaken, (S, inΓ) (▶S, new) = S, (∋=-weaken, inΓ new)
+
 
 ∋=-weaken,s : Γ ∋= X
            → Γ ▶s k , T ⇘ Γ'
@@ -189,7 +212,36 @@ data _⨟_▶s_,_⇘_⨟_ : Env n m → Env n m → Fin (1 + n) → Type m → E
 ∋=-weaken,s (S∙ inΓ) (▶sS∙ new x) = S∙ (∋=-weaken,s inΓ new)
 ∋=-weaken,s (S^ inΓ) (▶sS^ new x) = S^ (∋=-weaken,s inΓ new)
 ∋=-weaken,s (S= inΓ) (▶sS= new x) = S= (∋=-weaken,s inΓ new)
+∋=-weaken,s (S≝ inΓ) (▶sS≝ new x) = S≝ (∋=-weaken,s inΓ new)
 ∋=-weaken,s (S, inΓ) (▶sS, new) = S, (∋=-weaken,s inΓ new)
+
+∋≝-weaken, : Γ ∋≝ X
+           → Γ ▶ k , T ⇘ Γ'
+           → Γ' ∋≝ X
+∋≝-weaken, Z (▶Z regA) = S, Z
+∋≝-weaken, Z (▶S≝ new x) = Z
+∋≝-weaken, (S∙ inΓ) (▶Z regA) = S, (S∙ inΓ)
+∋≝-weaken, (S∙ inΓ) (▶S∙ new x) = S∙ (∋≝-weaken, inΓ new)
+∋≝-weaken, (S^ inΓ) (▶Z regA) = S, (S^ inΓ)
+∋≝-weaken, (S^ inΓ) (▶S^ new x) = S^ (∋≝-weaken, inΓ new)
+∋≝-weaken, (S= inΓ) (▶Z regA) = S, (S= inΓ)
+∋≝-weaken, (S= inΓ) (▶S= new x) = S= (∋≝-weaken, inΓ new)
+∋≝-weaken, (S≝ inΓ) (▶Z regA) = S, (S≝ inΓ)
+∋≝-weaken, (S≝ inΓ) (▶S≝ new x) = S≝ (∋≝-weaken, inΓ new)
+∋≝-weaken, (S, inΓ) (▶Z regA) = S, (S, inΓ)
+∋≝-weaken, (S, inΓ) (▶S, new) = S, (∋≝-weaken, inΓ new)
+∋≝-weaken, (S⋈ inΓ) (▶Z regA) = S, (S⋈ inΓ)
+
+∋≝-weaken,s : Γ ∋≝ X
+           → Γ ▶s k , T ⇘ Γ'
+           → Γ' ∋≝ X
+∋≝-weaken,s Z (▶sS≝ new x) = Z
+∋≝-weaken,s (S∙ inΓ) (▶sS∙ new x) = S∙ (∋≝-weaken,s inΓ new)
+∋≝-weaken,s (S^ inΓ) (▶sS^ new x) = S^ (∋≝-weaken,s inΓ new)
+∋≝-weaken,s (S= inΓ) (▶sS= new x) = S= (∋≝-weaken,s inΓ new)
+∋≝-weaken,s (S≝ inΓ) (▶sS≝ new x) = S≝ (∋≝-weaken,s inΓ new)
+∋≝-weaken,s (S, inΓ) (▶sS, new) = S, (∋≝-weaken,s inΓ new)
+∋≝-weaken,s (S⋈ inΓ) (▶sS⋈ x) = S⋈ (∋≝-weaken, inΓ x)
 
 
 ∋:=-weaken, : Γ ∋ X := A
@@ -203,6 +255,8 @@ data _⨟_▶s_,_⇘_⨟_ : Env n m → Env n m → Fin (1 + n) → Type m → E
 ∋:=-weaken, (S^ inΓ up) (▶S^ new x) = S^ (∋:=-weaken, inΓ new) up
 ∋:=-weaken, (S= inΓ up) (▶Z regA) = S, (S= inΓ up)
 ∋:=-weaken, (S= inΓ up) (▶S= new x) = S= (∋:=-weaken, inΓ new) up
+∋:=-weaken, (S≝ inΓ up) (▶Z regA) = S, (S≝ inΓ up)
+∋:=-weaken, (S≝ inΓ up) (▶S≝ new x) = S≝ (∋:=-weaken, inΓ new) up
 ∋:=-weaken, (S, inΓ) (▶Z regA) = S, (S, inΓ)
 ∋:=-weaken, (S, inΓ) (▶S, new) = S, (∋:=-weaken, inΓ new)
 
@@ -214,9 +268,18 @@ data _⨟_▶s_,_⇘_⨟_ : Env n m → Env n m → Fin (1 + n) → Type m → E
 ∋:=-weaken,s (S∙ inΓ up) (▶sS∙ new x) = S∙ (∋:=-weaken,s inΓ new) up
 ∋:=-weaken,s (S^ inΓ up) (▶sS^ new x) = S^ (∋:=-weaken,s inΓ new) up
 ∋:=-weaken,s (S= inΓ up) (▶sS= new x) = S= (∋:=-weaken,s inΓ new) up
+∋:=-weaken,s (S≝ inΓ up) (▶sS≝ new x) = S≝ (∋:=-weaken,s inΓ new) up
 ∋:=-weaken,s (S, inΓ) (▶sS, new) = S, (∋:=-weaken,s inΓ new)
 
-
+∋:≝-weaken,s : Γ ∋ X ≝ A
+            → Γ ▶s k , T ⇘ Γ'
+            → Γ' ∋ X ≝ A
+∋:≝-weaken,s (Z up) (▶sS≝ new x) = Z up
+∋:≝-weaken,s (S∙ inΓ up) (▶sS∙ new x) = S∙ (∋:≝-weaken,s inΓ new) up
+∋:≝-weaken,s (S^ inΓ up) (▶sS^ new x) = S^ (∋:≝-weaken,s inΓ new) up
+∋:≝-weaken,s (S= inΓ up) (▶sS= new x) = S= (∋:≝-weaken,s inΓ new) up
+∋:≝-weaken,s (S≝ inΓ up) (▶sS≝ new x) = S≝ (∋:≝-weaken,s inΓ new) up
+∋:≝-weaken,s (S, inΓ) (▶sS, new) = S, (∋:≝-weaken,s inΓ new)
 
 ∋⦂-weaken, : Γ ∋ x ⦂ A
            → Γ ▶ k , T ⇘ Γ'
@@ -231,6 +294,8 @@ data _⨟_▶s_,_⇘_⨟_ : Env n m → Env n m → Fin (1 + n) → Type m → E
 ∋⦂-weaken, (S^ inΓ up) (▶S^ new x) = S^ (∋⦂-weaken, inΓ new) up
 ∋⦂-weaken, (S= inΓ up) (▶Z regA) = S, (S= inΓ up)
 ∋⦂-weaken, (S= inΓ up) (▶S= new x) = S= (∋⦂-weaken, inΓ new) up
+∋⦂-weaken, (S≝ inΓ up) (▶Z regA) = S, (S≝ inΓ up)
+∋⦂-weaken, (S≝ inΓ up) (▶S≝ new x) = S≝ (∋⦂-weaken, inΓ new) up
 
 
 ∋^-weaken, : Γ ∋^ X
@@ -242,6 +307,8 @@ data _⨟_▶s_,_⇘_⨟_ : Env n m → Env n m → Fin (1 + n) → Type m → E
 ∋^-weaken, (S∙ inΓ) (▶S∙ new x) = S∙ (∋^-weaken, inΓ new)
 ∋^-weaken, (S= inΓ) (▶Z regA) = S, (S= inΓ)
 ∋^-weaken, (S= inΓ) (▶S= new x) = S= (∋^-weaken, inΓ new)
+∋^-weaken, (S≝ inΓ) (▶Z regA) = S, (S≝ inΓ)
+∋^-weaken, (S≝ inΓ) (▶S≝ new x) = S≝ (∋^-weaken, inΓ new)
 ∋^-weaken, (S^ inΓ) (▶Z regA) = S, (S^ inΓ)
 ∋^-weaken, (S^ inΓ) (▶S^ new x) = S^ (∋^-weaken, inΓ new)
 ∋^-weaken, (S, inΓ) (▶Z regA) = S, (S, inΓ)
@@ -253,6 +320,7 @@ data _⨟_▶s_,_⇘_⨟_ : Env n m → Env n m → Fin (1 + n) → Type m → E
 ∋^-weaken,s Z (▶sS^ new x) = Z
 ∋^-weaken,s (S∙ inΓ) (▶sS∙ new x) = S∙ (∋^-weaken,s inΓ new)
 ∋^-weaken,s (S= inΓ) (▶sS= new x) = S= (∋^-weaken,s inΓ new)
+∋^-weaken,s (S≝ inΓ) (▶sS≝ new x) = S≝ (∋^-weaken,s inΓ new)
 ∋^-weaken,s (S^ inΓ) (▶sS^ new x) = S^ (∋^-weaken,s inΓ new)
 ∋^-weaken,s (S, inΓ) (▶sS, new) = S, (∋^-weaken,s inΓ new)
 
@@ -261,6 +329,7 @@ data _⨟_▶s_,_⇘_⨟_ : Env n m → Env n m → Fin (1 + n) → Type m → E
            → Γ' ⊢r A
 ⊢r-weaken, ⊢r-int new = ⊢r-int
 ⊢r-weaken, (⊢r-var-∙ inΓ) new = ⊢r-var-∙ (∋∙-weaken, inΓ new)
+⊢r-weaken, (⊢r-var-≝ inΓ) new = ⊢r-var-≝ (∋≝-weaken, inΓ new)
 ⊢r-weaken, (⊢r-arr regA regA₁) new = ⊢r-arr (⊢r-weaken, regA new) (⊢r-weaken, regA₁ new)
 ⊢r-weaken, {T = T} (⊢r-∀ regA) new
   with ⟨ T' , upT ⟩ ← ↑ty0-total T = ⊢r-∀ (⊢r-weaken, regA (▶S∙ new upT))
@@ -271,9 +340,11 @@ data _⨟_▶s_,_⇘_⨟_ : Env n m → Env n m → Fin (1 + n) → Type m → E
             → Γ' ⊢r A
 ⊢r-weaken,s ⊢r-int new = ⊢r-int
 ⊢r-weaken,s (⊢r-var-∙ inΓ) new = ⊢r-var-∙ (∋∙-weaken,s inΓ new)
-⊢r-weaken,s (⊢r-arr regA regA₁) new = ⊢r-arr (⊢r-weaken,s regA new) (⊢r-weaken,s regA₁ new)
+⊢r-weaken,s (⊢r-var-≝ inΓ) new = ⊢r-var-≝ (∋≝-weaken,s inΓ new)
+⊢r-weaken,s (⊢r-arr x₁ x) new = ⊢r-arr (⊢r-weaken,s x₁ new) (⊢r-weaken,s x new)
 ⊢r-weaken,s {T = T} (⊢r-∀ regA) new
   with ⟨ T' , upT ⟩ ← ↑ty0-total T = ⊢r-∀ (⊢r-weaken,s regA (▶sS∙ new upT))
+
 
 ⊢c-weaken, : Γ ⊢c A
            → Γ ▶ k , T ⇘ Γ'
@@ -281,6 +352,7 @@ data _⨟_▶s_,_⇘_⨟_ : Env n m → Env n m → Fin (1 + n) → Type m → E
 ⊢c-weaken, ⊢c-int new = ⊢c-int
 ⊢c-weaken, (⊢c-var-∙ inΔ) new = ⊢c-var-∙ (∋∙-weaken, inΔ new)
 ⊢c-weaken, (⊢c-var-= inΔ) new = ⊢c-var-= (∋=-weaken, inΔ new)
+⊢c-weaken, (⊢c-var-≝ inΔ) new = ⊢c-var-≝ (∋≝-weaken, inΔ new)
 ⊢c-weaken, (⊢c-arr cloA cloA₁) new = ⊢c-arr (⊢c-weaken, cloA new) (⊢c-weaken, cloA₁ new)
 ⊢c-weaken, {T = T} (⊢c-∀ cloA) new
   with ⟨ T' , upT ⟩ ← ↑ty0-total T = ⊢c-∀ (⊢c-weaken, cloA (▶S∙ new upT))
@@ -301,6 +373,7 @@ data _⨟_▶s_,_⇘_⨟_ : Env n m → Env n m → Fin (1 + n) → Type m → E
 ⊢c-weaken,s ⊢c-int new = ⊢c-int
 ⊢c-weaken,s (⊢c-var-∙ inΔ) new = ⊢c-var-∙ (∋∙-weaken,s inΔ new)
 ⊢c-weaken,s (⊢c-var-= inΔ) new = ⊢c-var-= (∋=-weaken,s inΔ new)
+⊢c-weaken,s (⊢c-var-≝ inΔ) new = ⊢c-var-≝ (∋≝-weaken,s inΔ new)
 ⊢c-weaken,s (⊢c-arr cloA cloA₁) new = ⊢c-arr (⊢c-weaken,s cloA new) (⊢c-weaken,s cloA₁ new)
 ⊢c-weaken,s {T = T} (⊢c-∀ cloA) new
   with ⟨ T' , upT ⟩ ← ↑ty0-total T = ⊢c-∀ (⊢c-weaken,s cloA (▶sS∙ new upT))
@@ -328,6 +401,8 @@ tregular-weaken, (reg-S^ regΓ) (▶Z regA) = reg-S, (reg-S^ regΓ) regA
 tregular-weaken, (reg-S^ regΓ) (▶S^ new x) = reg-S^ (tregular-weaken, regΓ new)
 tregular-weaken, (reg-S= regΓ regA) (▶Z regA₁) = reg-S, (reg-S= regΓ regA) regA₁
 tregular-weaken, (reg-S= regΓ regA) (▶S= new x) = reg-S= (tregular-weaken, regΓ new) (⊢r-weaken, regA new)
+tregular-weaken, (reg-S≝ regΓ regA) (▶Z regA₁) = reg-S, (reg-S≝ regΓ regA) regA₁
+tregular-weaken, (reg-S≝ regΓ regA) (▶S≝ new x) = reg-S≝ (tregular-weaken, regΓ new) (⊢r-weaken, regA new)
 
 sregular-weaken,s : SRegular Γ
                  → Γ ▶s k , T ⇘ Γ'
@@ -336,8 +411,7 @@ sregular-weaken,s (reg-Z regΓ) (▶sS⋈ x) = reg-Z (tregular-weaken, regΓ x)
 sregular-weaken,s (reg-S∙ regΓ) (▶sS∙ new x) = reg-S∙ (sregular-weaken,s regΓ new)
 sregular-weaken,s (reg-S^ regΓ) (▶sS^ new x) = reg-S^ (sregular-weaken,s regΓ new)
 sregular-weaken,s (reg-S= regΓ regA) (▶sS= new x) = reg-S= (sregular-weaken,s regΓ new) (⊢r-weaken,s regA new)
-
-
+sregular-weaken,s (reg-S≝ regΓ regA) (▶sS≝ new x) = reg-S≝ (sregular-weaken,s regΓ new) (⊢r-weaken,s regA new)
 
 ≫-weaken,s : Γ ≫ A ⇘ B
           → Γ ▶s k , T ⇘ Γ'
@@ -345,6 +419,7 @@ sregular-weaken,s (reg-S= regΓ regA) (▶sS= new x) = reg-S= (sregular-weaken,s
 ≫-weaken,s grd-int new = grd-int
 ≫-weaken,s (grd-var= x) new = grd-var= (∋:=-weaken,s x new)
 ≫-weaken,s (grd-var∙ x) new = grd-var∙ (∋∙-weaken,s x new)
+≫-weaken,s (grd-var≝ x) new = grd-var≝ (∋≝-weaken,s x new)
 ≫-weaken,s (grd-arr grd grd₁) new = grd-arr (≫-weaken,s grd new) (≫-weaken,s grd₁ new)
 ≫-weaken,s {T = T} (grd-∀ grd) new
   with ⟨ T' , upT ⟩ ← ↑ty0-total T = grd-∀ (≫-weaken,s grd (▶sS∙ new upT))
@@ -357,3 +432,4 @@ inst-weaken,s (⟹^0 up regA env) (▶sS^= new x)
 inst-weaken,s (⟹^S inst up1) (▶sS^ new x) = ⟹^S (inst-weaken,s inst new) up1
 inst-weaken,s (⟹∙S inst up1) (▶sS∙ new x) = ⟹∙S (inst-weaken,s inst new) up1
 inst-weaken,s (⟹=S inst up1 regB) (▶sS= new x) = ⟹=S (inst-weaken,s inst new) up1 (⊢r-weaken,s regB (▶s⨟,-▶s,-l new))
+inst-weaken,s (⟹≝S inst up1 regB) (▶sS≝ new x) = ⟹≝S (inst-weaken,s inst new) up1 (⊢r-weaken,s regB (▶s⨟,-▶s,-l new))

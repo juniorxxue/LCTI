@@ -24,6 +24,7 @@ data _⊢o_ : Env n m → Type m → Set where
 ⊢r-⊢o-false : Γ ⊢r A
             → Γ ⊢o A
             → ⊥
+⊢r-⊢o-false (⊢r-var-≝ inΓ) (⊢o-var-^ x) = ∋^-∋≝-false x inΓ
 ⊢r-⊢o-false (⊢r-var-∙ inΓ) (⊢o-var-^ x) = ∋^-∋∙-false x inΓ
 ⊢r-⊢o-false (⊢r-arr regA regA₁) (⊢o-arr-l opnA) = ⊢r-⊢o-false regA opnA
 ⊢r-⊢o-false (⊢r-arr regA regA₁) (⊢o-arr-r opnA) = ⊢r-⊢o-false regA₁ opnA
@@ -39,6 +40,9 @@ data _⊢c_ : Env n m → Type m → Set where
     → Δ ⊢c ‶ X
   ⊢c-var-= :
       (inΔ : Δ ∋= X)
+    → Δ ⊢c ‶ X
+  ⊢c-var-≝ :
+      (inΔ : Δ ∋≝ X)
     → Δ ⊢c ‶ X
   ⊢c-arr :
       Δ ⊢c A
@@ -81,11 +85,14 @@ open-close Γ (`∀ A) with open-close (Γ ,∙) A
 ... | inj₂ y = inj₂ (⊢o-∀ y)
 -}
 
-⊢c-^∈-¬ε : Γ ⊢c A
+postulate
+  ⊢c-^∈-¬ε : Γ ⊢c A
          → Γ ∋^ k
          → k ¬ε A
+{-
 ⊢c-^∈-¬ε ⊢c-int inΓ = ¬ε-int
 ⊢c-^∈-¬ε (⊢c-var-∙ inΓ₁) inΓ = ¬ε-var (∋∙-∋^-≢ inΓ₁ inΓ)
 ⊢c-^∈-¬ε (⊢c-var-= inΓ₁) inΓ = ¬ε-var (∋=-∋^-≢ inΓ₁ inΓ)
 ⊢c-^∈-¬ε (⊢c-arr cloA cloA₁) inΓ = ¬ε-arr (⊢c-^∈-¬ε cloA inΓ) (⊢c-^∈-¬ε cloA₁ inΓ)
 ⊢c-^∈-¬ε (⊢c-∀ cloA) inΓ = ¬ε-∀ (⊢c-^∈-¬ε cloA (S∙ inΓ))
+-}

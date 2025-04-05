@@ -18,6 +18,7 @@ open import Implicit.Language.Shift.Base
                         ↑tm-app (↑tm-total e x .proj₂) (↑tm-total e₁ x .proj₂) ⟩
 ↑tm-total (e ⦂ A) x = ⟨ ↑tm-total e x .proj₁ ⦂ A , ↑tm-⦂ (↑tm-total e x .proj₂) ⟩
 ↑tm-total (Λ e) x = ⟨ Λ ↑tm-total e x .proj₁ , ↑tm-Λ (↑tm-total e x .proj₂) ⟩
+↑tm-total (e ⓪ A) x = ⟨ ↑tm-total e x .proj₁ ⓪ A , ↑tm-⓪ (↑tm-total e x .proj₂) ⟩
 
 
 ↑tm-unique : e ↑tm k ⇘ e₁
@@ -29,6 +30,7 @@ open import Implicit.Language.Shift.Base
 ↑tm-unique (↑tm-app up1 up3) (↑tm-app up2 up4) rewrite ↑tm-unique up1 up2 | ↑tm-unique up3 up4 = refl
 ↑tm-unique (↑tm-⦂ up1) (↑tm-⦂ up2) rewrite ↑tm-unique up1 up2 = refl
 ↑tm-unique (↑tm-Λ up1) (↑tm-Λ up2) rewrite ↑tm-unique up1 up2 = refl
+↑tm-unique (↑tm-⓪ up1) (↑tm-⓪ up2) rewrite ↑tm-unique up1 up2 = refl
 
 ----------------------------------------------------------------------
 --+                           type shift                           +--
@@ -168,6 +170,7 @@ private variable
 ↑tyᵉ-comm' lt (↑tyᵉ-app up1 up4) (↑tyᵉ-app up2 up5) (↑tyᵉ-app up3 up6) = ↑tyᵉ-app (↑tyᵉ-comm' lt up1 up2 up3) (↑tyᵉ-comm' lt up4 up5 up6)
 ↑tyᵉ-comm' lt (↑tyᵉ-⦂ up1 up) (↑tyᵉ-⦂ up2 up₁) (↑tyᵉ-⦂ up3 up₂) = ↑tyᵉ-⦂ (↑tyᵉ-comm' lt up1 up2 up3) (↑ty-comm' lt up up₁ up₂)
 ↑tyᵉ-comm' lt (↑tyᵉ-Λ up1) (↑tyᵉ-Λ up2) (↑tyᵉ-Λ up3) = ↑tyᵉ-Λ (↑tyᵉ-comm' (s≤s lt) up1 up2 up3)
+↑tyᵉ-comm' lt (↑tyᵉ-⓪ up1 upA1) (↑tyᵉ-⓪ up2 upA2) (↑tyᵉ-⓪ up3 upA3) = ↑tyᵉ-⓪ (↑tyᵉ-comm' lt up1 up2 up3) (↑ty-comm' lt upA1 upA2 upA3)
 
 
 ↑tyᵉ-comm0' : ∀ {e : Term n m} {eₖ eₖ₊₁ e₀ k}
@@ -191,6 +194,7 @@ private variable
 ↑tm-comm' lt (↑tm-app up1 up4) (↑tm-app up2 up5) (↑tm-app up3 up6) = ↑tm-app (↑tm-comm' lt up1 up2 up3) (↑tm-comm' lt up4 up5 up6)
 ↑tm-comm' lt (↑tm-⦂ up1) (↑tm-⦂ up2) (↑tm-⦂ up3) = ↑tm-⦂ (↑tm-comm' lt up1 up2 up3)
 ↑tm-comm' lt (↑tm-Λ up1) (↑tm-Λ up2) (↑tm-Λ up3) = ↑tm-Λ (↑tm-comm' lt up1 up2 up3)
+↑tm-comm' lt (↑tm-⓪ up1) (↑tm-⓪ up2) (↑tm-⓪ up3) = ↑tm-⓪ (↑tm-comm' lt up1 up2 up3)
 
 ↑ty-punchOut : (¬p : k ≢ X)
              → ‶ punchOut ¬p ↑ty k ⇘ ‶ X
@@ -368,6 +372,8 @@ private variable
 ... | ⟨ e' , upe ⟩ | ⟨ A' , upA ⟩ = ⟨ e' ⦂ A' , ↑tyᵉ-⦂ upe upA ⟩
 ↑tyᵉ-total (Λ e) k = ⟨ Λ ↑tyᵉ-total e (#S k) .proj₁ ,
                       ↑tyᵉ-Λ (↑tyᵉ-total e (#S k) .proj₂) ⟩
+↑tyᵉ-total (e ⓪ A) k  with ↑tyᵉ-total e k | ↑ty-total A k
+... | ⟨ e' , upe ⟩ | ⟨ A' , upA ⟩ = ⟨ e' ⓪ A' , ↑tyᵉ-⓪ upe upA ⟩
 
 
 ↑tyᵉ0-total : ∀ (e : Term n m)
@@ -390,6 +396,9 @@ private variable
   with refl ← ↑ty-unique up up₁ = refl
 ↑tyᵉ-unique (↑tyᵉ-Λ up1) (↑tyᵉ-Λ up2)
   with refl ← ↑tyᵉ-unique up1 up2 = refl
+↑tyᵉ-unique (↑tyᵉ-⓪ up1 upA1) (↑tyᵉ-⓪ up2 upA2)
+  with refl ← ↑tyᵉ-unique up1 up2
+  with refl ← ↑ty-unique upA1 upA2 = refl
 
 
 -- generic consumer

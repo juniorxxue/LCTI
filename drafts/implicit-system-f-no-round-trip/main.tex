@@ -219,7 +219,7 @@
     {\Gamma; \Delta \vdash_{S~n} \forall a. ~A <:^+ C \to D}
     \\    
       \inferrule*[right=\texttt{S-TApp}]
-    {\Gamma ,a:= B \vdash_n A <: C}
+    {\Gamma \vdash B \\\Gamma ,a:= B \vdash_n A <: C}
     {\Gamma \vdash_{T~n} \forall a. ~A <: \forall a. ~C}
     \\
     
@@ -246,7 +246,7 @@
 \begin{align*}
 &\text{Typing Environments} \quad\quad &\Gamma::=&~ . \mid \Gamma, x : A \mid \Gamma, a\\
 &\text{Subtyping Environments} \quad\quad &\Gamma, \Omega, \Delta ::=&~ . \mid \Gamma, x : A \mid \Gamma, a \mid \Gamma , \hat{a} \mid \Gamma, \hat{a} = A\\
-    &\text{Contexts} \quad\quad &\Sigma ::=&~  \square  \mid A \mid \boxed{e} \leadsto \Sigma \mid \boxed{A} \leadsto \Sigma\\
+    &\text{Contexts} \quad\quad &\Sigma ::=&~  \square  \mid A \mid \boxed{e} \leadsto \Sigma \mid @A \leadsto \Sigma\\
     &\text{Generic Consumers} \quad \quad &g::=&~ i \mid x \mid e : A \mid \Lambda a.~e
 \end{align*}
 

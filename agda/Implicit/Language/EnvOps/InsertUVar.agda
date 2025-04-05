@@ -22,6 +22,9 @@ data _▶_,∙⇘_ : Env n m → Fin (1 + m) → Env n (1 + m) → Set where
   ▶S= : Γ ▶ k ,∙⇘ Γ'
       → B ↑ty k ⇘ B'
       → Γ ,= B ▶ #S k ,∙⇘ Γ' ,= B'
+  ▶S≝ : Γ ▶ k ,∙⇘ Γ'
+      → B ↑ty k ⇘ B'
+      → Γ ,≝ B ▶ #S k ,∙⇘ Γ' ,≝ B'
   ▶S⋈ : Γ ▶ k ,∙⇘ Γ'
       → Γ ⋈ ▶ k ,∙⇘ Γ' ⋈
 
@@ -43,6 +46,9 @@ data _▶_,∙⇘_ : Env n m → Fin (1 + m) → Env n (1 + m) → Set where
 ∋:=-weaken∙ (S= inΓ up) ▶Z upA = S∙ (S= inΓ up) upA
 ∋:=-weaken∙ (S= {A = A} inΓ up) (▶S= {k = k} newΓ x) upA with ↑ty-total A k
 ... | ⟨ A' , upA' ⟩ = S= (∋:=-weaken∙ inΓ newΓ upA') (↑ty-comm0 up upA upA')
+∋:=-weaken∙ (S≝ inΓ up) ▶Z upA = S∙ (S≝ inΓ up) upA
+∋:=-weaken∙ (S≝ {A = A} inΓ up) (▶S≝ {k = k} newΓ x) upA with ↑ty-total A k
+... | ⟨ A' , upA' ⟩ = S≝ (∋:=-weaken∙ inΓ newΓ upA') (↑ty-comm0 up upA upA')
 
 
 ∋∙-weaken∙ : Γ ∋∙ X
@@ -56,6 +62,8 @@ data _▶_,∙⇘_ : Env n m → Fin (1 + m) → Env n (1 + m) → Set where
 ∋∙-weaken∙ (S∙ inΓ) (▶S∙ newΓ) = S∙ (∋∙-weaken∙ inΓ newΓ)
 ∋∙-weaken∙ (S= inΓ) ▶Z = S∙ (S= inΓ)
 ∋∙-weaken∙ (S= inΓ) (▶S= newΓ x) = S= (∋∙-weaken∙ inΓ newΓ)
+∋∙-weaken∙ (S≝ inΓ) ▶Z = S∙ (S≝ inΓ)
+∋∙-weaken∙ (S≝ inΓ) (▶S≝ newΓ x) = S≝ (∋∙-weaken∙ inΓ newΓ)
 ∋∙-weaken∙ (S^ inΓ) ▶Z = S∙ (S^ inΓ)
 ∋∙-weaken∙ (S^ inΓ) (▶S^ newΓ) = S^ (∋∙-weaken∙ inΓ newΓ)
 ∋∙-weaken∙ (S⋈ inΓ) ▶Z = S∙ (S⋈ inΓ)
@@ -74,6 +82,27 @@ data _▶_,∙⇘_ : Env n m → Fin (1 + m) → Env n (1 + m) → Set where
 ∋=-weaken∙ (S^ inΓ) (▶S^ newΓ) = S^ (∋=-weaken∙ inΓ newΓ)
 ∋=-weaken∙ (S= inΓ) ▶Z = S∙ (S= inΓ)
 ∋=-weaken∙ (S= inΓ) (▶S= newΓ x) = S= (∋=-weaken∙ inΓ newΓ)
+∋=-weaken∙ (S≝ inΓ) ▶Z = S∙ (S≝ inΓ)
+∋=-weaken∙ (S≝ inΓ) (▶S≝ newΓ x) = S≝ (∋=-weaken∙ inΓ newΓ)
+
+∋≝-weaken∙ : Γ ∋≝ X
+      → Γ ▶ k ,∙⇘ Γ'
+      → Γ' ∋≝ punchIn k X
+∋≝-weaken∙ Z ▶Z = S∙ Z
+∋≝-weaken∙ Z (▶S≝ newΓ x) = Z
+∋≝-weaken∙ (S, inΓ) ▶Z = S∙ (S, inΓ)
+∋≝-weaken∙ (S, inΓ) (▶S, newΓ x) = S, (∋≝-weaken∙ inΓ newΓ)
+∋≝-weaken∙ (S∙ inΓ) ▶Z = S∙ (S∙ inΓ)
+∋≝-weaken∙ (S∙ inΓ) (▶S∙ newΓ) = S∙ (∋≝-weaken∙ inΓ newΓ)
+∋≝-weaken∙ (S^ inΓ) ▶Z = S∙ (S^ inΓ)
+∋≝-weaken∙ (S^ inΓ) (▶S^ newΓ) = S^ (∋≝-weaken∙ inΓ newΓ)
+∋≝-weaken∙ (S= inΓ) ▶Z = S∙ (S= inΓ)
+∋≝-weaken∙ (S= inΓ) (▶S= newΓ x) = S= (∋≝-weaken∙ inΓ newΓ)
+∋≝-weaken∙ (S≝ inΓ) ▶Z = S∙ (S≝ inΓ)
+∋≝-weaken∙ (S≝ inΓ) (▶S≝ newΓ x) = S≝ (∋≝-weaken∙ inΓ newΓ)
+∋≝-weaken∙ (S⋈ inΓ) ▶Z = S∙ (S⋈ inΓ)
+∋≝-weaken∙ (S⋈ inΓ) (▶S⋈ new) = S⋈ (∋≝-weaken∙ inΓ new)
+
 
 
 ⊢r-weaken∙ : Γ ⊢r A
@@ -82,5 +111,6 @@ data _▶_,∙⇘_ : Env n m → Fin (1 + m) → Env n (1 + m) → Set where
            → Γ' ⊢r A'
 ⊢r-weaken∙ ⊢r-int new ↑ty-int = ⊢r-int
 ⊢r-weaken∙ (⊢r-var-∙ inΓ) new ↑ty-var = ⊢r-var-∙ (∋∙-weaken∙ inΓ new)
+⊢r-weaken∙ (⊢r-var-≝ inΓ) new ↑ty-var = ⊢r-var-≝ (∋≝-weaken∙ inΓ new)
 ⊢r-weaken∙ (⊢r-arr regA regA₁) new (↑ty-arr upA upA₁) = ⊢r-arr (⊢r-weaken∙ regA new upA) (⊢r-weaken∙ regA₁ new upA₁)
 ⊢r-weaken∙ (⊢r-∀ regA) new (↑ty-∀ upA) = ⊢r-∀ (⊢r-weaken∙ regA (▶S∙ new) upA)

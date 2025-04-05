@@ -12,6 +12,8 @@ data _≫_⇘_ where
   grd-int : Δ ≫ Int ⇘ Int
   grd-var= : Δ ∋ X := A
            → Δ ≫ (‶ X) ⇘ A
+  grd-var≝ : Δ ∋≝ X
+           → Δ ≫ (‶ X) ⇘ (‶ X)
   grd-var∙ : Δ ∋∙ X
           → Δ ≫ (‶ X) ⇘ (‶ X)
   grd-arr : Δ ≫ A ⇘ A%

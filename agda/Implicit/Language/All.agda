@@ -16,7 +16,6 @@ open import Implicit.Language.Regular.All public
 -- two files below are entangled
 open import Implicit.Language.OpenClose.Base public
 
-
 open import Implicit.Language.Extension.All public
 open import Implicit.Language.Ground.All public
 

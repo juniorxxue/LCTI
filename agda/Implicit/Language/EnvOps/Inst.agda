@@ -30,12 +30,18 @@ data [_/_]_⟹_ : Type m → Fin m → Env n m → Env n m → Set where
         → (regB : Γ ⊢r B)
         → [ A' / #S k ] (Γ ,= B) ⟹ (Γ' ,= B)
 
+  ⟹≝S : [ A / k ] Γ ⟹ Γ'
+        → (up1 : ↑ty0 A ⇘ A')
+        → (regB : Γ ⊢r B)
+        → [ A' / #S k ] (Γ ,≝ B) ⟹ (Γ' ,≝ B)
+
 inst-∋^ : [ A / k ] Γ ⟹ Δ
         → Γ ∋^ k
 inst-∋^ (⟹^0 up regA env) = Z
 inst-∋^ (⟹^S inst up1) = S^ (inst-∋^ inst)
 inst-∋^ (⟹∙S inst up1) = S∙ (inst-∋^ inst)
 inst-∋^ (⟹=S inst up1 regB) = S= (inst-∋^ inst)
+inst-∋^ (⟹≝S inst up1 regB) = S≝ (inst-∋^ inst)
 
 inst-∋= : [ A / k ] Γ ⟹ Δ
         → Δ ∋= k
@@ -43,6 +49,7 @@ inst-∋= (⟹^0 up regA env) = Z
 inst-∋= (⟹^S inst up1) = S^ (inst-∋= inst)
 inst-∋= (⟹∙S inst up1) = S∙ (inst-∋= inst)
 inst-∋= (⟹=S inst up1 regB) = S= (inst-∋= inst)
+inst-∋= (⟹≝S inst up1 regB) = S≝ (inst-∋= inst)
 
 inst-∋:= : [ A / k ] Γ ⟹ Δ
          → Δ ∋ k := A
@@ -50,3 +57,4 @@ inst-∋:= (⟹^0 up regA env) = Z up
 inst-∋:= (⟹^S inst up1) = S^ (inst-∋:= inst) up1
 inst-∋:= (⟹∙S inst up1) = S∙ (inst-∋:= inst) up1
 inst-∋:= (⟹=S inst up1 regB) = S= (inst-∋:= inst) up1
+inst-∋:= (⟹≝S inst up1 regB) = S≝ (inst-∋:= inst) up1

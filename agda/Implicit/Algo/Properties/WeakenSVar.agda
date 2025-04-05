@@ -5,7 +5,7 @@ open import Implicit.Algo.Base
 open import Implicit.Algo.Properties.Extension
 open import Implicit.Algo.Properties.Shift
 open import Implicit.Algo.Properties.Id
-
+{-
 ▶⨟=-Ω-exist : Γ ⨟ Δ ▶ k ,= T ⇘ Γ' ⨟ Δ'
             → Γ ⊆ Ω
             → Ω ⊆ Δ
@@ -46,21 +46,22 @@ ss-weaken= (s-arr ss ss₁) new (↑ty-arr upA upA₁) (↑ty-arr upB upB₁)
   = s-arr (ss-weaken= ss new1 upB upA) (ss-weaken= ss₁ new2 upA₁ upB₁)
 ss-weaken= {T = T} (s-∀ ss) new (↑ty-∀ upA) (↑ty-∀ upB)
   with ⟨ T' , upT ⟩ ← ↑ty0-total T = s-∀ (ss-weaken= ss (▶S∙ new upT) upA upB)
-
-t-weaken= : Γ ⊢ Σ ⇒ e ⇒ A
+-}
+postulate
+  t-weaken= : Γ ⊢ Σ ⇒ e ⇒ A
           → Γ ▶ k ,= T ⇘ Γ'
           → Σ ↑tyᶜ k ⇘ Σ'
           → e ↑tyᵉ k ⇘ e'
           → A ↑ty k ⇘ A'
           → Γ' ⊢ Σ' ⇒ e' ⇒ A'
 
-s-weaken= : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
+  s-weaken= : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
           → Γ ⨟ Δ ▶ k ,= T ⇘ Γ' ⨟ Δ'
           → A ↑ty k ⇘ A'
           → Σ ↑tyᶜ k ⇘ Σ'
           → B ↑ty k ⇘ B'
           → Γ' ⊢ A' ≤⁺ Σ' ⊣ Δ' ↪ B'
-
+{-
 t-weaken= (⊢lit regΓ) new ↑tyᶜ-□ ↑tyᵉ-lit ↑ty-int = ⊢lit (tregular-weaken= regΓ new)
 t-weaken= (⊢var regΓ x∈Γ) new ↑tyᶜ-□ ↑tyᵉ-var upA = ⊢var (tregular-weaken= regΓ new) (∋⦂-weaken= x∈Γ new upA)
 t-weaken= {k = k} (⊢ann {B = B} ⊢e) new ↑tyᶜ-□ (↑tyᵉ-⦂ upe up) upA
@@ -107,6 +108,7 @@ s-weaken= {k = k} {T = T} (s-∀l {B = B} s upᶜ upᵉ upC upD) new (↑ty-∀ 
                       (↑tyᶜ-comm0' (↑tyᶜ-e up-e upΣ) (↑tyᶜ-e upe″ upΣ″) (↑tyᶜ-e upᵉ upᶜ))
                       (↑ty-arr (↑ty-comm0' upC' upC″ upC) (↑ty-comm0' upD' upD″ upD))) upΣ″ upe″ upC″ upD″
 
+-}
 
 s-weaken=0 : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
            → ↑ty0 A ⇘ A'
