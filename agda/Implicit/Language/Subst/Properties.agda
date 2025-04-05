@@ -87,6 +87,7 @@ st-↑ty (st-∀ up st) = ↑ty-∀ (st-↑ty st)
 ↑tyᵉ-st-eq (↑tyᵉ-app up up₁) (st-· st st₁) rewrite ↑tyᵉ-st-eq up st | ↑tyᵉ-st-eq up₁ st₁ = refl
 ↑tyᵉ-st-eq (↑tyᵉ-⦂ up x) (st-⦂ st x₁) rewrite ↑tyᵉ-st-eq up st | ↑ty-st-eq x x₁ = refl
 ↑tyᵉ-st-eq (↑tyᵉ-Λ up) (st-Λ st up') = cong Λ_ (↑tyᵉ-st-eq up st)
+↑tyᵉ-st-eq (↑tyᵉ-⓪ up upA) (st-⓪ st stA) rewrite ↑tyᵉ-st-eq up st | ↑ty-st-eq upA stA = refl
 
 ↑tyᵉ-st :
     e ↑tyᵉ k ⇘ e'
@@ -97,6 +98,7 @@ st-↑ty (st-∀ up st) = ↑ty-∀ (st-↑ty st)
 ↑tyᵉ-st (↑tyᵉ-app up up₁) = st-· (↑tyᵉ-st up) (↑tyᵉ-st up₁)
 ↑tyᵉ-st (↑tyᵉ-⦂ up up₁) = st-⦂ (↑tyᵉ-st up) (↑ty-st up₁)
 ↑tyᵉ-st {T = T} (↑tyᵉ-Λ up) = st-Λ (↑tyᵉ-st up) (proj₂ (↑ty0-total T))
+↑tyᵉ-st {T = T} (↑tyᵉ-⓪ upe upA) = st-⓪ (↑tyᵉ-st upe) (↑ty-st upA)
 
 st-total-rev : ∀ k B → ∃[ A ](⟦ k / T ⟧ A ⇘ B)
 st-total-rev k B = let ⟨ B* , up ⟩ = ↑ty-total B k in ⟨ B* , ↑ty-st up ⟩

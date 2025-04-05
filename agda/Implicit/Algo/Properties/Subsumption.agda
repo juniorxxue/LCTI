@@ -3,7 +3,6 @@ module Implicit.Algo.Properties.Subsumption where
 open import Implicit.Language.All
 open import Implicit.Algo.Base
 open import Implicit.Algo.Properties.Shift
-open import Implicit.Algo.Properties.Split
 open import Implicit.Algo.Properties.Id
 open import Implicit.Algo.Properties.Reflexivity
 open import Implicit.Algo.Properties.Extension
@@ -13,7 +12,7 @@ open import Implicit.Algo.Properties.StrengthenTVar
 open import Implicit.Algo.Properties.StrengthenSVar
 open import Implicit.Algo.Properties.Weaken
 open import Implicit.Algo.Properties.Irrelevance
-open import Implicit.Algo.Properties.Trans
+-- open import Implicit.Algo.Properties.Trans
 
 -- aux lemmas
 t-inf-open-false : Γ ⊢ □ ⇒ e ⇒ A

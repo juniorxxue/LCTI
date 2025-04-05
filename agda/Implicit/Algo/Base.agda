@@ -6,7 +6,6 @@ open import Implicit.Algo.Constructs.Syntax public
 open import Implicit.Algo.Constructs.Shift public
 open import Implicit.Algo.Constructs.Subst public
 open import Implicit.Algo.Constructs.Lookup public
-open import Implicit.Algo.Constructs.Split public
 
 infix 3 _⊢_⌞_⌝_⊣_
 data _⊢_⌞_⌝_⊣_ : Env n m → Type m → Polar → Type m → Env n m → Set where
@@ -96,6 +95,11 @@ data _⊢_⇒_⇒_ where
       Γ ,∙ ⊢ □ ⇒ e ⇒ A
     → Γ ⊢ □ ⇒ Λ e ⇒ `∀ A
 
+  ⊢tapp :
+       Γ ⊢ A ⓪↝ Σ ⇒ e ⇒ `∀ B
+    → ⟦ A ⟧ B ⇘ B*
+    → Γ ⊢ Σ ⇒ e ⓪ A ⇒ B*
+
 data _⊢_≤⁺_⊣_↪_ where
 
   s-empty :
@@ -129,3 +133,8 @@ data _⊢_≤⁺_⊣_↪_ where
     → (upC : ↑ty0 C ⇘ C')
     → (upD : ↑ty0 D ⇘ D')
     → Δ ⊢ `∀ A ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ C `→ D
+
+  s-tapp :
+      Δ ,= B ⊢ A ≤⁺ Σ' ⊣ Ψ ,= B ↪ C
+    → (upᶜ : ↑tyᶜ0 Σ ⇘ Σ')
+    → Δ ⊢ `∀ A ≤⁺ (B ⓪↝ Σ) ⊣ Ψ ↪ `∀ C

@@ -6,6 +6,7 @@ infixr 5  ƛ_
 infixl 7  _·_
 infix  9  `_
 infixr 5  Λ_
+infixl 5  _⓪_
 infix  5  _⦂_
 
 infix  9  ‶_
@@ -17,6 +18,7 @@ data Type : ℕ → Set where
   ‶_     : (X : Fin m) → Type m
   _`→_   : (A : Type m) → (B : Type m) → Type m
   `∀_    : (A : Type (1 + m)) → Type m
+
 
 variable
   A  B  C  D  E  T  : Type m
@@ -36,6 +38,7 @@ data Term : ℕ → ℕ → Set where
   _·_      : (e₁ : Term n m) → (e₂ : Term n m) → Term n m
   _⦂_      : (e : Term n m) → (A : Type m) → Term n m
   Λ_       : (e : Term n (1 + m)) → Term n m
+  _⓪_      : (e : Term n m) → (A : Type m) → Term n m
 
 variable
   e  e' e* : Term n m

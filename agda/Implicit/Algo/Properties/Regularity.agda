@@ -22,6 +22,7 @@ t-env (⊢lam₂ ⊢e up-c ⊢e₁) = t-env ⊢e
 t-env (⊢sub ⊢e ne gc s) = t-env ⊢e
 t-env (⊢tabs ⊢e) with t-env ⊢e
 ... | reg-S∙ r = r
+t-env (⊢tapp ⊢e) = t-env ⊢e
 
 inst-env-in : [ A / X ] Γ ⟹ Δ
             → SRegular Γ
@@ -54,6 +55,8 @@ s-env-in (s-term-c cloA ap ⊢e s) = s-env-in s
 s-env-in (s-term-o opnA ⊢e x s) = ss-env-in x
 s-env-in (s-∀l s upᶜ upᵉ upC upD) with s-env-in s
 ... | reg-S^ r = r
+s-env-in (s-tapp s upᶜ upC) with s-env-in s
+... | reg-S= r regA = r
 
 s-env-out : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
           → SRegular Δ
@@ -81,6 +84,7 @@ s-⊢r (s-type ss) = ss-polarity+ ss
 s-⊢r (s-term-c cloA ap ⊢e s) = ⊢r-arr (⊢c-≫-⊢r (s-env-in s) cloA ap) (s-⊢r s)
 s-⊢r (s-term-o opnA ⊢e ss s) = ⊢r-arr (⊢r-𝕣 (t-⊢r ⊢e)) (⊆-⊢r' (s-⊢r s) (ss-⊆ ss))
 s-⊢r (s-∀l s upᶜ upᵉ upC upD) = ⊢r-strengthen^0 (s-⊢r s) (↑ty-arr upC upD)
+s-⊢r (s-tapp s upᶜ upC) = ⊢r-strengthen=0 (s-⊢r s) upC
 
 t-⊢r (⊢lit regΓ) = ⊢r-int
 t-⊢r (⊢var regΓ x∈Γ) = ∋⦂-⊢r regΓ x∈Γ
@@ -92,3 +96,4 @@ t-⊢r (⊢lam₁ ⊢e) with t-env ⊢e
 t-⊢r (⊢lam₂ ⊢e up-c ⊢e₁) = ⊢r-arr (t-⊢r ⊢e) (⊢r-strengthen,0 (t-⊢r ⊢e₁))
 t-⊢r (⊢sub ⊢e ne gc s) = ⊢r-𝕣' (s-⊢r s)
 t-⊢r (⊢tabs ⊢e) = ⊢r-∀ (t-⊢r ⊢e)
+t-⊢r (⊢tapp ⊢e) = t-⊢r ⊢e

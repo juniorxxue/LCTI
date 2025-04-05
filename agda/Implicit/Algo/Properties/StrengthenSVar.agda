@@ -1,3 +1,4 @@
+{-# OPTIONS --allow-unsolved-metas #-}
 module Implicit.Algo.Properties.StrengthenSVar where
 
 open import Implicit.Language.All
@@ -128,6 +129,7 @@ t-strengthen= (⊢sub ⊢e ne gc s) newΓ upA upe upΣ
   = ⊢sub (t-strengthen= ⊢e newΓ uppA upe ↑tyᶜ-□) (nonempty-↑tyᶜ ne upΣ) (↑ty-gc' gc upe)
                                                         (s-strengthen= s (◀S⋈ newΓ) (◀S⋈ newΓ) uppA upA upΣ)
 t-strengthen= (⊢tabs ⊢e) newΓ (↑ty-∀ upA) (↑tyᵉ-Λ upe) ↑tyᶜ-□ = ⊢tabs (t-strengthen= ⊢e (◀S∙ newΓ) upA upe ↑tyᶜ-□)
+t-strengthen= (⊢tapp ⊢e) = {!!}
 
 
 s-strengthen= (s-empty regΓ cloA x) newΓ newΔ upA upB ↑tyᶜ-□
@@ -157,6 +159,7 @@ s-strengthen= (s-∀l s upᶜ upᵉ upC upD) newΓ newΔ (↑ty-∀ upA) (↑ty-
                         (↑ty-arr (↑ty-comm0' upB upC upA') (↑ty-comm0' upB₁ upD upB'))
                         (↑tyᶜ-e (↑tyᵉ-comm0' up-e upᵉ upe) (↑tyᶜ-comm0' upΣ upᶜ upΣ')))
          upΣ' upe upA' upB'
+s-strengthen= (s-tapp s upᶜ upC) = {!!}
 
 
 -- corollaries

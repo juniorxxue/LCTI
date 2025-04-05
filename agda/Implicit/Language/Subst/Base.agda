@@ -6,41 +6,6 @@ open import Implicit.Language.Shift.All
 private variable
   i : ℕ
 
-----------------------------------------------------------------------
---+                         Function Ver.                          +--
-----------------------------------------------------------------------
-
--- type subst
-infix 6 ⟦_/_⟧_
-⟦_/_⟧_ : Fin (1 + m) → Type m → Type (1 + m) → Type m
-⟦ k / A ⟧ Int      = Int
-⟦ k / A ⟧ (‶ X) with k #≟ X
-... | yes p = A
-... | no ¬p = ‶ punchOut {i = k} {j = X} ¬p
-⟦ k / A ⟧ (B `→ C) = (⟦ k / A ⟧ B) `→ (⟦ k / A ⟧ C)
-⟦ k / A ⟧ (`∀ B)   = `∀ (⟦ #S k / ↑ty0 A ⟧ B)
-
-infix 7 ⟦_⟧_
-⟦_⟧_ : Type m → Type (1 + m) → Type m
-⟦_⟧_ = ⟦_/_⟧_ #0
-
--- type subst in term
-infix 6 ⟦_/_⟧ᵉ_
-⟦_/_⟧ᵉ_ : Fin (1 + m) → Type m → Term n (1 + m) → Term n m
-⟦ k / A ⟧ᵉ lit i = lit i
-⟦ k / A ⟧ᵉ ` x = ` x
-⟦ k / A ⟧ᵉ (ƛ e) = ƛ (⟦ k / A ⟧ᵉ e)
-⟦ k / A ⟧ᵉ e₁ · e₂ = (⟦ k / A ⟧ᵉ e₁) · (⟦ k / A ⟧ᵉ e₂)
-⟦ k / A ⟧ᵉ (e ⦂ B) = (⟦ k / A ⟧ᵉ e) ⦂ (⟦ k / A ⟧ B)
-⟦ k / A ⟧ᵉ (Λ e) = Λ ⟦ #S k / ↑ty0 A ⟧ᵉ e
-
-infix 7 ⟦_⟧ᵉ_
-⟦_⟧ᵉ_ : Type m → Term n (1 + m) → Term n m
-⟦_⟧ᵉ_ = ⟦_/_⟧ᵉ_ #0
-
--- unshift is just substing with a random type, be careful to use it
-↓ty0 : Type (1 + m) → Type m
-↓ty0 A = ⟦ Int ⟧ A
 
 ----------------------------------------------------------------------
 --+                         Relation Ver.                          +--
@@ -96,6 +61,10 @@ data ⟦_/_⟧ᵉ_⇘_ : Fin (1 + m) → Type m → Term n (1 + m) → Term n m 
       ⟦ #S k / A' ⟧ᵉ e ⇘ e'
     → (up : ↑ty0 A ⇘ A')
     → ⟦ k / A ⟧ᵉ (Λ e) ⇘ (Term n m ∋⦂ Λ e')
+  st-⓪ :
+      ⟦ k / A ⟧ᵉ e ⇘ e'
+    → (st : ⟦ k / A ⟧ B ⇘ B')
+    → ⟦ k / A ⟧ᵉ (e ⓪ B) ⇘ (Term n m ∋⦂ e' ⓪ B')
 
 
 infix 3 ⟦_⟧ᵉ_⇘_
