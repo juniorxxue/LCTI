@@ -4,6 +4,7 @@ open import Implicit.Language.All
 open import Implicit.Algo.All
 open import Implicit.Interm.Base
 open import Implicit.Interm.Properties.Regularity
+open import Implicit.Interm.Properties.Polarity
 open import Implicit.Interm.Ground
 open import Implicit.Interm2Algo.Counter2Context
 open import Implicit.Interm2Algo.ExtIrrev
@@ -59,12 +60,19 @@ complete-s {j = 𝕚 j} {Γ = Γ} (s-arr₂ {A = A} s s₁) (⊆I ext ext₁) (~
 ... | inj₂ cloA
   with refl ← ⊆/-⊢c-eq ext cloA = s-term-c cloA (⊆-⊢c-≫ (⊆/c-⊆ ext₁) cloA (s--≫ s)) (subsumption0 ⊢e) (complete-s s₁ ext₁ j~Σ)
 complete-s {j = 𝕔 j} (s-arr₃ cloA grd s) (⊆C cloA' ext) (~C ⊢e j~Σ) = s-term-c cloA' (⊆-⊢c-≫ (⊆/c-⊆ ext) cloA' grd) ⊢e (complete-s s ext j~Σ)
-complete-s (s-∀l s ic fd upC upD) (⊆∀-I ext) j~'@(~I {Σ = Σ} {e = e} ⊢e j~) with ↑tyᶜ0-total Σ | ↑tyᵉ0-total e | s-sregular s
-... | ⟨ Σ' , upΣ ⟩ | ⟨ e' , upe ⟩ | reg-S= r regA = let weaken-j~ = (~weaken^0 (~I ⊢e j~) (↑ty-arr upC upD) (↑tyᶜ-e upe upΣ))
-                                      in s-∀l (complete-s s (⊆/c-irrev-^=0 ext fd regA) weaken-j~ ) upΣ upe upC upD
-complete-s (s-∀l s ic fd upC upD) (⊆∀-C ext) j~'@(~C {Σ = Σ} {e = e} ⊢e j~) with ↑tyᶜ0-total Σ | ↑tyᵉ0-total e | s-sregular s
-... | ⟨ Σ' , upΣ ⟩ | ⟨ e' , upe ⟩ | reg-S= r regA = let weaken-j~ = (~weaken^0 (~C ⊢e j~) (↑ty-arr upC upD) (↑tyᶜ-e upe upΣ))
-                                    in s-∀l (complete-s s (⊆/c-irrev-^=0 ext fd regA) weaken-j~) upΣ upe upC upD
+complete-s (s-∀l s ic fd upC upD (↑tyʲ-𝕚 upj)) (⊆∀-I ext upj') j~'@(~I {Σ = Σ} {e = e} ⊢e j~) with ↑tyᶜ0-total Σ | ↑tyᵉ0-total e | s-sregular s
+... | ⟨ Σ' , upΣ ⟩ | ⟨ e' , upe ⟩ | reg-S= r regA
+  with refl ← ↑tyʲ-unique upj upj' = let weaken-j~ = (~weaken^0 (~I ⊢e j~) (↑ty-arr upC upD) (↑tyᶜ-e upe upΣ)) (↑tyʲ-𝕚 upj)
+                                     in s-∀l (complete-s s (⊆/c-irrev-^=0 ext fd regA) weaken-j~) upΣ upe upC upD
+complete-s (s-∀l s ic fd upC upD (↑tyʲ-𝕔 upj)) (⊆∀-C ext upj') j~'@(~C {Σ = Σ} {e = e} ⊢e j~) with ↑tyᶜ0-total Σ | ↑tyᵉ0-total e | s-sregular s
+... | ⟨ Σ' , upΣ ⟩ | ⟨ e' , upe ⟩ | reg-S= r regA
+  with refl ← ↑tyʲ-unique upj upj' = let weaken-j~ = (~weaken^0 (~C ⊢e j~) (↑ty-arr upC upD) (↑tyᶜ-e upe upΣ)) (↑tyʲ-𝕔 upj)
+                                     in s-∀l (complete-s s (⊆/c-irrev-^=0 ext fd regA) weaken-j~) upΣ upe upC upD
+complete-s (s-tapp s upj) (⊆∀-T ext upj₁) (~T {Σ = Σ} ~j st)
+  with refl ← ↑tyʲ-unique upj upj₁
+  with ⟨ Σ' , upΣ ⟩ ← ↑tyᶜ0-total Σ
+  with reg-S= r regA ← s-sregular s
+  with svar ext' regA₁ ← ⊆/c-⊆ ext = s-tapp (complete-s s ext (~weaken=0 ~j (st-↑ty (⊢r-¬ε (s+-polarity s) Z) st) upΣ upj regA₁)) upΣ
 
 s+-⊆/ : Δ ⊢ j # A ⌞ ≤⁺ ⌝ B
       → Δ ⊆ Δ w/t A w/c j
@@ -87,10 +95,11 @@ s+-⊆/ (s-arr₂ s s₁) = ⊆I (s--⊆/ s) (s+-⊆/ s₁)
 s+-⊆/ (s-arr₃ cloA grd s) = ⊆C cloA (s+-⊆/ s)
 s+-⊆/ (s-∀ s) with s+-⊆/ s
 ... | ⊆∞ x = ⊆∞ (ext-∀ x)
-s+-⊆/ (s-∀l s ic fd upC upD) with s+-⊆/ s
-s+-⊆/ (s-∀l s case-𝕚 fd upC upD) | r = ⊆∀-I (⊆/c-irrev-^0 r fd)
-s+-⊆/ (s-∀l s case-𝕔 fd upC upD) | r = ⊆∀-C (⊆/c-irrev-^0 r fd)
+s+-⊆/ (s-∀l s ic fd upC upD upj) with s+-⊆/ s
+s+-⊆/ (s-∀l s case-𝕚 fd upC upD (↑tyʲ-𝕚 upj)) | r = ⊆∀-I (⊆/c-irrev-^0 r fd) upj
+s+-⊆/ (s-∀l s case-𝕔 fd upC upD (↑tyʲ-𝕔 upj)) | r = ⊆∀-C (⊆/c-irrev-^0 r fd) upj
 s+-⊆/ (s-svar-l x inΔ) = ⊆∞ (ext-var (⊆/x-refl x (⊢c-var-= (∋:=to∋= inΔ))))
+s+-⊆/ (s-tapp s upj) = ⊆∀-T (s+-⊆/ s) upj
 
 complete-s0 : Γ ⋈ ⊢ j # A ⌞ ≤⁺ ⌝ B
             → Γ ⊢ ⟨ j , B ⟩ ~t Σ
@@ -118,6 +127,7 @@ complete (⊢sub ⊢e B≤A x j≢Z) j~Σ = ⊢sub (complete ⊢e ~Z) (nonempty 
         nonempty nz-I (~I ⊢e j~Σ) = ne-app
         nonempty nz-C (~C ⊢e j~Σ) = ne-app
 complete (⊢tabs ⊢e) ~Z = ⊢tabs (complete ⊢e ~Z)
+complete (⊢tapp ⊢e st) ~j = ⊢tapp (complete ⊢e (~T ~j st)) st
 
 -- corollaries
 complete-0 : Γ ⊢ Z # e ⦂ A
