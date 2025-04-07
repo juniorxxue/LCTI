@@ -27,7 +27,7 @@ data _↑tyᶜ_⇘_ : Context n m → Fin (1 + m) → Context n (1 + m) → Set 
   ↑tyᶜ-e : (up-e : e ↑tyᵉ k ⇘ e')
          → Σ ↑tyᶜ k ⇘ Σ'
          → [ e ]↝ Σ ↑tyᶜ k ⇘ [ e' ]↝ Σ'
-  ↑tyᶜ-⓪ : A ↑ty k ⇘ A'
+  ↑tyᶜ-⓪ : (upA : A ↑ty k ⇘ A')
          → Σ ↑tyᶜ k ⇘ Σ'
          → (A ⓪↝ Σ) ↑tyᶜ k ⇘ A' ⓪↝ Σ'
 

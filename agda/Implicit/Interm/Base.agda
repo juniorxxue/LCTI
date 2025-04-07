@@ -106,7 +106,7 @@ data _⊢_#_⦂_ : Env n m → Counter m → Term n m → Type m → Set where
       Γ ,∙ ⊢ Z # e ⦂ A
     → Γ ⊢ Z # Λ e ⦂ `∀ A
   ⊢tapp : Γ ⊢ 𝕥₍ A ₎ j # e ⦂ `∀ B
-        → ⟦ A ⟧ B ⇘ B*
+        → (st : ⟦ A ⟧ B ⇘ B*)
         → Γ ⊢ j # e ⓪ A ⦂ B*
 
 -- small note: e @ A must be inferreable, and in the form of

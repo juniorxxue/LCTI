@@ -33,6 +33,43 @@ infix 3 ↑tyʲ0_⇘_
   with refl ← ↑ty-unique upA upA₁
   with refl ← ↑tyʲ-unique up1 up2 = refl
 
+↑tyʲ0-total : ∀ (j : Counter m)
+            → ∃[ j' ](↑tyʲ0 j ⇘ j')
+↑tyʲ0-total Z = ⟨ Z , ↑tyʲ-Z ⟩
+↑tyʲ0-total ∞ = ⟨ ∞ , ↑tyʲ-∞ ⟩
+↑tyʲ0-total (𝕚 j) = ⟨ 𝕚 (↑tyʲ0-total j .proj₁) , ↑tyʲ-𝕚 (↑tyʲ0-total j .proj₂) ⟩
+↑tyʲ0-total (𝕔 j) = ⟨ 𝕔 (↑tyʲ0-total j .proj₁) , ↑tyʲ-𝕔 (↑tyʲ0-total j .proj₂) ⟩
+↑tyʲ0-total (𝕥₍ A ₎ j) with ↑ty0-total A | ↑tyʲ0-total j
+... | ⟨ A' , upA ⟩ | ⟨ j' , upj ⟩ = ⟨ 𝕥₍ A' ₎ j' , ↑tyʲ-𝕥 upj upA ⟩
+
+
+↑tyʲ-comm0' : ∀ {k : Fin (1 + m)} {j jₖ j₀ jₖ₊₁}
+            → j ↑tyʲ k ⇘ jₖ
+            → ↑tyʲ0 jₖ ⇘ jₖ₊₁
+            → ↑tyʲ0 j ⇘ j₀
+            → j₀ ↑tyʲ #S k ⇘ jₖ₊₁
+↑tyʲ-comm0' ↑tyʲ-Z ↑tyʲ-Z ↑tyʲ-Z = ↑tyʲ-Z
+↑tyʲ-comm0' ↑tyʲ-∞ ↑tyʲ-∞ ↑tyʲ-∞ = ↑tyʲ-∞
+↑tyʲ-comm0' (↑tyʲ-𝕚 up1) (↑tyʲ-𝕚 up2) (↑tyʲ-𝕚 up3) = ↑tyʲ-𝕚 (↑tyʲ-comm0' up1 up2 up3)
+↑tyʲ-comm0' (↑tyʲ-𝕔 up1) (↑tyʲ-𝕔 up2) (↑tyʲ-𝕔 up3) = ↑tyʲ-𝕔 (↑tyʲ-comm0' up1 up2 up3)
+↑tyʲ-comm0' (↑tyʲ-𝕥 up1 upA) (↑tyʲ-𝕥 up2 upA₁) (↑tyʲ-𝕥 up3 upA₂)
+  = ↑tyʲ-𝕥 (↑tyʲ-comm0' up1 up2 up3) (↑ty-comm0' upA upA₁ upA₂)
+
+𝕚𝕔-↑tyʲ' : 𝕚𝕔 j'
+         → j ↑tyʲ k ⇘ j'
+         → 𝕚𝕔 j
+𝕚𝕔-↑tyʲ' case-𝕚 (↑tyʲ-𝕚 upj) = case-𝕚
+𝕚𝕔-↑tyʲ' case-𝕔 (↑tyʲ-𝕔 upj) = case-𝕔
+
+nonz-↑tyʲ' : NonZ j'
+          → j ↑tyʲ k ⇘ j'
+          → NonZ j
+nonz-↑tyʲ' nz-∞ ↑tyʲ-∞ = nz-∞
+nonz-↑tyʲ' nz-I (↑tyʲ-𝕚 upj) = nz-I
+nonz-↑tyʲ' nz-C (↑tyʲ-𝕔 upj) = nz-C
+nonz-↑tyʲ' nz-T (↑tyʲ-𝕥 upj upA) = nz-T
+
+
 -- find A k j
 -- at j-th position of A type, should have a bound variable, example: |-1 forall a. a -> a <: Int
 data find : Type m → Fin m → Counter m → Set where

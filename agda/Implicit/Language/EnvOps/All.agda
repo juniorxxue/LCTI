@@ -9,3 +9,5 @@ open import Implicit.Language.EnvOps.InsertTVar public
 open import Implicit.Language.EnvOps.InsertUVar public
 open import Implicit.Language.EnvOps.InsertSVar public
 open import Implicit.Language.EnvOps.Regular public
+
+open import Implicit.Language.EnvOps.Replace public

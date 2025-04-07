@@ -135,18 +135,6 @@ data [_/_]_=⟹_ : Type m → Fin m → Env n m → Env n m → Set where
 --+                          replacement                           +--
 ----------------------------------------------------------------------
 
--- in k position, we replace a ,= B with ,∙
-infix 3 _◆_⇘_
-data _◆_⇘_ : Env n m → Fin m → Env n m → Set where
-  ◆Z : Γ ,= A ◆ #0 ⇘ Γ ,∙
-  ◆S, : Γ ◆ k ⇘ Γ'
-      → Γ , A ◆ k ⇘ Γ' , A
-  ◆S∙ : Γ ◆ k ⇘ Γ'
-      → Γ ,∙ ◆ #S k ⇘ Γ' ,∙
-  ◆S= : Γ ◆ k ⇘ Γ'
-      → Γ ,= A ◆ #S k ⇘ Γ' ,= A
-  ◆S^ : Γ ◆ k ⇘ Γ'
-      → Γ ,^ ◆ #S k ⇘ Γ' ,^
 
 -- in k position, we replace a ,= B with ,^
 infix 3 _◎_⇘_

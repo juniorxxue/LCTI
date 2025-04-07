@@ -4,6 +4,21 @@ open import Implicit.Language.Base
 open import Implicit.Language.Shift.All
 open import Implicit.Language.Lookup.All
 open import Implicit.Language.EnvOps.Base
+open import Implicit.Language.Regular.Base
+
+-- in k position, we replace a ,= B with ,∙
+infix 3 _◆_⇘_
+data _◆_⇘_ : Env n m → Fin m → Env n m → Set where
+  ◆Z : Γ ,= A ◆ #0 ⇘ Γ ,∙
+  ◆S, : Γ ◆ k ⇘ Γ'
+      → Γ , A ◆ k ⇘ Γ' , A
+  ◆S∙ : Γ ◆ k ⇘ Γ'
+      → Γ ,∙ ◆ #S k ⇘ Γ' ,∙
+  ◆S= : Γ ◆ k ⇘ Γ'
+      → Γ ,= A ◆ #S k ⇘ Γ' ,= A
+  ◆S^ : Γ ◆ k ⇘ Γ'
+      → Γ ,^ ◆ #S k ⇘ Γ' ,^
+
 
 ◆-unique : Γ ◆ k ⇘ Γ₁
          → Γ ◆ k ⇘ Γ₂
@@ -17,11 +32,10 @@ open import Implicit.Language.EnvOps.Base
 ◆-total : Γ ∋= k
         → ∃[ Γ' ](Γ ◆ k ⇘ Γ')
 ◆-total {Γ = Γ ,= _} Z = ⟨ Γ ,∙ , ◆Z ⟩
-◆-total (S, {B = B} inΓ) with ◆-total inΓ
-... | ⟨ Γ' , newΓ ⟩ = ⟨ (Γ' , B) , ◆S, newΓ ⟩
 ◆-total (S∙ inΓ) = ⟨ (◆-total inΓ .proj₁ ,∙) , ◆S∙ (◆-total inΓ .proj₂) ⟩
 ◆-total (S^ inΓ) = ⟨ ◆-total inΓ .proj₁ ,^ , ◆S^ (◆-total inΓ .proj₂) ⟩
 ◆-total (S= {B = B} inΓ) = ⟨ (◆-total inΓ .proj₁ ,= B) , ◆S= (◆-total inΓ .proj₂) ⟩
+◆-total {Γ = Γ , A} (S, inΓ) = ⟨ ((◆-total inΓ .proj₁) , A) , ◆S, (◆-total inΓ .proj₂) ⟩
 
 ◇-total : Γ ∋^ k
         → ∃[ Γ' ](Γ ◇ k ⇘ Γ')
@@ -117,3 +131,16 @@ env-◆◇-false (◇S^ newΓ1) (◆S^ newΓ2) = env-◆◇-false newΓ1 newΓ2
 ◆-∋= (◆S∙ newΓ) = S∙ (◆-∋= newΓ)
 ◆-∋= (◆S= newΓ) = S= (◆-∋= newΓ)
 ◆-∋= (◆S^ newΓ) = S^ (◆-∋= newΓ)
+
+
+⊢r-◆ : Γ ⊢r A
+     → Γ ◆ k ⇘ Γ'
+     → Γ' ⊢r A
+⊢r-◆ ⊢r-int new = ⊢r-int
+⊢r-◆ (⊢r-var-∙ inΓ) new = ⊢r-var-∙ (◆-∙∈ inΓ new)
+⊢r-◆ (⊢r-arr regA regA₁) new = ⊢r-arr (⊢r-◆ regA new) (⊢r-◆ regA₁ new)
+⊢r-◆ (⊢r-∀ regA) new = ⊢r-∀ (⊢r-◆ regA (◆S∙ new))
+
+⊢r-◆0 : Γ ,= T ⊢r A
+     → Γ ,∙ ⊢r A
+⊢r-◆0 regA = ⊢r-◆ regA ◆Z

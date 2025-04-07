@@ -171,6 +171,15 @@ postulate
              → ⟦ B' ⟧ C' ⇘ C*'
              → C* ↑ty k ⇘ C*'
 
+
+  ↑ty-st-comm0'' :
+               ⟦ B' ⟧ C' ⇘ C*'
+             → B ↑ty k ⇘ B'
+             → C ↑ty #S k ⇘ C'
+             → C* ↑ty k ⇘ C*'
+             → ⟦ B ⟧ C ⇘ C*
+
+
 #≤-inject : ∀ {k₁ : Fin (1 + m)} {k₂ : Fin (1 + m)}
           → k₁ #≤ k₂
           → inject₁ k₁ #≤ k₂
