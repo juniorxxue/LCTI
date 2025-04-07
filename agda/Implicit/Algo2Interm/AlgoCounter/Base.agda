@@ -3,17 +3,18 @@ module Implicit.Algo2Interm.AlgoCounter.Base where
 open import Implicit.Language.All
 open import Implicit.Algo.Base
 
-✫ : Counter → Counter
+✫ : Counter m → Counter m
 ✫ Z = Z
 ✫ ∞ = ∞
 ✫ (𝕚 j) = j
 ✫ (𝕔 j) = j
+✫ (𝕥₍ A ₎ j) = j
 
 infix 3 _⊢_⇒_⇒_↡_
 infix 3 _⊢_≤⁺_⊣_↪_↡_
 
-data _⊢_⇒_⇒_↡_ : Env n m → Context n m → Term n m → Type m → Counter → Set
-data _⊢_≤⁺_⊣_↪_↡_ : Env n m → Type m → Context n m → Env n m → Type m → Counter → Set
+data _⊢_⇒_⇒_↡_ : Env n m → Context n m → Term n m → Type m → Counter m → Set
+data _⊢_≤⁺_⊣_↪_↡_ : Env n m → Type m → Context n m → Env n m → Type m → Counter m → Set
 
 
 data _⊢_⇒_⇒_↡_ where
@@ -55,6 +56,12 @@ data _⊢_⇒_⇒_↡_ where
       Γ ,∙ ⊢ □ ⇒ e ⇒ A ↡ Z
     → Γ ⊢ □ ⇒ Λ e ⇒ `∀ A ↡ Z
 
+  ⊢tapp :
+      Γ ⊢ A ⓪↝ Σ ⇒ e ⇒ `∀ B ↡ 𝕥₍ A ₎ j
+    → (st : ⟦ A ⟧ B ⇘ B*)
+    → Γ ⊢ Σ ⇒ e ⓪ A ⇒ B* ↡ j
+
+
 data _⊢_≤⁺_⊣_↪_↡_ where
 
   s-empty :
@@ -81,10 +88,27 @@ data _⊢_≤⁺_⊣_↪_↡_ where
     → Ω ⊢ B ≤⁺ Σ ⊣ Ψ ↪ D ↡ j
     → Δ ⊢ A `→ B ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ C `→ D ↡ 𝕚 j
 
-  s-∀l :
-      Δ ,^ ⊢ A ≤⁺ ([ e' ]↝ Σ') ⊣ Ψ ,= B ↪ (C' `→ D') ↡ j
+  s-∀l-𝕚 :
+      Δ ,^ ⊢ A ≤⁺ ([ e' ]↝ Σ') ⊣ Ψ ,= B ↪ (C' `→ D') ↡ (𝕚 j')
     → (upᶜ : ↑tyᶜ0 Σ ⇘ Σ')
+    → (upj : ↑tyʲ0 j ⇘ j')
     → (upᵉ : ↑tyᵉ0 e ⇘ e')
     → (upC : ↑ty0 C ⇘ C')
     → (upD : ↑ty0 D ⇘ D')
-    → Δ ⊢ `∀ A ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ C `→ D ↡ j
+    → Δ ⊢ `∀ A ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ C `→ D ↡ (𝕚 j)
+
+  s-∀l-𝕔 :
+      Δ ,^ ⊢ A ≤⁺ ([ e' ]↝ Σ') ⊣ Ψ ,= B ↪ (C' `→ D') ↡ (𝕔 j')
+    → (upᶜ : ↑tyᶜ0 Σ ⇘ Σ')
+    → (upj : ↑tyʲ0 j ⇘ j')
+    → (upᵉ : ↑tyᵉ0 e ⇘ e')
+    → (upC : ↑ty0 C ⇘ C')
+    → (upD : ↑ty0 D ⇘ D')
+    → Δ ⊢ `∀ A ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ C `→ D ↡ (𝕔 j)
+
+
+  s-tapp :
+      Δ ,= B ⊢ A ≤⁺ Σ' ⊣ Ψ ,= B ↪ C ↡ j'
+    → (upᶜ : ↑tyᶜ0 Σ ⇘ Σ')
+    → (upj : ↑tyʲ0 j ⇘ j')
+    → Δ ⊢ `∀ A ≤⁺ (B ⓪↝ Σ) ⊣ Ψ ↪ `∀ C ↡ (𝕥₍ B ₎ j)

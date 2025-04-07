@@ -8,6 +8,18 @@ open import Implicit.Algo2Interm.Context2Counter
 open import Implicit.Algo2Interm.AlgoCounter.All
 open import Implicit.Algo2Interm.Main
 
+↑tyʲ0-exist : Γ ⊢ ⟨ j' , A ⟩ ~s Σ'
+            → ↑tyᶜ0 Σ ⇘ Σ'
+            → ∃[ j ](↑tyʲ0 j ⇘ j')
+↑tyʲ0-exist ~sZ ↑tyᶜ-□ = ⟨ Z , ↑tyʲ-Z ⟩
+↑tyʲ0-exist ~s∞ (↑tyᶜ-τ up-t) = ⟨ ∞ , ↑tyʲ-∞ ⟩
+↑tyʲ0-exist (~sI ⊢e ~s) (↑tyᶜ-e up-e upΣ) = ⟨ 𝕚 (↑tyʲ0-exist ~s upΣ .proj₁) ,
+                                             ↑tyʲ-𝕚 (↑tyʲ0-exist ~s upΣ .proj₂) ⟩
+↑tyʲ0-exist (~sC ⊢e ~s) (↑tyᶜ-e up-e upΣ) = ⟨ 𝕔 (↑tyʲ0-exist ~s upΣ .proj₁) ,
+                                             ↑tyʲ-𝕔 (↑tyʲ0-exist ~s upΣ .proj₂) ⟩
+↑tyʲ0-exist (~sT ~s st) (↑tyᶜ-⓪ {A = A} x upΣ) = ⟨ 𝕥₍ A ₎ ↑tyʲ0-exist ~s upΣ .proj₁ ,
+                                          ↑tyʲ-𝕥 (↑tyʲ0-exist ~s upΣ .proj₂) x ⟩
+
 -- corollaries are bridged via completeness of AlgoCounter
 
 data JustType (Γ : Env n m) (Σ : Context n m) (e : Term n m) (A : Type m) : Set where
@@ -43,6 +55,9 @@ tc-complete (⊢sub ⊢e ne gc s) with sc-complete s | tc-complete ⊢e
 ... | subs j~Σ s₁ | typs ~tZ ⊢e' = typs (~s-~t j~Σ) (⊢sub ⊢e' ne gc s₁)
 tc-complete (⊢tabs ⊢e) with tc-complete ⊢e
 ... | typs ~tZ ⊢e₁ = typs ~tZ (⊢tabs ⊢e₁)
+tc-complete (⊢tapp ⊢e st) with tc-complete ⊢e
+... | typs (~tT j~Σ st₁) ⊢e₁
+  with refl ← st-unique st st₁ = typs j~Σ (⊢tapp ⊢e₁ st)
 
 sc-complete (s-empty regΓ cloA x) = subs ~sZ (s-empty regΓ cloA x)
 sc-complete (s-type ss) = subs ~s∞ (s-type ss)
@@ -53,8 +68,18 @@ sc-complete s'@(s-term-o opnA ⊢e ss s) with sc-complete s | tc-complete ⊢e
 ... | subs j~Σ s₁ | typs ~tZ ⊢e₁ = subs (~sI (t-⊆-prv (sound ⊢e₁) (s-⊆ s')) j~Σ)
                                         (s-term-o opnA ⊢e₁ ss s₁)
 sc-complete (s-∀l s upᶜ upᵉ upC upD) with sc-complete s
-... | subs j~Σ s₁ = subs (~s-strengthen=0 j~Σ (↑ty-arr upC upD) (↑tyᶜ-e upᵉ upᶜ))
-                         (s-∀l s₁ upᶜ upᵉ upC upD)
+sc-complete (s-∀l s upᶜ upᵉ upC upD) | subs {𝕚 j} j~Σ s₁
+  with ⟨ j' , ↑tyʲ-𝕚 upj' ⟩ ← ↑tyʲ0-exist j~Σ (↑tyᶜ-e upᵉ upᶜ)
+  = subs (~s-strengthen=0 j~Σ (↑ty-arr upC upD) (↑tyᶜ-e upᵉ upᶜ) (↑tyʲ-𝕚 upj'))
+                          (s-∀l-𝕚 s₁ upᶜ upj' upᵉ upC upD)
+sc-complete (s-∀l s upᶜ upᵉ upC upD) | subs {𝕔 j} j~Σ s₁
+  with ⟨ j' , ↑tyʲ-𝕔 upj' ⟩ ← ↑tyʲ0-exist j~Σ (↑tyᶜ-e upᵉ upᶜ)
+  = subs (~s-strengthen=0 j~Σ (↑ty-arr upC upD) (↑tyᶜ-e upᵉ upᶜ) (↑tyʲ-𝕔 upj'))
+                    (s-∀l-𝕔 s₁ upᶜ upj' upᵉ upC upD)
+sc-complete (s-tapp {B = B} {C = C} s upᶜ) with sc-complete s
+... | subs j~Σ s₁
+  with ⟨ B* , stB ⟩ ← st0-total B C
+  with ⟨ j' , upj' ⟩ ← ↑tyʲ0-exist j~Σ upᶜ = subs (~sT (~s-strengthen=0 j~Σ (st-↑ty (⊢r-¬ε (s-⊢r s) Z) stB) upᶜ upj') stB) (s-tapp s₁ upᶜ upj')
 
 ----------------------------------------------------------------------
 --+                          corollaries                           +--

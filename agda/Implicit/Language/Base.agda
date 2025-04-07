@@ -120,6 +120,7 @@ data NonZ : Counter m → Set where
   nz-∞ : NonZ (Counter m ∋⦂ ∞)
   nz-I : NonZ (𝕚 j)
   nz-C : NonZ (𝕔 j)
+  nz-T : NonZ (𝕥₍ A ₎ j)
 
 data 𝕚𝕔 : Counter m → Set where
   case-𝕚 : 𝕚𝕔 (𝕚 j)

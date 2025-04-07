@@ -126,6 +126,7 @@ complete (⊢sub ⊢e B≤A x j≢Z) j~Σ = ⊢sub (complete ⊢e ~Z) (nonempty 
         nonempty nz-∞ ~∞ = ne-τ
         nonempty nz-I (~I ⊢e j~Σ) = ne-app
         nonempty nz-C (~C ⊢e j~Σ) = ne-app
+        nonempty nz-T (~T ~j st) = ne-tapp
 complete (⊢tabs ⊢e) ~Z = ⊢tabs (complete ⊢e ~Z)
 complete (⊢tapp ⊢e st) ~j = ⊢tapp (complete ⊢e (~T ~j st)) st
 

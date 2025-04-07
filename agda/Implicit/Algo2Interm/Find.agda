@@ -4,6 +4,7 @@ open import Implicit.Language.All
 open import Implicit.Interm.All
 open import Implicit.Algo.All
 open import Implicit.Algo2Interm.AlgoCounter.All
+open import Implicit.Algo2Interm.Context2Counter
 
 ss-find-l : Γ ⊢ A ⌞ ≤⁺ ⌝ B ⊣ Δ
               → Γ ∋^ k
@@ -28,7 +29,9 @@ s-find (s-term-c cloA ap ⊢e s) inΓ inΔ = f-arr-𝕔 (⊢c-^∈-¬ε cloA in�
 s-find {k = k} (s-term-o {A = A} opnA ⊢e ss s) inΓ inΔ with ε-dec {k = k} {A = A}
 ... | inj₁ inA  = f-arr-𝕚-l inA
 ... | inj₂ ¬inA = f-arr-𝕚-r ¬inA (s-find s (⊆/-^in-^out (ss--⊆/ ss) ¬inA inΓ) inΔ)
-s-find (s-∀l s upᶜ upᵉ upC upD) inΓ inΔ = f-∀ (s-find s (S^ inΓ) (S= inΔ))
+s-find (s-∀l-𝕚 s upᶜ upj upᵉ upC upD) inΓ inΔ = f-∀-𝕚 (s-find s (S^ inΓ) (S= inΔ)) upj
+s-find (s-∀l-𝕔 s upᶜ upj upᵉ upC upD) inΓ inΔ = f-∀-𝕔 (s-find s (S^ inΓ) (S= inΔ)) upj
+s-find (s-tapp s upᶜ upj) inΓ inΔ = f-𝕥 (s-find s (S= inΓ) (S= inΔ)) upj
 
 s-find0 : Γ ,^ ⊢ A ≤⁺ [ e' ]↝ Σ' ⊣ Δ ,= B ↪ C `→ D ↡ j
               → ↑tyᵉ0 e ⇘ e'

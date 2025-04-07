@@ -47,14 +47,18 @@ tc-~ (⊢lam₁ ⊢e) with tc-id0 ⊢e
 tc-~ (⊢lam₂ ⊢e up-c ⊢e₁) = ~tI (sound ⊢e) (~t-strengthen,0 (tc-~ ⊢e₁) up-c)
 tc-~ (⊢sub ⊢e ne gc s) = ~s-~t (sc-~ s)
 tc-~ (⊢tabs ⊢e) = ~tZ
+tc-~ (⊢tapp ⊢e st) with tc-~ ⊢e
+... | ~tT r st₁ with refl ← st-unique st st₁ = r
 
 sc-~ (s-empty regΓ cloA x) = ~sZ
 sc-~ (s-type ss) = ~s∞
 sc-~ (s-term-c cloA ap ⊢e s) with tc-id0 ⊢e
 ... | refl = ~sC (t-⊆-prv (sound ⊢e) (sc-⊆ s)) (sc-~ s)
 sc-~ s'@(s-term-o opnA ⊢e ss s) = ~sI (t-⊆-prv (sound ⊢e) (sc-⊆ s')) (sc-~ s)
-sc-~ (s-∀l s upᶜ upᵉ upC upD) = ~s-strengthen=0 (sc-~ s) (↑ty-arr upC upD) (↑tyᶜ-e upᵉ upᶜ)
-
+sc-~ (s-∀l-𝕚 s upᶜ upj upᵉ upC upD) = ~s-strengthen=0 (sc-~ s) (↑ty-arr upC upD) (↑tyᶜ-e upᵉ upᶜ) (↑tyʲ-𝕚 upj)
+sc-~ (s-∀l-𝕔 s upᶜ upj upᵉ upC upD) = ~s-strengthen=0 (sc-~ s) (↑ty-arr upC upD) (↑tyᶜ-e upᵉ upᶜ) (↑tyʲ-𝕔 upj)
+sc-~ (s-tapp {B = B} {C = C} s upᶜ upj)
+  with ⟨ B* , stB ⟩ ← st0-total B C = ~sT (~s-strengthen=0 (sc-~ s) (st-↑ty (⊢r-¬ε (s-⊢r (sc-sound s)) Z) stB) upᶜ upj) stB
 
 sound (⊢lit regΓ) = ⊢lit regΓ
 sound (⊢var regΓ x∈Γ) = ⊢var regΓ x∈Γ
@@ -67,14 +71,13 @@ sound (⊢lam₂ ⊢e up-c ⊢e₁) = ⊢lam₂ (sound ⊢e₁)
 sound (⊢sub ⊢e ne gc s) with sc-~ s
 ... | r = ⊢sub (sound ⊢e) (sound-s s) gc (NonEmpty-NonZ ne (~s-~t r))
 sound (⊢tabs ⊢e) = ⊢tabs (sound ⊢e)
+sound (⊢tapp ⊢e st) = ⊢tapp (sound ⊢e) st
 
 sound-s (s-empty regΓ cloA x) = s-refl regΓ cloA x
 sound-s (s-type ss) = sound-ss ss
 sound-s (s-term-c cloA ap ⊢e s) with tc-id0 ⊢e
 ... | refl = s-arr₃ (⊆-⊢c cloA (sc-⊆ s)) (⊆-⊢c-≫' (sc-⊆ s) cloA ap) (sound-s s)
 sound-s (s-term-o opnA ⊢e ss s) = s-arr₂ (s-⊆-prv (sound-ss ss) (sc-⊆ s)) (sound-s s)
-sound-s (s-∀l s upᶜ upᵉ upC upD) = s-∀l (sound-s s) (ic-aux (sc-~ s)) (s-find0 s upᵉ upᶜ) upC upD
-    where ic-aux : Δ ,= B ⊢ ⟨ j , C `→ D ⟩ ~s [ e' ]↝ Σ'
-                 → 𝕚𝕔 j
-          ic-aux (~sI ⊢e s) = case-𝕚
-          ic-aux (~sC ⊢e s) = case-𝕔
+sound-s (s-∀l-𝕚 s upᶜ upj upᵉ upC upD) = s-∀l (sound-s s) case-𝕚 (s-find0 s upᵉ upᶜ) upC upD (↑tyʲ-𝕚 upj)
+sound-s (s-∀l-𝕔 s upᶜ upj upᵉ upC upD) = s-∀l (sound-s s) case-𝕔 (s-find0 s upᵉ upᶜ) upC upD (↑tyʲ-𝕔 upj)
+sound-s (s-tapp s upᶜ upj) = s-tapp (sound-s s) upj

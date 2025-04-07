@@ -164,6 +164,13 @@ punchIn-punchOut' {m = suc m} {k₁ = #S k₁} {X = #S X} {k₂ = #S k₂} ¬p (
              → ⟦ B' ⟧ C' ⇘ C*'
 ↑ty-st-comm0 up1 st1 up2 up3 = ↑ty-st-comm {k₁ = #0} z≤n up1 up2 st1 up3
 
+postulate
+  ↑ty-st-comm0' : ⟦ B ⟧ C ⇘ C*
+             → B ↑ty k ⇘ B'
+             → C ↑ty #S k ⇘ C'
+             → ⟦ B' ⟧ C' ⇘ C*'
+             → C* ↑ty k ⇘ C*'
+
 #≤-inject : ∀ {k₁ : Fin (1 + m)} {k₂ : Fin (1 + m)}
           → k₁ #≤ k₂
           → inject₁ k₁ #≤ k₂
