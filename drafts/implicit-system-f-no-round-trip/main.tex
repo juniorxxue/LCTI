@@ -45,7 +45,7 @@
 
 \begin{align*}
 &\text{Environments} \quad\quad &\Gamma::=&~ . \mid \Gamma, x : A \mid \Gamma, a \\
-&\text{Counters} \quad\quad &n ::=&~ 0 \mid \infty \mid S~n \mid T~n\\
+&\text{Counters} \quad\quad &n ::=&~ 0 \mid \infty \mid S~n \mid T_A~n\\
 &\text{Successor Counters} \quad\quad &S ::=&~ C \mid I
 \end{align*}
 
@@ -92,7 +92,7 @@
     {\Gamma \vdash_0 \Lambda a.~e : \forall a.~A}
 
     \inferrule*[right=\texttt{TApp}]
-    {\Gamma \vdash_{T~n} e : \forall a. ~B}
+    {\Gamma \vdash_{T_A~n} e : \forall a. ~B}
     {\Gamma \vdash_n e ~@ A :  [a/A]~B}    
 \end{mathpar}
 
@@ -128,7 +128,7 @@
     
     \inferrule*[right=\texttt{S-TApp}]
     {\Gamma \vdash_n [B/a]~A <: [B/a]~C}
-    {\Gamma \vdash_{T~n} \forall a. ~A <: \forall a. ~C}
+    {\Gamma \vdash_{T_B~n} \forall a. ~A <: \forall a. ~C}
 \end{mathpar}
 
 
@@ -136,8 +136,8 @@
 
 \begin{align*}
 &\text{Typing Environments} \quad\quad &\Gamma::=&~ . \mid \Gamma, x : A \mid \Gamma, a\\
-&\text{Subtyping Environments} \quad\quad &\Gamma, \Omega, \Delta ::=&~ . \mid \Gamma, x : A \mid \Gamma, a \mid \Gamma, \hat{a} = A \mid \Gamma, a := A\\
-&\text{Counters} \quad\quad &n ::=&~ 0 \mid \infty \mid S~n \mid T~n\\
+&\text{Subtyping Environments} \quad\quad &\Gamma, \Omega, \Delta ::=&~ . \mid \Gamma, x : A \mid \Gamma, a \mid \Gamma, \hat{a} = A \\
+&\text{Counters} \quad\quad &n ::=&~ 0 \mid \infty \mid S~n \mid T_A~n\\
 &\text{Successor Counters} \quad\quad &S ::=&~ C \mid I
 \end{align*}
 
@@ -183,7 +183,7 @@
     {\Gamma \vdash_0 \Lambda a.~e : \forall a.~A}
     
     \inferrule*[right=\texttt{TApp}]
-    {\Gamma \vdash_{T~n} e : \forall a. ~B}
+    {\Gamma \vdash_{T_A~n} e : \forall a. ~B}
     {\Gamma \vdash_n e ~@ A :  [a/A]~B}    
 \end{mathpar}
 
@@ -202,12 +202,15 @@
     { }
     {\Gamma; \Delta \vdash_\infty a <: a}
   
-
     \inferrule*[right=\texttt{S-Arr}]
     {\Gamma; \Delta \vdash_{\infty} C <:^* A \\
      \Gamma; \Delta \vdash_{n-} B <: D}
     {\Gamma; \Delta \vdash_n A \rightarrow B <:C \rightarrow D}
-
+    
+        \inferrule*[right=\texttt{S-Arr-Chk}]
+     {\Gamma; \Delta \vdash_{n} B <: D}
+    {\Gamma; \Delta \vdash_{C ~n} A \rightarrow B <: \Delta(A) \rightarrow D}
+    
     \inferrule*[right=\texttt{S-$\forall$}]
     {\Gamma; \Delta , a \vdash_{\infty} A <: B}
     {\Gamma; \Delta \vdash_{\infty} \forall a.~A <: \forall a.~B}
@@ -217,11 +220,10 @@
      a \in \texttt{FV}_{(S~n)}(A)\\
      \Gamma; \Delta, \hat{a} = B \vdash_{S~n}  A <:^+ C \to D}
     {\Gamma; \Delta \vdash_{S~n} \forall a. ~A <:^+ C \to D}
-    \\    
+
       \inferrule*[right=\texttt{S-TApp}]
-    {\Gamma ,a:= B \vdash_n A <: C}
-    {\Gamma \vdash_{T~n} \forall a. ~A <: \forall a. ~C}
-    \\
+    {\Gamma , \hat{a}= B \vdash_n A <: C}
+    {\Gamma \vdash_{T_B~n} \forall a. ~A <: \forall a. ~C}
     
     \inferrule*[right=\texttt{S-Var-L}]
     { }
@@ -230,15 +232,6 @@
      \inferrule*[right=\texttt{S-Var-R}]
    { }
     {\Gamma; \Delta [\hat{a} = A] \vdash_\infty A <:^- \hat{a}}
-    \\
-    
-    \inferrule*[right=\texttt{S-Var-L}]
-    { }
-    {\Gamma; \Delta [\hat{a} := A] \vdash_\infty \hat{a} <:^+ A}
-    
-     \inferrule*[right=\texttt{S-Var-R}]
-   { }
-    {\Gamma; \Delta [\hat{a} := A] \vdash_\infty A <:^- \hat{a}}    
 \end{mathpar}
 
 \section{Algo.}
@@ -410,7 +403,7 @@
 {\Gamma; \Delta \vdash \forall a. A \leq^+ \boxed{e} \leadsto \Sigma \dashv \Delta' \rightsquigarrow B}
 
 \inferrule*[right=\texttt{S-TApp}]
-{ \Gamma; \Delta, a:=B \vdash A \leq^+ \Sigma \dashv \Delta, a := B \rightsquigarrow C}
+{ \Gamma; \Delta, a =B \vdash A \leq^+ \Sigma \dashv \Delta, a = B \rightsquigarrow C}
 {\Gamma; \Delta \vdash \forall a. A \leq^+ \boxed{B} \leadsto \Sigma \dashv \Delta \rightsquigarrow \forall a. C}
 
 \end{mathpar}
