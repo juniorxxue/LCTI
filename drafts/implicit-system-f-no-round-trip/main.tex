@@ -378,7 +378,7 @@
 \noindent\makebox[\linewidth]{\rule{16cm}{0.4pt}}
 
 \inferrule*[right=\texttt{S-Empty}]
-{\Gamma; \Delta \vdash_{close}A}
+{\Gamma; \Delta \vdash_{\texttt{close}}A}
 {\Gamma; \Delta \vdash A \leq^+ \square \dashv \Delta \rightsquigarrow \Delta(A)}
 
 \inferrule*[right=\texttt{S-Type}]
@@ -386,13 +386,13 @@
 {\Gamma; \Delta \vdash A \leq B  \dashv \Delta' \rightsquigarrow B  }
 
 \inferrule*[right=\texttt{S-Term-Close}]
-{ \Delta \vdash_{close} A \\
+{ \Delta \vdash_{\texttt{close}} A \\
 \Gamma \vdash \Delta(A) \Rightarrow e \Rightarrow A'\\
  \Gamma; \Delta \vdash B \leq^+ \Sigma \dashv \Delta' \rightsquigarrow D}
 {\Gamma; \Delta \vdash A \rightarrow B \leq^+ \boxed{e} \leadsto \Sigma \dashv \Delta' \rightsquigarrow \Delta(A) \rightarrow D}
 
 \inferrule*[right=\texttt{S-Term-Open}]
-{ \Delta \vdash_{open} A \\
+{ \Delta \vdash_{\texttt{open}} A \\
 \Gamma \vdash \square \Rightarrow e \Rightarrow C\\
 \Gamma; \Delta \vdash C \leq^- A \dashv \Omega \\
 \Gamma; \Omega \vdash B \leq^+ \Sigma \dashv \Delta' \rightsquigarrow D}
