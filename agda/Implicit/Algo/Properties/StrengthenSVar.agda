@@ -1,4 +1,3 @@
-{-# OPTIONS --allow-unsolved-metas #-}
 module Implicit.Algo.Properties.StrengthenSVar where
 
 open import Implicit.Language.All
@@ -129,7 +128,10 @@ t-strengthen= (⊢sub ⊢e ne gc s) newΓ upA upe upΣ
   = ⊢sub (t-strengthen= ⊢e newΓ uppA upe ↑tyᶜ-□) (nonempty-↑tyᶜ ne upΣ) (↑ty-gc' gc upe)
                                                         (s-strengthen= s (◀S⋈ newΓ) (◀S⋈ newΓ) uppA upA upΣ)
 t-strengthen= (⊢tabs ⊢e) newΓ (↑ty-∀ upA) (↑tyᵉ-Λ upe) ↑tyᶜ-□ = ⊢tabs (t-strengthen= ⊢e (◀S∙ newΓ) upA upe ↑tyᶜ-□)
-t-strengthen= (⊢tapp ⊢e st) = {!!}
+t-strengthen= (⊢tapp ⊢e st) newΓ upA (↑tyᵉ-⓪ upe upA₁) upΣ
+  with regA ← t-⊢r ⊢e
+  with ⟨ pA , ↑ty-∀ uppA ⟩ ← ⊢r-◀-↑ty-surjective regA newΓ
+  = ⊢tapp (t-strengthen= ⊢e newΓ (↑ty-∀ uppA) upe (↑tyᶜ-⓪ upA₁ upΣ)) (↑ty-st-comm0'' st upA₁ uppA upA)
 
 
 s-strengthen= (s-empty regΓ cloA x) newΓ newΔ upA upB ↑tyᶜ-□
@@ -159,7 +161,9 @@ s-strengthen= (s-∀l s upᶜ upᵉ upC upD) newΓ newΔ (↑ty-∀ upA) (↑ty-
                         (↑ty-arr (↑ty-comm0' upB upC upA') (↑ty-comm0' upB₁ upD upB'))
                         (↑tyᶜ-e (↑tyᵉ-comm0' up-e upᵉ upe) (↑tyᶜ-comm0' upΣ upᶜ upΣ')))
          upΣ' upe upA' upB'
-s-strengthen= (s-tapp s upᶜ) = {!!}
+s-strengthen= (s-tapp s upᶜ) newΓ newΔ (↑ty-∀ upA) (↑ty-∀ upB) (↑tyᶜ-⓪ {Σ = Σ} upA₁ upΣ)
+  with ⟨ Σ' , upΣ' ⟩ ← ↑tyᶜ0-total Σ
+  = s-tapp (s-strengthen= s (◀S= newΓ upA₁) (◀S= newΔ upA₁) upA upB (↑tyᶜ-comm0' upΣ upᶜ upΣ')) upΣ'
 
 
 -- corollaries

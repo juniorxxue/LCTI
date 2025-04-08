@@ -1,4 +1,3 @@
-{-# OPTIONS --allow-unsolved-metas #-}
 module Implicit.Algo.Properties.WeakenTVar where
 
 open import Implicit.Language.All
@@ -92,7 +91,9 @@ s-weaken, {T = T} (s-∀l s upᶜ upᵉ upC upD) (↑tmᶜ-e {e' = e'} {Σ' = Σ
   with ⟨ Σ″ , upΣ' ⟩ ← ↑tyᶜ0-total Σ'
   with ⟨ e″ , upe' ⟩ ← ↑tyᵉ0-total e'
   = s-∀l (s-weaken, s (↑tmᶜ-e (↑tm-↑tyᵉ-comm up-e upe' upᵉ) (↑tmᶜ-↑tyᶜ-comm upΣ upΣ' upᶜ)) (▶sS^= new upT)) upΣ' upe' upC upD
-s-weaken, (s-tapp s upᶜ) upΣ new = {!!}
+s-weaken, {T = T} (s-tapp s upᶜ) (↑tmᶜ-⓪ {Σ' = Σ'} upΣ) new
+  with ⟨ Σ″ , upΣ″ ⟩ ← ↑tyᶜ0-total Σ'
+  with ⟨ T' , upT ⟩ ← ↑ty0-total T = s-tapp (s-weaken, s (↑tmᶜ-↑tyᶜ-comm upΣ upΣ″ upᶜ) (▶sS= new upT)) upΣ″
 
 s-weaken,0 : Γ ⋈ ⊢ A ≤⁺ Σ ⊣ Δ ⋈ ↪ B
            → ↑tmᶜ0 Σ ⇘ Σ'
