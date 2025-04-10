@@ -1,0 +1,61 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <title>Tree view</title>
+  <style type="text/css">
+    .node {
+    }
+    .interactive:hover {
+        background-color: #CCC;
+    }
+    .collapsed {
+      cursor:      pointer;
+      color:       grey;
+      font-weight: bold;
+    }
+    .expanded {
+      cursor:      pointer;
+      color:       #009;
+      font-weight: bold;
+    }
+    .fixed {
+      color: black;
+    }
+  </style>
+  <style type="text/css">
+    .shown {
+      display: inline;
+    }
+    .hidden {
+      display: none;
+    }
+  </style>
+  <script type="text/javascript">
+    function toggle(e) {
+      var node     = e.srcElement == undefined ? e.target : e.srcElement;
+      var id       = node.getAttribute("id");
+      var children = document.getElementById("children_" + id),
+          cstyle   = window.getComputedStyle(children),
+          cdispay  = cstyle.getPropertyValue("display");
+      if (cdispay == "inline") {
+        document.getElementById("children_" + id).className = "hidden";
+        document.getElementById(id).className = "node interactive collapsed";
+      } else {
+        document.getElementById("children_" + id).className = "shown";
+        document.getElementById(id).className = "node interactive expanded";
+      }
+    }
+  </script>
+</head>
+
+<body>
+<pre>
+<span id="node0" class="node interactive collapsed" onclick="toggle(event)" title="No comments">2</span><span id="children_node0" class="hidden">
+ ├╴<span id="node1" class="node fixed" title="No comments">2</span>
+ └╴<span id="node2" class="node fixed" title="No comments">2</span></span>
+</pre>
+</body>
+
+</html>
