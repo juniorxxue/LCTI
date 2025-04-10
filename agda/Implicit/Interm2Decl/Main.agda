@@ -22,6 +22,7 @@ sound (s-arr₁ s s₁) grd1 grd2 = {!!}
 sound (s-arr₂ s s₁) grd1 grd2 = {!!}
 sound (s-arr₃ cloA grd s) grd1 grd2 = {!!}
 sound (s-∀ s) grd1 grd2 = {!!}
-sound (s-∀l s ic fd upC upD) (grd-∀ grd1) (grd-arr grd2 grd3) = s-∀l {!!} (sd-strengthen=0 (sound s {!!} {!!}) {!!} {!!}) ic {!!}
+sound (s-∀l s ic fd upC upD upj) (grd-∀ grd1) (grd-arr grd2 grd3) = s-∀l {!!} (sound s {!!} (grd-arr {!!} {!!})) ic {!!} {!!} {!!} upj
+sound (s-tapp s upj) grd1 grd2 = {!!}
 sound (s-svar-l x inΔ) grd1 grd2 = {!!}
 sound (s-svar-r x inΔ) grd1 grd2 = {!!}
