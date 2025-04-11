@@ -28,7 +28,8 @@ data _⊢_#_⌞_⌝_ : Env n m → Counter m → Type m → Polar → Type m →
     → Δ ⊢ j # B ⌞ ≤⁺ ⌝ D
     → Δ ⊢ 𝕚 j # A `→ B ⌞ ≤⁺ ⌝ C `→ D
   s-arr₃ :
-      Δ ⊢ j # B ⌞ ≤⁺ ⌝ D
+      (regA : Δ ⊢r A)
+    → Δ ⊢ j # B ⌞ ≤⁺ ⌝ D
     → Δ ⊢ 𝕔 j # A `→ B ⌞ ≤⁺ ⌝ A `→ D
   s-∀ :
       Δ ,∙ ⊢ ∞ # A ⌞ ≤ ⌝ B
@@ -46,4 +47,5 @@ data _⊢_#_⌞_⌝_ : Env n m → Counter m → Type m → Polar → Type m →
       (Δ ,= B) ≫ A ⇘ A%
     → Δ ,= B ⊢ j' # A% ⌞ ≤⁺ ⌝ C
     → (upC : ↑ty0 C ⇘ C')
+    → (upj : ↑tyʲ0 j ⇘ j')
     → Δ ⊢ 𝕥₍ B ₎ j # `∀ A ⌞ ≤⁺ ⌝ `∀ C

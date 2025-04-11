@@ -169,3 +169,41 @@ s-trans s1 (⇉C newj) s2 = {!!}
 -- sub-gen {j = 𝕚 j} ⊢e s = {!!}
 -- sub-gen {j = 𝕔 j} ⊢e s = {!!}
 -- -}
+
+{-
+down : Counter (1 + m) → Counter m
+down Z = Z
+down ∞ = ∞
+down (𝕚 j) = 𝕚 (down j)
+down (𝕔 j) = 𝕔 (down j)
+down (𝕥₍ x ₎ j) = 𝕥₍ Int ₎ (down j)
+
+need : Term n m → Counter m
+need (lit i) = Z
+need (` x) = Z
+need (ƛ e) = 𝕚 (need e)
+need (e₁ · e₂) with need e₁
+... | Z = Z
+... | ∞ = ∞
+... | 𝕚 r = r
+... | 𝕔 r = r
+... | 𝕥₍ A ₎ r = 𝕥₍ A ₎ r
+need (e ⦂ A) = Z
+need (Λ e) = down (need e)
+need (e ⓪ A) = need e
+
+annota : Γ ⊢ j # e ⦂ A
+       → need (e) ≡ Z
+       → Γ ⊢ Z # e ⦂ A
+annota (⊢lit regΓ) refl = ⊢lit regΓ
+annota (⊢var regΓ x∈Γ) refl = ⊢var regΓ x∈Γ
+annota (⊢ann ⊢e) refl = ⊢ann ⊢e
+annota (⊢app₁ {e₁ = e₁} {e₂ = e₂} ⊢e ⊢e₁) eq with need e₁ | annota ⊢e {!!}
+... | Z | r = ⊢app₁ {!!} ⊢e₁
+... | 𝕚 Z | r = ⊢app₁ {!!} ⊢e₁
+... | 𝕔 Z | r = ⊢app₁ {!!} ⊢e₁
+annota (⊢app₂ ⊢e ⊢e₁) eq = {!!}
+annota (⊢sub ⊢e B≤A gc j≢Z) eq = {!!}
+annota (⊢tabs ⊢e) eq = ⊢tabs ⊢e
+annota (⊢tapp ⊢e st) eq = {!!}
+-}
