@@ -3,6 +3,8 @@
 {-# HLINT ignore "Redundant multi-way if" #-}
 module DeBruijn where
 
+import Debug.Trace
+
 import Syntax
 
 -- shifting --
@@ -26,10 +28,12 @@ substTyp k tyA (TArr t1 t2) = TArr (substTyp k tyA t1) (substTyp k tyA t2)
 substTyp k tyA (TForall tyB) = TForall (substTyp (k + 1) (shiftTyp0 tyA) tyB)
 
 substTyp0 :: Typ -> Typ -> Typ
-substTyp0 = substTyp 0
+-- substTyp0 a b | trace ("substTyp0 " ++ show a ++ " " ++ show b) False = undefined
+substTyp0 a b = substTyp 0 a b
 
 unshiftTyp0 :: Typ -> Typ
-unshiftTyp0 = substTyp 0 TInt
+unshiftTyp0 a | trace ("unshiftTyp0 " ++ show a) False = undefined
+unshiftTyp0 a = substTyp 0 TInt a
 
 shiftTerm :: Int -> Trm -> Trm
 shiftTerm _ (Lit i) = Lit i
@@ -53,5 +57,28 @@ shiftContext k (CParType ty ctx) = CParType ty (shiftContext k ctx)
 
 shiftContext0 :: Context -> Context
 shiftContext0 = shiftContext 0
+
+
+
+-- type shift in term
+shiftTyTerm :: Int -> Trm -> Trm
+shiftTyTerm _ (Lit i) = Lit i
+shiftTyTerm k (Var x) = (Var x)
+shiftTyTerm k (Abs t) = Abs (shiftTyTerm k t)
+shiftTyTerm k (App t1 t2) = App (shiftTyTerm k t1) (shiftTyTerm k t2)
+shiftTyTerm k (Ann t ty) = Ann (shiftTyTerm k t) (shiftTyp k ty)
+shiftTyTerm k (TAbs t) = TAbs (shiftTyTerm (1 + k) t)
+shiftTyTerm k (TApp t ty) = TApp (shiftTyTerm k t) (shiftTyp k ty)
+
+-- type shift in context
+shiftTyContext :: Int -> Context -> Context
+shiftTyContext _ CEmpty = CEmpty
+shiftTyContext k (CFullType ty) = CFullType (shiftTyp k ty)
+shiftTyContext k (CTerm trm ctx) = CTerm (shiftTyTerm k trm) (shiftTyContext k ctx)
+shiftTyContext k (CTApp ty ctx) = CTApp (shiftTyp k ty) (shiftTyContext k ctx)
+shiftTyContext k (CParType ty ctx) = CParType (shiftTyp k ty) (shiftContext k ctx)
+
+shiftTyContext0 :: Context -> Context
+shiftTyContext0 = shiftTyContext 0
 
 -- end shifting --

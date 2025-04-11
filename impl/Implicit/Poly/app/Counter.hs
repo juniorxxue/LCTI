@@ -39,3 +39,16 @@ need (App t1 t2) = prd (need t1)
 need (Ann e tyA) = N 0
 need (TAbs e) = need e
 need (TApp e tyA) = need e
+
+
+instance Eq Counter where
+  Inf == Inf = True
+  Inf == _ = False
+  _ == Inf = False
+  (N n) == (N m) = n == m
+
+instance Ord Counter where
+    compare Inf Inf = EQ
+    compare Inf _ = GT
+    compare _ Inf = LT
+    compare (N n) (N m) = compare n m

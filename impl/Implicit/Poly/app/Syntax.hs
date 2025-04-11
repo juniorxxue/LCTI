@@ -3,6 +3,8 @@
 {-# HLINT ignore "Redundant multi-way if" #-}
 module Syntax where
 
+import Debug.Trace
+
 type Log = [String]
 data Typ = TInt | TVar Int | TArr Typ Typ | TForall Typ deriving (Eq)
 data Trm = Lit Int | Var Int | Abs Trm | App Trm Trm | Ann Trm Typ | TAbs Trm | TApp Trm Typ
@@ -71,6 +73,7 @@ isEvar (ESvar _ env) k = if | k == 0 -> False
                             | otherwise -> isEvar env (k - 1)
 
 isUvar :: Env -> Int -> Bool
+-- isUvar a b  | trace ("isUvar " ++ show a ++ " in " ++ show b) False = undefined
 isUvar EEmpty _ = False
 isUvar (ETrm _ env) k = isUvar env k
 isUvar (EUvar env) k = if | k == 0 -> True
@@ -82,6 +85,7 @@ isUvar (ESvar _ env) k = if | k == 0 -> False
 
 
 closed :: Env -> Typ -> Bool
+closed env ty | trace ("closed " ++ show env ++ " |- " ++ show ty) False = undefined
 closed _ TInt = True
 closed senv (TVar x) = not $ isEvar senv x
 closed senv (TArr t1 t2) = closed senv t1 && closed senv t2

@@ -4,6 +4,7 @@
 module Main where
 import Control.Monad.Writer
 import Control.Monad (forM_)
+import Debug.Trace
 
 import Syntax
 import DeBruijn
@@ -21,6 +22,7 @@ lookupEnv k (ESvar _ env) = shiftTyp0 <$> lookupEnv k env
 lookupEnv _ _ = lift Nothing
 
 findSol :: Env -> Int -> WriterT Log Maybe Typ
+findSol a b | trace ("findSol " ++ show a ++ " |- " ++ show b) False = undefined
 findSol EEmpty _ = lift Nothing
 findSol (ESvar ty _) 0 = return ty
 findSol (ESvar _ senv) k | k > 0 = do
@@ -48,12 +50,13 @@ inst (ESvar ty senv) k tyA | k > 0 = do
 inst _ _ _ = Nothing
 
 ssubP :: (Env, Env) -> Typ -> Typ -> WriterT Log Maybe Env
+-- ssubP (a1, a2) b c | trace ("ssub " ++ show a1 ++ ";" ++ show a2 ++ " |- " ++ show b ++ " <:+ " ++ show c) False = undefined
 ssubP (env, senv) TInt TInt = do
   tell ["[S-Int] " ++ logSSubFull (env, senv) TInt TInt senv]
-  return env
+  return senv
 ssubP (env, senv) (TVar a) (TVar b) | isUvar (envConcat env senv) a && a == b = do
   tell ["[S-Refl] " ++ logSSubFull (env, senv) (TVar a) (TVar b) senv]
-  return env
+  return senv
 ssubP (env, senv) (TVar a) tyA | isEvar senv a = do
   case inst senv a tyA of
     Just newenv -> do
@@ -82,6 +85,7 @@ ssubP (env, senv) (TForall tyA) (TForall tyB) = do
 ssubP _ _ _ = lift Nothing
 
 ssubN :: (Env, Env) -> Typ -> Typ -> WriterT Log Maybe Env
+-- ssubN (a1, a2) b c | trace ("ssub " ++ show a1 ++ ";" ++ show a2 ++ " |- " ++ show b ++ " <:- " ++ show c) False = undefined
 ssubN (env, senv) TInt TInt = do
   tell ["[S-Int] " ++ logSSubFull (env, senv) TInt TInt senv]
   return env
@@ -108,7 +112,7 @@ ssubN (env, senv) (TArr tyA tyB) (TArr tyC tyD) = do
     tell $ indentAll _log2
     return senv2
 ssubN (env, senv) (TForall tyA) (TForall tyB) = do
-    (senv', _log) <- peek $ ssubN (env, EUvar senv) tyA tyB
+    (EUvar senv', _log) <- peek $ ssubN (env, EUvar senv) tyA tyB
     tell ["[S-Forall] " ++ logSSubFull (env, senv) (TForall tyA) (TForall tyB) senv']
     tell $ indentAll _log
     return senv'
@@ -116,6 +120,7 @@ ssubN _ _ _ = lift Nothing
 
 
 ground :: Env -> Typ -> WriterT Log Maybe Typ
+ground a b | trace ("ground " ++ show a ++ " |- " ++ show b) False = undefined
 ground _ TInt = return TInt
 ground env (TVar k) | isUvar env k = return (TVar k)
 ground env (TVar k) = findSol env k
@@ -128,28 +133,49 @@ ground env (TForall tyA) = do
   return $ TForall tyA'
 
 sub :: (Env, Env) -> Typ -> Context -> WriterT Log Maybe (Env, Typ)
+sub (a1, a2) b c | trace ("sub " ++ show a1 ++ ";" ++ show a2 ++ " |- " ++ show b ++ " <: " ++ show c) False = undefined
 sub (env, senv) tyA CEmpty | closed (envConcat env senv) tyA = do
-  grdA <- ground senv tyA
+  grdA <- ground (envConcat env senv) tyA
   tell ["[S-Empty] " ++ logSubFull (env, senv) tyA CEmpty senv grdA]
-  return (envConcat env senv, grdA)
+  return (senv, grdA)
 sub (env, senv) tyA (CFullType tyB) = do
   (senv', _log1) <- peek $ ssubP (env, senv) tyA tyB
   tell ["[S-Type] " ++ logSubFull (env, senv) tyA (CFullType tyB) senv' tyB]
   tell $ indentAll _log1
   return (senv', tyB)
 sub (env, senv) (TArr tyA tyB) (CTerm e h) | closed (envConcat env senv) tyA = do
-  grdA <- ground senv tyA
+  grdA <- ground (envConcat env senv) tyA
   (tyC, _log1) <- peek $ infer (envConcat env senv) (CFullType grdA) e
   ((senv', tyD), _log2) <- peek $ sub (env, senv) tyB h
   tell ["[S-Term-Close] " ++ logSubFull (env, senv) (TArr tyA tyB) (CTerm e h) senv' (TArr tyC tyD)]
   tell $ indentAll _log1
   tell $ indentAll _log2
   return (senv', TArr tyC tyD)
-
+sub (env, senv) (TArr tyA tyB) (CTerm e h) | open (envConcat env senv) tyA = do
+  (tyC, _log1) <- peek $ infer (envConcat env senv) CEmpty e
+  (senv1, _log2) <- peek $ ssubN (env, senv) tyC tyA
+  ((senv2, tyD), _log3) <- peek $ sub (env, senv1) tyB h
+  tell ["[S-Term-Open] " ++ logSubFull (env, senv) (TArr tyA tyB) (CTerm e h) senv2 (TArr tyC tyD)]
+  tell $ indentAll _log1
+  tell $ indentAll _log2
+  tell $ indentAll _log3
+  return (senv2, TArr tyC tyD)
+sub (env, senv) (TForall tyA) (CTerm e h) = do
+  ((ESvar _ senv' , tyB), _log1) <- peek $ sub (env, EEvar senv) tyA (shiftTyContext0 (CTerm e h))
+  tell ["[S-Forall-L] " ++ logSubFull (env, senv) (TForall tyA) (CTerm e h) senv' (unshiftTyp0 tyB)]
+  tell $ indentAll _log1
+  return (senv', unshiftTyp0 tyB)
+sub (env, senv) (TForall tyA) (CTApp tyB h) = do
+  ((ESvar _ senv', tyC), _log1) <- peek $ sub (env, ESvar tyB senv) tyA (shiftTyContext0 h)
+  tell ["[S-Forall-TApp] " ++ logSubFull (env, senv) (TForall tyA) (CTApp tyB h) senv' (TForall tyC)]
+  tell $ indentAll _log1
+  return (senv', TForall tyC)
 sub _ _ _ = lift Nothing
 
+-- sub (EEmpty, (ESvar TInt EEmpty)) (TArr (TVar 0) (TVar 0)) (CTerm (Lit 42) CEmpty)
 
 infer :: Env -> Context -> Trm -> WriterT Log Maybe Typ
+infer a b c | trace ("infer " ++ show a ++ " |- " ++ show b ++ " => " ++ show c) False = undefined
 infer env CEmpty (Lit n) = do
   tell ["[Ty-Int] " ++ logInferFull env CEmpty (Lit n) TInt]
   return TInt
@@ -193,7 +219,7 @@ infer e CEmpty (TAbs tm) = do
   tell $ indentAll _log
   return $ TForall tyA
 infer e h (TApp tm tyA) = do
-  (tyB, _log) <- peek $ infer e (CTApp tyA h) tm
+  (TForall tyB, _log) <- peek $ infer e (CTApp tyA h) tm
   tell ["[Ty-TApp] " ++ logInferFull e h (TApp tm tyA) (substTyp0 tyA tyB)]
   tell $ indentAll _log
   return (substTyp0 tyA tyB)
@@ -209,12 +235,13 @@ idTrm = TAbs (Ann (Abs (Var 0)) (TArr (TVar 0) (TVar 0)))
 main :: IO ()
 main = do
   -- print idTyp
-  let ex_id = infer EEmpty CEmpty idTrm
+  let
+      ex_id = infer EEmpty CEmpty idTrm
       ex_id1 = infer EEmpty CEmpty (App idTrm (Lit 1))
       ex_idInt = infer EEmpty CEmpty (TApp idTrm TInt)
       ex_idInt1 = infer EEmpty CEmpty (App (TApp idTrm TInt) (Lit 42))
       ex_f1 = infer (ETrm (TForall (TArr (TVar 0) (TVar 0))) EEmpty) CEmpty (App (Var 0) (Lit 42))
-  forM_ [ex_id, ex_id1, ex_idInt, ex_idInt1, ex_f1] $ \ex -> case runWriterT ex of
+  forM_ [ex_idInt1] $ \ex -> case runWriterT ex of
     Just (tyA, logs) -> do
       putStrLn $ "inferred type: " ++ show tyA
       mapM_ putStrLn logs
