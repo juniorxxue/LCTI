@@ -279,7 +279,18 @@ main = do
       -- g : forall a. (a -> a) -> a -> a
       -- g (\x. x) 1
       ex_gid1 = infer (ETrm (TForall (TArr (TArr (TVar 0) (TVar 0)) (TArr (TVar 0) (TVar 0)))) EEmpty) CEmpty (App (App (Var 0) (Abs (Var 0))) (Lit 1))
-  forM_ [ex_id, ex_id1, ex_idInt, ex_idInt1, ex_f1, ex_gid, ex_gid1] $ \ex -> case runWriterT ex of
+      -- spine-local
+      -- g : forall a. b. (a -> a) -> b -> ((a -> a) -> b)
+      -- (g (\x. x) (lit 1)) : ((Int -> Int) -> Int))
+      ex_g2 = infer (ETrm (TForall (TForall (TArr (TArr (TVar 1) (TVar 1))
+                                                  (TArr (TVar 0)
+                                                        (TArr (TArr (TVar 1) (TVar 1))
+                                                              (TVar 0)))))) EEmpty)
+                    CEmpty
+                    (Ann (App (App (Var 0) (Abs (Var 0)))
+                              (Lit 1))
+                         (TArr (TArr TInt TInt) TInt))
+  forM_ [ex_id, ex_id1, ex_idInt, ex_idInt1, ex_f1, ex_gid, ex_gid1, ex_g2] $ \ex -> case runWriterT ex of
     Just (tyA, logs) -> do
       putStrLn $ "inferred type: " ++ show tyA
       mapM_ putStrLn logs
