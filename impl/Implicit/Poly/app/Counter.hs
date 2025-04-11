@@ -1,6 +1,8 @@
 {-# LANGUAGE MultiWayIf #-}
 module Counter where
 
+import Debug.Trace
+
 import Syntax
 
 data Counter = Inf | N Int
@@ -24,6 +26,7 @@ prd (N n) | n > 0 = N (n - 1)
 prd (N 0) = N 0
 
 have :: Env -> Typ -> Counter
+-- have env tyA | trace ("have " ++ show env ++ " |- " ++ show tyA) False = undefined
 have env TInt = Inf
 have env (TVar k) = if isEvar env k then N 0 else Inf
 have env (TArr tyA tyB) = if closed env tyA
@@ -32,6 +35,7 @@ have env (TArr tyA tyB) = if closed env tyA
 have env (TForall tyA) = have (EUvar env) tyA
 
 need :: Trm -> Counter
+-- need a | trace ("need " ++ show a) False = undefined
 need (Lit _) = N 0
 need (Var _) = N 0
 need (Abs e) = suc $ need e
@@ -52,3 +56,10 @@ instance Ord Counter where
     compare Inf _ = GT
     compare _ Inf = LT
     compare (N n) (N m) = compare n m
+
+
+isLessEqThan :: Counter -> Counter -> Bool
+-- isLessEqThan c1 c2 | trace ("isLessEqThan " ++ show c1 ++ " " ++ show c2) False = undefined
+isLessEqThan Inf _ = False
+isLessEqThan _ Inf = True
+isLessEqThan (N n) (N m) = n <= m

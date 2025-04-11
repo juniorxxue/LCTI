@@ -32,7 +32,7 @@ substTyp0 :: Typ -> Typ -> Typ
 substTyp0 a b = substTyp 0 a b
 
 unshiftTyp0 :: Typ -> Typ
-unshiftTyp0 a | trace ("unshiftTyp0 " ++ show a) False = undefined
+-- unshiftTyp0 a | trace ("unshiftTyp0 " ++ show a) False = undefined
 unshiftTyp0 a = substTyp 0 TInt a
 
 shiftTerm :: Int -> Trm -> Trm

@@ -85,11 +85,12 @@ isUvar (ESvar _ env) k = if | k == 0 -> False
 
 
 closed :: Env -> Typ -> Bool
-closed env ty | trace ("closed " ++ show env ++ " |- " ++ show ty) False = undefined
+-- closed env ty | trace ("closed " ++ show env ++ " |- " ++ show ty) False = undefined
 closed _ TInt = True
 closed senv (TVar x) = not $ isEvar senv x
 closed senv (TArr t1 t2) = closed senv t1 && closed senv t2
 closed senv (TForall t) = closed (EUvar senv) t
 
 open :: Env -> Typ -> Bool
+-- open env ty | trace ("open " ++ show env ++ " |- " ++ show ty) False = undefined
 open senv ty = not $ closed senv ty

@@ -1,6 +1,7 @@
 {-# LANGUAGE MultiWayIf, LambdaCase, RankNTypes, TypeSynonymInstances #-}
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 {-# HLINT ignore "Redundant multi-way if" #-}
+{-# HLINT ignore "Use if" #-}
 module Main where
 import Control.Monad.Writer
 import Control.Monad (forM_)
@@ -22,7 +23,7 @@ lookupEnv k (ESvar _ env) = shiftTyp0 <$> lookupEnv k env
 lookupEnv _ _ = lift Nothing
 
 findSol :: Env -> Int -> WriterT Log Maybe Typ
-findSol a b | trace ("findSol " ++ show a ++ " |- " ++ show b) False = undefined
+-- findSol a b | trace ("findSol " ++ show a ++ " |- " ++ show b) False = undefined
 findSol EEmpty _ = lift Nothing
 findSol (ESvar ty _) 0 = return ty
 findSol (ESvar _ senv) k | k > 0 = do
@@ -70,7 +71,7 @@ ssubP (env, senv) (TVar a) tyA = do
     return senv
   else lift Nothing
 ssubP (env, senv) (TArr tyA tyB) (TArr tyC tyD) = do
-  (senv1, _log1) <- peek $ ssubN (env, senv) tyA tyC
+  (senv1, _log1) <- peek $ ssubN (env, senv) tyC tyA
   (senv2, _log2) <- peek $ ssubP (env, senv1) tyB tyD
   tell ["[S-Arr] " ++ logSSubFull (env, senv) (TArr tyA tyB) (TArr tyC tyD) senv2]
   tell $ indentAll _log1
@@ -105,7 +106,7 @@ ssubN (env, senv) tyA (TVar a) = do
     return senv
   else lift Nothing
 ssubN (env, senv) (TArr tyA tyB) (TArr tyC tyD) = do
-    (senv1, _log1) <- peek $ ssubP (env, senv) tyA tyC
+    (senv1, _log1) <- peek $ ssubP (env, senv) tyC tyA
     (senv2, _log2) <- peek $ ssubN (env, senv1) tyB tyD
     tell ["[S-Arr] " ++ logSSubFull (env, senv) (TArr tyA tyB) (TArr tyC tyD) senv2]
     tell $ indentAll _log1
@@ -120,7 +121,7 @@ ssubN _ _ _ = lift Nothing
 
 
 ground :: Env -> Typ -> WriterT Log Maybe Typ
-ground a b | trace ("ground " ++ show a ++ " |- " ++ show b) False = undefined
+-- ground a b | trace ("ground " ++ show a ++ " |- " ++ show b) False = undefined
 ground _ TInt = return TInt
 ground env (TVar k) | isUvar env k = return (TVar k)
 ground env (TVar k) = findSol env k
@@ -132,8 +133,13 @@ ground env (TForall tyA) = do
   tyA' <- ground (EUvar env) tyA
   return $ TForall tyA'
 
+transform :: Counter -> Typ -> Context
+transform Inf tyA = CFullType tyA
+transform (N 0) _ = CEmpty
+transform (N n) (TArr tyA tyB) | n > 0 = CParType tyA (transform (N (n-1)) tyB)
+
 sub :: (Env, Env) -> Typ -> Context -> WriterT Log Maybe (Env, Typ)
-sub (a1, a2) b c | trace ("sub " ++ show a1 ++ ";" ++ show a2 ++ " |- " ++ show b ++ " <: " ++ show c) False = undefined
+-- sub (a1, a2) b c | trace ("sub " ++ show a1 ++ ";" ++ show a2 ++ " |- " ++ show b ++ " <: " ++ show c) False = undefined
 sub (env, senv) tyA CEmpty | closed (envConcat env senv) tyA = do
   grdA <- ground (envConcat env senv) tyA
   tell ["[S-Empty] " ++ logSubFull (env, senv) tyA CEmpty senv grdA]
@@ -152,14 +158,28 @@ sub (env, senv) (TArr tyA tyB) (CTerm e h) | closed (envConcat env senv) tyA = d
   tell $ indentAll _log2
   return (senv', TArr tyC tyD)
 sub (env, senv) (TArr tyA tyB) (CTerm e h) | open (envConcat env senv) tyA = do
-  (tyC, _log1) <- peek $ infer (envConcat env senv) CEmpty e
-  (senv1, _log2) <- peek $ ssubN (env, senv) tyC tyA
-  ((senv2, tyD), _log3) <- peek $ sub (env, senv1) tyB h
-  tell ["[S-Term-Open] " ++ logSubFull (env, senv) (TArr tyA tyB) (CTerm e h) senv2 (TArr tyC tyD)]
-  tell $ indentAll _log1
-  tell $ indentAll _log2
-  tell $ indentAll _log3
-  return (senv2, TArr tyC tyD)
+  let count = have (envConcat env senv) tyA
+  case isLessEqThan (need e) count of
+    True -> do
+      (tyC, _log1) <- peek $ infer (envConcat env senv) (transform count tyA) e
+      (senv1, _log2) <- peek $ ssubN (env, senv) tyC tyA
+      ((senv2, tyD), _log3) <- peek $ sub (env, senv1) tyB h
+      tell ["[S-Term-Open-1] " ++ logSubFull (env, senv) (TArr tyA tyB) (CTerm e h) senv2 (TArr tyC tyD)]
+      tell $ indentAll _log1
+      tell $ indentAll _log2
+      tell $ indentAll _log3
+      return (senv2, TArr tyC tyD)
+    False -> do
+      ((senv1, tyD), _log1) <- peek $ sub (env, senv) tyB h
+      grdA <- ground (envConcat env senv1) tyA
+      let count2 = have (envConcat env senv1) grdA
+      (tyC, _log2) <- peek $ infer (envConcat env senv1) (transform count2 grdA) e
+      (senv2, _log3) <- peek $ ssubN (env, senv1) tyC tyA
+      tell ["[S-Term-Open-2] " ++ logSubFull (env, senv) (TArr tyA tyB) (CTerm e h) senv2 (TArr tyC tyD)]
+      tell $ indentAll _log1
+      tell $ indentAll _log2
+      tell $ indentAll _log3
+      return (senv2, TArr tyC tyD)
 sub (env, senv) (TForall tyA) (CTerm e h) = do
   ((ESvar _ senv' , tyB), _log1) <- peek $ sub (env, EEvar senv) tyA (shiftTyContext0 (CTerm e h))
   tell ["[S-Forall-L] " ++ logSubFull (env, senv) (TForall tyA) (CTerm e h) senv' (unshiftTyp0 tyB)]
@@ -175,7 +195,7 @@ sub _ _ _ = lift Nothing
 -- sub (EEmpty, (ESvar TInt EEmpty)) (TArr (TVar 0) (TVar 0)) (CTerm (Lit 42) CEmpty)
 
 infer :: Env -> Context -> Trm -> WriterT Log Maybe Typ
-infer a b c | trace ("infer " ++ show a ++ " |- " ++ show b ++ " => " ++ show c) False = undefined
+-- infer a b c | trace ("infer " ++ show a ++ " |- " ++ show b ++ " => " ++ show c) False = undefined
 infer env CEmpty (Lit n) = do
   tell ["[Ty-Int] " ++ logInferFull env CEmpty (Lit n) TInt]
   return TInt
@@ -205,6 +225,11 @@ infer env (CTerm tm2 h) (Abs tm) = do
   tell ["[Ty-Abs2] " ++ logInferFull env (CTerm tm2 h) (Abs tm) (TArr tyA tyB)]
   tell $ indentAll _log1
   tell $ indentAll _log2
+  return $ TArr tyA tyB
+infer env (CParType tyA h) (Abs tm) = do
+  (tyB, _log) <- peek $ infer (ETrm tyA env) (shiftContext0 h) tm
+  tell ["[Ty-Abs-Par] " ++ logInferFull env (CParType tyA h) (Abs tm) (TArr tyA tyB)]
+  tell $ indentAll _log
   return $ TArr tyA tyB
 infer env h g | genericConsumer g && nonEmptyContext h = do
   (tyA, _log1) <- peek $ infer env CEmpty g
@@ -236,13 +261,31 @@ main :: IO ()
 main = do
   -- print idTyp
   let
+      -- /\a. (\x. x : a -> a)
       ex_id = infer EEmpty CEmpty idTrm
+      -- id 1
       ex_id1 = infer EEmpty CEmpty (App idTrm (Lit 1))
+      -- id @Int
       ex_idInt = infer EEmpty CEmpty (TApp idTrm TInt)
+      -- id @Int 1
       ex_idInt1 = infer EEmpty CEmpty (App (TApp idTrm TInt) (Lit 42))
+      -- f : forall a. a -> a
+      -- f 1
       ex_f1 = infer (ETrm (TForall (TArr (TVar 0) (TVar 0))) EEmpty) CEmpty (App (Var 0) (Lit 42))
-  forM_ [ex_idInt1] $ \ex -> case runWriterT ex of
+      -- g : forall a. (Int -> a) -> a
+      -- g (\x. x)
+      ex_gid = infer (ETrm (TForall (TArr (TArr TInt (TVar 0)) (TVar 0))) EEmpty) CEmpty (App (Var 0) (Abs (Var 0)))
+      -- test order-insensitive
+      -- g : forall a. (a -> a) -> a -> a
+      -- g (\x. x) 1
+      ex_gid1 = infer (ETrm (TForall (TArr (TArr (TVar 0) (TVar 0)) (TArr (TVar 0) (TVar 0)))) EEmpty) CEmpty (App (App (Var 0) (Abs (Var 0))) (Lit 1))
+  forM_ [ex_id, ex_id1, ex_idInt, ex_idInt1, ex_f1, ex_gid, ex_gid1] $ \ex -> case runWriterT ex of
     Just (tyA, logs) -> do
       putStrLn $ "inferred type: " ++ show tyA
       mapM_ putStrLn logs
     Nothing -> print "Nothing"
+
+
+
+
+-- closed (EEvar EEmpty) (TArr (TVar 0) TInt)
