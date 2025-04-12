@@ -117,3 +117,5 @@ st0-⊢r : Γ ⊢r `∀ B
        → ⟦ A ⟧ B ⇘ B*
        → Γ ⊢r B*
 st0-⊢r (⊢r-∀ reg) regA st = st-⊢r reg ◀Z regA st
+
+

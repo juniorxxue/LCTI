@@ -26,6 +26,16 @@ data _▶_,∙⇘_ : Env n m → Fin (1 + m) → Env n (1 + m) → Set where
       → Γ ⋈ ▶ k ,∙⇘ Γ' ⋈
 
 
+▶∙-∋∙ : Γ ▶ k ,∙⇘ Γ'
+      → Γ' ∋∙ k
+▶∙-∋∙ ▶Z = Z
+▶∙-∋∙ (▶S, new x) = S, (▶∙-∋∙ new)
+▶∙-∋∙ (▶S^ new) = S^ (▶∙-∋∙ new)
+▶∙-∋∙ (▶S∙ new) = S∙ (▶∙-∋∙ new)
+▶∙-∋∙ (▶S= new x) = S= (▶∙-∋∙ new)
+▶∙-∋∙ (▶S⋈ new) = S⋈ (▶∙-∋∙ new)
+
+
 ∋:=-weaken∙ : Γ ∋ X := A
      → Γ ▶ k ,∙⇘ Γ'
      → A ↑ty k ⇘ A'

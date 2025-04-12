@@ -18,6 +18,11 @@ data ⟦_/_⟧ˣ_⇘_ : Fin (1 + m) → Type m → Fin (1 + m) → Type m → Se
           → ⟦ k / A ⟧ˣ X ⇘ ‶ punchOut {i = k} {j = X} ¬p
 
 
+stx-neq-helper : (¬p : k ≢ X)
+               → Y ≡ punchOut {i = k} {j = X} ¬p
+               → ⟦ k / A ⟧ˣ X ⇘ ‶ Y
+stx-neq-helper ¬p refl = stx-neq ¬p
+
 -- type subst
 infix 3 ⟦_/_⟧_⇘_
 data ⟦_/_⟧_⇘_ : Fin (1 + m) → Type m → Type (1 + m) → Type m → Set where
