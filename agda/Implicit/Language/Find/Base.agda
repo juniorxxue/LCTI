@@ -61,6 +61,12 @@ infix 3 ↑tyʲ0_⇘_
 𝕚𝕔-↑tyʲ' case-𝕚 (↑tyʲ-𝕚 upj) = case-𝕚
 𝕚𝕔-↑tyʲ' case-𝕔 (↑tyʲ-𝕔 upj) = case-𝕔
 
+𝕚𝕔-↑tyʲ : 𝕚𝕔 j
+         → j ↑tyʲ k ⇘ j'
+         → 𝕚𝕔 j'
+𝕚𝕔-↑tyʲ case-𝕚 (↑tyʲ-𝕚 upj) = case-𝕚
+𝕚𝕔-↑tyʲ case-𝕔 (↑tyʲ-𝕔 upj) = case-𝕔
+
 nonz-↑tyʲ' : NonZ j'
           → j ↑tyʲ k ⇘ j'
           → NonZ j
@@ -68,6 +74,14 @@ nonz-↑tyʲ' nz-∞ ↑tyʲ-∞ = nz-∞
 nonz-↑tyʲ' nz-I (↑tyʲ-𝕚 upj) = nz-I
 nonz-↑tyʲ' nz-C (↑tyʲ-𝕔 upj) = nz-C
 nonz-↑tyʲ' nz-T (↑tyʲ-𝕥 upj upA) = nz-T
+
+nonz-↑tyʲ : NonZ j
+          → j ↑tyʲ k ⇘ j'
+          → NonZ j
+nonz-↑tyʲ nz-∞ ↑tyʲ-∞ = nz-∞
+nonz-↑tyʲ nz-I (↑tyʲ-𝕚 upj) = nz-I
+nonz-↑tyʲ nz-C (↑tyʲ-𝕔 upj) = nz-C
+nonz-↑tyʲ nz-T (↑tyʲ-𝕥 upj upA) = nz-T
 
 
 -- find A k j
