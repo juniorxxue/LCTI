@@ -1,4 +1,4 @@
-module Implicit.Language.Find where
+module Implicit.Language.Find.Base where
 
 open import Implicit.Language.Base
 open import Implicit.Language.Shift.All

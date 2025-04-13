@@ -9,7 +9,7 @@ open import Implicit.Language.Subst.All public
 open import Implicit.Language.Lookup.All public
 open import Implicit.Language.Occur.All public
 
-open import Implicit.Language.Find public
+open import Implicit.Language.Find.All public
 
 open import Implicit.Language.Regular.All public
 

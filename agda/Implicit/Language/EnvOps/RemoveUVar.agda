@@ -25,6 +25,32 @@ data _◀_∙⇘_ : Env n (1 + m) → Fin (1 + m) → Env n m → Set where
   ◀S⋈ : Γ ◀ k ∙⇘ Γ'
       → Γ ⋈ ◀ k ∙⇘ Γ' ⋈
 
+◀∙-∋∙ : Γ ◀ k ∙⇘ Γ'
+      → Γ ∋∙ k
+◀∙-∋∙ ◀Z = Z
+◀∙-∋∙ (◀S, new x) = S, (◀∙-∋∙ new)
+◀∙-∋∙ (◀S^ new) = S^ (◀∙-∋∙ new)
+◀∙-∋∙ (◀S∙ new) = S∙ (◀∙-∋∙ new)
+◀∙-∋∙ (◀S= new x) = S= (◀∙-∋∙ new)
+◀∙-∋∙ (◀S⋈ new) = S⋈ (◀∙-∋∙ new)
+
+∋∙-strengthen∙' : (¬p : k ≢ X)
+                → Γ' ∋∙ punchOut ¬p
+                → Γ ◀ k ∙⇘ Γ'
+                → Γ ∋∙ X
+∋∙-strengthen∙' {k = #0} {X = #0} ¬p inΓ new = ⊥-elim (¬p refl)
+∋∙-strengthen∙' {k = #0} {X = #S X} ¬p inΓ ◀Z = S∙ inΓ
+∋∙-strengthen∙' {k = #0} {X = #S X} ¬p (S, inΓ) (◀S, new x) = S, (∋∙-strengthen∙' (λ ()) inΓ new)
+∋∙-strengthen∙' {k = #0} {X = #S X} ¬p (S⋈ inΓ) (◀S⋈ new) = S⋈ (∋∙-strengthen∙' (λ ()) inΓ new)
+∋∙-strengthen∙' {k = #S k} {X = #0} ¬p (S, inΓ) (◀S, new x) = S, (∋∙-strengthen∙' ¬p inΓ new)
+∋∙-strengthen∙' {k = #S k} {X = #0} ¬p Z (◀S∙ new) = Z
+∋∙-strengthen∙' {k = #S k} {X = #0} ¬p (S⋈ inΓ) (◀S⋈ new) = S⋈ (∋∙-strengthen∙' ¬p inΓ new)
+∋∙-strengthen∙' {k = #S k} {X = #S X} ¬p (S, inΓ) (◀S, new x) = S, (∋∙-strengthen∙' ¬p inΓ new)
+∋∙-strengthen∙' {k = #S k} {X = #S X} ¬p (S^ inΓ) (◀S^ new) = S^ (∋∙-strengthen∙' (λ x → ¬p (cong #S x)) inΓ new)
+∋∙-strengthen∙' {k = #S k} {X = #S X} ¬p (S∙ inΓ) (◀S∙ new) = S∙ (∋∙-strengthen∙' (λ x → ¬p (cong #S x)) inΓ new)
+∋∙-strengthen∙' {k = #S k} {X = #S X} ¬p (S= inΓ) (◀S= new x) = S= (∋∙-strengthen∙' (λ x₁ → ¬p (cong #S x₁)) inΓ new)
+∋∙-strengthen∙' {k = #S k} {X = #S X} ¬p (S⋈ inΓ) (◀S⋈ new) = S⋈ (∋∙-strengthen∙' ¬p inΓ new)
+
 
 ∋∙-strengthen∙ : Γ ∋∙ punchIn k X
       → Γ ◀ k ∙⇘ Γ'

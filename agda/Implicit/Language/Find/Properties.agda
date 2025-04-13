@@ -1,7 +1,10 @@
-module Implicit.Interm.Properties.Find where
+module Implicit.Language.Find.Properties where
 
-open import Implicit.Language.All
-open import Implicit.Interm.Base
+
+open import Implicit.Language.Base
+open import Implicit.Language.Shift.All
+open import Implicit.Language.Occur.All
+open import Implicit.Language.Find.Base
 
 
 ↑ty-find : find A X j
