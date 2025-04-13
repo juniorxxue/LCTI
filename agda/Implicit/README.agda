@@ -4,9 +4,15 @@ import Implicit.Language.All
 import Implicit.Interm.All
 import Implicit.Algo.All
 
--- completeness
+-- (interm. <----> algo.) completeness
 import Implicit.Algo2Interm.Main
 import Implicit.Algo2Interm.Corollaries
 
--- soundness
+-- (interm. <----> algo.) soundness
 import Implicit.Interm2Algo.Main
+
+-- (decl. <----> interm.) completeness
+import Implicit.Decl2Interm.Main
+
+-- (decl. <----> interm.) soundness
+import Implicit.Interm2Decl.Main

@@ -5,6 +5,7 @@ open import Implicit.Language.Shift.All
 open import Implicit.Language.Lookup.All
 open import Implicit.Language.EnvOps.Base
 open import Implicit.Language.Regular.Base
+open import Implicit.Language.OpenClose.Base
 
 -- in k position, we replace a ,= B with ,∙
 infix 3 _◆_⇘_
@@ -144,3 +145,19 @@ env-◆◇-false (◇S^ newΓ1) (◆S^ newΓ2) = env-◆◇-false newΓ1 newΓ2
 ⊢r-◆0 : Γ ,= T ⊢r A
      → Γ ,∙ ⊢r A
 ⊢r-◆0 regA = ⊢r-◆ regA ◆Z
+
+
+⊢c-◆ : Γ ⊢c A
+     → Γ ◆ k ⇘ Γ'
+     → Γ' ⊢c A
+⊢c-◆ ⊢c-int new = ⊢c-int
+⊢c-◆ (⊢c-var-∙ inΔ) new = ⊢c-var-∙ (◆-∙∈ inΔ new)
+⊢c-◆ {k = k} (⊢c-var-= {X = X} inΔ) new with k #≟ X
+... | yes refl = ⊢c-var-∙ (◆-=∈-≡ inΔ new)
+... | no ¬p = ⊢c-var-= (◆-=∈-≢ inΔ new ¬p)
+⊢c-◆ (⊢c-arr cloA cloA₁) new = ⊢c-arr (⊢c-◆ cloA new) (⊢c-◆ cloA₁ new)
+⊢c-◆ (⊢c-∀ cloA) new = ⊢c-∀ (⊢c-◆ cloA (◆S∙ new))
+
+⊢c-◆0 : Γ ,= T ⊢c A
+      → Γ ,∙ ⊢c A
+⊢c-◆0 cloA = ⊢c-◆ cloA ◆Z

@@ -144,6 +144,7 @@ find-≫-∙ (f-𝕥 fd upj) ninΓ inΓ (grd-∀ grd upj₁)
   = f-𝕥 (find-≫-∙ fd (S∙ ninΓ) (S∙ inΓ) grd) upj
 
 
+
 complete+ : Γ ⊢d j # A% ⌞ ≤⁺ ⌝ B
           → Γ ≫ A ⇘ A% by j
           → Γ ⊢i j # A ⌞ ≤⁺ ⌝ B

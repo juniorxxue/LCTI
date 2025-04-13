@@ -106,3 +106,5 @@ t-⊢rʲ (⊢sub ⊢e B≤A gc j≢Z) = ⊢r-⋈ (s-⊢rʲ B≤A)
 t-⊢rʲ (⊢tabs ⊢e) = j-Z
 t-⊢rʲ (⊢tapp ⊢e st) with t-⊢rʲ ⊢e
 ... | j-𝕥 r x = r
+
+

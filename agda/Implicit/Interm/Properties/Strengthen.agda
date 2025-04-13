@@ -4,7 +4,6 @@ open import Implicit.Language.All
 open import Implicit.Interm.Base
 open import Implicit.Interm.Properties.Regularity
 open import Implicit.Interm.Properties.Polarity
-open import Implicit.Interm.Properties.Find
 
 s-strengthen, : Γ ⊢ j # A ⌞ ≤ ⌝ B
               → Γ ◀ k ,⇘ Γ'

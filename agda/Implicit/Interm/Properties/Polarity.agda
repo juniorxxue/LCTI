@@ -45,3 +45,29 @@ t-⊢r (⊢sub ⊢e B≤A gc j≢Z) = ⊢r-𝕣' (s+-polarity B≤A)
 t-⊢r (⊢tabs ⊢e) = ⊢r-∀ (t-⊢r ⊢e)
 t-⊢r (⊢tapp ⊢e st) with t-⊢rʲ ⊢e
 ... | j-𝕥 r x = st0-⊢r (t-⊢r ⊢e) x st
+
+
+s-⊢c-l : Γ ⊢ j # A ⌞ ≤ ⌝ B
+        → Γ ⊢c A
+
+s-⊢c-r : Γ ⊢ j # A ⌞ ≤ ⌝ B
+        → Γ ⊢c B
+
+s-⊢c-l {≤ = ≤⁺} (s-refl regΔ cloA grd) = cloA
+s-⊢c-l {≤ = ≤⁺} (s-int regΔ) = ⊢c-int
+s-⊢c-l {≤ = ≤⁺} (s-var-∙ regΔ inΔ) = ⊢c-var-∙ inΔ
+s-⊢c-l {≤ = ≤⁺} (s-arr₁ s s₁) = ⊢c-arr (s-⊢c-r s) (s-⊢c-l s₁)
+s-⊢c-l {≤ = ≤⁺} (s-arr₂ s s₁) = ⊢c-arr (s-⊢c-r s) (s-⊢c-l s₁)
+s-⊢c-l {≤ = ≤⁺} (s-arr₃ cloA grd s) = ⊢c-arr cloA (s-⊢c-l s)
+s-⊢c-l {≤ = ≤⁺} (s-∀ s) = ⊢c-∀ (s-⊢c-l s)
+s-⊢c-l {≤ = ≤⁺} (s-∀l s ic fd upC upD upj) = ⊢c-∀ (⊢c-◆0 (s-⊢c-l s))
+s-⊢c-l {≤ = ≤⁺} (s-tapp s upj) = ⊢c-∀ (⊢c-◆0 (s-⊢c-l s))
+s-⊢c-l {≤ = ≤⁺} (s-svar-l x inΔ) = ⊢c-var-= (∋:=to∋= inΔ)
+s-⊢c-l {≤ = ≤⁻} s = ⊢r-⊢c (s--polarity s)
+
+s-⊢c-r {≤ = ≤⁺} s = ⊢r-⊢c (s+-polarity s)
+s-⊢c-r {≤ = ≤⁻} (s-int regΔ) = ⊢c-int
+s-⊢c-r {≤ = ≤⁻} (s-var-∙ regΔ inΔ) = ⊢c-var-∙ inΔ
+s-⊢c-r {≤ = ≤⁻} (s-arr₁ s s₁) = ⊢c-arr (s-⊢c-l s) (s-⊢c-r s₁)
+s-⊢c-r {≤ = ≤⁻} (s-∀ s) = ⊢c-∀ (s-⊢c-r s)
+s-⊢c-r {≤ = ≤⁻} (s-svar-r x inΔ) = ⊢c-var-= (∋:=to∋= inΔ)
