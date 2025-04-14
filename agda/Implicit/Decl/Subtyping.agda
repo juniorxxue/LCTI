@@ -122,3 +122,23 @@ s1-strengthen=0 : Γ ,= T ⊢ j' # A' ⌞ ≤ ⌝ B'
             → ↑tyʲ0 j ⇘ j'
             → Γ ⊢ j # A ⌞ ≤ ⌝ B
 s1-strengthen=0 s upA upB upj = s1-strengthen= s ◀Z upA upB upj
+
+s1-weaken, : Γ ⊢ j # A ⌞ ≤ ⌝ B
+          → Γ ▶s k , T ⇘ Γ'
+          → Γ' ⊢ j # A ⌞ ≤ ⌝ B
+s1-weaken, (s-refl regΔ cloA) new = s-refl (sregular-weaken,s regΔ new) (⊢r-weaken,s cloA new)
+s1-weaken, (s-int regΔ) new = s-int (sregular-weaken,s regΔ new)
+s1-weaken, (s-var-∙ regΔ inΔ) new = s-var-∙ (sregular-weaken,s regΔ new) (∋∙-weaken,s inΔ new)
+s1-weaken, (s-arr₁ s s₁) new = s-arr₁ (s1-weaken, s new) (s1-weaken, s₁ new)
+s1-weaken, (s-arr₂ s s₁) new = s-arr₂ (s1-weaken, s new) (s1-weaken, s₁ new)
+s1-weaken, (s-arr₃ regA s) new = s-arr₃ (⊢r-weaken,s regA new) (s1-weaken, s new)
+s1-weaken, {T = T} (s-∀ s) new
+  with ⟨ T , upT ⟩ ← ↑ty0-total T = s-∀ (s1-weaken, s (▶sS∙ new upT))
+s1-weaken, (s-∀l regB st s ic fd upj) new = s-∀l (⊢r-weaken,s regB new) st (s1-weaken, s new) ic fd upj
+s1-weaken, (s-tapp regB st s upC) new = s-tapp (⊢r-weaken,s regB new) st (s1-weaken, s new) upC
+
+
+s1-weaken,0 : Γ ⋈ ⊢ j # A ⌞ ≤ ⌝ B
+            → Γ ⊢r T
+            → Γ , T ⋈ ⊢ j # A ⌞ ≤ ⌝ B
+s1-weaken,0 s regT = s1-weaken, s (▶sS⋈ (▶Z regT))

@@ -4,6 +4,7 @@ open import Implicit.Language.Base
 open import Implicit.Language.Shift.All
 open import Implicit.Language.Lookup.Base
 open import Implicit.Language.Occur.Base
+open import Implicit.Language.Regular.Base
 
 infix 3 _↑tyʲ_⇘_
 data _↑tyʲ_⇘_ : Counter m → Fin (1 + m) → Counter (1 + m) → Set where
@@ -125,3 +126,16 @@ find-arr-l fd = f-∞ (ε-arr-l (find-ε fd))
 find-Z-false : find A k Z
              → ⊥
 find-Z-false ()
+
+
+infix 3 _⊢rʲ_
+data _⊢rʲ_ : Env n m → Counter m → Set where
+  rj-Z : Γ ⊢rʲ Z
+  rj-∞ : Γ ⊢rʲ ∞
+  rj-𝕚 : Γ ⊢rʲ j
+       → Γ ⊢rʲ (𝕚 j)
+  rj-𝕔 : Γ ⊢rʲ j
+       → Γ ⊢rʲ (𝕔 j)
+  rj-𝕥 : Γ ⊢rʲ j
+       → (regA : Γ ⊢r A)
+       → Γ ⊢rʲ (𝕥₍ A ₎ j)
