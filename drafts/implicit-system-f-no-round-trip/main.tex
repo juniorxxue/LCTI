@@ -82,10 +82,10 @@
     \\
 
     \inferrule*[right=\texttt{Sub}]
-    {\Gamma \vdash_0 e : B \\
+    {\Gamma \vdash_0 g : B \\
     n \neq 0\\
     \Gamma \vdash_n B <: A}
-    {\Gamma \vdash_n e : A}
+    {\Gamma \vdash_n g : A}
 
     \inferrule*[right=\texttt{TAbs}]
     {\Gamma, a \vdash_0 e : A}
@@ -127,7 +127,8 @@
     {\Gamma \vdash_{S~n} \forall a. ~A <: C \to D}
     
     \inferrule*[right=\texttt{S-TApp}]
-    {\Gamma \vdash_n [B/a]~A <: C}
+    {\Gamma \vdash B \\
+    \Gamma \vdash_n [B/a]~A <: C}
     {\Gamma \vdash_{T_B~n} \forall a. ~A <: \forall a. ~C}
 \end{mathpar}
 
@@ -173,10 +174,10 @@
     \\
 
     \inferrule*[right=\texttt{Sub}]
-    {\Gamma \vdash_0 e : B \\
+    {\Gamma \vdash_0 g : B \\
     n \neq 0\\
     \Gamma \shortmid . \vdash_n B <:^{+} A}
-    {\Gamma \vdash_n e : A}
+    {\Gamma \vdash_n g : A}
 
     \inferrule*[right=\texttt{TAbs}]
     {\Gamma, a \vdash_0 e : A}
