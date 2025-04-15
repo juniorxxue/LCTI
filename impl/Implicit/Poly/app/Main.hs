@@ -6,6 +6,7 @@ module Main where
 import Control.Monad.Writer
 import Control.Monad (forM_)
 import Debug.Trace
+import System.IO (hFlush, stdout)
 
 import Syntax
 import DeBruijn
@@ -294,6 +295,7 @@ main = do
     Just (tyA, logs) -> do
       putStrLn $ "inferred type: " ++ show tyA
       mapM_ putStrLn logs
+      hFlush stdout
     Nothing -> print "Nothing"
 
 
