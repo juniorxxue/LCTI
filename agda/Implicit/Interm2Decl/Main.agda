@@ -1,21 +1,21 @@
 module Implicit.Interm2Decl.Main where
 
 open import Implicit.Language.All
-open import Implicit.Decl.All renaming (_⊢_#_⌞_⌝_ to _⊢d_#_⌞_⌝_)
+open import Implicit.Decl.All renaming (_⊢_#_≤_ to _⊢d_#_≤_)
 open import Implicit.Interm.All renaming (_⊢_#_⌞_⌝_ to _⊢i_#_⌞_⌝_)
 
 postulate
 
-  sd-strengthen=0 : Γ ,= T ⊢d j' # A' ⌞ ≤ ⌝ B'
+  sd-strengthen=0 : Γ ,= T ⊢d j' # A' ≤ B'
                   → ↑ty0 A ⇘ A'
                   → ↑ty0 B ⇘ B'
                   → ↑tyʲ0 j ⇘ j'
-                  → Γ ⊢d j # A ⌞ ≤ ⌝ B
+                  → Γ ⊢d j # A ≤ B
 
 
 sd-refl-∞ : SRegular Γ
           → Γ ⊢r A
-          → Γ ⊢d ∞ # A ⌞ ≤ ⌝ A
+          → Γ ⊢d ∞ # A ≤ A
 sd-refl-∞ regΓ ⊢r-int = s-int regΓ
 sd-refl-∞ regΓ (⊢r-var-∙ inΓ) = s-var-∙ regΓ inΓ
 sd-refl-∞ regΓ (⊢r-arr regA regA₁) = s-arr₁ (sd-refl-∞ regΓ regA) (sd-refl-∞ regΓ regA₁)
@@ -102,7 +102,7 @@ find-≫-∙ (f-𝕥 fd upj) ninΓ inΓ (grd-∀ grd) = f-𝕥 (find-≫-∙ fd 
 sound : Γ ⊢i j # A ⌞ ≤ ⌝ B
       → Γ ≫ A ⇘ A%
       → Γ ≫ B ⇘ B%
-      → Γ ⊢d j # A% ⌞ ≤ ⌝ B%
+      → Γ ⊢d j # A% ≤ B%
 sound (s-refl regΔ cloA grd) grd1 grd2
   with refl ← ≫-unique grd1 grd
   with refl ← ⊢r-≫-eq' (⊢c-≫-⊢r regΔ cloA grd1) grd2 = s-refl regΔ (⊢c-≫-⊢r regΔ cloA grd)

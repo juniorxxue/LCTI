@@ -6,54 +6,54 @@ open import Implicit.Language.All
 --+                           Subtyping                            +--
 ----------------------------------------------------------------------
 
-infix 3 _⊢_#_⌞_⌝_
-data _⊢_#_⌞_⌝_ : Env n m → Counter m → Type m → Polar → Type m → Set where
+infix 3 _⊢_#_≤_
+data _⊢_#_≤_ : Env n m → Counter m → Type m → Type m → Set where
   s-refl :
       (regΔ : SRegular Δ)
     → (cloA : Δ ⊢r A)
-    → Δ ⊢ Z # A ⌞ ≤⁺ ⌝ A
+    → Δ ⊢ Z # A ≤ A
   s-int :
       (regΔ : SRegular Δ)
-    → Δ ⊢ ∞ # Int ⌞ ≤ ⌝ Int
+    → Δ ⊢ ∞ # Int ≤ Int
   s-var-∙ :
       (regΔ : SRegular Δ)
     → (inΔ : Δ ∋∙ X)
-    → Δ ⊢ ∞ # ‶ X ⌞ ≤ ⌝ ‶ X
+    → Δ ⊢ ∞ # ‶ X ≤ ‶ X
   s-arr₁ :
-      Δ ⊢ ∞ # C ⌞ ⋆ ≤ ⌝ A
-    → Δ ⊢ ∞ # B ⌞ ≤ ⌝ D
-    → Δ ⊢ ∞ # A `→ B ⌞ ≤ ⌝ C `→ D
+      Δ ⊢ ∞ # C ≤ A
+    → Δ ⊢ ∞ # B ≤ D
+    → Δ ⊢ ∞ # A `→ B ≤ C `→ D
   s-arr₂ :
-      Δ ⊢ ∞ # C ⌞ ≤⁻ ⌝ A
-    → Δ ⊢ j # B ⌞ ≤⁺ ⌝ D
-    → Δ ⊢ 𝕚 j # A `→ B ⌞ ≤⁺ ⌝ C `→ D
+      Δ ⊢ ∞ # C ≤ A
+    → Δ ⊢ j # B ≤ D
+    → Δ ⊢ 𝕚 j # A `→ B ≤ C `→ D
   s-arr₃ :
       (regA : Δ ⊢r A)
-    → Δ ⊢ j # B ⌞ ≤⁺ ⌝ D
-    → Δ ⊢ 𝕔 j # A `→ B ⌞ ≤⁺ ⌝ A `→ D
+    → Δ ⊢ j # B ≤ D
+    → Δ ⊢ 𝕔 j # A `→ B ≤ A `→ D
   s-∀ :
-      Δ ,∙ ⊢ ∞ # A ⌞ ≤ ⌝ B
-    → Δ ⊢ ∞ # `∀ A ⌞ ≤ ⌝ `∀ B
+      Δ ,∙ ⊢ ∞ # A ≤ B
+    → Δ ⊢ ∞ # `∀ A ≤ `∀ B
   s-∀l :
       (grd : (Γ ,= B) ≫ A ⇘ A%)
     → (regA : Γ ,∙ ⊢r A)
-    → Γ ,= B ⊢ j' # A% ⌞ ≤⁺ ⌝ C' `→ D'
+    → Γ ,= B ⊢ j' # A% ≤ C' `→ D'
     → (ic : (𝕚𝕔 j))
     → (fd : find A #0 j')
     → (upC : ↑ty0 C ⇘ C')
     → (upD : ↑ty0 D ⇘ D')
     → (upj : ↑tyʲ0 j ⇘ j')
-    → Γ ⊢ j # `∀ A ⌞ ≤⁺ ⌝ C `→ D
+    → Γ ⊢ j # `∀ A ≤ C `→ D
   s-tapp :
       (Δ ,= B) ≫ A ⇘ A%
     → (regA : Δ ,∙ ⊢r A)
-    → Δ ,= B ⊢ j' # A% ⌞ ≤⁺ ⌝ C
+    → Δ ,= B ⊢ j' # A% ≤ C
     → (upj : ↑tyʲ0 j ⇘ j')
-    → Δ ⊢ 𝕥₍ B ₎ j # `∀ A ⌞ ≤⁺ ⌝ `∀ C
+    → Δ ⊢ 𝕥₍ B ₎ j # `∀ A ≤ `∀ C
 
 
 
-s2-sregular : Γ ⊢ j # A ⌞ ≤ ⌝ B
+s2-sregular : Γ ⊢ j # A ≤ B
             → SRegular Γ
 s2-sregular (s-refl regΔ cloA) = regΔ
 s2-sregular (s-int regΔ) = regΔ
@@ -69,10 +69,10 @@ s2-sregular (s-tapp x regA s upj) with s2-sregular s
 ... | reg-S= r regA = r
 
 
-s2-⊢r-l : Γ ⊢ j # A ⌞ ≤ ⌝ B
+s2-⊢r-l : Γ ⊢ j # A ≤ B
         → Γ ⊢r A
 
-s2-⊢r-r : Γ ⊢ j # A ⌞ ≤ ⌝ B
+s2-⊢r-r : Γ ⊢ j # A ≤ B
          → Γ ⊢r B
 
 
@@ -96,12 +96,12 @@ s2-⊢r-r (s-∀ s) = ⊢r-∀ (s2-⊢r-r s)
 s2-⊢r-r (s-∀l grd regA s ic fd upC upD upj) = ⊢r-strengthen=0 (s2-⊢r-r s) (↑ty-arr upC upD)
 s2-⊢r-r (s-tapp x regA s upj) = ⊢r-∀ (⊢r-◆0 (s2-⊢r-r s))
 
-s2-weaken= : Γ ⊢ j # A ⌞ ≤ ⌝ B
+s2-weaken= : Γ ⊢ j # A ≤ B
            → Γ ▶ k ,= T ⇘ Γ'
             → A ↑ty k ⇘ A'
             → B ↑ty k ⇘ B'
             → j ↑tyʲ k ⇘ j'
-            → Γ' ⊢ j' # A' ⌞ ≤ ⌝ B'
+            → Γ' ⊢ j' # A' ≤ B'
 s2-weaken= (s-refl regΔ cloA) new upA upB ↑tyʲ-Z
   with refl ← ↑ty-unique upA upB = s-refl (sregular-weaken= regΔ new) (⊢r-weaken= cloA new upB)
 s2-weaken= (s-int regΔ) new ↑ty-int ↑ty-int ↑tyʲ-∞ = s-int (sregular-weaken= regΔ new)
@@ -134,10 +134,10 @@ s2-weaken= {k = k} {T = T}  {j' = 𝕥₍  _ ₎ j'} (s-tapp {B = B} {A% = A%} x
            (s2-weaken= s (▶S= new upT upA₁) upA% upB (↑tyʲ-comm0' upj upj₂ upj₁)) upj₂
 
 
-s2-weaken=0 : Γ ⊢ j # A ⌞ ≤ ⌝ B
+s2-weaken=0 : Γ ⊢ j # A ≤ B
             → ↑ty0 A ⇘ A'
             → ↑ty0 B ⇘ B'
             → ↑tyʲ0 j ⇘ j'
             → Γ ⊢r T
-            → Γ ,= T ⊢ j' # A' ⌞ ≤ ⌝ B'
+            → Γ ,= T ⊢ j' # A' ≤ B'
 s2-weaken=0 s upA upB upj regT = s2-weaken= s (▶Z regT) upA upB upj

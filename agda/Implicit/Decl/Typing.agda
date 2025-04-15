@@ -35,7 +35,7 @@ data _⊢_#_⦂_ : Env n m → Counter m → Term n m → Type m → Set where
     → Γ ⊢ j # e₁ · e₂ ⦂ B
   ⊢sub :
       Γ ⊢ Z # g ⦂ A
-    → (B≤A : Γ ⋈ ⊢ j # A ⌞ ≤⁺ ⌝ B)
+    → (B≤A : Γ ⋈ ⊢ j # A ≤ B)
     → (gc : GenericConsumer g)
     → (j≢Z : NonZ j)
     → Γ ⊢ j # g ⦂ B
@@ -49,7 +49,7 @@ data _⊢_#_⦂_ : Env n m → Counter m → Term n m → Type m → Set where
 
 
 
-s-sregular : Γ ⊢ j # A ⌞ ≤ ⌝ B
+s-sregular : Γ ⊢ j # A ≤ B
            → SRegular Γ
 s-sregular (s-refl regΔ cloA) = regΔ
 s-sregular (s-int regΔ) = regΔ
@@ -98,7 +98,7 @@ t-tregular (⊢tapp ⊢e st) = t-tregular ⊢e
 ⊢rʲ-strengthen,0 (rj-𝕥 regj regA) = rj-𝕥 (⊢rʲ-strengthen,0 regj) (⊢r-strengthen,0 regA)
 
 
-s-⊢rʲ : Γ ⊢ j # A ⌞ ≤ ⌝ B
+s-⊢rʲ : Γ ⊢ j # A ≤ B
       → Γ ⊢rʲ j
 s-⊢rʲ (s-refl regΔ cloA) = rj-Z
 s-⊢rʲ (s-int regΔ) = rj-∞
@@ -190,15 +190,15 @@ find-≋ (f-𝕥 fd upj) (𝕥≋ {nj = nj} ~j)
   = f-𝕥 (find-≋ fd (↑ty-≋ ~j upj upnj)) upnj
 
 
-s-trans-∞ : Γ ⊢ ∞ # A ⌞ ≤ ⌝ B
-          → Γ ⊢ ∞ # B ⌞ ≤ ⌝ C
-          → Γ ⊢ ∞ # A ⌞ ≤ ⌝ C
+s-trans-∞ : Γ ⊢ ∞ # A ≤ B
+          → Γ ⊢ ∞ # B ≤ C
+          → Γ ⊢ ∞ # A ≤ C
 s-trans-∞ (s-int regΔ) (s-int regΔ₁) = s-int regΔ
 s-trans-∞ (s-var-∙ regΔ inΔ) s2 = s2
 s-trans-∞ (s-arr₁ s1 s3) (s-arr₁ s2 s4) = s-arr₁ (s-trans-∞ s2 s1) (s-trans-∞ s3 s4)
 s-trans-∞ (s-∀ s1) (s-∀ s2) = s-∀ (s-trans-∞ s1 s2)
 
-s-trans-∞-eq : Γ ⊢ ∞ # A ⌞ ≤ ⌝ B
+s-trans-∞-eq : Γ ⊢ ∞ # A ≤ B
              → A ≡ B
 s-trans-∞-eq (s-int regΔ) = refl
 s-trans-∞-eq (s-var-∙ regΔ inΔ) = refl
@@ -208,16 +208,16 @@ s-trans-∞-eq (s-∀ s) = cong `∀_ (s-trans-∞-eq s)
 
 s-refl-∞ : SRegular Γ
          → Γ ⊢r A
-         → Γ ⊢ ∞ # A ⌞ ≤ ⌝ A
+         → Γ ⊢ ∞ # A ≤ A
 s-refl-∞ regΓ ⊢r-int = s-int regΓ
 s-refl-∞ regΓ (⊢r-var-∙ inΓ) = s-var-∙ regΓ inΓ
 s-refl-∞ regΓ (⊢r-arr regA regA₁) = s-arr₁ (s-refl-∞ regΓ regA) (s-refl-∞ regΓ regA₁)
 s-refl-∞ regΓ (⊢r-∀ regA) = s-∀ (s-refl-∞ (reg-S∙ regΓ) regA)
 
-s-trans : Γ ⊢ j # A ⌞ ≤⁺ ⌝ B
+s-trans : Γ ⊢ j # A ≤ B
         → j ≋ j'
-        → Γ ⊢ j' # B ⌞ ≤⁺ ⌝ C
-        → Γ ⊢ j' # A ⌞ ≤⁺ ⌝ C
+        → Γ ⊢ j' # B ≤ C
+        → Γ ⊢ j' # A ≤ C
 s-trans (s-refl regΔ cloA) ~j s2 = s2
 s-trans (s-arr₂ s1 s3) (𝕚≋ ~j) (s-arr₂ s2 s4) = s-arr₂ (s-trans-∞ s2 s1) (s-trans s3 ~j s4)
 s-trans (s-arr₃ regA s1) (𝕔≋ ~j) (s-arr₃ regA₁ s2) = s-arr₃ regA (s-trans s1 ~j s2)
@@ -234,7 +234,7 @@ s-trans (s-tapp regB st s1 upC) (𝕥≋ ~j) (s-tapp regB₁ st₁ s2 upC₁)
 
 gen-sub : Γ ⊢ j # e ⦂ A
         → j ≋ j'
-        → Γ ⋈ ⊢ j' # A ⌞ ≤⁺ ⌝ B
+        → Γ ⋈ ⊢ j' # A ≤ B
         → Γ ⊢ j' # e ⦂ B
 gen-sub {j' = Z} ⊢e Z≋ (s-refl regΔ cloA) = ⊢e
 
@@ -286,6 +286,6 @@ gen-sub {j' = 𝕥₍ A ₎ j'} {B = B} (⊢tapp ⊢e st) ~j s
   = ⊢tapp (gen-sub ⊢e (𝕥≋ ~j) (s-tapp (⊢r-𝕣 regA) st s upB)) (↑ty-st upB)
 
 gen-sub0 : Γ ⊢ Z # g ⦂ A
-         → Γ ⋈ ⊢ j # A ⌞ ≤⁺ ⌝ B
+         → Γ ⋈ ⊢ j # A ≤ B
          → Γ ⊢ j # g ⦂ B
 gen-sub0 ⊢e s = gen-sub ⊢e Z≋ s

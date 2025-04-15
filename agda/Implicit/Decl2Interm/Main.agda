@@ -1,7 +1,7 @@
 module Implicit.Decl2Interm.Main where
 
 open import Implicit.Language.All
-open import Implicit.Decl.All renaming (_⊢_#_⌞_⌝_ to _⊢d_#_⌞_⌝_)
+open import Implicit.Decl.All renaming (_⊢_#_≤_ to _⊢d_#_≤_)
 open import Implicit.Interm.All renaming (_⊢_#_⌞_⌝_ to _⊢i_#_⌞_⌝_)
 
 infix 3 _≫_⇘_by_
@@ -27,7 +27,7 @@ data _≫_⇘_by_ where
           → (upj : ↑tyʲ0 j ⇘ j')
           → Δ ≫ `∀ A ⇘ `∀ A% by 𝕥₍ B ₎ j
 
-⊢d-refl-eq : Γ ⊢d ∞ # A ⌞ ≤ ⌝ B
+⊢d-refl-eq : Γ ⊢d ∞ # A ≤ B
            → A ≡ B
 ⊢d-refl-eq (s-int regΔ) = refl
 ⊢d-refl-eq (s-var-∙ regΔ inΔ) = refl
@@ -145,11 +145,11 @@ find-≫-∙ (f-𝕥 fd upj) ninΓ inΓ (grd-∀ grd upj₁)
 
 
 
-complete+ : Γ ⊢d j # A% ⌞ ≤⁺ ⌝ B
+complete+ : Γ ⊢d j # A% ≤ B
           → Γ ≫ A ⇘ A% by j
           → Γ ⊢i j # A ⌞ ≤⁺ ⌝ B
 
-complete- : Γ ⊢d ∞ # A ⌞ ≤⁻ ⌝ B%
+complete- : Γ ⊢d ∞ # A ≤ B%
           → Γ ≫ B ⇘ B%
           → Γ ⊢i ∞ # A ⌞ ≤⁻ ⌝ B
 
@@ -192,11 +192,11 @@ complete- (s-∀ s) (grd-var= x)
   with refl ← ⊢d-refl-eq s = s-svar-r (s2-sregular (s-∀ s)) x
 complete- (s-∀ s) (grd-∀ grd) = s-∀ (complete- s grd)
 
-complete0 : Γ ⊢d Z # A ⌞ ≤ ⌝ B
-          → Γ ⊢i Z # A ⌞ ≤ ⌝ B
+complete0 : Γ ⊢d Z # A ≤ B
+          → Γ ⊢i Z # A ⌞ ≤⁺ ⌝ B
 complete0 (s-refl regΔ cloA) = complete+ (s-refl regΔ cloA) (grd-Z (⊢r-≫-eq cloA))
 
-complete∞ : Γ ⊢d ∞ # A ⌞ ≤ ⌝ B
+complete∞ : Γ ⊢d ∞ # A ≤ B
           → Γ ⊢i ∞ # A ⌞ ≤ ⌝ B
 complete∞ {≤ = ≤⁺} s = complete+ s (grd-∞ (⊢r-≫-eq (s2-⊢r-l s)))
 complete∞ {≤ = ≤⁻} s = complete- s (⊢r-≫-eq (s2-⊢r-r s))

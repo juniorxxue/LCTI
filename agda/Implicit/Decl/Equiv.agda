@@ -1,10 +1,9 @@
 module Implicit.Decl.Equiv where
 
 open import Implicit.Language.All
-open import Implicit.Decl.Subtyping renaming (_⊢_#_⌞_⌝_ to _⊢¹_#_⌞_⌝_)
-open import Implicit.Decl.SubtypingV2 renaming (_⊢_#_⌞_⌝_ to _⊢²_#_⌞_⌝_)
+open import Implicit.Decl.Subtyping renaming (_⊢_#_≤_ to _⊢¹_#_≤_)
+open import Implicit.Decl.SubtypingV2 renaming (_⊢_#_≤_ to _⊢²_#_≤_)
 open import Implicit.Decl.AuxLemmas
-
 
 
 
@@ -32,19 +31,21 @@ open import Implicit.Decl.AuxLemmas
 ▶∙-punchOut {k = #S k} {X = #S X} ¬p (S= inΓ) (▶S= new x) = S= (▶∙-punchOut (λ x₁ → ¬p (cong #S x₁)) inΓ new)
 ▶∙-punchOut {k = #S k} {X = #S X} ¬p (S⋈ inΓ) (▶S⋈ new) = S⋈ (▶∙-punchOut ¬p inΓ new)
 
-st-⊢r' : Γ ⊢r A*
+
+st-⊢r'' : Γ ⊢r A*
        → Γ ▶ k ,∙⇘ Γ'
        → Γ ⊢r T
        → ⟦ k / T ⟧ A ⇘ A*
        → Γ' ⊢r A
-st-⊢r' ⊢r-int new regT st-int = ⊢r-int
-st-⊢r' ⊢r-int new regT (st-var stx-eq) = ⊢r-var-∙ (▶∙-∋∙ new)
-st-⊢r' (⊢r-var-∙ inΓ) new regT (st-var stx-eq) = ⊢r-var-∙ (▶∙-∋∙ new)
-st-⊢r' (⊢r-var-∙ inΓ) new regT (st-var (stx-neq ¬p)) = ⊢r-var-∙ (▶∙-punchOut ¬p inΓ new)
-st-⊢r' (⊢r-arr regA regA₁) new regT (st-var stx-eq) = st-⊢r' regA₁ new regA₁ (st-var stx-eq)
-st-⊢r' (⊢r-arr regA regA₁) new regT (st-arr st st₁) = ⊢r-arr (st-⊢r' regA new regT st) (st-⊢r' regA₁ new regT st₁)
-st-⊢r' (⊢r-∀ regA) new regT (st-var stx-eq) = ⊢r-var-∙ (▶∙-∋∙ new)
-st-⊢r' (⊢r-∀ regA) new regT (st-∀ up st) = ⊢r-∀ (st-⊢r' regA (▶S∙ new) (⊢r-weaken∙0 regT up) st)
+st-⊢r'' ⊢r-int new regT st-int = ⊢r-int
+st-⊢r'' ⊢r-int new regT (st-var stx-eq) = ⊢r-var-∙ (▶∙-∋∙ new)
+st-⊢r'' (⊢r-var-∙ inΓ) new regT (st-var stx-eq) = ⊢r-var-∙ (▶∙-∋∙ new)
+st-⊢r'' (⊢r-var-∙ inΓ) new regT (st-var (stx-neq ¬p)) = ⊢r-var-∙ (▶∙-punchOut ¬p inΓ new)
+st-⊢r'' (⊢r-arr regA regA₁) new regT (st-var stx-eq) = st-⊢r'' regA₁ new regA₁ (st-var stx-eq)
+st-⊢r'' (⊢r-arr regA regA₁) new regT (st-arr st st₁) = ⊢r-arr (st-⊢r'' regA new regT st) (st-⊢r'' regA₁ new regT st₁)
+st-⊢r'' (⊢r-∀ regA) new regT (st-var stx-eq) = ⊢r-var-∙ (▶∙-∋∙ new)
+st-⊢r'' (⊢r-∀ regA) new regT (st-∀ up st) = ⊢r-∀ (st-⊢r'' regA (▶S∙ new) (⊢r-weaken∙0 regT up) st)
+
 
 infix 3 _▶'_,=_⇘_
 data _▶'_,=_⇘_ : Env n m → Fin (1 + m) → Type m → Env n (1 + m) → Set where
@@ -161,8 +162,8 @@ st-↑ty-≫0 : ⟦ B ⟧ A ⇘ A*
           → Γ ,= B ≫ A ⇘ A*'
 st-↑ty-≫0 st regA upA* regB = st-↑ty-≫ st upA* regA (▶'Z regB)
 
-sound : Γ ⊢¹ j # A ⌞ ≤ ⌝ B
-      → Γ ⊢² j # A ⌞ ≤ ⌝ B
+sound : Γ ⊢¹ j # A ≤ B
+      → Γ ⊢² j # A ≤ B
 sound (s-refl regΔ cloA) = s-refl regΔ cloA
 sound (s-int regΔ) = s-int regΔ
 sound (s-var-∙ regΔ inΔ) = s-var-∙ regΔ inΔ
@@ -175,15 +176,15 @@ sound (s-∀l {B = B} {A* = A*} {C = C} {D = D} regB st s ic fd upj)
   with ⟨ D' , upD ⟩ ← ↑ty0-total D
   with ⟨ A*' , upA* ⟩ ← ↑ty0-total A*
   with regA* ← s1-⊢r-l s
-  with regA ← st-⊢r' regA* ▶Z regB st
+  with regA ← st-⊢r'' regA* ▶Z regB st
   = s-∀l {B = B} {A% = A*'} (st-↑ty-≫0 st regA* upA* regB) regA (s2-weaken=0 (sound s) upA* (↑ty-arr upC upD) upj regB) ic fd upC upD upj
 sound (s-tapp {A* = A*} {j = j} regB st s upC)
   with ⟨ A*' , upA* ⟩ ← ↑ty0-total A*
   with ⟨ j' , upj ⟩ ← ↑tyʲ0-total j
-  = s-tapp (st-↑ty-≫0 st (s1-⊢r-l s) upA* regB) (st-⊢r' (s1-⊢r-l s) ▶Z regB st) (s2-weaken=0 (sound s) upA* upC upj regB) upj
+  = s-tapp (st-↑ty-≫0 st (s1-⊢r-l s) upA* regB) (st-⊢r'' (s1-⊢r-l s) ▶Z regB st) (s2-weaken=0 (sound s) upA* upC upj regB) upj
 
-complete : Γ ⊢² j # A ⌞ ≤ ⌝ B
-         → Γ ⊢¹ j # A ⌞ ≤ ⌝ B
+complete : Γ ⊢² j # A ≤ B
+         → Γ ⊢¹ j # A ≤ B
 complete (s-refl regΔ cloA) = s-refl regΔ cloA
 complete (s-int regΔ) = s-int regΔ
 complete (s-var-∙ regΔ inΔ) = s-var-∙ regΔ inΔ
