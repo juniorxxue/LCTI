@@ -1,6 +1,6 @@
 module Implicit.Interm.Properties.Regularity where
 
-open import Implicit.Language.All
+open import Implicit.Language.All hiding (_⊢rʲ_)
 open import Implicit.Interm.Base
 
 s-sregular : Γ ⊢ j # A ⌞ ≤ ⌝ B
@@ -106,5 +106,3 @@ t-⊢rʲ (⊢sub ⊢e B≤A gc j≢Z) = ⊢r-⋈ (s-⊢rʲ B≤A)
 t-⊢rʲ (⊢tabs ⊢e) = j-Z
 t-⊢rʲ (⊢tapp ⊢e st) with t-⊢rʲ ⊢e
 ... | j-𝕥 r x = r
-
-

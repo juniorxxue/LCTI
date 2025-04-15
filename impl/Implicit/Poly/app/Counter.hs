@@ -41,7 +41,7 @@ need (Var _) = N 0
 need (Abs e) = suc $ need e
 need (App t1 t2) = prd (need t1)
 need (Ann e tyA) = N 0
-need (TAbs e) = need e
+need (TAbs e) = N 0
 need (TApp e tyA) = need e
 
 
