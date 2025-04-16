@@ -115,6 +115,7 @@ data Counter : ℕ → Set where
 variable
   j j′ j″  : Counter m
   j' j'' : Counter m
+  j₁ j₂ j₃ : Counter m
 
 data NonZ : Counter m → Set where
   nz-∞ : NonZ (Counter m ∋⦂ ∞)

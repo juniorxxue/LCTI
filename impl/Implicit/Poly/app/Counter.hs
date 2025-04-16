@@ -42,7 +42,7 @@ need (Abs e) = suc $ need e
 need (App t1 t2) = prd (need t1)
 need (Ann e tyA) = N 0
 need (TAbs e) = N 0
-need (TApp e tyA) = need e
+need (TApp e tyA) = N 0
 
 
 instance Eq Counter where
