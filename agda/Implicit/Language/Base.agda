@@ -116,6 +116,7 @@ variable
   j j′ j″  : Counter m
   j' j'' : Counter m
   j₁ j₂ j₃ : Counter m
+  p p₁ p₂ : Counter m -- used in algo for case analysis
 
 data NonZ : Counter m → Set where
   nz-∞ : NonZ (Counter m ∋⦂ ∞)
@@ -142,3 +143,17 @@ data GenericConsumer : Term n m → Set where
   gc-var : ∀ {x} → GenericConsumer (Term n m ∋⦂ ` x)
   gc-ann : ∀ {e : Term n m} {A} → GenericConsumer (e ⦂ A)
   gc-tlam : ∀ {e : Term n (1 + m)} → GenericConsumer (Λ e)
+
+
+data Need : Term n m → Counter m → Set where
+  need-lit : ∀ {num} → Need (Term n m ∋⦂ (lit num)) Z
+  need-var : Need (Term n m ∋⦂ ` x) Z
+  need-ann : Need (e ⦂ A) Z
+  need-lam : Need e j
+           → Need (ƛ e) (𝕚 j)
+  need-app1 : Need e₁ Z
+           → Need (e₁ · e₂) Z
+  need-app2 : Need e₁ (𝕚 j)
+            → Need (e₁ · e₂) j
+  need-tabs : Need (Λ e) Z
+  need-tapp : Need (e ⓪ A) Z

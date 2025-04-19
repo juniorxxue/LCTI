@@ -51,7 +51,7 @@ s-env-in : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
          → SRegular Γ
 s-env-in (s-empty cloΓ cloA x) = cloΓ
 s-env-in (s-type ss) = ss-env-in ss
-s-env-in (s-term-c cloA ap ⊢e s) = s-env-in s
+s-env-in (s-term-c nd s cloA ap ⊢e) = s-env-in s
 s-env-in (s-term-o opnA ⊢e x s) = ss-env-in x
 s-env-in (s-∀l s upᶜ upᵉ upC upD) with s-env-in s
 ... | reg-S^ r = r
@@ -130,7 +130,7 @@ s-⊢rᶜ : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
       → Γ ⊢rᶜ Σ
 s-⊢rᶜ (s-empty regΓ cloA grd) = ⊢rᶜ-empty
 s-⊢rᶜ (s-type ss) = ⊢rᶜ-τ (ss-polarity+ ss)
-s-⊢rᶜ (s-term-c cloA ap ⊢e s) = ⊢rᶜ-term (s-⊢rᶜ s)
+s-⊢rᶜ (s-term-c nd s cloA ap ⊢e) = ⊢rᶜ-term (s-⊢rᶜ s)
 s-⊢rᶜ (s-term-o opnA ⊢e ss s) = ⊢rᶜ-term (⊆-⊢rᶜ' (s-⊢rᶜ s) (ss-⊆ ss))
 s-⊢rᶜ (s-∀l s upᶜ upᵉ upC upD) with s-⊢rᶜ s
 ... | ⊢rᶜ-term r = ⊢rᶜ-term (⊢rᶜ-strengthen^0 r upᶜ)
@@ -161,7 +161,7 @@ t-⊢r : Γ ⊢ Σ ⇒ e ⇒ A
 
 s-⊢r (s-empty regΓ cloA x) = ⊢c-≫-⊢r regΓ cloA x
 s-⊢r (s-type ss) = ss-polarity+ ss
-s-⊢r (s-term-c cloA ap ⊢e s) = ⊢r-arr (⊢c-≫-⊢r (s-env-in s) cloA ap) (s-⊢r s)
+s-⊢r (s-term-c nd s cloA ap ⊢e) = ⊢r-arr (⊆-⊢r' (⊢c-≫-⊢r (s-env-out s) cloA ap) (s-⊆ s)) (s-⊢r s)
 s-⊢r (s-term-o opnA ⊢e ss s) = ⊢r-arr (⊢r-𝕣 (t-⊢r ⊢e)) (⊆-⊢r' (s-⊢r s) (ss-⊆ ss))
 s-⊢r (s-∀l s upᶜ upᵉ upC upD) = ⊢r-strengthen^0 (s-⊢r s) (↑ty-arr upC upD)
 s-⊢r (s-tapp s upᶜ) = ⊢r-∀ (⊢r-◆0 (s-⊢r s))

@@ -6,7 +6,7 @@ open import Implicit.Algo.Properties.Extension
 open import Implicit.Algo.Properties.Shift
 open import Implicit.Algo.Properties.Id
 open import Implicit.Algo.Properties.Regularity
-
+open import Implicit.AuxOrder
 
 ◀,-⊆-total : Γ ⊆ Δ
            → Γ ◀ k ,⇘ Γ'
@@ -69,10 +69,10 @@ s-strengthen, (s-empty regΓ cloA x) newΓ newΔ ↑tmᶜ-□ with refl ← ◀,
                                                                                                (⊢c-strengthen, cloA newΓ)
                                                                                                (≫-strengthen, x newΓ)
 s-strengthen, (s-type ss) newΓ newΔ ↑tmᶜ-τ = s-type (ss-strengthen, ss newΓ newΔ)
-s-strengthen, (s-term-c cloA ap ⊢e s) newΓ newΔ (↑tmᶜ-e up-e upΣ) = s-term-c (⊢c-strengthen, cloA newΓ) (≫-strengthen, ap newΓ)
-                                                                             (t-strengthen, ⊢e (◀,-𝕣 newΓ) ↑tmᶜ-τ up-e) (s-strengthen, s newΓ newΔ upΣ)
+s-strengthen, (s-term-c nd s cloA ap ⊢e) newΓ newΔ (↑tmᶜ-e up-e upΣ)
+  = s-term-c (need-↑tm' nd up-e) (s-strengthen, s newΓ newΔ upΣ) (⊢c-strengthen, cloA newΔ) (≫-strengthen, ap newΔ) (t-strengthen, ⊢e (◀,-𝕣 newΔ) ↑tmᶜ-τ up-e)
 s-strengthen, (s-term-o opnA ⊢e ss s) newΓ newΔ (↑tmᶜ-e up-e upΣ) with ◀,-⊆-total (ss-⊆ ss) newΓ
-... | ⟨ Ω' , newΩ ⟩ = s-term-o (⊢o-strengthen, opnA newΓ) (t-strengthen, ⊢e (◀,-𝕣 newΓ) ↑tmᶜ-□ up-e) (ss-strengthen, ss newΓ newΩ) (s-strengthen, s newΩ newΔ upΣ)
+... | ⟨ Ω' , newΩ ⟩ = s-term-o (need-↑tm' opnA up-e) (t-strengthen, ⊢e (◀,-𝕣 newΓ) ↑tmᶜ-□ up-e) (ss-strengthen, ss newΓ newΩ) (s-strengthen, s newΩ newΔ upΣ)
 s-strengthen, (s-∀l s upᶜ upᵉ upC upD) newΓ newΔ (↑tmᶜ-e {e = e} {Σ = Σ} up-e upΣ)
   with ⟨ Σ' , upΣ' ⟩ ← ↑tyᶜ0-total Σ
   with ⟨ e' , upe ⟩ ← ↑tyᵉ0-total e

@@ -108,6 +108,7 @@ data _⨟_▶s_,_⇘_⨟_ : Env n m → Env n m → Fin (1 + n) → Type m → E
 ▶⨟,-▶,-l (▶S= new x) = ▶S= (▶⨟,-▶,-l new) x
 ▶⨟,-▶,-l (▶S^= new x) = ▶S^ (▶⨟,-▶,-l new) x
 
+
 ▶s⨟,-▶s,-l : Γ ⨟ Δ ▶s k , T ⇘ Γ' ⨟ Δ'
            → Γ ▶s k , T ⇘ Γ'
 ▶s⨟,-▶s,-l (▶sS⋈ x) = ▶sS⋈ (▶⨟,-▶,-l x)
@@ -116,6 +117,7 @@ data _⨟_▶s_,_⇘_⨟_ : Env n m → Env n m → Fin (1 + n) → Type m → E
 ▶s⨟,-▶s,-l (▶sS∙ new x) = ▶sS∙ (▶s⨟,-▶s,-l new) x
 ▶s⨟,-▶s,-l (▶sS= new x) = ▶sS= (▶s⨟,-▶s,-l new) x
 ▶s⨟,-▶s,-l (▶sS^= new x) = ▶sS^ (▶s⨟,-▶s,-l new) x
+
 
 ▶,-▶⨟, : Γ ▶ k , T ⇘ Γ'
        → Γ ⨟ Γ ▶ k , T ⇘ Γ' ⨟ Γ'

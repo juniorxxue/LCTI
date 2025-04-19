@@ -54,7 +54,7 @@ s-id' : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
 
 s-id' (s-empty regΓ cloA grd) = id-□
 s-id' (s-type ss) = id-τ
-s-id' (s-term-c cloA ap ⊢e s) = id-e (s-id' s)
+s-id' (s-term-c nd s cloA ap ⊢e) = id-e (s-id' s)
 s-id' (s-term-o opnA ⊢e ss s) = id-e (s-id' s)
 s-id' (s-∀l s upᶜ upᵉ upC upD) with s-id' s
 ... | id-e r = id-e (id-st' {T = Int} r (↑tyᶜ-st upᶜ) (↑ty-st upD))

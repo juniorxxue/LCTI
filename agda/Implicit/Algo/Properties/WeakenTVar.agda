@@ -76,13 +76,14 @@ t-weaken, (⊢tapp ⊢e st) new upΣ (↑tm-⓪ upe) = ⊢tapp (t-weaken, ⊢e n
 s-weaken, (s-empty regΓ cloA grd) ↑tmᶜ-□ new
    with refl ← ▶s⨟,-unique new = s-empty (sregular-weaken,s regΓ (▶s⨟,-▶s,-l new)) (⊢c-weaken,s cloA (▶s⨟,-▶s,-l new)) (≫-weaken,s grd (▶s⨟,-▶s,-l new))
 s-weaken, (s-type ss) ↑tmᶜ-τ new = s-type (ss-weaken, ss new)
-s-weaken, (s-term-c cloA ap ⊢e s) (↑tmᶜ-e up-e upΣ) new = s-term-c (⊢c-weaken,s cloA (▶s⨟,-▶s,-l new))
+s-weaken, (s-term-c nd s cloA ap ⊢e) (↑tmᶜ-e up-e upΣ) new = s-term-c {!!} (s-weaken, s upΣ new) (⊢c-weaken,s cloA {!!}) {!!} {!!}
+{- s-term-c (⊢c-weaken,s cloA (▶s⨟,-▶s,-l new))
                                                                    (≫-weaken,s ap (▶s⨟,-▶s,-l new))
                                                                    (t-weaken, ⊢e (▶,-▶s,-𝕣 (▶s⨟,-▶s,-l new)) ↑tmᶜ-τ up-e)
-                                                                   (s-weaken, s upΣ new)
+                                                                   (s-weaken, s upΣ new) -}
 s-weaken, (s-term-o opnA ⊢e ss s) (↑tmᶜ-e up-e upΣ) new
   with ⟨ Ω' , ⟨ new1 , new2 ⟩ ⟩ ← ▶s⨟,-Ω-exist new (ss-⊆ ss) (s-⊆ s)
-  = s-term-o (⊢o-weaken,s opnA (▶s⨟,-▶s,-l new))
+  = s-term-o {!!}
              (t-weaken, ⊢e (▶,-▶s,-𝕣 (▶s⨟,-▶s,-l new)) ↑tmᶜ-□ up-e)
              (ss-weaken, ss new1)
              (s-weaken, s upΣ new2)

@@ -75,15 +75,15 @@ data _⊢_≤⁺_⊣_↪_↡_ where
     → Δ ⊢ A ≤⁺ (τ B) ⊣ Ψ ↪ B ↡ ∞
 
   s-term-c :
-      (cloA : Δ ⊢c A)
-    → (ap : Δ ≫ A ⇘ A%)
-    → (⊢e : 𝕣 Δ ⊢ τ A% ⇒ e ⇒ A' ↡ ∞)
+      Need e (𝕚 p)
     → Δ ⊢ B ≤⁺ Σ ⊣ Ψ ↪ D ↡ j
+    → (ap : Ψ ≫ A ⇘ A%)
+    → (⊢e : 𝕣 Ψ ⊢ τ A% ⇒ e ⇒ A' ↡ ∞)
     → Δ ⊢ (A `→ B) ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ A% `→ D ↡ 𝕔 j
 
   s-term-o :
-      (opnA : Δ ⊢o A)
-    → (⊢e : 𝕣 Δ ⊢ □ ⇒ e ⇒ C ↡ Z)
+      Need e Z
+    → (⊢e : 𝕣 Δ ⊢ □ ⇒ e ⇒ C)
     → (ss : Δ ⊢ C ⌞ ≤⁻ ⌝ A ⊣ Ω)
     → Ω ⊢ B ≤⁺ Σ ⊣ Ψ ↪ D ↡ j
     → Δ ⊢ A `→ B ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ C `→ D ↡ 𝕚 j
@@ -105,7 +105,6 @@ data _⊢_≤⁺_⊣_↪_↡_ where
     → (upC : ↑ty0 C ⇘ C')
     → (upD : ↑ty0 D ⇘ D')
     → Δ ⊢ `∀ A ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ C `→ D ↡ (𝕔 j)
-
 
   s-tapp :
       Δ ,= B ⊢ A ≤⁺ Σ' ⊣ Ψ ,= B ↪ C ↡ j'

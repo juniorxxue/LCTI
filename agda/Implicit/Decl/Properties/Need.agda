@@ -3,18 +3,7 @@ module Implicit.Decl.Properties.Need where
 open import Implicit.Language.All
 open import Implicit.Decl.Typing
 
-data Need : Term n m → Counter m → Set where
-  need-lit : ∀ {num} → Need (Term n m ∋⦂ (lit num)) Z
-  need-var : Need (Term n m ∋⦂ ` x) Z
-  need-ann : Need (e ⦂ A) Z
-  need-lam : Need e j
-           → Need (ƛ e) (𝕚 j)
-  need-app1 : Need e₁ Z
-           → Need (e₁ · e₂) Z
-  need-app2 : Need e₁ (𝕚 j)
-            → Need (e₁ · e₂) j
-  need-tabs : Need (Λ e) Z
-  need-tapp : Need (e ⓪ A) Z
+
 
 data Comj : Counter m → Counter m → Set where
   comj-Z : Comj Z j
@@ -25,7 +14,6 @@ data Comj : Counter m → Counter m → Set where
 t-need : Γ ⊢ j # e ⦂ A
        → ∃[ j' ](Need e j'
          × Comj j' j)
-
 
 t-need0 : Γ ⊢ Z # e ⦂ A
         → Need e Z

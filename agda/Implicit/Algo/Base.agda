@@ -113,14 +113,15 @@ data _⊢_≤⁺_⊣_↪_ where
     → Δ ⊢ A ≤⁺ (τ B) ⊣ Ψ ↪ B
 
   s-term-c :
-      (cloA : Δ ⊢c A)
-    → (ap : Δ ≫ A ⇘ A%)
-    → (⊢e : 𝕣 Δ ⊢ τ A% ⇒ e ⇒ A')
+      Need e (𝕚 j)
     → Δ ⊢ B ≤⁺ Σ ⊣ Ψ ↪ D
+    → (cloA : Ψ ⊢c A)
+    → (ap : Ψ ≫ A ⇘ A%)
+    → (⊢e : 𝕣 Ψ ⊢ τ A% ⇒ e ⇒ A')
     → Δ ⊢ (A `→ B) ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ A% `→ D
 
   s-term-o :
-      (opnA : Δ ⊢o A)
+      Need e Z
     → (⊢e : 𝕣 Δ ⊢ □ ⇒ e ⇒ C)
     → (ss : Δ ⊢ C ⌞ ≤⁻ ⌝ A ⊣ Ω)
     → Ω ⊢ B ≤⁺ Σ ⊣ Ψ ↪ D
