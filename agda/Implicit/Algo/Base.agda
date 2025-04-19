@@ -113,7 +113,7 @@ data _⊢_≤⁺_⊣_↪_ where
     → Δ ⊢ A ≤⁺ (τ B) ⊣ Ψ ↪ B
 
   s-term-c :
-      Need e (𝕚 j)
+      (nd : Need e (𝕚 j))
     → Δ ⊢ B ≤⁺ Σ ⊣ Ψ ↪ D
     → (cloA : Ψ ⊢c A)
     → (ap : Ψ ≫ A ⇘ A%)
@@ -121,7 +121,7 @@ data _⊢_≤⁺_⊣_↪_ where
     → Δ ⊢ (A `→ B) ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ A% `→ D
 
   s-term-o :
-      Need e Z
+      (nd : Need e Z)
     → (⊢e : 𝕣 Δ ⊢ □ ⇒ e ⇒ C)
     → (ss : Δ ⊢ C ⌞ ≤⁻ ⌝ A ⊣ Ω)
     → Ω ⊢ B ≤⁺ Σ ⊣ Ψ ↪ D

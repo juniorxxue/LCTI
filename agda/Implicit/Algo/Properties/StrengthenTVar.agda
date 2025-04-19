@@ -17,14 +17,11 @@ open import Implicit.AuxOrder
 ◀,-⊆-total (svar ext regA) (◀S= {A = A} newΓ) = ⟨ ◀,-⊆-total ext newΓ .proj₁ ,= A , ◀S= (◀,-⊆-total ext newΓ .proj₂) ⟩
 ◀,-⊆-total (mark regΓ) (◀S⋈ {Γ' = Γ'} newΓ) = ⟨ Γ' ⋈ , ◀S⋈ newΓ ⟩
 
-inst-strengthen, : [ A / X ] Γ ⟹ Δ
+postulate
+  inst-strengthen, : [ A / X ] Γ ⟹ Δ
                  → Γ ◀ k ,⇘ Γ'
                  → Δ ◀ k ,⇘ Δ'
                  → [ A / X ] Γ' ⟹ Δ'
-inst-strengthen, (⟹^0 up regA env) (◀S^ newΓ) (◀S= newΔ) with refl ← ◀,-unique newΓ newΔ = ⟹^0 up (⊢r-strengthen, regA newΓ) (sregular-strengthen, env newΓ)
-inst-strengthen, (⟹^S inst up1) (◀S^ newΓ) (◀S^ newΔ) = ⟹^S (inst-strengthen, inst newΓ newΔ) up1
-inst-strengthen, (⟹∙S inst up1) (◀S∙ newΓ) (◀S∙ newΔ) = ⟹∙S (inst-strengthen, inst newΓ newΔ) up1
-inst-strengthen, (⟹=S inst up1 regB) (◀S= newΓ) (◀S= newΔ) = ⟹=S (inst-strengthen, inst newΓ newΔ) up1 (⊢r-strengthen, regB newΓ)
 
 ss-strengthen, : Γ ⊢ A ⌞ ≤ ⌝ B ⊣ Δ
                → Γ ◀ k ,⇘ Γ'
@@ -70,9 +67,9 @@ s-strengthen, (s-empty regΓ cloA x) newΓ newΔ ↑tmᶜ-□ with refl ← ◀,
                                                                                                (≫-strengthen, x newΓ)
 s-strengthen, (s-type ss) newΓ newΔ ↑tmᶜ-τ = s-type (ss-strengthen, ss newΓ newΔ)
 s-strengthen, (s-term-c nd s cloA ap ⊢e) newΓ newΔ (↑tmᶜ-e up-e upΣ)
-  = s-term-c (need-↑tm' nd up-e) (s-strengthen, s newΓ newΔ upΣ) (⊢c-strengthen, cloA newΔ) (≫-strengthen, ap newΔ) (t-strengthen, ⊢e (◀,-𝕣 newΔ) ↑tmᶜ-τ up-e)
+  = s-term-c {!need-↑tm'!} (s-strengthen, s newΓ newΔ upΣ) (⊢c-strengthen, cloA newΔ) (≫-strengthen, ap newΔ) (t-strengthen, ⊢e (◀,-𝕣 newΔ) ↑tmᶜ-τ up-e)
 s-strengthen, (s-term-o opnA ⊢e ss s) newΓ newΔ (↑tmᶜ-e up-e upΣ) with ◀,-⊆-total (ss-⊆ ss) newΓ
-... | ⟨ Ω' , newΩ ⟩ = s-term-o (need-↑tm' opnA up-e) (t-strengthen, ⊢e (◀,-𝕣 newΓ) ↑tmᶜ-□ up-e) (ss-strengthen, ss newΓ newΩ) (s-strengthen, s newΩ newΔ upΣ)
+... | ⟨ Ω' , newΩ ⟩ = s-term-o {!!} (t-strengthen, ⊢e (◀,-𝕣 newΓ) ↑tmᶜ-□ up-e) (ss-strengthen, ss newΓ newΩ) (s-strengthen, s newΩ newΔ upΣ)
 s-strengthen, (s-∀l s upᶜ upᵉ upC upD) newΓ newΔ (↑tmᶜ-e {e = e} {Σ = Σ} up-e upΣ)
   with ⟨ Σ' , upΣ' ⟩ ← ↑tyᶜ0-total Σ
   with ⟨ e' , upe ⟩ ← ↑tyᵉ0-total e

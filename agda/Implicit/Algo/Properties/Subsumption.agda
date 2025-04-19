@@ -8,11 +8,11 @@ open import Implicit.Algo.Properties.Reflexivity
 open import Implicit.Algo.Properties.Extension
 open import Implicit.Algo.Properties.Regularity
 open import Implicit.Algo.Properties.Polarity
-open import Implicit.Algo.Properties.StrengthenTVar
-open import Implicit.Algo.Properties.StrengthenSVar
+open import Implicit.Algo.Properties.PStrengthenTVar
+open import Implicit.Algo.Properties.PStrengthenSVar
 open import Implicit.Algo.Properties.Weaken
 open import Implicit.Algo.Properties.Irrelevance
-open import Implicit.Algo.Properties.Trans
+open import Implicit.Algo.Properties.PTrans
 
 ≊-weaken : Σ₁ ≊ Σ₂
          → ↑tmᶜ0 Σ₁ ⇘ Σ₁'
@@ -21,8 +21,6 @@ open import Implicit.Algo.Properties.Trans
 ≊-weaken ≊Z ↑tmᶜ-□ ↑tmᶜ-τ = ≊Z
 ≊-weaken (≊S new) (↑tmᶜ-e up-e up1) (↑tmᶜ-e up-e₁ up2) with refl ← ↑tm-unique up-e up-e₁ = ≊S (≊-weaken new up1 up2)
 ≊-weaken (≊⓪ new) (↑tmᶜ-⓪ up1) (↑tmᶜ-⓪ up2) = ≊⓪ (≊-weaken new up1 up2)
-
-
 
 -- aux lemmas
 t-inf-open-false : Γ ⊢ □ ⇒ e ⇒ A

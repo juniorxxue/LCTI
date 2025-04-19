@@ -92,11 +92,9 @@ data find : Type m → Fin m → Counter m → Set where
             → find A k ∞
   f-arr-𝕚-l : k ε A
             → find (A `→ B) k (𝕚 j)
-  f-arr-𝕚-r : (¬inA : k ¬ε A)
-            → find B k j
+  f-arr-𝕚-r : find B k j
             → find (A `→ B) k (𝕚 j)
-  f-arr-𝕔   : (¬inA : k ¬ε A)
-            → find B k j
+  f-arr-𝕔   : find B k j
             → find (A `→ B) k (𝕔 j)
   f-∀-𝕚     : find A (#S k) (𝕚 j')
             → (upj : ↑tyʲ0 j ⇘ j')

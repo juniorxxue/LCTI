@@ -23,8 +23,8 @@ tc-sound {e = e ⓪ A} (⊢tapp s st) = ⊢tapp (tc-sound s) st
 
 sc-sound (s-empty regΓ cloA x) = s-empty regΓ cloA x
 sc-sound (s-type ss) = s-type ss
-sc-sound (s-term-c cloA ap ⊢e s) = s-term-c cloA ap (tc-sound ⊢e) (sc-sound s)
-sc-sound (s-term-o opnA ⊢e ss s) = s-term-o opnA (tc-sound ⊢e) ss (sc-sound s)
+sc-sound (s-term-c nd s cloA ap ⊢e) = s-term-c nd (sc-sound s) cloA ap (tc-sound ⊢e)
+sc-sound (s-term-o nd ⊢e ss s) = s-term-o nd (tc-sound ⊢e) ss (sc-sound s)
 sc-sound (s-∀l-𝕚 s upᶜ upj upᵉ upC upD) = s-∀l (sc-sound s) upᶜ upᵉ upC upD
 sc-sound (s-∀l-𝕔 s upᶜ upj upᵉ upC upD) = s-∀l (sc-sound s) upᶜ upᵉ upC upD
 sc-sound (s-tapp s upᶜ upj) = s-tapp (sc-sound s) upᶜ

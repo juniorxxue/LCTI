@@ -52,9 +52,9 @@ tc-~ (⊢tapp ⊢e st) with tc-~ ⊢e
 
 sc-~ (s-empty regΓ cloA x) = ~sZ
 sc-~ (s-type ss) = ~s∞
-sc-~ (s-term-c cloA ap ⊢e s) with tc-id0 ⊢e
-... | refl = ~sC (t-⊆-prv (sound ⊢e) (sc-⊆ s)) (sc-~ s)
-sc-~ s'@(s-term-o opnA ⊢e ss s) = ~sI (t-⊆-prv (sound ⊢e) (sc-⊆ s')) (sc-~ s)
+sc-~ (s-term-c nd s cloA ap ⊢e) with tc-id0 ⊢e
+... | refl = ~sC (sound ⊢e) (sc-~ s)
+sc-~ s'@(s-term-o nd ⊢e ss s) = ~sI (t-⊆-prv (sound ⊢e) (sc-⊆ s')) (sc-~ s)
 sc-~ (s-∀l-𝕚 s upᶜ upj upᵉ upC upD) = ~s-strengthen=0 (sc-~ s) (↑ty-arr upC upD) (↑tyᶜ-e upᵉ upᶜ) (↑tyʲ-𝕚 upj)
 sc-~ (s-∀l-𝕔 s upᶜ upj upᵉ upC upD) = ~s-strengthen=0 (sc-~ s) (↑ty-arr upC upD) (↑tyᶜ-e upᵉ upᶜ) (↑tyʲ-𝕔 upj)
 sc-~ (s-tapp {B = B} {C = C} s upᶜ upj)
@@ -75,8 +75,8 @@ sound (⊢tapp ⊢e st) = ⊢tapp (sound ⊢e) st
 
 sound-s (s-empty regΓ cloA x) = s-refl regΓ cloA x
 sound-s (s-type ss) = sound-ss ss
-sound-s (s-term-c cloA ap ⊢e s) with tc-id0 ⊢e
-... | refl = s-arr₃ (⊆-⊢c cloA (sc-⊆ s)) (⊆-⊢c-≫' (sc-⊆ s) cloA ap) (sound-s s)
+sound-s (s-term-c nd s cloA ap ⊢e) with tc-id0 ⊢e
+... | refl = s-arr₃ cloA ap (sound-s s)
 sound-s (s-term-o opnA ⊢e ss s) = s-arr₂ (s-⊆-prv (sound-ss ss) (sc-⊆ s)) (sound-s s)
 sound-s (s-∀l-𝕚 s upᶜ upj upᵉ upC upD) = s-∀l (sound-s s) case-𝕚 (s-find0 s upᵉ upᶜ) upC upD (↑tyʲ-𝕚 upj)
 sound-s (s-∀l-𝕔 s upᶜ upj upᵉ upC upD) = s-∀l (sound-s s) case-𝕔 (s-find0 s upᵉ upᶜ) upC upD (↑tyʲ-𝕔 upj)

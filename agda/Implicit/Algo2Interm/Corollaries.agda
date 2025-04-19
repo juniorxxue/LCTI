@@ -61,9 +61,8 @@ tc-complete (⊢tapp ⊢e st) with tc-complete ⊢e
 
 sc-complete (s-empty regΓ cloA x) = subs ~sZ (s-empty regΓ cloA x)
 sc-complete (s-type ss) = subs ~s∞ (s-type ss)
-sc-complete (s-term-c cloA ap ⊢e s) with sc-complete s | tc-complete ⊢e
-... | subs j~Σ s₁ | typs ~t∞ ⊢e₁ = subs (~sC (t-⊆-prv (sound ⊢e₁) (sc-⊆ s₁)) j~Σ)
-                                        (s-term-c cloA ap ⊢e₁ s₁)
+sc-complete (s-term-c nd s cloA ap ⊢e) with sc-complete s | tc-complete ⊢e
+... | subs j~Σ s₁ | typs ~t∞ ⊢e₁ = subs (~sC (sound ⊢e₁) j~Σ) (s-term-c nd s₁ cloA ap ⊢e₁)
 sc-complete s'@(s-term-o opnA ⊢e ss s) with sc-complete s | tc-complete ⊢e
 ... | subs j~Σ s₁ | typs ~tZ ⊢e₁ = subs (~sI (t-⊆-prv (sound ⊢e₁) (s-⊆ s')) j~Σ)
                                         (s-term-o opnA ⊢e₁ ss s₁)

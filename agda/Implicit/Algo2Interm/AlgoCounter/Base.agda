@@ -77,13 +77,14 @@ data _⊢_≤⁺_⊣_↪_↡_ where
   s-term-c :
       Need e (𝕚 p)
     → Δ ⊢ B ≤⁺ Σ ⊣ Ψ ↪ D ↡ j
+    → (cloA : Ψ ⊢c A)
     → (ap : Ψ ≫ A ⇘ A%)
     → (⊢e : 𝕣 Ψ ⊢ τ A% ⇒ e ⇒ A' ↡ ∞)
     → Δ ⊢ (A `→ B) ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ A% `→ D ↡ 𝕔 j
 
   s-term-o :
       Need e Z
-    → (⊢e : 𝕣 Δ ⊢ □ ⇒ e ⇒ C)
+    → (⊢e : 𝕣 Δ ⊢ □ ⇒ e ⇒ C ↡ Z)
     → (ss : Δ ⊢ C ⌞ ≤⁻ ⌝ A ⊣ Ω)
     → Ω ⊢ B ≤⁺ Σ ⊣ Ψ ↪ D ↡ j
     → Δ ⊢ A `→ B ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ C `→ D ↡ 𝕚 j
