@@ -14,8 +14,7 @@ data _⊆_w/t_w/c_ : Env n m → Env n m → Type m → Counter m → Set where
   ⊆I : (ext : Γ ⊆ Ω w/t A)
      → Ω ⊆ Δ w/t B w/c j
      → Γ ⊆ Δ w/t (A `→ B) w/c (𝕚 j)
-  ⊆C : (cloA : Δ ⊢c A)
-     → Γ ⊆ Δ w/t B w/c j
+  ⊆C : Γ ⊆ Δ w/t B w/c j
      → Γ ⊆ Δ w/t (A `→ B) w/c (𝕔 j)
   ⊆∀-I : Γ ,^ ⊆ Δ ,= B w/t A w/c (𝕚 j')
        → (upj : ↑tyʲ0 j ⇘ j')
@@ -186,4 +185,3 @@ postulate
   ⊆/c-irrev-^0 : Γ ,= B ⊆ Δ ,= B w/t A w/c j
                → find A #0 j
                → Γ ,^ ⊆ Δ ,= B w/t A w/c j
-

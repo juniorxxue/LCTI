@@ -22,6 +22,24 @@ postulate
   need-dec : ∀ (e : Term n m)
            → JustNeed e
 
+  infer-check-fail : Need e Z
+                   → ¬ (Γ ⊢ □ ⇒ e ⇒ A)
+                   → ¬ (Γ ⊢ τ A ⇒ e ⇒ A)
+
+  inf-dec : ∀ (Γ : Env n m) e
+          → Dec (∃[ A ](Γ ⊢ □ ⇒ e ⇒ A))
+
+s-term-c-old : Δ ⊢ B ≤⁺ Σ ⊣ Ψ ↪ D
+             → (cloA : Ψ ⊢c A)
+             → (ap : Ψ ≫ A ⇘ A%)
+             → (⊢e : 𝕣 Ψ ⊢ τ A% ⇒ e ⇒ A')
+             → Δ ⊢ (A `→ B) ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ A% `→ D
+s-term-c-old {Ψ = Ψ} {e = e} s cloA ap ⊢e with need-dec e | inf-dec Ψ e
+... | need-z nd | yes ⟨ A' , ⊢e' ⟩ = s-term-o {!!} {!!} {!!} s
+... | need-z nd | no ¬p = {!!}
+... | need-𝕚 nd | _ = s-term-c nd s cloA ap ⊢e
+
+
 complete-ss+ : Δ ⊢ ∞ # A ⌞ ≤⁺ ⌝ B
              → Γ ⊆ Δ w/t A
              → Γ ⊢ A ⌞ ≤⁺ ⌝ B ⊣ Δ
@@ -67,7 +85,7 @@ complete-s {j = 𝕚 j} {Γ = Γ} (s-arr₂ {A = A} s s₁) (⊆I ext ext₁) (~
   with ⟨ Ψ , diff ⟩ ← ⅆ-total (⊆/-⊆ ext) (⊆/c-⊆ ext₁)
   with ih ← complete-ss- {Γ = Ψ} s (ⅆ-⊆/ diff ext)
   = s-term-o {!!} ⊢e (s--subirrev-final ih diff (⊆/-⊢c ext)) (complete-s s₁ ext₁ (~irrev j~Σ (⊆/-⊆ ext)))
-complete-s {j = 𝕔 j} (s-arr₃ cloA grd s) (⊆C cloA' ext) (~C {e = e} ⊢e j~Σ) with need-dec e
+complete-s {j = 𝕔 j} (s-arr₃ cloA grd s) (⊆C ext) (~C {e = e} nd ⊢e j~Σ) with need-dec e
 ... | need-z nd = {!!}
 ... | need-𝕚 nd = {!!}
 --  = s-term-c {!!} {!!} {!!} {!!} {!!}
@@ -76,9 +94,9 @@ complete-s (s-∀l s ic fd upC upD (↑tyʲ-𝕚 upj)) (⊆∀-I ext upj') j~'@(
 ... | ⟨ Σ' , upΣ ⟩ | ⟨ e' , upe ⟩ | reg-S= r regA
   with refl ← ↑tyʲ-unique upj upj' = let weaken-j~ = (~weaken^0 (~I ⊢e j~) (↑ty-arr upC upD) (↑tyᶜ-e upe upΣ)) (↑tyʲ-𝕚 upj)
                                      in s-∀l (complete-s s (⊆/c-irrev-^=0 ext fd regA) weaken-j~) upΣ upe upC upD
-complete-s (s-∀l s ic fd upC upD (↑tyʲ-𝕔 upj)) (⊆∀-C ext upj') j~'@(~C {Σ = Σ} {e = e} ⊢e j~) with ↑tyᶜ0-total Σ | ↑tyᵉ0-total e | s-sregular s
+complete-s (s-∀l s ic fd upC upD (↑tyʲ-𝕔 upj)) (⊆∀-C ext upj') j~'@(~C {Σ = Σ} {e = e} nd ⊢e j~) with ↑tyᶜ0-total Σ | ↑tyᵉ0-total e | s-sregular s
 ... | ⟨ Σ' , upΣ ⟩ | ⟨ e' , upe ⟩ | reg-S= r regA
-  with refl ← ↑tyʲ-unique upj upj' = let weaken-j~ = (~weaken^0 (~C ⊢e j~) (↑ty-arr upC upD) (↑tyᶜ-e upe upΣ)) (↑tyʲ-𝕔 upj)
+  with refl ← ↑tyʲ-unique upj upj' = let weaken-j~ = (~weaken^0 (~C {!!} ⊢e j~) (↑ty-arr upC upD) (↑tyᶜ-e upe upΣ)) (↑tyʲ-𝕔 upj)
                                      in s-∀l (complete-s s (⊆/c-irrev-^=0 ext fd regA) weaken-j~) upΣ upe upC upD
 complete-s (s-tapp s upj) (⊆∀-T ext upj₁) (~T {Σ = Σ} ~j st)
   with refl ← ↑tyʲ-unique upj upj₁
@@ -104,7 +122,7 @@ s+-⊆/ (s-var-∙ regΔ inΔ) = ⊆∞ (ext-var (reg-⊆/x∙ regΔ inΔ))
 s+-⊆/ (s-arr₁ s s₁) with s+-⊆/ s₁
 ... | ⊆∞ x = ⊆∞ (ext-arr (s--⊆/ s) x)
 s+-⊆/ (s-arr₂ s s₁) = ⊆I (s--⊆/ s) (s+-⊆/ s₁)
-s+-⊆/ (s-arr₃ cloA grd s) = ⊆C cloA (s+-⊆/ s)
+s+-⊆/ (s-arr₃ cloA grd s) = ⊆C (s+-⊆/ s)
 s+-⊆/ (s-∀ s) with s+-⊆/ s
 ... | ⊆∞ x = ⊆∞ (ext-∀ x)
 s+-⊆/ (s-∀l s ic fd upC upD upj) with s+-⊆/ s
@@ -129,7 +147,7 @@ complete (⊢lam₂ ⊢e) (~I {Σ = Σ} ⊢e₁ j~Σ)
   with reg-S, regΓ regA ← t-tregular ⊢e
   with ⟨ Σ' , upΣ ⟩ ← ↑tmᶜ0-total Σ
   = ⊢lam₂ ⊢e₁ upΣ (complete ⊢e (~weaken,0 j~Σ upΣ regA))
-complete (⊢app₁ ⊢e ⊢e₁) j~Σ = ⊢app (complete ⊢e (~C (complete ⊢e₁ ~∞) j~Σ))
+complete (⊢app₁ ⊢e ⊢e₁) j~Σ = ⊢app (complete ⊢e (~C {!need-dec!} (complete ⊢e₁ ~∞) j~Σ))
 complete (⊢app₂ ⊢e ⊢e₁) j~Σ = ⊢app (complete ⊢e (~I (complete ⊢e₁ ~Z) j~Σ))
 complete (⊢sub ⊢e B≤A x j≢Z) j~Σ = ⊢sub (complete ⊢e ~Z) (nonempty j≢Z j~Σ) x (complete-s0 B≤A j~Σ)
   where nonempty : NonZ j
@@ -137,7 +155,7 @@ complete (⊢sub ⊢e B≤A x j≢Z) j~Σ = ⊢sub (complete ⊢e ~Z) (nonempty 
                  → NonEmpty Σ
         nonempty nz-∞ ~∞ = ne-τ
         nonempty nz-I (~I ⊢e j~Σ) = ne-app
-        nonempty nz-C (~C ⊢e j~Σ) = ne-app
+        nonempty nz-C (~C nd ⊢e j~Σ) = ne-app
         nonempty nz-T (~T ~j st) = ne-tapp
 complete (⊢tabs ⊢e) ~Z = ⊢tabs (complete ⊢e ~Z)
 complete (⊢tapp ⊢e st) ~j = ⊢tapp (complete ⊢e (~T ~j st)) st

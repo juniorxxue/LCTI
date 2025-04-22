@@ -1,0 +1,414 @@
+\documentclass[9pt]{article}
+
+\RequirePackage[T1]{fontenc} 
+%\usepackage[tt=false, type1=true]{libertine} 
+\RequirePackage[varqu]{zi4} 
+\RequirePackage[libertine]{newtxmath}
+\usepackage{xcolor}
+
+\newcommand{\grey}[1]{\textcolor{grey}{#1}}
+\newcommand{\mgrey}[1]{\mathcolor{grey}{#1}}
+
+\usepackage{comment}
+
+%\usepackage{fullpage}
+\usepackage[a4paper, margin=1.5cm]{geometry}
+
+%\usepackage{setspace}
+%\setstretch{0.9} % shrink line spacing slightly
+
+\usepackage{graphicx} % Required for inserting images
+
+\usepackage{mathpartir}
+\usepackage{amsmath}
+%\usepackage{amssymb}
+%\usepackage{mathtools}
+%\usepackage{xfrac,unicode-math}
+% \usepackage{amsthm}
+%\usepackage{amsthm}
+\newtheorem{lemma}{Lemma}
+\newcommand{\highlight}{\colorbox{lightgray}}
+
+\title{Contextual Typing (Colored Local Type Inference)}
+\author{Xu Xue}
+
+\begin{document}
+
+\maketitle
+
+\begin{align*}
+&\text{Types} \quad\quad &A, B, C, D ::=&~ a \mid \mathtt{Int} \mid A \rightarrow B \mid \forall a.~A\\
+&\text{Expressions} \quad \quad &e::=&~ i \mid x \mid \lambda x . ~e \mid e_1~e_2 \mid e : A \mid \Lambda a.~e \mid e ~@ A
+\end{align*}
+
+\section{Decl.}
+
+\begin{align*}
+&\text{Environments} \quad\quad &\Gamma::=&~ . \mid \Gamma, x : A \mid \Gamma, a \\
+&\text{Application Counters} \quad\quad &m, n ,j ::=&~ 0 \mid \infty \mid S_m~n  \mid T_A ~n\\
+\end{align*}
+
+
+\subsection{Typing: $\Gamma \vdash_n e : A$}
+
+\begin{mathpar}
+    \inferrule*[right=\texttt{Int}]
+	{ }
+    {\Gamma \vdash_0 i : \mathtt{Int}}
+
+    \inferrule*[right=\texttt{Var}]
+    { }
+    {\Gamma \vdash_0 x : A}
+
+    \inferrule*[right=\texttt{Ann}]
+    {\Gamma \vdash_{\infty} e : A}
+    {\Gamma \vdash_0 (e : A) : A}
+
+    \inferrule*[right=\texttt{Lam1}]
+    {\Gamma, x : A \vdash_{\infty} e : B}
+    {\Gamma \vdash_{\infty} \lambda x.~ e : A \rightarrow B}
+    
+    \inferrule*[right=\texttt{Lam2}]
+    {\Gamma, x : A \vdash_{n} e : B}
+    {\Gamma \vdash_{S_0~n} \lambda x.~ e : A \rightarrow B}    
+
+    \inferrule*[right=\texttt{App}]
+    {\Gamma \vdash_{S_m~n} e_1 : A \rightarrow B \\
+    \Gamma \vdash_{m} e_2 : A}
+    {\Gamma \vdash_n e_1~e_2 : B}
+
+    \inferrule*[right=\texttt{Sub}]
+    {\Gamma \vdash_0 g : B \\
+    n \neq 0\\
+    \Gamma \vdash_n B <: A}
+    {\Gamma \vdash_n g : A}
+  \\
+    \inferrule*[right=\texttt{TAbs}]
+    {\Gamma, a \vdash_0 e : A}
+    {\Gamma \vdash_0 \Lambda a.~e : \forall a.~A}
+
+    \inferrule*[right=\texttt{TApp}]
+    {\Gamma \vdash_{T_A~n} e : \forall a. ~B}
+    {\Gamma \vdash_n e ~@ A :  [a/A]~B}    
+\end{mathpar}
+
+\subsection{Subtyping: $\Gamma \vdash_n A <: B$}
+
+\begin{mathpar}
+    \inferrule*[right=\texttt{S-Refl}]
+    { }
+    {\Gamma \vdash_0 A <: A}
+
+    \inferrule*[right=\texttt{S-Int}]
+    { }
+    {\Gamma \vdash_{\infty} \mathtt{Int} <: \mathtt{Int}}
+    
+    \inferrule*[right=\texttt{S-Var}]
+    { }
+    {\Gamma \vdash_\infty a <: a}
+
+    \inferrule*[right=\texttt{S-Arr1}]
+    {\Gamma \vdash_{\infty} C <: A \\
+     \Gamma \vdash_{\infty} B <: D}
+    {\Gamma \vdash_\infty A \rightarrow B <:C \rightarrow D}
+    
+    \inferrule*[right=\texttt{S-Arr1}]
+    {\Gamma \vdash_{S_m} C <: A \\
+     \Gamma \vdash_{n} B <: D}
+    {\Gamma \vdash_{S_m n} A \rightarrow B <:C \rightarrow D}
+
+    \inferrule*[right=\texttt{S-$\forall$}]
+    {\Gamma , a \vdash_{\infty} A <: B}
+    {\Gamma \vdash_{\infty} \forall a.~A <: \forall a.~B}
+
+    \inferrule*[right=\texttt{S-$\forall$L}]
+    {\Gamma \vdash B \\
+    a \in \texttt{FV}_{(S~n)}(A)\\
+     \Gamma \vdash_{S~n}  [B/a]A <: C \to D}
+    {\Gamma \vdash_{S~n} \forall a. ~A <: C \to D}
+    
+    \inferrule*[right=\texttt{S-TApp}]
+    {\Gamma \vdash B \\
+    \Gamma \vdash_n [B/a]~A <: C}
+    {\Gamma \vdash_{T_B~n} \forall a. ~A <: \forall a. ~C}
+\end{mathpar}
+
+
+\section{Interm.}
+
+\begin{align*}
+&\text{Typing Environments} \quad\quad &\Gamma::=&~ . \mid \Gamma, x : A \mid \Gamma, a\\
+&\text{Subtyping Environments} \quad\quad &\Gamma, \Omega, \Delta ::=&~ . \mid \Gamma, x : A \mid \Gamma, a \mid \Gamma, \hat{a} = A \\
+&\text{Counters} \quad\quad &n ::=&~ 0 \mid \infty \mid S~n \mid T_A~n\\
+&\text{Successor Counters} \quad\quad &S ::=&~ C \mid I
+\end{align*}
+
+\subsection{Typing: $\Gamma \vdash_n e : A$}
+
+\begin{mathpar}
+    \inferrule*[right=\texttt{Int}]
+    { }
+    {\Gamma \vdash_0 i : \mathtt{Int}}
+
+    \inferrule*[right=\texttt{Var}]
+    {x : A \in \Gamma}
+    {\Gamma \vdash_0 x : A}
+
+    \inferrule*[right=\texttt{Ann}]
+    {\Gamma \vdash_{\infty} e : A}
+    {\Gamma \vdash_0 (e : A) : A}
+
+    \inferrule*[right=\texttt{Lam}]
+    {\Gamma, x : A \vdash_{n-} e : B}
+    {\Gamma \vdash_{n} \lambda x.~ e : A \rightarrow B}
+    \\
+
+    \inferrule*[right=\texttt{App1}]
+    {\Gamma \vdash_{C~n} e_1 : A \rightarrow B \\
+    \Gamma \vdash_{\infty} e_2 : A}
+    {\Gamma \vdash_n e_1~e_2 : B}
+
+    \inferrule*[right=\texttt{App2}]
+    {\Gamma \vdash_{I~n} e_1 : A \rightarrow B \\
+    \Gamma \vdash_0 e_2 : A}
+    {\Gamma \vdash_n e_1~e_2 : B}
+    \\
+
+    \inferrule*[right=\texttt{Sub}]
+    {\Gamma \vdash_0 g : B \\
+    n \neq 0\\
+    \Gamma \shortmid . \vdash_n B <:^{+} A}
+    {\Gamma \vdash_n g : A}
+
+    \inferrule*[right=\texttt{TAbs}]
+    {\Gamma, a \vdash_0 e : A}
+    {\Gamma \vdash_0 \Lambda a.~e : \forall a.~A}
+    
+    \inferrule*[right=\texttt{TApp}]
+    {\Gamma \vdash_{T_A~n} e : \forall a. ~B}
+    {\Gamma \vdash_n e ~@ A :  [a/A]~B}    
+\end{mathpar}
+
+\subsection{Subtyping: $\Gamma \shortmid \Delta \vdash_n A <:^{\pm} B$}
+
+\begin{mathpar}
+    \inferrule*[right=\texttt{S-Refl}]
+    { }
+    {\Gamma \shortmid \Delta \vdash_0 A <:^{+} \Delta(A)}
+
+    \inferrule*[right=\texttt{S-Int}]
+    { }
+    {\Gamma ; \Delta\vdash_{\infty} \mathtt{Int} <: \mathtt{Int}}
+    
+    \inferrule*[right=\texttt{S-Var}]
+    { }
+    {\Gamma; \Delta \vdash_\infty a <: a}
+  
+    \inferrule*[right=\texttt{S-Arr}]
+    {\Gamma; \Delta \vdash_{\infty} C <:^* A \\
+     \Gamma; \Delta \vdash_{n-} B <: D}
+    {\Gamma; \Delta \vdash_n A \rightarrow B <:C \rightarrow D}
+    
+        \inferrule*[right=\texttt{S-Arr-Chk}]
+     {\Gamma; \Delta \vdash_{n} B <: D}
+    {\Gamma; \Delta \vdash_{C ~n} A \rightarrow B <: \Delta(A) \rightarrow D}
+    
+    \inferrule*[right=\texttt{S-$\forall$}]
+    {\Gamma; \Delta , a \vdash_{\infty} A <: B}
+    {\Gamma; \Delta \vdash_{\infty} \forall a.~A <: \forall a.~B}
+
+    \inferrule*[right=\texttt{S-$\forall$L}]
+    {\Gamma \vdash B \\
+     a \in \texttt{FV}_{(S~n)}(A)\\
+     \Gamma; \Delta, \hat{a} = B \vdash_{S~n}  A <:^+ C \to D}
+    {\Gamma; \Delta \vdash_{S~n} \forall a. ~A <:^+ C \to D}
+
+      \inferrule*[right=\texttt{S-TApp}]
+    {\Gamma , \hat{a}= B \vdash_n A <: C}
+    {\Gamma \vdash_{T_B~n} \forall a. ~A <: \forall a. ~C}
+    
+    \inferrule*[right=\texttt{S-Var-L}]
+    { }
+    {\Gamma; \Delta [\hat{a} = A] \vdash_\infty \hat{a} <:^+ A}
+    
+     \inferrule*[right=\texttt{S-Var-R}]
+   { }
+    {\Gamma; \Delta [\hat{a} = A] \vdash_\infty A <:^- \hat{a}}
+\end{mathpar}
+
+\section{Algo.}
+
+\begin{align*}
+&\text{Typing Environments} \quad\quad &\Gamma::=&~ . \mid \Gamma, x : A \mid \Gamma, a\\
+&\text{Subtyping Environments} \quad\quad &\Gamma, \Omega, \Delta ::=&~ . \mid \Gamma, x : A \mid \Gamma, a \mid \Gamma , \hat{a} \mid \Gamma, \hat{a} = A\\
+    &\text{Contexts} \quad\quad &\Sigma ::=&~  \square  \mid A \mid \boxed{e} \leadsto \Sigma \mid \boxed{A} \leadsto \Sigma\\
+    &\text{Generic Consumers} \quad \quad &g::=&~ i \mid x \mid e : A \mid \Lambda a.~e
+\end{align*}
+
+\subsection{Typing: $\Gamma \vdash \Sigma \Rightarrow e \Rightarrow A$}
+
+\begin{mathpar}
+\inferrule*[right=\texttt{T-Lit}]
+{ }
+{\Gamma \vdash \square \Rightarrow i \Rightarrow \mathsf{Int}}
+
+\inferrule*[right=\texttt{T-Var}]
+{ x : A \in \Gamma}
+{\Gamma \vdash \square \Rightarrow x \Rightarrow A}
+
+\inferrule*[right=\texttt{T-Ann}]
+{\Gamma \vdash A \Rightarrow e \Rightarrow B}
+{\Gamma \vdash \square \Rightarrow e : A \Rightarrow A}
+
+\inferrule*[right=\texttt{T-App}]
+{\Gamma \vdash \boxed{e_2} \leadsto \Sigma \Rightarrow e_1 \Rightarrow A \rightarrow B}
+{\Gamma \vdash \Sigma \Rightarrow e_1~e_2 \Rightarrow B}
+
+\inferrule*[right=\texttt{T-Lam1}]
+{\Gamma, x : A \vdash B \Rightarrow e \Rightarrow C}
+{\Gamma \vdash A \rightarrow B \Rightarrow \lambda x.~e \Rightarrow A \rightarrow C}
+
+\inferrule*[right=\texttt{T-Lam2}]
+{\Gamma \vdash \square \Rightarrow e_2 \Rightarrow A\\
+ \Gamma , x : A \vdash \Sigma \Rightarrow e \Rightarrow B}
+{\Gamma \vdash \boxed{e_2} \leadsto \Sigma \Rightarrow \lambda x.~e \Rightarrow A \rightarrow B}
+
+\inferrule*[right=\texttt{T-Sub}]
+{\Gamma \vdash \square \Rightarrow g \Rightarrow A\\
+\Sigma \neq \square\\
+ \Gamma; . \vdash A \leq^+ \Sigma \dashv . \rightsquigarrow B}
+{\Gamma \vdash \Sigma \Rightarrow g \Rightarrow B}
+
+\inferrule*[right=\texttt{T-TAbs}]
+{\Gamma, a \vdash \square \Rightarrow e \Rightarrow A}
+{\Gamma \vdash \square \Rightarrow \Lambda a.~e \Rightarrow \forall a.~A}
+
+%\inferrule*[right=\texttt{T-TAbs2}]
+%{\Gamma, a \vdash \Sigma  \Rightarrow e \Rightarrow B}
+%{\Gamma \vdash \boxed{A} \leadsto \Sigma \Rightarrow \Lambda a. ~e \Rightarrow [A/a]B}
+
+\inferrule*[right=\texttt{T-TApp}]
+%{\Gamma \vdash H \Rightarrow e \Rightarrow \forall X.~B}
+{\Gamma \vdash \boxed{A} \leadsto \Sigma \Rightarrow e \Rightarrow \forall a.~B}
+{\Gamma \vdash  \Sigma \Rightarrow e ~@A \Rightarrow [A/a]B}
+\end{mathpar}
+
+\begin{comment}
+\subsection{Subtyping: $\boxed{\Gamma \vdash A <: \Sigma \dashv \Gamma' \rightsquigarrow A}$}
+
+\begin{mathpar}
+\inferrule*[right=\texttt{S-Int}]
+{ }
+{\Gamma \vdash \mathtt{Int} <: \mathtt{Int} \dashv \Gamma \rightsquigarrow \mathtt{Int}}
+
+\inferrule*[right=\texttt{S-Empty}]
+{FV_{ex}(\Gamma, A) = . \\ \Gamma \vdash A}
+{\Gamma \vdash A <: \square \dashv \Gamma \rightsquigarrow A}
+
+\inferrule*[right=\texttt{S-Ex-L}]
+{FV_{ex}(\Gamma, A) = . \\ \Gamma \vdash A}
+{\Gamma \vdash \hat{a} <: A \dashv [A/\hat{a}]~\Gamma \rightsquigarrow A}
+
+\inferrule*[right=\texttt{S-Ex-R}]
+{FV_{ex}(\Gamma, A) = . \\ \Gamma \vdash A}
+{\Gamma \vdash A <: \hat{a} \dashv [A/\hat{a}]~\Gamma \rightsquigarrow A}
+
+\inferrule*[right=\texttt{S-Arr}]
+{\Gamma \vdash C <: A \dashv \Gamma_1 \rightsquigarrow A' \\
+ \Gamma_1 \vdash B <: D \dashv \Gamma_2 \rightsquigarrow D'}
+{\Gamma \vdash A \rightarrow B <: C \rightarrow D \dashv \Gamma_2 \rightsquigarrow C \rightarrow D}
+
+\inferrule*[right=\texttt{S-Hole-No-Ex}]
+{ FV_{ex}(\Gamma, A) = . \\
+\Gamma \vdash A \Rightarrow e \Rightarrow C\\
+ \Gamma \vdash B <: \Sigma \dashv \Gamma' \rightsquigarrow D}
+{\Gamma \vdash A \rightarrow B <: \boxed{e} \leadsto \Sigma \dashv \Gamma' \rightsquigarrow A \rightarrow D}
+
+\inferrule*[right=\texttt{S-Hole-Ex}]
+{ FV_{ex}(A) \neq . \\
+\Gamma \vdash \square \Rightarrow e \Rightarrow C\\
+\Gamma \vdash C <: A \dashv \Gamma_1 \rightsquigarrow A' \\
+\Gamma_1 \vdash B <: \Sigma \dashv \Gamma_2 \rightsquigarrow D}
+{\Gamma \vdash A \rightarrow B <: \boxed{e} \leadsto \Sigma \dashv \Gamma_2 \rightsquigarrow A' \rightarrow D}
+
+\inferrule*[right=\texttt{S-All}]
+{\Gamma, a \vdash A <: B \dashv \Gamma', a\rightsquigarrow C}
+{\Gamma \vdash \forall a. A <: \forall a. B \dashv \Gamma' \rightsquigarrow \forall a. C}
+
+\inferrule*[right=\texttt{S-All-L}]
+{\Gamma, \hat{a} \vdash [\hat{a}/a]A <: \boxed{e} \leadsto \Sigma \dashv \Gamma', \hat{a} \rightsquigarrow B}
+{\Gamma \vdash \forall a. A <: \boxed{e} \leadsto \Sigma \dashv \Gamma' \rightsquigarrow B}
+\end{mathpar}
+\end{comment}
+
+\subsection{Subtyping: $\Gamma; \Delta \vdash A \leq^{\pm} \Sigma \dashv \Delta' \rightsquigarrow A'$}
+
+\begin{mathpar}
+\inferrule*[right=\texttt{\texttt{S-Int}}]
+{ }
+{\Gamma; \Delta \vdash \mathtt{Int} \leq \mathtt{Int} \dashv \Delta  }
+
+\inferrule*[right=\texttt{S-UVar}]
+{ }
+{\Gamma; \Delta \vdash a \leq a \dashv \Delta }
+\\
+\inferrule*[right=\texttt{S-Ex-L}]
+{ }
+{\Gamma; \Delta[\hat{a}] \vdash \hat{a} \leq^+ A \dashv \Delta[\hat{a} = A] }
+
+\inferrule*[right=\texttt{S-Ex-R}]
+{ }
+{\Gamma; \Delta[\hat{a}] \vdash A \leq^- \hat{a} \dashv \Delta[\hat{a} = A] }
+
+\inferrule*[right=\texttt{S-Ex-Eq-L}]
+{ }
+{\Gamma; \Delta[\hat{a:=A}] \vdash \hat{a} \leq^+ A \dashv \Delta[\hat{a} = A] }
+
+\inferrule*[right=\texttt{S-Ex-Eq-R}]
+{ }
+{\Gamma; \Delta[\hat{a:=A}] \vdash A \leq^- \hat{a}  \dashv \Delta[\hat{a} = A] }
+
+\inferrule*[right=\texttt{S-Arr}]
+{\Gamma; \Delta \vdash C \leq^* A \dashv \Omega  \\
+ \Gamma; \Omega \vdash B \leq D \dashv \Delta' }
+{\Gamma; \Delta \vdash A \rightarrow B \leq C \rightarrow D \dashv \Delta' }
+
+\inferrule*[right=\texttt{S-$\forall$}]
+{\Gamma; \Delta, a \vdash A \leq B \dashv \Delta', a }
+{\Gamma; \Delta \vdash \forall a.A \leq \forall a.~B \dashv \Delta' }
+
+\noindent\makebox[\linewidth]{\rule{16cm}{0.4pt}}
+
+\inferrule*[right=\texttt{S-Empty}]
+{\Gamma; \Delta \vdash_{\texttt{close}}A}
+{\Gamma; \Delta \vdash A \leq^+ \square \dashv \Delta \rightsquigarrow \Delta(A)}
+
+\inferrule*[right=\texttt{S-Type}]
+{\Gamma; \Delta \vdash A \leq B  \dashv \Delta' }
+{\Gamma; \Delta \vdash A \leq B  \dashv \Delta' \rightsquigarrow B  }
+
+\inferrule*[right=\texttt{S-Term-L}]
+{ Need(e) > Have(A) \\
+ \Gamma; \Delta \vdash B \leq^+ \Sigma \dashv \Delta' \rightsquigarrow D\\
+\Gamma \vdash \Delta'(A) \Rightarrow e \Rightarrow A'}
+{\Gamma; \Delta \vdash A \rightarrow B \leq^+ \boxed{e} \leadsto \Sigma \dashv \Delta' \rightsquigarrow \Delta(A) \rightarrow D}
+
+\inferrule*[right=\texttt{S-Term-R}]
+{ Need(e) \leq Have(A) \\
+  A \longmapsto \Sigma' \\
+\Gamma \vdash \Sigma' \Rightarrow e \Rightarrow C\\
+\Gamma; \Delta \vdash C \leq^- A \dashv \Omega \\
+\Gamma; \Omega \vdash B \leq^+ \Sigma \dashv \Delta' \rightsquigarrow D}
+{\Gamma; \Delta \vdash A \rightarrow B \leq^+ \boxed{e} \leadsto \Sigma \dashv \Delta' \rightsquigarrow C \rightarrow D}
+
+\inferrule*[right=\texttt{S-$\forall$L}]
+{\Gamma; \Delta, \hat{a} \vdash A \leq^+ \boxed{e} \leadsto \Sigma \dashv \Delta', \hat{a}=C \rightsquigarrow B}
+{\Gamma; \Delta \vdash \forall a. A \leq^+ \boxed{e} \leadsto \Sigma \dashv \Delta' \rightsquigarrow B}
+
+\inferrule*[right=\texttt{S-TApp}]
+{ \Gamma; \Delta, a =B \vdash A \leq^+ \Sigma \dashv \Delta, a = B \rightsquigarrow C}
+{\Gamma; \Delta \vdash \forall a. A \leq^+ \boxed{B} \leadsto \Sigma \dashv \Delta \rightsquigarrow \forall a. C}
+
+\end{mathpar}
+
+\end{document}
