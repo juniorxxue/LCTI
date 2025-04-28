@@ -58,7 +58,7 @@
     {\Gamma \vdash_0 i : \mathtt{Int}}
 
     \inferrule*[right=\texttt{Var}]
-    { }
+    {x : A \in \Gamma}
     {\Gamma \vdash_0 x : A}
 
     \inferrule*[right=\texttt{Ann}]
