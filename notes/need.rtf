@@ -1,0 +1,74 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2820
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fnil\fcharset0 Iosevka-Fixed;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww26760\viewh18000\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs26 \cf0 Need function design for three systems:\
+\
+1. base system, left-to-right order, no partial\
+2. order-insensitive, no partial\
+3. order-insensitive, partial allowed\
+\
+need (pair (\\x. x) 1) = 8\
+\
+need with env T implicitly passed, shortened for demo\
+\
+need id = 0\
+needFun id = I 0\
+\
+need id = 0\
+\
+System 1:\
+\
+need i = 0\
+need x = 0\
+need (\\x. e) = I (need e)\
+need (e1 e2) = case needFun e1 of\
+                 C n -> n\
+                 I n -> n\
+need (e : A) = 0\
+need (/\\a. e) = need \{T, a\} e\
+need (e @A) = need e\
+\
+------------\
+\
+f : forall a. (a -> Int) -> a\
+needFun f = I 0\
+\
+f2 : forall a b. (a -> Int) -> b -> a\
+needFun f2 = I I 0\
+\
+f3 : forall a b c. (a -> Int) -> b -> c\
+needFun f3 = I I 8\
+\
+\
+needTypArg = \
+\
+needFun i = error\
+needFun x = needFunType A\
+	where A is (x : A) in T\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx4369\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf0 needFun (\\x. e) = I (needFun \{T, x:_\} e)\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf0 needFun (e1 e2) = case needFun e1 of\
+                    C n -> n\
+                    I n -> n\
+needFun (e : A) = needFunType A\
+needFun (/\\a. e) = needFun \{T, a\} e\
+needFun (e @A) = needFun e\
+\
+------------\
+\
+needFunType Int = error\
+needFunType a = if a then 0 else 8\
+needFunType (A -> B) = needFunType\
+\
+how many posibilities of \
+needFunType (forall a. (a -> a) -> a -> a)\
+\
+I C 0\
+C I 0\
+\
+}

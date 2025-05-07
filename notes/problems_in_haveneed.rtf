@@ -1,0 +1,77 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2820
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fnil\fcharset0 Iosevka;\f1\fnil\fcharset0 Iosevka-Bold;\f2\fnil\fcharset0 Iosevka-Oblique;
+}
+{\colortbl;\red255\green255\blue255;\red63\green105\blue30;\red155\green44\blue3;\red251\green2\blue7;
+\red5\green61\blue204;\red253\green128\blue8;\red128\green0\blue128;\red62\green69\blue5;\red133\green0\blue175;
+}
+{\*\expandedcolortbl;;\cssrgb\c30831\c47797\c15540;\cssrgb\c67803\c24280\c0;\cssrgb\c100000\c14913\c0;
+\cssrgb\c0\c33896\c83855;\cssrgb\c100000\c57637\c0;\cssrgb\c57919\c12801\c57269;\cssrgb\c30924\c33489\c1233;\cssrgb\c59982\c16236\c74118;
+}
+\paperw11900\paperh16840\margl1440\margr1440\vieww27260\viewh17300\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs36 \cf0 Currently, there're two problems spoted for `need/have` approach\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f1\b \cf0 1) Need/Have approach is not backwards compatiable with old Open/Close approaches (left-to-right):
+\f0\b0 \
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\fs28 \cf2 ----- definition of need ---\
+The current have function simply counts the offset number of lambda binders; \
+\
+need (\\x. x) = 1\
+need ((\\x. x) 1) = 0\
+need (/\\a. \\x. x) = 1\
+need (/\\a. ((\\x. x) 1)) = 0\
+\
+and I have a proved property to validate its correctness\
+\
+T |-0 e : A\
+------------\
+need(e) = 0\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf2 ----- definition of need ---\cf3 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf3 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\fs36 \cf0 One example is \cf4 pair (\\x. x) 1\cf0 , which need result is 0, and 
+\f2\i \cf5 it is not inferable but checkable
+\f0\i0 \cf0 \
+\
+say \cf4 foo = pair (\\x. x) 1\cf0 ;\
+\
+and \cf4 f : forall a. a -> ((a -> a) X a) -> a -> Int\cf0 \
+\
+then to deal with \cf6 f 1 foo 2\cf0 , in the middle of derivation, we have\
+\
+....\
+---------------------------------------------------------------\
+a=Int |- ((a -> a) X a)  -> a -> Int <: [foo] -> [2] -> []\
+\
+\cf7 1) need/have approach tells us to infer \cf6 foo\cf7 , we fail\
+2) open/close approach tells us to check \cf6 foo\cf7 , we success\cf0 \
+\
+In other words, examples like \cf6 f 1 foo 2\cf0  is not accpeted in `need/have` approach, but accepted in old systems.\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f1\b \cf0 2) Spec is non-trivial to design, to do two points at once:\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf8 * accept `g (\\x. x)`\
+* reject `g id` example
+\f0\b0 \cf0 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf0 \
+but do both in algo is not hard\
+\
+Say g is \cf4 forall a. (Int -> a) -> a\cf0 \
+\
+this is simply because both can be derived with the counter 1, if without some hacks/restrictions.\
+\
+\cf9 |-1 \\x. x : Int -> Int\
+|-1 id : Int -> Int}
