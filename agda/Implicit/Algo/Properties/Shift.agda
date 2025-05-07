@@ -68,7 +68,6 @@ open import Implicit.Algo.Base
 ↑tyᶜ-comm0' : ∀ {Σ : Context n m} {Σₖ Σₖ₊₁ Σ₀ k}
               → Σ ↑tyᶜ k ⇘ Σₖ
               → ↑tyᶜ0 Σₖ ⇘ Σₖ₊₁
-              ---------------------
               → ↑tyᶜ0 Σ ⇘ Σ₀
               → Σ₀ ↑tyᶜ #S k ⇘ Σₖ₊₁
 ↑tyᶜ-comm0' ↑tyᶜ-□ ↑tyᶜ-□ ↑tyᶜ-□ = ↑tyᶜ-□

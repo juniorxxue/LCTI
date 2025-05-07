@@ -3,7 +3,7 @@ module Implicit.Algo.Properties.Trans where
 open import Implicit.Language.All
 open import Implicit.Algo.Base
 open import Implicit.Algo.Properties.Id
-open import Implicit.Algo.Properties.Shift
+open import Implicit.Algo.Properties.PShift
 open import Implicit.Algo.Properties.Extension
 open import Implicit.Algo.Properties.Weaken
 open import Implicit.Algo.Properties.Regularity
@@ -18,6 +18,8 @@ open import Implicit.Algo.Properties.Polarity
 ≊-↑ty0 (≊S newΣ) (↑tyᶜ-e up-e up1) (↑tyᶜ-e up-e₁ up2) with refl ← ↑tyᵉ-unique up-e up-e₁ = ≊S (≊-↑ty0 newΣ up1 up2)
 ≊-↑ty0 (≊⓪ newΣ) (↑tyᶜ-⓪ x up1) (↑tyᶜ-⓪ x₁ up2)
   with refl ← ↑ty-unique x₁ x = ≊⓪ (≊-↑ty0 newΣ up1 up2)
+≊-↑ty0 (≊P newΣ) (↑tyᶜ-◐ upA up1) (↑tyᶜ-◐ upA₁ up2)
+  with refl ← ↑ty-unique upA upA₁  = ≊P (≊-↑ty0 newΣ up1 up2)
 
 
 ss-grd+ : SRegular Γ
@@ -93,6 +95,14 @@ s-trans (s-∀l s1 upᶜ upᵉ upC upD) s'@(s-term-c {A% = A%} {Σ = Σ′} {D =
 s-trans s'@(s-∀l s1 upᶜ upᵉ upC upD) (s-term-o opnA ⊢e x s2) (≊S newΣ)
   with (⊢r-arr regC regD) ← s-⊢r s' = let regA = ⊆-⊢r regC (s-⊆ s') in ⊥-elim (⊢r-⊢o-false regA opnA)
 s-trans {C = C} (s-tapp {B = B} s1 upᶜ) (s-tapp s2 upᶜ₁) (≊⓪ {Σ' = Σ'} newΣ) = s-tapp (s-trans s1 s2 (≊-↑ty0 newΣ upᶜ upᶜ₁)) upᶜ₁
+s-trans (s-term-p ss s1) (s-term-p ss₁ s2) (≊P newΣ)
+  with refl ← ⊆-antisymm (ss-⊆ ss₁) (s-⊆ s2) = s-term-p ss (s-trans s1 s2 newΣ)
+s-trans (s-∀l-p s1 upᶜ upE upC upD) s'@(s-term-p {Σ = Σ′} {D = D} ss s2) (≊P newΣ)
+  with reg-S= regΓ regB ← s-env-out s1
+  =
+  let ⟨ Σ″ , upΣ′ ⟩ = ↑tyᶜ0-total Σ′
+      ⟨ D' , upD' ⟩ = ↑ty0-total D
+  in s-∀l-p (s-trans s1 (s-weaken=0 s' (↑ty-arr upC upD) (↑tyᶜ-◐ upE upΣ′) (↑ty-arr upE upD') regB) (≊P (≊-↑ty0 newΣ upᶜ upΣ′))) upΣ′ upE upE upD'
 
 {-
   with reg-S= regΓ regB ← s-env-out s1

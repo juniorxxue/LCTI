@@ -108,24 +108,42 @@ infixr 9 𝕥₍_₎_
 data Counter : ℕ → Set where
   Z : Counter m
   ∞ : Counter m
-  𝕚 : Counter m → Counter m
-  𝕔 : Counter m → Counter m
+  𝕊₍_₎_ : Counter m → Counter m → Counter m
   𝕥₍_₎_ : Type m → Counter m → Counter m
 
 variable
   j j′ j″  : Counter m
   j' j'' : Counter m
   j₁ j₂ j₃ : Counter m
+  w w' w'' w₁ w₂ w₃ : Counter m
+
+data Rank0 : Counter m → Set where
+  rk0-Z : Rank0 (Counter m ∋⦂ Z)
+  rk0-∞ : Rank0 (Counter m ∋⦂ ∞)
+
+
+data Rank1 : Counter m → Set where
+  rk1-Z : Rank1 (Counter m ∋⦂ Z)
+  rk1-∞ : Rank1 (Counter m ∋⦂ ∞)
+  rk1-S : Rank0 w
+        → Rank1 j
+        → Rank1 (𝕊₍ w ₎ j)
+  rk1-𝕥 : Rank1 j
+        → Rank1 (𝕥₍ A ₎ j)
+
+data Rank2 : Counter m → Set where
+  rk2-Z : Rank2 (Counter m ∋⦂ Z)
+  rk2-∞ : Rank2 (Counter m ∋⦂ ∞)
+  rk2-S : Rank1 w
+        → Rank2 j
+        → Rank2 (𝕊₍ w ₎ j)
+  rk2-𝕥 : Rank2 j
+        → Rank2 (𝕥₍ A ₎ j)
 
 data NonZ : Counter m → Set where
   nz-∞ : NonZ (Counter m ∋⦂ ∞)
-  nz-I : NonZ (𝕚 j)
-  nz-C : NonZ (𝕔 j)
+  nz-S : NonZ (𝕊₍ w ₎ j)
   nz-T : NonZ (𝕥₍ A ₎ j)
-
-data 𝕚𝕔 : Counter m → Set where
-  case-𝕚 : 𝕚𝕔 (𝕚 j)
-  case-𝕔 : 𝕚𝕔 (𝕔 j)
 
 data Polar : Set where
   ≤⁺ ≤⁻ : Polar

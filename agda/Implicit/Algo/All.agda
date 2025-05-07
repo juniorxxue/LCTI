@@ -1,7 +1,7 @@
 module Implicit.Algo.All where
 
 open import Implicit.Algo.Base public
-open import Implicit.Algo.Properties.Shift public
+open import Implicit.Algo.Properties.PShift public
 
 open import Implicit.Algo.Properties.Weaken public
 

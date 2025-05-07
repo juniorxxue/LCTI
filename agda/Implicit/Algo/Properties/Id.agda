@@ -9,6 +9,8 @@ data Id : Context n m → Type m → Set where
   id-τ : Id (Context n m ∋⦂ τ A) A
   id-e : Id Σ B
        → Id ([ e ]↝ Σ) (A `→ B)
+  id-◐ : Id Σ B
+       → Id (A ◐↝ Σ) (A `→ B)
   id-⓪ : Id Σ B*
        → (st : ⟦ A ⟧ B ⇘ B*)
        → Id (A ⓪↝ Σ) (`∀ B)
@@ -22,6 +24,8 @@ id-st' id-τ (fulltype st) stA with refl ← st-unique st stA = id-τ
 id-st' (id-e id₁) (term stc ste) (st-arr stA stA₁) = id-e (id-st' id₁ stc stA₁)
 id-st' {k = k} {T} (id-⓪ {B* = B*} id₁ st) (tapp stc x) (st-∀ up stA)
   with ⟨ B*' , stB* ⟩ ← st-total T k B* = id-⓪ (id-st' id₁ stc stB*) (st-st-comm z≤n st stB* up stA x)
+id-st' (id-◐ id₁) (partype st-c stA) (st-arr stB stB₁)
+  with refl ← st-unique stA stB = id-◐ (id-st' id₁ st-c stB₁)
 
 id-↑tm : Id Σ' A
        → Σ ↑tmᶜ k ⇘ Σ'
@@ -30,6 +34,7 @@ id-↑tm id-□ ↑tmᶜ-□ = id-□
 id-↑tm id-τ ↑tmᶜ-τ = id-τ
 id-↑tm (id-e id₁) (↑tmᶜ-e up-e upΣ) = id-e (id-↑tm id₁ upΣ)
 id-↑tm (id-⓪ id₁ st) (↑tmᶜ-⓪ upΣ) = id-⓪ (id-↑tm id₁ upΣ) st
+id-↑tm (id-◐ id₁) (↑tmᶜ-◐ upΣ) = id-◐ (id-↑tm id₁ upΣ)
 
 ⊢id' : Γ ⊢ Σ ⇒ e ⇒ A
      → Id Σ A
@@ -51,6 +56,7 @@ s-id' : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
 ⊢id' (⊢tapp ⊢e st') with ⊢id' ⊢e
 ... | id-⓪ r st
   with refl ← st-unique st st' = r
+⊢id' (⊢lam₃ up-c ⊢e) = id-◐ (id-↑tm (⊢id' ⊢e) up-c)
 
 s-id' (s-empty regΓ cloA grd) = id-□
 s-id' (s-type ss) = id-τ
@@ -60,6 +66,11 @@ s-id' (s-∀l s upᶜ upᵉ upC upD) with s-id' s
 ... | id-e r = id-e (id-st' {T = Int} r (↑tyᶜ-st upᶜ) (↑ty-st upD))
 s-id' (s-tapp {B = B} {C = C} s upᶜ)
   with ⟨ B* , stB ⟩ ← st0-total B C = id-⓪ (id-st' (s-id' s) (↑tyᶜ-st upᶜ) stB) stB
+s-id' (s-term-p ss s) = id-◐ (s-id' s)
+s-id' (s-∀l-p s upᶜ upE upC upD)
+  with id-◐ r ← s-id' s
+  with refl ← ↑ty-unique-inver upE upC
+  = id-◐ (id-st' {T = Int} r (↑tyᶜ-st upᶜ) (↑ty-st upD))
 
 ⊢id0 : Γ ⊢ τ B ⇒ e ⇒ A
      → B ≡ A

@@ -5,6 +5,7 @@ open import Implicit.Interm.Base
 
 s-sregular : Γ ⊢ j # A ⌞ ≤ ⌝ B
            → SRegular Γ
+{-
 s-sregular (s-refl regΔ cloA grd) = regΔ
 s-sregular (s-int regΔ) = regΔ
 s-sregular (s-var-∙ regΔ inΔ) = regΔ
@@ -19,9 +20,11 @@ s-sregular (s-svar-l x inΔ) = x
 s-sregular (s-svar-r x inΔ) = x
 s-sregular (s-tapp s upj) with s-sregular s
 ... | reg-S= r regA = r
+-}
 
 t-tregular : Γ ⊢ j # e ⦂ A
            → TRegular Γ
+{-
 t-tregular (⊢lit cloΓ) = cloΓ
 t-tregular (⊢var cloΓ x∈Γ) = cloΓ
 t-tregular (⊢ann ⊢e) = t-tregular ⊢e
@@ -35,6 +38,7 @@ t-tregular (⊢sub ⊢e B≤A x j≢Z) = t-tregular ⊢e
 t-tregular (⊢tabs ⊢e) with t-tregular ⊢e
 ... | reg-S∙ r = r
 t-tregular {e = e ⓪ A} (⊢tapp ⊢e st) = t-tregular ⊢e
+-}
 
 
 
@@ -42,10 +46,9 @@ infix 3 _⊢rʲ_
 data _⊢rʲ_ : Env n m → Counter m → Set where
   j-Z : Γ ⊢rʲ Z
   j-∞ : Γ ⊢rʲ ∞
-  j-𝕚 : Γ ⊢rʲ j
-      → Γ ⊢rʲ (𝕚 j)
-  j-𝕔 : Γ ⊢rʲ j
-      → Γ ⊢rʲ (𝕔 j)
+  j-𝕊 : Γ ⊢rʲ j
+      → Γ ⊢rʲ w
+      → Γ ⊢rʲ (𝕊₍ w ₎ j)
   j-𝕥 : Γ ⊢rʲ j
       → Γ ⊢r A
       → Γ ⊢rʲ 𝕥₍ A ₎ j

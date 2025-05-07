@@ -1,15 +1,16 @@
+{-# OPTIONS --allow-unsolved-metas #-}
 module Implicit.Algo.Properties.Subsumption where
 
 open import Implicit.Language.All
 open import Implicit.Algo.Base
-open import Implicit.Algo.Properties.Shift
+open import Implicit.Algo.Properties.PShift
 open import Implicit.Algo.Properties.Id
 open import Implicit.Algo.Properties.Reflexivity
 open import Implicit.Algo.Properties.Extension
 open import Implicit.Algo.Properties.Regularity
 open import Implicit.Algo.Properties.Polarity
-open import Implicit.Algo.Properties.StrengthenTVar
-open import Implicit.Algo.Properties.StrengthenSVar
+open import Implicit.Algo.Properties.PStrengthenTVar
+open import Implicit.Algo.Properties.PStrengthenSVar
 open import Implicit.Algo.Properties.Weaken
 open import Implicit.Algo.Properties.Irrelevance
 open import Implicit.Algo.Properties.Trans
@@ -21,7 +22,7 @@ open import Implicit.Algo.Properties.Trans
 ≊-weaken ≊Z ↑tmᶜ-□ ↑tmᶜ-τ = ≊Z
 ≊-weaken (≊S new) (↑tmᶜ-e up-e up1) (↑tmᶜ-e up-e₁ up2) with refl ← ↑tm-unique up-e up-e₁ = ≊S (≊-weaken new up1 up2)
 ≊-weaken (≊⓪ new) (↑tmᶜ-⓪ up1) (↑tmᶜ-⓪ up2) = ≊⓪ (≊-weaken new up1 up2)
-
+≊-weaken (≊P new) (↑tmᶜ-◐ up1) (↑tmᶜ-◐ up2) = ≊P (≊-weaken new up1 up2)
 
 
 -- aux lemmas
@@ -55,7 +56,8 @@ s-refined-p s'@(s-term-o opnA ⊢e ss s) with subsumption0 ⊢e
          in s-term-c (⊢r-⊢c regA) (⊢r-≫-eq regA) (t-irrev-⊆ ih (s-⊆ s')) (s-refined-p s)
 s-refined-p (s-∀l s upᶜ upᵉ upC upD) = s-strengthen=0 (s-refined-p s) (↑ty-arr upC upD) (↑ty-arr upC upD) (↑tyᶜ-e upᵉ upᶜ)
 s-refined-p (s-tapp s upᶜ) = s-tapp (s-refined-p s) upᶜ
-
+s-refined-p s'@(s-term-p ss s) = s-term-p (s-refl (s-env-out s) (⊆-⊢r (ss-polarity- ss) (s-⊆ s' ))) (s-refined-p s)
+s-refined-p (s-∀l-p s upᶜ upE upC upD) = s-strengthen=0 (s-refined-p s) (↑ty-arr upC upD) (↑ty-arr upC upD) (↑tyᶜ-◐ upE upᶜ)
 
 ⊢to≤ (⊢lit regΓ) = s-empty (reg-Z regΓ) ⊢c-int grd-int
 ⊢to≤ (⊢var cloΓ x∈Γ) = let regA = ⊢r-𝕣 (∋⦂-⊢r cloΓ x∈Γ)
@@ -71,6 +73,9 @@ s-refined-p (s-tapp s upᶜ) = s-tapp (s-refined-p s) upᶜ
   with regB ← t-⊢r ⊢e = s-type (s-refl (reg-Z r) (⊢r-arr (⊢r-𝕣 regA) (⊢r-𝕣 (⊢r-strengthen,0 regB))))
 ⊢to≤ (⊢lam₂ ⊢e up-c ⊢e₁) with ⊢to≤ ⊢e₁
 ... | ih = let regA = ⊢r-𝕣 (t-⊢r ⊢e) in s-term-c (⊢r-⊢c regA) (⊢r-≫-eq regA) (subsumption0 ⊢e) (s-strengthen,0 ih up-c)
+⊢to≤ (⊢lam₃ up-c ⊢e)
+  with reg-S, r regA ← t-env ⊢e
+  = s-term-p (s-refl (reg-Z r) (⊢r-𝕣 regA)) (s-strengthen,0 (⊢to≤ ⊢e) up-c)
 ⊢to≤ (⊢sub ⊢e ne gc s) = s-refined-p s
 ⊢to≤ (⊢tabs ⊢e) with t-env ⊢e
 ... | reg-S∙ r = let regA = ⊢r-𝕣 (t-⊢r ⊢e) in s-empty (reg-Z r) (⊢c-∀ (⊢r-⊢c regA)) (grd-∀ (⊢r-≫-eq regA))
@@ -121,3 +126,10 @@ subsumption {Σ' = A ⓪↝ Σ'} {A' = A′} (⊢tapp ⊢e st) (≊⓪ newΣ) s
   with reg-S= regΓ regA ← s-env-in s'
   = let upA' = (st-↑ty (⊢r-¬ε (s-⊢r s') Z) st)
     in ⊢tapp (subsumption ⊢e (≊⓪ (≊⓪ newΣ)) (s-tapp (s-weaken=0 s upA' (↑tyᶜ-⓪ up-e upΣ') upA′ regA) (↑tyᶜ-⓪ up-e upΣ'))) (↑ty-st upA′)
+subsumption (⊢app ⊢e) (≊P newΣ) s = {!!}
+subsumption {Σ' = _ ◐↝ Σ'}  (⊢lam₃ up-c ⊢e) (≊P newΣ) (s-term-p ss s)
+  with ⟨ nΣ' , upΣ ⟩ ← ↑tmᶜ0-total Σ'
+  with reg-S, regΓ regA ← t-env ⊢e
+  with refl ← ⊆-antisymm (ss-⊆ ss) (s-⊆ s) = ⊢lam₃ upΣ (subsumption ⊢e (≊-weaken newΣ up-c upΣ) (s-weaken,0 s upΣ {!!}))
+subsumption (⊢sub ⊢e ne gc s₁) (≊P newΣ) s = ⊢sub ⊢e ne-par gc (s-trans s₁ s (≊P newΣ))
+subsumption (⊢tapp ⊢e st) (≊P newΣ) s = {!!}

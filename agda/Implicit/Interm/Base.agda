@@ -8,11 +8,16 @@ open import Implicit.Language.All
 
 infix 3 _⊢_#_⌞_⌝_
 data _⊢_#_⌞_⌝_ : Env n m → Counter m → Type m → Polar → Type m → Set where
-  s-refl :
+  s-refl+ :
       (regΔ : SRegular Δ)
     → (cloA : Δ ⊢c A)
     → (grd : Δ ≫ A ⇘ A%)
     → Δ ⊢ Z # A ⌞ ≤⁺ ⌝ A%
+  s-refl- :
+      (regΔ : SRegular Δ)
+    → (cloA : Δ ⊢c A)
+    → (grd : Δ ≫ A ⇘ A%)
+    → Δ ⊢ Z # A% ⌞ ≤⁻ ⌝ A
   s-int :
       (regΔ : SRegular Δ)
     → Δ ⊢ ∞ # Int ⌞ ≤ ⌝ Int
@@ -24,26 +29,31 @@ data _⊢_#_⌞_⌝_ : Env n m → Counter m → Type m → Polar → Type m →
       Δ ⊢ ∞ # C ⌞ ⋆ ≤ ⌝ A
     → Δ ⊢ ∞ # B ⌞ ≤ ⌝ D
     → Δ ⊢ ∞ # A `→ B ⌞ ≤ ⌝ C `→ D
+{-
+need to justify/reason w is 0/∞
+-}
+{-
+
+Γ (A) ~~> A*
+|-∞ A* ⌞  ≤⁻ ⌝ A
+
+-}
+
   s-arr₂ :
-      Δ ⊢ ∞ # C ⌞ ≤⁻ ⌝ A
-    → Δ ⊢ j # B ⌞ ≤⁺ ⌝ D
-    → Δ ⊢ 𝕚 j # A `→ B ⌞ ≤⁺ ⌝ C `→ D
-  s-arr₃ :
-      (cloA : Δ ⊢c A)
-    → (grd : Δ ≫ A ⇘ A%)
-    → Δ ⊢ j # B ⌞ ≤⁺ ⌝ D
-    → Δ ⊢ 𝕔 j # A `→ B ⌞ ≤⁺ ⌝ A% `→ D
+      Δ ⊢ w # C ⌞ ⋆ ≤ ⌝ A
+    → Δ ⊢ j # B ⌞ ≤ ⌝ D
+    → Δ ⊢ 𝕊₍ w ₎ j # A `→ B ⌞ ≤ ⌝ C `→ D
   s-∀ :
       Δ ,∙ ⊢ ∞ # A ⌞ ≤ ⌝ B
     → Δ ⊢ ∞ # `∀ A ⌞ ≤ ⌝ `∀ B
   s-∀l :
-      Δ ,= B ⊢ j' # A ⌞ ≤⁺ ⌝ C' `→ D'
-    → (ic : (𝕚𝕔 j))
-    → (fd : find A #0 j')
+      Δ ,= B ⊢ (𝕊₍ w' ₎ j') # A ⌞ ≤⁺ ⌝ C' `→ D'
+    → (fd : find2 A #0 (𝕊₍ w' ₎ j'))
     → (upC : ↑ty0 C ⇘ C')
     → (upD : ↑ty0 D ⇘ D')
     → (upj : ↑tyʲ0 j ⇘ j')
-    → Δ ⊢ j # `∀ A ⌞ ≤⁺ ⌝ C `→ D
+    → (upw : ↑tyʲ0 w ⇘ w')
+    → Δ ⊢ (𝕊₍ w ₎ j) # `∀ A ⌞ ≤⁺ ⌝ C `→ D
   s-tapp :
       Δ ,= B ⊢ j' # A ⌞ ≤⁺ ⌝ C
     → (upj : ↑tyʲ0 j ⇘ j')
@@ -87,14 +97,10 @@ data _⊢_#_⦂_ : Env n m → Counter m → Term n m → Type m → Set where
     → Γ ⊢ ∞ # ƛ e ⦂ A `→ B
   ⊢lam₂ :
       Γ , A ⊢ j # e ⦂ B
-    → Γ ⊢ 𝕚 j # ƛ e ⦂ A `→ B
+    → Γ ⊢ 𝕊₍ Z ₎ j # ƛ e ⦂ A `→ B
   ⊢app₁ :
-      Γ ⊢ 𝕔 j # e₁ ⦂ A `→ B
-    → Γ ⊢ ∞ # e₂ ⦂ A
-    → Γ ⊢ j # e₁ · e₂ ⦂ B
-  ⊢app₂ :
-      Γ ⊢ 𝕚 j # e₁ ⦂ A `→ B
-    → Γ ⊢ Z # e₂ ⦂ A
+      Γ ⊢ 𝕊₍ w ₎ j # e₁ ⦂ A `→ B
+    → Γ ⊢ w # e₂ ⦂ A
     → Γ ⊢ j # e₁ · e₂ ⦂ B
   ⊢sub :
       Γ ⊢ Z # g ⦂ A
