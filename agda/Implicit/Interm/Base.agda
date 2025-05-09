@@ -98,9 +98,10 @@ data _⊢_#_⦂_ : Env n m → Counter m → Term n m → Type m → Set where
   ⊢lam₂ :
       Γ , A ⊢ j # e ⦂ B
     → Γ ⊢ 𝕊₍ Z ₎ j # ƛ e ⦂ A `→ B
-  ⊢app₁ :
+  ⊢app :
       Γ ⊢ 𝕊₍ w ₎ j # e₁ ⦂ A `→ B
     → Γ ⊢ w # e₂ ⦂ A
+    → Rank1 w
     → Γ ⊢ j # e₁ · e₂ ⦂ B
   ⊢sub :
       Γ ⊢ Z # g ⦂ A
@@ -213,3 +214,40 @@ annota (⊢sub ⊢e B≤A gc j≢Z) eq = {!!}
 annota (⊢tabs ⊢e) eq = ⊢tabs ⊢e
 annota (⊢tapp ⊢e st) eq = {!!}
 -}
+
+_ : ∅ , `∀ ((Int `→ ‶ #0) `→ ‶ #0) ⊢ Z # (` #0 · (ƛ ` #0)) ⦂ Int
+_ = ⊢app {w = 𝕊₍ Z ₎ Z} {A = Int `→ Int}
+         (⊢sub (⊢var
+                 (reg-S, reg-Z
+                  (⊢r-∀ (⊢r-arr (⊢r-arr ⊢r-int (⊢r-var-∙ Z)) (⊢r-var-∙ Z))))
+                 Z)
+                 (s-∀l {B = Int} {C' = Int `→ Int} {D' = Int}
+                   (s-arr₂ (s-arr₂ (s-refl+
+                                     (reg-S=
+                                      (reg-Z
+                                       (reg-S, reg-Z
+                                        (⊢r-∀ (⊢r-arr (⊢r-arr ⊢r-int (⊢r-var-∙ Z)) (⊢r-var-∙ Z)))))
+                                      ⊢r-int)
+                                     ⊢c-int grd-int) (s-refl-
+                                                       (reg-S=
+                                                        (reg-Z
+                                                         (reg-S, reg-Z
+                                                          (⊢r-∀ (⊢r-arr (⊢r-arr ⊢r-int (⊢r-var-∙ Z)) (⊢r-var-∙ Z)))))
+                                                        ⊢r-int)
+                                                       (⊢c-var-= Z) (grd-var= (Z ↑ty-int)))) (s-refl+
+                                                                                               (reg-S=
+                                                                                                (reg-Z
+                                                                                                 (reg-S, reg-Z
+                                                                                                  (⊢r-∀ (⊢r-arr (⊢r-arr ⊢r-int (⊢r-var-∙ Z)) (⊢r-var-∙ Z)))))
+                                                                                                ⊢r-int)
+                                                                                               (⊢c-var-= Z) (grd-var= (Z ↑ty-int))))
+                   (f2-arr-l (f1-arr-r-Z (f1-∞ ε-var)))
+                   (↑ty-arr ↑ty-int ↑ty-int) ↑ty-int ↑tyʲ-Z (↑tyʲ-𝕊 ↑tyʲ-Z ↑tyʲ-Z)) -- subtyping
+                 gc-var nz-S)
+         (⊢lam₂ (⊢var
+                  (reg-S,
+                   (reg-S, reg-Z
+                    (⊢r-∀ (⊢r-arr (⊢r-arr ⊢r-int (⊢r-var-∙ Z)) (⊢r-var-∙ Z))))
+                   ⊢r-int)
+                  Z))
+         (rk1-S rk0-Z rk1-Z)

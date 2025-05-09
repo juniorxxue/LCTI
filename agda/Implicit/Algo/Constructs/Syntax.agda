@@ -13,6 +13,7 @@ data Context : ℕ → ℕ → Set where
 
 variable
   Σ Σ' Σ* Σ'* Σ₁ Σ₂ Σ₁' Σ₂' Σ'' : Context n m
+  δ δ' : Context n m
 
 data NonEmpty : Context n m → Set where
   ne-τ    : NonEmpty (Context n m ∋⦂ τ A)

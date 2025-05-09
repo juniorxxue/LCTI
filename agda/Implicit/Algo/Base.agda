@@ -7,6 +7,21 @@ open import Implicit.Algo.Constructs.Shift public
 open import Implicit.Algo.Constructs.Subst public
 open import Implicit.Algo.Constructs.Lookup public
 
+
+-- assumption: A is open
+infix 3 _⊢_↦_
+data _⊢_↦_ : Env n m → Type m → Context n m → Set where
+  tf-tvar :
+    Γ ⊢ ‶ X ↦ □
+  tf-∀ :
+    Γ ⊢ `∀ A ↦ □
+  tf-arr :
+      Γ ⊢c A
+    → Γ ≫ A ⇘ A%
+    → Γ ⊢ B ↦ Σ
+    → Γ ⊢ A `→ B ↦ A% ◐↝ Σ
+
+
 infix 3 _⊢_⌞_⌝_⊣_
 data _⊢_⌞_⌝_⊣_ : Env n m → Type m → Polar → Type m → Env n m → Set where
   s-int :
@@ -126,7 +141,8 @@ data _⊢_≤⁺_⊣_↪_ where
 
   s-term-o :
       (opnA : Δ ⊢o A)
-    → (⊢e : 𝕣 Δ ⊢ □ ⇒ e ⇒ C)
+    → (tf : Δ ⊢ A ↦ δ)
+    → (⊢e : 𝕣 Δ ⊢ δ ⇒ e ⇒ C)
     → (ss : Δ ⊢ C ⌞ ≤⁻ ⌝ A ⊣ Ω)
     → Ω ⊢ B ≤⁺ Σ ⊣ Ψ ↪ D
     → Δ ⊢ A `→ B ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ C `→ D
@@ -156,3 +172,32 @@ data _⊢_≤⁺_⊣_↪_ where
       Δ ,= B ⊢ A ≤⁺ Σ' ⊣ Ψ ,= B ↪ C
     → (upᶜ : ↑tyᶜ0 Σ ⇘ Σ')
     → Δ ⊢ `∀ A ≤⁺ (B ⓪↝ Σ) ⊣ Ψ ↪ `∀ C
+
+
+-- colored example
+
+_ : ∅ , `∀ ((Int `→ ‶ #0) `→ ‶ #0) ⊢ □ ⇒ (` #0 · (ƛ ` #0)) ⇒ Int
+_ = ⊢app (⊢sub (⊢var
+                 (reg-S, reg-Z
+                  (⊢r-∀ (⊢r-arr (⊢r-arr ⊢r-int (⊢r-var-∙ Z)) (⊢r-var-∙ Z))))
+                 Z)
+                ne-app gc-var
+                (s-∀l {B = Int} (s-term-o (⊢o-arr-r (⊢o-var-^ Z)) (tf-arr ⊢c-int grd-int tf-tvar)
+                  (⊢lam₃ ↑tmᶜ-□ (⊢var (reg-S, (reg-S^
+                                                            (reg-S, reg-Z (⊢r-∀ (⊢r-arr (⊢r-arr ⊢r-int (⊢r-var-∙ Z)) (⊢r-var-∙ Z)))))
+                                                                                                              ⊢r-int) Z)) (s-arr (s-int
+                                                                                                                                   (reg-S^
+                                                                                                                                    (reg-Z
+                                                                                                                                     (reg-S, reg-Z
+                                                                                                                                      (⊢r-∀ (⊢r-arr (⊢r-arr ⊢r-int (⊢r-var-∙ Z)) (⊢r-var-∙ Z))))))) (s-ex-r^ (⟹^0 ↑ty-int ⊢r-int
+                                                                                                                                                                                                               (reg-Z
+                                                                                                                                                                                                                (reg-S, reg-Z
+                                                                                                                                                                                                                 (⊢r-∀ (⊢r-arr (⊢r-arr ⊢r-int (⊢r-var-∙ Z)) (⊢r-var-∙ Z)))))))) (s-empty
+                                                                                                                                                                                                                                                                                  (reg-S=
+                                                                                                                                                                                                                                                                                   (reg-Z
+                                                                                                                                                                                                                                                                                    (reg-S, reg-Z
+                                                                                                                                                                                                                                                                                     (⊢r-∀ (⊢r-arr (⊢r-arr ⊢r-int (⊢r-var-∙ Z)) (⊢r-var-∙ Z)))))
+                                                                                                                                                                                                                                                                                   ⊢r-int)
+                                                                                                                                                                                                                                                                                  (⊢c-var-= Z) (grd-var= (Z ↑ty-int))))
+                  ↑tyᶜ-□ (↑tyᵉ-ƛ ↑tyᵉ-var) (↑ty-arr ↑ty-int ↑ty-int) ↑ty-int)
+                 )
