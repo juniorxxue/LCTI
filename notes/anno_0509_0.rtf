@@ -1,0 +1,136 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2820
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fnil\fcharset0 Iosevka;\f1\fnil\fcharset0 Iosevka-Bold;}
+{\colortbl;\red255\green255\blue255;\red251\green2\blue7;\red0\green0\blue255;\red0\green0\blue255;
+\red0\green0\blue0;}
+{\*\expandedcolortbl;;\cssrgb\c100000\c14913\c0;\cssrgb\c1680\c19835\c100000;\cssrgb\c1680\c19835\c100000;
+\cssrgb\c0\c0\c0;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww23400\viewh14680\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs36 \cf0 We have to use the subset (partial abilities) of our type system\
+\
+The consequences are\
+\
+* no check counters\
+\
+need (lit i) = 0\
+need x = 0\
+need (\\x. e) = S (need e)\
+need (e1 e2) =\
+  let \
+      r1 = need e2\
+      r2 = needFun e2\
+  in\
+      case needFun e1 with (r1 r2) of\
+        S n -> n\
+        0 -> 0\
+\
+\
+needFun lit i with _ = nothing\
+needFun x with _ = lookup x T\
+needFun (\\x. e) with (r1, r2) = ?\
+\
+\
+--------- need is a caller to recursively calling needFun\
+--------- maybe just generalize/merge needFun and need\
+\
+need (lit i) with [] = 0\
+need x with rs = needType x with rs\
+need (\\x. e) with [] = S (need e with [])\
+need (\\x. e) with ((r : rs) = case\
+\
+\
+need _ with _ = nothing\
+\
+the problem is 
+\f1\b do we need to precompute all the typing environments?\
+\
+\
+forall a. a -> a\
+=> I 0\
+\
+\
+forall a. (Int -> Int) -> a -> a\
+=> I I 0\
+\
+forall a. a -> a -> a\
+=> I 0\
+\
+T, f : (Int -> Int) -> Int) |- f (\\x. x) : Int\
+----------------------------------------------\
+T |- \\f. f (\\x. x) : ((Int -> Int) -> Int) -> Int\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf0 T, f : (forall a. (a -> a)) -> Int) |- f (\\x. x) : Int\
+----------------------------------------------\
+T |- \\f. f (\\x. x) : ((forall a. (a -> a)) -> Int) -> Int\
+\
+\
+need T e1 > 0\
+need T e2 > 0\
+--------------\
+e1 e2 ~~> (e1 : A) e2\
+\
+\
+need T (\\f. f (\\x. x)) id \
+=> \
+\
+(\\f. f (\\x. x)) id ~~>\
+-------------------------------------------------\
+(\\f. ((\\z. f z : (Int -> Int) -> Int) (\\x. x))) id\
+\
+g : (Int -> Int) -> Int\
+\
+\
+T |- e : A ~~> e'\
+need (e) = n\
+-----------------\
+T |-n e' : A\
+\
+need e1 = 1\
+need e2 = 1\
+\
+------------------\
+(\\x. x) (\\x. x)\
+\
+
+\f0\b0 need (
+\f1\b ((\\x. x) (\\x. x))) = 1\
+need (\\x.x) = 1
+\f0\b0 \
+----------------------------\
+
+\f1\b ((\\x. x) (\\x. x)) --> (\\x. x)\
+\
+\
+(\\f. f (\\x. x)) id : ~~> \
+\
+\
+(\\f. <f 1, f (\\x. x)>) id\
+\
+\cf2 Does annotate the argument really causes trouble?\
+\
+---------\
+\
+\cf3 g : forall a b. a -> b -> a\
+\
+g (\\x. x)\
+\
+|- g 1\
+\
+((\\x. g x) : Int -> Int -> Int) 1\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf4 forall a b. a -> b -> a \cf3 <: [x] -> (\cf4 Int -> Int)\cf3 \
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\b0 \cf5 (\\f. f (\\x. x)) g\
+\
+\
+(\\f1. \\f2. f2 f1 (\\x. x)) g
+\f1\b \cf2 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\b0 \cf0 \
+}
