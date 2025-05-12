@@ -7,21 +7,6 @@ open import Implicit.Algo.Constructs.Shift public
 open import Implicit.Algo.Constructs.Subst public
 open import Implicit.Algo.Constructs.Lookup public
 
-
--- assumption: A is open
-infix 3 _⊢_↦_
-data _⊢_↦_ : Env n m → Type m → Context n m → Set where
-  tf-tvar :
-    Γ ⊢ ‶ X ↦ □
-  tf-∀ :
-    Γ ⊢ `∀ A ↦ □
-  tf-arr :
-      Γ ⊢c A
-    → Γ ≫ A ⇘ A%
-    → Γ ⊢ B ↦ Σ
-    → Γ ⊢ A `→ B ↦ A% ◐↝ Σ
-
-
 infix 3 _⊢_⌞_⌝_⊣_
 data _⊢_⌞_⌝_⊣_ : Env n m → Type m → Polar → Type m → Env n m → Set where
   s-int :

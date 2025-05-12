@@ -30,3 +30,17 @@ data _≊_ : Context n m → Context n m → Set where
      → A ◐↝ Σ ≊ A ◐↝ Σ'
   ≊⓪ : Σ ≊ Σ'
      → A ⓪↝ Σ ≊ A ⓪↝ Σ'
+
+
+-- assumption: A is open
+infix 3 _⊢_↦_
+data _⊢_↦_ : Env n m → Type m → Context n m → Set where
+  tf-tvar :
+    Γ ⊢ ‶ X ↦ □
+  tf-∀ :
+    Γ ⊢ `∀ A ↦ □
+  tf-arr :
+      Γ ⊢c A
+    → Γ ≫ A ⇘ A%
+    → Γ ⊢ B ↦ Σ
+    → Γ ⊢ A `→ B ↦ A% ◐↝ Σ

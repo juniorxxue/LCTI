@@ -24,7 +24,7 @@ open import Implicit.Algo.Properties.Trans
 ≊-weaken (≊⓪ new) (↑tmᶜ-⓪ up1) (↑tmᶜ-⓪ up2) = ≊⓪ (≊-weaken new up1 up2)
 ≊-weaken (≊P new) (↑tmᶜ-◐ up1) (↑tmᶜ-◐ up2) = ≊P (≊-weaken new up1 up2)
 
-
+↑²
 -- aux lemmas
 t-inf-open-false : Γ ⊢ □ ⇒ e ⇒ A
                  → Γ ⋈ ⊢o A
