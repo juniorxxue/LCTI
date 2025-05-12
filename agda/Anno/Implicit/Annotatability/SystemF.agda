@@ -1,80 +1,20 @@
 module Implicit.Annotatability.SystemF where
 
-open import Implicit.Language.All hiding (Counter)
+open import Implicit.Language.All
 open import Implicit.Decl.Typing
+open import Implicit.Decl.Subtyping
 
 private variable
   e₁′ : Term n m
-
-data Counter : Set where
-  Z : Counter
-  ∞ : Counter
-  𝕚 : Counter → Counter
-  𝕔 : Counter → Counter
-
-private variable
-  p p' p₁ p₂ : Counter
-  mp mp' mp₁ mp₂ : Maybe Counter
-
-infix 3 _⊢_needFunT_
-data _⊢_needFunT_ : Env n m → Type m → Counter → Set where
-  ndft-var1 : Γ ∋= X
-            → Γ ⊢ ‶ X needFunT Z
-  ndft-var2 : Γ ∋^ X
-            → Γ ⊢ ‶ X needFunT ∞
-  ndft-arr1 : Γ ⊢c A
-            → Γ ⊢ B needFunT p
-            → Γ ⊢ A `→ B needFunT 𝕔 p
-  ndft-arr2 : Γ ⊢o A
-            → Γ ⊆ Δ w/t A
-            → Δ ⊢ B needFunT p
-            → Γ ⊢ A `→ B needFunT 𝕚 p
-  ndft-∀ : Γ ,^ ⊢ A needFunT p
-         → Γ ⊢ `∀ A needFunT p
-
-data NEnv : ℕ → Set where
-  ∅ : NEnv 0
-  S : Counter → NEnv n → NEnv (1 + n)
-
-private variable
-  δ : NEnv n
-
-data Conv : Env n m → NEnv n → Set where
-  conv-Z : Conv ∅ ∅
-  conv-S : Conv Γ δ
-         → Γ ⊢ A needFunT p
-         → Conv (Γ , A) (S p δ)
 
 infix 3 _𝕄_
 data _𝕄_ : Type m → Type m → Set where
 
   𝕄-arr : A `→ B 𝕄 A `→ B
-  M-∀ : ⟦ T ⟧ A ⇘ A*
+  M-∀ : (st : ⟦ T ⟧ A ⇘ A*)
        → A* 𝕄 B `→ C
+       → (ocr : #0 ε A)
        → `∀ A 𝕄 B `→ C
-
-infix 3 _⊢_needFun_
-data _⊢_needFun_ : Env n m → Term n m → Counter → Set where
-  ndf-var : Γ ∋ x ⦂ A
-          → Γ ⋈ ⊢ A needFunT p
-          → Γ ⊢ ` x needFun p
-  ndf-lam : Γ , A ⊢ e needFun p
-          → Γ ⊢ ƛ e needFun 𝕚 p
-  ndf-app1 : Γ ⊢ e₁ needFun 𝕚 p
-           → Γ ⊢ e₁ · e₂ needFun p
-  ndf-app2 : Γ ⊢ e₁ needFun 𝕔 p
-           → Γ ⊢ e₁ · e₂ needFun p
-
-infix 3 _⊢_need_
-data _⊢_need_ : Env n m → Term n m → Counter → Set where
-  nd-lit : Γ ⊢ lit n need Z
-  nd-var : Γ ⊢ ` x need Z
-  nd-lam : Γ , A ⊢ e need p
-         → Γ ⊢ ƛ e need 𝕚 p
-  nd-app1 : Γ ⊢ e₁ needFun 𝕚 p
-          → Γ ⊢ e₁ · e₂ need p
-  nd-app2 : Γ ⊢ e₁ needFun 𝕔 p
-          → Γ ⊢ e₁ · e₂ need p
 
 infix 3 _⊢_⦂_⟶_
 data _⊢_⦂_⟶_ : Env n m → Term n m → Type m → Term n m → Set where
@@ -84,38 +24,63 @@ data _⊢_⦂_⟶_ : Env n m → Term n m → Type m → Term n m → Set where
           → Γ ⊢ ` x ⦂ A ⟶ ` x
   ela-lam : Γ , A ⊢ e ⦂ B ⟶ e'
           → Γ ⊢ ƛ e ⦂ A `→ B ⟶ ƛ e'
-  ela-app1 : (ndf : Γ ⊢ e₁ needFun 𝕔 p)
-           → Γ ⊢ e₁ ⦂ A ⟶ e₁'
+  ela-app : Γ ⊢ e₁ ⦂ A ⟶ e₁'
            → A 𝕄 B `→ C
            → Γ ⊢ e₂ ⦂ B ⟶ e₂'
-           → Γ ⊢ e₁ · e₂ ⦂ C ⟶ e₁' · e₂'
-  ela-app2 : (nd : Γ ⊢ e₂ need Z)
-           → Γ ⊢ e₁ ⦂ A ⟶ e₁'
-           → A 𝕄 B `→ C
-           → Γ ⊢ e₂ ⦂ B ⟶ e₂'
-           → Γ ⊢ e₁ · e₂ ⦂ C ⟶ e₁' · e₂'
-  ela-app3 : (ndf : Γ ⊢ e₁ needFun 𝕚 p)
-           → (nd : Γ ⊢ e₂ need 𝕚 p')
-           → Γ ⊢ e₁ ⦂ A ⟶ e₁'
-           → A 𝕄 B `→ C
-           → Γ ⊢ e₂ ⦂ B ⟶ e₂'
-           → (up : ↑tm0 e₁' ⇘ e₁′)
-           → Γ ⊢ e₁ · e₂ ⦂ C ⟶ ((ƛ (e₁′ · ` #0)) ⦂ B `→ C) · e₂'
+           → Γ ⊢ e₁ · e₂ ⦂ C ⟶ e₁' · (e₂' ⦂ B)
+
+infix 3 _⟾_
+data _⟾_ : Counter m × Type m → Counter m × Type m → Set where
+  base : A 𝕄 B
+       → ⟨ ∞ , A ⟩ ⟾ ⟨ 𝕚 ∞ , B ⟩
+  case-𝕚 : ⟨ j , B ⟩ ⟾ ⟨ j' , D ⟩
+         → ⟨ 𝕚 j , A `→ B ⟩ ⟾ ⟨ 𝕚 j' , A `→ D ⟩
+  case-𝕔 : ⟨ j , B ⟩ ⟾ ⟨ j' , D ⟩
+         → ⟨ 𝕔 j , A `→ B ⟩ ⟾ ⟨ 𝕔 j' , A `→ D ⟩
+  case-𝕥 : ⟨ j′ , B ⟩ ⟾ ⟨ j″ , D ⟩
+         → (upj1 : ↑tyʲ0 j ⇘ j′)
+         → (upj2 : ↑tyʲ0 j' ⇘ j″)
+         → ⟨ 𝕥₍ A ₎ j , `∀ B ⟩ ⟾ ⟨ 𝕥₍ A ₎ j' , `∀ D ⟩
 
 
-_ : ∅ , `∀ (‶ #0 `→ ‶ #0) ⊢ (` #0) · (lit 1) ⦂ Int ⟶ (` #0) · (lit 1)
-_ = ela-app2 nd-lit (ela-var Z)
-     (M-∀ (st-arr (st-var stx-eq) (st-var stx-eq)) 𝕄-arr) ela-lit
+conv-sub-gen-s : Γ ⊢ j # A ≤ B
+               → ⟨ j , B ⟩ ⟾ ⟨ j' , C ⟩
+               → Γ ⊢ j' # A ≤ C  --- we need to generalize the conclusion
+conv-sub-gen-s (s-int regΔ) (base ())
+conv-sub-gen-s (s-var-∙ regΔ inΔ) (base ())
+conv-sub-gen-s (s-arr₁ s s₁) (base 𝕄-arr) = s-arr₂ s s₁
+conv-sub-gen-s (s-arr₂ s s₁) (case-𝕚 cv) = s-arr₂ s (conv-sub-gen-s s₁ cv)
+conv-sub-gen-s (s-arr₃ regA s) (case-𝕔 cv) = s-arr₃ regA (conv-sub-gen-s s cv)
+conv-sub-gen-s (s-∀ s) (base (M-∀ st mm ocr)) = {!!}
+-- conv-sub-gen-s (s-∀ s) (base (M-∀ {T = T} x x₁ ocr))
+--  with refl ← s-trans-∞-eq s = s-∀l {B = T} {!!} x {!!} case-𝕚 {!!} (↑tyʲ-𝕚 ↑tyʲ-∞) -- some inductive happens here
+conv-sub-gen-s (s-∀l regB st s case-𝕚 fd upj) (case-𝕚 cv) = s-∀l regB st (conv-sub-gen-s s (case-𝕚 cv)) case-𝕚 {!!} {!!} -- ok
+conv-sub-gen-s (s-∀l regB st s case-𝕔 fd upj) (case-𝕔 cv) = s-∀l regB st (conv-sub-gen-s s (case-𝕔 cv)) case-𝕔 {!!} {!!} -- ok
+conv-sub-gen-s (s-tapp regB st s upC) (case-𝕥 cv upj1 upj2) = s-tapp regB st (conv-sub-gen-s s {!cv!}) {!!}  -- ok
 
-_ : ∅ , `∀ (‶ #0 `→ ‶ #0) ⊢ (` #0) · (ƛ ` #0) ⦂ Int `→ Int ⟶ (` #0) · ((ƛ ` #0) ⦂ Int `→ Int)
-_ = {!!}
+conv-sub-gen : Γ ⊢ j # e ⦂ A
+             → ⟨ j , A ⟩ ⟾ ⟨ j' , B ⟩
+             → Γ ⊢ j' # e ⦂ B
+conv-sub-gen (⊢lam₁ ⊢e) (base 𝕄-arr) = ⊢lam₂ ⊢e
+conv-sub-gen (⊢lam₂ ⊢e) (case-𝕚 cv) = ⊢lam₂ (conv-sub-gen ⊢e cv)
+conv-sub-gen (⊢app₁ ⊢e ⊢e₁) cv = ⊢app₁ (conv-sub-gen ⊢e (case-𝕔 cv)) ⊢e₁
+conv-sub-gen (⊢app₂ ⊢e ⊢e₁) cv = ⊢app₂ (conv-sub-gen ⊢e (case-𝕚 cv)) ⊢e₁
+conv-sub-gen (⊢sub ⊢e B≤A gc j≢Z) cv = ⊢sub ⊢e (conv-sub-gen-s B≤A cv) gc {!!} -- ok
+conv-sub-gen (⊢tapp ⊢e st) cv = ⊢tapp (conv-sub-gen ⊢e (case-𝕥 {!!} {!!} {!!})) {!!} -- could be avoided
 
+conv-sub : Γ ⊢ ∞ # e ⦂ A
+         → A 𝕄 B
+         → Γ ⊢ 𝕚 ∞ # e ⦂ B
+-- conv-sub ⊢e cv = conv-sub-gen ⊢e (base cv)
+conv-sub (⊢lam₁ ⊢e) 𝕄-arr = ⊢lam₂ ⊢e
+conv-sub (⊢app₁ ⊢e ⊢e₁) cv = ⊢app₁ {!!} ⊢e₁
+conv-sub (⊢app₂ ⊢e ⊢e₁) cv = ⊢app₂ {!!} ⊢e₁
+conv-sub (⊢sub ⊢e B≤A gc j≢Z) cv = ⊢sub ⊢e {!!} gc nz-I
+conv-sub (⊢tapp ⊢e st) cv = ⊢tapp {!!} {!!}
 
 annotatability : Γ ⊢ e ⦂ A ⟶ e'
-               → Γ ⊢ e need p
-               → Γ ⊢ j # e' ⦂ A
-
-annotatability-fun : Γ ⊢ e ⦂ A ⟶ e'
-                   → Γ ⊢ e needFun p
-                   → A 𝕄 B
-                   → Γ ⊢ j # e' ⦂ B
+               → Γ ⊢ ∞ # e' ⦂ A
+annotatability ela-lit = ⊢sub (⊢lit {!!}) {!!} gc-i nz-∞
+annotatability (ela-var x) = {!!}
+annotatability (ela-lam ⊢e) = ⊢lam₁ (annotatability ⊢e)
+annotatability (ela-app ⊢e cv ⊢e₁) = ⊢app₂ (conv-sub (annotatability ⊢e) cv) (⊢ann (annotatability ⊢e₁))
