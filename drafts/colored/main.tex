@@ -398,19 +398,17 @@
 \Gamma; \Omega \vdash B \leq^+ \Sigma \dashv \Delta' \rightsquigarrow D}
 {\Gamma; \Delta \vdash A \rightarrow B \leq^+ \boxed{e} \leadsto \Sigma \dashv \Delta' \rightsquigarrow C \rightarrow D}
 
-\inferrule*[right=\texttt{S-Term-Par}]
+\inferrule*[right=\texttt{S-ParType}]
 {\Gamma; \Delta \vdash C \leq^- A \dashv \Omega \\
 \Gamma; \Omega \vdash B \leq^+ \Sigma \dashv \Delta' \rightsquigarrow D}
 {\Gamma; \Delta \vdash A \rightarrow B \leq^+ \boxed{C} \leadsto \Sigma \dashv \Delta' \rightsquigarrow C \rightarrow D}
 \\
 
 \inferrule*[right=\texttt{S-$\forall$L}]
-{\Gamma; \Delta, \hat{a} \vdash A \leq^+ \boxed{e} \leadsto \Sigma \dashv \Delta', \hat{a}=C \rightsquigarrow B}
-{\Gamma; \Delta \vdash \forall a. A \leq^+ \boxed{e} \leadsto \Sigma \dashv \Delta' \rightsquigarrow B}
-
-\inferrule*[right=\texttt{S-$\forall$L-Par}]
-{\Gamma; \Delta, \hat{a} \vdash A \leq^+ \boxed{D} \leadsto \Sigma \dashv \Delta', \hat{a}=C \rightsquigarrow B}
-{\Gamma; \Delta \vdash \forall a. A \leq^+ \boxed{D} \leadsto \Sigma \dashv \Delta' \rightsquigarrow B}
+{\Gamma \vdash \Sigma \longmapsto \Sigma'\\
+ \texttt{fun}(\Sigma')\\
+\Gamma; \Delta, \hat{a} \vdash A \leq^+ \Sigma' \dashv \Delta', \hat{a}=B \rightsquigarrow C}
+{\Gamma; \Delta \vdash \forall a. A \leq^+ \Sigma \dashv \Delta' \rightsquigarrow C}
 
 \inferrule*[right=\texttt{S-TApp}]
 { \Gamma; \Delta, a =B \vdash A \leq^+ \Sigma \dashv \Delta, a = B \rightsquigarrow C}
