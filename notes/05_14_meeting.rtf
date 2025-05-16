@@ -1,0 +1,58 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2820
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fnil\fcharset0 Iosevka;}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue255;}
+{\*\expandedcolortbl;;\cssrgb\c1680\c19835\c100000;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww23100\viewh14380\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs36 \cf0 * Difficulty of need\
+\
+id 1\
+id (\\x. x)\
+\
+(\\f. id f) (\\x. x)\
+(\\f. f (\\x. x)) id\
+\
+* Current (naive) annotate principles\
+* Stuck at some proof\
+\
+* (id : Int -> Int)\
+* Worried about completeness, where 8 ~~> i i i 8\
+\
+\
+\
+T |-8 id : forall a. a -> a\
+\
+\
+T |-8 : id : Int -> Int\
+\
+\
+\
+\cf2 |-8 forall a b. a -> b -> b <: forall a b. a -> b -> b \cf0 \
+---------------------------------------------------\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf0 |-I 8 forall a b. a -> b -> b <: Int -> Int -> Int\
+\
+|-I 8 forall b. Int -> b -> b <: Int -> Int -> Int\
+\
+|-I 0 forall a b. a -> b -> b <: forall b. Int -> b -> b \
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf0 |-? forall a b. (a -> b) -> b <: forall b. (Int -> b) -> b\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf0 \
+conv-sub-gen-s : \uc0\u915  \u8866  j # A \u8804  B\
+               \uc0\u8594  \u10216  j , B \u10217  \u10238  \u10216  j' , C \u10217 \
+               \uc0\u8594  \{\u915  \u8866  j' # A \u8804  C, \u915  \u8866  j' # A1 \u8804  C, \u915  \u8866  j' # An \u8804  C\
+\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf0 X) |-I 8 forall a b. a -> b -> b <: forall b. Int -> b -> b\
+\
+O) |-I 8 forall a b. a -> b -> b <: Int -> Int -> Int\
+O) |-I 8 forall b. Int -> b -> b <: Int -> Int -> Int\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf0 \
+\
+}

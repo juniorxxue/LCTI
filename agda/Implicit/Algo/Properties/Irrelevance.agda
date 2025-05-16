@@ -262,11 +262,10 @@ s-irrev (s-term-c cloA ap ⊢e s) tf = s-term-c (⇌s-⊢c-l cloA tf) (⇌s-≫-
 s-irrev (s-term-o opnA trf ⊢e ss s) tf with ⇌s-Ω (ss-⊆ ss) tf
 ... | ⟨ Ω' , tf' ⟩ = s-term-o (⇌s-⊢o-l opnA tf) {!!}
     (t-irrev ⊢e (⇌s-⇌-l tf)) (ss-irrev ss tf') (s-irrev s (⇌s-arr tf tf' (s-⊆ s)))
-s-irrev (s-∀l s upᶜ upᵉ upC upD) tf = s-∀l (s-irrev s (evar-sol tf)) upᶜ upᵉ upC upD
+s-irrev (s-∀l s conv funp upᶜ upC upD) tf = s-∀l (s-irrev s (evar-sol tf)) conv funp upᶜ upC upD
 s-irrev (s-tapp s upᶜ) tf = s-tapp (s-irrev s (svar tf)) upᶜ
 s-irrev (s-term-p ss s) tf with ⇌s-Ω (ss-⊆ ss) tf
 ... | ⟨ Ω' , tf' ⟩ = s-term-p (ss-irrev ss tf') (s-irrev s (⇌s-arr tf tf' (s-⊆ s)))
-s-irrev (s-∀l-p s upᶜ upE upC upD) tf = s-∀l-p (s-irrev s (evar-sol tf)) upᶜ upE upC upD
 
 ----------------------------------------------------------------------
 --+                           corollary                            +--

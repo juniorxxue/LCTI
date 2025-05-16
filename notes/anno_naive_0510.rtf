@@ -15,4 +15,35 @@ x --> x\
 \
 \\x. e -- \\x. e'\
 \
-e1 e2 --> e1 (e2 : A)}
+e1 e2 --> e1 (e2 : A)\
+\
+\
+id 1\
+\
+id (\\x. x)\
+\
+(\\f. f (\\x. x)) id\
+\
+f : forall a. b. a -> b\
+\
+(f (1 : Int)) : Bool\
+\
+\
+f : forall a. Int -> Int\
+(f 1) : Int\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf0 forall a. Int -> Int <: Int -> Int\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf0 \
+(f (1 : Int)) : Int\
+\
+\
+-----------------------------------\
+forall a. Int -> Int <: [1] -> Int\
+\
+\
+\
+f : forall a b. a (a -> a)-> b\
+\
+(f (1 : Int)) : Int}
