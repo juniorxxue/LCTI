@@ -52,8 +52,6 @@ s-trans-∞-eq (s-var-∙ regΔ inΔ) = refl
 s-trans-∞-eq (s-arr₁ s s₁) = cong₂ _`→_ (sym (s-trans-∞-eq s)) (s-trans-∞-eq s₁)
 s-trans-∞-eq (s-∀ s) = cong `∀_ (s-trans-∞-eq s)
 
-
-
 s-refl-∞ : SRegular Γ
          → Γ ⊢r A
          → Γ ⊢ ∞ # A ≤ A

@@ -75,6 +75,9 @@ s-trans : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
         → Γ ⊢ A ≤⁺ Σ' ⊣ Δ ↪ C
 s-trans (s-empty cloΓ cloA x) (s-type ss) ≊Z with ss-⊢r-eq+ ss (⊢c-≫-⊢r cloΓ cloA x)
 ... | refl = s-type (ss-grd+ cloΓ cloA x)
+s-trans (s-empty regΓ cloA (grd-var= x)) s'@(s-∀l s (tf-τ x₁) funP upδ upC upD) ≊Z
+  with refl ← s-id0 s' = {!!}
+s-trans (s-empty regΓ cloA (grd-∀ grd)) (s-∀l s (tf-τ x₁) funP upδ upC upD) ≊Z = {!!}
 s-trans (s-term-c cloA ap ⊢e s1) (s-term-c cloA₁ ap₁ ⊢e₁ s2) (≊S newΣ)
   with regA% ← ⊢c-≫-⊢r (s-env-in s1) cloA ap
   with relf ← ⊢id0 ⊢e
@@ -86,23 +89,12 @@ s-trans s'@(s-term-o opnA tf ⊢e x s1) (s-term-c cloA ap ⊢e₁ s2) (≊S new�
   with refl ← ⊢r-≫-eq' (⊆-⊢r (ss-polarity- x) (s-⊆ s')) ap = s-term-o opnA tf ⊢e x (s-trans s1 s2 newΣ)
 s-trans s'@(s-term-o opnA tf ⊢e x s1) (s-term-o opnA₁ tf₁ ⊢e₁ x₁ s2) (≊S newΣ) = let regA = ⊆-⊢r (⊢r-𝕣 (t-⊢r ⊢e)) (s-⊆ s')
                                                                           in ⊥-elim (⊢r-⊢o-false regA opnA₁)
-s-trans (s-∀l s1 upᶜ upᵉ upC upD) s'@(s-term-c {A% = A%} {Σ = Σ′} {D = D} cloA ap ⊢e s2) (≊S newΣ)
-  with reg-S= regΓ regB ← s-env-out s1
-  = let ⟨ Σ″ , upΣ′ ⟩ = ↑tyᶜ0-total Σ′
-        ⟨ A%' , upA%' ⟩ = ↑ty0-total A%
-        ⟨ D' , upD' ⟩ = ↑ty0-total D
-    in s-∀l (s-trans s1 (s-weaken=0 s' (↑ty-arr upC upD) (↑tyᶜ-e upᵉ upΣ′) (↑ty-arr upA%' upD') regB) (≊S (≊-↑ty0 newΣ upᶜ upΣ′))) upΣ′ upᵉ upA%' upD'
-s-trans s'@(s-∀l s1 upᶜ upᵉ upC upD) (s-term-o opnA tf ⊢e x s2) (≊S newΣ)
-  with (⊢r-arr regC regD) ← s-⊢r s' = let regA = ⊆-⊢r regC (s-⊆ s') in ⊥-elim (⊢r-⊢o-false regA opnA)
+s-trans (s-∀l s1 conv funP upᶜ upC upD) s2 newΣ = {!!}
+
 s-trans {C = C} (s-tapp {B = B} s1 upᶜ) (s-tapp s2 upᶜ₁) (≊⓪ {Σ' = Σ'} newΣ) = s-tapp (s-trans s1 s2 (≊-↑ty0 newΣ upᶜ upᶜ₁)) upᶜ₁
 s-trans (s-term-p ss s1) (s-term-p ss₁ s2) (≊P newΣ)
   with refl ← ⊆-antisymm (ss-⊆ ss₁) (s-⊆ s2) = s-term-p ss (s-trans s1 s2 newΣ)
-s-trans (s-∀l-p s1 upᶜ upE upC upD) s'@(s-term-p {Σ = Σ′} {D = D} ss s2) (≊P newΣ)
-  with reg-S= regΓ regB ← s-env-out s1
-  =
-  let ⟨ Σ″ , upΣ′ ⟩ = ↑tyᶜ0-total Σ′
-      ⟨ D' , upD' ⟩ = ↑ty0-total D
-  in s-∀l-p (s-trans s1 (s-weaken=0 s' (↑ty-arr upC upD) (↑tyᶜ-◐ upE upΣ′) (↑ty-arr upE upD') regB) (≊P (≊-↑ty0 newΣ upᶜ upΣ′))) upΣ′ upE upE upD'
+s-trans {C = C `→ C₁} (s-tapp x₁ upᶜ) x (≊⓪ x₂) = {!!}
 
 {-
   with reg-S= regΓ regB ← s-env-out s1

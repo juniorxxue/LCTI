@@ -139,8 +139,8 @@ data _⊢_≤⁺_⊣_↪_ where
 
   s-∀l :
       Δ ,^ ⊢ A ≤⁺ δ' ⊣ Ψ ,= B ↪ (C' `→ D')
-    → Σ ⟼ δ
-    → 𝔽 δ
+    → (conv : Σ ⟼ δ)
+    → (funP : 𝔽 δ)
     → (upδ : ↑tyᶜ0 δ ⇘ δ')
     → (upC : ↑ty0 C ⇘ C')
     → (upD : ↑ty0 D ⇘ D')
@@ -170,4 +170,4 @@ _ = ⊢ann (⊢sub {B = Int `→ Int} (⊢var (reg-S, reg-Z (⊢r-∀ (⊢r-arr 
                                                                                                   (reg-S=
                                                                                                    (reg-Z (reg-S, reg-Z (⊢r-∀ (⊢r-arr (⊢r-var-∙ Z) (⊢r-var-∙ Z)))))
                                                                                                    ⊢r-int)
-                                                                                                  (Z ↑ty-int)))) (tf-τ (tf-arr tf-int)) 𝔽-par (↑tyᶜ-◐ ↑ty-int (↑tyᶜ-τ ↑ty-int)) ↑ty-int ↑ty-int))
+                                 (Z ↑ty-int)))) (tf-τ (tf-arr tf-int)) 𝔽-par (↑tyᶜ-◐ ↑ty-int (↑tyᶜ-τ ↑ty-int)) ↑ty-int ↑ty-int))

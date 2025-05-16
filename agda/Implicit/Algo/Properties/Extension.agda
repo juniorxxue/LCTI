@@ -29,9 +29,7 @@ s-⊆ (s-type ss) = ss-⊆ ss
 s-⊆ (s-term-c cloA ap ⊢e s) = s-⊆ s
 s-⊆ (s-term-o opnA tf ⊢e x s) = ⊆-trans (ss-⊆ x) (s-⊆ s)
 s-⊆ (s-term-p ss s) = ⊆-trans (ss-⊆ ss) (s-⊆ s)
-s-⊆ (s-∀l s upᶜ upᵉ upC upD) with s-⊆ s
-... | evar-sol r regA = r
-s-⊆ (s-∀l-p s upᶜ upᵉ upC upD) with s-⊆ s
+s-⊆ (s-∀l s conv funP upᶜ upC upD) with s-⊆ s
 ... | evar-sol r regA = r
 s-⊆ (s-tapp s upᶜ) with s-⊆ s
 ... | svar r regA = r
