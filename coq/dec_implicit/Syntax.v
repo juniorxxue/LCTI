@@ -66,7 +66,7 @@ Notation "Γ ⋈"     := (SepCons Γ) (at level 55, right associativity).
 
 (* The function f(i,j) = if i<=j then j+1 else j *)
 Definition punchIn (k : nat) (X : nat) : nat :=
-  if k <=? X then X + 1 else X.
+  if k <=? X then S X else X.
 
 Fixpoint ty_shift (A : Typ) (k : nat) : Typ :=
   match A with
@@ -146,7 +146,7 @@ Inductive lookupExTy : Env -> nat -> Typ -> Prop :=
 | l_exty_STy    : forall Γ A x, lookupExTy Γ x A -> lookupExTy (TyCons Γ) (S x) (ty_shift A 0)
 | l_exty_SEx    : forall Γ A x, lookupExTy Γ x A -> lookupExTy (ExCons Γ) (S x) (ty_shift A 0)
 | l_exty_SExTy  : forall Γ A B x, lookupExTy Γ x A -> lookupExTy (ExTyCons Γ B) (S x) (ty_shift A 0)
-| l_exty_STm    : forall Γ A x, lookupExTy Γ x A -> lookupExTy (TmCons Γ A) x (ty_shift A 0).
+| l_exty_STm    : forall Γ A B x, lookupExTy Γ x A -> lookupExTy (TmCons Γ B) x (ty_shift A 0).
 
 (* lookup an entry in subtyping env: solution (simpler ver.) *)
 Inductive lookupExTy' : Env -> nat -> Prop :=

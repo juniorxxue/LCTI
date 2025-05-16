@@ -10,10 +10,10 @@ Inductive sub : Env -> Typ -> Polar -> Typ -> Env -> Prop :=
     sub Δ (TVar x) p (TVar x) Δ
 | s_ex_l : forall Δ Ψ x A,
     substEnv A x Δ Ψ ->
-    sub Ψ (TVar x) Pos A Ψ
+    sub Δ (TVar x) Pos A Ψ
 | s_ex_r : forall Δ Ψ x A,
     substEnv A x Δ Ψ ->
-    sub Ψ A Neg (TVar x) Ψ
+    sub Δ A Neg (TVar x) Ψ
 | s_exty_l : forall Δ x A,
     SRegular Δ ->
     lookupExTy Δ x A ->
