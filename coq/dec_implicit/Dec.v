@@ -64,11 +64,15 @@ Proof.
   - hauto q: on.
 Qed.
 
-(* Lemma lookupTm : forall Γ x,
-  {A | lookupTm Γ x A} + {~ exists A, lookupTm Γ x A}.
+Lemma dec_lookupTm : forall Δ x,
+  {A | lookupTm Δ x A} + {~ exists A, lookupTm Δ x A}.
 Proof.
-  intro Γ. induction Γ; intro x.
-  best.  *)
+  intro Δ. induction Δ; intros x.
+  3 - 6 : destruct (IHΔ x) as [[A' Heq] | Hneq]; sauto lq: on.
+  - sauto lq: on.
+  - destruct x. sauto lq: on.
+    destruct (IHΔ x) as [[A' Heq] | Hneq]; sauto lq: on.
+Qed.
 
 Lemma dec_lookupTy : forall Γ x,
   {lookupTy Γ x} + {~ lookupTy Γ x}.
@@ -345,7 +349,7 @@ Fixpoint tm_size (e : Trm) : nat :=
   | Var _ => 1
   | Lam e' => 1 + tm_size e'
   | App e1 e2 => 3 + tm_size e1 + tm_size e2
-  | Ann e' _ => 1 + tm_size e'
+  | Ann e' _ => 2 + tm_size e'
   | TLam e' => 1 + tm_size e'
   | TApp e' _ => 2 + tm_size e'
   end.
@@ -471,11 +475,55 @@ Lemma sub_ctx_det : forall Δ A Σ Δ1 Δ2 A1 A2,
   sub_ctx Δ A Σ Δ1 A1 -> sub_ctx Δ A Σ Δ2 A2 -> Δ1 = Δ2 /\ A1 = A2.
 Proof. hauto lq: on rew: off use: ty_sub_ctx_det'. Qed.
 
+Lemma eq_dec_env : forall (Γ : Env) Γ',
+  {Γ = Γ'} + {Γ <> Γ'}.
+Proof. repeat decide equality. Qed.
+
 Lemma dec_ty_sub_ctx' : forall n,
   (forall Γ Σ e, tm_size e + ctx_size Σ < n ->
     {A | ty Γ Σ e A} + {~ exists A, ty Γ Σ e A}) *
   (forall m Δ A Σ, ctx_size Σ < n -> ty_size A + ctx_size Σ < m ->
     {Δ' : Env & {A' : Typ & sub_ctx Δ A Σ Δ' A'}} + {~ exists Δ' A', sub_ctx Δ A Σ Δ' A'}).
+Proof.
+  intro n. induction n. split; try lia.
+  destruct IHn as [IHty IHsub]. split.
+  - intros Γ Σ e Hlt.
+    assert (Sub: GenericConsumer e -> NonEmpty Σ -> {A | ty Γ Σ e A} + {~ exists A, ty Γ Σ e A}).
+    { intros Hgc Hne.
+      eapply NonEmpty_ctx_size_gt0 in Hne as Hgt.
+      assert (Hgt': tm_size e > 0) by apply tm_size_gt0.
+      assert (Hlt': tm_size e + ctx_size CtxEmpty < n). { simpl. lia. }
+      eapply IHty with (Γ := Γ) in Hlt' as Hempty.
+      assert (Hlt'': ctx_size Σ < n) by lia.
+      destruct Hempty as [[A Hty] | Hnty].
+      - eapply IHsub with (Δ := SepCons Γ) (A := A) in Hlt'' as Hsub; eauto.
+        destruct Hsub as [[Γ' [A' Hsub']] | Hneg].
+        + destruct (eq_dec_env (SepCons Γ) Γ'); subst. sauto lq: on.
+          right. intros [Γ'' Hc]. dependent destruction Hc; try sfirstorder use: NonEmpty_false.
+          eapply ty_det in Hty; eauto; subst. eapply sub_ctx_det in Hsub'; eauto. sfirstorder.
+        + right. intros [Γ'' Hc]. dependent destruction Hc; try sfirstorder use: NonEmpty_false.
+          eapply ty_det in Hty; eauto; subst. sfirstorder.
+      - right. intros [Γ'' Hc]. dependent destruction Hc; try sfirstorder use: NonEmpty_false. }
+    destruct e; simpl in *.
+    + destruct (dec_CtxEmpty Σ); subst; try sfirstorder.
+      destruct (dec_TRegular Γ); sauto q: on.
+    + destruct (dec_CtxEmpty Σ); subst; try sfirstorder.
+      destruct (dec_lookupTm Γ n0) as [[A' Hlk] | Hnlk].
+      * destruct (dec_TRegular Γ). sauto lq: on.
+        right. intros [Γ' Hc]. dependent destruction Hc; sfirstorder use: NonEmpty_false.
+      * right. intros [Γ' Hc]. dependent destruction Hc; try sfirstorder use: NonEmpty_false.
+    + admit.
+    + admit.
+    + destruct (dec_CtxEmpty Σ); subst; try sfirstorder.
+      assert (Hlt': tm_size e + ctx_size (CtxTyp t) < n). { simpl in *. lia. }
+      eapply IHty with (Γ := Γ) in Hlt' as Hty.
+      destruct Hty as [[A Hty] | Hnty]. sauto lq: on.
+      right. intros [Γ' Hc]. dependent destruction Hc; try sfirstorder use: NonEmpty_false.
+    + destruct (dec_CtxEmpty Σ); subst; try sfirstorder.
+      assert (Hlt': tm_size e + ctx_size (□) < n) by lia.
+      eapply IHty with (Γ := TyCons Γ) in Hlt' as Hty.
+      destruct Hty as [[A Hty] | Hnty]. sauto lq: on.
+      right. intros [Γ' Hc]. dependent destruction Hc; try sfirstorder use: NonEmpty_false.
 Admitted.
 
 Theorem dec_ty : forall Γ Σ e,
