@@ -512,18 +512,48 @@ Proof.
       * destruct (dec_TRegular Γ). sauto lq: on.
         right. intros [Γ' Hc]. dependent destruction Hc; sfirstorder use: NonEmpty_false.
       * right. intros [Γ' Hc]. dependent destruction Hc; try sfirstorder use: NonEmpty_false.
-    + admit.
-    + admit.
+    + destruct Σ.
+      * sauto lq: on.
+      * destruct t. 1, 2, 4 : sauto lq: on.
+        assert (Hlt': tm_size e + ctx_size (CtxTyp t2) < n). { simpl in *. lia. }
+        eapply IHty with (Γ := TmCons Γ t1) in Hlt' as Hty.
+        destruct Hty as [[A Hty] | Hnty]. sauto lq: on.
+        right. intros [Γ' Hc]. dependent destruction Hc; try sfirstorder use: NonEmpty_false.
+      * assert (Hlt': tm_size t + ctx_size CtxEmpty < n). { simpl in *. lia. }
+        assert (Hlt'': tm_size e + ctx_size (tm_shift_ctx Σ 0) < n).
+        { rewrite ctx_size_tm_shift. simpl in *. lia. }
+        eapply IHty with (Γ := Γ) in Hlt' as Hty.
+        destruct Hty as [[A Hty] | Hnty].
+        -- eapply IHty with (Γ := TmCons Γ A) in Hlt'' as Hty'.
+           destruct Hty' as [[A' Hty'] | Hnty']. sauto lq: on.
+           right. intros [Γ' Hc]. dependent destruction Hc; try sfirstorder use: NonEmpty_false.
+           eapply ty_det in Hty; eauto. sfirstorder.
+        -- right. intros [Γ' Hc]. dependent destruction Hc; try sfirstorder use: NonEmpty_false.
+      * sauto lq: on.
+    + assert (Hlt': tm_size e1 + ctx_size (CtxTrm e2 Σ) < n). { simpl in *. lia. }
+      eapply IHty with (Γ := Γ) in Hlt' as Hty.
+      destruct Hty as [[A Hty] | Hnty].
+      * destruct A; try solve [right; intros [Γ' Hc]; dependent destruction Hc; try sfirstorder;
+          eapply ty_det in Hty; eauto; sfirstorder].
+        sauto lq: on.
+      * right. intros [Γ' Hc]. dependent destruction Hc; try sfirstorder use: NonEmpty_false. 
     + destruct (dec_CtxEmpty Σ); subst; try sfirstorder.
       assert (Hlt': tm_size e + ctx_size (CtxTyp t) < n). { simpl in *. lia. }
       eapply IHty with (Γ := Γ) in Hlt' as Hty.
       destruct Hty as [[A Hty] | Hnty]. sauto lq: on.
       right. intros [Γ' Hc]. dependent destruction Hc; try sfirstorder use: NonEmpty_false.
     + destruct (dec_CtxEmpty Σ); subst; try sfirstorder.
-      assert (Hlt': tm_size e + ctx_size (□) < n) by lia.
+      assert (Hlt': tm_size e + ctx_size CtxEmpty < n) by lia.
       eapply IHty with (Γ := TyCons Γ) in Hlt' as Hty.
       destruct Hty as [[A Hty] | Hnty]. sauto lq: on.
       right. intros [Γ' Hc]. dependent destruction Hc; try sfirstorder use: NonEmpty_false.
+    + assert (Hlt': tm_size e + ctx_size (CtxTApp t Σ) < n). { simpl in *. lia. }
+      eapply IHty with (Γ := Γ) in Hlt' as Hty.
+      destruct Hty as [[A Hty] | Hnty].
+      * destruct A; try solve [right; intros [Γ' Hc]; dependent destruction Hc; try sfirstorder;
+          eapply ty_det in Hty; eauto; sfirstorder].
+        sauto lq: on.
+      * right. intros [Γ' Hc]. dependent destruction Hc; try sfirstorder use: NonEmpty_false. 
 Admitted.
 
 Theorem dec_ty : forall Γ Σ e,
