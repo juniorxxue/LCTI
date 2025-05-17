@@ -126,7 +126,7 @@ data _⊢_≤⁺_⊣_↪_ where
 
   s-term-o :
       (opnA : Δ ⊢o A)
-    → (tf : Δ ⊢ A ↦₁ δ)
+    → (conv : Δ ⊢ A ↦₁ δ)
     → (⊢e : 𝕣 Δ ⊢ δ ⇒ e ⇒ C)
     → (ss : Δ ⊢ C ⌞ ≤⁻ ⌝ A ⊣ Ω)
     → Ω ⊢ B ≤⁺ Σ ⊣ Ψ ↪ D
@@ -138,36 +138,14 @@ data _⊢_≤⁺_⊣_↪_ where
     → Δ ⊢ A `→ B ≤⁺ (C ◐↝ Σ) ⊣ Ψ ↪ C `→ D
 
   s-∀l :
-      Δ ,^ ⊢ A ≤⁺ δ' ⊣ Ψ ,= B ↪ (C' `→ D')
-    → (conv : Σ ⟼ δ)
-    → (funP : 𝔽 δ)
-    → (upδ : ↑tyᶜ0 δ ⇘ δ')
-    → (upC : ↑ty0 C ⇘ C')
-    → (upD : ↑ty0 D ⇘ D')
-    → Δ ⊢ `∀ A ≤⁺ Σ ⊣ Ψ ↪ C `→ D
-{-
-  s-∀l-p :
-      Δ ,^ ⊢ A ≤⁺ (E' ◐↝ Σ') ⊣ Ψ ,= B ↪ (C' `→ D')
+      Δ ,^ ⊢ A ≤⁺ ([ e' ]↝ Σ') ⊣ Ψ ,= B ↪ (C' `→ D')
     → (upᶜ : ↑tyᶜ0 Σ ⇘ Σ')
-    → (upE : ↑ty0 E ⇘ E')
+    → (upᵉ : ↑tyᵉ0 e ⇘ e')
     → (upC : ↑ty0 C ⇘ C')
     → (upD : ↑ty0 D ⇘ D')
-    → Δ ⊢ `∀ A ≤⁺ (E ◐↝ Σ) ⊣ Ψ ↪ C `→ D
--}
+    → Δ ⊢ `∀ A ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ C `→ D
 
   s-tapp :
       Δ ,= B ⊢ A ≤⁺ Σ' ⊣ Ψ ,= B ↪ C
     → (upᶜ : ↑tyᶜ0 Σ ⇘ Σ')
     → Δ ⊢ `∀ A ≤⁺ (B ⓪↝ Σ) ⊣ Ψ ↪ `∀ C
-
-
-_ : ∅ , `∀ (‶ #0 `→ ‶ #0) ⊢ □ ⇒ (` #0) ⦂ (Int `→ Int) ⇒ (Int `→ Int)
-_ = ⊢ann (⊢sub {B = Int `→ Int} (⊢var (reg-S, reg-Z (⊢r-∀ (⊢r-arr (⊢r-var-∙ Z) (⊢r-var-∙ Z)))) Z) ne-τ gc-var
-         (s-∀l (s-term-p (s-ex-r^
-                           (⟹^0 ↑ty-int ⊢r-int
-                            (reg-Z (reg-S, reg-Z (⊢r-∀ (⊢r-arr (⊢r-var-∙ Z) (⊢r-var-∙ Z))))))) (s-type
-                                                                                                 (s-ex-l=
-                                                                                                  (reg-S=
-                                                                                                   (reg-Z (reg-S, reg-Z (⊢r-∀ (⊢r-arr (⊢r-var-∙ Z) (⊢r-var-∙ Z)))))
-                                                                                                   ⊢r-int)
-                                 (Z ↑ty-int)))) (tf-τ (tf-arr tf-int)) 𝔽-par (↑tyᶜ-◐ ↑ty-int (↑tyᶜ-τ ↑ty-int)) ↑ty-int ↑ty-int))

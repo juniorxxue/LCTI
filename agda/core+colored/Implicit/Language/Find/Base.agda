@@ -10,10 +10,6 @@ infix 3 _↑tyʲ_⇘_
 data _↑tyʲ_⇘_ : Counter m → Fin (1 + m) → Counter (1 + m) → Set where
   ↑tyʲ-Z : Z ↑tyʲ k ⇘ Z
   ↑tyʲ-∞ : ∞ ↑tyʲ k ⇘ ∞
-  ↑tyʲ-𝕚 : j ↑tyʲ k ⇘ j'
-         → (𝕚 j) ↑tyʲ k ⇘ (𝕚 j')
-  ↑tyʲ-𝕔 : j ↑tyʲ k ⇘ j'
-         → (𝕔 j) ↑tyʲ k ⇘ (𝕔 j')
   ↑tyʲ-𝕥 : j ↑tyʲ k ⇘ j'
          → (upA : A ↑ty k ⇘ A')
          → 𝕥₍ A ₎ j ↑tyʲ k ⇘ 𝕥₍ A' ₎ j'

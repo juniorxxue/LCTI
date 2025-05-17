@@ -106,10 +106,9 @@ data SEnv : Env n m → Set where
 
 infixr 9 𝕥₍_₎_
 data Counter : ℕ → Set where
-  Z : Counter m
+  𝕟 : ℕ → Counter m
   ∞ : Counter m
-  𝕚 : Counter m → Counter m
-  𝕔 : Counter m → Counter m
+  𝕊₍_₎_ : ℕ → Counter m → Counter m
   𝕥₍_₎_ : Type m → Counter m → Counter m
 
 variable
@@ -118,13 +117,13 @@ variable
 
 data NonZ : Counter m → Set where
   nz-∞ : NonZ (Counter m ∋⦂ ∞)
-  nz-I : NonZ (𝕚 j)
-  nz-C : NonZ (𝕔 j)
+--   nz-I : NonZ (𝕚₍ n ₎ j)
+--  nz-C : NonZ (𝕔 j)
   nz-T : NonZ (𝕥₍ A ₎ j)
 
 data 𝕚𝕔 : Counter m → Set where
-  case-𝕚 : 𝕚𝕔 (𝕚 j)
-  case-𝕔 : 𝕚𝕔 (𝕔 j)
+--  case-𝕚 : 𝕚𝕔 (𝕚₍ n ₎ j)
+--  case-𝕔 : 𝕚𝕔 (𝕔 j)
 
 data Polar : Set where
   ≤⁺ ≤⁻ : Polar
