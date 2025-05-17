@@ -47,7 +47,7 @@ data _⊢_#_≤_ : Env n m → Counter m → Type m → Type m → Set where
     → (st : ⟦ B ⟧ A ⇘ A*)
     → Δ ⊢ j # A* ≤ C
     → (upC : ↑ty0 C ⇘ C')
-    → Δ ⊢ 𝕥₍ B ₎ j # `∀ A ≤ `∀ C'
+    → Δ ⊢ 𝕋₍ B ₎ j # `∀ A ≤ `∀ C'
 
 
 
@@ -107,7 +107,7 @@ s1-strengthen= {j = j} (s-∀l {B = B} {A* = A*} regB st s ic fd upj₁) new (�
   = s-∀l (⊢r-strengthen= regB new upB')
          (↑ty-st-comm0'' st upB' upA upA*)
          (s1-strengthen= s new upA* (↑ty-arr upB upB₁) upj) (𝕚𝕔-↑tyʲ' ic upj) (↑ty-find0' fd upA (↑tyʲ-comm0' upj upj₁ upj')) upj'
-s1-strengthen= (s-tapp {A* = A*} {C = C} regB st s upC) new (↑ty-∀ upA) (↑ty-∀ upB) (↑tyʲ-𝕥 {j = j} upj upA₁)
+s1-strengthen= (s-tapp {A* = A*} {C = C} regB st s upC) new (↑ty-∀ upA) (↑ty-∀ upB) (↑tyʲ-𝕋 {j = j} upj upA₁)
   with regA* ← s1-⊢r-l s
   with regC ← s1-⊢r-r s
   with k¬εA* ← ⊢r-¬ε regA* (◀=-∋=' new)

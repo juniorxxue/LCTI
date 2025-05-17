@@ -113,12 +113,12 @@ variable
   𝕖 𝕖₁ 𝕖₂ : ENat
   i i₁ i₂ : ℕ
 
-infixr 9 𝕥₍_₎_
+infixr 9 𝕋₍_₎_
 infixr 9 𝕊₍_₎_
 data Counter : ℕ → Set where
   𝔼 : ENat → Counter m
   𝕊₍_₎_ : ENat → Counter m → Counter m
-  𝕥₍_₎_ : Type m → Counter m → Counter m
+  𝕋₍_₎_ : Type m → Counter m → Counter m
 
 -- some syntactic sugar
 `𝕫 : Counter m
@@ -135,7 +135,7 @@ variable
 
 data NonZ : Counter m → Set where
   nz-S  : NonZ (𝕊₍ 𝕖 ₎ j)
-  nz-T  : NonZ (𝕥₍ A ₎ j)
+  nz-T  : NonZ (𝕋₍ A ₎ j)
 
 data Polar : Set where
   ≤⁺ ≤⁻ : Polar

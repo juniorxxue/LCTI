@@ -5,7 +5,7 @@ open import Implicit.Algo.Base
 open import Implicit.Algo.Properties.Extension
 open import Implicit.Algo.Properties.PShift
 open import Implicit.Algo.Properties.Id
-open import Implicit.Algo.Properties.Regularity
+open import Implicit.Algo.Properties.PRegularity
 
 postulate
   ◀=-unique : Γ ◀ k =⇘ Γ'

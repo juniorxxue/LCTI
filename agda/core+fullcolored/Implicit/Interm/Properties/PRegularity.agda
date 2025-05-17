@@ -14,14 +14,13 @@ postulate
 infix 3 _⊢rʲ_
 
 data _⊢rʲ_ : Env n m → Counter m → Set where
-  j-Z : Γ ⊢rʲ Z
-  j-∞ : Γ ⊢rʲ ∞
+  j-Z : Γ ⊢rʲ `𝕫
+  j-∞ : Γ ⊢rʲ `∞
   j-𝕊 : Γ ⊢rʲ j
-      → Γ ⊢rʲ w
-      → Γ ⊢rʲ (𝕊₍ w ₎ j)
-  j-𝕥 : Γ ⊢rʲ j
+      → Γ ⊢rʲ (𝕊₍ 𝕖 ₎ j)
+  j-𝕋 : Γ ⊢rʲ j
       → Γ ⊢r A
-      → Γ ⊢rʲ 𝕥₍ A ₎ j
+      → Γ ⊢rʲ 𝕋₍ A ₎ j
 
 
 postulate
