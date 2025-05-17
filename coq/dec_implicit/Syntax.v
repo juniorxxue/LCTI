@@ -43,11 +43,22 @@ Inductive NonEmpty : Context -> Prop :=
 | ne_app  : forall e Σ, NonEmpty (CtxTrm e Σ)
 | ne_tapp : forall A Σ, NonEmpty (CtxTApp A Σ).
 
-Inductive GenericConsumer : Trm -> Prop :=
+(* Inductive GenericConsumer : Trm -> Prop :=
 | gc_i    : forall n,   GenericConsumer (Lit n)
 | gc_var  : forall x,   GenericConsumer (Var x)
 | gc_ann  : forall e A, GenericConsumer (Ann e A)
-| gc_tlam : forall e,   GenericConsumer (TLam e).
+| gc_tlam : forall e,   GenericConsumer (TLam e). *)
+
+Fixpoint GenericConsumer (e : Trm) : Prop :=
+  match e with
+  | Lit n     => True
+  | Var x     => True
+  | Ann e A   => True
+  | TLam e    => True
+  | _         => False
+  end.
+
+(* The environment is a list of types, and the existential variables are in the tail *)
 
 Inductive Env : Set :=
 | EnvEmpty  : Env

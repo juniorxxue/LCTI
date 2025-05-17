@@ -6,25 +6,6 @@ Require Import Coq.Program.Equality.
 Require Import Coq.Arith.Compare_dec.
 Require Import Coq.Arith.PeanoNat.
 
-Fixpoint tm_size (e : Trm) : nat :=
-  match e with
-  | Lit _ => 1
-  | Var _ => 1
-  | Lam e' => 1 + tm_size e'
-  | App e1 e2 => 2 + tm_size e1 + tm_size e2
-  | Ann e' _ => 1 + tm_size e'
-  | TLam e' => 1 + tm_size e'
-  | TApp e' _ => 1 + tm_size e'
-  end.
-
-Fixpoint ctx_size (Σ : Context) : nat :=
-  match Σ with
-  | CtxEmpty => 0
-  | CtxTyp _ => 0
-  | CtxTrm e Σ' => 1 + tm_size e + ctx_size Σ'
-  | CtxTApp _ Σ' => 1 + ctx_size Σ'
-  end.
-
 Fixpoint ty_size (A : Typ) : nat :=
   match A with
   | Int => 1
@@ -358,10 +339,142 @@ Theorem dec_sub : forall Δ A p B,
   {Ω | sub Δ A p B Ω} + {~ exists Ω, sub Δ A p B Ω}.
 Proof. intros. eapply dec_sub'; eauto. Qed.
 
+Fixpoint tm_size (e : Trm) : nat :=
+  match e with
+  | Lit _ => 1
+  | Var _ => 1
+  | Lam e' => 1 + tm_size e'
+  | App e1 e2 => 3 + tm_size e1 + tm_size e2
+  | Ann e' _ => 1 + tm_size e'
+  | TLam e' => 1 + tm_size e'
+  | TApp e' _ => 2 + tm_size e'
+  end.
+
+Fixpoint ctx_size (Σ : Context) : nat :=
+  match Σ with
+  | CtxEmpty => 0
+  | CtxTyp _ => 1
+  | CtxTrm e Σ' => 2 + tm_size e + ctx_size Σ'
+  | CtxTApp _ Σ' => 1 + ctx_size Σ'
+  end.
+
+Lemma NonEmpty_ctx_size_gt0 : forall Σ,
+  NonEmpty Σ -> ctx_size Σ > 0.
+Proof.
+  intros Σ Hne. destruct Σ; simpl in *; try sfirstorder.
+  sauto lq: on.
+Qed. 
+
+Lemma tm_size_gt0 : forall e, tm_size e > 0.
+Proof. induction e; simpl; lia. Qed.
+
+Lemma lookupExTy_det : forall Δ x A A',
+  lookupExTy Δ x A -> lookupExTy Δ x A' -> A = A'.
+Proof.
+  intros Δ x A A' Hlookup Hlookup'. generalize dependent A'.
+  induction Hlookup; intros * Hlookup'; dependent destruction Hlookup'; sfirstorder use: ty_unshift_det.
+Qed.
+
+Lemma grd_typ_det : forall Δ A A' A'',
+  grd_typ Δ A A' -> grd_typ Δ A A'' -> A' = A''.
+Proof.
+  intros Δ A A' A'' Hgrd1 Hgrd2. generalize dependent A''.
+  induction Hgrd1; intros * Hgrd2; dependent destruction Hgrd2;
+    sfirstorder use: lookupExTy_det, lookupTy_ExTy.
+Qed.
+
+Lemma lookupExTy_lookupExTy' : forall Δ x A,
+  lookupExTy Δ x A -> lookupExTy' Δ x.
+Proof. intros Δ x A Hlk. induction Hlk; sauto lq: on. Qed.
+
+Lemma lookupExTy'_lookupExTy : forall Δ x,
+  lookupExTy' Δ x -> exists A, lookupExTy Δ x A.
+Proof. intros Δ x Hlk. induction Hlk; sauto lq: on. Qed.
+
+Lemma open_close_false : forall Δ A,
+  open Δ A -> close Δ A -> False.
+Proof.
+  intros Δ A Hopen Hclose.
+  induction Hopen; dependent destruction Hclose;
+    sfirstorder use: lookupTy_Ex, lookupEx_ExTy, lookupExTy'_lookupExTy.
+Qed.
+
+Lemma lookupTm_det : forall Γ x A A',
+  lookupTm Γ x A -> lookupTm Γ x A' -> A = A'.
+Proof.
+  intros Γ x A A' Hlk. generalize dependent A'.
+  induction Hlk; intros * Hlk'; dependent destruction Hlk'; sfirstorder.
+Qed.
+
+Lemma tm_size_tm_shift : forall e k,
+  tm_size (tm_shift e k) = tm_size e.
+Proof. induction e; intros k; simpl in *; try lia; try sfirstorder. Qed.
+
+Lemma tm_size_ty_shift_tm : forall e k,
+  tm_size (ty_shift_tm e k) = tm_size e.
+Proof. induction e; intros k; simpl in *; try lia; try sfirstorder. Qed.
+
+Lemma ty_size_ty_shift : forall A k,
+  ty_size (ty_shift A k) = ty_size A.
+Proof. induction A; intros k; simpl in *; try lia; try sfirstorder. Qed.
+
+Lemma ctx_size_tm_shift : forall Σ k,
+  ctx_size (tm_shift_ctx Σ k) = ctx_size Σ.
+Proof. induction Σ; intros k; simpl; try lia; try sfirstorder use: tm_size_tm_shift. Qed.
+
+Lemma ctx_size_ty_shift : forall Σ k,
+  ctx_size (ty_shift_ctx Σ k) = ctx_size Σ.
+Proof. induction Σ; intros k; simpl; try lia; try sfirstorder use: tm_size_ty_shift_tm. Qed.
+
+Lemma NonEmpty_false : NonEmpty CtxEmpty -> False.
+Proof. sauto lq: on. Qed.
+
+Lemma ty_sub_ctx_det' : forall n,
+  (forall Γ Σ e A A', tm_size e + ctx_size Σ < n ->
+    ty Γ Σ e A -> ty Γ Σ e A' -> A = A') /\
+  (forall m Δ A Σ Δ1 Δ2 A1 A2, ctx_size Σ < n -> ty_size A + ctx_size Σ < m ->
+    sub_ctx Δ A Σ Δ1 A1 -> sub_ctx Δ A Σ Δ2 A2 -> Δ1 = Δ2 /\ A1 = A2).
+Proof.
+  intro n. induction n. split; try lia.
+  destruct IHn as [IHty IHsub]. split.
+  - intros Γ Σ e A A' Hlt Hty1 Hty2.
+    dependent destruction Hty1; dependent destruction Hty2; simpl in *;
+      try sfirstorder use: NonEmpty_false, lookupTm_det;
+      try solve [eapply IHty in Hty1; eauto; simpl; try lia; sfirstorder].
+    + eapply IHty in Hty1_1; eauto; simpl; try lia. subst.
+      eapply IHty in Hty1_2; eauto. sfirstorder.
+      rewrite ctx_size_tm_shift. lia.
+    + assert (Hlt': tm_size g < n). { eapply NonEmpty_ctx_size_gt0 in H. lia. }
+      assert (Hlt'': ctx_size Σ < n). { specialize (tm_size_gt0 g). lia. }
+      eapply IHty in Hty1; eauto; simpl; try lia. subst.
+      eapply IHsub with (Δ1 := (Γ ⋈)) in H1; eauto; simpl; try lia. sfirstorder.
+  - intro m. induction m; try lia.
+    intros Δ A Σ Δ1 Δ2 A1 A2 Hlt1 Hlt2 Hsub1 Hsub2.
+    dependent destruction Hsub1; dependent destruction Hsub2; simpl in *;
+      try sfirstorder use: grd_typ_det, sub_det, open_close_false.
+    + eapply grd_typ_det in H0; eauto. subst.
+      eapply IHty in H1; eauto; simpl; try lia. subst.
+      eapply IHsub in Hsub1; eauto; simpl; try lia. sfirstorder.
+    + eapply IHty in H0; eauto; simpl; try lia. subst.
+      eapply sub_det in H1; eauto; simpl; try lia. subst.
+      eapply IHsub in Hsub1; eauto; simpl; try lia. sfirstorder.
+    + eapply IHm in Hsub1; eauto; simpl;
+        try rewrite tm_size_ty_shift_tm; try rewrite ctx_size_ty_shift; try lia.
+      sfirstorder use: ty_unshift_det.
+    + eapply IHsub in Hsub1; eauto; simpl; try rewrite ctx_size_ty_shift; try lia; try sfirstorder.
+Qed.
+
+Lemma ty_det : forall Γ Σ e A A', ty Γ Σ e A -> ty Γ Σ e A' -> A = A'.
+Proof. sauto lq: on use: ty_sub_ctx_det'. Qed.
+
+Lemma sub_ctx_det : forall Δ A Σ Δ1 Δ2 A1 A2,
+  sub_ctx Δ A Σ Δ1 A1 -> sub_ctx Δ A Σ Δ2 A2 -> Δ1 = Δ2 /\ A1 = A2.
+Proof. hauto lq: on rew: off use: ty_sub_ctx_det'. Qed.
+
 Lemma dec_ty_sub_ctx' : forall n,
   (forall Γ Σ e, tm_size e + ctx_size Σ < n ->
     {A | ty Γ Σ e A} + {~ exists A, ty Γ Σ e A}) *
-  (forall Δ A Σ, ctx_size Σ < n ->
+  (forall m Δ A Σ, ctx_size Σ < n -> ty_size A + ctx_size Σ < m ->
     {Δ' : Env & {A' : Typ & sub_ctx Δ A Σ Δ' A'}} + {~ exists Δ' A', sub_ctx Δ A Σ Δ' A'}).
 Admitted.
 
