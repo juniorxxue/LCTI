@@ -372,7 +372,11 @@
 
 \inferrule*[right=\texttt{S-$\forall$}]
 {\Gamma; \Delta, a \vdash A \leq B \dashv \Delta', a }
-{\Gamma; \Delta \vdash \forall a.A \leq \forall a.~B \dashv \Delta' }
+{\Gamma; \Delta \vdash \forall a.A \leq \forall a.B \dashv \Delta' }
+
+\inferrule*[right=\texttt{S-$\forall L$}]
+{\Gamma; \Delta, \hat{a} \vdash A \leq^+ B \to C \dashv \Delta'}
+{\Gamma; \Delta \vdash \forall a.A \leq^+ B \to C \dashv \Delta'}
 
 \noindent\makebox[\linewidth]{\rule{16cm}{0.4pt}}
 
@@ -405,10 +409,12 @@
 \\
 
 \inferrule*[right=\texttt{S-$\forall$L}]
-{\Gamma \vdash \Sigma \longmapsto \Sigma'\\
- \texttt{fun}(\Sigma')\\
-\Gamma; \Delta, \hat{a} \vdash A \leq^+ \Sigma' \dashv \Delta', \hat{a}=B \rightsquigarrow C}
-{\Gamma; \Delta \vdash \forall a. A \leq^+ \Sigma \dashv \Delta' \rightsquigarrow C}
+{\Gamma; \Delta, \hat{a} \vdash A \leq^+ \boxed{e} \leadsto \Sigma \dashv \Delta', \hat{a}=B \rightsquigarrow C}
+{\Gamma; \Delta \vdash \forall a. A \leq^+ \boxed{e} \leadsto \Sigma \dashv \Delta' \rightsquigarrow C}
+
+\inferrule*[right=\texttt{S-$\forall$L-Par}]
+{\Gamma; \Delta, \hat{a} \vdash A \leq^+ \boxed{D} \leadsto \Sigma \dashv \Delta', \hat{a}=B \rightsquigarrow C}
+{\Gamma; \Delta \vdash \forall a. A \leq^+ \boxed{D} \leadsto \Sigma \dashv \Delta' \rightsquigarrow C}
 
 \inferrule*[right=\texttt{S-TApp}]
 { \Gamma; \Delta, a =B \vdash A \leq^+ \Sigma \dashv \Delta, a = B \rightsquigarrow C}
