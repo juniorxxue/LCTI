@@ -606,7 +606,7 @@ Proof.
            destruct Hsub as [[Δ'' [A2' Hsub]] | Hnsub]. 2 : sauto lq: on.
            assert (Hlt'': tm_size t + ctx_size (CtxTyp A1') < n). { simpl in *. lia. }
            eapply IHty with (Γ := rm_sep Δ) in Hlt'' as Hty.
-           destruct Hty as [[A'' Hty] | Hnty]. best.
+           destruct Hty as [[A'' Hty] | Hnty]. sauto lq: on.
            right. intros [Δ' [A' Hcontra]]. dependent destruction Hcontra; try sfirstorder.
            eapply grd_typ_det in Hgrd; eauto. subst. eapply sub_ctx_det in Hsub; eauto.
         -- destruct (dec_open Δ A1) as [Ho | Hno]. 2 : sauto lq: on.
