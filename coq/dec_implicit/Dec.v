@@ -651,6 +651,10 @@ Proof.
       * right. intros [Δ'' [A'' Hcontra]]. dependent destruction Hcontra; try sfirstorder. 
 Qed.
 
+Theorem dec_ty : forall Γ Σ e,
+  {A | ty Γ Σ e A} + {~ exists A, ty Γ Σ e A}.
+Proof. hauto lq: on use: dec_ty_sub_ctx'. Qed.
+
 Theorem dec_sub_ctx : forall Δ A Σ,
   {Δ' : Env & {A' : Typ & sub_ctx Δ A Σ Δ' A'}} + {~ exists Δ' A', sub_ctx Δ A Σ Δ' A'}.
 Proof. hauto lq: on use: dec_ty_sub_ctx'. Qed.
