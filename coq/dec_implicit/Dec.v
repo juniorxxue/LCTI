@@ -479,6 +479,41 @@ Lemma eq_dec_env : forall (Γ : Env) Γ',
   {Γ = Γ'} + {Γ <> Γ'}.
 Proof. repeat decide equality. Qed.
 
+Lemma dec_close : forall Δ A,
+  {close Δ A} + {~ close Δ A}.
+Proof.
+  intros Δ A. generalize dependent Δ.
+  induction A; intro Δ; try sfirstorder.
+  - destruct (dec_lookupTy Δ n). sauto lq: on.
+    destruct (dec_lookupExTy Δ n). sauto lq: on use: lookupExTy_lookupExTy'.
+    sauto lq: on use: lookupExTy'_lookupExTy, lookupTy_ExTy.
+  - specialize (IHA1 Δ). specialize (IHA2 Δ). sauto q: on.
+  - specialize (IHA (TyCons Δ)). sauto lq: on.
+Qed.
+
+Lemma dec_open : forall Δ A,
+  {open Δ A} + {~ open Δ A}.
+Proof.
+  intros Δ A. generalize dependent Δ.
+  induction A; intro Δ.
+  - sauto lq: on. 
+  - destruct (dec_lookupEx Δ n); sauto lq: on.
+  - specialize (IHA1 Δ). specialize (IHA2 Δ). sauto q: on.
+  - specialize (IHA (TyCons Δ)). sauto q: on.
+Qed.
+
+Lemma dec_grd_typ : forall Δ A,
+  {A' | grd_typ Δ A A'} + {~ exists A', grd_typ Δ A A'}.
+Proof.
+  intros Δ A. generalize dependent Δ.
+  induction A; intro Δ.
+  - hauto l: on.
+  - destruct (dec_lookupTy Δ n). sauto lq: on.
+    destruct (dec_lookupExTy Δ n); sauto lq: on.
+  - specialize (IHA1 Δ). specialize (IHA2 Δ). sauto q: on.
+  - specialize (IHA (TyCons Δ)). sauto q: on.
+Qed.
+
 Lemma dec_ty_sub_ctx' : forall n,
   (forall Γ Σ e, tm_size e + ctx_size Σ < n ->
     {A | ty Γ Σ e A} + {~ exists A, ty Γ Σ e A}) *
@@ -553,12 +588,68 @@ Proof.
       * destruct A; try solve [right; intros [Γ' Hc]; dependent destruction Hc; try sfirstorder;
           eapply ty_det in Hty; eauto; sfirstorder].
         sauto lq: on.
-      * right. intros [Γ' Hc]. dependent destruction Hc; try sfirstorder use: NonEmpty_false. 
-Admitted.
-
-Theorem dec_ty : forall Γ Σ e,
-  {A | ty Γ Σ e A} + {~ exists A, ty Γ Σ e A}.
-Proof. hauto lq: on use: dec_ty_sub_ctx'. Qed.
+      * right. intros [Γ' Hc]. dependent destruction Hc; try sfirstorder use: NonEmpty_false.
+  - intro m. induction m; try lia.
+    intros Δ A Σ Hlt1 Hlt2.
+    destruct Σ.
+    + destruct (dec_SRegular Δ). 2 : sauto lq: on rew: off.
+      destruct (dec_close Δ A) as [Hc | Hnc]. 2 : sauto lq: on.
+      destruct (dec_grd_typ Δ A) as [[A' Hgrd] | Hngrd]; sauto lq: on.
+    + destruct (dec_sub Δ A Pos t) as [[Δ' Hsub] | Hnsub]; sauto lq: on.
+    + destruct A. 1 - 2 : sauto lq: on.
+      * destruct (dec_close Δ A1) as [Hc | Hnc].
+        -- destruct (dec_open Δ A1) as [Ho | Hno].
+           sfirstorder use: open_close_false.
+           destruct (dec_grd_typ Δ A1) as [[A1' Hgrd] | Hngrd]. 2 : sauto lq: on.
+           assert (Hlt': ctx_size Σ < n). { simpl in *. lia. }
+           eapply IHsub with (Δ := Δ) (A := A2) in Hlt' as Hsub; eauto.
+           destruct Hsub as [[Δ'' [A2' Hsub]] | Hnsub]. 2 : sauto lq: on.
+           assert (Hlt'': tm_size t + ctx_size (CtxTyp A1') < n). { simpl in *. lia. }
+           eapply IHty with (Γ := rm_sep Δ) in Hlt'' as Hty.
+           destruct Hty as [[A'' Hty] | Hnty]. best.
+           right. intros [Δ' [A' Hcontra]]. dependent destruction Hcontra; try sfirstorder.
+           eapply grd_typ_det in Hgrd; eauto. subst. eapply sub_ctx_det in Hsub; eauto.
+        -- destruct (dec_open Δ A1) as [Ho | Hno]. 2 : sauto lq: on.
+           assert (Hlt': tm_size t + ctx_size CtxEmpty < n). { simpl in *. lia. }
+           eapply IHty with (Γ := rm_sep Δ) in Hlt' as Hty.
+           destruct Hty as [[A'' Hty] | Hnty]. 2 : sauto lq: on.
+           assert (Hlt'': ctx_size Σ < n). { simpl in *. lia. }
+           destruct (dec_sub Δ A'' Neg A1) as [[Ω Hsub] | Hnsub].
+           ++ eapply IHsub with (Δ := Ω) (A := A2) in Hlt'' as Hsub'; eauto.
+              destruct Hsub' as [[Ψ [D Hsub']] | Hnsub']. sauto l: on.
+              right. intros [Ψ' [D' Hcontra]]. dependent destruction Hcontra; try sfirstorder.
+              eapply ty_det in Hty; eauto. subst.
+              eapply sub_det in Hsub; eauto. sfirstorder.
+           ++ right. intros [Ψ' [D' Hcontra]]. dependent destruction Hcontra; try sfirstorder.
+              eapply ty_det in Hty; eauto. sfirstorder.
+      * assert (Hlt': ctx_size (CtxTrm (ty_shift_tm t 0) (ty_shift_ctx Σ 0)) < S n).
+        { simpl in *. rewrite tm_size_ty_shift_tm. rewrite ctx_size_ty_shift. lia. }
+        assert (Hlt'': ty_size A + ctx_size (CtxTrm (ty_shift_tm t 0) (ty_shift_ctx Σ 0)) < m).
+        { simpl in *. rewrite tm_size_ty_shift_tm. rewrite ctx_size_ty_shift. lia. }
+        eapply IHm with (Δ := ExCons Δ) in Hlt'' as Hsub; eauto.
+        destruct Hsub as [[Δ' [A' Hsub]] | Hnsub].
+        -- destruct Δ'; try solve [right; intros [Δ'' [A'' Hcontra]];
+             dependent destruction Hcontra; eapply sub_ctx_det in Hsub; eauto; hauto q: on].
+           destruct A'. 1, 2, 4 : sauto q: on. 
+           destruct (dec_ty_unshift A'1 0) as [[A1' Heq1] | Hneq1]; subst.
+           ++ destruct (dec_ty_unshift A'2 0) as [[A2' Heq2] | Hneq2]; subst. sauto lq: on.
+              right. intros [Δ'' [A'' Hcontra]]. dependent destruction Hcontra; try sfirstorder.
+              eapply sub_ctx_det in Hsub; eauto. sfirstorder.
+           ++ right. intros [Δ'' [A'' Hcontra]]. dependent destruction Hcontra; try sfirstorder.
+              eapply sub_ctx_det in Hsub; eauto. sfirstorder.
+        -- sauto lq: on.
+    + destruct A. 1 - 3 : sauto lq: on.
+      assert (Hlt': ctx_size (ty_shift_ctx Σ 0) < n).
+      { simpl in *. rewrite ctx_size_ty_shift. lia. }
+      eapply IHsub with (Δ := ExTyCons Δ t) (A := A) in Hlt' as Hsub; eauto.
+      destruct Hsub as [[Δ' [A' Hsub]] | Hnsub].
+      * destruct Δ'; try solve [right; intros [Δ'' [A'' Hcontra]];
+           dependent destruction Hcontra; eapply sub_ctx_det in Hsub; eauto; hauto q: on].
+        destruct (eq_dec_ty t t0); subst. sauto lq: on.
+        right. intros [Δ'' [A'' Hcontra]]. dependent destruction Hcontra; try sfirstorder.
+        eapply sub_ctx_det in Hsub; eauto. sfirstorder.
+      * right. intros [Δ'' [A'' Hcontra]]. dependent destruction Hcontra; try sfirstorder. 
+Qed.
 
 Theorem dec_sub_ctx : forall Δ A Σ,
   {Δ' : Env & {A' : Typ & sub_ctx Δ A Σ Δ' A'}} + {~ exists Δ' A', sub_ctx Δ A Σ Δ' A'}.
