@@ -436,7 +436,7 @@ Proof. sauto lq: on. Qed.
 Lemma ty_sub_ctx_det' : forall n,
   (forall Γ Σ e A A', tm_size e + ctx_size Σ < n ->
     ty Γ Σ e A -> ty Γ Σ e A' -> A = A') /\
-  (forall m Δ A Σ Δ1 Δ2 A1 A2, ctx_size Σ < n -> ty_size A + ctx_size Σ < m ->
+  (forall m Δ A Σ Δ1 Δ2 A1 A2, ctx_size Σ < n -> ty_size A < m ->
     sub_ctx Δ A Σ Δ1 A1 -> sub_ctx Δ A Σ Δ2 A2 -> Δ1 = Δ2 /\ A1 = A2).
 Proof.
   intro n. induction n. split; try lia.
@@ -517,7 +517,7 @@ Qed.
 Lemma dec_ty_sub_ctx' : forall n,
   (forall Γ Σ e, tm_size e + ctx_size Σ < n ->
     {A | ty Γ Σ e A} + {~ exists A, ty Γ Σ e A}) *
-  (forall m Δ A Σ, ctx_size Σ < n -> ty_size A + ctx_size Σ < m ->
+  (forall m Δ A Σ, ctx_size Σ < n -> ty_size A < m ->
     {Δ' : Env & {A' : Typ & sub_ctx Δ A Σ Δ' A'}} + {~ exists Δ' A', sub_ctx Δ A Σ Δ' A'}).
 Proof.
   intro n. induction n. split; try lia.
@@ -624,8 +624,7 @@ Proof.
               eapply ty_det in Hty; eauto. sfirstorder.
       * assert (Hlt': ctx_size (CtxTrm (ty_shift_tm t 0) (ty_shift_ctx Σ 0)) < S n).
         { simpl in *. rewrite tm_size_ty_shift_tm. rewrite ctx_size_ty_shift. lia. }
-        assert (Hlt'': ty_size A + ctx_size (CtxTrm (ty_shift_tm t 0) (ty_shift_ctx Σ 0)) < m).
-        { simpl in *. rewrite tm_size_ty_shift_tm. rewrite ctx_size_ty_shift. lia. }
+        assert (Hlt'': ty_size A < m). { simpl in *. lia. }
         eapply IHm with (Δ := ExCons Δ) in Hlt'' as Hsub; eauto.
         destruct Hsub as [[Δ' [A' Hsub]] | Hnsub].
         -- destruct Δ'; try solve [right; intros [Δ'' [A'' Hcontra]];
