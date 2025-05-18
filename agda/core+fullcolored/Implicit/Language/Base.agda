@@ -127,6 +127,9 @@ data Counter : ℕ → Set where
 `∞ : Counter m
 `∞ = 𝔼 ∞
 
+`𝕟 : ℕ → Counter m
+`𝕟 i = 𝔼 (𝕟 i)
+
 variable
   j j′ j″  : Counter m
   j' j'' : Counter m

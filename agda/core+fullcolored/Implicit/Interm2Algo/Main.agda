@@ -4,22 +4,17 @@ open import Implicit.Language.All
 open import Implicit.Algo.All
 open import Implicit.Interm.All
 open import Implicit.Interm2Algo.Counter2Context
-open import Implicit.Interm2Algo.ExtIrrev
+open import Implicit.Interm2Algo.NewExtIrrev
 open import Implicit.Interm2Algo.EnvDiff
 open import Implicit.Interm2Algo.OpenClose
 
-complete-ss+ : Δ ⊢ ∞ # A ⌞ ≤⁺ ⌝ B
+complete-ss+ : Δ ⊢ `∞ # A ⌞ ≤⁺ ⌝ B
              → Γ ⊆ Δ w/t A
              → Γ ⊢ A ⌞ ≤⁺ ⌝ B ⊣ Δ
 
-complete-ss- : Δ ⊢ ∞ # A ⌞ ≤⁻ ⌝ B
+complete-ss- : Δ ⊢ `∞ # A ⌞ ≤⁻ ⌝ B
              → Γ ⊆ Δ w/t B
              → Γ ⊢ A ⌞ ≤⁻ ⌝ B ⊣ Δ
-
-complete-s :  Δ ⊢ j # A ⌞ ≤⁺ ⌝ B
-            → Γ ⊆ Δ w/t A w/c j
-            → Γ ⊢ ⟨ j , B ⟩ ~s Σ
-            → Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
 
 complete-ss+ (s-int regΔ) ext with ⊆/-⊢c-eq ext ⊢c-int
 ... | refl = s-int regΔ
@@ -31,7 +26,8 @@ complete-ss+ (s-arr₁ s s₁) (ext-arr ext ext₁)
   = s-arr (s--subirrev-final ih diff (⊆/-⊢c ext)) (complete-ss+ s₁ ext₁)
 complete-ss+ (s-∀ s) (ext-∀ ext) = s-∀ (complete-ss+ s ext)
 complete-ss+ (s-svar-l x inΔ) ext'@(ext-var x₁) with ⊆/x-=out-in x₁ (∋:=to∋= inΔ)
-... | is-ex inΓ = s-ex-l^ (⊆/x-^in-=out-inst inΓ inΔ x₁)
+... | is-ex inΓ = {!!}
+-- s-ex-l^ (⊆/x-^in-=out-inst inΓ inΔ x₁)
 ... | is-sol inΓ with refl ← ⊆/-⊢c-eq ext' (⊢c-var-= inΓ) = s-ex-l= x inΔ
 
 complete-ss- (s-int regΔ) ext with ⊆/-⊢c-eq ext ⊢c-int
@@ -44,9 +40,26 @@ complete-ss- (s-arr₁ s s₁) (ext-arr ext ext₁)
   = s-arr (s+-subirrev-final ih diff (⊆/-⊢c ext)) (complete-ss- s₁ ext₁)
 complete-ss- (s-∀ s) (ext-∀ ext) = s-∀ (complete-ss- s ext)
 complete-ss- (s-svar-r x inΔ) ext'@(ext-var x₁) with ⊆/x-=out-in x₁ (∋:=to∋= inΔ)
-... | is-ex inΓ = s-ex-r^ (⊆/x-^in-=out-inst inΓ inΔ x₁)
+... | is-ex inΓ = {!!}
+-- s-ex-r^ (⊆/x-^in-=out-inst inΓ inΔ x₁)
 ... | is-sol inΓ with refl ← ⊆/-⊢c-eq ext' (⊢c-var-= inΓ) = s-ex-r= x inΔ
 
+complete-s-n : Δ ⊢ (`𝕟 i) # A ⌞ ≤⁻ ⌝ B
+              → Γ ⊆ Δ w/t B w/n i
+              → ⟨ i , A ⟩ ~₁ P
+              → Γ ⊢ B ≤⁺ `p P ⊣ Δ ↪ A
+complete-s-n (s-refl- regΔ cloA grd) (⊆/n-Z regΓ) ~₁Z = s-empty regΔ cloA grd
+complete-s-n (s-arr-n s s₁) (⊆/n-S ext ext₁) (~₁S ~p) = s-term-p {!complete-ss+ s ?!} (complete-s-n s₁ ext₁ ~p)
+
+
+complete-s :  Δ ⊢ j # A ⌞ ≤⁺ ⌝ B
+            → Γ ⊆ Δ w/t A w/c j
+            → Γ ⊢ ⟨ j , B ⟩ ~s Σ
+            → Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
+complete-s s ext ~j = {!!}
+
+
+{-
 complete-s {j = Z} (s-refl regΔ cloA grd) (⊆Z regΓ) ~Z = s-empty regΔ cloA grd
 complete-s {j = ∞} s (⊆∞ x) ~∞ = s-type (complete-ss+ s x)
 complete-s {j = 𝕚 j} {Γ = Γ} (s-arr₂ {A = A} s s₁) (⊆I ext ext₁) (~I ⊢e j~Σ) with ⊆/-openclose ext
@@ -70,12 +83,15 @@ complete-s (s-tapp s upj) (⊆∀-T ext upj₁) (~T {Σ = Σ} ~j st)
   with ⟨ Σ' , upΣ ⟩ ← ↑tyᶜ0-total Σ
   with reg-S= r regA ← s-sregular s
   with svar ext' regA₁ ← ⊆/c-⊆ ext = s-tapp (complete-s s ext (~weaken=0 ~j (st-↑ty (⊢r-¬ε (s+-polarity s) Z) st) upΣ upj regA₁)) upΣ
+-}
 
 s+-⊆/ : Δ ⊢ j # A ⌞ ≤⁺ ⌝ B
       → Δ ⊆ Δ w/t A w/c j
 
-s--⊆/ : Δ ⊢ ∞ # A ⌞ ≤⁻ ⌝ B
+s--⊆/ : Δ ⊢ `∞ # A ⌞ ≤⁻ ⌝ B
       → Δ ⊆ Δ w/t B
+
+{-
 s--⊆/ (s-int regΔ) = ext-int regΔ
 s--⊆/ (s-var-∙ regΔ inΔ) = ext-var (reg-⊆/x∙ regΔ inΔ)
 s--⊆/ (s-arr₁ s s₁) with s+-⊆/ s
@@ -97,6 +113,7 @@ s+-⊆/ (s-∀l s case-𝕚 fd upC upD (↑tyʲ-𝕚 upj)) | r = ⊆∀-I (⊆/c
 s+-⊆/ (s-∀l s case-𝕔 fd upC upD (↑tyʲ-𝕔 upj)) | r = ⊆∀-C (⊆/c-irrev-^0 r fd) upj
 s+-⊆/ (s-svar-l x inΔ) = ⊆∞ (ext-var (⊆/x-refl x (⊢c-var-= (∋:=to∋= inΔ))))
 s+-⊆/ (s-tapp s upj) = ⊆∀-T (s+-⊆/ s) upj
+-}
 
 complete-s0 : Γ ⋈ ⊢ j # A ⌞ ≤⁺ ⌝ B
             → Γ ⊢ ⟨ j , B ⟩ ~t Σ
@@ -106,6 +123,7 @@ complete-s0 s j~Σ = complete-s s (s+-⊆/ s) (~t-~s j~Σ)
 complete : Γ ⊢ j # e ⦂ A
          → Γ ⊢ ⟨ j , A ⟩ ~t Σ
          → Γ ⊢ Σ ⇒ e ⇒ A
+{-
 complete (⊢lit cloΓ) ~Z = ⊢lit cloΓ
 complete (⊢var cloΓ x∈Γ) ~Z = ⊢var cloΓ x∈Γ
 complete (⊢ann ⊢e) ~Z = ⊢ann (complete ⊢e ~∞)
@@ -126,12 +144,13 @@ complete (⊢sub ⊢e B≤A x j≢Z) j~Σ = ⊢sub (complete ⊢e ~Z) (nonempty 
         nonempty nz-T (~T ~j st) = ne-tapp
 complete (⊢tabs ⊢e) ~Z = ⊢tabs (complete ⊢e ~Z)
 complete (⊢tapp ⊢e st) ~j = ⊢tapp (complete ⊢e (~T ~j st)) st
+-}
 
 -- corollaries
-complete-0 : Γ ⊢ Z # e ⦂ A
-           → Γ ⊢ □ ⇒ e ⇒ A
-complete-0 ⊢e = complete ⊢e ~Z
+complete-0 : Γ ⊢ `𝕫 # e ⦂ A
+           → Γ ⊢ `□ ⇒ e ⇒ A
+complete-0 ⊢e = complete ⊢e (~𝔼 (~₂p ~₁Z))
 
-complete-∞ : Γ ⊢ ∞ # e ⦂ A
-           → Γ ⊢ τ A ⇒ e ⇒ A
-complete-∞ ⊢e = complete ⊢e ~∞
+complete-∞ : Γ ⊢ `∞ # e ⦂ A
+           → Γ ⊢ `τ A ⇒ e ⇒ A
+complete-∞ ⊢e = complete ⊢e (~𝔼 ~₂∞)

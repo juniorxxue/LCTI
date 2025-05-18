@@ -30,9 +30,13 @@ data _⊢_#_⌞_⌝_ : Env n m → Counter m → Type m → Polar → Type m →
     → Δ ⊢ `∞ # B ⌞ ≤ ⌝ D
     → Δ ⊢ `∞ # A `→ B ⌞ ≤ ⌝ C `→ D
   s-arr₂ :
-      Δ ⊢ 𝔼 𝕖 # C ⌞ ⋆ ≤ ⌝ A
-    → Δ ⊢ j # B ⌞ ≤ ⌝ D
-    → Δ ⊢ 𝕊₍ 𝕖 ₎ j # A `→ B ⌞ ≤ ⌝ C `→ D
+      Δ ⊢ 𝔼 𝕖 # C ⌞ ≤⁻ ⌝ A
+    → Δ ⊢ j # B ⌞ ≤⁺ ⌝ D
+    → Δ ⊢ 𝕊₍ 𝕖 ₎ j # A `→ B ⌞ ≤⁺ ⌝ C `→ D
+  s-arr-n :
+      Δ ⊢ `∞ # C ⌞ ≤⁺ ⌝ A
+    → Δ ⊢ `𝕟 i # B ⌞ ≤⁻ ⌝ D
+    → Δ ⊢ `𝕟 (suc i) # A `→ B ⌞ ≤⁻ ⌝ C `→ D
   s-∀ :
       Δ ,∙ ⊢ `∞ # A ⌞ ≤ ⌝ B
     → Δ ⊢ `∞ # `∀ A ⌞ ≤ ⌝ `∀ B
