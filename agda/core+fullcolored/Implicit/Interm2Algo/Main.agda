@@ -56,7 +56,12 @@ complete-s :  Δ ⊢ j # A ⌞ ≤⁺ ⌝ B
             → Γ ⊆ Δ w/t A w/c j
             → Γ ⊢ ⟨ j , B ⟩ ~s Σ
             → Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
-complete-s s ext ~j = {!!}
+complete-s {j = 𝔼 ∞} s (⊆/c-𝔼 (⊆/e-∞ ext)) (~𝔼 ~₂∞) = s-type (complete-ss+ s ext)
+complete-s {j = 𝔼 (𝕟 0)} (s-refl+ regΔ cloA grd) (⊆/c-𝔼 (⊆/e-𝕟 (⊆/n-Z regΓ))) (~𝔼 (~₂p ~₁Z)) = s-empty regΔ cloA grd
+complete-s {j = 𝕊₍ 𝕖 ₎ j} (s-arr₂ s s₁) (⊆/c-𝕊 ext-e ext) (~𝕊 ~a ⊢e ~j) = {!⊆/-openclose!}
+complete-s {j = 𝕊₍ 𝕖 ₎ j} (s-∀l s upC upD upj) ext (~𝕊 ~a ⊢e ~j)
+  = s-∀l (complete-s s {!!} {!!}) {!!} {!!} upC upD
+complete-s {j = 𝕋₍ A ₎ j} s ext ~j = {!!}
 
 
 {-
@@ -115,14 +120,47 @@ s+-⊆/ (s-svar-l x inΔ) = ⊆∞ (ext-var (⊆/x-refl x (⊢c-var-= (∋:=to�
 s+-⊆/ (s-tapp s upj) = ⊆∀-T (s+-⊆/ s) upj
 -}
 
+
 complete-s0 : Γ ⋈ ⊢ j # A ⌞ ≤⁺ ⌝ B
             → Γ ⊢ ⟨ j , B ⟩ ~t Σ
             → Γ ⋈ ⊢ A ≤⁺ Σ ⊣ Γ ⋈ ↪ B
 complete-s0 s j~Σ = complete-s s (s+-⊆/ s) (~t-~s j~Σ)
 
+{-
+data Complete (Γ : Env n m) (j : Counter m) (e : Term n m) (A : Type m) : Set where
+  justcom : ∀ {Σ}
+          → Γ ⊢ ⟨ j , A ⟩ ~t Σ
+          → Γ ⊢ Σ ⇒ e ⇒ A
+          → Complete Γ j e A
+
+complete' : Γ ⊢ j # e ⦂ A
+          → Complete Γ j e A
+complete' (⊢lit regΓ) = justcom (~𝔼 (~₂p ~₁Z)) (⊢lit regΓ)
+complete' (⊢var regΓ x∈Γ) = justcom (~𝔼 (~₂p ~₁Z)) (⊢var regΓ x∈Γ)
+complete' (⊢ann ⊢e) = {!!}
+complete' (⊢lam₁ ⊢e) = {!!}
+complete' (⊢lam₂ ⊢e) = {!!}
+complete' (⊢lam₃ ⊢e) = {!!}
+complete' (⊢app ⊢e ⊢e₁) with complete' ⊢e | complete' ⊢e₁
+... | justcom (~𝕊 x ⊢e₂ x₄) x₁ | justcom x₂ x₃ = justcom {!!} {!!}
+complete' (⊢sub ⊢e B≤A gc j≢Z) = {!!}
+complete' (⊢tabs ⊢e) = {!!}
+complete' (⊢tapp ⊢e st) = {!!}
+-}
+
 complete : Γ ⊢ j # e ⦂ A
          → Γ ⊢ ⟨ j , A ⟩ ~t Σ
          → Γ ⊢ Σ ⇒ e ⇒ A
+complete (⊢lit regΓ) ~j = {!!}
+complete (⊢var regΓ x∈Γ) ~j = {!!}
+complete (⊢ann ⊢e) ~j = {!!}
+complete (⊢lam₁ ⊢e) ~j = {!!}
+complete (⊢lam₂ ⊢e) ~j = {!!}
+complete (⊢lam₃ ⊢e) ~j = {!!}
+complete (⊢app ⊢e ⊢e₁) ~j = ⊢app (complete ⊢e (~𝕊 {!!} (complete ⊢e₁ (~𝔼 {!!})) ~j))
+complete (⊢sub ⊢e B≤A gc j≢Z) ~j = {!!}
+complete (⊢tabs ⊢e) ~j = {!!}
+complete (⊢tapp ⊢e st) ~j = ⊢tapp (complete ⊢e (~𝕋 ~j st)) st
 {-
 complete (⊢lit cloΓ) ~Z = ⊢lit cloΓ
 complete (⊢var cloΓ x∈Γ) ~Z = ⊢var cloΓ x∈Γ
