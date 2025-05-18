@@ -24,7 +24,7 @@ data _⊆_w/t_w/c_ : Env n m → Env n m → Type m → Counter m → Set where
        → Γ ⊆ Δ w/t `∀ A w/c (𝕔 j)
   ⊆∀-T : Γ ,= B ⊆ Δ ,= B w/t A w/c j'
        → (upj : ↑tyʲ0 j ⇘ j')
-       → Γ ⊆ Δ w/t `∀ A w/c 𝕥₍ B ₎ j
+       → Γ ⊆ Δ w/t `∀ A w/c 𝕋₍ B ₎ j
 
 ⊆/c-⊆ : Γ ⊆ Δ w/t A w/c j
       → Γ ⊆ Δ
@@ -201,7 +201,7 @@ data _⊆_w/t_w/c_ : Env n m → Env n m → Type m → Counter m → Set where
 ⊆/c-irrev-^= {B = B} (⊆∀-C ext upj') inΓ newΔ (f-∀-𝕔 fd upj) with ⊆/c-⊆ ext
 ... | evar-sol r regA
   with refl ← ↑tyʲ-unique upj upj' = ⊆∀-C (⊆/c-irrev-^= ext (S^ inΓ) (=⟹=S newΔ (proj₂ (↑ty0-total B)) regA) fd) upj'
-⊆/c-irrev-^= {B = B} (⊆∀-T ext upj) inΓ newΔ (f-𝕥 fd upj₁) with ⊆/c-⊆ ext
+⊆/c-irrev-^= {B = B} (⊆∀-T ext upj) inΓ newΔ (f-𝕋 fd upj₁) with ⊆/c-⊆ ext
 ... | svar r regA
   with refl ← ↑tyʲ-unique upj upj₁ = ⊆∀-T (⊆/c-irrev-^= ext (S= inΓ) (=⟹=S newΔ (proj₂ (↑ty0-total B)) (⊆-⊢r regA r)) fd) upj
 
@@ -355,7 +355,7 @@ data _⊆_w/t_w/c_ : Env n m → Env n m → Type m → Counter m → Set where
   with refl ← ↑tyʲ-unique upj upj' = ⊆∀-I (⊆/c-irrev-^ ext fd (◎S^ newΓ)) upj'
 ⊆/c-irrev-^ (⊆∀-C ext upj') (f-∀-𝕔 fd upj) newΓ
   with refl ← ↑tyʲ-unique upj upj' = ⊆∀-C (⊆/c-irrev-^ ext fd (◎S^ newΓ)) upj'
-⊆/c-irrev-^ (⊆∀-T ext upj) (f-𝕥 fd upj₁) newΓ
+⊆/c-irrev-^ (⊆∀-T ext upj) (f-𝕋 fd upj₁) newΓ
   with refl ← ↑tyʲ-unique upj upj₁ = ⊆∀-T (⊆/c-irrev-^ ext fd (◎S= newΓ)) upj
 
 ⊆/c-irrev-^0 : Γ ,= B ⊆ Δ ,= B w/t A w/c j

@@ -11,9 +11,9 @@ data _↑tyʲ_⇘_ : Counter m → Fin (1 + m) → Counter (1 + m) → Set where
   ↑tyʲ-𝔼 : 𝔼 𝕖 ↑tyʲ k ⇘ 𝔼 𝕖
   ↑tyʲ-𝕊 :  j ↑tyʲ k ⇘ j'
          → 𝕊₍ 𝕖 ₎ j ↑tyʲ k ⇘ 𝕊₍ 𝕖 ₎ j'
-  ↑tyʲ-𝕥 : j ↑tyʲ k ⇘ j'
+  ↑tyʲ-𝕋 : j ↑tyʲ k ⇘ j'
          → (upA : A ↑ty k ⇘ A')
-         → 𝕥₍ A ₎ j ↑tyʲ k ⇘ 𝕥₍ A' ₎ j'
+         → 𝕋₍ A ₎ j ↑tyʲ k ⇘ 𝕋₍ A' ₎ j'
 
 infix 3 ↑tyʲ0_⇘_
 ↑tyʲ0_⇘_ : Counter m → Counter (1 + m) → Set
@@ -56,6 +56,6 @@ data _⊢rʲ_ : Env n m → Counter m → Set where
   rj-𝔼 : Γ ⊢rʲ (𝔼 𝕖)
   rj-𝕊 : Γ ⊢rʲ j
        → Γ ⊢rʲ (𝕊₍ 𝕖 ₎ j)
-  rj-𝕥 : Γ ⊢rʲ j
+  rj-𝕋 : Γ ⊢rʲ j
        → (regA : Γ ⊢r A)
-       → Γ ⊢rʲ (𝕥₍ A ₎ j)
+       → Γ ⊢rʲ (𝕋₍ A ₎ j)

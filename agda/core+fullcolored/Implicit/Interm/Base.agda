@@ -46,7 +46,7 @@ data _⊢_#_⌞_⌝_ : Env n m → Counter m → Type m → Polar → Type m →
   s-tapp :
       Δ ,= B ⊢ j' # A ⌞ ≤⁺ ⌝ C
     → (upj : ↑tyʲ0 j ⇘ j')
-    → Δ ⊢ 𝕥₍ B ₎ j # `∀ A ⌞ ≤⁺ ⌝ `∀ C
+    → Δ ⊢ 𝕋₍ B ₎ j # `∀ A ⌞ ≤⁺ ⌝ `∀ C
   -- two atomic rules
   s-svar-l : ∀ {X A}
     → (SRegular Δ)
@@ -103,6 +103,6 @@ data _⊢_#_⦂_ : Env n m → Counter m → Term n m → Type m → Set where
   ⊢tabs :
       Γ ,∙ ⊢ `𝕫 # e ⦂ A
     → Γ ⊢ `𝕫 # Λ e ⦂ `∀ A
-  ⊢tapp : Γ ⊢ 𝕥₍ A ₎ j # e ⦂ `∀ B
+  ⊢tapp : Γ ⊢ 𝕋₍ A ₎ j # e ⦂ `∀ B
         → (st : ⟦ A ⟧ B ⇘ B*)
         → Γ ⊢ j # e ⓪ A ⦂ B*

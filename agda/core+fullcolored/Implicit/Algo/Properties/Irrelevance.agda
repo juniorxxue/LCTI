@@ -251,7 +251,7 @@ t-irrev (⊢ann ⊢e) tf = ⊢ann (t-irrev ⊢e tf)
 t-irrev (⊢app ⊢e) tf = ⊢app (t-irrev ⊢e tf)
 t-irrev (⊢lam₁ ⊢e) tf = ⊢lam₁ (t-irrev ⊢e (var tf))
 t-irrev (⊢lam₂ ⊢e up-c ⊢e₁) tf = ⊢lam₂ (t-irrev ⊢e tf) up-c (t-irrev ⊢e₁ (var tf))
-t-irrev {Σ = A ◐↝ Σ} {ƛ e} (⊢lam₃ up-c x₁) x = ⊢lam₃ up-c (t-irrev x₁ (var x))
+t-irrev (⊢lam₃ ⊢e) tf = ⊢lam₃ (t-irrev ⊢e (var tf))
 t-irrev (⊢sub ⊢e ne gc s) tf = ⊢sub (t-irrev ⊢e tf) ne gc (s-irrev s (mark tf))
 t-irrev (⊢tabs ⊢e) tf = ⊢tabs (t-irrev ⊢e (uvar tf))
 t-irrev (⊢tapp ⊢e st) tf = ⊢tapp (t-irrev ⊢e tf) st

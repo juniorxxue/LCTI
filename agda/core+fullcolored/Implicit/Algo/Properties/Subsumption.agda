@@ -7,43 +7,34 @@ open import Implicit.Algo.Properties.PShift
 open import Implicit.Algo.Properties.Id
 open import Implicit.Algo.Properties.Reflexivity
 open import Implicit.Algo.Properties.Extension
-open import Implicit.Algo.Properties.Regularity
+open import Implicit.Algo.Properties.PRegularity
 open import Implicit.Algo.Properties.Polarity
 open import Implicit.Algo.Properties.PStrengthenTVar
 open import Implicit.Algo.Properties.PStrengthenSVar
 open import Implicit.Algo.Properties.Weaken
 open import Implicit.Algo.Properties.Irrelevance
-open import Implicit.Algo.Properties.Trans
+-- open import Implicit.Algo.Properties.Trans
 
-≊-weaken : Σ₁ ≊ Σ₂
+postulate
+  ≊-weaken : Σ₁ ≊ Σ₂
          → ↑tmᶜ0 Σ₁ ⇘ Σ₁'
          → ↑tmᶜ0 Σ₂ ⇘ Σ₂'
          → Σ₁' ≊ Σ₂'
-≊-weaken ≊Z ↑tmᶜ-□ ↑tmᶜ-τ = ≊Z
-≊-weaken (≊S new) (↑tmᶜ-e up-e up1) (↑tmᶜ-e up-e₁ up2) with refl ← ↑tm-unique up-e up-e₁ = ≊S (≊-weaken new up1 up2)
-≊-weaken (≊⓪ new) (↑tmᶜ-⓪ up1) (↑tmᶜ-⓪ up2) = ≊⓪ (≊-weaken new up1 up2)
-≊-weaken (≊P new) (↑tmᶜ-◐ up1) (↑tmᶜ-◐ up2) = ≊P (≊-weaken new up1 up2)
 
 
--- aux lemmas
-t-inf-open-false : Γ ⊢ □ ⇒ e ⇒ A
-                 → Γ ⋈ ⊢o A
-                 → ⊥
-t-inf-open-false ⊢e opnA = ⊢r-⊢o-false (⊢r-𝕣 (t-⊢r ⊢e)) opnA
-
-⊢to≤ : Γ ⊢ Σ ⇒ e ⇒ A
+  ⊢to≤ : Γ ⊢ Σ ⇒ e ⇒ A
      → Γ ⋈ ⊢ A ≤⁺ Σ ⊣ Γ ⋈ ↪ A
 
-subsumption :  Γ ⊢ Σ ⇒ e ⇒ A
+  subsumption :  Γ ⊢ Σ ⇒ e ⇒ A
              → Σ ≊ Σ'
              → Γ ⋈ ⊢ A ≤⁺ Σ' ⊣ Γ ⋈ ↪ A'
              → Γ ⊢ Σ' ⇒ e ⇒ A'
 
-subsumption0 : Γ ⊢ □ ⇒ e ⇒ A
-             → Γ ⊢ τ A ⇒ e ⇒ A
-subsumption0 ⊢e = subsumption ⊢e ≊Z (s-type (s-refl (reg-Z (t-env ⊢e)) (⊢r-weaken⋈0 (t-⊢r ⊢e))))
+  subsumption0 : Γ ⊢ `□ ⇒ e ⇒ A
+             → Γ ⊢ `τ A ⇒ e ⇒ A
+-- subsumption ⊢e ≊Z (s-type (s-refl (reg-Z (t-env ⊢e)) (⊢r-weaken⋈0 (t-⊢r ⊢e))))
 
-
+{-
 s-refined-p : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
             → Δ ⊢ B ≤⁺ Σ ⊣ Δ ↪ B
 s-refined-p (s-empty cloΓ cloA x) = let regB = (⊢c-≫-⊢r cloΓ cloA x) in s-empty cloΓ (⊢r-⊢c regB ) (⊢r-≫-eq regB)
@@ -84,9 +75,9 @@ s-refined-p s'@(s-term-p ss s) = s-term-p (s-refl (s-env-out s) (⊆-⊢r (ss-po
 ... | s-tapp r upᶜ = let upA = (st-↑ty (⊢r-¬ε (s-⊢r r) Z) st)
                      in s-strengthen=0 r upA upA upᶜ
 
-subsumption {Σ' = τ A} (⊢lit regΓ) ≊Z s = ⊢sub (⊢lit regΓ) ne-τ gc-i s
-subsumption {Σ' = τ A} (⊢var cloΓ x∈Γ) ≊Z s = ⊢sub (⊢var cloΓ x∈Γ) ne-τ gc-var s
-subsumption {Σ' = τ A} (⊢ann ⊢e) ≊Z s = ⊢sub (⊢ann ⊢e) ne-τ gc-ann s
+subsumption {Σ' = τ A} (⊢lit regΓ) ≊Z s = ⊢sub (⊢lit regΓ) ? gc-i s
+subsumption {Σ' = τ A} (⊢var cloΓ x∈Γ) ≊Z s = ⊢sub (⊢var cloΓ x∈Γ) ? gc-var s
+subsumption {Σ' = τ A} (⊢ann ⊢e) ≊Z s = ⊢sub (⊢ann ⊢e) ? gc-ann s
 subsumption {Σ' = τ A} (⊢app ⊢e) ≊Z s with ⊢to≤ ⊢e
 ... | s-term-c cloA ap ⊢e₁ s₁ = ⊢app (subsumption ⊢e (≊S ≊Z) (s-term-c cloA ap ⊢e₁ s))
 ... | s-term-o opnA conv ⊢e₁ x s₁ = {!!}
@@ -137,3 +128,4 @@ subsumption {Σ' = _ ◐↝ Σ'}  (⊢lam₃ up-c ⊢e) (≊P newΣ) (s-term-p s
   with refl ← ⊆-antisymm (ss-⊆ ss) (s-⊆ s) = ⊢lam₃ upΣ (subsumption ⊢e (≊-weaken newΣ up-c upΣ) (s-weaken,0 s upΣ {!!}))
 subsumption (⊢sub ⊢e ne gc s₁) (≊P newΣ) s = ⊢sub ⊢e ne-par gc (s-trans s₁ s (≊P newΣ))
 subsumption (⊢tapp ⊢e st) (≊P newΣ) s = {!!}
+-}
