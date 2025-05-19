@@ -110,3 +110,71 @@ data _⊢_#_⦂_ : Env n m → Counter m → Term n m → Type m → Set where
   ⊢tapp : Γ ⊢ 𝕋₍ A ₎ j # e ⦂ `∀ B
         → (st : ⟦ A ⟧ B ⇘ B*)
         → Γ ⊢ j # e ⓪ A ⦂ B*
+
+
+data Match1 : Type m → ℕ → Set where
+  m1-z : Match1 A 0
+  m1-s : Match1 B i
+       → Match1 (A `→ B) (suc i)
+
+data Match2 : Type m → ENat → Set where
+  m2-∞ : Match2 A ∞
+  m2-n : Match1 A i
+       → Match2 A (𝕟 i)
+
+data Match : Type m → Counter m → Set where
+  m-𝔼 : Match2 A 𝕖
+      → Match A (𝔼 𝕖)
+  m-𝕊 : Match2 A 𝕖
+      → Match B j
+      → Match (A `→ B) (𝕊₍ 𝕖 ₎ j)
+  𝕞-𝕋 : Match A* j
+      → (st : ⟦ B ⟧ A ⇘ A*)
+      → Match (`∀ A) (𝕋₍ B ₎ j)
+
+postulate
+  s-match+ : Γ ⊢ j # A ⌞ ≤⁺ ⌝ B
+        → Match B j
+
+  s-match- : Γ ⊢ j # A ⌞ ≤⁻ ⌝ B
+        → Match A j
+{-
+s-match+ (s-refl+ regΔ cloA grd) = m-𝔼 (m2-n m1-z)
+s-match+ (s-int regΔ) = m-𝔼 m2-∞
+s-match+ (s-var-∙ regΔ inΔ) = m-𝔼 m2-∞
+s-match+ (s-arr₁ s s₁) = m-𝔼 m2-∞
+s-match+ (s-arr₂ s s₁) with s-match- s
+... | m-𝔼 x = m-𝕊 x (s-match+ s₁)
+s-match+ (s-∀ s) = m-𝔼 m2-∞
+s-match+ (s-∀l s upC upD upj) = m-𝕊 {!!} {!!}
+s-match+ (s-tapp s upj) = 𝕞-𝕋 {!!} {!!}
+s-match+ (s-svar-l x inΔ) = m-𝔼 m2-∞
+
+s-match- (s-refl- regΔ cloA grd) = m-𝔼 (m2-n m1-z)
+s-match- (s-int regΔ) = m-𝔼 m2-∞
+s-match- (s-var-∙ regΔ inΔ) = m-𝔼 m2-∞
+s-match- (s-arr₁ s s₁) = m-𝔼 m2-∞
+s-match- (s-arr-n s s₁) with s-match- s₁
+... | m-𝔼 (m2-n x) = m-𝔼 (m2-n (m1-s x))
+s-match- (s-∀ s) = m-𝔼 m2-∞
+s-match- (s-svar-r x inΔ) = m-𝔼 m2-∞
+-}
+
+
+t-match : Γ ⊢ j # e ⦂ A
+        → Match A j
+
+t-match (⊢lit regΓ) = m-𝔼 (m2-n m1-z)
+t-match (⊢var regΓ x∈Γ) = m-𝔼 (m2-n m1-z)
+t-match (⊢ann ⊢e) = m-𝔼 (m2-n m1-z)
+t-match (⊢lam₁ ⊢e) = m-𝔼 m2-∞
+t-match (⊢lam₂ ⊢e) = m-𝕊 (m2-n m1-z) (t-match ⊢e)
+t-match (⊢lam₃ ⊢e) with t-match ⊢e
+... | m-𝔼 (m2-n mt) = m-𝔼 (m2-n (m1-s mt))
+t-match (⊢app ⊢e ⊢e₁) with t-match ⊢e
+... | m-𝕊 x r = r
+t-match (⊢sub ⊢e B≤A gc j≢Z) = s-match+ B≤A
+t-match (⊢tabs ⊢e) = m-𝔼 (m2-n m1-z)
+t-match (⊢tapp ⊢e st) with t-match ⊢e
+... | 𝕞-𝕋 r st₁
+  with refl ← st-unique st st₁ = r

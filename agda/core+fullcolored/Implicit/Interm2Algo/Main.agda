@@ -121,74 +121,45 @@ s+-⊆/ (s-tapp s upj) = ⊆∀-T (s+-⊆/ s) upj
 -}
 
 
-complete-s0 : Γ ⋈ ⊢ j # A ⌞ ≤⁺ ⌝ B
-            → Γ ⊢ ⟨ j , B ⟩ ~t Σ
-            → Γ ⋈ ⊢ A ≤⁺ Σ ⊣ Γ ⋈ ↪ B
-complete-s0 s j~Σ = complete-s s (s+-⊆/ s) (~t-~s j~Σ)
+-- complete-s0 : Γ ⋈ ⊢ j # A ⌞ ≤⁺ ⌝ B
+--             → Γ ⊢ ⟨ j , B ⟩ ~t Σ
+--             → Γ ⋈ ⊢ A ≤⁺ Σ ⊣ Γ ⋈ ↪ B
+-- complete-s0 s j~Σ = complete-s s (s+-⊆/ s) (~t-~s j~Σ)
 
-{-
-data Complete (Γ : Env n m) (j : Counter m) (e : Term n m) (A : Type m) : Set where
-  justcom : ∀ {Σ}
-          → Γ ⊢ ⟨ j , A ⟩ ~t Σ
-          → Γ ⊢ Σ ⇒ e ⇒ A
-          → Complete Γ j e A
+-- match1-~ : Match1 A i
+--          → ∃[ P ]( ⟨ i , A ⟩ ~₁ P )
+-- match1-~ m1-z = ⟨ □ , ~₁Z ⟩
+-- match1-~ {A = A `→ B} (m1-s mt1) = ⟨ A ◐↝ match1-~ mt1 .proj₁ , ~₁S (match1-~ mt1 .proj₂) ⟩
 
-complete' : Γ ⊢ j # e ⦂ A
-          → Complete Γ j e A
-complete' (⊢lit regΓ) = justcom (~𝔼 (~₂p ~₁Z)) (⊢lit regΓ)
-complete' (⊢var regΓ x∈Γ) = justcom (~𝔼 (~₂p ~₁Z)) (⊢var regΓ x∈Γ)
-complete' (⊢ann ⊢e) = {!!}
-complete' (⊢lam₁ ⊢e) = {!!}
-complete' (⊢lam₂ ⊢e) = {!!}
-complete' (⊢lam₃ ⊢e) = {!!}
-complete' (⊢app ⊢e ⊢e₁) with complete' ⊢e | complete' ⊢e₁
-... | justcom (~𝕊 x ⊢e₂ x₄) x₁ | justcom x₂ x₃ = justcom {!!} {!!}
-complete' (⊢sub ⊢e B≤A gc j≢Z) = {!!}
-complete' (⊢tabs ⊢e) = {!!}
-complete' (⊢tapp ⊢e st) = {!!}
--}
+-- match2-~ : Match2 A 𝕖
+--         → ∃[ δ ]( ⟨ 𝕖 , A ⟩ ~₂ δ )
+-- match2-~ {A = A} m2-∞ = ⟨ τ A , ~₂∞ ⟩
+-- match2-~ {A = A} (m2-n mt1)
+--   with ⟨ P , ~j ⟩ ← match1-~ mt1 = ⟨ p P , ~₂p ~j ⟩
 
-complete : Γ ⊢ j # e ⦂ A
-         → Γ ⊢ ⟨ j , A ⟩ ~t Σ
-         → Γ ⊢ Σ ⇒ e ⇒ A
-complete (⊢lit regΓ) ~j = {!!}
-complete (⊢var regΓ x∈Γ) ~j = {!!}
-complete (⊢ann ⊢e) ~j = {!!}
-complete (⊢lam₁ ⊢e) ~j = {!!}
-complete (⊢lam₂ ⊢e) ~j = {!!}
-complete (⊢lam₃ ⊢e) ~j = {!!}
-complete (⊢app ⊢e ⊢e₁) ~j = ⊢app (complete ⊢e (~𝕊 {!!} (complete ⊢e₁ (~𝔼 {!!})) ~j))
-complete (⊢sub ⊢e B≤A gc j≢Z) ~j = {!!}
-complete (⊢tabs ⊢e) ~j = {!!}
-complete (⊢tapp ⊢e st) ~j = ⊢tapp (complete ⊢e (~𝕋 ~j st)) st
-{-
-complete (⊢lit cloΓ) ~Z = ⊢lit cloΓ
-complete (⊢var cloΓ x∈Γ) ~Z = ⊢var cloΓ x∈Γ
-complete (⊢ann ⊢e) ~Z = ⊢ann (complete ⊢e ~∞)
-complete (⊢lam₁ ⊢e) ~∞ = ⊢lam₁ (complete ⊢e ~∞)
-complete (⊢lam₂ ⊢e) (~I {Σ = Σ} ⊢e₁ j~Σ)
-  with reg-S, regΓ regA ← t-tregular ⊢e
-  with ⟨ Σ' , upΣ ⟩ ← ↑tmᶜ0-total Σ
-  = ⊢lam₂ ⊢e₁ upΣ (complete ⊢e (~weaken,0 j~Σ upΣ regA))
-complete (⊢app₁ ⊢e ⊢e₁) j~Σ = ⊢app (complete ⊢e (~C (complete ⊢e₁ ~∞) j~Σ))
-complete (⊢app₂ ⊢e ⊢e₁) j~Σ = ⊢app (complete ⊢e (~I (complete ⊢e₁ ~Z) j~Σ))
-complete (⊢sub ⊢e B≤A x j≢Z) j~Σ = ⊢sub (complete ⊢e ~Z) (nonempty j≢Z j~Σ) x (complete-s0 B≤A j~Σ)
-  where nonempty : NonZ j
-                 → Γ ⊢ ⟨ j , A ⟩ ~t Σ
-                 → NonEmpty Σ
-        nonempty nz-∞ ~∞ = ne-τ
-        nonempty nz-I (~I ⊢e j~Σ) = ne-app
-        nonempty nz-C (~C ⊢e j~Σ) = ne-app
-        nonempty nz-T (~T ~j st) = ne-tapp
-complete (⊢tabs ⊢e) ~Z = ⊢tabs (complete ⊢e ~Z)
-complete (⊢tapp ⊢e st) ~j = ⊢tapp (complete ⊢e (~T ~j st)) st
--}
+-- complete : Γ ⊢ j # e ⦂ A
+--          → Γ ⊢ ⟨ j , A ⟩ ~t Σ
+--          → Γ ⊢ Σ ⇒ e ⇒ A
+-- complete (⊢lit regΓ) ~j = {!!}
+-- complete (⊢var regΓ x∈Γ) ~j = {!!}
+-- complete (⊢ann ⊢e) ~j = {!!}
+-- complete (⊢lam₁ ⊢e) ~j = {!!}
+-- complete (⊢lam₂ ⊢e) (~𝕊 {Σ = Σ} (~₂p ~₁Z) ⊢e₁ ~j)
+--   with reg-S, regΓ regA ← t-tregular ⊢e
+--   with ⟨ Σ' , upΣ ⟩ ← ↑tmᶜ0-total Σ = ⊢lam₂ ⊢e₁ upΣ (complete ⊢e (~weaken,0 ~j upΣ regA))
+-- complete (⊢lam₃ ⊢e) (~𝔼 (~₂p (~₁S ~j))) = ⊢lam₃ (complete ⊢e (~𝔼 (~₂p ~j)))
+-- complete (⊢app ⊢e ⊢e₁) ~j
+--   with m-𝔼 mt ← t-match ⊢e₁
+--   with ⟨ δ , ~j' ⟩ ← match2-~ mt = ⊢app (complete ⊢e (~𝕊 ~j' (complete ⊢e₁ (~𝔼 ~j')) ~j))
+-- complete (⊢sub ⊢e B≤A gc j≢Z) ~j = ⊢sub (complete ⊢e (~𝔼 (~₂p ~₁Z))) {!!} gc (complete-s0 B≤A ~j)
+-- complete (⊢tabs ⊢e) (~𝔼 (~₂p ~₁Z)) = ⊢tabs (complete ⊢e (~𝔼 (~₂p ~₁Z)))
+-- complete (⊢tapp ⊢e st) ~j = ⊢tapp (complete ⊢e (~𝕋 ~j st)) st
 
--- corollaries
-complete-0 : Γ ⊢ `𝕫 # e ⦂ A
-           → Γ ⊢ `□ ⇒ e ⇒ A
-complete-0 ⊢e = complete ⊢e (~𝔼 (~₂p ~₁Z))
+-- -- corollaries
+-- complete-0 : Γ ⊢ `𝕫 # e ⦂ A
+--            → Γ ⊢ `□ ⇒ e ⇒ A
+-- complete-0 ⊢e = complete ⊢e (~𝔼 (~₂p ~₁Z))
 
-complete-∞ : Γ ⊢ `∞ # e ⦂ A
-           → Γ ⊢ `τ A ⇒ e ⇒ A
-complete-∞ ⊢e = complete ⊢e (~𝔼 ~₂∞)
+-- complete-∞ : Γ ⊢ `∞ # e ⦂ A
+--            → Γ ⊢ `τ A ⇒ e ⇒ A
+-- complete-∞ ⊢e = complete ⊢e (~𝔼 ~₂∞)
