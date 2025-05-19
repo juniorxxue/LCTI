@@ -149,6 +149,63 @@ data _⊢_≤⁺_⊣_↪_ where
     → (upᶜ : ↑tyᶜ0 Σ ⇘ Σ')
     → Δ ⊢ `∀ A ≤⁺ (B ⓪↝ Σ) ⊣ Ψ ↪ `∀ C
 
+
+data AMatch1 : Type m → ParType m → Set where
+  amt1-z : AMatch1 A □
+  amt1-s : AMatch1 B P
+        → AMatch1 (A `→ B) (A ◐↝ P)
+
+data AMatch2 : Type m → EContext m → Set where
+  amt2-p : AMatch1 A P
+         → AMatch2 A (p P)
+  amt2-τ : AMatch2 A (τ A)
+
+data AMatch : Type m → Context n m → Set where
+  amt-𝔼 : AMatch2 A δ
+        → AMatch A (Context n m ∋⦂ (𝔼 δ))
+  amt-term : AMatch B Σ
+           → AMatch (A `→ B) ([ e ]↝ Σ)
+  amt-tapp : AMatch A* Σ
+           → (st : ⟦ B ⟧ A ⇘ A*)
+           → AMatch (`∀ A) (B ⓪↝ Σ)
+
+postulate
+  t-amatch : Γ ⊢ Σ ⇒ e ⇒ A
+         → AMatch A Σ
+
+  s-amatch : Γ ⊢ A ≤⁺ Σ ⊣ Ψ ↪ B
+         → AMatch B Σ
+
+{-
+s-amatch (s-empty regΓ cloA grd) = amt-𝔼 (amt2-p amt1-z)
+s-amatch (s-type ss) = amt-𝔼 amt2-τ
+s-amatch (s-term-c cloA ap ⊢e s) = amt-term (s-amatch s)
+s-amatch (s-term-o opnA conv ⊢e ss s) = amt-term (s-amatch s)
+s-amatch (s-term-p ss s) with s-amatch s
+... | amt-𝔼 (amt2-p x) = amt-𝔼 (amt2-p (amt1-s x))
+s-amatch (s-∀l s upᶜ upᵉ upC upD) with s-amatch s
+... | amt-term r = amt-term {!!}
+s-amatch (s-tapp s upᶜ) with s-amatch s
+... | r = amt-tapp {!!} {!!}
+
+t-amatch (⊢lit regΓ) = amt-𝔼 (amt2-p amt1-z)
+t-amatch (⊢var regΓ x∈Γ) = amt-𝔼 (amt2-p amt1-z)
+t-amatch (⊢ann ⊢e) = amt-𝔼 (amt2-p amt1-z)
+t-amatch (⊢app ⊢e) with t-amatch ⊢e
+... | amt-term r = r
+t-amatch (⊢lam₁ ⊢e) with t-amatch ⊢e
+... | amt-𝔼 amt2-τ = amt-𝔼 amt2-τ
+t-amatch (⊢lam₂ ⊢e up-c ⊢e₁) with t-amatch ⊢e
+... | amt-𝔼 (amt2-p amt1-z) = amt-term {!!}
+t-amatch (⊢lam₃ ⊢e) with t-amatch ⊢e
+... | amt-𝔼 (amt2-p mt) = amt-𝔼 (amt2-p (amt1-s mt))
+t-amatch (⊢sub ⊢e ne gc s) = s-amatch s
+t-amatch (⊢tabs ⊢e) = amt-𝔼 (amt2-p amt1-z)
+t-amatch (⊢tapp ⊢e st) with t-amatch ⊢e
+... | amt-tapp r st₁ = {!!}
+-}
+
+
 _ : ∅ , `∀ ((Int `→ ‶ #0) `→ ‶ #0) ⊢ `□ ⇒ (` #0 · (ƛ ` #0)) ⇒ Int
 _ = ⊢app (⊢sub (⊢var
                  (reg-S, reg-Z

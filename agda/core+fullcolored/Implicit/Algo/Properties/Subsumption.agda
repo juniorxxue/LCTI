@@ -30,8 +30,22 @@ postulate
              → Γ ⋈ ⊢ A ≤⁺ Σ' ⊣ Γ ⋈ ↪ A'
              → Γ ⊢ Σ' ⇒ e ⇒ A'
 
-  subsumption0 : Γ ⊢ `□ ⇒ e ⇒ A
+
+amatch1-≊P : AMatch1 A P
+           → P ≊P A
+amatch1-≊P amt1-z = ≊P-Z
+amatch1-≊P (amt1-s mt) = ≊P-S (amatch1-≊P mt)
+
+subsumption0 : Γ ⊢ `p P ⇒ e ⇒ A
+                → Γ ⊢ `τ A ⇒ e ⇒ A
+subsumption0 ⊢e with t-amatch ⊢e
+... | amt-𝔼 (amt2-p mt) = subsumption ⊢e (≋E (p2τ (amatch1-≊P mt))) (s-type (s-refl (reg-Z (t-env ⊢e)) (⊢r-weaken⋈0 (t-⊢r ⊢e))))
+
+subsumption0' : Γ ⊢ `□ ⇒ e ⇒ A
              → Γ ⊢ `τ A ⇒ e ⇒ A
+subsumption0' ⊢e = subsumption0 ⊢e
+
+
 -- subsumption ⊢e ≊Z (s-type (s-refl (reg-Z (t-env ⊢e)) (⊢r-weaken⋈0 (t-⊢r ⊢e))))
 
 {-

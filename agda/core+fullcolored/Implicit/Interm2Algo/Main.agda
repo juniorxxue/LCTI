@@ -61,15 +61,10 @@ complete-s :  Δ ⊢ j # A ⌞ ≤⁺ ⌝ B
             → Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
 complete-s {j = 𝔼 ∞} s (⊆/c-𝔼 (⊆/e-∞ ext)) (~𝔼 ~₂∞) = s-type (complete-ss+ s ext)
 complete-s {j = 𝔼 (𝕟 0)} (s-refl+ regΔ cloA grd) (⊆/c-𝔼 (⊆/e-𝕟 (⊆/n-Z regΓ))) (~𝔼 (~₂p ~₁Z)) = s-empty regΔ cloA grd
-complete-s {j = 𝕊₍ ∞ ₎ j} (s-arr₂ s s₁) (⊆/c-𝕊 (⊆/e-∞ ext₁) ext) (~𝕊 ~₂∞ ⊢e ~j) = {!!}
-complete-s {j = 𝕊₍ 𝕟 i ₎ j} (s-arr₂ s s₁) (⊆/c-𝕊 ext-e ext) (~𝕊 (~₂p ~₁) ⊢e ~j) with ⊆/e-openclose ext-e
-... | inj₁ opnA = s-term-o opnA {!complete-s-n s ? ~₁!} ⊢e {!!} {!!}
-... | inj₂ cloA = {!!}
-{-
-with ⊆/e-openclose ext-e
-... | inj₁ opnA = s-term-o opnA {!~a!} {!!} {!!} {!!}
-... | inj₂ cloA = {!!}
--}
+complete-s {j = 𝕊₍ ∞ ₎ j} (s-arr₂ s s₁) (⊆/c-𝕊 (⊆/e!-∞ cloA) ext) (~𝕊 ~₂∞ ⊢e ~j) = s-term-c cloA {!!} ⊢e (complete-s s₁ ext ~j)
+complete-s {j = 𝕊₍ 𝕟 i ₎ j} (s-arr₂ s s₁) (⊆/c-𝕊 ext-e ext) (~𝕊 (~₂p ~₁) ⊢e ~j) with ⊆/e!-openclose ext-e
+... | inj₁ opnA = s-term-o opnA {!!} {!!} {!!} {!!}
+... | inj₂ cloA = s-term-c cloA {!!} (subsumption0 ⊢e) (complete-s s₁ {!!} ~j)
 complete-s {j = 𝕊₍ 𝕖 ₎ j} (s-∀l s upC upD upj) ext (~𝕊 ~a ⊢e ~j)
   = s-∀l (complete-s s {!!} {!!}) {!!} {!!} upC upD
 complete-s {j = 𝕋₍ A ₎ j} s ext ~j = {!!}
