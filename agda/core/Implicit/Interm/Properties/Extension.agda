@@ -1,3 +1,4 @@
+{-# OPTIONS --allow-unsolved-metas #-}
 module Implicit.Interm.Properties.Extension where
 
 open import Implicit.Language.All
@@ -20,6 +21,9 @@ s-⊆-prv (s-svar-l x inΔ) ext = s-svar-l (⊆-sregular' ext) (⊆-∋:= inΔ e
 s-⊆-prv (s-svar-r x inΔ) ext = s-svar-r (⊆-sregular' ext) (⊆-∋:= inΔ ext)
 s-⊆-prv (s-tapp s upj) ext with s-sregular s
 ... | reg-S= r regA = s-tapp (s-⊆-prv s (svar ext regA)) upj
+s-⊆-prv (s-svar-𝕚 x₁ _) x = {!!}
+s-⊆-prv (s-svar-𝕔 x₁ _) x = {!!}
+s-⊆-prv (s-svar-𝕥 x₁ x₂) x = {!!}
 
 infix 3 _⊆t_
 data _⊆t_ : Env n m → Env n m → Set where
@@ -150,6 +154,9 @@ s-⊆-prv-gen (s-svar-l x inΔ) ext = s-svar-l (⊆t-sregular x ext) (⊆t-∋:=
 s-⊆-prv-gen (s-svar-r x inΔ) ext = s-svar-r (⊆t-sregular x ext) (⊆t-∋:= inΔ ext)
 s-⊆-prv-gen (s-tapp s st) ext with s-sregular s
 ... | reg-S= r regA = s-tapp (s-⊆-prv-gen s (svar ext regA)) st
+s-⊆-prv-gen (s-svar-𝕚 x₁ _) x = {!!}
+s-⊆-prv-gen (s-svar-𝕔 x₁ _) x = {!!}
+s-⊆-prv-gen (s-svar-𝕥 x₁ x₂) x = {!!}
 
 t-⊆-prv-gen : Γ ⊢ j # e ⦂ A
         → Γ ⊆t Δ

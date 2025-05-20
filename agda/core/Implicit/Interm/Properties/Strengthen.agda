@@ -1,3 +1,4 @@
+{-# OPTIONS --allow-unsolved-metas #-}
 module Implicit.Interm.Properties.Strengthen where
 
 open import Implicit.Language.All
@@ -19,6 +20,9 @@ s-strengthen, (s-∀l s ic fd upC upD upj) newΓ = s-∀l (s-strengthen, s (◀S
 s-strengthen, (s-svar-l x inΔ) newΓ = s-svar-l (sregular-strengthen, x newΓ) (∋:=-strengthen, inΔ newΓ)
 s-strengthen, (s-svar-r x inΔ) newΓ = s-svar-r (sregular-strengthen, x newΓ) (∋:=-strengthen, inΔ newΓ)
 s-strengthen, (s-tapp s upj) newΓ = s-tapp (s-strengthen, s (◀S= newΓ)) upj
+s-strengthen, (s-svar-𝕚 _ x₁) x = {!!}
+s-strengthen, (s-svar-𝕔 _ x₁) x = {!!}
+s-strengthen, (s-svar-𝕥 x₁ x₂) x = {!!}
 
 
 t-strengthen, : Γ ⊢ j # e' ⦂ A
@@ -75,7 +79,11 @@ s-strengthen= (s-tapp s upj₁) newΓ (↑ty-∀ upA) (↑ty-∀ upB) (↑tyʲ-�
   = s-tapp (s-strengthen= s (◀S= newΓ upA₁) upA upB (↑tyʲ-comm0' upj upj₁ upj')) upj'
 s-strengthen= (s-svar-l x inΔ) newΓ ↑ty-var upB ↑tyʲ-∞ = s-svar-l (sregular-strengthen= x newΓ) (∋:=-strengthen=-reg x inΔ newΓ upB)
 s-strengthen= (s-svar-r x inΔ) newΓ upA ↑ty-var ↑tyʲ-∞ = s-svar-r (sregular-strengthen= x newΓ) (∋:=-strengthen=-reg x inΔ newΓ upA)
-
+s-strengthen= {A = Int} x x₁ x₂ (↑ty-arr x₃ x₄) (↑tyʲ-𝕚 x₅) = {!!}
+s-strengthen= {A = ‶ X} x x₁ x₂ (↑ty-arr x₃ x₄) (↑tyʲ-𝕚 x₅) = {!!}
+s-strengthen= {A = Int} x x₁ x₂ (↑ty-arr x₃ x₄) (↑tyʲ-𝕔 x₅) = {!!}
+s-strengthen= {A = ‶ X} x x₁ x₂ (↑ty-arr x₃ x₄) (↑tyʲ-𝕔 x₅) = {!!}
+s-strengthen= (s-svar-𝕥 x₄ x₅) x x₁ x₂ x₃ = {!!}
 
 t-strengthen= : Γ ⊢ j' # e' ⦂ A'
                 → Γ ◀ k =⇘ Γ'
