@@ -79,8 +79,6 @@ t-tregular (⊢tabs ⊢e) with t-tregular ⊢e
 t-tregular (⊢tapp ⊢e st) = t-tregular ⊢e
 
 
-
-
 ⊢rʲ-⋈' : Γ ⋈ ⊢rʲ j
        → Γ ⊢rʲ j
 ⊢rʲ-⋈' rj-Z = rj-Z
