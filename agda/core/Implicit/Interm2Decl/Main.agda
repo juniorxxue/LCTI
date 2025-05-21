@@ -202,3 +202,12 @@ sound (s-svar-r x inΔ) grd1 (grd-var= x₁)
   with regA ← ∋:=-⊢r x inΔ
   with refl ← ⊢r-≫-eq' regA grd1 = sd-refl-∞ x regA
 sound (s-svar-r x inΔ) grd1 (grd-var∙ x₁) = ⊥-elim (∋∙-∋:=-false x₁ inΔ)
+sound (s-svar-𝕚 inΓ s) (grd-var= x) (grd-arr grd2 grd3)
+  with refl ← ∋:=-unique inΓ x = sound s (⊢r-≫-eq (∋:=-⊢r (s-sregular s) inΓ)) (grd-arr grd2 grd3)
+sound (s-svar-𝕚 inΓ s) (grd-var∙ x) (grd-arr grd2 grd3) = ⊥-elim (∋∙-∋:=-false x inΓ)
+sound (s-svar-𝕔 inΓ s) (grd-var= x) (grd-arr grd2 grd3)
+  with refl ← ∋:=-unique inΓ x = sound s (⊢r-≫-eq (∋:=-⊢r (s-sregular s) inΓ)) (grd-arr grd2 grd3)
+sound (s-svar-𝕔 inΓ s) (grd-var∙ x) grd2 = ⊥-elim (∋∙-∋:=-false x inΓ)
+sound (s-svar-𝕥 inΓ s) (grd-var= x) (grd-∀ grd2)
+  with refl ← ∋:=-unique inΓ x = sound s (⊢r-≫-eq (∋:=-⊢r (s-sregular s) inΓ)) (grd-∀ grd2)
+sound (s-svar-𝕥 inΓ s) (grd-var∙ x) grd2 = ⊥-elim (∋∙-∋:=-false x inΓ)

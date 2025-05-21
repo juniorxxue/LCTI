@@ -261,6 +261,8 @@ s-irrev (s-term-o opnA ⊢e ss s) tf with ⇌s-Ω (ss-⊆ ss) tf
 ... | ⟨ Ω' , tf' ⟩ = s-term-o (⇌s-⊢o-l opnA tf) (t-irrev ⊢e (⇌s-⇌-l tf)) (ss-irrev ss tf') (s-irrev s (⇌s-arr tf tf' (s-⊆ s)))
 s-irrev (s-∀l s upᶜ upᵉ upC upD) tf = s-∀l (s-irrev s (evar-sol tf)) upᶜ upᵉ upC upD
 s-irrev (s-tapp s upᶜ) tf = s-tapp (s-irrev s (svar tf)) upᶜ
+s-irrev (s-svar-term inΓ s) tf with refl ← ⇌s-eq tf = s-svar-term (⇌s-∋:=-l inΓ tf) (s-irrev s tf)
+s-irrev (s-svar-tapp inΓ s) tf with refl ← ⇌s-eq tf = s-svar-tapp (⇌s-∋:=-l inΓ tf) (s-irrev s tf)
 
 ----------------------------------------------------------------------
 --+                           corollary                            +--

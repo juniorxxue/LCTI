@@ -12,7 +12,7 @@ import Implicit.Algo2Interm.Corollaries
 import Implicit.Interm2Algo.Main
 
 -- (decl. <----> interm.) completeness
-import Implicit.Decl2Interm.Main
+import Implicit.Decl2Interm.MainNew
 
 -- (decl. <----> interm.) soundness
 import Implicit.Interm2Decl.Main

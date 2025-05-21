@@ -22,8 +22,6 @@ open import Implicit.Algo.Properties.Trans
 ≊-weaken (≊S new) (↑tmᶜ-e up-e up1) (↑tmᶜ-e up-e₁ up2) with refl ← ↑tm-unique up-e up-e₁ = ≊S (≊-weaken new up1 up2)
 ≊-weaken (≊⓪ new) (↑tmᶜ-⓪ up1) (↑tmᶜ-⓪ up2) = ≊⓪ (≊-weaken new up1 up2)
 
-
-
 -- aux lemmas
 t-inf-open-false : Γ ⊢ □ ⇒ e ⇒ A
                  → Γ ⋈ ⊢o A
@@ -55,6 +53,8 @@ s-refined-p s'@(s-term-o opnA ⊢e ss s) with subsumption0 ⊢e
          in s-term-c (⊢r-⊢c regA) (⊢r-≫-eq regA) (t-irrev-⊆ ih (s-⊆ s')) (s-refined-p s)
 s-refined-p (s-∀l s upᶜ upᵉ upC upD) = s-strengthen=0 (s-refined-p s) (↑ty-arr upC upD) (↑ty-arr upC upD) (↑tyᶜ-e upᵉ upᶜ)
 s-refined-p (s-tapp s upᶜ) = s-tapp (s-refined-p s) upᶜ
+s-refined-p (s-svar-term inΓ s) = s-refined-p s
+s-refined-p (s-svar-tapp inΓ s) = s-refined-p s
 
 
 ⊢to≤ (⊢lit regΓ) = s-empty (reg-Z regΓ) ⊢c-int grd-int

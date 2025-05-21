@@ -81,6 +81,10 @@ sc-complete (s-tapp {B = B} {C = C} s upᶜ) with sc-complete s
   with ⟨ B* , stB ⟩ ← st0-total B C
   with ⟨ j' , upj' ⟩ ← ↑tyʲ0-exist j~Σ upᶜ
   = subs (~sT (~s-strengthen=0 j~Σ (st-↑ty (⊢r-¬ε (s-⊢r s) Z) stB) upᶜ upj') stB) (s-tapp s₁ upᶜ upj')
+sc-complete (s-svar-term inΓ s) with sc-complete s
+... | subs j~Σ s₁ = subs j~Σ (s-svar-term inΓ s₁)
+sc-complete (s-svar-tapp inΓ s) with sc-complete s
+... | subs (~sT j~Σ st) s₁ = subs (~sT j~Σ st) (s-svar-tapp inΓ s₁)
 
 ----------------------------------------------------------------------
 --+                          corollaries                           +--

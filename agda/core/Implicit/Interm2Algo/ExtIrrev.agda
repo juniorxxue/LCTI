@@ -25,6 +25,12 @@ data _⊆_w/t_w/c_ : Env n m → Env n m → Type m → Counter m → Set where
   ⊆∀-T : Γ ,= B ⊆ Δ ,= B w/t A w/c j'
        → (upj : ↑tyʲ0 j ⇘ j')
        → Γ ⊆ Δ w/t `∀ A w/c 𝕥₍ B ₎ j
+  ⊆I-X : (regΓ : SRegular Δ)
+       → Δ ⊆ Δ w/t ‶ X w/c 𝕚 j
+  ⊆C-X : (regΓ : SRegular Δ)
+       → Δ ⊆ Δ w/t ‶ X w/c 𝕔 j
+  ⊆T-X : (regΓ : SRegular Δ)
+       → Δ ⊆ Δ w/t ‶ X w/c 𝕥₍ A ₎ j
 
 ⊆/c-⊆ : Γ ⊆ Δ w/t A w/c j
       → Γ ⊆ Δ
@@ -38,6 +44,9 @@ data _⊆_w/t_w/c_ : Env n m → Env n m → Type m → Counter m → Set where
 ... | evar-sol r regA = r
 ⊆/c-⊆ (⊆∀-T ext upj) with ⊆/c-⊆ ext
 ... | svar r regA = r
+⊆/c-⊆ (⊆I-X regΓ) = ⊆-refl regΓ
+⊆/c-⊆ (⊆C-X regΓ) = ⊆-refl regΓ
+⊆/c-⊆ (⊆T-X regΓ) = ⊆-refl regΓ
 
 ----------------------------------------------------------------------
 --+                              inst                              +--
@@ -160,6 +169,9 @@ data _⊆_w/t_w/c_ : Env n m → Env n m → Type m → Counter m → Set where
 ⊆/c-irrev-== {B = B} (⊆∀-T ext upj) new1 new2
   with svar r regA ← ⊆/c-⊆ ext
   with ⟨ B' , upB ⟩ ← ↑ty0-total B = ⊆∀-T (⊆/c-irrev-== ext (=⟹=S new1 upB regA) (=⟹=S new2 upB (⊆-⊢r regA r))) upj
+⊆/c-irrev-== (⊆I-X regΓ) new1 new2 with refl ← =⟹-unique new1 new2 = ⊆I-X (=⟹-sregular new1)
+⊆/c-irrev-== (⊆C-X regΓ) new1 new2 with refl ← =⟹-unique new1 new2 = ⊆C-X (=⟹-sregular new1)
+⊆/c-irrev-== (⊆T-X regΓ) new1 new2 with refl ← =⟹-unique new1 new2 = ⊆T-X (=⟹-sregular new1)
 
 
 ⊆/v-irrev-^= : Γ ⊆ Δ w/v k

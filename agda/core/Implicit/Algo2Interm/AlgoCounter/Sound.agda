@@ -28,6 +28,8 @@ sc-sound (s-term-o opnA ⊢e ss s) = s-term-o opnA (tc-sound ⊢e) ss (sc-sound 
 sc-sound (s-∀l-𝕚 s upᶜ upj upᵉ upC upD) = s-∀l (sc-sound s) upᶜ upᵉ upC upD
 sc-sound (s-∀l-𝕔 s upᶜ upj upᵉ upC upD) = s-∀l (sc-sound s) upᶜ upᵉ upC upD
 sc-sound (s-tapp s upᶜ upj) = s-tapp (sc-sound s) upᶜ
+sc-sound (s-svar-term inΓ s) = s-svar-term inΓ (sc-sound s)
+sc-sound (s-svar-tapp inΓ s) = s-svar-tapp inΓ (sc-sound s)
 
 ----------------------------------------------------------------------
 --+                         useful lemmas                          +--

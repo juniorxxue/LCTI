@@ -93,6 +93,10 @@ s-trans (s-∀l s1 upᶜ upᵉ upC upD) s'@(s-term-c {A% = A%} {Σ = Σ′} {D =
 s-trans s'@(s-∀l s1 upᶜ upᵉ upC upD) (s-term-o opnA ⊢e x s2) (≊S newΣ)
   with (⊢r-arr regC regD) ← s-⊢r s' = let regA = ⊆-⊢r regC (s-⊆ s') in ⊥-elim (⊢r-⊢o-false regA opnA)
 s-trans {C = C} (s-tapp {B = B} s1 upᶜ) (s-tapp s2 upᶜ₁) (≊⓪ {Σ' = Σ'} newΣ) = s-tapp (s-trans s1 s2 (≊-↑ty0 newΣ upᶜ upᶜ₁)) upᶜ₁
+s-trans (s-svar-term inΓ s) (s-term-c cloA ap ⊢e s2) (≊S newΣ) = s-svar-term inΓ (s-trans s (s-term-c cloA ap ⊢e s2) (≊S newΣ))
+s-trans (s-svar-term inΓ s) (s-term-o opnA ⊢e ss s2) (≊S newΣ)
+  with ⊢r-arr regA regB ← s-⊢r s = ⊥-elim (⊢r-⊢o-false regA opnA)
+s-trans (s-svar-tapp inΓ s) (s-tapp s2 upᶜ) (≊⓪ newΣ) = s-svar-tapp inΓ (s-trans s (s-tapp s2 upᶜ) (≊⓪ newΣ))
 
 {-
   with reg-S= regΓ regB ← s-env-out s1

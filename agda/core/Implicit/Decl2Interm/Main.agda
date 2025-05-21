@@ -146,7 +146,7 @@ find-≫-∙ (f-𝕥 fd upj) ninΓ inΓ (grd-∀ grd upj₁)
 
 
 complete+ : Γ ⊢d j # A% ≤ B
-          → Γ ≫ A ⇘ A% by j
+--          → Γ ≫ A ⇘ A% by j
           → Γ ⊢i j # A ⌞ ≤⁺ ⌝ B
 
 complete- : Γ ⊢d ∞ # A ≤ B%
