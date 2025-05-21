@@ -29,7 +29,7 @@
 \newtheorem{lemma}{Lemma}
 \newcommand{\highlight}{\colorbox{lightgray}}
 
-\title{Contextual Typing (No-round-trip; dual environments)}
+\title{Contextual Typing (Latest)}
 \author{Xu Xue}
 
 \begin{document}
@@ -231,9 +231,18 @@
     {\Gamma; \Delta [\hat{a} = A] \vdash_\infty \hat{a} <:^+ A}
     
      \inferrule*[right=\texttt{S-Var-R}]
-   { }
+     { }
     {\Gamma; \Delta [\hat{a} = A] \vdash_\infty A <:^- \hat{a}}
-\end{mathpar}
+    
+    \\
+     \inferrule*[right=\texttt{S-SVar-S}]
+    {\Gamma; \Delta [\hat{a} = A] \vdash_{S~n} A <:^+ B \to C}
+    {\Gamma; \Delta [\hat{a} = A] \vdash_{S~n} \hat{a} <:^+ B \to C}
+
+     \inferrule*[right=\texttt{S-SVar-T}]
+    {\Gamma; \Delta [\hat{a} = A] \vdash_{T_D~n} A <:^+ \forall a~.C}
+    {\Gamma; \Delta [\hat{a} = A] \vdash_{T_D~n} \hat{a} <:^+ \forall a~.C}    
+    \end{mathpar}
 
 \section{Algo.}
 
@@ -361,11 +370,11 @@
 
 \inferrule*[right=\texttt{S-Ex-Eq-L}]
 { }
-{\Gamma; \Delta[\hat{a:=A}] \vdash \hat{a} \leq^+ A \dashv \Delta[\hat{a} = A] }
+{\Gamma; \Delta[\hat{a}=A] \vdash \hat{a} \leq^+ A \dashv \Delta[\hat{a} = A] }
 
 \inferrule*[right=\texttt{S-Ex-Eq-R}]
 { }
-{\Gamma; \Delta[\hat{a:=A}] \vdash A \leq^- \hat{a}  \dashv \Delta[\hat{a} = A] }
+{\Gamma; \Delta[\hat{a}=A] \vdash A \leq^- \hat{a}  \dashv \Delta[\hat{a} = A] }
 
 \inferrule*[right=\texttt{S-Arr}]
 {\Gamma; \Delta \vdash C \leq^* A \dashv \Omega  \\
@@ -406,6 +415,14 @@
 \inferrule*[right=\texttt{S-TApp}]
 { \Gamma; \Delta, a =B \vdash A \leq^+ \Sigma \dashv \Delta, a = B \rightsquigarrow C}
 {\Gamma; \Delta \vdash \forall a. A \leq^+ \boxed{B} \leadsto \Sigma \dashv \Delta \rightsquigarrow \forall a. C}
+
+\inferrule*[right=\texttt{S-SVar-Term}]
+{\Gamma; \Delta[\hat{a}=A] \vdash A \leq^+ \boxed{e} \leadsto \Sigma \dashv \Gamma; \Delta[\hat{a}=A] \rightsquigarrow B \to C}
+{\Gamma; \Delta[\hat{a}=A] \vdash \hat{A} \leq^+ \boxed{e} \leadsto \Sigma \dashv \Gamma; \Delta[\hat{a}=A] \rightsquigarrow B \to C}
+\inferrule*[right=\texttt{S-SVar-TApp}]
+{\Gamma; \Delta[\hat{a}=A] \vdash A \leq^+ \boxed{T} \leadsto \Sigma \dashv \Gamma; \Delta[\hat{a}=A] \rightsquigarrow \forall a~.C}
+{\Gamma; \Delta[\hat{a}=A] \vdash \hat{A} \leq^+ \boxed{T} \leadsto \Sigma \dashv \Gamma; \Delta[\hat{a}=A] \rightsquigarrow \forall a~.C}
+
 
 \end{mathpar}
 
