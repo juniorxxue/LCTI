@@ -1,4 +1,3 @@
-{-# OPTIONS --allow-unsolved-metas #-}
 module Implicit.Algo.Properties.WeakenEVar where
 
 open import Implicit.Language.All
@@ -100,8 +99,12 @@ s-weaken^ {k = k} (s-∀l {B = B} s upᶜ upᵉ upC upD) new (↑ty-∀ upA) (�
          upΣ″ upe″ upC″ upD″
 s-weaken^ (s-tapp s upᶜ) new (↑ty-∀ upA) (↑tyᶜ-⓪ {Σ' = Σ'} upA' upΣ) (↑ty-∀ upB)
   with ⟨ Σ″ , upΣ″ ⟩ ← ↑tyᶜ0-total Σ' = s-tapp (s-weaken^ s (▶S= new upA') upA (↑tyᶜ-comm0' upΣ upΣ″ upᶜ) upB) upΣ″
-s-weaken^ (s-svar-term inΓ s) = {!!}
-s-weaken^ (s-svar-tapp inΓ s) = {!!}
+s-weaken^ {k = k} (s-svar-term {A = A} inΓ s) new ↑ty-var (↑tyᶜ-e up-e upΣ) (↑ty-arr upB upB₁)
+  with ⟨ A' , upA ⟩ ← ↑ty-total A k
+  with refl ← ▶⨟^-unique new = s-svar-term (∋:=-weaken^ inΓ upA (▶⨟^-▶^-l new)) (s-weaken^ s new upA (↑tyᶜ-e up-e upΣ) (↑ty-arr upB upB₁))
+s-weaken^ {k = k} (s-svar-tapp {A = A} inΓ s) new ↑ty-var (↑tyᶜ-⓪ upA upΣ) (↑ty-∀ upB)
+  with ⟨ A' , upA' ⟩ ← ↑ty-total A k
+  with refl ← ▶⨟^-unique new = s-svar-tapp (∋:=-weaken^ inΓ upA' (▶⨟^-▶^-l new)) (s-weaken^ s new upA' (↑tyᶜ-⓪ upA upΣ) (↑ty-∀ upB))
 
 t-weaken^ (⊢lit regΓ) newΓ ↑tyᶜ-□ ↑tyᵉ-lit ↑ty-int = ⊢lit (tregular-weaken^ regΓ newΓ)
 t-weaken^ (⊢var regΓ x∈Γ) newΓ ↑tyᶜ-□ ↑tyᵉ-var upA = ⊢var (tregular-weaken^ regΓ newΓ) (∋⦂-weaken^ x∈Γ newΓ upA)
