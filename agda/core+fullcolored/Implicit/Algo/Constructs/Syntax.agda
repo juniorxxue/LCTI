@@ -30,16 +30,18 @@ data NonEmpty : Context n m → Set where
   ne-app  : NonEmpty ([ e ]↝ Σ)
   ne-tapp : NonEmpty (A ⓪↝ Σ)
 
+
 infix 3 _≊P_
-data _≊P_ : ParType m → Type m → Set where
-  ≊P-Z : □ ≊P A
-  ≊P-S : P ≊P B
-       → A ◐↝ P ≊P A `→ B
+data _≊P_ : ParType m → ParType m → Set where
+  ≊P-Z : □ ≊P P
+  ≊P-S : P₁ ≊P P₂
+       → A ◐↝ P₁ ≊P A ◐↝ P₂
 
 infix 3 _≊E_
 data _≊E_ : EContext m → EContext m → Set where
-  p2τ : P ≊P A
-      → p P ≊E τ A
+  p2τ : p P ≊E τ A
+  p2p : P₁ ≊P P₂
+      → p P₁ ≊E p P₂
 
 infix 3 _≊_
 data _≊_ : Context n m → Context n m → Set where
