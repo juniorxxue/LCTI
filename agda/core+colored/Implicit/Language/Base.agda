@@ -104,26 +104,41 @@ data SEnv : Env n m → Set where
             → X ≡ Y
 ‶-injective refl = refl
 
-infixr 9 𝕥₍_₎_
+-- extended natural numbers
+data ENat : Set where
+  ∞ : ENat
+  𝕟 : ℕ → ENat
+
+variable
+  𝕖 𝕖₁ 𝕖₂ : ENat
+  i i₁ i₂ : ℕ
+
+infixr 9 𝕋₍_₎_
+infixr 9 𝕊₍_₎_
 data Counter : ℕ → Set where
-  𝕟 : ℕ → Counter m
-  ∞ : Counter m
-  𝕊₍_₎_ : ℕ → Counter m → Counter m
-  𝕥₍_₎_ : Type m → Counter m → Counter m
+  𝔼 : ENat → Counter m
+  𝕊₍_₎_ : ENat → Counter m → Counter m
+  𝕋₍_₎_ : Type m → Counter m → Counter m
+
+-- some syntactic sugar
+`𝕫 : Counter m
+`𝕫 = 𝔼 (𝕟 0)
+
+`∞ : Counter m
+`∞ = 𝔼 ∞
+
+`𝕟 : ℕ → Counter m
+`𝕟 i = 𝔼 (𝕟 i)
 
 variable
   j j′ j″  : Counter m
   j' j'' : Counter m
+  j₁ j₂ j₃ : Counter m
+  w w' w'' w₁ w₂ w₃ : Counter m
 
 data NonZ : Counter m → Set where
-  nz-∞ : NonZ (Counter m ∋⦂ ∞)
---   nz-I : NonZ (𝕚₍ n ₎ j)
---  nz-C : NonZ (𝕔 j)
-  nz-T : NonZ (𝕥₍ A ₎ j)
-
-data 𝕚𝕔 : Counter m → Set where
---  case-𝕚 : 𝕚𝕔 (𝕚₍ n ₎ j)
---  case-𝕔 : 𝕚𝕔 (𝕔 j)
+  nz-S  : NonZ (𝕊₍ 𝕖 ₎ j)
+  nz-T  : NonZ (𝕋₍ A ₎ j)
 
 data Polar : Set where
   ≤⁺ ≤⁻ : Polar

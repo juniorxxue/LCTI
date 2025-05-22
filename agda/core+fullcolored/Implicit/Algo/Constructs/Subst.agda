@@ -3,7 +3,6 @@ module Implicit.Algo.Constructs.Subst where
 open import Implicit.Language.All
 open import Implicit.Algo.Constructs.Syntax
 
-{-
 -- subst a type in context
 infix 3 ⟦_/_⟧ᶜ_⇘_
 data ⟦_/_⟧ᶜ_⇘_ : Fin (1 + m) → Type m → Context n (1 + m) → Context n m → Set where
@@ -28,4 +27,3 @@ data ⟦_/_⟧ᶜ_⇘_ : Fin (1 + m) → Type m → Context n (1 + m) → Contex
 infix 3 ⟦_⟧ᶜ_⇘_
 ⟦_⟧ᶜ_⇘_ : Type m → Context n (1 + m) → Context n m → Set
 ⟦_⟧ᶜ_⇘_ = ⟦_/_⟧ᶜ_⇘_ #0
--}

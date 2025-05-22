@@ -57,7 +57,7 @@ t-⊢r (⊢app₂ ⊢e ⊢e₁) with t-⊢r ⊢e
 t-⊢r (⊢sub ⊢e B≤A gc j≢Z) = ⊢r-𝕣' (s+-polarity B≤A)
 t-⊢r (⊢tabs ⊢e) = ⊢r-∀ (t-⊢r ⊢e)
 t-⊢r (⊢tapp ⊢e st) with t-⊢rʲ ⊢e
-... | j-𝕋 r x = st0-⊢r (t-⊢r ⊢e) x st
+... | j-𝕥 r x = st0-⊢r (t-⊢r ⊢e) x st
 -}
 
 

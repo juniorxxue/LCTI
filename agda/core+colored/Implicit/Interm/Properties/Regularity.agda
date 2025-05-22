@@ -5,6 +5,7 @@ open import Implicit.Interm.Base
 
 s-sregular : Γ ⊢ j # A ⌞ ≤ ⌝ B
            → SRegular Γ
+{-
 s-sregular (s-refl regΔ cloA grd) = regΔ
 s-sregular (s-int regΔ) = regΔ
 s-sregular (s-var-∙ regΔ inΔ) = regΔ
@@ -19,9 +20,11 @@ s-sregular (s-svar-l x inΔ) = x
 s-sregular (s-svar-r x inΔ) = x
 s-sregular (s-tapp s upj) with s-sregular s
 ... | reg-S= r regA = r
+-}
 
 t-tregular : Γ ⊢ j # e ⦂ A
            → TRegular Γ
+{-
 t-tregular (⊢lit cloΓ) = cloΓ
 t-tregular (⊢var cloΓ x∈Γ) = cloΓ
 t-tregular (⊢ann ⊢e) = t-tregular ⊢e
@@ -35,6 +38,7 @@ t-tregular (⊢sub ⊢e B≤A x j≢Z) = t-tregular ⊢e
 t-tregular (⊢tabs ⊢e) with t-tregular ⊢e
 ... | reg-S∙ r = r
 t-tregular {e = e ⓪ A} (⊢tapp ⊢e st) = t-tregular ⊢e
+-}
 
 
 
@@ -42,13 +46,12 @@ infix 3 _⊢rʲ_
 data _⊢rʲ_ : Env n m → Counter m → Set where
   j-Z : Γ ⊢rʲ Z
   j-∞ : Γ ⊢rʲ ∞
-  j-𝕚 : Γ ⊢rʲ j
-      → Γ ⊢rʲ (𝕚 j)
-  j-𝕔 : Γ ⊢rʲ j
-      → Γ ⊢rʲ (𝕔 j)
-  j-𝕥 : Γ ⊢rʲ j
+  j-𝕊 : Γ ⊢rʲ j
+      → Γ ⊢rʲ w
+      → Γ ⊢rʲ (𝕊₍ w ₎ j)
+  j-𝕋 : Γ ⊢rʲ j
       → Γ ⊢r A
-      → Γ ⊢rʲ 𝕥₍ A ₎ j
+      → Γ ⊢rʲ 𝕋₍ A ₎ j
 
 ⊢rʲ-strengthen=0 : Γ ,= T ⊢rʲ j'
                  → ↑tyʲ0 j ⇘ j'
@@ -57,7 +60,7 @@ data _⊢rʲ_ : Env n m → Counter m → Set where
 ⊢rʲ-strengthen=0 j-∞ ↑tyʲ-∞ = j-∞
 ⊢rʲ-strengthen=0 (j-𝕚 regj) (↑tyʲ-𝕚 upj) = j-𝕚 (⊢rʲ-strengthen=0 regj upj)
 ⊢rʲ-strengthen=0 (j-𝕔 regj) (↑tyʲ-𝕔 upj) = j-𝕔 (⊢rʲ-strengthen=0 regj upj)
-⊢rʲ-strengthen=0 (j-𝕥 regj x) (↑tyʲ-𝕥 upj upA) = j-𝕥 (⊢rʲ-strengthen=0 regj upj) (⊢r-strengthen=0 x upA)
+⊢rʲ-strengthen=0 (j-𝕋 regj x) (↑tyʲ-𝕋 upj upA) = j-𝕋 (⊢rʲ-strengthen=0 regj upj) (⊢r-strengthen=0 x upA)
 
 ⊢rʲ-strengthen,0 : Γ , T ⊢rʲ j
                  → Γ ⊢rʲ j
@@ -65,7 +68,7 @@ data _⊢rʲ_ : Env n m → Counter m → Set where
 ⊢rʲ-strengthen,0 j-∞ = j-∞
 ⊢rʲ-strengthen,0 (j-𝕚 regj) = j-𝕚 (⊢rʲ-strengthen,0 regj)
 ⊢rʲ-strengthen,0 (j-𝕔 regj) = j-𝕔 (⊢rʲ-strengthen,0 regj)
-⊢rʲ-strengthen,0 (j-𝕥 regj x) = j-𝕥 (⊢rʲ-strengthen,0 regj) (⊢r-strengthen,0 x)
+⊢rʲ-strengthen,0 (j-𝕋 regj x) = j-𝕋 (⊢rʲ-strengthen,0 regj) (⊢r-strengthen,0 x)
 
 s-⊢rʲ : Γ ⊢ j # A ⌞ ≤ ⌝ B
       → Γ ⊢rʲ j
@@ -78,7 +81,7 @@ s-⊢rʲ (s-arr₃ cloA grd s) = j-𝕔 (s-⊢rʲ s)
 s-⊢rʲ (s-∀ s) = j-∞
 s-⊢rʲ (s-∀l s ic fd upC upD upj) = ⊢rʲ-strengthen=0 (s-⊢rʲ s) upj
 s-⊢rʲ (s-tapp s upj) with s-sregular s
-... | reg-S= r regA = j-𝕥 (⊢rʲ-strengthen=0 (s-⊢rʲ s) upj) regA
+... | reg-S= r regA = j-𝕋 (⊢rʲ-strengthen=0 (s-⊢rʲ s) upj) regA
 s-⊢rʲ (s-svar-l x inΔ) = j-∞
 s-⊢rʲ (s-svar-r x inΔ) = j-∞
 
@@ -88,7 +91,7 @@ s-⊢rʲ (s-svar-r x inΔ) = j-∞
 ⊢r-⋈ j-∞ = j-∞
 ⊢r-⋈ (j-𝕚 regj) = j-𝕚 (⊢r-⋈ regj)
 ⊢r-⋈ (j-𝕔 regj) = j-𝕔 (⊢r-⋈ regj)
-⊢r-⋈ (j-𝕥 regj x) = j-𝕥 (⊢r-⋈ regj) (⊢r-𝕣' x)
+⊢r-⋈ (j-𝕋 regj x) = j-𝕋 (⊢r-⋈ regj) (⊢r-𝕣' x)
 
 
 t-⊢rʲ : Γ ⊢ j # e ⦂ A
@@ -105,4 +108,4 @@ t-⊢rʲ (⊢app₂ ⊢e ⊢e₁) with t-⊢rʲ ⊢e
 t-⊢rʲ (⊢sub ⊢e B≤A gc j≢Z) = ⊢r-⋈ (s-⊢rʲ B≤A)
 t-⊢rʲ (⊢tabs ⊢e) = j-Z
 t-⊢rʲ (⊢tapp ⊢e st) with t-⊢rʲ ⊢e
-... | j-𝕥 r x = r
+... | j-𝕋 r x = r

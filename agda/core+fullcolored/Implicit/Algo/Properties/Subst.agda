@@ -2,7 +2,7 @@ module Implicit.Algo.Properties.Subst where
 
 open import Implicit.Language.All
 open import Implicit.Algo.Base
-{-
+
 ↑tyᶜ-st-eq :
     Σ ↑tyᶜ k ⇘ Σ'
   → ⟦ k / T ⟧ᶜ Σ' ⇘ Σ*
@@ -21,4 +21,3 @@ open import Implicit.Algo.Base
 ↑tyᶜ-st (↑tyᶜ-e up-e up) = term (↑tyᶜ-st up) (↑tyᵉ-st up-e)
 ↑tyᶜ-st (↑tyᶜ-⓪ x x₁) = tapp (↑tyᶜ-st x₁) (↑ty-st x)
 ↑tyᶜ-st (↑tyᶜ-◐ upA x) = partype (↑tyᶜ-st x) (↑ty-st upA)
--}

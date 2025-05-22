@@ -41,7 +41,7 @@ sd-strengthen= {j = j} (s-∀l {B = B} grd regA' s ic fd upC upD upj₁) new (�
          (sd-strengthen= s (◀S= new upB') upA% (↑ty-arr (↑ty-comm0' upB upC upA′) (↑ty-comm0' upB₁ upD upB′)) (↑tyʲ-comm0' upj upj₁ upj'))
          (𝕚𝕔-↑tyʲ' ic upj)
          (↑ty-find0' fd upA (↑tyʲ-comm0' upj upj₁ upj')) upA′ upB′ upj'
-sd-strengthen= (s-tapp grd regA' s upj₁) new (↑ty-∀ upA) (↑ty-∀ upB) (↑tyʲ-𝕋A {j = j} upj upA₁)
+sd-strengthen= (s-tapp grd regA' s upj₁) new (↑ty-∀ upA) (↑ty-∀ upB) (↑tyʲ-𝕥 {j = j} upj upA₁)
   with ⟨ j' , upj' ⟩ ← ↑tyʲ0-total j
   --
   with reg-S= regΓ regA ← s2-sregular s
@@ -147,7 +147,7 @@ find-≫-∙ (f-arr-𝕚-r ¬inA fd) ninΓ inΓ (grd-arr grd grd₁) = f-arr-�
 find-≫-∙ (f-arr-𝕔 ¬inA fd) ninΓ inΓ (grd-arr grd grd₁) = f-arr-𝕔 (¬ε-≫-∙ ¬inA inΓ ninΓ grd) (find-≫-∙ fd ninΓ inΓ grd₁)
 find-≫-∙ (f-∀-𝕚 fd upj) ninΓ inΓ (grd-∀ grd) = f-∀-𝕚 (find-≫-∙ fd (S∙ ninΓ) (S∙ inΓ) grd) upj
 find-≫-∙ (f-∀-𝕔 fd upj) ninΓ inΓ (grd-∀ grd) = f-∀-𝕔 (find-≫-∙ fd (S∙ ninΓ) (S∙ inΓ) grd) upj
-find-≫-∙ (f-𝕋 fd upj) ninΓ inΓ (grd-∀ grd) = f-𝕋 (find-≫-∙ fd (S∙ ninΓ) (S∙ inΓ) grd) upj
+find-≫-∙ (f-𝕥 fd upj) ninΓ inΓ (grd-∀ grd) = f-𝕥 (find-≫-∙ fd (S∙ ninΓ) (S∙ inΓ) grd) upj
 
 
 sound : Γ ⊢i j # A ⌞ ≤ ⌝ B

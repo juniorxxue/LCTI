@@ -26,7 +26,7 @@ data _⊢_~t_ : Env n m → Counter m × Type m → Context n m → Set where
 
   ~tT : Γ ⊢ ⟨ j , B* ⟩ ~t Σ
      → (st : ⟦ A ⟧ B ⇘ B*)
-     → Γ ⊢ ⟨ 𝕥₍ A ₎ j , `∀ B ⟩ ~t A ⓪↝ Σ
+     → Γ ⊢ ⟨ 𝕋₍ A ₎ j , `∀ B ⟩ ~t A ⓪↝ Σ
 
 infix 3 _⊢_~s_
 data _⊢_~s_ : Env n m → Counter m × Type m → Context n m → Set where
@@ -49,7 +49,7 @@ data _⊢_~s_ : Env n m → Counter m × Type m → Context n m → Set where
 
   ~sT : Γ ⊢ ⟨ j , B* ⟩ ~s Σ
      → (st : ⟦ A ⟧ B ⇘ B*)
-     → Γ ⊢ ⟨ 𝕥₍ A ₎ j , `∀ B ⟩ ~s A ⓪↝ Σ
+     → Γ ⊢ ⟨ 𝕋₍ A ₎ j , `∀ B ⟩ ~s A ⓪↝ Σ
 
 ~s-~t : Γ ⊢ ⟨ j , A ⟩ ~s Σ
       → 𝕣 Γ ⊢ ⟨ j , A ⟩ ~t Σ
@@ -69,7 +69,6 @@ NonEmpty-NonZ ne-tapp (~tT ~J st) = nz-T
 
 
 
-
 ~s-strengthen=0 : Γ ,= T ⊢ ⟨ j' , A' ⟩ ~s Σ'
                  → ↑ty0 A ⇘ A'
                  → ↑tyᶜ0 Σ ⇘ Σ'
@@ -79,7 +78,7 @@ NonEmpty-NonZ ne-tapp (~tT ~J st) = nz-T
 ~s-strengthen=0 ~s∞ upA (↑tyᶜ-τ up-t) ↑tyʲ-∞ with refl ← ↑ty-unique-inver upA up-t = ~s∞
 ~s-strengthen=0 (~sI ⊢e ~s) (↑ty-arr upA upA₁) (↑tyᶜ-e up-e upΣ) (↑tyʲ-𝕚 upj) = ~sI (t-strengthen= ⊢e ◀Z up-e upA ↑tyʲ-Z) (~s-strengthen=0 ~s upA₁ upΣ upj)
 ~s-strengthen=0 (~sC ⊢e ~s) (↑ty-arr upA upA₁) (↑tyᶜ-e up-e upΣ) (↑tyʲ-𝕔 upj) = ~sC (t-strengthen= ⊢e ◀Z up-e upA ↑tyʲ-∞) (~s-strengthen=0 ~s upA₁ upΣ upj)
-~s-strengthen=0 (~sT ~s st) (↑ty-∀ {A = C} upA) (↑tyᶜ-⓪ x upΣ) (↑tyʲ-𝕥 {A = A} upj upA₁) with refl ← ↑ty-unique-inver upA₁ x
+~s-strengthen=0 (~sT ~s st) (↑ty-∀ {A = C} upA) (↑tyᶜ-⓪ x upΣ) (↑tyʲ-𝕋 {A = A} upj upA₁) with refl ← ↑ty-unique-inver upA₁ x
   with ⟨ C* , stC ⟩ ← st0-total A C
   = ~sT (~s-strengthen=0 ~s (↑ty-st-comm0' stC x upA st) upΣ upj) stC
 {-

@@ -49,7 +49,7 @@ data _⊢_#_≤_ : Env n m → Counter m → Type m → Type m → Set where
     → (regA : Δ ,∙ ⊢r A)
     → Δ ,= B ⊢ j' # A% ≤ C
     → (upj : ↑tyʲ0 j ⇘ j')
-    → Δ ⊢ 𝕋₍ B ₎ j # `∀ A ≤ `∀ C
+    → Δ ⊢ 𝕥₍ B ₎ j # `∀ A ≤ `∀ C
 
 
 
@@ -124,7 +124,7 @@ s2-weaken= {k = k} {T = T} {j' = j'} (s-∀l {B = B} {A% = A%} grd regA s ic fd 
          (⊢r-weaken= regA (▶S∙ new upT) upA)
          (s2-weaken= s (▶S= new upT upB₂) upA% (↑ty-arr (↑ty-comm0' upB upC₁ upC) (↑ty-comm0' upB₁ upD₁ upD)) (↑tyʲ-comm0' upj upj₂ upj₁))
          (𝕚𝕔-↑tyʲ ic upj) (↑ty-find0 fd upA (↑tyʲ-comm0' upj upj₂ upj₁)) upC₁ upD₁ upj₂
-s2-weaken= {k = k} {T = T}  {j' = 𝕋₍  _ ₎ j'} (s-tapp {B = B} {A% = A%} x regA s upj₁) new (↑ty-∀ upA) (↑ty-∀ upB) (↑tyʲ-𝕋 upj upA₁)
+s2-weaken= {k = k} {T = T}  {j' = 𝕥₍  _ ₎ j'} (s-tapp {B = B} {A% = A%} x regA s upj₁) new (↑ty-∀ upA) (↑ty-∀ upB) (↑tyʲ-𝕥 upj upA₁)
   with ⟨ j₁ , upj₂ ⟩ ← ↑tyʲ0-total j'
   with ⟨ T' , upT ⟩ ← ↑ty0-total T
   with ⟨ B' , upB₂ ⟩ ← ↑ty-total B k

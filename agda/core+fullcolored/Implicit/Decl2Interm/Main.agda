@@ -25,7 +25,7 @@ data _≫_⇘_by_ where
            → Δ ≫ `∀ A ⇘ `∀ A% by (𝕔 j)
   grd-∀   : Δ ,∙ ≫ A ⇘ A% by j'
           → (upj : ↑tyʲ0 j ⇘ j')
-          → Δ ≫ `∀ A ⇘ `∀ A% by 𝕋₍ B ₎ j
+          → Δ ≫ `∀ A ⇘ `∀ A% by 𝕥₍ B ₎ j
 
 ⊢d-refl-eq : Γ ⊢d ∞ # A ≤ B
            → A ≡ B
@@ -139,9 +139,9 @@ find-≫-∙ (f-∀-𝕚 fd upj) ninΓ inΓ (grd-∀l-𝕚 grd upj₁)
 find-≫-∙ (f-∀-𝕔 fd upj) ninΓ inΓ (grd-∀l-𝕔 grd upj₁)
   with refl ← ↑tyʲ-unique upj upj₁
   = f-∀-𝕔 (find-≫-∙ fd (S∙ ninΓ) (S∙ inΓ) grd) upj
-find-≫-∙ (f-𝕋 fd upj) ninΓ inΓ (grd-∀ grd upj₁)
+find-≫-∙ (f-𝕥 fd upj) ninΓ inΓ (grd-∀ grd upj₁)
   with refl ← ↑tyʲ-unique upj upj₁
-  = f-𝕋 (find-≫-∙ fd (S∙ ninΓ) (S∙ inΓ) grd) upj
+  = f-𝕥 (find-≫-∙ fd (S∙ ninΓ) (S∙ inΓ) grd) upj
 
 
 

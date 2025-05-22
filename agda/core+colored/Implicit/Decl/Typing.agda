@@ -43,7 +43,7 @@ data _⊢_#_⦂_ : Env n m → Counter m → Term n m → Type m → Set where
       Γ ,∙ ⊢ Z # e ⦂ A
     → Γ ⊢ Z # Λ e ⦂ `∀ A
   ⊢tapp :
-      Γ ⊢ 𝕥₍ A ₎ j # e ⦂ `∀ B
+      Γ ⊢ 𝕋₍ A ₎ j # e ⦂ `∀ B
     → (st : ⟦ A ⟧ B ⇘ B*)
     → Γ ⊢ j # e ⓪ A ⦂ B*
 
@@ -87,7 +87,7 @@ t-tregular (⊢tapp ⊢e st) = t-tregular ⊢e
 ⊢rʲ-⋈' rj-∞ = rj-∞
 ⊢rʲ-⋈' (rj-𝕚 regj) = rj-𝕚 (⊢rʲ-⋈' regj)
 ⊢rʲ-⋈' (rj-𝕔 regj) = rj-𝕔 (⊢rʲ-⋈' regj)
-⊢rʲ-⋈' (rj-𝕥 regj regA) = rj-𝕥 (⊢rʲ-⋈' regj) (⊢r-𝕣' regA)
+⊢rʲ-⋈' (rj-𝕋 regj regA) = rj-𝕋 (⊢rʲ-⋈' regj) (⊢r-𝕣' regA)
 
 ⊢rʲ-strengthen,0 : Γ , A ⊢rʲ j
                  → Γ ⊢rʲ j
@@ -95,7 +95,7 @@ t-tregular (⊢tapp ⊢e st) = t-tregular ⊢e
 ⊢rʲ-strengthen,0 rj-∞ = rj-∞
 ⊢rʲ-strengthen,0 (rj-𝕚 regj) = rj-𝕚 (⊢rʲ-strengthen,0 regj)
 ⊢rʲ-strengthen,0 (rj-𝕔 regj) = rj-𝕔 (⊢rʲ-strengthen,0 regj)
-⊢rʲ-strengthen,0 (rj-𝕥 regj regA) = rj-𝕥 (⊢rʲ-strengthen,0 regj) (⊢r-strengthen,0 regA)
+⊢rʲ-strengthen,0 (rj-𝕋 regj regA) = rj-𝕋 (⊢rʲ-strengthen,0 regj) (⊢r-strengthen,0 regA)
 
 
 s-⊢rʲ : Γ ⊢ j # A ≤ B
@@ -108,7 +108,7 @@ s-⊢rʲ (s-arr₂ s s₁) = rj-𝕚 (s-⊢rʲ s₁)
 s-⊢rʲ (s-arr₃ regA s) = rj-𝕔 (s-⊢rʲ s)
 s-⊢rʲ (s-∀ s) = rj-∞
 s-⊢rʲ (s-∀l regB st s ic fd upj) = s-⊢rʲ s
-s-⊢rʲ (s-tapp regB st s upC) = rj-𝕥 (s-⊢rʲ s) regB
+s-⊢rʲ (s-tapp regB st s upC) = rj-𝕋 (s-⊢rʲ s) regB
 
 t-⊢rʲ : Γ ⊢ j # e ⦂ A
       → Γ ⊢rʲ j
@@ -124,7 +124,7 @@ t-⊢rʲ (⊢app₂ ⊢e ⊢e₁) with t-⊢rʲ ⊢e
 t-⊢rʲ (⊢sub ⊢e B≤A gc j≢Z) = ⊢rʲ-⋈' (s-⊢rʲ B≤A)
 t-⊢rʲ (⊢tabs ⊢e) = rj-Z
 t-⊢rʲ (⊢tapp ⊢e st) with t-⊢rʲ ⊢e
-... | rj-𝕥 r regA = r
+... | rj-𝕋 r regA = r
 
 t-⊢r : Γ ⊢ j # e ⦂ A
      → Γ ⊢r A
@@ -142,7 +142,7 @@ t-⊢r (⊢app₂ ⊢e ⊢e₁) with t-⊢r ⊢e
 t-⊢r (⊢sub ⊢e B≤A gc j≢Z) = ⊢r-𝕣' (s1-⊢r-r B≤A)
 t-⊢r (⊢tabs ⊢e) = ⊢r-∀ (t-⊢r ⊢e)
 t-⊢r (⊢tapp ⊢e st) with t-⊢rʲ ⊢e
-... | rj-𝕥 r regA = st0-⊢r (t-⊢r ⊢e) regA st
+... | rj-𝕋 r regA = st0-⊢r (t-⊢r ⊢e) regA st
 
 
 infix 3 _≋_
@@ -155,9 +155,9 @@ data _≋_ : Counter m → Counter m → Set where
   𝕔≋ : ∀ {nj}
      → j ≋ nj
      → 𝕔 j ≋ 𝕔 nj
-  𝕥≋ : ∀ {nj}
+  𝕋≋ : ∀ {nj}
      → j ≋ nj
-     → 𝕥₍ A ₎ j ≋ 𝕥₍ A ₎ nj
+     → 𝕋₍ A ₎ j ≋ 𝕋₍ A ₎ nj
 
 ↑ty-≋ : ∀ {nj nj'}
       → j ≋ nj
@@ -167,9 +167,9 @@ data _≋_ : Counter m → Counter m → Set where
 ↑ty-≋ Z≋ ↑tyʲ-Z up2 = Z≋
 ↑ty-≋ (𝕚≋ new) (↑tyʲ-𝕚 up1) (↑tyʲ-𝕚 up2) = 𝕚≋ (↑ty-≋ new up1 up2)
 ↑ty-≋ (𝕔≋ new) (↑tyʲ-𝕔 up1) (↑tyʲ-𝕔 up2) = 𝕔≋ (↑ty-≋ new up1 up2)
-↑ty-≋ (𝕥≋ new) (↑tyʲ-𝕥 up1 upA) (↑tyʲ-𝕥 up2 upA₁)
+↑ty-≋ (𝕋≋ new) (↑tyʲ-𝕋 up1 upA) (↑tyʲ-𝕋 up2 upA₁)
   with refl ← ↑ty-unique upA upA₁
-  = 𝕥≋ (↑ty-≋ new up1 up2)
+  = 𝕋≋ (↑ty-≋ new up1 up2)
 
 
 find-≋ : ∀ {nj}
@@ -185,9 +185,9 @@ find-≋ (f-∀-𝕚 fd upj) (𝕚≋ {nj = nj} ~j)
 find-≋ (f-∀-𝕔 fd upj) (𝕔≋ {nj = nj} ~j)
   with ⟨ nj' , upnj ⟩ ← ↑tyʲ0-total nj
   = f-∀-𝕔 (find-≋ fd (𝕔≋ (↑ty-≋ ~j upj upnj))) upnj
-find-≋ (f-𝕥 fd upj) (𝕥≋ {nj = nj} ~j)
+find-≋ (f-𝕋 fd upj) (𝕋≋ {nj = nj} ~j)
   with ⟨ nj' , upnj ⟩ ← ↑tyʲ0-total nj
-  = f-𝕥 (find-≋ fd (↑ty-≋ ~j upj upnj)) upnj
+  = f-𝕋 (find-≋ fd (↑ty-≋ ~j upj upnj)) upnj
 
 
 s-trans-∞ : Γ ⊢ ∞ # A ≤ B
@@ -229,7 +229,7 @@ s-trans (s-∀l regB st s1 ic fd (↑tyʲ-𝕚 upj)) (𝕚≋ {nj = nj} ~j) (s-a
 s-trans (s-∀l regB st s1 ic fd (↑tyʲ-𝕔 upj)) (𝕔≋ {nj = nj} ~j) (s-arr₃ regA s2)
   with ⟨ nj' , upnj ⟩ ← ↑tyʲ0-total nj
   = s-∀l regB st (s-trans s1 (𝕔≋ ~j) (s-arr₃ regA s2)) case-𝕔 (find-≋ fd (𝕔≋ (↑ty-≋ ~j upj upnj))) (↑tyʲ-𝕔 upnj)
-s-trans (s-tapp regB st s1 upC) (𝕥≋ ~j) (s-tapp regB₁ st₁ s2 upC₁)
+s-trans (s-tapp regB st s1 upC) (𝕋≋ ~j) (s-tapp regB₁ st₁ s2 upC₁)
   with refl ← ↑ty-st-eq upC st₁ = s-tapp regB st (s-trans s1 ~j s2) upC₁
 
 gen-sub : Γ ⊢ j # e ⦂ A
@@ -246,8 +246,8 @@ gen-sub {j' = ∞} (⊢app₂ ⊢e ⊢e₁) Z≋ s = ⊢app₂ (gen-sub ⊢e (�
 gen-sub {j' = ∞} (⊢tabs ⊢e) Z≋ s = ⊢sub (⊢tabs ⊢e) s gc-tlam nz-∞
 gen-sub {j' = ∞} {B = B} (⊢tapp ⊢e st) Z≋ s
   with ⟨ B' , upB ⟩ ← ↑ty0-total B
-  with rj-𝕥 regj regA ← t-⊢rʲ ⊢e
-  = ⊢tapp (gen-sub ⊢e (𝕥≋ Z≋) (s-tapp (⊢r-𝕣 regA) st s upB)) (↑ty-st upB)
+  with rj-𝕋 regj regA ← t-⊢rʲ ⊢e
+  = ⊢tapp (gen-sub ⊢e (𝕋≋ Z≋) (s-tapp (⊢r-𝕣 regA) st s upB)) (↑ty-st upB)
 
 gen-sub {j' = 𝕚 j'} (⊢var regΓ x∈Γ) ~j s = ⊢sub (⊢var regΓ x∈Γ) s gc-var nz-I
 gen-sub {j' = 𝕚 j'} (⊢ann ⊢e) ~j s = ⊢sub (⊢ann ⊢e) s gc-ann nz-I
@@ -260,8 +260,8 @@ gen-sub {j' = 𝕚 j'} (⊢sub ⊢e B≤A gc j≢Z) (𝕚≋ ~j) s = ⊢sub ⊢e
 gen-sub {j' = 𝕚 j'} (⊢tabs ⊢e) ~j s = ⊢sub (⊢tabs ⊢e) s gc-tlam nz-I
 gen-sub {j' = 𝕚 j'} {B = B} (⊢tapp ⊢e st) ~j s
   with ⟨ B' , upB ⟩ ← ↑ty0-total B
-  with rj-𝕥 regj regA ← t-⊢rʲ ⊢e
-  = ⊢tapp (gen-sub ⊢e (𝕥≋ ~j) (s-tapp (⊢r-𝕣 regA) st s upB)) (↑ty-st upB)
+  with rj-𝕋 regj regA ← t-⊢rʲ ⊢e
+  = ⊢tapp (gen-sub ⊢e (𝕋≋ ~j) (s-tapp (⊢r-𝕣 regA) st s upB)) (↑ty-st upB)
 
 gen-sub {j' = 𝕔 j'} (⊢var regΓ x∈Γ) ~j s = ⊢sub (⊢var regΓ x∈Γ) s gc-var nz-C
 gen-sub {j' = 𝕔 j'} (⊢ann ⊢e) ~j s = ⊢sub (⊢ann ⊢e) s gc-ann nz-C
@@ -271,19 +271,19 @@ gen-sub {j' = 𝕔 j'} (⊢sub ⊢e B≤A gc j≢Z) ~j s = ⊢sub ⊢e (s-trans 
 gen-sub {j' = 𝕔 j'} (⊢tabs ⊢e) ~j s = ⊢sub (⊢tabs ⊢e) s gc-tlam nz-C
 gen-sub {j' = 𝕔 j'} {B = B} (⊢tapp ⊢e st) ~j s
   with ⟨ B' , upB ⟩ ← ↑ty0-total B
-  with rj-𝕥 regj regA ← t-⊢rʲ ⊢e
-  = ⊢tapp (gen-sub ⊢e (𝕥≋ ~j) (s-tapp (⊢r-𝕣 regA) st s upB)) (↑ty-st upB)
+  with rj-𝕋 regj regA ← t-⊢rʲ ⊢e
+  = ⊢tapp (gen-sub ⊢e (𝕋≋ ~j) (s-tapp (⊢r-𝕣 regA) st s upB)) (↑ty-st upB)
 
-gen-sub {j' = 𝕥₍ A ₎ j'} (⊢var regΓ x∈Γ) ~j s = ⊢sub (⊢var regΓ x∈Γ) s gc-var nz-T
-gen-sub {j' = 𝕥₍ A ₎ j'} (⊢ann ⊢e) ~j s = ⊢sub (⊢ann ⊢e) s gc-ann nz-T
-gen-sub {j' = 𝕥₍ A ₎ j'} (⊢app₁ ⊢e ⊢e₁) ~j s = ⊢app₁ (gen-sub ⊢e (𝕔≋ ~j) (s-arr₃ (⊢r-𝕣 (t-⊢r ⊢e₁)) s)) ⊢e₁
-gen-sub {j' = 𝕥₍ A ₎ j'} (⊢app₂ ⊢e ⊢e₁) ~j s = ⊢app₂ (gen-sub ⊢e (𝕚≋ ~j) (s-arr₂ (s-refl-∞ (s-sregular s) (⊢r-𝕣 (t-⊢r ⊢e₁))) s)) ⊢e₁
-gen-sub {j' = 𝕥₍ A ₎ j'} (⊢sub ⊢e B≤A gc j≢Z) ~j s = ⊢sub ⊢e (s-trans B≤A ~j s) gc nz-T
-gen-sub {j' = 𝕥₍ A ₎ j'} (⊢tabs ⊢e) ~j s = ⊢sub (⊢tabs ⊢e) s gc-tlam nz-T
-gen-sub {j' = 𝕥₍ A ₎ j'} {B = B} (⊢tapp ⊢e st) ~j s
+gen-sub {j' = 𝕋₍ A ₎ j'} (⊢var regΓ x∈Γ) ~j s = ⊢sub (⊢var regΓ x∈Γ) s gc-var nz-T
+gen-sub {j' = 𝕋₍ A ₎ j'} (⊢ann ⊢e) ~j s = ⊢sub (⊢ann ⊢e) s gc-ann nz-T
+gen-sub {j' = 𝕋₍ A ₎ j'} (⊢app₁ ⊢e ⊢e₁) ~j s = ⊢app₁ (gen-sub ⊢e (𝕔≋ ~j) (s-arr₃ (⊢r-𝕣 (t-⊢r ⊢e₁)) s)) ⊢e₁
+gen-sub {j' = 𝕋₍ A ₎ j'} (⊢app₂ ⊢e ⊢e₁) ~j s = ⊢app₂ (gen-sub ⊢e (𝕚≋ ~j) (s-arr₂ (s-refl-∞ (s-sregular s) (⊢r-𝕣 (t-⊢r ⊢e₁))) s)) ⊢e₁
+gen-sub {j' = 𝕋₍ A ₎ j'} (⊢sub ⊢e B≤A gc j≢Z) ~j s = ⊢sub ⊢e (s-trans B≤A ~j s) gc nz-T
+gen-sub {j' = 𝕋₍ A ₎ j'} (⊢tabs ⊢e) ~j s = ⊢sub (⊢tabs ⊢e) s gc-tlam nz-T
+gen-sub {j' = 𝕋₍ A ₎ j'} {B = B} (⊢tapp ⊢e st) ~j s
   with ⟨ B' , upB ⟩ ← ↑ty0-total B
-  with rj-𝕥 regj regA ← t-⊢rʲ ⊢e
-  = ⊢tapp (gen-sub ⊢e (𝕥≋ ~j) (s-tapp (⊢r-𝕣 regA) st s upB)) (↑ty-st upB)
+  with rj-𝕋 regj regA ← t-⊢rʲ ⊢e
+  = ⊢tapp (gen-sub ⊢e (𝕋≋ ~j) (s-tapp (⊢r-𝕣 regA) st s upB)) (↑ty-st upB)
 
 gen-sub0 : Γ ⊢ Z # g ⦂ A
          → Γ ⋈ ⊢ j # A ≤ B

@@ -2,7 +2,7 @@ module Implicit.Interm.Properties.Polarity where
 
 open import Implicit.Language.All
 open import Implicit.Interm.Base
-open import Implicit.Interm.Properties.Regularity
+open import Implicit.Interm.Properties.PRegularity
 
 s+-polarity : Γ ⊢ j # A ⌞ ≤⁺ ⌝ B
             → Γ ⊢r B
@@ -10,6 +10,17 @@ s+-polarity : Γ ⊢ j # A ⌞ ≤⁺ ⌝ B
 s--polarity : Γ ⊢ j # A ⌞ ≤⁻ ⌝ B
             → Γ ⊢r A
 
+s+-polarity (s-refl+ regΔ cloA grd) = {!!}
+s+-polarity (s-int regΔ) = {!!}
+s+-polarity (s-var-∙ regΔ inΔ) = {!!}
+s+-polarity (s-arr₁ s s₁) = {!!}
+s+-polarity (s-arr₂ s s₁) = ⊢r-arr {!!} (s+-polarity s₁)
+s+-polarity (s-∀ s) = {!!}
+s+-polarity (s-∀l s fd upC upD upj upw) = {!!}
+s+-polarity (s-tapp s upj) = {!!}
+s+-polarity (s-svar-l x inΔ) = {!!}
+
+{-
 s+-polarity (s-refl regΔ cloA grd) = ⊢c-≫-⊢r regΔ cloA grd
 s+-polarity (s-int regΔ) = ⊢r-int
 s+-polarity (s-var-∙ regΔ inΔ) = ⊢r-var-∙ inΔ
@@ -26,10 +37,12 @@ s--polarity (s-var-∙ regΔ inΔ) = ⊢r-var-∙ inΔ
 s--polarity (s-arr₁ s s₁) = ⊢r-arr (s+-polarity s) (s--polarity s₁)
 s--polarity (s-∀ s) = ⊢r-∀ (s--polarity s)
 s--polarity (s-svar-r x inΔ) = ∋:=-⊢r x inΔ
+-}
 
 
 t-⊢r : Γ ⊢ j # e ⦂ A
      → Γ ⊢r A
+{-
 t-⊢r (⊢lit regΓ) = ⊢r-int
 t-⊢r (⊢var regΓ x∈Γ) = ∋⦂-⊢r regΓ x∈Γ
 t-⊢r (⊢ann ⊢e) = t-⊢r ⊢e
@@ -44,7 +57,8 @@ t-⊢r (⊢app₂ ⊢e ⊢e₁) with t-⊢r ⊢e
 t-⊢r (⊢sub ⊢e B≤A gc j≢Z) = ⊢r-𝕣' (s+-polarity B≤A)
 t-⊢r (⊢tabs ⊢e) = ⊢r-∀ (t-⊢r ⊢e)
 t-⊢r (⊢tapp ⊢e st) with t-⊢rʲ ⊢e
-... | j-𝕥 r x = st0-⊢r (t-⊢r ⊢e) x st
+... | j-𝕋 r x = st0-⊢r (t-⊢r ⊢e) x st
+-}
 
 
 s-⊢c-l : Γ ⊢ j # A ⌞ ≤ ⌝ B
@@ -52,7 +66,7 @@ s-⊢c-l : Γ ⊢ j # A ⌞ ≤ ⌝ B
 
 s-⊢c-r : Γ ⊢ j # A ⌞ ≤ ⌝ B
         → Γ ⊢c B
-
+{-
 s-⊢c-l {≤ = ≤⁺} (s-refl regΔ cloA grd) = cloA
 s-⊢c-l {≤ = ≤⁺} (s-int regΔ) = ⊢c-int
 s-⊢c-l {≤ = ≤⁺} (s-var-∙ regΔ inΔ) = ⊢c-var-∙ inΔ
@@ -71,3 +85,4 @@ s-⊢c-r {≤ = ≤⁻} (s-var-∙ regΔ inΔ) = ⊢c-var-∙ inΔ
 s-⊢c-r {≤ = ≤⁻} (s-arr₁ s s₁) = ⊢c-arr (s-⊢c-l s) (s-⊢c-r s₁)
 s-⊢c-r {≤ = ≤⁻} (s-∀ s) = ⊢c-∀ (s-⊢c-r s)
 s-⊢c-r {≤ = ≤⁻} (s-svar-r x inΔ) = ⊢c-var-= (∋:=to∋= inΔ)
+-}

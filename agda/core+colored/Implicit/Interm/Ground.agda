@@ -14,10 +14,10 @@ open import Implicit.Interm.Base
 ⊢c-⊢r tenv (⊢c-∀ cloA) = ⊢r-∀ (⊢c-⊢r (S∙ tenv) cloA)
 -}
 
-s+-≫ : Γ ⊢ ∞ # A ⌞ ≤⁺ ⌝ B
+s+-≫ : Γ ⊢ `∞ # A ⌞ ≤⁺ ⌝ B
      → Γ ≫ A ⇘ B
 
-s--≫ : Γ ⊢ ∞ # A ⌞ ≤⁻ ⌝ B
+s--≫ : Γ ⊢ `∞ # A ⌞ ≤⁻ ⌝ B
      → Γ ≫ B ⇘ A
 
 s+-≫ (s-int cloΓ) = grd-int

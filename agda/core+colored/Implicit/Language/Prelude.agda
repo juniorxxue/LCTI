@@ -21,7 +21,6 @@ open import Function renaming (_∋_ to _∋⦂_) public
 variable
   m m' n n' o : ℕ
   l : ℕ
-  i : ℕ
 
 m+1≤n→m≤n : suc m ≤ n
           → m ≤ n

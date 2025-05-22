@@ -3,7 +3,7 @@ module Implicit.Algo.Properties.WeakenSVar where
 open import Implicit.Language.All
 open import Implicit.Algo.Base
 open import Implicit.Algo.Properties.Extension
-open import Implicit.Algo.Properties.Shift
+open import Implicit.Algo.Properties.PShift
 open import Implicit.Algo.Properties.Id
 
 ▶⨟=-Ω-exist : Γ ⨟ Δ ▶ k ,= T ⇘ Γ' ⨟ Δ'

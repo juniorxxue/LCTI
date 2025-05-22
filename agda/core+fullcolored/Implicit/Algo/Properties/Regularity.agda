@@ -1,3 +1,4 @@
+{-# OPTIONS --allow-unsolved-metas #-}
 module Implicit.Algo.Properties.Regularity where
 
 open import Implicit.Language.All
@@ -23,6 +24,8 @@ t-env (⊢sub ⊢e ne gc s) = t-env ⊢e
 t-env (⊢tabs ⊢e) with t-env ⊢e
 ... | reg-S∙ r = r
 t-env (⊢tapp ⊢e st) = t-env ⊢e
+t-env (⊢lam₃ up-c ⊢e) with t-env ⊢e
+... | reg-S, r regA = r
 
 inst-env-in : [ A / X ] Γ ⟹ Δ
             → SRegular Γ
@@ -52,11 +55,12 @@ s-env-in : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
 s-env-in (s-empty cloΓ cloA x) = cloΓ
 s-env-in (s-type ss) = ss-env-in ss
 s-env-in (s-term-c cloA ap ⊢e s) = s-env-in s
-s-env-in (s-term-o opnA ⊢e x s) = ss-env-in x
-s-env-in (s-∀l s upᶜ upᵉ upC upD) with s-env-in s
+s-env-in (s-term-o opnA tf ⊢e x s) = ss-env-in x
+s-env-in (s-∀l s conv funP upᶜ upC upD) with s-env-in s
 ... | reg-S^ r = r
 s-env-in (s-tapp s upᶜ) with s-env-in s
 ... | reg-S= r regA = r
+s-env-in (s-term-p ss x) = ss-env-in ss
 
 s-env-out : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
           → SRegular Δ
@@ -84,6 +88,9 @@ data _⊢rᶜ_ : Env n m → Context n m → Set where
   ⊢rᶜ-tapp : (regA : Γ ⊢r A)
            → Γ ⊢rᶜ Σ
            → Γ ⊢rᶜ A ⓪↝ Σ
+  ⊢rᶜ-par : (regA : Γ ⊢r A)
+           → Γ ⊢rᶜ Σ
+           → Γ ⊢rᶜ A ◐↝ Σ
 
 ⊆-⊢rᶜ' : Δ ⊢rᶜ Σ
        → Γ ⊆ Δ
@@ -92,6 +99,7 @@ data _⊢rᶜ_ : Env n m → Context n m → Set where
 ⊆-⊢rᶜ' (⊢rᶜ-τ regA) ext = ⊢rᶜ-τ (⊆-⊢r' regA ext)
 ⊆-⊢rᶜ' (⊢rᶜ-term regΣ) ext = ⊢rᶜ-term (⊆-⊢rᶜ' regΣ ext)
 ⊆-⊢rᶜ' (⊢rᶜ-tapp regA regΓ) ext = ⊢rᶜ-tapp (⊆-⊢r' regA ext) (⊆-⊢rᶜ' regΓ ext)
+⊆-⊢rᶜ' (⊢rᶜ-par regA x₁) x = ⊢rᶜ-par (⊆-⊢r' regA x) (⊆-⊢rᶜ' x₁ x)
 
 ⊢rᶜ-strengthen^0 : Γ ,^ ⊢rᶜ Σ'
                  → ↑tyᶜ0 Σ ⇘ Σ'
@@ -100,6 +108,7 @@ data _⊢rᶜ_ : Env n m → Context n m → Set where
 ⊢rᶜ-strengthen^0 (⊢rᶜ-τ regA) (↑tyᶜ-τ up-t) = ⊢rᶜ-τ (⊢r-strengthen^0 regA up-t)
 ⊢rᶜ-strengthen^0 (⊢rᶜ-term regΣ) (↑tyᶜ-e up-e upΣ) = ⊢rᶜ-term (⊢rᶜ-strengthen^0 regΣ upΣ)
 ⊢rᶜ-strengthen^0 (⊢rᶜ-tapp regA regΣ) (↑tyᶜ-⓪ upA upΣ) = ⊢rᶜ-tapp (⊢r-strengthen^0 regA upA) (⊢rᶜ-strengthen^0 regΣ upΣ)
+⊢rᶜ-strengthen^0 (⊢rᶜ-par regA x) (↑tyᶜ-◐ upA x₁) = ⊢rᶜ-par (⊢r-strengthen^0 regA upA) (⊢rᶜ-strengthen^0 x x₁)
 
 
 ⊢rᶜ-strengthen=0 : Γ ,= T ⊢rᶜ Σ'
@@ -109,6 +118,7 @@ data _⊢rᶜ_ : Env n m → Context n m → Set where
 ⊢rᶜ-strengthen=0 (⊢rᶜ-τ regA) (↑tyᶜ-τ up-t) = ⊢rᶜ-τ (⊢r-strengthen=0 regA up-t)
 ⊢rᶜ-strengthen=0 (⊢rᶜ-term regΣ) (↑tyᶜ-e up-e upΣ) = ⊢rᶜ-term (⊢rᶜ-strengthen=0 regΣ upΣ)
 ⊢rᶜ-strengthen=0 (⊢rᶜ-tapp regA regΣ) (↑tyᶜ-⓪ upA upΣ) = ⊢rᶜ-tapp (⊢r-strengthen=0 regA upA) (⊢rᶜ-strengthen=0 regΣ upΣ)
+⊢rᶜ-strengthen=0 (⊢rᶜ-par regA x) (↑tyᶜ-◐ upA x₁) = ⊢rᶜ-par (⊢r-strengthen=0 regA upA) (⊢rᶜ-strengthen=0 x x₁)
 
 ⊢rᶜ-strengthen,0 : Γ , A ⊢rᶜ Σ'
                  → ↑tmᶜ0 Σ ⇘ Σ'
@@ -117,6 +127,7 @@ data _⊢rᶜ_ : Env n m → Context n m → Set where
 ⊢rᶜ-strengthen,0 (⊢rᶜ-τ regA) ↑tmᶜ-τ = ⊢rᶜ-τ (⊢r-strengthen,0 regA)
 ⊢rᶜ-strengthen,0 (⊢rᶜ-term regΣ) (↑tmᶜ-e up-e upΣ) = ⊢rᶜ-term (⊢rᶜ-strengthen,0 regΣ upΣ)
 ⊢rᶜ-strengthen,0 (⊢rᶜ-tapp regA regΣ) (↑tmᶜ-⓪ upΣ) = ⊢rᶜ-tapp (⊢r-strengthen,0 regA) (⊢rᶜ-strengthen,0 regΣ upΣ)
+⊢rᶜ-strengthen,0 (⊢rᶜ-par regA x) (↑tmᶜ-◐ x₁) = ⊢rᶜ-par (⊢r-strengthen,0 regA) (⊢rᶜ-strengthen,0 x x₁)
 
 ⊢rᶜ-⋈ : Γ ⋈ ⊢rᶜ Σ
       → Γ ⊢rᶜ Σ
@@ -124,18 +135,20 @@ data _⊢rᶜ_ : Env n m → Context n m → Set where
 ⊢rᶜ-⋈ (⊢rᶜ-τ regA) = ⊢rᶜ-τ (⊢r-𝕣' regA)
 ⊢rᶜ-⋈ (⊢rᶜ-term reg) = ⊢rᶜ-term (⊢rᶜ-⋈ reg)
 ⊢rᶜ-⋈ (⊢rᶜ-tapp regA regΓ) = ⊢rᶜ-tapp (⊢r-𝕣' regA) (⊢rᶜ-⋈ regΓ)
-
+⊢rᶜ-⋈ (⊢rᶜ-par regA x) = ⊢rᶜ-par (⊢r-𝕣' regA) (⊢rᶜ-⋈ x)
 
 s-⊢rᶜ : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
       → Γ ⊢rᶜ Σ
 s-⊢rᶜ (s-empty regΓ cloA grd) = ⊢rᶜ-empty
 s-⊢rᶜ (s-type ss) = ⊢rᶜ-τ (ss-polarity+ ss)
 s-⊢rᶜ (s-term-c cloA ap ⊢e s) = ⊢rᶜ-term (s-⊢rᶜ s)
-s-⊢rᶜ (s-term-o opnA ⊢e ss s) = ⊢rᶜ-term (⊆-⊢rᶜ' (s-⊢rᶜ s) (ss-⊆ ss))
-s-⊢rᶜ (s-∀l s upᶜ upᵉ upC upD) with s-⊢rᶜ s
-... | ⊢rᶜ-term r = ⊢rᶜ-term (⊢rᶜ-strengthen^0 r upᶜ)
+s-⊢rᶜ (s-term-o opnA tf ⊢e ss s) = ⊢rᶜ-term (⊆-⊢rᶜ' (s-⊢rᶜ s) (ss-⊆ ss))
+s-⊢rᶜ (s-∀l s conv funP upᶜ upC upD) with s-⊢rᶜ s
+... | r = {!!}
+-- ⊢rᶜ-term (⊢rᶜ-strengthen^0 r upᶜ)
 s-⊢rᶜ (s-tapp s upᶜ) with s-env-in s
 ... | reg-S= r regA = ⊢rᶜ-tapp regA (⊢rᶜ-strengthen=0 (s-⊢rᶜ s) upᶜ)
+s-⊢rᶜ (s-term-p ss x) = ⊢rᶜ-par (ss-polarity- ss) (⊆-⊢rᶜ' (s-⊢rᶜ x) (ss-⊆ ss))
 
 t-⊢rᶜ : Γ ⊢ Σ ⇒ e ⇒ A
       → Γ ⊢rᶜ Σ
@@ -153,6 +166,8 @@ t-⊢rᶜ (⊢sub ⊢e ne gc s) = ⊢rᶜ-⋈ (s-⊢rᶜ s)
 t-⊢rᶜ (⊢tabs ⊢e) = ⊢rᶜ-empty
 t-⊢rᶜ (⊢tapp ⊢e st) with t-⊢rᶜ ⊢e
 ... | ⊢rᶜ-tapp regA regΓ = regΓ
+t-⊢rᶜ (⊢lam₃ up-c ⊢e)
+  with reg-S, regA' regΓ ← t-env ⊢e = ⊢rᶜ-par regΓ (⊢rᶜ-strengthen,0 (t-⊢rᶜ ⊢e) up-c)
 
 s-⊢r : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
      → Γ ⊢r B
@@ -162,9 +177,10 @@ t-⊢r : Γ ⊢ Σ ⇒ e ⇒ A
 s-⊢r (s-empty regΓ cloA x) = ⊢c-≫-⊢r regΓ cloA x
 s-⊢r (s-type ss) = ss-polarity+ ss
 s-⊢r (s-term-c cloA ap ⊢e s) = ⊢r-arr (⊢c-≫-⊢r (s-env-in s) cloA ap) (s-⊢r s)
-s-⊢r (s-term-o opnA ⊢e ss s) = ⊢r-arr (⊢r-𝕣 (t-⊢r ⊢e)) (⊆-⊢r' (s-⊢r s) (ss-⊆ ss))
-s-⊢r (s-∀l s upᶜ upᵉ upC upD) = ⊢r-strengthen^0 (s-⊢r s) (↑ty-arr upC upD)
+s-⊢r (s-term-o opnA tf ⊢e ss s) = ⊢r-arr (⊢r-𝕣 (t-⊢r ⊢e)) (⊆-⊢r' (s-⊢r s) (ss-⊆ ss))
+s-⊢r (s-∀l s conv funP upᶜ upC upD) = ⊢r-strengthen^0 (s-⊢r s) (↑ty-arr upC upD)
 s-⊢r (s-tapp s upᶜ) = ⊢r-∀ (⊢r-◆0 (s-⊢r s))
+s-⊢r (s-term-p ss x) = ⊢r-arr (ss-polarity- ss) (⊆-⊢r' (s-⊢r x) (ss-⊆ ss))
 
 t-⊢r (⊢lit regΓ) = ⊢r-int
 t-⊢r (⊢var regΓ x∈Γ) = ∋⦂-⊢r regΓ x∈Γ
@@ -178,3 +194,5 @@ t-⊢r (⊢sub ⊢e ne gc s) = ⊢r-𝕣' (s-⊢r s)
 t-⊢r (⊢tabs ⊢e) = ⊢r-∀ (t-⊢r ⊢e)
 t-⊢r (⊢tapp ⊢e st) with t-⊢rᶜ ⊢e
 ... | ⊢rᶜ-tapp regA regΓ = st0-⊢r (t-⊢r ⊢e) regA st
+t-⊢r (⊢lam₃ up-c ⊢e) with t-env ⊢e
+... | reg-S, r regA = ⊢r-arr regA (⊢r-strengthen,0 (t-⊢r ⊢e))

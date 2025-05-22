@@ -17,8 +17,8 @@ open import Implicit.Algo2Interm.Main
                                              ↑tyʲ-𝕚 (↑tyʲ0-exist ~s upΣ .proj₂) ⟩
 ↑tyʲ0-exist (~sC ⊢e ~s) (↑tyᶜ-e up-e upΣ) = ⟨ 𝕔 (↑tyʲ0-exist ~s upΣ .proj₁) ,
                                              ↑tyʲ-𝕔 (↑tyʲ0-exist ~s upΣ .proj₂) ⟩
-↑tyʲ0-exist (~sT ~s st) (↑tyᶜ-⓪ {A = A} x upΣ) = ⟨ 𝕋₍ A ₎ ↑tyʲ0-exist ~s upΣ .proj₁ ,
-                                          ↑tyʲ-𝕋 (↑tyʲ0-exist ~s upΣ .proj₂) x ⟩
+↑tyʲ0-exist (~sT ~s st) (↑tyᶜ-⓪ {A = A} x upΣ) = ⟨ 𝕥₍ A ₎ ↑tyʲ0-exist ~s upΣ .proj₁ ,
+                                          ↑tyʲ-𝕥 (↑tyʲ0-exist ~s upΣ .proj₂) x ⟩
 
 -- corollaries are bridged via completeness of AlgoCounter
 

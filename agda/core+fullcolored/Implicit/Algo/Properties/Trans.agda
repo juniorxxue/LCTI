@@ -6,7 +6,7 @@ open import Implicit.Algo.Properties.Id
 open import Implicit.Algo.Properties.PShift
 open import Implicit.Algo.Properties.Extension
 open import Implicit.Algo.Properties.Weaken
-open import Implicit.Algo.Properties.PRegularity
+open import Implicit.Algo.Properties.Regularity
 open import Implicit.Algo.Properties.Polarity
 
 
@@ -14,12 +14,18 @@ open import Implicit.Algo.Properties.Polarity
        → ↑tyᶜ0 Σ₁ ⇘ Σ₁'
        → ↑tyᶜ0 Σ₂ ⇘ Σ₂'
        → Σ₁' ≊ Σ₂'
+≊-↑ty0 ≊Z ↑tyᶜ-□ (↑tyᶜ-τ up-t) = ≊Z
+≊-↑ty0 (≊S newΣ) (↑tyᶜ-e up-e up1) (↑tyᶜ-e up-e₁ up2) with refl ← ↑tyᵉ-unique up-e up-e₁ = ≊S (≊-↑ty0 newΣ up1 up2)
+≊-↑ty0 (≊⓪ newΣ) (↑tyᶜ-⓪ x up1) (↑tyᶜ-⓪ x₁ up2)
+  with refl ← ↑ty-unique x₁ x = ≊⓪ (≊-↑ty0 newΣ up1 up2)
+≊-↑ty0 (≊P newΣ) (↑tyᶜ-◐ upA up1) (↑tyᶜ-◐ upA₁ up2)
+  with refl ← ↑ty-unique upA upA₁  = ≊P (≊-↑ty0 newΣ up1 up2)
+
 
 ss-grd+ : SRegular Γ
        → Γ ⊢c A
          → Γ ≫ A ⇘ B
          → Γ ⊢ A ⌞ ≤⁺ ⌝ B ⊣ Γ
-
 ss-grd- : SRegular Γ
        → Γ ⊢c A
          → Γ ≫ A ⇘ B
@@ -69,26 +75,26 @@ s-trans : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
         → Γ ⊢ A ≤⁺ Σ' ⊣ Δ ↪ C
 s-trans (s-empty cloΓ cloA x) (s-type ss) ≊Z with ss-⊢r-eq+ ss (⊢c-≫-⊢r cloΓ cloA x)
 ... | refl = s-type (ss-grd+ cloΓ cloA x)
+s-trans (s-empty regΓ cloA (grd-var= x)) s'@(s-∀l s (tf-τ x₁) funP upδ upC upD) ≊Z
+  with refl ← s-id0 s' = {!!}
+s-trans (s-empty regΓ cloA (grd-∀ grd)) (s-∀l s (tf-τ x₁) funP upδ upC upD) ≊Z = {!!}
 s-trans (s-term-c cloA ap ⊢e s1) (s-term-c cloA₁ ap₁ ⊢e₁ s2) (≊S newΣ)
   with regA% ← ⊢c-≫-⊢r (s-env-in s1) cloA ap
   with relf ← ⊢id0 ⊢e
   with refl ← ⊢id0 ⊢e₁
   with refl ← ⊢r-≫-eq' (⊆-⊢r regA% (s-⊆ s1)) ap₁ = s-term-c cloA ap ⊢e (s-trans s1 s2 newΣ)
-s-trans (s-term-c cloA ap ⊢e s1) (s-term-o opnA conv ⊢e₁ x s2) (≊S newΣ) = let regA = ⊆-⊢r (⊢c-≫-⊢r (s-env-in s1) cloA ap) (s-⊆ s1)
+s-trans (s-term-c cloA ap ⊢e s1) (s-term-o opnA tf ⊢e₁ x s2) (≊S newΣ) = let regA = ⊆-⊢r (⊢c-≫-⊢r (s-env-in s1) cloA ap) (s-⊆ s1)
                                                                       in ⊥-elim (⊢r-⊢o-false regA opnA)
-s-trans s'@(s-term-o opnA conv ⊢e x s1) (s-term-c cloA ap ⊢e₁ s2) (≊S newΣ)
-  with refl ← ⊢r-≫-eq' (⊆-⊢r (ss-polarity- x) (s-⊆ s')) ap = s-term-o opnA conv ⊢e x (s-trans s1 s2 newΣ)
-s-trans s'@(s-term-o opnA conv1 ⊢e x s1) (s-term-o opnA₁ conv2 ⊢e₁ x₁ s2) (≊S newΣ) = let regA = ⊆-⊢r (⊢r-𝕣 (t-⊢r ⊢e)) (s-⊆ s')
+s-trans s'@(s-term-o opnA tf ⊢e x s1) (s-term-c cloA ap ⊢e₁ s2) (≊S newΣ)
+  with refl ← ⊢r-≫-eq' (⊆-⊢r (ss-polarity- x) (s-⊆ s')) ap = s-term-o opnA tf ⊢e x (s-trans s1 s2 newΣ)
+s-trans s'@(s-term-o opnA tf ⊢e x s1) (s-term-o opnA₁ tf₁ ⊢e₁ x₁ s2) (≊S newΣ) = let regA = ⊆-⊢r (⊢r-𝕣 (t-⊢r ⊢e)) (s-⊆ s')
                                                                           in ⊥-elim (⊢r-⊢o-false regA opnA₁)
-s-trans (s-∀l s1 upᶜ upᵉ upC upD) s'@(s-term-c {A% = A%} {Σ = Σ′} {D = D} cloA ap ⊢e s2) (≊S newΣ)
-  with reg-S= regΓ regB ← s-env-out s1
-  = let ⟨ Σ″ , upΣ′ ⟩ = ↑tyᶜ0-total Σ′
-        ⟨ A%' , upA%' ⟩ = ↑ty0-total A%
-        ⟨ D' , upD' ⟩ = ↑ty0-total D
-    in s-∀l (s-trans s1 (s-weaken=0 s' (↑ty-arr upC upD) (↑tyᶜ-e upᵉ upΣ′) (↑ty-arr upA%' upD') regB) (≊S (≊-↑ty0 newΣ upᶜ upΣ′))) upΣ′ upᵉ upA%' upD'
-s-trans s'@(s-∀l s1 upᶜ upᵉ upC upD) (s-term-o opnA conv ⊢e x s2) (≊S newΣ)
-  with (⊢r-arr regC regD) ← s-⊢r s' = let regA = ⊆-⊢r regC (s-⊆ s') in ⊥-elim (⊢r-⊢o-false regA opnA)
+s-trans (s-∀l s1 conv funP upᶜ upC upD) s2 newΣ = {!!}
+
 s-trans {C = C} (s-tapp {B = B} s1 upᶜ) (s-tapp s2 upᶜ₁) (≊⓪ {Σ' = Σ'} newΣ) = s-tapp (s-trans s1 s2 (≊-↑ty0 newΣ upᶜ upᶜ₁)) upᶜ₁
+s-trans (s-term-p ss s1) (s-term-p ss₁ s2) (≊P newΣ)
+  with refl ← ⊆-antisymm (ss-⊆ ss₁) (s-⊆ s2) = s-term-p ss (s-trans s1 s2 newΣ)
+s-trans {C = C `→ C₁} (s-tapp x₁ upᶜ) x (≊⓪ x₂) = {!!}
 
 {-
   with reg-S= regΓ regB ← s-env-out s1

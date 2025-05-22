@@ -70,7 +70,7 @@ s-strengthen= {j = j} (s-∀l {B = B} s ic fd upC upD upj₁) newΓ (↑ty-∀ u
   with ⟨ preB , upB' ⟩ ← ↑ty-surjective k¬εB
     = s-∀l (s-strengthen= s (◀S= newΓ upB') upA (↑ty-arr (↑ty-comm0' upB upC upA′) (↑ty-comm0' upB₁ upD upB′)) (↑tyʲ-comm0' upj upj₁ upj'))
            (𝕚𝕔-↑tyʲ' ic upj) (↑ty-find0' fd upA (↑tyʲ-comm0' upj upj₁ upj')) upA′ upB′ upj'
-s-strengthen= (s-tapp s upj₁) newΓ (↑ty-∀ upA) (↑ty-∀ upB) (↑tyʲ-𝕋 {j = j} upj upA₁)
+s-strengthen= (s-tapp s upj₁) newΓ (↑ty-∀ upA) (↑ty-∀ upB) (↑tyʲ-𝕥 {j = j} upj upA₁)
   with ⟨ j' , upj' ⟩ ← ↑tyʲ0-total j
   = s-tapp (s-strengthen= s (◀S= newΓ upA₁) upA upB (↑tyʲ-comm0' upj upj₁ upj')) upj'
 s-strengthen= (s-svar-l x inΔ) newΓ ↑ty-var upB ↑tyʲ-∞ = s-svar-l (sregular-strengthen= x newΓ) (∋:=-strengthen=-reg x inΔ newΓ upB)
@@ -106,4 +106,4 @@ t-strengthen= (⊢tabs ⊢e) newΓ (↑tyᵉ-Λ upe) (↑ty-∀ upA) ↑tyʲ-Z =
 t-strengthen= (⊢tapp ⊢e st) newΓ (↑tyᵉ-⓪ upe upA₁) upA upj
   with r ← t-⊢r ⊢e
   with ⟨ preA , ↑ty-∀ upp ⟩ ← ⊢r-◀-↑ty-surjective r newΓ
-  = ⊢tapp (t-strengthen= ⊢e newΓ upe (↑ty-∀ upp) (↑tyʲ-𝕋 upj upA₁)) (↑ty-st-comm0'' st upA₁ upp upA)
+  = ⊢tapp (t-strengthen= ⊢e newΓ upe (↑ty-∀ upp) (↑tyʲ-𝕥 upj upA₁)) (↑ty-st-comm0'' st upA₁ upp upA)
