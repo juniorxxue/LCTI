@@ -85,11 +85,21 @@ nonz-↑tyʲ nz-C (↑tyʲ-𝕔 upj) = nz-C
 nonz-↑tyʲ nz-T (↑tyʲ-𝕥 upj upA) = nz-T
 
 
+data IsoInf : Counter m → Set where
+  i∞-z : IsoInf (Counter m ∋⦂ ∞)
+  i∞-i : IsoInf j
+       → IsoInf (𝕚 j)
+
 -- find A k j
 -- at j-th position of A type, should have a bound variable, example: |-1 forall a. a -> a <: Int
 data find : Type m → Fin m → Counter m → Set where
+  f-i∞       : k ε A
+            → IsoInf j
+            → find A k j
+{-
   f-∞       : k ε A
             → find A k ∞
+-}
   f-arr-𝕚-l : k ε A
             → find (A `→ B) k (𝕚 j)
   f-arr-𝕚-r : (¬inA : k ¬ε A)
@@ -110,7 +120,7 @@ data find : Type m → Fin m → Counter m → Set where
 
 find-ε : find A k ∞
        → k ε A
-find-ε (f-∞ x) = x
+find-ε (f-i∞ x x₁) = x
 
 {-
 find-arr-r : find B k ∞
@@ -120,13 +130,12 @@ find-arr-r fd = f-∞ (ε-arr-r {!!} (find-ε fd))
 
 find-arr-l : find A k ∞
            → find (A `→ B) k ∞
-find-arr-l fd = f-∞ (ε-arr-l (find-ε fd))
+find-arr-l (f-i∞ x x₁) = f-i∞ (ε-arr-l x) x₁
 
 
 find-Z-false : find A k Z
              → ⊥
-find-Z-false ()
-
+find-Z-false (f-i∞ x ())
 
 infix 3 _⊢rʲ_
 data _⊢rʲ_ : Env n m → Counter m → Set where
