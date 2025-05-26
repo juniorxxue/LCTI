@@ -60,6 +60,18 @@ data _⊢_#_⌞_⌝_ : Env n m → Counter m → Type m → Polar → Type m →
     → (SRegular Δ)
     → (inΔ : Δ ∋ X := A)
     → Δ ⊢ `∞ # A ⌞ ≤⁻ ⌝ ‶ X
+  s-var-𝕟 :
+      Δ ∋ X := C
+    → Δ ⊢ `𝕟 (suc i) # C ⌞ ≤⁺ ⌝ A `→ B
+    → Δ ⊢ `𝕟 (suc i) # ‶ X ⌞ ≤⁺ ⌝ A `→ B
+  s-svar-𝕚 :
+      Δ ∋ X := C
+    → Δ ⊢ (𝕊₍ 𝕖 ₎ j) # C ⌞ ≤⁺ ⌝ A `→ B
+    → Δ ⊢ (𝕊₍ 𝕖 ₎ j) # ‶ X ⌞ ≤⁺ ⌝ A `→ B
+  s-svar-𝕥 :
+      Δ ∋ X := B
+    → Δ ⊢ (𝕋₍ A ₎ j) # B ⌞ ≤⁺ ⌝ `∀ C
+    → Δ ⊢ (𝕋₍ A ₎ j) # ‶ X ⌞ ≤⁺ ⌝ `∀ C
 
 s-refl-∞ : SRegular Γ
          → Γ ⊢r A

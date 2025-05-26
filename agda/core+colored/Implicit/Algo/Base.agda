@@ -149,6 +149,21 @@ data _⊢_≤⁺_⊣_↪_ where
     → (upᶜ : ↑tyᶜ0 Σ ⇘ Σ')
     → Δ ⊢ `∀ A ≤⁺ (B ⓪↝ Σ) ⊣ Ψ ↪ `∀ C
 
+  s-svar-par :
+      Δ ∋ X := A
+    → Δ ⊢ A ≤⁺ (D `◐↝ P) ⊣ Δ ↪ B `→ C
+    → Δ ⊢ ‶ X ≤⁺ (D `◐↝ P) ⊣ Δ ↪ B `→ C
+
+  s-svar-term :
+      Δ ∋ X := A
+    → Δ ⊢ A ≤⁺ ([ e ]↝ Σ) ⊣ Δ ↪ B `→ C
+    → Δ ⊢ ‶ X ≤⁺ ([ e ]↝ Σ) ⊣ Δ ↪ B `→ C
+
+  s-svar-tapp :
+      Δ ∋ X := A
+    → Δ ⊢ A ≤⁺ (B ⓪↝ Σ) ⊣ Δ ↪ `∀ C
+    → Δ ⊢ ‶ X ≤⁺ (B ⓪↝ Σ) ⊣ Δ ↪ `∀ C
+
 
 data AMatch1 : Type m → ParType m → Set where
   amt1-z : AMatch1 A □

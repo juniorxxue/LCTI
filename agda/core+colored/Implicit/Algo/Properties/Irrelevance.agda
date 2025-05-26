@@ -265,6 +265,9 @@ s-irrev (s-∀l s upᶜ upᵉ upC upD) tf = s-∀l (s-irrev s (evar-sol tf)) up�
 s-irrev (s-tapp s upᶜ) tf = s-tapp (s-irrev s (svar tf)) upᶜ
 s-irrev (s-term-p ss s) tf with ⇌s-Ω (ss-⊆ ss) tf
 ... | ⟨ Ω' , tf' ⟩ = s-term-p (ss-irrev ss tf') (s-irrev s (⇌s-arr tf tf' (s-⊆ s)))
+s-irrev (s-svar-par x₁ x₂) x = {!!}
+s-irrev (s-svar-term x₁ x₂) x = {!!}
+s-irrev (s-svar-tapp x₁ x₂) x = {!!}
 
 ----------------------------------------------------------------------
 --+                           corollary                            +--

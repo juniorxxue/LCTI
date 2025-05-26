@@ -13,4 +13,4 @@ open import Implicit.Algo.Properties.Extension public
 open import Implicit.Algo.Properties.PRegularity public
 
 open import Implicit.Algo.Properties.Irrelevance public
-open import Implicit.Algo.Properties.Subsumption public
+open import Implicit.Algo.Properties.SubsumptionNew public

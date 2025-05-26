@@ -69,8 +69,12 @@ postulate
   ⊆/n-⊆ : Γ ⊆ Δ w/t A w/n i
       → Γ ⊆ Δ
 
+  ⊆/n!-⊆ : Γ ⊆ Δ w/t A w/n! i
+      → Γ ⊆ Δ
+
   ⊆/e!-openclose : Γ ⊆ Δ w/t A w/e! 𝕖
               → Γ ⊢o A ⊎ Γ ⊢c A
+
 
 
 _ : (∅ ⋈ ,^) ⊆ ∅ ⋈ ,= Int w/t (Int `→ ‶ #0) `→ ‶ #0 w/c (𝕊₍ (𝕟 1) ₎ `𝕫)

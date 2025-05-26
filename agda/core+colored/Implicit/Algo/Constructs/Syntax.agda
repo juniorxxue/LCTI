@@ -25,8 +25,21 @@ variable
   Σ Σ' Σ* Σ'* Σ₁ Σ₂ Σ₁' Σ₂' Σ'' : Context n m
   δ δ' δ₁ δ₂ : EContext m
 
+
+-- sugar
+`□ : Context n m
+`□ = 𝔼 (p □)
+
+`τ : Type m → Context n m
+`τ A = 𝔼 (τ A)
+
+`p : ParType m → Context n m
+`p P = 𝔼 (p P)
+
+
 data NonEmpty : Context n m → Set where
-  -- ?
+  ne-par  : NonEmpty (Context n m ∋⦂ (`p (A ◐↝ P)))
+  ne-τ    : NonEmpty (Context n m ∋⦂ (`τ A))
   ne-app  : NonEmpty ([ e ]↝ Σ)
   ne-tapp : NonEmpty (A ⓪↝ Σ)
 
@@ -65,16 +78,6 @@ data _⊢_↦₁_ : Env n m → Type m → ParType m → Set where
     → Γ ⊢ B ↦₁ P
     → Γ ⊢ A `→ B ↦₁ A% ◐↝ P
 
-
--- sugar
-`□ : Context n m
-`□ = 𝔼 (p □)
-
-`τ : Type m → Context n m
-`τ A = 𝔼 (τ A)
-
-`p : ParType m → Context n m
-`p P = 𝔼 (p P)
 
 _`◐↝_ : Type m → ParType m → Context n m
 A `◐↝ P = 𝔼 (p (A ◐↝ P))

@@ -144,6 +144,7 @@ data _ⅆ_≋_ⅆ_ : Env n m → Env n m → Env n m → Env n m → Set where
 ⅆ-⊆/x (ⅆS==2 dd regA) (ext-Z^ regΓ regA₁) with refl ← ⅆ-out-eq dd = ext-Z^ (⊆-regular regΓ (ⅆ-l-⊆ dd)) regA
 
 
+
 ⅆ-⊆/ : Δ ⅆ Δ' ≋ Γ ⅆ Γ'
      → Γ' ⊆ Δ' w/t A
      → Γ ⊆ Δ w/t A
