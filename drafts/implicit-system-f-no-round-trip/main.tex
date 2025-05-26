@@ -418,12 +418,11 @@
 
 \inferrule*[right=\texttt{S-SVar-Term}]
 {\Gamma; \Delta[\hat{a}=A] \vdash A \leq^+ \boxed{e} \leadsto \Sigma \dashv \Gamma; \Delta[\hat{a}=A] \rightsquigarrow B \to C}
-{\Gamma; \Delta[\hat{a}=A] \vdash \hat{A} \leq^+ \boxed{e} \leadsto \Sigma \dashv \Gamma; \Delta[\hat{a}=A] \rightsquigarrow B \to C}
+{\Gamma; \Delta[\hat{a}=A] \vdash \hat{a} \leq^+ \boxed{e} \leadsto \Sigma \dashv \Gamma; \Delta[\hat{a}=A] \rightsquigarrow B \to C}
+
 \inferrule*[right=\texttt{S-SVar-TApp}]
 {\Gamma; \Delta[\hat{a}=A] \vdash A \leq^+ \boxed{T} \leadsto \Sigma \dashv \Gamma; \Delta[\hat{a}=A] \rightsquigarrow \forall a~.C}
-{\Gamma; \Delta[\hat{a}=A] \vdash \hat{A} \leq^+ \boxed{T} \leadsto \Sigma \dashv \Gamma; \Delta[\hat{a}=A] \rightsquigarrow \forall a~.C}
-
-
+{\Gamma; \Delta[\hat{a}=A] \vdash \hat{a} \leq^+ \boxed{T} \leadsto \Sigma \dashv \Gamma; \Delta[\hat{a}=A] \rightsquigarrow \forall a~.C}
 \end{mathpar}
 
 \end{document}
