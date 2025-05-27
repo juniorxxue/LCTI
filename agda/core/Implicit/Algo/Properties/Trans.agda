@@ -19,6 +19,13 @@ open import Implicit.Algo.Properties.Polarity
 ≊-↑ty0 (≊⓪ newΣ) (↑tyᶜ-⓪ x up1) (↑tyᶜ-⓪ x₁ up2)
   with refl ← ↑ty-unique x₁ x = ≊⓪ (≊-↑ty0 newΣ up1 up2)
 
+≊-infs-false : Γ ⊨ Σ ⟹ A
+             → Σ ≊ Σ'
+             → ⊥
+≊-infs-false (infs-s x infs) (≊S newΣ) = ≊-infs-false infs newΣ
+
+
+
 
 ss-grd+ : SRegular Γ
        → Γ ⊢c A
@@ -97,13 +104,4 @@ s-trans (s-svar-term inΓ s) (s-term-c cloA ap ⊢e s2) (≊S newΣ) = s-svar-te
 s-trans (s-svar-term inΓ s) (s-term-o opnA ⊢e ss s2) (≊S newΣ)
   with ⊢r-arr regA regB ← s-⊢r s = ⊥-elim (⊢r-⊢o-false regA opnA)
 s-trans (s-svar-tapp inΓ s) (s-tapp s2 upᶜ) (≊⓪ newΣ) = s-svar-tapp inΓ (s-trans s (s-tapp s2 upᶜ) (≊⓪ newΣ))
-
-{-
-  with reg-S= regΓ regB ← s-env-out s1
-  with ⟨ Σ″ , upΣ′ ⟩ ← ↑tyᶜ0-total Σ'
-  with ⟨ B' , upB' ⟩ ← ↑ty0-total B
-  with ⟨ C' , upC' ⟩ ← ↑ty0-total C
-  with ih ← s-trans s1 (s-weaken=0 s2 upC {!!} {!!} regB) (≊-↑ty0 newΣ upᶜ upΣ′)
-  = s-tapp ih {!!} {!!}
--- we cannot copy forall-L solution, since tapp with eliminate the context, while forall-L doesn't
--}
+s-trans (s-evar-infers (infs-s x infs) inst) s2 (≊S newΣ) = ⊥-elim (≊-infs-false infs newΣ)

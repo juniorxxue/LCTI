@@ -240,6 +240,10 @@ t-irrev : Γ ⊢ Σ ⇒ e ⇒ A
         → Γ ⇌ Δ
         → Δ ⊢ Σ ⇒ e ⇒ A
 
+infs-irrev : Γ ⊨ Σ ⟹ A
+           → Γ ⇌ Δ
+           → Δ ⊨ Σ ⟹ A
+
 s-irrev : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
         → Γ & Δ ⇌s Γ' & Δ'
         → Γ' ⊢ A ≤⁺ Σ ⊣ Δ' ↪ B
@@ -263,6 +267,10 @@ s-irrev (s-∀l s upᶜ upᵉ upC upD) tf = s-∀l (s-irrev s (evar-sol tf)) up�
 s-irrev (s-tapp s upᶜ) tf = s-tapp (s-irrev s (svar tf)) upᶜ
 s-irrev (s-svar-term inΓ s) tf with refl ← ⇌s-eq tf = s-svar-term (⇌s-∋:=-l inΓ tf) (s-irrev s tf)
 s-irrev (s-svar-tapp inΓ s) tf with refl ← ⇌s-eq tf = s-svar-tapp (⇌s-∋:=-l inΓ tf) (s-irrev s tf)
+s-irrev (s-evar-infers infs inst) tf = s-evar-infers (infs-irrev infs (⇌s-⇌-l tf)) (⇌s-inst tf inst)
+
+infs-irrev (infs-z regΓ regA) tf = infs-z (⇌-tregular regΓ tf) (⇌-⊢r regA tf)
+infs-irrev (infs-s x infs) tf = infs-s (t-irrev x tf) (infs-irrev infs tf)
 
 ----------------------------------------------------------------------
 --+                           corollary                            +--
@@ -303,3 +311,10 @@ t-irrev-⊆' : 𝕣 Δ ⊢ Σ ⇒ e ⇒ A
            → Γ ⊆ Δ
            → 𝕣 Γ ⊢ Σ ⇒ e ⇒ A
 t-irrev-⊆' ⊢e ext = t-irrev ⊢e (⇌-symm (⊆-⇌ ext))
+
+
+infs-irrev-⊆ : 𝕣 Γ ⊨ Σ ⟹ A
+             → Γ ⊆ Δ
+             → 𝕣 Δ ⊨ Σ ⟹ A
+infs-irrev-⊆ (infs-z regΓ regA) ext = infs-z (⇌-tregular regΓ (⊆-⇌ ext)) (⊢r-𝕣' (⊆-⊢r (⊢r-𝕣 regA) ext))
+infs-irrev-⊆ (infs-s x infs) ext = infs-s (t-irrev-⊆ x ext) (infs-irrev-⊆ infs ext)

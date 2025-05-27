@@ -34,6 +34,7 @@ s-⊆ (s-tapp s upᶜ) with s-⊆ s
 ... | svar r regA = r
 s-⊆ (s-svar-term inΓ s) = s-⊆ s
 s-⊆ (s-svar-tapp inΓ s) = s-⊆ s
+s-⊆ (s-evar-infers x inst) = inst-⊆ inst
 
 inst-⊆/x : [ A / X ] Γ ⟹ Δ
          → Γ ⊆ Δ w/v X

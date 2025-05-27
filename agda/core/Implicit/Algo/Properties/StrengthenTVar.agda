@@ -1,3 +1,4 @@
+{-# OPTIONS --allow-unsolved-metas #-}
 module Implicit.Algo.Properties.StrengthenTVar where
 
 open import Implicit.Language.All
@@ -84,6 +85,7 @@ s-strengthen, (s-svar-term inΓ s) newΓ newΔ (↑tmᶜ-e up-e upΣ)
   with refl ← ◀,-unique newΓ newΔ = s-svar-term (∋:=-strengthen, inΓ newΓ) (s-strengthen, s newΓ newΓ (↑tmᶜ-e up-e upΣ))
 s-strengthen, (s-svar-tapp inΓ s) newΓ newΔ (↑tmᶜ-⓪ upΣ)
   with refl ← ◀,-unique newΓ newΔ = s-svar-tapp (∋:=-strengthen, inΓ newΓ) (s-strengthen, s newΓ newΓ (↑tmᶜ-⓪ upΣ))
+s-strengthen, (s-evar-infers infs inst) newΓ newΔ upΣ = ?
 
 -- corollaries
 s-strengthen,0 : Γ , T ⋈ ⊢ A ≤⁺ Σ' ⊣ Δ , T ⋈  ↪ B

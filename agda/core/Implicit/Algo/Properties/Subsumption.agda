@@ -1,3 +1,4 @@
+{-# OPTIONS --allow-unsolved-metas #-}
 module Implicit.Algo.Properties.Subsumption where
 
 open import Implicit.Language.All
@@ -28,6 +29,7 @@ t-inf-open-false : Γ ⊢ □ ⇒ e ⇒ A
                  → ⊥
 t-inf-open-false ⊢e opnA = ⊢r-⊢o-false (⊢r-𝕣 (t-⊢r ⊢e)) opnA
 
+
 ⊢to≤ : Γ ⊢ Σ ⇒ e ⇒ A
      → Γ ⋈ ⊢ A ≤⁺ Σ ⊣ Γ ⋈ ↪ A
 
@@ -36,6 +38,11 @@ subsumption :  Γ ⊢ Σ ⇒ e ⇒ A
              → Γ ⋈ ⊢ A ≤⁺ Σ' ⊣ Γ ⋈ ↪ A'
              → Γ ⊢ Σ' ⇒ e ⇒ A'
 
+infs-sub : Γ ⊨ Σ ⟹ A
+         → Γ ⋈ ⊢ A ≤⁺ Σ ⊣ Γ ⋈ ↪ A
+
+
+
 subsumption0 : Γ ⊢ □ ⇒ e ⇒ A
              → Γ ⊢ τ A ⇒ e ⇒ A
 subsumption0 ⊢e = subsumption ⊢e ≊Z (s-type (s-refl (reg-Z (t-env ⊢e)) (⊢r-weaken⋈0 (t-⊢r ⊢e))))
@@ -43,6 +50,10 @@ subsumption0 ⊢e = subsumption ⊢e ≊Z (s-type (s-refl (reg-Z (t-env ⊢e)) (
 
 s-refined-p : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
             → Δ ⊢ B ≤⁺ Σ ⊣ Δ ↪ B
+
+infs-sub (infs-z regΓ regA) = s-type (s-refl (reg-Z regΓ) (⊢r-𝕣 regA))
+infs-sub (infs-s x infs) = s-term-c (⊢r-⊢c (⊢r-𝕣 (t-⊢r x))) (⊢r-≫-eq (⊢r-𝕣 (t-⊢r x))) (subsumption0 x) (infs-sub infs)
+
 s-refined-p (s-empty cloΓ cloA x) = let regB = (⊢c-≫-⊢r cloΓ cloA x) in s-empty cloΓ (⊢r-⊢c regB ) (⊢r-≫-eq regB)
 s-refined-p (s-type ss) = s-type (s-refl (ss-env-out ss) (ss-polarity+-out ss))
 s-refined-p (s-term-c cloA ap ⊢e s) with ⊢id0 ⊢e
@@ -55,6 +66,8 @@ s-refined-p (s-∀l s upᶜ upᵉ upC upD) = s-strengthen=0 (s-refined-p s) (↑
 s-refined-p (s-tapp s upᶜ) = s-tapp (s-refined-p s) upᶜ
 s-refined-p (s-svar-term inΓ s) = s-refined-p s
 s-refined-p (s-svar-tapp inΓ s) = s-refined-p s
+s-refined-p (s-evar-infers (infs-s x infs) inst) = s-term-c {!!} {!!} (t-irrev-⊆ (subsumption0 x) (inst-⊆ inst)) {!infs-sub infs!}
+
 
 
 ⊢to≤ (⊢lit regΓ) = s-empty (reg-Z regΓ) ⊢c-int grd-int

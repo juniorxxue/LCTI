@@ -51,9 +51,11 @@ data _⊢_⌞_⌝_⊣_ : Env n m → Type m → Polar → Type m → Env n m →
 
 infix 3 _⊢_⇒_⇒_
 infix 3 _⊢_≤⁺_⊣_↪_
+infix 3 _⊨_⟹_
 
 data _⊢_⇒_⇒_ : Env n m → Context n m → Term n m → Type m → Set
 data _⊢_≤⁺_⊣_↪_ : Env n m → Type m → Context n m → Env n m → Type m → Set
+data _⊨_⟹_ : Env n m → Context n m → Type m → Set
 
 data _⊢_⇒_⇒_ where
 
@@ -148,6 +150,19 @@ data _⊢_≤⁺_⊣_↪_ where
       Δ ∋ X := A
     → Δ ⊢ A ≤⁺ (B ⓪↝ Σ) ⊣ Δ ↪ `∀ C
     → Δ ⊢ ‶ X ≤⁺ (B ⓪↝ Σ) ⊣ Δ ↪ `∀ C
+
+  s-evar-infers :
+      (infs : 𝕣 Δ ⊨ [ e ]↝ Σ ⟹ A)
+    → (inst : [ A / X ] Δ ⟹ Ψ) -- implies Γ ∋^k
+    → Δ ⊢ ‶ X ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ A
+
+data _⊨_⟹_ where
+  infs-z : (regΓ : TRegular Γ)
+         → (regA : Γ ⊢r A)
+         → Γ ⊨ τ A ⟹ A
+  infs-s : Γ ⊢ □ ⇒ e ⇒ A
+         → Γ ⊨ Σ ⟹ B
+         → Γ ⊨ [ e ]↝ Σ ⟹ A `→ B
 
 _ : ∅ , (Int `→ Int) , `∀ (‶ #0 `→ ‶ #0) ⊢ □ ⇒ (` #0 · ` #1) · (lit 1) ⇒ Int
 _ = ⊢app (⊢app (⊢sub (⊢var (reg-S, (reg-S, reg-Z (⊢r-arr ⊢r-int ⊢r-int))
