@@ -117,4 +117,12 @@ sub_ctx : Env -> Typ -> Context -> Env -> Typ -> Prop :=
     sub_ctx Δ (All A) (CtxTrm e Σ) Ψ (Arr C D)
 | s_tapp : forall Δ A B Σ Ψ C,
     sub_ctx (ExTyCons Δ B) A (ty_shift_ctx Σ 0) (ExTyCons Ψ B) C ->
-    sub_ctx Δ (All A) (CtxTApp B Σ) Ψ (All C).
+    sub_ctx Δ (All A) (CtxTApp B Σ) Ψ (All C)
+| s_svar_trm : forall Δ x e Σ A B C,
+    lookupExTy Δ x A ->
+    sub_ctx Δ A (CtxTrm e Σ) Δ (Arr B C) ->
+    sub_ctx Δ (TVar x) (CtxTrm e Σ) Δ (Arr B C)
+| s_svar_tapp : forall Δ x Σ A B C,
+    lookupExTy Δ x A ->
+    sub_ctx Δ A (CtxTApp B Σ) Δ (All C) ->
+    sub_ctx Δ (TVar x) (CtxTApp B Σ) Δ (All C).
