@@ -10,6 +10,7 @@ open import Implicit.Interm2Algo.Counter2Context
 open import Implicit.Interm2Algo.ExtIrrev
 open import Implicit.Interm2Algo.EnvDiff
 open import Implicit.Interm2Algo.OpenClose
+open import Implicit.Interm2Algo.Find
 
 s+-⊆/ : Δ ⊢ j # A ⌞ ≤⁺ ⌝ B
       → Δ ⊆ Δ w/t A w/c j
@@ -35,6 +36,9 @@ s+-⊆/ (s-∀ s) with s+-⊆/ s
 s+-⊆/ (s-∀l s ic fd upC upD upj) with s+-⊆/ s
 s+-⊆/ (s-∀l s case-𝕚 fd upC upD (↑tyʲ-𝕚 upj)) | r = ⊆∀-I (⊆/c-irrev-^0 r fd) upj
 s+-⊆/ (s-∀l s case-𝕔 fd upC upD (↑tyʲ-𝕔 upj)) | r = ⊆∀-C (⊆/c-irrev-^0 r fd) upj
+s+-⊆/ (s-∀l-no-appear s ic fd upC upD upj) with s+-⊆/ s
+s+-⊆/ (s-∀l-no-appear s case-𝕚 fd upC upD (↑tyʲ-𝕚 upj)) | r = ⊆∀-I-no r upj
+s+-⊆/ (s-∀l-no-appear s case-𝕔 fd upC upD (↑tyʲ-𝕔 upj)) | r = ⊆∀-C-no r upj
 s+-⊆/ (s-svar-l x inΔ) = ⊆∞ (ext-var (⊆/x-refl x (⊢c-var-= (∋:=to∋= inΔ))))
 s+-⊆/ (s-tapp s upj) = ⊆∀-T (s+-⊆/ s) upj
 s+-⊆/ (s-svar-𝕚 inΓ s) = ⊆I-X (s-sregular s)
@@ -106,6 +110,24 @@ complete-s (s-tapp s upj) (⊆∀-T ext upj₁) (~T {Σ = Σ} ~j st)
 complete-s (s-svar-𝕚 inΓ s) (⊆I-X regΓ) (~I ⊢e ~j) = s-svar-term inΓ (complete-s s (s+-⊆/ s) (~I ⊢e ~j))
 complete-s (s-svar-𝕔 inΓ s) (⊆C-X regΓ) (~C ⊢e ~j) = s-svar-term inΓ (complete-s s (s+-⊆/ s) (~C ⊢e ~j))
 complete-s (s-svar-𝕥 inΓ s) (⊆T-X regΓ) (~T ~j st) = s-svar-tapp inΓ (complete-s s (s+-⊆/ s) (~T ~j st))
+complete-s (s-∀l s ic fd upC upD (↑tyʲ-𝕚 upj)) (⊆∀-I-no ext upj₁) (~I ⊢e j~)
+  with refl ← ↑tyʲ-unique upj upj₁
+  with () ← ⊆/c-find-∋= ext Z fd
+complete-s (s-∀l s ic fd upC upD (↑tyʲ-𝕔 upj)) (⊆∀-C-no ext upj₁) (~C ⊢e j~)
+  with refl ← ↑tyʲ-unique upj upj₁
+  with () ← ⊆/c-find-∋= ext Z fd
+complete-s (s-∀l-no-appear s case-𝕚 fd upC upD (↑tyʲ-𝕚 upj)) (⊆∀-I ext upj₁) (~I ⊢e j~) = ⊥-elim (ε-¬ε-false (find-ε-gen (⊆/c-find0 ext)) fd)
+complete-s (s-∀l-no-appear s case-𝕔 fd upC upD (↑tyʲ-𝕔 upj)) (⊆∀-C ext upj₁) (~C ⊢e j~) = ⊥-elim (ε-¬ε-false (find-ε-gen (⊆/c-find0 ext)) fd)
+complete-s (s-∀l-no-appear s case-𝕚 fd upC upD (↑tyʲ-𝕚 upj)) (⊆∀-I-no ext upj₁) j~'@(~I {Σ = Σ} {e = e} ⊢e j~) with ↑tyᶜ0-total Σ | ↑tyᵉ0-total e
+... | ⟨ Σ' , upΣ ⟩ | ⟨ e' , upe ⟩
+  with refl ← ↑tyʲ-unique upj upj₁
+  = let weaken-j~ = (~weaken^0 (~I ⊢e j~) (↑ty-arr upC upD) (↑tyᶜ-e upe upΣ)) (↑tyʲ-𝕚 upj)
+    in s-∀l-no (complete-s s ext weaken-j~) upΣ upe upC upD
+complete-s (s-∀l-no-appear s case-𝕔 fd upC upD (↑tyʲ-𝕔 upj)) (⊆∀-C-no ext upj₁) j~'@(~C {Σ = Σ} {e = e} ⊢e j~) with ↑tyᶜ0-total Σ | ↑tyᵉ0-total e
+... | ⟨ Σ' , upΣ ⟩ | ⟨ e' , upe ⟩
+  with refl ← ↑tyʲ-unique upj upj₁
+  = let weaken-j~ = (~weaken^0 (~C ⊢e j~) (↑ty-arr upC upD) (↑tyᶜ-e upe upΣ)) (↑tyʲ-𝕔 upj)
+    in s-∀l-no (complete-s s ext weaken-j~) upΣ upe upC upD
 
 complete-s0 : Γ ⋈ ⊢ j # A ⌞ ≤⁺ ⌝ B
             → Γ ⊢ ⟨ j , B ⟩ ~t Σ

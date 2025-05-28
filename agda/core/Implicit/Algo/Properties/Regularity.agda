@@ -55,6 +55,8 @@ s-env-in (s-term-c cloA ap ⊢e s) = s-env-in s
 s-env-in (s-term-o opnA ⊢e x s) = ss-env-in x
 s-env-in (s-∀l s upᶜ upᵉ upC upD) with s-env-in s
 ... | reg-S^ r = r
+s-env-in (s-∀l-no s upᶜ upᵉ upC upD) with s-env-in s
+... | reg-S^ r = r
 s-env-in (s-tapp s upᶜ) with s-env-in s
 ... | reg-S= r regA = r
 s-env-in (s-svar-term inΓ s) = s-env-in s
@@ -136,6 +138,8 @@ s-⊢rᶜ (s-term-c cloA ap ⊢e s) = ⊢rᶜ-term (s-⊢rᶜ s)
 s-⊢rᶜ (s-term-o opnA ⊢e ss s) = ⊢rᶜ-term (⊆-⊢rᶜ' (s-⊢rᶜ s) (ss-⊆ ss))
 s-⊢rᶜ (s-∀l s upᶜ upᵉ upC upD) with s-⊢rᶜ s
 ... | ⊢rᶜ-term r = ⊢rᶜ-term (⊢rᶜ-strengthen^0 r upᶜ)
+s-⊢rᶜ (s-∀l-no s upᶜ upᵉ upC upD) with s-⊢rᶜ s
+... | ⊢rᶜ-term r = ⊢rᶜ-term (⊢rᶜ-strengthen^0 r upᶜ)
 s-⊢rᶜ (s-tapp s upᶜ) with s-env-in s
 ... | reg-S= r regA = ⊢rᶜ-tapp regA (⊢rᶜ-strengthen=0 (s-⊢rᶜ s) upᶜ)
 s-⊢rᶜ (s-svar-term inΓ s) = s-⊢rᶜ s
@@ -168,6 +172,7 @@ s-⊢r (s-type ss) = ss-polarity+ ss
 s-⊢r (s-term-c cloA ap ⊢e s) = ⊢r-arr (⊢c-≫-⊢r (s-env-in s) cloA ap) (s-⊢r s)
 s-⊢r (s-term-o opnA ⊢e ss s) = ⊢r-arr (⊢r-𝕣 (t-⊢r ⊢e)) (⊆-⊢r' (s-⊢r s) (ss-⊆ ss))
 s-⊢r (s-∀l s upᶜ upᵉ upC upD) = ⊢r-strengthen^0 (s-⊢r s) (↑ty-arr upC upD)
+s-⊢r (s-∀l-no s upᶜ upᵉ upC upD) = ⊢r-strengthen^0 (s-⊢r s) (↑ty-arr upC upD)
 s-⊢r (s-tapp s upᶜ) = ⊢r-∀ (⊢r-◆0 (s-⊢r s))
 s-⊢r (s-svar-term inΓ s) = s-⊢r s
 s-⊢r (s-svar-tapp inΓ s) = s-⊢r s

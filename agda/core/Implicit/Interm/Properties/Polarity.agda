@@ -1,3 +1,4 @@
+{-# OPTIONS --allow-unsolved-metas #-}
 module Implicit.Interm.Properties.Polarity where
 
 open import Implicit.Language.All
@@ -18,6 +19,7 @@ s+-polarity (s-arr₂ s s₁) = ⊢r-arr (s--polarity s) (s+-polarity s₁)
 s+-polarity (s-arr₃ cloA grd s) = ⊢r-arr (⊢c-≫-⊢r (s-sregular s) cloA grd) (s+-polarity s)
 s+-polarity (s-∀ s) = ⊢r-∀ (s+-polarity s)
 s+-polarity (s-∀l s ic fd upC upD upj) = ⊢r-strengthen=0 (s+-polarity s) (↑ty-arr upC upD)
+s+-polarity (s-∀l-no-appear s ic fd upC upD upj) = {!!}
 s+-polarity (s-svar-l x inΔ) = ∋:=-⊢r x inΔ
 s+-polarity (s-tapp s upj) = ⊢r-∀ (⊢r-◆0 (s+-polarity s))
 s+-polarity (s-svar-𝕚 _ x) = s+-polarity x
@@ -64,6 +66,7 @@ s-⊢c-l {≤ = ≤⁺} (s-arr₂ s s₁) = ⊢c-arr (s-⊢c-r s) (s-⊢c-l s₁
 s-⊢c-l {≤ = ≤⁺} (s-arr₃ cloA grd s) = ⊢c-arr cloA (s-⊢c-l s)
 s-⊢c-l {≤ = ≤⁺} (s-∀ s) = ⊢c-∀ (s-⊢c-l s)
 s-⊢c-l {≤ = ≤⁺} (s-∀l s ic fd upC upD upj) = ⊢c-∀ (⊢c-◆0 (s-⊢c-l s))
+s-⊢c-l {≤ = ≤⁺} (s-∀l-no-appear s ic fd upC upD upj) = {!!}
 s-⊢c-l {≤ = ≤⁺} (s-tapp s upj) = ⊢c-∀ (⊢c-◆0 (s-⊢c-l s))
 s-⊢c-l {≤ = ≤⁺} (s-svar-l x inΔ) = ⊢c-var-= (∋:=to∋= inΔ)
 s-⊢c-l {≤ = ≤⁻} s = ⊢r-⊢c (s--polarity s)

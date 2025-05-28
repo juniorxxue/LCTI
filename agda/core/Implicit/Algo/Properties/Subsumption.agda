@@ -52,6 +52,8 @@ s-refined-p s'@(s-term-o opnA ⊢e ss s) with subsumption0 ⊢e
 ... | ih = let regA = ⊆-⊢r (ss-polarity- ss) (s-⊆ s')
          in s-term-c (⊢r-⊢c regA) (⊢r-≫-eq regA) (t-irrev-⊆ ih (s-⊆ s')) (s-refined-p s)
 s-refined-p (s-∀l s upᶜ upᵉ upC upD) = s-strengthen=0 (s-refined-p s) (↑ty-arr upC upD) (↑ty-arr upC upD) (↑tyᶜ-e upᵉ upᶜ)
+s-refined-p (s-∀l-no s upᶜ upᵉ upC upD) = s-strengthen^0 (s-refined-p s) (↑ty-arr upC upD) (↑ty-arr upC upD) (↑tyᶜ-e upᵉ upᶜ)
+-- s-strengthen=0 (s-refined-p s) (↑ty-arr upC upD) (↑ty-arr upC upD) (↑tyᶜ-e upᵉ upᶜ)
 s-refined-p (s-tapp s upᶜ) = s-tapp (s-refined-p s) upᶜ
 s-refined-p (s-svar-term inΓ s) = s-refined-p s
 s-refined-p (s-svar-tapp inΓ s) = s-refined-p s

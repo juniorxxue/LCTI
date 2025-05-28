@@ -161,6 +161,16 @@ s-strengthen= (s-∀l s upᶜ upᵉ upC upD) newΓ newΔ (↑ty-∀ upA) (↑ty-
                         (↑ty-arr (↑ty-comm0' upB upC upA') (↑ty-comm0' upB₁ upD upB'))
                         (↑tyᶜ-e (↑tyᵉ-comm0' up-e upᵉ upe) (↑tyᶜ-comm0' upΣ upᶜ upΣ')))
          upΣ' upe upA' upB'
+s-strengthen= (s-∀l-no s upᶜ upᵉ upC upD) newΓ newΔ (↑ty-∀ upA) (↑ty-arr {A = A} {B = B} upB upB₁) (↑tyᶜ-e {e = e} {Σ = Σ} up-e upΣ)
+  with reg-S^ regΓ ← s-env-out s
+  with ⟨ e' , upe ⟩ ← ↑tyᵉ0-total e
+  with ⟨ Σ' , upΣ' ⟩ ← ↑tyᶜ0-total Σ
+  with ⟨ A' , upA' ⟩ ← ↑ty0-total A
+  with ⟨ B' , upB' ⟩ ← ↑ty0-total B
+  = s-∀l-no (s-strengthen= s (◀S^ newΓ) (◀S^ newΔ) upA
+                        (↑ty-arr (↑ty-comm0' upB upC upA') (↑ty-comm0' upB₁ upD upB'))
+                        (↑tyᶜ-e (↑tyᵉ-comm0' up-e upᵉ upe) (↑tyᶜ-comm0' upΣ upᶜ upΣ')))
+         upΣ' upe upA' upB'
 s-strengthen= (s-tapp s upᶜ) newΓ newΔ (↑ty-∀ upA) (↑ty-∀ upB) (↑tyᶜ-⓪ {Σ = Σ} upA₁ upΣ)
   with ⟨ Σ' , upΣ' ⟩ ← ↑tyᶜ0-total Σ
   = s-tapp (s-strengthen= s (◀S= newΓ upA₁) (◀S= newΔ upA₁) upA upB (↑tyᶜ-comm0' upΣ upᶜ upΣ')) upΣ'
@@ -182,3 +192,11 @@ s-strengthen=0 : Γ ,= T ⊢ A' ≤⁺ Σ' ⊣ Δ ,= T ↪ B'
                  → ↑tyᶜ0 Σ ⇘ Σ'
                  → Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
 s-strengthen=0 s upB upA upΣ = s-strengthen= s ◀Z ◀Z upA upB upΣ
+
+
+postulate
+  s-strengthen^0 : Γ ,^ ⊢ A' ≤⁺ Σ' ⊣ Δ ,^ ↪ B'
+                 → ↑ty0 B ⇘ B'
+                 → ↑ty0 A ⇘ A'
+                 → ↑tyᶜ0 Σ ⇘ Σ'
+                 → Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B

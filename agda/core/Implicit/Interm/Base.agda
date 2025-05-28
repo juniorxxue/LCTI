@@ -44,6 +44,14 @@ data _⊢_#_⌞_⌝_ : Env n m → Counter m → Type m → Polar → Type m →
     → (upD : ↑ty0 D ⇘ D')
     → (upj : ↑tyʲ0 j ⇘ j')
     → Δ ⊢ j # `∀ A ⌞ ≤⁺ ⌝ C `→ D
+  s-∀l-no-appear :
+      Δ ,^ ⊢ j' # A ⌞ ≤⁺ ⌝ C' `→ D'
+    → (ic : (𝕚𝕔 j))
+    → (fd : #0 ¬ε A)
+    → (upC : ↑ty0 C ⇘ C')
+    → (upD : ↑ty0 D ⇘ D')
+    → (upj : ↑tyʲ0 j ⇘ j')
+    → Δ ⊢ j # `∀ A ⌞ ≤⁺ ⌝ C `→ D
   s-tapp :
       Δ ,= B ⊢ j' # A ⌞ ≤⁺ ⌝ C
     → (upj : ↑tyʲ0 j ⇘ j')

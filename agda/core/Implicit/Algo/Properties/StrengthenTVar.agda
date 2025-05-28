@@ -77,6 +77,10 @@ s-strengthen, (s-∀l s upᶜ upᵉ upC upD) newΓ newΔ (↑tmᶜ-e {e = e} {Σ
   with ⟨ Σ' , upΣ' ⟩ ← ↑tyᶜ0-total Σ
   with ⟨ e' , upe ⟩ ← ↑tyᵉ0-total e
   = s-∀l (s-strengthen, s (◀S^ newΓ) (◀S= newΔ) (↑tmᶜ-e (↑tm-↑tyᵉ-comm up-e upᵉ upe) (↑tmᶜ-↑tyᶜ-comm upΣ upᶜ upΣ'))) upΣ' upe upC upD
+s-strengthen, (s-∀l-no s upᶜ upᵉ upC upD) newΓ newΔ (↑tmᶜ-e {e = e} {Σ = Σ} up-e upΣ)
+  with ⟨ Σ' , upΣ' ⟩ ← ↑tyᶜ0-total Σ
+  with ⟨ e' , upe ⟩ ← ↑tyᵉ0-total e
+  = s-∀l-no (s-strengthen, s (◀S^ newΓ) (◀S^ newΔ) (↑tmᶜ-e (↑tm-↑tyᵉ-comm up-e upᵉ upe) (↑tmᶜ-↑tyᶜ-comm upΣ upᶜ upΣ'))) upΣ' upe upC upD
 s-strengthen, (s-tapp s upᶜ) newΓ newΔ (↑tmᶜ-⓪ {Σ = Σ} upΣ)
   with ⟨ Σ' , upΣ' ⟩ ← ↑tyᶜ0-total Σ
   = s-tapp (s-strengthen, s (◀S= newΓ) (◀S= newΔ) (↑tmᶜ-↑tyᶜ-comm upΣ upᶜ upΣ')) upΣ'

@@ -75,16 +75,6 @@ open import Implicit.Interm.All renaming (_⊢_#_⌞_⌝_ to _⊢i_#_⌞_⌝_)
 ε-≫-∙ (ε-∀ inA) inΓ ninΓ (grd-var= x) = ⊥-elim (εᵍ-:=-false x (ε-∀ inA) ninΓ)
 ε-≫-∙ (ε-∀ inA) inΓ ninΓ (grd-∀ grd) = ε-∀ (ε-≫-∙ inA (S∙ inΓ) (S∙ ninΓ) grd)
 
-find-ε-gen : find A k j
-           → k ε A
-find-ε-gen (f-∞ x) = x
-find-ε-gen (f-arr-𝕚-l x) = ε-arr-l x
-find-ε-gen (f-arr-𝕚-r ¬inA fd) = ε-arr-r ¬inA (find-ε-gen fd)
-find-ε-gen (f-arr-𝕔 ¬inA fd) = ε-arr-r ¬inA (find-ε-gen fd)
-find-ε-gen (f-∀-𝕚 fd upj) = ε-∀ (find-ε-gen fd)
-find-ε-gen (f-∀-𝕔 fd upj) = ε-∀ (find-ε-gen fd)
-find-ε-gen (f-𝕥 fd upj) = ε-∀ (find-ε-gen fd)
-
 find-≫-∙ : find A% k j
          → k ¬εᵍ Γ
          → Γ ∋∙ k

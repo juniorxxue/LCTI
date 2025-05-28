@@ -97,6 +97,15 @@ s-weaken^ {k = k} (s-∀l {B = B} s upᶜ upᵉ upC upD) new (↑ty-∀ upA) (�
          (↑tyᶜ-comm0' (↑tyᶜ-e up-e upΣ) (↑tyᶜ-e upe″ upΣ″) (↑tyᶜ-e upᵉ upᶜ))
          (↑ty-arr (↑ty-comm0' upC' upC″ upC) (↑ty-comm0' upD' upD″ upD)))
          upΣ″ upe″ upC″ upD″
+s-weaken^ {k = k} (s-∀l-no s upᶜ upᵉ upC upD) new (↑ty-∀ upA) (↑tyᶜ-e {e' = e'} {Σ' = Σ'} up-e upΣ) (↑ty-arr {A' = C'} {B' = D'} upC' upD')
+  with ⟨ C″ , upC″ ⟩ ← ↑ty0-total C'
+  with ⟨ D″ , upD″ ⟩ ← ↑ty0-total D'
+  with ⟨ e″ , upe″ ⟩ ← ↑tyᵉ0-total e'
+  with ⟨ Σ″ , upΣ″ ⟩ ← ↑tyᶜ0-total Σ'
+  = s-∀l-no (s-weaken^ s (▶S^ new) upA
+         (↑tyᶜ-comm0' (↑tyᶜ-e up-e upΣ) (↑tyᶜ-e upe″ upΣ″) (↑tyᶜ-e upᵉ upᶜ))
+         (↑ty-arr (↑ty-comm0' upC' upC″ upC) (↑ty-comm0' upD' upD″ upD)))
+         upΣ″ upe″ upC″ upD″
 s-weaken^ (s-tapp s upᶜ) new (↑ty-∀ upA) (↑tyᶜ-⓪ {Σ' = Σ'} upA' upΣ) (↑ty-∀ upB)
   with ⟨ Σ″ , upΣ″ ⟩ ← ↑tyᶜ0-total Σ' = s-tapp (s-weaken^ s (▶S= new upA') upA (↑tyᶜ-comm0' upΣ upΣ″ upᶜ) upB) upΣ″
 s-weaken^ {k = k} (s-svar-term {A = A} inΓ s) new ↑ty-var (↑tyᶜ-e up-e upΣ) (↑ty-arr upB upB₁)
