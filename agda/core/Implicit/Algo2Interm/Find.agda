@@ -34,9 +34,19 @@ s-find (s-∀l-𝕔 s upᶜ upj upᵉ upC upD) inΓ inΔ = f-∀-𝕔 (s-find s 
 s-find (s-tapp s upᶜ upj) inΓ inΔ = f-𝕥 (s-find s (S= inΓ) (S= inΔ)) upj
 s-find (s-svar-term in' s) inΓ inΔ = ⊥-elim (∋^-∋=-false inΓ inΔ)
 s-find (s-svar-tapp in' s) inΓ inΔ = ⊥-elim (∋^-∋=-false inΓ inΔ)
+s-find (s-∀l-no-𝕚 s upᶜ upj upᵉ upC upD) inΓ inΔ = f-∀-𝕚 (s-find s (S^ inΓ) (S^ inΔ)) upj
+s-find (s-∀l-no-𝕔 s upᶜ upj upᵉ upC upD) inΓ inΔ = f-∀-𝕔 (s-find s (S^ inΓ) (S^ inΔ)) upj
 
 s-find0 : Γ ,^ ⊢ A ≤⁺ [ e' ]↝ Σ' ⊣ Δ ,= B ↪ C `→ D ↡ j
               → ↑tyᵉ0 e ⇘ e'
               → ↑tyᶜ0 Σ ⇘ Σ'
               → find A #0 j
 s-find0 s up1 up2 = s-find s Z Z
+
+
+
+s-¬ε : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B ↡ j
+       → Γ ∋^ k
+       → Δ ∋^ k
+       → k ¬ε A
+s-¬ε s inΓ inΔ = ^in-^out-¬ε (s-⊆/ (sc-sound s)) inΓ inΔ

@@ -1,3 +1,4 @@
+{-# OPTIONS --allow-unsolved-metas #-}
 module Implicit.Algo.Properties.Regularity where
 
 open import Implicit.Language.All
@@ -190,3 +191,20 @@ t-⊢r (⊢sub ⊢e ne gc s) = ⊢r-𝕣' (s-⊢r s)
 t-⊢r (⊢tabs ⊢e) = ⊢r-∀ (t-⊢r ⊢e)
 t-⊢r (⊢tapp ⊢e st) with t-⊢rᶜ ⊢e
 ... | ⊢rᶜ-tapp regA regΓ = st0-⊢r (t-⊢r ⊢e) regA st
+
+
+----------------------------------------------------------------------
+--+                           Extension                            +--
+----------------------------------------------------------------------
+
+s-⊆/ : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
+     → Γ ⊆ Δ w/t A
+s-⊆/ (s-empty regΓ cloA grd) = ⊆/-refl regΓ cloA
+s-⊆/ (s-type ss) = ss+-⊆/ ss
+s-⊆/ (s-term-c cloA ap ⊢e s) = ext-arr (⊆/-refl (s-env-in s) cloA) (s-⊆/ s)
+s-⊆/ (s-term-o opnA ⊢e ss s) = ext-arr (ss--⊆/ ss) (s-⊆/ s)
+s-⊆/ (s-∀l s upᶜ upᵉ upC upD) = ext-∀ {!s-⊆/ s!}
+s-⊆/ (s-∀l-no s upᶜ upᵉ upC upD) = ext-∀ {!s-⊆/ s!}
+s-⊆/ (s-tapp s upᶜ) = ext-∀ {!s-⊆/ s!}
+s-⊆/ (s-svar-term x s) = ⊆/-refl (s-env-in s) (⊢c-var-= (∋:=to∋= x))
+s-⊆/ (s-svar-tapp x s) = ⊆/-refl (s-env-in s) (⊢c-var-= (∋:=to∋= x))

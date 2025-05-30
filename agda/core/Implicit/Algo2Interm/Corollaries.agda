@@ -85,6 +85,13 @@ sc-complete (s-svar-term inΓ s) with sc-complete s
 ... | subs j~Σ s₁ = subs j~Σ (s-svar-term inΓ s₁)
 sc-complete (s-svar-tapp inΓ s) with sc-complete s
 ... | subs (~sT j~Σ st) s₁ = subs (~sT j~Σ st) (s-svar-tapp inΓ s₁)
+sc-complete (s-∀l-no s upᶜ upᵉ upC upD) with sc-complete s
+... | subs {𝕚 j} j~Σ s₁
+  with ⟨ j' , ↑tyʲ-𝕚 upj' ⟩ ← ↑tyʲ0-exist j~Σ (↑tyᶜ-e upᵉ upᶜ)
+  = subs (~s-strengthen^0 j~Σ (↑ty-arr upC upD) (↑tyᶜ-e upᵉ upᶜ) (↑tyʲ-𝕚 upj')) (s-∀l-no-𝕚 s₁ upᶜ upj' upᵉ upC upD)
+... | subs {𝕔 j} j~Σ s₁
+  with ⟨ j' , ↑tyʲ-𝕔 upj' ⟩ ← ↑tyʲ0-exist j~Σ (↑tyᶜ-e upᵉ upᶜ)
+  = subs (~s-strengthen^0 j~Σ (↑ty-arr upC upD) (↑tyᶜ-e upᵉ upᶜ) (↑tyʲ-𝕔 upj')) (s-∀l-no-𝕔 s₁ upᶜ upj' upᵉ upC upD)
 
 ----------------------------------------------------------------------
 --+                          corollaries                           +--

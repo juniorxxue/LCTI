@@ -68,6 +68,12 @@ NonEmpty-NonZ ne-app (~tC ⊢e j~Σ) = nz-C
 NonEmpty-NonZ ne-tapp (~tT ~J st) = nz-T
 
 
+postulate
+  ~s-strengthen^0 : Γ ,^ ⊢ ⟨ j' , A' ⟩ ~s Σ'
+                 → ↑ty0 A ⇘ A'
+                 → ↑tyᶜ0 Σ ⇘ Σ'
+                 → ↑tyʲ0 j ⇘ j'
+                 → Γ ⊢ ⟨ j , A ⟩ ~s Σ
 
 
 ~s-strengthen=0 : Γ ,= T ⊢ ⟨ j' , A' ⟩ ~s Σ'

@@ -64,3 +64,4 @@ ss--⊆/ (s-ex-r^ inst) = ext-var (inst-⊆/x inst)
 ss--⊆/ (s-ex-r= regΓ x-in) = ext-var (⊆/x-refl regΓ (⊢c-var-= (∋:=to∋= x-in)))
 ss--⊆/ (s-arr s s₁) = ext-arr (ss+-⊆/ s) (ss--⊆/ s₁)
 ss--⊆/ (s-∀ s) = ext-∀ (ss--⊆/ s)
+

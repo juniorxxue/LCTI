@@ -61,6 +61,8 @@ sc-~ (s-tapp {B = B} {C = C} s upᶜ upj)
   with ⟨ B* , stB ⟩ ← st0-total B C = ~sT (~s-strengthen=0 (sc-~ s) (st-↑ty (⊢r-¬ε (s-⊢r (sc-sound s)) Z) stB) upᶜ upj) stB
 sc-~ (s-svar-term inΓ s) = sc-~ s
 sc-~ (s-svar-tapp inΓ s) = sc-~ s
+sc-~ (s-∀l-no-𝕚 s upᶜ upj upᵉ upC upD) = ~s-strengthen^0 (sc-~ s) (↑ty-arr upC upD) (↑tyᶜ-e upᵉ upᶜ) (↑tyʲ-𝕚 upj)
+sc-~ (s-∀l-no-𝕔 s upᶜ upj upᵉ upC upD) = ~s-strengthen^0 (sc-~ s) (↑ty-arr upC upD) (↑tyᶜ-e upᵉ upᶜ) (↑tyʲ-𝕔 upj)
 
 sound (⊢lit regΓ) = ⊢lit regΓ
 sound (⊢var regΓ x∈Γ) = ⊢var regΓ x∈Γ
@@ -87,3 +89,5 @@ sound-s (s-svar-term inΓ s) with sc-~ s
 ... | ~sI ⊢e r = s-svar-𝕚 inΓ (sound-s s)
 ... | ~sC ⊢e r = s-svar-𝕔 inΓ (sound-s s)
 sound-s (s-svar-tapp inΓ s) = s-svar-𝕥 inΓ (sound-s s)
+sound-s (s-∀l-no-𝕚 s upᶜ upj upᵉ upC upD) = s-∀l-no-appear (sound-s s) case-𝕚 (s-¬ε s Z Z) upC upD (↑tyʲ-𝕚 upj)
+sound-s (s-∀l-no-𝕔 s upᶜ upj upᵉ upC upD) = s-∀l-no-appear (sound-s s) case-𝕔 (s-¬ε s Z Z) upC upD (↑tyʲ-𝕔 upj)

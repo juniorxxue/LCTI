@@ -17,7 +17,7 @@ s-⊆-prv (s-∀ s) ext = s-∀ (s-⊆-prv s (uvar ext))
 s-⊆-prv (s-∀l s ic fd upC upD upj) ext with s-sregular s
 ... | reg-S= r regA = s-∀l (s-⊆-prv s (svar ext regA)) ic fd upC upD upj
 s-⊆-prv (s-∀l-no-appear s ic fd upC upD upj) ext with s-sregular s
-... | reg-S= r regA = s-∀l-no-appear (s-⊆-prv s (svar ext regA)) ic fd upC upD upj
+... | reg-S^ r = s-∀l-no-appear (s-⊆-prv s (evar ext)) ic fd upC upD upj
 s-⊆-prv (s-svar-l x inΔ) ext = s-svar-l (⊆-sregular' ext) (⊆-∋:= inΔ ext)
 s-⊆-prv (s-svar-r x inΔ) ext = s-svar-r (⊆-sregular' ext) (⊆-∋:= inΔ ext)
 s-⊆-prv (s-tapp s upj) ext with s-sregular s
@@ -152,7 +152,7 @@ s-⊆-prv-gen (s-∀ s) ext = s-∀ (s-⊆-prv-gen s (uvar ext))
 s-⊆-prv-gen (s-∀l s ic fd upC upD upj) ext with s-sregular s
 ... | reg-S= r regA = s-∀l (s-⊆-prv-gen s (svar ext regA)) ic fd upC upD upj
 s-⊆-prv-gen (s-∀l-no-appear s ic fd upC upD upj) ext with s-sregular s
-... | reg-S= r regA = s-∀l-no-appear (s-⊆-prv-gen s (svar ext regA)) ic fd upC upD upj
+... | reg-S^ r = s-∀l-no-appear (s-⊆-prv-gen s (evar ext)) ic fd upC upD upj
 s-⊆-prv-gen (s-svar-l x inΔ) ext = s-svar-l (⊆t-sregular x ext) (⊆t-∋:= inΔ ext)
 s-⊆-prv-gen (s-svar-r x inΔ) ext = s-svar-r (⊆t-sregular x ext) (⊆t-∋:= inΔ ext)
 s-⊆-prv-gen (s-tapp s st) ext with s-sregular s

@@ -1,4 +1,3 @@
-{-# OPTIONS --allow-unsolved-metas #-}
 module Implicit.Interm.Properties.Regularity where
 
 open import Implicit.Language.All hiding (_⊢rʲ_)
@@ -65,6 +64,15 @@ data _⊢rʲ_ : Env n m → Counter m → Set where
 ⊢rʲ-strengthen=0 (j-𝕔 regj) (↑tyʲ-𝕔 upj) = j-𝕔 (⊢rʲ-strengthen=0 regj upj)
 ⊢rʲ-strengthen=0 (j-𝕥 regj x) (↑tyʲ-𝕥 upj upA) = j-𝕥 (⊢rʲ-strengthen=0 regj upj) (⊢r-strengthen=0 x upA)
 
+⊢rʲ-strengthen^0 : Γ ,^ ⊢rʲ j'
+                 → ↑tyʲ0 j ⇘ j'
+                 → Γ ⊢rʲ j
+⊢rʲ-strengthen^0 j-Z ↑tyʲ-Z = j-Z
+⊢rʲ-strengthen^0 j-∞ ↑tyʲ-∞ = j-∞
+⊢rʲ-strengthen^0 (j-𝕚 regj) (↑tyʲ-𝕚 upj) = j-𝕚 (⊢rʲ-strengthen^0 regj upj)
+⊢rʲ-strengthen^0 (j-𝕔 regj) (↑tyʲ-𝕔 upj) = j-𝕔 (⊢rʲ-strengthen^0 regj upj)
+⊢rʲ-strengthen^0 (j-𝕥 regj x) (↑tyʲ-𝕥 upj upA) = j-𝕥 (⊢rʲ-strengthen^0 regj upj) (⊢r-strengthen^0 x upA)
+
 ⊢rʲ-strengthen,0 : Γ , T ⊢rʲ j
                  → Γ ⊢rʲ j
 ⊢rʲ-strengthen,0 j-Z = j-Z
@@ -83,7 +91,7 @@ s-⊢rʲ (s-arr₂ s s₁) = j-𝕚 (s-⊢rʲ s₁)
 s-⊢rʲ (s-arr₃ cloA grd s) = j-𝕔 (s-⊢rʲ s)
 s-⊢rʲ (s-∀ s) = j-∞
 s-⊢rʲ (s-∀l s ic fd upC upD upj) = ⊢rʲ-strengthen=0 (s-⊢rʲ s) upj
-s-⊢rʲ (s-∀l-no-appear s ic fd upC upD upj) = {!!}
+s-⊢rʲ (s-∀l-no-appear s ic fd upC upD upj) = ⊢rʲ-strengthen^0 (s-⊢rʲ s) upj
 s-⊢rʲ (s-tapp s upj) with s-sregular s
 ... | reg-S= r regA = j-𝕥 (⊢rʲ-strengthen=0 (s-⊢rʲ s) upj) regA
 s-⊢rʲ (s-svar-l x inΔ) = j-∞

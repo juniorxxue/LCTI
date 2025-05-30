@@ -30,6 +30,8 @@ sc-sound (s-∀l-𝕔 s upᶜ upj upᵉ upC upD) = s-∀l (sc-sound s) upᶜ up�
 sc-sound (s-tapp s upᶜ upj) = s-tapp (sc-sound s) upᶜ
 sc-sound (s-svar-term inΓ s) = s-svar-term inΓ (sc-sound s)
 sc-sound (s-svar-tapp inΓ s) = s-svar-tapp inΓ (sc-sound s)
+sc-sound (s-∀l-no-𝕚 x upᶜ upj upᵉ upC upD) = s-∀l-no (sc-sound x) upᶜ upᵉ upC upD
+sc-sound (s-∀l-no-𝕔 x upᶜ upj upᵉ upC upD) = s-∀l-no (sc-sound x) upᶜ upᵉ upC upD
 
 ----------------------------------------------------------------------
 --+                         useful lemmas                          +--

@@ -161,3 +161,8 @@ env-◆◇-false (◇S^ newΓ1) (◆S^ newΓ2) = env-◆◇-false newΓ1 newΓ2
 ⊢c-◆0 : Γ ,= T ⊢c A
       → Γ ,∙ ⊢c A
 ⊢c-◆0 cloA = ⊢c-◆ cloA ◆Z
+
+
+postulate
+  ⊢c-◇0 : Γ ,^ ⊢c A
+        → Γ ,∙ ⊢c A
