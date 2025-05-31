@@ -61,6 +61,11 @@ open import Implicit.Interm.All renaming (_⊢_#_⌞_⌝_ to _⊢i_#_⌞_⌝_)
 ¬ε-≫-∙ ninA inΓ ninΓ (grd-var= x) = ¬ε-var (≢-sym (∋∙-∋:=-≢ x inΓ))
 ¬ε-≫-∙ (¬ε-∀ ninA) inΓ ninΓ (grd-∀ grd) = ¬ε-∀ (¬ε-≫-∙ ninA (S∙ inΓ) (S∙ ninΓ) grd)
 
+¬ε-≫-∙0 : #0 ¬ε A%
+        → Γ ,∙ ≫ A ⇘ A%
+        → #0 ¬ε A
+¬ε-≫-∙0 ninA grd = ¬ε-≫-∙ ninA Z Z∙ grd
+
 ε-≫-∙ : k ε A%
       → Γ ∋∙ k
       → k ¬εᵍ Γ
@@ -100,6 +105,8 @@ find-≫-∙0 : find A% #0 j
           → find A #0 j
 find-≫-∙0 {Γ = Γ} fd grd = find-≫-∙ {Γ = Γ ,∙} fd Z∙ Z grd
 
+
+
 complete+ : Γ ⊢d j # A% ≤ B
           → Γ ≫ A ⇘ A%
           → Γ ⊢i j # A ⌞ ≤⁺ ⌝ B
@@ -129,12 +136,22 @@ complete+ (s-∀l grd₁ regA s case-𝕚 fd upC upD upj) (grd-var= x)
   = s-svar-𝕚 x (s-∀l (complete+ s grd₁) case-𝕚 fd upC upD upj)
 complete+ (s-∀l grd₁ regA s case-𝕔 fd upC upD upj) (grd-var= x)
   = s-svar-𝕔 x (s-∀l (complete+ s grd₁) case-𝕔 fd upC upD upj)
+complete+ (s-∀l-no-appear grd₁ regA s case-𝕚 fd upC upD upj) (grd-var= x)
+  = s-svar-𝕚 x (s-∀l-no-appear (complete+ s grd₁) case-𝕚 fd upC upD upj)
+complete+ (s-∀l-no-appear grd₁ regA s case-𝕔 fd upC upD upj) (grd-var= x)
+  = s-svar-𝕔 x (s-∀l-no-appear (complete+ s grd₁) case-𝕔 fd upC upD upj)
 complete+ (s-∀l grd₁ regA s case-𝕚 fd upC upD upj) (grd-∀ grd)
   with reg-S= regΓ regA ← s2-sregular s
   = s-∀l (complete+ s (≫-trans0 regΓ regA grd₁ grd)) case-𝕚 (find-≫-∙0 fd grd) upC upD upj
 complete+ (s-∀l grd₁ regA s case-𝕔 fd upC upD upj) (grd-∀ grd)
   with reg-S= regΓ regA ← s2-sregular s
   = s-∀l (complete+ s (≫-trans0 regΓ regA grd₁ grd)) case-𝕔 (find-≫-∙0 fd grd) upC upD upj
+complete+ (s-∀l-no-appear grd₁ regA s case-𝕚 fd upC upD upj) (grd-∀ grd)
+  with reg-S^ regΓ ← s2-sregular s
+  = s-∀l-no-appear (complete+ s {!!}) case-𝕚 (¬ε-≫-∙0 fd grd) upC upD upj
+complete+ (s-∀l-no-appear grd₁ regA s case-𝕔 fd upC upD upj) (grd-∀ grd)
+  with reg-S^ regΓ ← s2-sregular s
+  = s-∀l-no-appear (complete+ s {!!}) case-𝕔 (¬ε-≫-∙0 fd grd) upC upD upj
 complete+ (s-tapp x regA s upj) (grd-var= x₁) = s-svar-𝕥 x₁ (s-tapp (complete+ s x) upj)
 complete+ (s-tapp x regA s upj) (grd-∀ grd)
   with reg-S= regΓ regA ← s2-sregular s = s-tapp (complete+ s (≫-trans0 regΓ regA x grd)) upj

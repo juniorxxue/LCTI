@@ -41,6 +41,21 @@ sd-strengthen= {j = j} (s-∀l {B = B} grd regA' s ic fd upC upD upj₁) new (�
          (sd-strengthen= s (◀S= new upB') upA% (↑ty-arr (↑ty-comm0' upB upC upA′) (↑ty-comm0' upB₁ upD upB′)) (↑tyʲ-comm0' upj upj₁ upj'))
          (𝕚𝕔-↑tyʲ' ic upj)
          (↑ty-find0' fd upA (↑tyʲ-comm0' upj upj₁ upj')) upA′ upB′ upj'
+sd-strengthen= {j = j} (s-∀l-no-appear grd regA' s ic fd upC upD upj₁) new (↑ty-∀ upA) (↑ty-arr {A = A′} {B = B′} upB upB₁) upj
+  with ⟨ A″ , upA′ ⟩ ← ↑ty0-total A′
+  with ⟨ B″ , upB′ ⟩ ← ↑ty0-total B′
+  with ⟨ j' , upj' ⟩ ← ↑tyʲ0-total j
+  with reg-S^ regΓ  ← s2-sregular s
+  -- A%
+  with regA% ← s2-⊢r-l s
+  with k1¬εB ← ⊢r-¬ε regA% (S^ (◀=-∋=' new))
+  with ⟨ preA% , upA% ⟩ ← ↑ty-surjective k1¬εB
+  = s-∀l-no-appear (≫-strengthen= grd (reg-S^ regΓ) (◀S^ new) upA upA%)
+                   (⊢r-strengthen= regA' (◀S∙ new) upA)
+                   (sd-strengthen= s (◀S^ new) upA% (↑ty-arr (↑ty-comm0' upB upC upA′) (↑ty-comm0' upB₁ upD upB′)) (↑tyʲ-comm0' upj upj₁ upj'))
+                   (𝕚𝕔-↑tyʲ' ic upj)
+                   (¬ε-↑ty'-inv0 fd upA)
+                   upA′ upB′ upj'
 sd-strengthen= (s-tapp grd regA' s upj₁) new (↑ty-∀ upA) (↑ty-∀ upB) (↑tyʲ-𝕥 {j = j} upj upA₁)
   with ⟨ j' , upj' ⟩ ← ↑tyʲ0-total j
   --
@@ -180,6 +195,20 @@ sound s'@(s-∀l {B = B} s ic fd upC upD upj) (grd-∀ grd1) grdCD@(grd-arr grd2
          (sound s grdA (⊢r-≫-eq (s+-polarity s)))
          ic
          (find-≫-∙ fd Z∙ Z grd1)
+         upC
+         upD
+         upj
+sound s'@(s-∀l-no-appear s ic fd upC upD upj) (grd-∀ grd1) grdCD@(grd-arr grd2 grd3)
+  with cloA ← s-⊢c-l s
+  with ⟨ A% , grdA ⟩ ← ≫-total (s-sregular s) cloA
+  with reg-S^ regΓ ← s-sregular s
+  with regCD ← s+-polarity s'
+  with refl ← ⊢r-≫-eq' regCD grdCD
+  = s-∀l-no-appear {!!}
+         (⊢c-≫-⊢r (reg-S∙ regΓ) (⊢c-◇0 (s-⊢c-l s)) grd1)
+         (sound s grdA (⊢r-≫-eq (s+-polarity s)))
+         ic
+         (¬ε-≫-∙ fd Z Z∙ grd1)
          upC
          upD
          upj
