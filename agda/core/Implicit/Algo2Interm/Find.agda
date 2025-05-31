@@ -44,9 +44,42 @@ s-find0 : Γ ,^ ⊢ A ≤⁺ [ e' ]↝ Σ' ⊣ Δ ,= B ↪ C `→ D ↡ j
 s-find0 s up1 up2 = s-find s Z Z
 
 
+ss-¬ε+ : Γ ⊢ A ⌞ ≤⁺ ⌝ B ⊣ Δ
+        → Γ ∋^ k
+        → Δ ∋^ k
+        → k ¬ε A
 
-s-¬ε : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B ↡ j
+ss-¬ε- : Γ ⊢ A ⌞ ≤⁻ ⌝ B ⊣ Δ
+        → Γ ∋^ k
+        → Δ ∋^ k
+        → k ¬ε B
+
+ss-¬ε+ (s-int regΓ) inΓ inΔ = ¬ε-int
+ss-¬ε+ (s-var-∙ regΓ x) inΓ inΔ = ¬ε-var (∋∙-∋^-≢ x inΓ)
+ss-¬ε+ (s-ex-l^ inst) inΓ inΔ = ¬ε-var (∋=-∋^-≢ (inst-∋= inst) inΔ)
+ss-¬ε+ (s-ex-l= regΓ x-in) inΓ inΔ = ¬ε-var (∋=-∋^-≢ (∋:=to∋= x-in) inΔ)
+ss-¬ε+ (s-arr s s₁) inΓ inΔ = let inΩ = ⊆-∋^-middle inΓ inΔ (ss-⊆ s) (ss-⊆ s₁)
+                              in ¬ε-arr (ss-¬ε- s inΓ inΩ) (ss-¬ε+ s₁ inΩ inΔ)
+ss-¬ε+ (s-∀ s) inΓ inΔ = ¬ε-∀ (ss-¬ε+ s (S∙ inΓ) (S∙ inΔ))
+
+ss-¬ε- (s-int regΓ) inΓ inΔ = ¬ε-int
+ss-¬ε- (s-var-∙ regΓ x) inΓ inΔ = ¬ε-var (∋∙-∋^-≢ x inΓ)
+ss-¬ε- (s-ex-r^ inst) inΓ inΔ = ¬ε-var (∋=-∋^-≢ (inst-∋= inst) inΔ)
+ss-¬ε- (s-ex-r= regΓ x-in) inΓ inΔ = ¬ε-var (∋=-∋^-≢ (∋:=to∋= x-in) inΔ)
+ss-¬ε- (s-arr s s₁) inΓ inΔ = let inΩ = ⊆-∋^-middle inΓ inΔ (ss-⊆ s) (ss-⊆ s₁) in ¬ε-arr (ss-¬ε+ s inΓ inΩ) (ss-¬ε- s₁ inΩ inΔ)
+ss-¬ε- (s-∀ s) inΓ inΔ = ¬ε-∀ (ss-¬ε- s (S∙ inΓ) (S∙ inΔ))
+
+s-¬ε : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
        → Γ ∋^ k
        → Δ ∋^ k
        → k ¬ε A
-s-¬ε s inΓ inΔ = ^in-^out-¬ε (s-⊆/ (sc-sound s)) inΓ inΔ
+s-¬ε (s-empty regΓ cloA grd) inΓ inΔ = ⊢c-^∈-¬ε cloA inΔ
+s-¬ε (s-type ss) inΓ inΔ = ss-¬ε+ ss inΓ inΔ
+s-¬ε (s-term-c cloA ap ⊢e s) inΓ inΔ = ¬ε-arr (⊢c-^∈-¬ε cloA inΓ) (s-¬ε s inΓ inΔ)
+s-¬ε (s-term-o opnA ⊢e ss s) inΓ inΔ = let inΩ = ⊆-∋^-middle inΓ inΔ (ss-⊆ ss) (s-⊆ s)
+                                       in ¬ε-arr (ss-¬ε- ss inΓ inΩ) (s-¬ε s inΩ inΔ)
+s-¬ε (s-∀l s upᶜ upᵉ upC upD) inΓ inΔ = ¬ε-∀ (s-¬ε s (S^ inΓ) (S= inΔ))
+s-¬ε (s-∀l-no s upᶜ upᵉ upC upD) inΓ inΔ = ¬ε-∀ (s-¬ε s (S^ inΓ) (S^ inΔ))
+s-¬ε (s-tapp s upᶜ) inΓ inΔ = ¬ε-∀ (s-¬ε s (S= inΓ) (S= inΔ))
+s-¬ε (s-svar-term x s) inΓ inΔ = ¬ε-var (∋=-∋^-≢ (∋:=to∋= x) inΓ)
+s-¬ε (s-svar-tapp x s) inΓ inΔ = ¬ε-var (∋=-∋^-≢ (∋:=to∋= x) inΓ)

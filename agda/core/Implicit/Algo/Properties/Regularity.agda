@@ -1,4 +1,3 @@
-{-# OPTIONS --allow-unsolved-metas #-}
 module Implicit.Algo.Properties.Regularity where
 
 open import Implicit.Language.All
@@ -197,6 +196,8 @@ t-⊢r (⊢tapp ⊢e st) with t-⊢rᶜ ⊢e
 --+                           Extension                            +--
 ----------------------------------------------------------------------
 
+{- this lemma is correct and provable
+   but requires several irrevelence lemmas, but is heavy to prove, thus avoid this lemma in its call site
 s-⊆/ : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
      → Γ ⊆ Δ w/t A
 s-⊆/ (s-empty regΓ cloA grd) = ⊆/-refl regΓ cloA
@@ -208,3 +209,4 @@ s-⊆/ (s-∀l-no s upᶜ upᵉ upC upD) = ext-∀ {!s-⊆/ s!}
 s-⊆/ (s-tapp s upᶜ) = ext-∀ {!s-⊆/ s!}
 s-⊆/ (s-svar-term x s) = ⊆/-refl (s-env-in s) (⊢c-var-= (∋:=to∋= x))
 s-⊆/ (s-svar-tapp x s) = ⊆/-refl (s-env-in s) (⊢c-var-= (∋:=to∋= x))
+-}
