@@ -237,10 +237,10 @@ sregular-strengthen= (reg-S= sreg regA) (◀S= newΓ x) = reg-S= (sregular-stren
 ≫-strengthen= (grd-∀ grd) regΓ newΓ (↑ty-∀ upA) (↑ty-∀ upB) = grd-∀ (≫-strengthen= grd (reg-S∙ regΓ) (◀S∙ newΓ) upA upB)
 
 -- aux lemmas
-⊢r-◀-↑ty-surjective : Γ ⊢r A
+⊢r-◀=-↑ty-surjective : Γ ⊢r A
                     → Γ ◀ k =⇘ Γ'
                     → ∃[ pA ](pA ↑ty k ⇘ A)
-⊢r-◀-↑ty-surjective regA newΓ = ↑ty-surjective (⊢r-¬ε regA (◀=-∋=' newΓ))
+⊢r-◀=-↑ty-surjective regA newΓ = ↑ty-surjective (⊢r-¬ε regA (◀=-∋=' newΓ))
 
 
 ∋⦂-strengthen= : Γ ∋ x ⦂ A'
@@ -252,11 +252,11 @@ sregular-strengthen= (reg-S= sreg regA) (◀S= newΓ x) = reg-S= (sregular-stren
 ∋⦂-strengthen= (S, inΓ) (reg-S, regΓ regA) (◀S, newΓ up) upA = S, (∋⦂-strengthen= inΓ regΓ newΓ upA)
 ∋⦂-strengthen= (S∙ inΓ up) (reg-S∙ regΓ) (◀S∙ newΓ) upA
   with regA ← ∋⦂-⊢r regΓ inΓ
-  with ⟨ pA , uppA ⟩ ← ⊢r-◀-↑ty-surjective regA newΓ = S∙ (∋⦂-strengthen= inΓ regΓ newΓ uppA) (↑ty-comm1 upA up uppA)
+  with ⟨ pA , uppA ⟩ ← ⊢r-◀=-↑ty-surjective regA newΓ = S∙ (∋⦂-strengthen= inΓ regΓ newΓ uppA) (↑ty-comm1 upA up uppA)
 ∋⦂-strengthen= (S^ inΓ up) (reg-S^ regΓ) (◀S^ newΓ) upA
   with regA ← ∋⦂-⊢r regΓ inΓ
-  with ⟨ pA , uppA ⟩ ← ⊢r-◀-↑ty-surjective regA newΓ = S^ (∋⦂-strengthen= inΓ regΓ newΓ uppA) (↑ty-comm1 upA up uppA)
+  with ⟨ pA , uppA ⟩ ← ⊢r-◀=-↑ty-surjective regA newΓ = S^ (∋⦂-strengthen= inΓ regΓ newΓ uppA) (↑ty-comm1 upA up uppA)
 ∋⦂-strengthen= (S= inΓ up) (reg-S= regΓ regA) ◀Z upA with refl ← ↑ty-unique-inver up upA = inΓ
 ∋⦂-strengthen= (S= inΓ up) (reg-S= regΓ regA) (◀S= newΓ x) upA
   with regA ← ∋⦂-⊢r regΓ inΓ
-  with ⟨ pA , uppA ⟩ ← ⊢r-◀-↑ty-surjective regA newΓ = S= (∋⦂-strengthen= inΓ regΓ newΓ uppA) (↑ty-comm1 upA up uppA)
+  with ⟨ pA , uppA ⟩ ← ⊢r-◀=-↑ty-surjective regA newΓ = S= (∋⦂-strengthen= inΓ regΓ newΓ uppA) (↑ty-comm1 upA up uppA)

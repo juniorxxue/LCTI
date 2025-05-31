@@ -4,6 +4,7 @@ open import Implicit.Language.EnvOps.Base public
 open import Implicit.Language.EnvOps.Inst public
 open import Implicit.Language.EnvOps.RemoveTVar public
 open import Implicit.Language.EnvOps.RemoveSVar public
+open import Implicit.Language.EnvOps.RemoveEVar public
 open import Implicit.Language.EnvOps.InsertEVar public
 open import Implicit.Language.EnvOps.InsertTVar public
 open import Implicit.Language.EnvOps.InsertUVar public

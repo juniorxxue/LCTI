@@ -68,12 +68,19 @@ NonEmpty-NonZ ne-app (~tC ⊢e j~Σ) = nz-C
 NonEmpty-NonZ ne-tapp (~tT ~J st) = nz-T
 
 
-postulate
-  ~s-strengthen^0 : Γ ,^ ⊢ ⟨ j' , A' ⟩ ~s Σ'
+
+~s-strengthen^0 : Γ ,^ ⊢ ⟨ j' , A' ⟩ ~s Σ'
                  → ↑ty0 A ⇘ A'
                  → ↑tyᶜ0 Σ ⇘ Σ'
                  → ↑tyʲ0 j ⇘ j'
                  → Γ ⊢ ⟨ j , A ⟩ ~s Σ
+~s-strengthen^0 ~sZ upA ↑tyᶜ-□ ↑tyʲ-Z = ~sZ
+~s-strengthen^0 ~s∞ upA (↑tyᶜ-τ up-t) ↑tyʲ-∞ with refl ← ↑ty-unique-inver upA up-t = ~s∞
+~s-strengthen^0 (~sI ⊢e ~s) (↑ty-arr upA upA₁) (↑tyᶜ-e up-e upΣ) (↑tyʲ-𝕚 upj) = ~sI (t-strengthen^ ⊢e ◀Z up-e upA ↑tyʲ-Z) (~s-strengthen^0 ~s upA₁ upΣ upj)
+~s-strengthen^0 (~sC ⊢e ~s) (↑ty-arr upA upA₁) (↑tyᶜ-e up-e upΣ) (↑tyʲ-𝕔 upj) = ~sC (t-strengthen^ ⊢e ◀Z up-e upA ↑tyʲ-∞) (~s-strengthen^0 ~s upA₁ upΣ upj)
+~s-strengthen^0 (~sT ~s st) (↑ty-∀ {A = C} upA) (↑tyᶜ-⓪ upA₁ upΣ) (↑tyʲ-𝕥 {A = A} upj upA₂)
+  with refl ← ↑ty-unique-inver upA₁ upA₂
+  with ⟨ C* , stC ⟩ ← st0-total A C = ~sT (~s-strengthen^0 ~s (↑ty-st-comm0' stC upA₁ upA st) upΣ upj) stC
 
 
 ~s-strengthen=0 : Γ ,= T ⊢ ⟨ j' , A' ⟩ ~s Σ'
@@ -88,12 +95,6 @@ postulate
 ~s-strengthen=0 (~sT ~s st) (↑ty-∀ {A = C} upA) (↑tyᶜ-⓪ x upΣ) (↑tyʲ-𝕥 {A = A} upj upA₁) with refl ← ↑ty-unique-inver upA₁ x
   with ⟨ C* , stC ⟩ ← st0-total A C
   = ~sT (~s-strengthen=0 ~s (↑ty-st-comm0' stC x upA st) upΣ upj) stC
-{-
-~s-strengthen=0 ~sZ upA ↑tyᶜ-□ = ~sZ
-~s-strengthen=0 ~s∞ upA (↑tyᶜ-τ up-t) with refl ← ↑ty-unique-inver upA up-t = ~s∞
-~s-strengthen=0 (~sI ⊢e ~s) (↑ty-arr upA upA₁) (↑tyᶜ-e up-e upΣ) = ~sI (t-strengthen= ⊢e ◀Z up-e upA) (~s-strengthen=0 ~s upA₁ upΣ)
-~s-strengthen=0 (~sC ⊢e ~s) (↑ty-arr upA upA₁) (↑tyᶜ-e up-e upΣ) = ~sC (t-strengthen= ⊢e ◀Z up-e upA) (~s-strengthen=0 ~s upA₁ upΣ)
--}
 
 ~t-strengthen,0 : Γ , A ⊢ ⟨ j , B ⟩ ~t Σ'
                 → ↑tmᶜ0 Σ ⇘ Σ'

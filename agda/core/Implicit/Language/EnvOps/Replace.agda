@@ -163,6 +163,15 @@ env-◆◇-false (◇S^ newΓ1) (◆S^ newΓ2) = env-◆◇-false newΓ1 newΓ2
 ⊢c-◆0 cloA = ⊢c-◆ cloA ◆Z
 
 
-postulate
-  ⊢c-◇0 : Γ ,^ ⊢c A
+⊢c-◇ : Γ ⊢c A
+     → Γ ◇ k ⇘ Γ'
+     → Γ' ⊢c A
+⊢c-◇ ⊢c-int new = ⊢c-int
+⊢c-◇ (⊢c-var-∙ inΔ) new = ⊢c-var-∙ (◇-∙∈ inΔ new)
+⊢c-◇ (⊢c-var-= inΔ) new = ⊢c-var-= (◇-=∈ inΔ new)
+⊢c-◇ (⊢c-arr cloA cloA₁) new = ⊢c-arr (⊢c-◇ cloA new) (⊢c-◇ cloA₁ new)
+⊢c-◇ (⊢c-∀ cloA) new = ⊢c-∀ (⊢c-◇ cloA (◇S∙ new))
+
+⊢c-◇0 : Γ ,^ ⊢c A
         → Γ ,∙ ⊢c A
+⊢c-◇0 cloA = ⊢c-◇ cloA ◇Z

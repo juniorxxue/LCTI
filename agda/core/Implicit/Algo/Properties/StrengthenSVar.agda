@@ -26,7 +26,7 @@ open import Implicit.Algo.Properties.Regularity
 ◀=-⊆-total (evar ext) (◀S^ newΓ) = ⟨ ◀=-⊆-total ext newΓ .proj₁ ,^ , ◀S^ (◀=-⊆-total ext newΓ .proj₂) ⟩
 ◀=-⊆-total (evar-sol ext regA) (◀S^ newΓ)
   with ⟨ Δ' , newΔ ⟩ ← ◀=-⊆-total ext newΓ
-  with ⟨ preA , uppA ⟩ ← ⊢r-◀-↑ty-surjective regA newΔ
+  with ⟨ preA , uppA ⟩ ← ⊢r-◀=-↑ty-surjective regA newΔ
   = ⟨ Δ' ,= preA , (◀S= newΔ uppA) ⟩
 ◀=-⊆-total (svar {Δ = Δ} ext regA) ◀Z = ⟨ Δ , ◀Z ⟩
 ◀=-⊆-total (svar ext regA) (◀S= {A = A} newΓ x) = ⟨ ◀=-⊆-total ext newΓ .proj₁ ,= A , ◀S= (◀=-⊆-total ext newΓ .proj₂) x ⟩
@@ -45,14 +45,14 @@ inst-strengthen= {k = #S k} {#0} (⟹^0 up regA env) (◀S^ newΓ) (◀S= newΔ 
   with refl ← ◀=-unique newΓ newΔ = ⟹^0 (↑ty-comm1 upB up x) (⊢r-strengthen= regA newΓ x) (sregular-strengthen= env newΓ)
 inst-strengthen= {k = #S k} {#S X} (⟹^S inst up1) (◀S^ newΓ) (◀S^ newΔ) upB
   with regA ← inst-⊢r inst
-  with ⟨ preA , uppA ⟩ ← ⊢r-◀-↑ty-surjective regA newΓ = ⟹^S (inst-strengthen= inst newΓ newΔ uppA) (↑ty-comm1 upB up1 uppA)
+  with ⟨ preA , uppA ⟩ ← ⊢r-◀=-↑ty-surjective regA newΓ = ⟹^S (inst-strengthen= inst newΓ newΔ uppA) (↑ty-comm1 upB up1 uppA)
 inst-strengthen= {k = #S k} {#S X} (⟹∙S inst up1) (◀S∙ newΓ) (◀S∙ newΔ) upB
   with regA ← inst-⊢r inst
-  with ⟨ preA , uppA ⟩ ← ⊢r-◀-↑ty-surjective regA newΓ = ⟹∙S (inst-strengthen= inst newΓ newΔ uppA) (↑ty-comm1 upB up1 uppA)
+  with ⟨ preA , uppA ⟩ ← ⊢r-◀=-↑ty-surjective regA newΓ = ⟹∙S (inst-strengthen= inst newΓ newΔ uppA) (↑ty-comm1 upB up1 uppA)
 inst-strengthen= {k = #S k} {#S X} (⟹=S inst up1 regB) (◀S= newΓ x) (◀S= newΔ x₁) upB
   with refl ← ↑ty-unique-inver x x₁
   with regA ← inst-⊢r inst
-  with ⟨ preA , uppA ⟩ ← ⊢r-◀-↑ty-surjective regA newΓ = ⟹=S (inst-strengthen= inst newΓ newΔ uppA) (↑ty-comm1 upB up1 uppA) (⊢r-strengthen= regB newΓ x₁)
+  with ⟨ preA , uppA ⟩ ← ⊢r-◀=-↑ty-surjective regA newΓ = ⟹=S (inst-strengthen= inst newΓ newΔ uppA) (↑ty-comm1 upB up1 uppA) (⊢r-strengthen= regB newΓ x₁)
 
 
 ss-strengthen= : Γ ⊢ A' ⌞ ≤ ⌝ B' ⊣ Δ
@@ -108,12 +108,12 @@ t-strengthen= (⊢lit regΓ) newΓ ↑ty-int ↑tyᵉ-lit ↑tyᶜ-□ = ⊢lit 
 t-strengthen= (⊢var regΓ x∈Γ) newΓ upA ↑tyᵉ-var ↑tyᶜ-□ = ⊢var (tregular-strengthen= regΓ newΓ) (∋⦂-strengthen= x∈Γ regΓ newΓ upA)
 t-strengthen= (⊢ann ⊢e) newΓ upA (↑tyᵉ-⦂ upe up) ↑tyᶜ-□
   with regB ← t-⊢r ⊢e
-  with ⟨ _ , uppB ⟩ ← ⊢r-◀-↑ty-surjective regB newΓ
+  with ⟨ _ , uppB ⟩ ← ⊢r-◀=-↑ty-surjective regB newΓ
   with refl ← ↑ty-unique-inver upA up
   = ⊢ann (t-strengthen= ⊢e newΓ uppB upe (↑tyᶜ-τ upA))
 t-strengthen= (⊢app ⊢e) newΓ upA (↑tyᵉ-app upe upe₁) upΣ
   with ⊢r-arr regA regA₁ ← t-⊢r ⊢e
-  with ⟨ _ , uppA ⟩ ← ⊢r-◀-↑ty-surjective regA newΓ
+  with ⟨ _ , uppA ⟩ ← ⊢r-◀=-↑ty-surjective regA newΓ
   = ⊢app (t-strengthen= ⊢e newΓ (↑ty-arr uppA upA) upe (↑tyᶜ-e upe₁ upΣ))
 t-strengthen= (⊢lam₁ ⊢e) newΓ (↑ty-arr upA upA₁) (↑tyᵉ-ƛ upe) (↑tyᶜ-τ (↑ty-arr up-t up-t₁))
   with refl ← ↑ty-unique-inver upA up-t
@@ -124,13 +124,13 @@ t-strengthen= (⊢lam₂ ⊢e up-c ⊢e₁) newΓ (↑ty-arr upA upA₁) (↑ty�
           (t-strengthen= ⊢e₁ (◀S, newΓ upA) upA₁ upe (↑tmᶜ-↑tyᶜ-comm' upΣ' upΣ up-c))
 t-strengthen= (⊢sub ⊢e ne gc s) newΓ upA upe upΣ
   with regA ← t-⊢r ⊢e
-  with ⟨ pA , uppA ⟩ ← ⊢r-◀-↑ty-surjective regA newΓ
+  with ⟨ pA , uppA ⟩ ← ⊢r-◀=-↑ty-surjective regA newΓ
   = ⊢sub (t-strengthen= ⊢e newΓ uppA upe ↑tyᶜ-□) (nonempty-↑tyᶜ ne upΣ) (↑ty-gc' gc upe)
                                                         (s-strengthen= s (◀S⋈ newΓ) (◀S⋈ newΓ) uppA upA upΣ)
 t-strengthen= (⊢tabs ⊢e) newΓ (↑ty-∀ upA) (↑tyᵉ-Λ upe) ↑tyᶜ-□ = ⊢tabs (t-strengthen= ⊢e (◀S∙ newΓ) upA upe ↑tyᶜ-□)
 t-strengthen= (⊢tapp ⊢e st) newΓ upA (↑tyᵉ-⓪ upe upA₁) upΣ
   with regA ← t-⊢r ⊢e
-  with ⟨ pA , ↑ty-∀ uppA ⟩ ← ⊢r-◀-↑ty-surjective regA newΓ
+  with ⟨ pA , ↑ty-∀ uppA ⟩ ← ⊢r-◀=-↑ty-surjective regA newΓ
   = ⊢tapp (t-strengthen= ⊢e newΓ (↑ty-∀ uppA) upe (↑tyᶜ-⓪ upA₁ upΣ)) (↑ty-st-comm0'' st upA₁ uppA upA)
 
 
@@ -156,7 +156,7 @@ s-strengthen= (s-∀l s upᶜ upᵉ upC upD) newΓ newΔ (↑ty-∀ upA) (↑ty-
   with ⟨ Σ' , upΣ' ⟩ ← ↑tyᶜ0-total Σ
   with ⟨ A' , upA' ⟩ ← ↑ty0-total A
   with ⟨ B' , upB' ⟩ ← ↑ty0-total B
-  with ⟨ pB , uppB ⟩ ← ⊢r-◀-↑ty-surjective regB newΔ
+  with ⟨ pB , uppB ⟩ ← ⊢r-◀=-↑ty-surjective regB newΔ
   = s-∀l (s-strengthen= s (◀S^ newΓ) (◀S= newΔ uppB) upA
                         (↑ty-arr (↑ty-comm0' upB upC upA') (↑ty-comm0' upB₁ upD upB'))
                         (↑tyᶜ-e (↑tyᵉ-comm0' up-e upᵉ upe) (↑tyᶜ-comm0' upΣ upᶜ upΣ')))
@@ -177,12 +177,12 @@ s-strengthen= (s-tapp s upᶜ) newΓ newΔ (↑ty-∀ upA) (↑ty-∀ upB) (↑t
 s-strengthen= (s-svar-term inΓ s) newΓ newΔ ↑ty-var (↑ty-arr upB upB₁) (↑tyᶜ-e up-e upΣ)
   with refl ← ◀=-unique newΓ newΔ
   with regA ← ∋:=-⊢r (s-env-in s) inΓ
-  with ⟨ pA , uppA ⟩ ← ⊢r-◀-↑ty-surjective regA newΔ
+  with ⟨ pA , uppA ⟩ ← ⊢r-◀=-↑ty-surjective regA newΔ
   = s-svar-term (∋:=-strengthen=-reg (s-env-in s) inΓ newΓ uppA) (s-strengthen= s newΓ newΓ uppA (↑ty-arr upB upB₁) (↑tyᶜ-e up-e upΣ))
 s-strengthen= (s-svar-tapp inΓ s) newΓ newΔ ↑ty-var (↑ty-∀ upB) (↑tyᶜ-⓪ upA upΣ)
   with refl ← ◀=-unique newΓ newΔ
   with regA ← ∋:=-⊢r (s-env-in s) inΓ
-  with ⟨ pA , uppA ⟩ ← ⊢r-◀-↑ty-surjective regA newΔ
+  with ⟨ pA , uppA ⟩ ← ⊢r-◀=-↑ty-surjective regA newΔ
   = s-svar-tapp (∋:=-strengthen=-reg (s-env-in s) inΓ newΔ uppA) (s-strengthen= s newΔ newΔ uppA (↑ty-∀ upB) (↑tyᶜ-⓪ upA upΣ))
 
 -- corollaries
@@ -192,11 +192,3 @@ s-strengthen=0 : Γ ,= T ⊢ A' ≤⁺ Σ' ⊣ Δ ,= T ↪ B'
                  → ↑tyᶜ0 Σ ⇘ Σ'
                  → Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
 s-strengthen=0 s upB upA upΣ = s-strengthen= s ◀Z ◀Z upA upB upΣ
-
-
-postulate
-  s-strengthen^0 : Γ ,^ ⊢ A' ≤⁺ Σ' ⊣ Δ ,^ ↪ B'
-                 → ↑ty0 B ⇘ B'
-                 → ↑ty0 A ⇘ A'
-                 → ↑tyᶜ0 Σ ⇘ Σ'
-                 → Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
