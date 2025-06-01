@@ -1,4 +1,4 @@
-module Implicit.Annotatability.SystemF where
+module Implicit.Annotatability.SystemMore where
 
 open import Implicit.Language.All
 
@@ -256,7 +256,7 @@ data _⊢_⟾_ : Env n m → Counter m × Type m → Counter m × Type m → Set
 ⟾-find (f-arr-𝕚-l x) (case-𝕚 cv) = f-arr-𝕚-l x
 ⟾-find (f-arr-𝕚-r ¬inA fd) (case-𝕚 cv) = f-arr-𝕚-r ¬inA (⟾-find fd cv)
 ⟾-find (f-arr-𝕔 ¬inA fd) (case-𝕔 cv) = f-arr-𝕔 ¬inA (⟾-find fd cv)
-⟾-find (f-∀-𝕚 fd upj) cv = {!!}
+⟾-find (f-∀-𝕚 fd upj) (case-𝕚 cv) = f-∀-𝕚 (⟾-find fd (case-𝕚 {!!})) {!!}
 ⟾-find (f-∀-𝕔 fd upj) (case-𝕔 cv) = f-∀-𝕔 (⟾-find fd (case-𝕔 {!!})) {!!}
 
 
