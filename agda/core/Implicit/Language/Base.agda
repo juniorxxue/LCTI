@@ -69,29 +69,6 @@ variable
   Γ Γ' Γ'' Γ₁ Γ₂ Γ₃ Γ* Γ% : Env n m -- typing env
   Δ Δ' Δ₁ Δ₂ Ψ Ω Ψ' Ω' : Env n m -- subtyping env
 
-data TEnv : Env n m → Set where
-  Z⋈ : TEnv ∅
-  S, : TEnv Γ
-     → TEnv (Γ , A)
-  S= : TEnv Γ
-     → TEnv (Γ ,= B)
-  S∙ : TEnv Γ
-     → TEnv (Γ ,∙)
-  S^ : TEnv Γ
-     → TEnv (Γ ,^)
-
-data SEnv : Env n m → Set where
-  Z⋈ : TEnv Γ
-     → SEnv (Γ ⋈)
-  S, : SEnv Δ
-     → SEnv (Δ , A)
-  S= : SEnv Δ
-     → SEnv (Δ ,= B)
-  S∙ : SEnv Δ
-     → SEnv (Δ ,∙)
-  S^ : SEnv Δ
-     → SEnv (Δ ,^)
-
 𝕣 : Env n m → Env n m
 𝕣 ∅ = ∅
 𝕣 (Γ , A) = 𝕣 Γ , A

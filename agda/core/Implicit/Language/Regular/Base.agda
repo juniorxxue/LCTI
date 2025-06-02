@@ -29,21 +29,6 @@ data _⊢rᵉ_ : Env n m → Term n m → Set where
   ⊢r-ann : (cloA : Γ ⊢r A) → Γ ⊢rᵉ e → Γ ⊢rᵉ (e ⦂ A)
   ⊢r-tlam : Γ ,∙ ⊢rᵉ e → Γ ⊢rᵉ (Λ e)
 
-data Regular : Env n m → Set where
-  reg-Z : Regular ∅
-  reg-S, : Regular Γ
-         → (regA : Γ ⊢r A)
-         → Regular (Γ , A)
-  reg-S∙ : Regular Γ
-         → Regular (Γ ,∙)
-  reg-S^ : Regular Γ
-         → Regular (Γ ,^)
-  reg-S= : Regular Γ
-         → (regA : Γ ⊢r A)
-         → Regular (Γ ,= A)
-  reg-S⋈ : Regular Γ
-         → Regular (Γ ⋈)
-
 data TRegular : Env n m → Set where
   reg-Z : TRegular ∅
   reg-S, : TRegular Γ

@@ -3,17 +3,6 @@ module Implicit.Interm.Ground where
 open import Implicit.Language.All
 open import Implicit.Interm.Base
 
-{-
-⊢c-⊢r : TEnv Γ
-      → Γ ⊢c A
-      → Γ ⊢r A
-⊢c-⊢r tenv ⊢c-int = ⊢r-int
-⊢c-⊢r tenv (⊢c-var-∙ inΔ) = ⊢r-var-∙ inΔ
-⊢c-⊢r tenv (⊢c-var-= inΔ) = {!!} -- fasle
-⊢c-⊢r tenv (⊢c-arr cloA cloA₁) = ⊢r-arr (⊢c-⊢r tenv cloA) (⊢c-⊢r tenv cloA₁)
-⊢c-⊢r tenv (⊢c-∀ cloA) = ⊢r-∀ (⊢c-⊢r (S∙ tenv) cloA)
--}
-
 s+-≫ : Γ ⊢ ∞ # A ⌞ ≤⁺ ⌝ B
      → Γ ≫ A ⇘ B
 
