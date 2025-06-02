@@ -3,6 +3,7 @@ module Implicit.Interm2Decl.Main where
 open import Implicit.Language.All
 open import Implicit.Decl.All renaming (_⊢_#_≤_ to _⊢d_#_≤_)
 open import Implicit.Interm.All renaming (_⊢_#_⌞_⌝_ to _⊢i_#_⌞_⌝_)
+open import Implicit.Interm2Decl.AuxLemmas
 
 sd-strengthen= : Γ ⊢d j' # A' ≤ B'
                → Γ ◀ k =⇘ Γ'
@@ -204,7 +205,8 @@ sound s'@(s-∀l-no-appear s ic fd upC upD upj) (grd-∀ grd1) grdCD@(grd-arr gr
   with reg-S^ regΓ ← s-sregular s
   with regCD ← s+-polarity s'
   with refl ← ⊢r-≫-eq' regCD grdCD
-  = s-∀l-no-appear {!!}
+  with refl ← ≫-same grd1 ◈Z grdA fd
+  = s-∀l-no-appear (⊢r-≫-eq (⊢c-≫-⊢r (reg-S^ regΓ) cloA grdA))
          (⊢c-≫-⊢r (reg-S∙ regΓ) (⊢c-◇0 (s-⊢c-l s)) grd1)
          (sound s grdA (⊢r-≫-eq (s+-polarity s)))
          ic

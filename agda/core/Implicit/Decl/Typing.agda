@@ -61,6 +61,7 @@ s-sregular (s-∀ s) with s-sregular s
 ... | reg-S∙ r = r
 s-sregular (s-∀l regB st s ic fd upj) = s-sregular s
 s-sregular (s-tapp regB st s upC) = s-sregular s
+s-sregular (s-∀l-no-appear regB st x ic fd) = s-sregular x
 
 t-tregular : Γ ⊢ j # e ⦂ A
            → TRegular Γ
@@ -107,6 +108,7 @@ s-⊢rʲ (s-arr₃ regA s) = rj-𝕔 (s-⊢rʲ s)
 s-⊢rʲ (s-∀ s) = rj-∞
 s-⊢rʲ (s-∀l regB st s ic fd upj) = s-⊢rʲ s
 s-⊢rʲ (s-tapp regB st s upC) = rj-𝕥 (s-⊢rʲ s) regB
+s-⊢rʲ (s-∀l-no-appear regB st x ic fd) = s-⊢rʲ x
 
 t-⊢rʲ : Γ ⊢ j # e ⦂ A
       → Γ ⊢rʲ j
@@ -227,6 +229,10 @@ s-trans (s-∀l regB st s1 ic fd (↑tyʲ-𝕚 upj)) (𝕚≋ {nj = nj} ~j) (s-a
 s-trans (s-∀l regB st s1 ic fd (↑tyʲ-𝕔 upj)) (𝕔≋ {nj = nj} ~j) (s-arr₃ regA s2)
   with ⟨ nj' , upnj ⟩ ← ↑tyʲ0-total nj
   = s-∀l regB st (s-trans s1 (𝕔≋ ~j) (s-arr₃ regA s2)) case-𝕔 (find-≋ fd (𝕔≋ (↑ty-≋ ~j upj upnj))) (↑tyʲ-𝕔 upnj)
+s-trans (s-∀l-no-appear regB st s1 ic fd) (𝕚≋ ~j) (s-arr₂ s2 s3)
+  = s-∀l-no-appear regB st (s-trans s1 (𝕚≋ ~j) (s-arr₂ s2 s3)) case-𝕚 fd
+s-trans (s-∀l-no-appear regB st s1 ic fd) (𝕔≋ ~j) (s-arr₃ regA s3)
+  = s-∀l-no-appear regB st (s-trans s1 (𝕔≋ ~j) (s-arr₃ regA s3)) case-𝕔 fd
 s-trans (s-tapp regB st s1 upC) (𝕥≋ ~j) (s-tapp regB₁ st₁ s2 upC₁)
   with refl ← ↑ty-st-eq upC st₁ = s-tapp regB st (s-trans s1 ~j s2) upC₁
 

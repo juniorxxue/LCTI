@@ -89,5 +89,5 @@ sound-s (s-svar-term inΓ s) with sc-~ s
 ... | ~sI ⊢e r = s-svar-𝕚 inΓ (sound-s s)
 ... | ~sC ⊢e r = s-svar-𝕔 inΓ (sound-s s)
 sound-s (s-svar-tapp inΓ s) = s-svar-𝕥 inΓ (sound-s s)
-sound-s (s-∀l-no-𝕚 s upᶜ upj upᵉ upC upD) = s-∀l-no-appear (sound-s s) case-𝕚 (s-¬ε s Z Z) upC upD (↑tyʲ-𝕚 upj)
-sound-s (s-∀l-no-𝕔 s upᶜ upj upᵉ upC upD) = s-∀l-no-appear (sound-s s) case-𝕔 (s-¬ε s Z Z) upC upD (↑tyʲ-𝕔 upj)
+sound-s (s-∀l-no-𝕚 s upᶜ upj upᵉ upC upD) = s-∀l-no-appear (sound-s s) case-𝕚 (s-¬ε (sc-sound s) Z Z) upC upD (↑tyʲ-𝕚 upj)
+sound-s (s-∀l-no-𝕔 s upᶜ upj upᵉ upC upD) = s-∀l-no-appear (sound-s s) case-𝕔 (s-¬ε (sc-sound s) Z Z) upC upD (↑tyʲ-𝕔 upj)

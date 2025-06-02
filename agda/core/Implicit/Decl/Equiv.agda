@@ -178,6 +178,14 @@ sound (s-∀l {B = B} {A* = A*} {C = C} {D = D} regB st s ic fd upj)
   with regA* ← s1-⊢r-l s
   with regA ← st-⊢r'' regA* ▶Z regB st
   = s-∀l {B = B} {A% = A*'} (st-↑ty-≫0 st regA* upA* regB) regA (s2-weaken=0 (sound s) upA* (↑ty-arr upC upD) upj regB) ic fd upC upD upj
+sound (s-∀l-no-appear {B = B} {A* = A*} {j = j} {C = C} {D = D} regB st s ic fd)
+  with ⟨ C' , upC ⟩ ← ↑ty0-total C
+  with ⟨ D' , upD ⟩ ← ↑ty0-total D
+  with ⟨ A*' , upA* ⟩ ← ↑ty0-total A*
+  with ⟨ j' , upj ⟩ ← ↑tyʲ0-total j
+  with regA* ← s1-⊢r-l s
+  with regA ← st-⊢r'' regA* ▶Z regB st
+  = s-∀l-no-appear (≫-weaken^ {k = #0} (⊢r-≫-eq regA*) ▶Z (st-↑ty fd st) upA*) regA (s2-weaken^0 (sound s) upA* (↑ty-arr upC upD) upj) ic fd upC upD upj
 sound (s-tapp {A* = A*} {j = j} regB st s upC)
   with ⟨ A*' , upA* ⟩ ← ↑ty0-total A*
   with ⟨ j' , upj ⟩ ← ↑tyʲ0-total j
@@ -196,6 +204,12 @@ complete (s-∀l {B = B} grd regA s ic fd upC upD upj)
   with reg-S= r regA₁ ← s2-sregular s
   with ⟨ preA% , upp ⟩ ← ↑ty-surjective (⊢r-¬ε (s2-⊢r-l s) Z)
   = s-∀l regA₁ (≫-↑ty-st'0 regA regA₁ grd upp) (s1-strengthen=0 (complete s) upp (↑ty-arr upC upD) upj) ic fd upj
+complete (s-∀l-no-appear grd regA s ic fd upC upD upj)
+  with reg-S^ r ← s2-sregular s
+  with ⟨ preA% , upp ⟩ ← ↑ty-surjective (⊢r-¬ε-^ (s2-⊢r-l s) Z)
+  with ⟨ preA , upA ⟩ ← ↑ty-surjective fd
+  with refl ← ⊢r-≫-eq' (⊢r-weaken^0 (⊢r-strengthen∙0 regA upA) upA) grd
+  = s-∀l-no-appear ⊢r-int (↑ty-st upp) (s1-strengthen^0 (complete s) upp (↑ty-arr upC upD) upj) ic fd
 complete (s-tapp grd regA s upj)
   with reg-S= r regA₁ ← s2-sregular s
   with ⟨ preA% , upp ⟩ ← ↑ty-surjective (⊢r-¬ε (s2-⊢r-l s) Z)

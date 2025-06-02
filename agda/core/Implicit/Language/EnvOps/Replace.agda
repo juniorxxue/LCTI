@@ -175,3 +175,42 @@ env-◆◇-false (◇S^ newΓ1) (◆S^ newΓ2) = env-◆◇-false newΓ1 newΓ2
 ⊢c-◇0 : Γ ,^ ⊢c A
         → Γ ,∙ ⊢c A
 ⊢c-◇0 cloA = ⊢c-◇ cloA ◇Z
+
+◈-∋:=-neq-unique : Γ ◈ k ⇘ Γ'
+                 → X ≢ k
+                 → Γ ∋ X := A₁
+                 → Γ' ∋ X := A₂
+                 → A₁ ≡ A₂
+◈-∋:=-neq-unique ◈Z neq (S∙ in1 up) (S^ in2 up₁)
+  with refl ← ∋:=-unique in1 in2 = ↑ty-unique up up₁
+◈-∋:=-neq-unique (◈S, new) neq (S, in1) (S, in2) = ◈-∋:=-neq-unique new neq in1 in2
+◈-∋:=-neq-unique (◈S∙ new) neq (S∙ in1 up) (S∙ in2 up₁)
+  with refl ← ◈-∋:=-neq-unique new (≢-pred neq) in1 in2 = ↑ty-unique up up₁
+◈-∋:=-neq-unique (◈S= new) neq (Z up) (Z up₁) = ↑ty-unique up up₁
+◈-∋:=-neq-unique (◈S= new) neq (S= in1 up) (S= in2 up₁)
+  with refl ← ◈-∋:=-neq-unique new (≢-pred neq) in1 in2 = ↑ty-unique up up₁
+◈-∋:=-neq-unique (◈S^ new) neq (S^ in1 up) (S^ in2 up₁)
+  with refl ← ◈-∋:=-neq-unique new (≢-pred neq) in1 in2 = ↑ty-unique up up₁
+
+◈-neq-∋:= : Γ ∋ X := A
+          → Γ ◈ k ⇘ Γ'
+          → X ≢ k
+          → Γ' ∋ X := A
+◈-neq-∋:= (Z up) (◈S= new) neq = Z up
+◈-neq-∋:= (S∙ inΓ up) ◈Z neq = S^ inΓ up
+◈-neq-∋:= (S∙ inΓ up) (◈S∙ new) neq = S∙ (◈-neq-∋:= inΓ new (≢-pred neq)) up
+◈-neq-∋:= (S^ inΓ up) (◈S^ new) neq = S^ (◈-neq-∋:= inΓ new (≢-pred neq)) up
+◈-neq-∋:= (S= inΓ up) (◈S= new) neq = S= (◈-neq-∋:= inΓ new (≢-pred neq)) up
+◈-neq-∋:= (S, inΓ) (◈S, new) neq = S, (◈-neq-∋:= inΓ new neq)
+
+◈-neq-∋∙ : Γ ∋∙ X
+         → Γ ◈ k ⇘ Γ'
+         → X ≢ k
+         → Γ' ∋∙ X
+◈-neq-∋∙ Z ◈Z neq = ⊥-elim (neq refl)
+◈-neq-∋∙ Z (◈S∙ new) neq = Z
+◈-neq-∋∙ (S, in1) (◈S, new) neq = S, (◈-neq-∋∙ in1 new neq)
+◈-neq-∋∙ (S∙ in1) ◈Z neq = S^ in1
+◈-neq-∋∙ (S∙ in1) (◈S∙ new) neq = S∙ (◈-neq-∋∙ in1 new (≢-pred neq))
+◈-neq-∋∙ (S= in1) (◈S= new) neq = S= (◈-neq-∋∙ in1 new (≢-pred neq))
+◈-neq-∋∙ (S^ in1) (◈S^ new) neq = S^ (◈-neq-∋∙ in1 new (≢-pred neq))

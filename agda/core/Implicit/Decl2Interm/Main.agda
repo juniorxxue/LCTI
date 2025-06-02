@@ -38,6 +38,35 @@ open import Implicit.Interm.All renaming (_⊢_#_⌞_⌝_ to _⊢i_#_⌞_⌝_)
   with ⟨ T' , upT ⟩ ← ↑ty0-total T
   = grd-∀ (≫-trans (reg-S∙ regΓ) grd1 (∙⟹∙S new upT) (S∙ nin) grd2)
 
+◈-∋:=-neq : Γ ◈ k ⇘ Γ'
+          → Γ ∋ X := A
+          → X ≢ k
+◈-∋:=-neq ◈Z (S∙ inΓ up) = λ ()
+◈-∋:=-neq (◈S, new) (S, inΓ) = ◈-∋:=-neq new inΓ
+◈-∋:=-neq (◈S∙ new) (S∙ inΓ up) = ≢-suc (◈-∋:=-neq new inΓ)
+◈-∋:=-neq (◈S= new) (Z up) = λ ()
+◈-∋:=-neq (◈S= new) (S= inΓ up) = ≢-suc (◈-∋:=-neq new inΓ)
+◈-∋:=-neq (◈S^ new) (S^ inΓ up) = ≢-suc (◈-∋:=-neq new inΓ)
+
+≫-trans' : SRegular Γ
+        → Γ ≫ A ⇘ B
+        → Γ ◈ k ⇘ Γ'
+        → k ¬εᵍ Γ
+        → k ¬ε B
+        → Γ' ≫ A ⇘ B
+≫-trans' regΓ grd-int new ninΓ ninB = grd-int
+≫-trans' regΓ (grd-var= x) new ninΓ ninB = grd-var= (◈-neq-∋:= x new (◈-∋:=-neq new x))
+≫-trans' regΓ (grd-var∙ x) new ninΓ (¬ε-var x₁) = grd-var∙ (◈-neq-∋∙ x new x₁)
+≫-trans' regΓ (grd-arr grd grd₁) new ninΓ (¬ε-arr ninB ninB₁) = grd-arr (≫-trans' regΓ grd new ninΓ ninB)
+                                                                 (≫-trans' regΓ grd₁ new ninΓ ninB₁)
+≫-trans' regΓ (grd-∀ grd) new ninΓ (¬ε-∀ ninB) = grd-∀ (≫-trans' (reg-S∙ regΓ) grd (◈S∙ new) (S∙ ninΓ) ninB)
+
+≫-trans'0 : SRegular Γ
+          → Γ ,∙ ≫ A ⇘ B
+          → #0 ¬ε B
+          → Γ ,^ ≫ A ⇘ B
+≫-trans'0 regΓ grd1 ninA = ≫-trans' (reg-S∙ regΓ) grd1 ◈Z Z∙ ninA
+
 ≫-trans0 : SRegular Γ
           → Γ ⊢r B
           → Γ ,= B ≫ A₁ ⇘ A%
@@ -105,8 +134,6 @@ find-≫-∙0 : find A% #0 j
           → find A #0 j
 find-≫-∙0 {Γ = Γ} fd grd = find-≫-∙ {Γ = Γ ,∙} fd Z∙ Z grd
 
-
-
 complete+ : Γ ⊢d j # A% ≤ B
           → Γ ≫ A ⇘ A%
           → Γ ⊢i j # A ⌞ ≤⁺ ⌝ B
@@ -148,10 +175,14 @@ complete+ (s-∀l grd₁ regA s case-𝕔 fd upC upD upj) (grd-∀ grd)
   = s-∀l (complete+ s (≫-trans0 regΓ regA grd₁ grd)) case-𝕔 (find-≫-∙0 fd grd) upC upD upj
 complete+ (s-∀l-no-appear grd₁ regA s case-𝕚 fd upC upD upj) (grd-∀ grd)
   with reg-S^ regΓ ← s2-sregular s
-  = s-∀l-no-appear (complete+ s {!!}) case-𝕚 (¬ε-≫-∙0 fd grd) upC upD upj
+  with ⟨ A' , upA ⟩ ← ↑ty-surjective fd
+  with refl ← ⊢r-≫-eq' (⊢r-weaken^0 (⊢r-strengthen∙0 regA upA) upA) grd₁
+  = s-∀l-no-appear (complete+ s (≫-trans'0 regΓ grd fd)) case-𝕚 (¬ε-≫-∙0 fd grd) upC upD upj
 complete+ (s-∀l-no-appear grd₁ regA s case-𝕔 fd upC upD upj) (grd-∀ grd)
   with reg-S^ regΓ ← s2-sregular s
-  = s-∀l-no-appear (complete+ s {!!}) case-𝕔 (¬ε-≫-∙0 fd grd) upC upD upj
+  with ⟨ A' , upA ⟩ ← ↑ty-surjective fd
+  with refl ← ⊢r-≫-eq' (⊢r-weaken^0 (⊢r-strengthen∙0 regA upA) upA) grd₁
+  = s-∀l-no-appear (complete+ s (≫-trans'0 regΓ grd fd)) case-𝕔 (¬ε-≫-∙0 fd grd) upC upD upj
 complete+ (s-tapp x regA s upj) (grd-var= x₁) = s-svar-𝕥 x₁ (s-tapp (complete+ s x) upj)
 complete+ (s-tapp x regA s upj) (grd-∀ grd)
   with reg-S= regΓ regA ← s2-sregular s = s-tapp (complete+ s (≫-trans0 regΓ regA x grd)) upj
