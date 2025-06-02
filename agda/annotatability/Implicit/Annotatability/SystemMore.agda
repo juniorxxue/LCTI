@@ -280,7 +280,7 @@ ela-wf (ela-app ⊢e x ⊢e₁) with 𝕄-wf (ela-wf ⊢e) x
 infix 3 _⊢_⟾_
 data _⊢_⟾_ : Env n m → Counter m × Type m → Counter m × Type m → Set where
 
-  base : Γ ⊢ A 𝕄 B
+  base : (mm : Γ ⊢ A 𝕄 B)
        → Γ ⊢ ⟨ ∞ , A ⟩ ⟾ ⟨ 𝕚 ∞ , B ⟩
 
   case-𝕚 : Γ ⊢ ⟨ j , B ⟩ ⟾ ⟨ j' , D ⟩
@@ -304,7 +304,8 @@ data _⊢_⟾_ : Env n m → Counter m × Type m → Counter m × Type m → Set
 
 ⟾-weaken⋈ : Γ ⊢ ⟨ j , A ⟩ ⟾ ⟨ j' , B ⟩
            → Γ ⋈ ⊢ ⟨ j , A ⟩ ⟾ ⟨ j' , B ⟩
-⟾-weaken⋈ (base x) = base (𝕄-weaken⋈ x)
+⟾-weaken⋈ (base x) = {!!}
+-- base (𝕄-weaken⋈ x)
 ⟾-weaken⋈ (case-𝕚 ~j) = case-𝕚 (⟾-weaken⋈ ~j)
 ⟾-weaken⋈ (case-𝕔 ~j) = case-𝕔 (⟾-weaken⋈ ~j)
 
@@ -318,9 +319,20 @@ data _⊢_⟾_ : Env n m → Counter m × Type m → Counter m × Type m → Set
 ⟾-weaken,0 : Γ ⊢ ⟨ j , A ⟩ ⟾ ⟨ j' , B ⟩
            → Γ ⊢r T
            → Γ , T ⊢ ⟨ j , A ⟩ ⟾ ⟨ j' , B ⟩
-⟾-weaken,0 (base x) regT = base (𝕄-weaken,0 x regT)
+⟾-weaken,0 (base x) regT = {!!}
+-- base (𝕄-weaken,0 x regT)
 ⟾-weaken,0 (case-𝕚 ~j) regT = case-𝕚 (⟾-weaken,0 ~j regT)
 ⟾-weaken,0 (case-𝕔 ~j) regT = case-𝕔 (⟾-weaken,0 ~j regT)
+
+
+test : k ε A
+     → k ¬ε' A
+     → find A k (𝕚 ∞)
+test ε-var (¬ε'-var x) = ⊥-elim (x refl)
+test (ε-arr-l inA) ninA = f-arr-𝕚-l inA
+test (ε-arr-r ¬inA inA) (¬ε'-arr-l x) = f-arr-𝕚-l x
+test (ε-arr-r ¬inA inA) (¬ε'-arr-r x ninA) = f-arr-𝕚-r ¬inA (f-∞ inA)
+test (ε-∀ inA) (¬ε'-∀ ninA) = f-∀-𝕚 (test inA ninA) ↑tyʲ-∞
 
 
 ⟾-find : find A k j
@@ -335,15 +347,17 @@ data _⊢_⟾_ : Env n m → Counter m × Type m → Counter m × Type m → Set
 
 
 
-test : k ε A
-     → k ¬ε' A
-     → find A k (𝕚 ∞)
-test ε-var (¬ε'-var x) = ⊥-elim (x refl)
-test (ε-arr-l inA) ninA = f-arr-𝕚-l inA
-test (ε-arr-r ¬inA inA) (¬ε'-arr-l x) = f-arr-𝕚-l x
-test (ε-arr-r ¬inA inA) (¬ε'-arr-r x ninA) = f-arr-𝕚-r ¬inA (f-∞ inA)
-test (ε-∀ inA) (¬ε'-∀ ninA) = f-∀-𝕚 (test inA ninA) ↑tyʲ-∞
+mm-sub : Γ ⊢ A 𝕄 B
+       → SRegular Γ
+       → Γ ⊢r A
+       → wf A
+       → Γ ⊢ 𝕚 ∞ # A ≤ B
+mm-sub 𝕄-arr regΓ (⊢r-arr regA regA₁) (wf-arr wfA wfA₁) = s-arr₂ (s-refl-∞ regΓ regA) (s-refl-∞ regΓ regA₁)
+mm-sub (M-∀ {A = A} regT wfT st mm) regΓ regA (wf-∀ wfA rst) with ε-dec {k = #0} {A = A}
+... | inj₁ p = s-∀l regT st (mm-sub mm regΓ (st0-⊢r regA regT st) (st-wf wfA wfT st) ) case-𝕚 (test p rst) (↑tyʲ-𝕚 ↑tyʲ-∞)
+... | inj₂ ¬p = s-∀l-no regT st (mm-sub mm regΓ (st0-⊢r regA regT st) (st-wf wfA wfT st)) case-𝕚 ¬p
 
+{-
 mm-sub : Γ ⊢ A 𝕄 B
        → SRegular Γ
        → Γ ⊢r A
@@ -351,9 +365,8 @@ mm-sub : Γ ⊢ A 𝕄 B
 mm-sub 𝕄-arr regΓ (⊢r-arr regA regA₁) = s-arr₂ (s-refl-∞ regΓ regA) (s-refl-∞ regΓ regA₁)
 mm-sub (M-∀ {A = A} x wf st mm) regΓ regA with ε-dec {k = #0} {A = A}
 ... | inj₁ p = s-∀l x st (mm-sub mm regΓ (st0-⊢r regA x st)) case-𝕚 (test p {!!}) (↑tyʲ-𝕚 ↑tyʲ-∞)
--- s-∀l x st (mm-sub mm regΓ (st0-⊢r regA x st)) case-𝕚 (f-i∞ p (i∞-i i∞-z)) (↑tyʲ-𝕚 ↑tyʲ-∞)
 ... | inj₂ ¬p = s-∀l-no x st (mm-sub mm regΓ (st0-⊢r regA x st)) case-𝕚 ¬p
--- s-∀l-no x st (mm-sub mm regΓ (st0-⊢r regA x st)) case-𝕚 ¬p
+-}
 
 conv-sub-gen-s : Γ ⊢ j # A ≤ B
                → Γ ⊢ ⟨ j , B ⟩ ⟾ ⟨ j' , C ⟩
@@ -375,26 +388,39 @@ conv-sub-gen-s (s-∀l-no regB st s case-𝕚 fd) (case-𝕚 cv) = s-∀l-no reg
 conv-sub-gen-s (s-∀l-no regB st s case-𝕔 fd) (case-𝕔 cv) = s-∀l-no regB st (conv-sub-gen-s s (case-𝕔 cv)) case-𝕔 fd
 
 conv-sub-gen : Γ ⊢ j # e ⦂ A
+             → wf A
+             → wf B
              → Γ ⊢ ⟨ j , A ⟩ ⟾ ⟨ j' , B ⟩
              → Γ ⊢ j' # e ⦂ B
+conv-sub-gen (⊢lam₁ ⊢e) wfA wfB cv = {!!}
+conv-sub-gen (⊢lam₂ ⊢e) wfA wfB cv = {!!}
+conv-sub-gen (⊢app₁ ⊢e ⊢e₁) wfA wfB cv = {!!}
+conv-sub-gen (⊢app₂ ⊢e ⊢e₁) wfA wfB cv = {!!}
+conv-sub-gen (⊢sub ⊢e B≤A gc j≢Z) wfA wfB cv = {!!}
+{-
 conv-sub-gen (⊢lam₁ ⊢e) (base 𝕄-arr) = ⊢lam₂ ⊢e
 conv-sub-gen (⊢lam₂ ⊢e) (case-𝕚 cv) with t-tregular ⊢e
 ... | reg-S, r regA = ⊢lam₂ (conv-sub-gen ⊢e (⟾-weaken,0 cv regA))
 conv-sub-gen (⊢app₁ ⊢e ⊢e₁) cv = ⊢app₁ (conv-sub-gen ⊢e (case-𝕔 cv)) ⊢e₁
 conv-sub-gen (⊢app₂ ⊢e ⊢e₁) cv = ⊢app₂ (conv-sub-gen ⊢e (case-𝕚 cv)) ⊢e₁
-conv-sub-gen (⊢sub ⊢e B≤A gc j≢Z) cv = ⊢sub ⊢e (conv-sub-gen-s B≤A (⟾-weaken⋈ cv)) gc (⟾-NonZ j≢Z cv)
+conv-sub-gen (⊢sub ⊢e B≤A gc j≢Z) cv = {!!}
+-}
+-- ⊢sub ⊢e (conv-sub-gen-s B≤A (⟾-weaken⋈ cv)) gc (⟾-NonZ j≢Z cv)
 
 conv-sub : Γ ⊢ ∞ # e ⦂ A
+         → wf A
+         → wf B
          → Γ ⊢ A 𝕄 B
          → Γ ⊢ 𝕚 ∞ # e ⦂ B
-conv-sub ⊢e cv = conv-sub-gen ⊢e (base cv)
+conv-sub ⊢e wfA cv = {!!}
+-- conv-sub-gen ⊢e (base cv)
 
 annotatability : Γ ⊢ e ⦂ A ⟶ e'
                → Γ ⊢ ∞ # e' ⦂ A
 annotatability (ela-lit regΓ wfg₁) = ⊢sub (⊢lit regΓ) (s-int (reg-Z regΓ)) gc-i nz-∞
 annotatability (ela-var regΓ wfg₁ x) = ⊢sub (⊢var regΓ x) (s-refl-∞ (reg-Z regΓ) {!!}) gc-var nz-∞
 annotatability (ela-lam ⊢e) = ⊢lam₁ (annotatability ⊢e)
-annotatability (ela-app ⊢e x ⊢e₁) = ⊢app₂ {!annotatability ⊢e!} (⊢ann (annotatability ⊢e₁))
+annotatability (ela-app ⊢e x ⊢e₁) = ⊢app₂ {!!} (⊢ann (annotatability ⊢e₁))
 {-
 annotatability (ela-lit wfg reg) = ⊢sub (⊢lit reg) (s-int (reg-Z reg)) gc-i nz-∞
 annotatability (ela-var reg wfA x) = {!!}

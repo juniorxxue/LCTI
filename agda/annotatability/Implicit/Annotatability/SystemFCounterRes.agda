@@ -229,8 +229,8 @@ test : Match (𝕚 j) A
 
 test' : Γ ⊢ A 𝕄 B
       → Match j A
-     → Γ ⊢ j # A ≤ B
+      → Γ ⊢ j # A ≤ B
 test' 𝕄-arr (m-arr mt) = s-arr₂ {!!} (test' {!!} mt)
 test' (M-∀ {A = A} x st mm rst) (m-∀ mt upj) with ε-dec {k = #0} {A = A}
-... | inj₁ p = s-∀l x st {!!} {!!} {!!} {!!}
+... | inj₁ p = s-∀l x st (test' mm {!!}) {!!} {!!} {!!}
 ... | inj₂ ¬p = {!!}
