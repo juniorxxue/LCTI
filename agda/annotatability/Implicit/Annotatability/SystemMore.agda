@@ -173,21 +173,50 @@ data _¬ε'_ : Fin m → Type m → Set where
   ¬ε'-∀ : #S k ¬ε' A
         → k ¬ε' (`∀ A)
 
+
+data wf : Type m → Set where
+  wf-int : wf (Type m ∋⦂ Int)
+  wf-var : wf (‶ X)
+  wf-arr : wf A
+         → wf B
+         → wf (A `→ B)
+  wf-∀   : wf A
+         → #0 ¬ε' A
+         → wf (`∀ A)
+
+data wfg : Env n m → Set where
+  wf-∅ : wfg ∅
+  wf-, : wf A
+       → wfg Γ
+       → wfg (Γ , A)
+  wf-^ : wfg Γ
+       → wfg (Γ ,^)
+  wf-,∙ : wfg Γ
+        → wfg (Γ ,∙)
+  wf-,= : wfg Γ
+        → wf A
+        → wfg (Γ ,= A)
+  wf-⋈ : wfg Γ
+       → wfg (Γ ⋈)
+
 infix 3 _⊢_𝕄_
 data _⊢_𝕄_ : Env n m → Type m → Type m → Set where
   𝕄-arr : Γ ⊢ A `→ B 𝕄 A `→ B
   M-∀ : Γ ⊢r T
+      → wf T
       → (st : ⟦ T ⟧ A ⇘ A*)
       → Γ ⊢ A* 𝕄 B `→ C
-      → (rst : #0 ¬ε' A)
+--      → (rst : #0 ¬ε' A)
       → Γ ⊢ `∀ A 𝕄 B `→ C
 
 infix 3 _⊢_⦂_⟶_
 data _⊢_⦂_⟶_ : Env n m → Term n m → Type m → Term n m → Set where
 
   ela-lit : (regΓ : TRegular Γ)
+          → (wfg : wfg Γ)
           → Γ ⊢ (lit n) ⦂ Int ⟶ (lit n)
   ela-var : (regΓ : TRegular Γ)
+          → (wfg : wfg Γ)
           → Γ ∋ x ⦂ A
           → Γ ⊢ ` x ⦂ A ⟶ ` x
   ela-lam : Γ , A ⊢ e ⦂ B ⟶ e'
@@ -196,6 +225,51 @@ data _⊢_⦂_⟶_ : Env n m → Term n m → Type m → Term n m → Set where
            → Γ ⊢ A 𝕄 B `→ C
            → Γ ⊢ e₂ ⦂ B ⟶ e₂'
            → Γ ⊢ e₁ · e₂ ⦂ C ⟶ e₁' · (e₂' ⦂ B)
+
+ela-wfg : Γ ⊢ e ⦂ A ⟶ e'
+        → wfg Γ
+ela-wfg (ela-lit regΓ wfg₁) = wfg₁
+ela-wfg (ela-var regΓ wfg₁ x) = wfg₁
+ela-wfg (ela-lam ⊢e) with ela-wfg ⊢e
+... | wf-, x r = r
+ela-wfg (ela-app ⊢e x ⊢e₁) = ela-wfg ⊢e
+
+↑ty-wf : wf A
+       → A ↑ty k ⇘ A'
+       → wf A'
+↑ty-wf wf-int ↑ty-int = wf-int
+↑ty-wf wf-var ↑ty-var = wf-var
+↑ty-wf (wf-arr wfA wfA₁) (↑ty-arr upA upA₁) = wf-arr (↑ty-wf wfA upA) (↑ty-wf wfA₁ upA₁)
+↑ty-wf (wf-∀ wfA x) (↑ty-∀ upA) = wf-∀ (↑ty-wf wfA upA) {!!}
+
+∋⦂-wf : wfg Γ
+      → Γ ∋ x ⦂ A
+      → wf A
+∋⦂-wf (wf-, x wfg₁) Z = x
+∋⦂-wf (wf-, x wfg₁) (S, inΓ) = ∋⦂-wf wfg₁ inΓ
+∋⦂-wf (wf-^ wfg₁) (S^ inΓ up) = ↑ty-wf (∋⦂-wf wfg₁ inΓ) up
+∋⦂-wf (wf-,∙ wfg₁) (S∙ inΓ up) = ↑ty-wf (∋⦂-wf wfg₁ inΓ) up
+∋⦂-wf (wf-,= wfg₁ x) (S= inΓ up) = ↑ty-wf (∋⦂-wf wfg₁ inΓ) up
+
+st-wf : wf A
+      → wf T
+      → ⟦ k / T ⟧ A ⇘ A*
+      → wf A*
+
+𝕄-wf : wf A
+     → Γ ⊢ A 𝕄 B
+     → wf B
+𝕄-wf (wf-arr wfA wfA₁) 𝕄-arr = wf-arr wfA wfA₁
+𝕄-wf (wf-∀ wfA x) (M-∀ x₁ x₂ st mm) = 𝕄-wf (st-wf wfA x₂ st) mm
+
+ela-wf : Γ ⊢ e ⦂ A ⟶ e'
+       → wf A
+ela-wf (ela-lit regΓ wfg₁) = wf-int
+ela-wf (ela-var regΓ wfg₁ x) = ∋⦂-wf wfg₁ x
+ela-wf (ela-lam ⊢e) with ela-wfg ⊢e
+... | wf-, x r = wf-arr x (ela-wf ⊢e)
+ela-wf (ela-app ⊢e x ⊢e₁) with 𝕄-wf (ela-wf ⊢e) x
+... | wf-arr r r₁ = r₁
 
 -- f : forall a b. a -> b -> a
 -- f 1
@@ -225,7 +299,7 @@ data _⊢_⟾_ : Env n m → Counter m × Type m → Counter m × Type m → Set
 𝕄-weaken⋈ : Γ ⊢ A 𝕄 B
           → Γ ⋈ ⊢ A 𝕄 B
 𝕄-weaken⋈ 𝕄-arr = 𝕄-arr
-𝕄-weaken⋈ (M-∀ x st rst mm) = {!!}
+𝕄-weaken⋈ (M-∀ x wf st mm) = {!!}
 -- M-∀ (⊢r-𝕣 x) st (𝕄-weaken⋈ mm)
 
 ⟾-weaken⋈ : Γ ⊢ ⟨ j , A ⟩ ⟾ ⟨ j' , B ⟩
@@ -238,7 +312,7 @@ data _⊢_⟾_ : Env n m → Counter m × Type m → Counter m × Type m → Set
            → Γ ⊢r T
            → Γ , T ⊢ A 𝕄 B
 𝕄-weaken,0 𝕄-arr regT = 𝕄-arr
-𝕄-weaken,0 (M-∀ x st rst mm) regT = {!!}
+𝕄-weaken,0 (M-∀ x wf st mm) regT = {!!}
 -- M-∀ (⊢r-weaken,0 x regT) st (𝕄-weaken,0 mm regT)
 
 ⟾-weaken,0 : Γ ⊢ ⟨ j , A ⟩ ⟾ ⟨ j' , B ⟩
@@ -275,8 +349,8 @@ mm-sub : Γ ⊢ A 𝕄 B
        → Γ ⊢r A
        → Γ ⊢ 𝕚 ∞ # A ≤ B
 mm-sub 𝕄-arr regΓ (⊢r-arr regA regA₁) = s-arr₂ (s-refl-∞ regΓ regA) (s-refl-∞ regΓ regA₁)
-mm-sub (M-∀ {A = A} x st mm rst) regΓ regA with ε-dec {k = #0} {A = A}
-... | inj₁ p = s-∀l x st (mm-sub mm regΓ (st0-⊢r regA x st)) case-𝕚 (test p rst) (↑tyʲ-𝕚 ↑tyʲ-∞)
+mm-sub (M-∀ {A = A} x wf st mm) regΓ regA with ε-dec {k = #0} {A = A}
+... | inj₁ p = s-∀l x st (mm-sub mm regΓ (st0-⊢r regA x st)) case-𝕚 (test p {!!}) (↑tyʲ-𝕚 ↑tyʲ-∞)
 -- s-∀l x st (mm-sub mm regΓ (st0-⊢r regA x st)) case-𝕚 (f-i∞ p (i∞-i i∞-z)) (↑tyʲ-𝕚 ↑tyʲ-∞)
 ... | inj₂ ¬p = s-∀l-no x st (mm-sub mm regΓ (st0-⊢r regA x st)) case-𝕚 ¬p
 -- s-∀l-no x st (mm-sub mm regΓ (st0-⊢r regA x st)) case-𝕚 ¬p
@@ -291,7 +365,8 @@ conv-sub-gen-s (s-arr₁ s s₁) (base 𝕄-arr) = s-arr₂ s s₁
 conv-sub-gen-s (s-arr₂ s s₁) (case-𝕚 cv) = s-arr₂ s (conv-sub-gen-s s₁ cv)
 conv-sub-gen-s (s-arr₃ regA s) (case-𝕔 cv) = s-arr₃ regA (conv-sub-gen-s s cv)
 conv-sub-gen-s (s-∀ s) (base mm)
-  with refl ← s-trans-∞-eq s  = mm-sub mm (s-sregular (s-∀ s)) (⊢r-∀ (s1-⊢r-l s))
+  with refl ← s-trans-∞-eq s  = {!!}
+  -- mm-sub mm (s-sregular (s-∀ s)) (⊢r-∀ (s1-⊢r-l s))
 conv-sub-gen-s (s-∀l regB st s case-𝕚 fd (↑tyʲ-𝕚 upj)) (case-𝕚 cv) =
   s-∀l regB st (conv-sub-gen-s s (case-𝕚 cv)) case-𝕚 {!!} (↑tyʲ-𝕚 {!!})
 conv-sub-gen-s (s-∀l regB st s case-𝕔 fd (↑tyʲ-𝕔 upj)) (case-𝕔 cv) =
@@ -314,21 +389,19 @@ conv-sub : Γ ⊢ ∞ # e ⦂ A
          → Γ ⊢ 𝕚 ∞ # e ⦂ B
 conv-sub ⊢e cv = conv-sub-gen ⊢e (base cv)
 
-conv-sub' : Γ ⊢ ∞ # e ⦂ A
-         → Γ ⊢ A 𝕄 B
-         → Γ ⊢ 𝕚 ∞ # e ⦂ B
-conv-sub' (⊢lam₁ ⊢e) 𝕄-arr = ⊢lam₂ ⊢e
-conv-sub' (⊢app₁ ⊢e ⊢e₁) 𝕄-arr = ⊢app₁ {!!} ⊢e₁
-conv-sub' (⊢app₁ ⊢e ⊢e₁) (M-∀ x st mm rst) = {!!}
-conv-sub' (⊢app₂ ⊢e ⊢e₁) mm = {!!}
-conv-sub' (⊢sub ⊢e B≤A gc j≢Z) mm = {!!}
-
 annotatability : Γ ⊢ e ⦂ A ⟶ e'
                → Γ ⊢ ∞ # e' ⦂ A
-annotatability (ela-lit reg) = ⊢sub (⊢lit reg) (s-int (reg-Z reg)) gc-i nz-∞
-annotatability (ela-var reg x) = ⊢sub (⊢var reg x) (s-refl-∞ (reg-Z reg) (⊢r-𝕣 (∋⦂-⊢r reg x))) gc-var nz-∞
+annotatability (ela-lit regΓ wfg₁) = ⊢sub (⊢lit regΓ) (s-int (reg-Z regΓ)) gc-i nz-∞
+annotatability (ela-var regΓ wfg₁ x) = ⊢sub (⊢var regΓ x) (s-refl-∞ (reg-Z regΓ) {!!}) gc-var nz-∞
+annotatability (ela-lam ⊢e) = ⊢lam₁ (annotatability ⊢e)
+annotatability (ela-app ⊢e x ⊢e₁) = ⊢app₂ {!annotatability ⊢e!} (⊢ann (annotatability ⊢e₁))
+{-
+annotatability (ela-lit wfg reg) = ⊢sub (⊢lit reg) (s-int (reg-Z reg)) gc-i nz-∞
+annotatability (ela-var reg wfA x) = {!!}
+-- ⊢sub (⊢var reg x) (s-refl-∞ (reg-Z reg) (⊢r-𝕣 (∋⦂-⊢r reg x))) gc-var nz-∞
 annotatability (ela-lam ⊢e) = ⊢lam₁ (annotatability ⊢e)
 annotatability (ela-app ⊢e cv ⊢e₁) = ⊢app₂ {!!} (⊢ann (annotatability ⊢e₁))
+-}
 
 
 -- f : forall a . Int -> a
