@@ -13,7 +13,7 @@ open import Implicit.Language.Find.Base
          → j ↑tyʲ k ⇘ j'
          → X #< k
          → find A' (inject₁ X) j'
-↑ty-find (f-∞ inA isoinf) upA upj lt = {!!}
+↑ty-find (f-∞ inA) upA upj lt = {!!}
 -- f-∞ (↑ty-ε x upA lt)
 ↑ty-find (f-arr-𝕚-l x) (↑ty-arr upA upA₁) (↑tyʲ-𝕚 upj) lt = f-arr-𝕚-l (↑ty-ε x upA lt)
 ↑ty-find (f-arr-𝕚-r ¬inA fd) (↑ty-arr upA upA₁) (↑tyʲ-𝕚 upj) lt = f-arr-𝕚-r (↑ty-¬ε-prv ¬inA upA lt) (↑ty-find fd upA₁ upj lt)
@@ -37,7 +37,7 @@ open import Implicit.Language.Find.Base
           → j ↑tyʲ k ⇘ j'
           → X #< k
           → find A X j
-↑ty-find' (f-∞ inA isoinf) upA upj lt = {!!}
+↑ty-find' (f-∞ inA) upA upj lt = {!!}
 -- f-∞ (↑ty-ε' x lt upA)
 ↑ty-find' (f-arr-𝕚-l x) (↑ty-arr upA upA₁) (↑tyʲ-𝕚 upj) lt = f-arr-𝕚-l (↑ty-ε' x lt upA)
 ↑ty-find' (f-arr-𝕚-r ¬inA fd) (↑ty-arr upA upA₁) (↑tyʲ-𝕚 upj) lt = f-arr-𝕚-r (¬ε-↑ty'-inv ¬inA upA lt) (↑ty-find' fd upA₁ upj lt)

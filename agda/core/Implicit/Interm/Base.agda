@@ -2,6 +2,43 @@ module Implicit.Interm.Base where
 
 open import Implicit.Language.All
 
+-- occur only at the end
+infix 3 _ε'_
+data _ε'_ : Fin m → Type m → Set where
+  ε-var : k ε' (‶ k)
+  ε-arr : k ¬ε A
+        → k ε' B
+        → k ε' (A `→ B)
+  ε-∀ : #S k ε' A
+      → k ε' (`∀ A)
+
+variable
+  j₁ j₁' : Counter m
+
+infix 3 _ε'_by_↪_
+data _ε'_by_↪_ : Fin m → Type m → Counter m → Counter m → Set where
+  ε-var : IsoInf j
+        → k ε' (‶ k) by j ↪ ∞
+  ε-arr-𝕚 : k ¬ε A
+        → k ε' B by j ↪ j'
+        → k ε' (A `→ B) by (𝕚 j) ↪ (𝕚 j')
+  ε-arr-𝕔 : k ¬ε A
+        → k ε' B by j ↪ j'
+        → k ε' (A `→ B) by (𝕔 j) ↪ (𝕔 j')
+  ε-∀-𝕚 : #S k ε' A by 𝕚 j' ↪ j₁'
+        → (upj : ↑tyʲ0 j ⇘ j')
+        → (upj₁ : ↑tyʲ0 j₁ ⇘ j₁')
+        → k ε' `∀ A by (𝕚 j) ↪ j₁
+  ε-∀-𝕔 : #S k ε' A by 𝕔 j' ↪ j₁'
+        → (upj : ↑tyʲ0 j ⇘ j')
+        → (upj₁ : ↑tyʲ0 j₁ ⇘ j₁')
+        → k ε' `∀ A by (𝕔 j) ↪ j₁
+  ε-∀-𝕥 : #S k ε' A by j' ↪ j₁'
+        → (upj : ↑tyʲ0 j ⇘ j')
+        → (upj₁ : ↑tyʲ0 j₁ ⇘ j₁')
+        → k ε' `∀ A by (𝕥₍ B ₎ j) ↪ j₁
+
+
 ----------------------------------------------------------------------
 --+                           Subtyping                            +--
 ----------------------------------------------------------------------
@@ -44,6 +81,14 @@ data _⊢_#_⌞_⌝_ : Env n m → Counter m → Type m → Polar → Type m →
     → (upD : ↑ty0 D ⇘ D')
     → (upj : ↑tyʲ0 j ⇘ j')
     → Δ ⊢ j # `∀ A ⌞ ≤⁺ ⌝ C `→ D
+  s-∀l-tail :
+      Δ ,= B ⊢ j₁ # A ⌞ ≤⁺ ⌝ C' `→ D'
+    → (ic : (𝕚𝕔 j))
+    → (tail : #0 ε' A by j' ↪ j₁)
+    → (upC : ↑ty0 C ⇘ C')
+    → (upD : ↑ty0 D ⇘ D')
+    → (upj : ↑tyʲ0 j ⇘ j')
+    → Δ ⊢ j # `∀ A ⌞ ≤⁺ ⌝ C `→ D
   s-tapp :
       Δ ,= B ⊢ j' # A ⌞ ≤⁺ ⌝ C
     → (upj : ↑tyʲ0 j ⇘ j')
@@ -69,6 +114,13 @@ data _⊢_#_⌞_⌝_ : Env n m → Counter m → Type m → Polar → Type m →
       Δ ∋ X := B
     → Δ ⊢ (𝕥₍ A ₎ j) # B ⌞ ≤⁺ ⌝ `∀ C
     → Δ ⊢ (𝕥₍ A ₎ j) # ‶ X ⌞ ≤⁺ ⌝ `∀ C
+
+
+foo : ∅ ⋈ ⊢ 𝕚 ∞ # (`∀ (‶ #0)) ⌞ ≤⁺ ⌝ (Int `→ Int)
+foo = s-∀l-tail {B = Int `→ Int} (s-svar-l (reg-S= (reg-Z reg-Z) (⊢r-arr ⊢r-int ⊢r-int)) (Z (↑ty-arr ↑ty-int ↑ty-int)))
+                case-𝕚 (ε-var (i∞-i i∞-z)) ↑ty-int ↑ty-int (↑tyʲ-𝕚 ↑tyʲ-∞)
+
+
 
 s-refl-∞ : SRegular Γ
          → Γ ⊢r A
