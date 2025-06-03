@@ -6,6 +6,7 @@ open import Implicit.Algo.All
 open import Implicit.Algo2Interm.AlgoCounter.All
 open import Implicit.Algo2Interm.Context2Counter
 open import Implicit.Algo2Interm.Find
+open import Implicit.Language.ExtraDefs
 
 
 sound-ss : Γ ⊢ A ⌞ ≤ ⌝ B ⊣ Δ
@@ -29,6 +30,10 @@ tc-~ : Γ ⊢ Σ ⇒ e ⇒ A ↡ j
 
 sc-~ : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B ↡ j
      → Δ ⊢ ⟨ j , B ⟩ ~s Σ
+
+infs-~ : Γ ⊨ Σ ⟹ B ↡ j
+       → Γ ⊢ ⟨ j , B ⟩ ~t Σ
+
 
 sound : Γ ⊢ Σ ⇒ e ⇒ A ↡ j
       → Γ ⊢ j # e ⦂ A
@@ -61,6 +66,10 @@ sc-~ (s-tapp {B = B} {C = C} s upᶜ upj)
   with ⟨ B* , stB ⟩ ← st0-total B C = ~sT (~s-strengthen=0 (sc-~ s) (st-↑ty (⊢r-¬ε (s-⊢r (sc-sound s)) Z) stB) upᶜ upj) stB
 sc-~ (s-svar-term inΓ s) = sc-~ s
 sc-~ (s-svar-tapp inΓ s) = sc-~ s
+sc-~ (s-evar-infers infs inst) = {!infs-~ infs!}
+
+infs-~ (infs-z regΓ regA) = ~t∞
+infs-~ (infs-s x infs) = ~tI (sound x) (infs-~ infs)
 
 sound (⊢lit regΓ) = ⊢lit regΓ
 sound (⊢var regΓ x∈Γ) = ⊢var regΓ x∈Γ
@@ -80,10 +89,14 @@ sound-s (s-type ss) = sound-ss ss
 sound-s (s-term-c cloA ap ⊢e s) with tc-id0 ⊢e
 ... | refl = s-arr₃ (⊆-⊢c cloA (sc-⊆ s)) (⊆-⊢c-≫' (sc-⊆ s) cloA ap) (sound-s s)
 sound-s (s-term-o opnA ⊢e ss s) = s-arr₂ (s-⊆-prv (sound-ss ss) (sc-⊆ s)) (sound-s s)
-sound-s (s-∀l-𝕚 s upᶜ upj upᵉ upC upD) = s-∀l (sound-s s) case-𝕚 (s-find0 s upᵉ upᶜ) upC upD (↑tyʲ-𝕚 upj)
+sound-s (s-∀l-𝕚 {A = A} s upᶜ upj upᵉ upC upD) with ε'-dec #0 A
+... | inj₁ p = s-∀l-tail {!sound-s s!} case-𝕚 {!!} upC upD (↑tyʲ-𝕚 upj)
+... | inj₂ ¬p = s-∀l (sound-s s) case-𝕚 (s-find'0 s upᵉ upᶜ ¬p) upC upD (↑tyʲ-𝕚 upj)
+-- s-∀l (sound-s s) case-𝕚 (s-find0 s upᵉ upᶜ) upC upD (↑tyʲ-𝕚 upj)
 sound-s (s-∀l-𝕔 s upᶜ upj upᵉ upC upD) = s-∀l (sound-s s) case-𝕔 (s-find0 s upᵉ upᶜ) upC upD (↑tyʲ-𝕔 upj)
 sound-s (s-tapp s upᶜ upj) = s-tapp (sound-s s) upj
 sound-s (s-svar-term inΓ s) with sc-~ s
 ... | ~sI ⊢e r = s-svar-𝕚 inΓ (sound-s s)
 ... | ~sC ⊢e r = s-svar-𝕔 inΓ (sound-s s)
 sound-s (s-svar-tapp inΓ s) = s-svar-𝕥 inΓ (sound-s s)
+sound-s (s-evar-infers (infs-s x infs) inst) = s-svar-𝕚 (inst-∋:= inst) (s-arr₂ {!!} {!!})

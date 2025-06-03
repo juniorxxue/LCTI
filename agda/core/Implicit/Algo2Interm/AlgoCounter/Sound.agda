@@ -11,6 +11,9 @@ tc-sound : Γ ⊢ Σ ⇒ e ⇒ A ↡ j
 sc-sound : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B ↡ j
          → Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
 
+infs-sound : Γ ⊨ Σ ⟹ B ↡ j
+           → Γ ⊨ Σ ⟹ B
+
 tc-sound (⊢lit regΓ) = ⊢lit regΓ
 tc-sound (⊢var regΓ x∈Γ) = ⊢var regΓ x∈Γ
 tc-sound (⊢ann ⊢e) = ⊢ann (tc-sound ⊢e)
@@ -30,6 +33,10 @@ sc-sound (s-∀l-𝕔 s upᶜ upj upᵉ upC upD) = s-∀l (sc-sound s) upᶜ up�
 sc-sound (s-tapp s upᶜ upj) = s-tapp (sc-sound s) upᶜ
 sc-sound (s-svar-term inΓ s) = s-svar-term inΓ (sc-sound s)
 sc-sound (s-svar-tapp inΓ s) = s-svar-tapp inΓ (sc-sound s)
+sc-sound (s-evar-infers infs inst) = s-evar-infers (infs-sound infs) inst
+
+infs-sound (infs-z regΓ regA) = infs-z regΓ regA
+infs-sound (infs-s x infs) = infs-s (tc-sound x) (infs-sound infs)
 
 ----------------------------------------------------------------------
 --+                         useful lemmas                          +--

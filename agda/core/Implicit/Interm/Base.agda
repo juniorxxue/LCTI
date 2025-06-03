@@ -2,16 +2,6 @@ module Implicit.Interm.Base where
 
 open import Implicit.Language.All
 
--- occur only at the end
-infix 3 _ε'_
-data _ε'_ : Fin m → Type m → Set where
-  ε-var : k ε' (‶ k)
-  ε-arr : k ¬ε A
-        → k ε' B
-        → k ε' (A `→ B)
-  ε-∀ : #S k ε' A
-      → k ε' (`∀ A)
-
 variable
   j₁ j₁' : Counter m
 
