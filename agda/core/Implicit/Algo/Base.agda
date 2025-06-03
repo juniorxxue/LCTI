@@ -160,7 +160,7 @@ data _⊨_⟹_ where
   infs-z : (regΓ : TRegular Γ)
          → (regA : Γ ⊢r A)
          → Γ ⊨ τ A ⟹ A
-  infs-s : Γ ⊢ □ ⇒ e ⇒ A
+  infs-s : (⊢e : Γ ⊢ □ ⇒ e ⇒ A)
          → Γ ⊨ Σ ⟹ B
          → Γ ⊨ [ e ]↝ Σ ⟹ A `→ B
 

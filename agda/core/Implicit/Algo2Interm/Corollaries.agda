@@ -34,11 +34,23 @@ data JustSub (Γ : Env n m) (A : Type m) (Σ : Context n m) (Δ : Env n m) (B : 
     → (s : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B ↡ j)
     → JustSub Γ A Σ Δ B
 
+data JustInfs (Γ : Env n m) (Σ : Context n m) (A : Type m) : Set where
+  infers : ∀ {j}
+       → (j~Σ : Γ ⊢ ⟨ j , A ⟩ ~t Σ)
+       → (infs : Γ ⊨ Σ ⟹ A ↡ j)
+       → JustInfs Γ Σ A
+
+
+
+
 tc-complete : Γ ⊢ Σ ⇒ e ⇒ A
             → JustType Γ Σ e A
 
 sc-complete : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
             → JustSub Γ A Σ Δ B
+
+infs-complete : Γ ⊨ Σ ⟹ A
+              → JustInfs Γ Σ A
 
 tc-complete (⊢lit regΓ) = typs ~tZ (⊢lit regΓ)
 tc-complete (⊢var regΓ x∈Γ) = typs ~tZ (⊢var regΓ x∈Γ)
@@ -85,6 +97,13 @@ sc-complete (s-svar-term inΓ s) with sc-complete s
 ... | subs j~Σ s₁ = subs j~Σ (s-svar-term inΓ s₁)
 sc-complete (s-svar-tapp inΓ s) with sc-complete s
 ... | subs (~sT j~Σ st) s₁ = subs (~sT j~Σ st) (s-svar-tapp inΓ s₁)
+sc-complete (s-evar-infers infs inst) with infs-complete infs
+... | infers j~Σ infs₁ = subs {!j~Σ!} (s-evar-infers infs₁ inst)
+
+infs-complete (infs-z regΓ regA) = infers ~t∞ (infs-z regΓ regA)
+infs-complete (infs-s ⊢e infs)
+  with infers j~Σ infs₁ ← infs-complete infs
+  with typs ~tZ ⊢e₁ ← tc-complete ⊢e = infers (~tI (sound ⊢e₁) j~Σ) (infs-s ⊢e₁ infs₁)
 
 ----------------------------------------------------------------------
 --+                          corollaries                           +--

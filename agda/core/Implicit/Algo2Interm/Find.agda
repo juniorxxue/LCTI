@@ -73,3 +73,55 @@ s-find'0 : Γ ,^ ⊢ A ≤⁺ [ e' ]↝ Σ' ⊣ Δ ,= B ↪ C `→ D ↡ j
               → #0 ¬ε' A
               → find A #0 j
 s-find'0 s up1 up2 = s-find' s Z Z
+
+
+
+
+data Match : Type m → Type m → Counter m → Set where
+
+  mt-∞ : Match A A ∞
+  mt-𝕚 : Match A C j
+       → Match A (B `→ C) (𝕚 j)
+  mt-𝕔 : Match A C j
+       → Match A (B `→ C) (𝕔 j)
+  mt-𝕥 : Match A B* j
+       → ⟦ C ⟧ B ⇘ B*
+       → Match A (`∀ B) (𝕥₍ C ₎ j)
+
+
+data Truncated (k : Fin m) (A : Type m) (j : Counter m) (C : Type m) (B : Type m) : Set where
+  justrun : ∀ {j'}
+          → (newj : k ε' A by j ↪ j')
+          → (mt : Match C B j')
+          → Truncated k A j C B
+  in-type : find A k j
+          → Truncated k A j C B
+
+truncated : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B ↡ j
+          → Γ ∋^ k
+          → Δ ∋ k := C
+          → k ε' A
+          → Truncated k A j C B
+truncated (s-empty regΓ cloA x) inΓ inΔ inA = ⊥-elim {!!}
+truncated (s-type ss) inΓ inΔ inA = in-type (f-∞ {!!}) -- ok
+truncated (s-term-c cloA ap ⊢e s) inΓ inΔ (ε-arr x inA) with truncated s inΓ inΔ inA
+... | justrun newj mt = justrun (ε-arr-𝕔 x newj) (mt-𝕔 mt)
+... | in-type x₁ = in-type (f-arr-𝕔 x x₁)
+truncated (s-term-o opnA ⊢e ss s) inΓ inΔ (ε-arr x inA) with truncated s {!!} inΔ inA
+... | justrun newj mt = justrun (ε-arr-𝕚 x newj) (mt-𝕚 mt)
+... | in-type x₁ = in-type (f-arr-𝕚-r x x₁)
+truncated {C = C} (s-∀l-𝕚 s upᶜ upj upᵉ upC upD) inΓ inΔ (ε-∀ inA)
+  with ⟨ C' , upC ⟩ ← ↑ty0-total C
+  with truncated s (S^ inΓ) (S= inΔ upC) inA
+... | justrun newj mt = justrun (ε-∀-𝕚 newj upj {!!}) {!!} -- 90% ok
+... | in-type x = in-type (f-∀-𝕚 x upj)
+truncated (s-∀l-𝕔 s upᶜ upj upᵉ upC upD) inΓ inΔ inA = {!!} -- same as above
+truncated {C = C} (s-tapp s upᶜ upj) inΓ inΔ (ε-∀ inA)
+  with ⟨ C' , upC ⟩ ← ↑ty0-total C
+  with truncated s (S= inΓ) (S= inΔ upC) inA
+... | justrun newj mt = justrun (ε-∀-𝕥 newj upj {!!}) (mt-𝕥 {!mt!} {!!}) -- same as above
+... | in-type x = in-type (f-𝕥 x upj)
+truncated (s-svar-term x s) inΓ inΔ ε-var = ⊥-elim {!!}
+truncated (s-svar-tapp x s) inΓ inΔ ε-var = ⊥-elim {!!}
+truncated (s-evar-infers infs inst) inΓ inΔ ε-var
+  with refl ← ∋:=-unique (inst-∋:= inst) inΔ = justrun (ε-var {!!}) mt-∞ -- ok

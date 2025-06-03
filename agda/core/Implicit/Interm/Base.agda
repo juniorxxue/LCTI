@@ -1,13 +1,14 @@
 module Implicit.Interm.Base where
 
 open import Implicit.Language.All
+open import Implicit.Language.ExtraDefs
 
 variable
   j₁ j₁' : Counter m
 
 infix 3 _ε'_by_↪_
 data _ε'_by_↪_ : Fin m → Type m → Counter m → Counter m → Set where
-  ε-var : IsoInf j
+  ε-var : (isoinf : IsoInf j)
         → k ε' (‶ k) by j ↪ ∞
   ε-arr-𝕚 : k ¬ε A
         → k ε' B by j ↪ j'
@@ -26,7 +27,16 @@ data _ε'_by_↪_ : Fin m → Type m → Counter m → Counter m → Set where
   ε-∀-𝕥 : #S k ε' A by j' ↪ j₁'
         → (upj : ↑tyʲ0 j ⇘ j')
         → (upj₁ : ↑tyʲ0 j₁ ⇘ j₁')
-        → k ε' `∀ A by (𝕥₍ B ₎ j) ↪ j₁
+        → k ε' `∀ A by (𝕥₍ B ₎ j) ↪ 𝕥₍ B ₎ j₁
+
+ε'j→ε' : k ε' A by j ↪ j'
+       → k ε' A
+ε'j→ε' (ε-var x) = ε-var
+ε'j→ε' (ε-arr-𝕚 x inA) = ε-arr x (ε'j→ε' inA)
+ε'j→ε' (ε-arr-𝕔 x inA) = ε-arr x (ε'j→ε' inA)
+ε'j→ε' (ε-∀-𝕚 inA upj upj₁) = ε-∀ (ε'j→ε' inA)
+ε'j→ε' (ε-∀-𝕔 inA upj upj₁) = ε-∀ (ε'j→ε' inA)
+ε'j→ε' (ε-∀-𝕥 inA upj upj₁) = ε-∀ (ε'j→ε' inA)
 
 
 ----------------------------------------------------------------------
