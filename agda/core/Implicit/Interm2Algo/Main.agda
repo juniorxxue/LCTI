@@ -11,6 +11,7 @@ open import Implicit.Interm2Algo.ExtIrrev
 open import Implicit.Interm2Algo.EnvDiff
 open import Implicit.Interm2Algo.OpenClose
 -- open import Implicit.Interm2Algo.Find
+open import Implicit.Interm2Algo.WillExport
 
 s+-⊆/ : Δ ⊢ j # A ⌞ ≤⁺ ⌝ B
       → Δ ⊆ Δ w/t A w/c j
@@ -111,9 +112,16 @@ complete-s (s-svar-𝕥 inΓ s) (⊆T-X regΓ) (~T ~j st) = s-svar-tapp inΓ (co
 complete-s (s-∀l x ic fd upC upD (↑tyʲ-𝕚 upj)) (⊆∀-I-no x₁ upj₁) (~I ⊢e x₂) = {!!}
 complete-s (s-∀l x ic fd upC upD (↑tyʲ-𝕔 upj)) (⊆∀-C-no x₁ upj₁) (~C ⊢e x₂) = {!!}
 complete-s (s-∀l-tail s ic tail upC upD (↑tyʲ-𝕚 upj)) (⊆∀-I x upj₁) (~I ⊢e x₂)
-  with refl ← ↑tyʲ-unique upj upj₁ = s-∀l (complete-s s {!!} {!!}) {!!} {!!} upC upD
-complete-s (s-∀l-tail s ic tail upC upD (↑tyʲ-𝕚 upj)) (⊆∀-I-no x upj₁) (~I ⊢e x₂) = s-∀l (complete-s s {!!} {!!}) {!!} {!!} {!!} {!!}
-complete-s (s-∀l-tail s ic tail upC upD upj) x (~C ⊢e x₂) = {!upj!}
+  with refl ← ↑tyʲ-unique upj upj₁ = s-∀l (complete-s s {!!} {!!}) {!!} {!!} upC upD -- false
+complete-s (s-∀l-tail s ic tail upC upD (↑tyʲ-𝕚 upj)) (⊆∀-I-no x upj₁) (~I {Σ = Σ} {e = e} ⊢e x₂)
+  with ⟨ Σ' , upΣ ⟩ ← ↑tyᶜ0-total Σ
+  with ⟨ e' , upe ⟩ ← ↑tyᵉ0-total e
+  with refl ← ↑tyʲ-unique upj upj₁
+  with ih ← complete-s s (irrev-lemma0 x tail {!!}) {!!}
+  = s-∀l {!ih!}
+  -- (complete-s s (irrev-lemma0 x tail {!!}) (~weaken^0 {!!} (↑ty-arr upC upD) (↑tyᶜ-e upe upΣ) {!!}))
+         upΣ upe upC upD
+complete-s (s-∀l-tail s ic tail upC upD upj) x (~C ⊢e x₂) = {!!}
 
 complete-s0 : Γ ⋈ ⊢ j # A ⌞ ≤⁺ ⌝ B
             → Γ ⊢ ⟨ j , B ⟩ ~t Σ
