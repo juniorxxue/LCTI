@@ -225,6 +225,14 @@ data _⊢_⦂_⟶_ : Env n m → Term n m → Type m → Term n m → Set where
            → Γ ⊢ A 𝕄 B `→ C
            → Γ ⊢ e₂ ⦂ B ⟶ e₂'
            → Γ ⊢ e₁ · e₂ ⦂ C ⟶ e₁' · (e₂' ⦂ B)
+  -- two extra rules
+  ela-∀i  : Γ ,∙ ⊢ e ⦂ A ⟶ e₁
+         → (upe : ↑tyᵉ0 e ⇘ e')
+         → Γ ⊢ e ⦂ `∀ A ⟶ Λ e₁
+  ela-∀e  : Γ ⊢ e ⦂ `∀ A ⟶ e'
+          → ⟦ B ⟧ A ⇘ A*
+          → Γ ⊢ e ⦂ A* ⟶ e' ⓪ B
+
 
 ela-wfg : Γ ⊢ e ⦂ A ⟶ e'
         → wfg Γ
@@ -421,27 +429,3 @@ annotatability (ela-lit regΓ wfg₁) = ⊢sub (⊢lit regΓ) (s-int (reg-Z reg�
 annotatability (ela-var regΓ wfg₁ x) = ⊢sub (⊢var regΓ x) (s-refl-∞ (reg-Z regΓ) {!!}) gc-var nz-∞
 annotatability (ela-lam ⊢e) = ⊢lam₁ (annotatability ⊢e)
 annotatability (ela-app ⊢e x ⊢e₁) = ⊢app₂ {!!} (⊢ann (annotatability ⊢e₁))
-{-
-annotatability (ela-lit wfg reg) = ⊢sub (⊢lit reg) (s-int (reg-Z reg)) gc-i nz-∞
-annotatability (ela-var reg wfA x) = {!!}
--- ⊢sub (⊢var reg x) (s-refl-∞ (reg-Z reg) (⊢r-𝕣 (∋⦂-⊢r reg x))) gc-var nz-∞
-annotatability (ela-lam ⊢e) = ⊢lam₁ (annotatability ⊢e)
-annotatability (ela-app ⊢e cv ⊢e₁) = ⊢app₂ {!!} (⊢ann (annotatability ⊢e₁))
--}
-
-
--- f : forall a . Int -> a
--- |-8 f 1 : Int -> Int
-
-
-{-
-
-f 1 : Int -> Int ~~> f (1 : Int)
----------------------------------
-
-(f 1) 2 ---> f 1 2
---------------------
-
-|-I I 8 f :
-
--}
