@@ -49,7 +49,7 @@ Inductive NonEmpty : Context -> Prop :=
 | gc_ann  : forall e A, GenericConsumer (Ann e A)
 | gc_tlam : forall e,   GenericConsumer (TLam e). *)
 
-Fixpoint GenericConsumer (e : Trm) : Prop :=
+Definition GenericConsumer (e : Trm) : Prop :=
   match e with
   | Lit n     => True
   | Var x     => True
@@ -157,7 +157,7 @@ Inductive lookupExTy : Env -> nat -> Typ -> Prop :=
 | l_exty_STy    : forall Γ A x, lookupExTy Γ x A -> lookupExTy (TyCons Γ) (S x) (ty_shift A 0)
 | l_exty_SEx    : forall Γ A x, lookupExTy Γ x A -> lookupExTy (ExCons Γ) (S x) (ty_shift A 0)
 | l_exty_SExTy  : forall Γ A B x, lookupExTy Γ x A -> lookupExTy (ExTyCons Γ B) (S x) (ty_shift A 0)
-| l_exty_STm    : forall Γ A B x, lookupExTy Γ x A -> lookupExTy (TmCons Γ B) x (ty_shift A 0).
+| l_exty_STm    : forall Γ A B x, lookupExTy Γ x A -> lookupExTy (TmCons Γ B) x A.
 
 (* lookup an entry in subtyping env: solution (simpler ver.) *)
 Inductive lookupExTy' : Env -> nat -> Prop :=
@@ -193,26 +193,6 @@ Inductive RegularTyp : Env -> Typ -> Prop :=
 | r_all : forall Γ A,
     RegularTyp (TyCons Γ) A ->
     RegularTyp Γ (All A).
-
-Inductive Regular : Env -> Prop :=
-| reg_Z : Regular EnvEmpty
-| reg_STm : forall Γ A,
-    Regular Γ ->
-    RegularTyp Γ A ->
-    Regular (TmCons Γ A)
-| reg_STy : forall Γ,
-    Regular Γ ->
-    Regular (TyCons Γ)
-| reg_SEx : forall Γ,
-    Regular Γ ->
-    Regular (ExCons Γ)
-| reg_SExTy : forall Γ A,
-    Regular Γ ->
-    RegularTyp Γ A ->
-    Regular (ExTyCons Γ A)
-| reg_SSep : forall Γ,
-    Regular Γ ->
-    Regular (SepCons Γ).
 
 Inductive TRegular : Env -> Prop :=
 | treg_Z : TRegular EnvEmpty
