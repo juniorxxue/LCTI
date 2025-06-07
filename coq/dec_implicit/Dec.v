@@ -704,10 +704,17 @@ Proof. sauto lq: on rew: off use: num_solved_alt_env. Qed.
   {Σ = Σ'} + {Σ <> Σ'}.
 Proof. repeat decide equality. Qed. *)
 
+Fixpoint num_all (A : Typ) : nat :=
+  match A with
+  | Arr A1 A2 => num_all A1 + num_all A2
+  | All A' => 1 + num_all A'
+  | _ => 0
+  end.
+
 Lemma dec_ty_sub_ctx' : forall n,
   (forall Γ Σ e, tm_size e + ctx_size Σ < n ->
     {A | ty Γ Σ e A} + {~ exists A, ty Γ Σ e A}) *
-  (forall k m Δ A Σ, ctx_size Σ < n -> num_solved Δ A < k -> ty_size A < m ->
+  (forall k m Δ A Σ, ctx_size Σ < n -> num_solved Δ A < k -> num_all A < m ->
     {Δ' : Env & {A' : Typ & sub_ctx Δ A Σ Δ' A'}} + {~ exists Δ' A', sub_ctx Δ A Σ Δ' A'}).
 Proof.
   intro n. induction n. split; try lia.
@@ -832,7 +839,7 @@ Proof.
               eapply ty_det in Hty; eauto. sfirstorder.
       * assert (Hlt': ctx_size (CtxTrm (ty_shift_tm t 0) (ty_shift_ctx Σ 0)) < S n).
         { simpl in *. rewrite tm_size_ty_shift_tm. rewrite ctx_size_ty_shift. lia. }
-        assert (Hlt'': ty_size A < m). { simpl in *. lia. }
+        assert (Hlt'': num_all A < m). { simpl in *. lia. }
         assert (Hlt''': num_solved (Δ, ^) A < S k).
         { simpl in *. scongruence use: num_solved_Ty_Ex. }
         eapply IHm with (Δ := ExCons Δ) in Hlt'' as Hsub; eauto; simpl in *.
