@@ -149,8 +149,8 @@ data _ⅆ_≋_ⅆ_ : Env n m → Env n m → Env n m → Env n m → Set where
      → Γ ⊆ Δ w/t A
 ⅆ-⊆/ dd (ext-int x) with refl ← ⅆ-out-eq dd = ⊆/-refl (⊆-regular x (ⅆ-l-⊆ dd)) ⊢c-int
 ⅆ-⊆/ dd (ext-var x) = ext-var (ⅆ-⊆/x dd x)
-ⅆ-⊆/ dd (ext-arr ext ext₁) with ⅆ-total-mid dd (⊆/-⊆ ext) (⊆/-⊆ ext₁)
-... | ⟨ Ω' , ⟨ dd1 , dd2 ⟩ ⟩ = ext-arr (ⅆ-⊆/ dd1 ext) (ⅆ-⊆/ dd2 ext₁)
+ⅆ-⊆/ dd (ext-arr ext ext₁) with ⅆ-total-mid dd (⊆/-⊆ ext₁) (⊆/-⊆ ext)
+... | ⟨ Ω' , ⟨ dd1 , dd2 ⟩ ⟩ = ext-arr (ⅆ-⊆/ dd2 ext) (ⅆ-⊆/ dd1 ext₁)
 ⅆ-⊆/ dd (ext-∀ ext) = ext-∀ (ⅆ-⊆/ (ⅆS∙ dd) ext)
 
 
@@ -230,8 +230,8 @@ s+-subirrev (s-int regΓ) fv-Int tf with refl ← ⅆk-input-eq tf = s-int (⊆-
 s+-subirrev (s-var-∙ regΓ x) fv-var tf with refl ← ⅆk-input-eq tf = s-var-∙ (⊆-regular' regΓ (ⅆk-⊆-l tf)) (ⅆk-∋∙ tf refl x)
 s+-subirrev (s-ex-l^ inst) fv-var tf = s-ex-l^ (ⅆk-inst inst tf)
 s+-subirrev (s-ex-l= regΓ x-in) fv-var tf with refl ← ⅆk-input-eq tf = s-ex-l= (⊆-regular' regΓ (ⅆk-⊆-l tf)) (ⅆk-∋:= tf refl x-in)
-s+-subirrev (s-arr s s₁) (fv-arr fv fv₁ cb) tf with ⅆk-total tf (ss-⊆ s) (ss-⊆ s₁)
-... | ⟨ Ω' , ⟨ dd1 , dd2 ⟩ ⟩ = s-arr (s--subirrev s fv (ⅆk-or-l dd1 cb)) (s+-subirrev s₁ fv₁ (ⅆk-or-r dd2 cb))
+s+-subirrev (s-arr s s₁) (fv-arr fv fv₁ cb) tf with ⅆk-total tf (ss-⊆ s₁) (ss-⊆ s)
+... | ⟨ Ω' , ⟨ dd1 , dd2 ⟩ ⟩ = s-arr (s--subirrev s fv (ⅆk-or-l dd2 cb)) (s+-subirrev s₁ fv₁ (ⅆk-or-r dd1 cb))
 s+-subirrev (s-∀ s) (fv-∀-h fv) tf = s-∀ (s+-subirrev s fv (ⅆS∙∙-hit tf))
 s+-subirrev (s-∀ s) (fv-∀-m fv) tf = s-∀ (s+-subirrev s fv (ⅆS∙∙-mis tf))
 
@@ -239,8 +239,8 @@ s--subirrev (s-int regΓ) fv tf with refl ← ⅆk-input-eq tf = s-int (⊆-regu
 s--subirrev (s-var-∙ regΓ x) fv-var tf with refl ← ⅆk-input-eq tf = s-var-∙ (⊆-regular' regΓ (ⅆk-⊆-l tf)) (ⅆk-∋∙ tf refl x)
 s--subirrev (s-ex-r^ inst) fv-var tf = s-ex-r^ (ⅆk-inst inst tf)
 s--subirrev (s-ex-r= regΓ x-in) fv-var tf with refl ← ⅆk-input-eq tf = s-ex-r= (⊆-regular' regΓ (ⅆk-⊆-l tf)) (ⅆk-∋:= tf refl x-in)
-s--subirrev (s-arr s s₁) (fv-arr fv fv₁ cb) tf with ⅆk-total tf (ss-⊆ s) (ss-⊆ s₁)
-... | ⟨ Ω' , ⟨ dd1 , dd2 ⟩ ⟩ = s-arr (s+-subirrev s fv (ⅆk-or-l dd1 cb)) (s--subirrev s₁ fv₁ (ⅆk-or-r dd2 cb))
+s--subirrev (s-arr s s₁) (fv-arr fv fv₁ cb) tf with ⅆk-total tf (ss-⊆ s₁) (ss-⊆ s)
+... | ⟨ Ω' , ⟨ dd1 , dd2 ⟩ ⟩ = s-arr (s+-subirrev s fv (ⅆk-or-l dd2 cb)) (s--subirrev s₁ fv₁ (ⅆk-or-r dd1 cb))
 s--subirrev (s-∀ s) (fv-∀-h fv) tf = s-∀ (s--subirrev s fv (ⅆS∙∙-hit tf))
 s--subirrev (s-∀ s) (fv-∀-m fv) tf = s-∀ (s--subirrev s fv (ⅆS∙∙-mis tf))
 

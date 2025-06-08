@@ -53,19 +53,13 @@ complete-ss- : Δ ⊢ ∞ # A ⌞ ≤⁻ ⌝ B
              → Γ ⊆ Δ w/t B
              → Γ ⊢ A ⌞ ≤⁻ ⌝ B ⊣ Δ
 
-complete-s :  Δ ⊢ j # A ⌞ ≤⁺ ⌝ B
-            → Γ ⊆ Δ w/t A w/c j
-            → Γ ⊢ ⟨ j , B ⟩ ~s Σ
-            → Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
-
 complete-ss+ (s-int regΔ) ext with ⊆/-⊢c-eq ext ⊢c-int
 ... | refl = s-int regΔ
 complete-ss+ (s-var-∙ regΔ inΔ) (ext-var x) with ⊆/-⊢c-eq (ext-var x) (⊢c-var-∙ (⊆/-∙out-∙in inΔ x))
 ... | refl = s-var-∙ regΔ inΔ
 complete-ss+ (s-arr₁ s s₁) (ext-arr ext ext₁)
-  with ⟨ Ψ , diff ⟩ ← ⅆ-total (⊆/-⊆ ext) (⊆/-⊆ ext₁)
-  with ih ← complete-ss- {Γ = Ψ} s (ⅆ-⊆/ diff ext)
-  = s-arr (s--subirrev-final ih diff (⊆/-⊢c ext)) (complete-ss+ s₁ ext₁)
+  with ⟨ Ψ , diff ⟩ ← ⅆ-total (⊆/-⊆ ext₁) (⊆/-⊆ ext)
+  with ih ← complete-ss+ {Γ = Ψ} s₁ (ⅆ-⊆/ diff ext₁) = s-arr (complete-ss- s ext) (s+-subirrev-final ih diff (⊆/-⊢c ext₁))
 complete-ss+ (s-∀ s) (ext-∀ ext) = s-∀ (complete-ss+ s ext)
 complete-ss+ (s-svar-l x inΔ) ext'@(ext-var x₁) with ⊆/x-=out-in x₁ (∋:=to∋= inΔ)
 ... | is-ex inΓ = s-ex-l^ (⊆/x-^in-=out-inst inΓ inΔ x₁)
@@ -76,24 +70,37 @@ complete-ss- (s-int regΔ) ext with ⊆/-⊢c-eq ext ⊢c-int
 complete-ss- (s-var-∙ regΔ inΔ) (ext-var x) with ⊆/-⊢c-eq (ext-var x) (⊢c-var-∙ (⊆/-∙out-∙in inΔ x))
 ... | refl = s-var-∙ regΔ inΔ
 complete-ss- (s-arr₁ s s₁) (ext-arr ext ext₁)
-  with ⟨ Ψ , diff ⟩  ← ⅆ-total (⊆/-⊆ ext) (⊆/-⊆ ext₁)
-  with ih ← complete-ss+ {Γ = Ψ} s (ⅆ-⊆/ diff ext)
-  = s-arr (s+-subirrev-final ih diff (⊆/-⊢c ext)) (complete-ss- s₁ ext₁)
+  with ⟨ Ψ , diff ⟩ ← ⅆ-total (⊆/-⊆ ext₁) (⊆/-⊆ ext)
+  with ih ← complete-ss- {Γ = Ψ} s₁ (ⅆ-⊆/ diff ext₁) = s-arr (complete-ss+ s ext) (s--subirrev-final ih diff (⊆/-⊢c ext₁))
 complete-ss- (s-∀ s) (ext-∀ ext) = s-∀ (complete-ss- s ext)
 complete-ss- (s-svar-r x inΔ) ext'@(ext-var x₁) with ⊆/x-=out-in x₁ (∋:=to∋= inΔ)
 ... | is-ex inΓ = s-ex-r^ (⊆/x-^in-=out-inst inΓ inΔ x₁)
 ... | is-sol inΓ with refl ← ⊆/-⊢c-eq ext' (⊢c-var-= inΓ) = s-ex-r= x inΔ
 
+
+
+complete-s :  Δ ⊢ j # A ⌞ ≤⁺ ⌝ B
+            → Γ ⊆ Δ w/t A w/c j
+            → Γ ⊢ ⟨ j , B ⟩ ~s Σ
+            → Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
 complete-s {j = Z} (s-refl regΔ cloA grd) (⊆Z regΓ) ~Z = s-empty regΔ cloA grd
 complete-s {j = ∞} s (⊆∞ x) ~∞ = s-type (complete-ss+ s x)
 complete-s {j = 𝕚 j} {Γ = Γ} (s-arr₂ {A = A} s s₁) (⊆I ext ext₁) (~I ⊢e j~Σ) with ⊆/-openclose ext
 ... | inj₁ opnA
+  with ⟨ Ψ , diff ⟩ ← ⅆ-total (⊆/c-⊆ ext₁) (⊆/-⊆ ext)
+  with ih ← complete-s s₁ {!!} {!!}
+  = s-term-o opnA (t-irrev-⊆ ⊢e (⊆/c-⊆ ext₁)) (complete-ss- s ext) {!!}
+... | inj₂ cloA
+  with refl ← ⊆/-⊢c-eq ext cloA
+  = s-term-c cloA (s--≫ s) (t-irrev-⊆ (subsumption0 ⊢e) (⊆/c-⊆ ext₁)) (complete-s s₁ ext₁ j~Σ)
+{-with ⊆/-openclose ext
+... | inj₁ opnA
   with ⟨ Ψ , diff ⟩ ← ⅆ-total (⊆/-⊆ ext) (⊆/c-⊆ ext₁)
   with ih ← complete-ss- {Γ = Ψ} s (ⅆ-⊆/ diff ext)
   = s-term-o opnA ⊢e (s--subirrev-final ih diff (⊆/-⊢c ext)) (complete-s s₁ ext₁ (~irrev j~Σ (⊆/-⊆ ext)))
-... | inj₂ cloA
-  with refl ← ⊆/-⊢c-eq ext cloA = s-term-c cloA (⊆-⊢c-≫ (⊆/c-⊆ ext₁) cloA (s--≫ s)) (subsumption0 ⊢e) (complete-s s₁ ext₁ j~Σ)
-complete-s {j = 𝕔 j} (s-arr₃ cloA grd s) (⊆C cloA' ext) (~C ⊢e j~Σ) = s-term-c cloA' (⊆-⊢c-≫ (⊆/c-⊆ ext) cloA' grd) ⊢e (complete-s s ext j~Σ)
+-}
+complete-s {j = 𝕔 j} (s-arr₃ cloA grd s) (⊆C cloA' ext) (~C ⊢e j~Σ) = s-term-c cloA grd (t-irrev-⊆ ⊢e (⊆/c-⊆ ext)) (complete-s s ext j~Σ)
+-- s-term-c cloA' (⊆-⊢c-≫ (⊆/c-⊆ ext) cloA' grd) ⊢e (complete-s s ext j~Σ)
 complete-s (s-∀l s ic fd upC upD (↑tyʲ-𝕚 upj)) (⊆∀-I ext upj') j~'@(~I {Σ = Σ} {e = e} ⊢e j~) with ↑tyᶜ0-total Σ | ↑tyᵉ0-total e | s-sregular s
 ... | ⟨ Σ' , upΣ ⟩ | ⟨ e' , upe ⟩ | reg-S= r regA
   with refl ← ↑tyʲ-unique upj upj' = let weaken-j~ = (~weaken^0 (~I ⊢e j~) (↑ty-arr upC upD) (↑tyᶜ-e upe upΣ)) (↑tyʲ-𝕚 upj)

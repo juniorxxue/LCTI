@@ -85,6 +85,7 @@ nonz-↑tyʲ nz-C (↑tyʲ-𝕔 upj) = nz-C
 nonz-↑tyʲ nz-T (↑tyʲ-𝕥 upj upA) = nz-T
 
 data ¬find : Type m → Fin m → Counter m → Set where
+  f-z : ¬find A k Z
   f-∞ : k ¬ε A
       → ¬find A k ∞
   f-arr-𝕚 : k ¬ε A
@@ -101,7 +102,9 @@ data ¬find : Type m → Fin m → Counter m → Set where
   f-𝕥       : ¬find A (#S k) j'
             → (upj : ↑tyʲ0 j ⇘ j')
             → ¬find (`∀ A) k (𝕥₍ B ₎ j)
-
+  f-var₁ : ¬find (‶ X) k (𝕚 j)
+  f-var₂ : ¬find (‶ X) k (𝕔 j)
+  f-var₃ : ¬find (‶ X) k (𝕥₍ B ₎ j)
 
 -- find A k j
 -- at j-th position of A type, should have a bound variable, example: |-1 forall a. a -> a <: Int
