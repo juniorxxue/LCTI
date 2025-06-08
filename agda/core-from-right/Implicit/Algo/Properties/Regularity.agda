@@ -1,3 +1,5 @@
+{-# OPTIONS --allow-unsolved-metas #-}
+{-# OPTIONS --allow-incomplete-matches #-}
 module Implicit.Algo.Properties.Regularity where
 
 open import Implicit.Language.All
@@ -39,7 +41,7 @@ ss-env-in (s-ex-l^ inst) = inst-env-in inst
 ss-env-in (s-ex-r^ inst) = inst-env-in inst
 ss-env-in (s-ex-l= regΓ x-in) = regΓ
 ss-env-in (s-ex-r= regΓ x-in) = regΓ
-ss-env-in (s-arr s s₁) = ss-env-in s
+ss-env-in (s-arr s s₁) = ss-env-in s₁
 ss-env-in (s-∀ s) with ss-env-in s
 ... | reg-S∙ r = r
 
@@ -52,7 +54,7 @@ s-env-in : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
 s-env-in (s-empty cloΓ cloA x) = cloΓ
 s-env-in (s-type ss) = ss-env-in ss
 s-env-in (s-term-c cloA ap ⊢e s) = s-env-in s
-s-env-in (s-term-o opnA ⊢e x s) = ss-env-in x
+s-env-in (s-term-o opnA ⊢e x s) = s-env-in s
 s-env-in (s-∀l s upᶜ upᵉ upC upD) with s-env-in s
 ... | reg-S^ r = r
 s-env-in (s-∀l-no s upᶜ upᵉ upC upD) with s-env-in s
@@ -135,7 +137,8 @@ s-⊢rᶜ : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
 s-⊢rᶜ (s-empty regΓ cloA grd) = ⊢rᶜ-empty
 s-⊢rᶜ (s-type ss) = ⊢rᶜ-τ (ss-polarity+ ss)
 s-⊢rᶜ (s-term-c cloA ap ⊢e s) = ⊢rᶜ-term (s-⊢rᶜ s)
-s-⊢rᶜ (s-term-o opnA ⊢e ss s) = ⊢rᶜ-term (⊆-⊢rᶜ' (s-⊢rᶜ s) (ss-⊆ ss))
+s-⊢rᶜ (s-term-o opnA ⊢e ss s) = {!!}
+-- ⊢rᶜ-term (⊆-⊢rᶜ' (s-⊢rᶜ s) (ss-⊆ ss))
 s-⊢rᶜ (s-∀l s upᶜ upᵉ upC upD) with s-⊢rᶜ s
 ... | ⊢rᶜ-term r = ⊢rᶜ-term (⊢rᶜ-strengthen^0 r upᶜ)
 s-⊢rᶜ (s-∀l-no s upᶜ upᵉ upC upD) with s-⊢rᶜ s
@@ -169,8 +172,8 @@ t-⊢r : Γ ⊢ Σ ⇒ e ⇒ A
 
 s-⊢r (s-empty regΓ cloA x) = ⊢c-≫-⊢r regΓ cloA x
 s-⊢r (s-type ss) = ss-polarity+ ss
-s-⊢r (s-term-c cloA ap ⊢e s) = ⊢r-arr (⊢c-≫-⊢r (s-env-in s) cloA ap) (s-⊢r s)
-s-⊢r (s-term-o opnA ⊢e ss s) = ⊢r-arr (⊢r-𝕣 (t-⊢r ⊢e)) (⊆-⊢r' (s-⊢r s) (ss-⊆ ss))
+s-⊢r (s-term-c cloA ap ⊢e s) = ⊢r-arr (⊆-⊢r' (⊢c-≫-⊢r (s-env-out s) cloA ap) (s-⊆ s)) (s-⊢r s)
+s-⊢r (s-term-o opnA ⊢e ss s) = ⊢r-arr {!!} {!!}
 s-⊢r (s-∀l s upᶜ upᵉ upC upD) = ⊢r-strengthen^0 (s-⊢r s) (↑ty-arr upC upD)
 s-⊢r (s-∀l-no s upᶜ upᵉ upC upD) = ⊢r-strengthen^0 (s-⊢r s) (↑ty-arr upC upD)
 s-⊢r (s-tapp s upᶜ) = ⊢r-∀ (⊢r-◆0 (s-⊢r s))

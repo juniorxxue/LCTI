@@ -56,8 +56,8 @@ data _⊆_w/t_ : Env n m → Env n m → Type m → Set where
           → Γ ⊆ Γ w/t Int
   ext-var : Γ ⊆ Δ w/v X
           → Γ ⊆ Δ w/t ‶ X
-  ext-arr : Γ ⊆ Ω w/t A
-          → Ω ⊆ Δ w/t B
+  ext-arr : Ω ⊆ Δ w/t A
+          → Γ ⊆ Ω w/t B
           → Γ ⊆ Δ w/t A `→ B
   ext-∀   : Γ ,∙ ⊆ Δ ,∙ w/t A
           → Γ ⊆ Δ w/t `∀ A

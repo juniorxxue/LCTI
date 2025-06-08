@@ -48,11 +48,11 @@ s-⊆-exsol (svar ext _) (S= inΓ) with s-⊆-exsol ext inΓ
          → ExSol Δ k
 ⊆/-exsol (ext-int _) inΓ = is-ex inΓ
 ⊆/-exsol (ext-var x) inΓ = ⊆/x-exsol x inΓ
-⊆/-exsol (ext-arr ext ext₁) inΓ with ⊆/-exsol ext inΓ
-... | is-ex inΓ₁ with ⊆/-exsol ext₁ inΓ₁
+⊆/-exsol (ext-arr ext ext₁) inΓ with ⊆/-exsol ext₁ inΓ
+... | is-ex inΓ₁ with ⊆/-exsol ext inΓ₁
 ... | is-ex inΓ₂ = is-ex inΓ₂
 ... | is-sol inΓ₂ = is-sol inΓ₂
-⊆/-exsol (ext-arr ext ext₁) inΓ | is-sol inΓ₁ = is-sol (⊆/-=in-=out ext₁ inΓ₁)
+⊆/-exsol (ext-arr ext ext₁) inΓ | is-sol inΓ₁ = is-sol (⊆/-=in-=out ext inΓ₁)
 ⊆/-exsol (ext-∀ ext) inΓ with ⊆/-exsol ext (S∙ inΓ)
 ... | is-ex (S∙ inΓ₁) = is-ex inΓ₁
 ... | is-sol (S∙ inΓ₁) = is-sol inΓ₁

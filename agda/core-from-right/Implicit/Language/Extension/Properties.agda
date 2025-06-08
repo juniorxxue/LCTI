@@ -140,8 +140,8 @@ reg-⊆/ senv (⊢r-∀ regA) = ext-∀ (reg-⊆/ (reg-S∙ senv) regA)
 ⊆/-⊢c-eq (ext-var x) (⊢c-var-∙ inΔ) = ⊆/x-∋∙-eq x inΔ
 ⊆/-⊢c-eq (ext-var x) (⊢c-var-= inΔ) = ⊆/x-∋=-eq x inΔ
 ⊆/-⊢c-eq (ext-arr ext ext₁) (⊢c-arr cloA cloA₁)
-  with refl ← ⊆/-⊢c-eq ext cloA
-  with refl ← ⊆/-⊢c-eq ext₁ cloA₁ = refl
+  with refl ← ⊆/-⊢c-eq ext₁ cloA₁
+  with refl ← ⊆/-⊢c-eq ext cloA = refl
 ⊆/-⊢c-eq (ext-∀ ext) (⊢c-∀ cloA)
   with refl ← ⊆/-⊢c-eq ext cloA = refl
 
@@ -172,7 +172,7 @@ reg-⊆/ senv (⊢r-∀ regA) = ext-∀ (reg-⊆/ (reg-S∙ senv) regA)
      → Γ ⊆ Δ
 ⊆/-⊆ (ext-int regΓ) = ⊆-refl regΓ
 ⊆/-⊆ (ext-var x) = ⊆/x-⊆ x
-⊆/-⊆ (ext-arr ext ext₁) = ⊆-trans (⊆/-⊆ ext) (⊆/-⊆ ext₁)
+⊆/-⊆ (ext-arr ext ext₁) = ⊆-trans (⊆/-⊆ ext₁) (⊆/-⊆ ext)
 ⊆/-⊆ (ext-∀ ext) with ⊆/-⊆ ext
 ... | uvar r = r
 
@@ -218,7 +218,7 @@ reg-⊆/ senv (⊢r-∀ regA) = ext-∀ (reg-⊆/ (reg-S∙ senv) regA)
       → Δ ⊢c A
 ⊆/-⊢c (ext-int x) = ⊢c-int
 ⊆/-⊢c (ext-var x) = ⊆/x-⊢c x
-⊆/-⊢c (ext-arr ext ext₁) = ⊢c-arr (⊆-⊢c (⊆/-⊢c ext) (⊆/-⊆ ext₁)) (⊆/-⊢c ext₁)
+⊆/-⊢c (ext-arr ext ext₁) = ⊢c-arr (⊆/-⊢c ext) (⊆-⊢c (⊆/-⊢c ext₁) (⊆/-⊆ ext))
 ⊆/-⊢c (ext-∀ ext) = ⊢c-∀ (⊆/-⊢c ext)
 
 

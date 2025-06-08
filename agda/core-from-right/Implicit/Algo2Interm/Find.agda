@@ -1,3 +1,5 @@
+{-# OPTIONS --allow-unsolved-metas #-}
+{-# OPTIONS --allow-incomplete-matches #-}
 module Implicit.Algo2Interm.Find where
 
 open import Implicit.Language.All
@@ -25,10 +27,15 @@ s-find : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B ↡ j
        → find A k j
 s-find (s-empty regΓ cloA x) inΓ inΔ = ⊥-elim (∋^-∋=-false inΓ inΔ)
 s-find (s-type ss) inΓ inΔ = f-∞ (ss-find-l ss inΓ inΔ)
-s-find (s-term-c cloA ap ⊢e s) inΓ inΔ = f-arr-𝕔 (⊢c-^∈-¬ε cloA inΓ) (s-find s inΓ inΔ)
-s-find {k = k} (s-term-o {A = A} opnA ⊢e ss s) inΓ inΔ with ε-dec {k = k} {A = A}
+s-find (s-term-c cloA ap ⊢e s) inΓ inΔ = f-arr-𝕔 (s-find s inΓ inΔ)
+-- f-arr-𝕔 (⊢c-^∈-¬ε cloA inΓ) (s-find s inΓ inΔ)
+s-find {k = k} (s-term-o {B = B} opnA ⊢e ss s) inΓ inΔ with ε-dec {k = k} {A = B}
+... | inj₁ inB = f-arr-𝕚-r (s-find s inΓ (⊆/-^in-=out {!!} inB inΓ))
+... | inj₂ ¬inB = f-arr-𝕚-l (^in-=out-ε (ss--⊆/ ss) (⊆/-^in-^out {!!} ¬inB inΓ) inΔ) {!!}
+{- with ε-dec {k = k} {A = A}
 ... | inj₁ inA  = f-arr-𝕚-l inA
 ... | inj₂ ¬inA = f-arr-𝕚-r ¬inA (s-find s (⊆/-^in-^out (ss--⊆/ ss) ¬inA inΓ) inΔ)
+-}
 s-find (s-∀l-𝕚 s upᶜ upj upᵉ upC upD) inΓ inΔ = f-∀-𝕚 (s-find s (S^ inΓ) (S= inΔ)) upj
 s-find (s-∀l-𝕔 s upᶜ upj upᵉ upC upD) inΓ inΔ = f-∀-𝕔 (s-find s (S^ inΓ) (S= inΔ)) upj
 s-find (s-tapp s upᶜ upj) inΓ inΔ = f-𝕥 (s-find s (S= inΓ) (S= inΔ)) upj
@@ -58,15 +65,15 @@ ss-¬ε+ (s-int regΓ) inΓ inΔ = ¬ε-int
 ss-¬ε+ (s-var-∙ regΓ x) inΓ inΔ = ¬ε-var (∋∙-∋^-≢ x inΓ)
 ss-¬ε+ (s-ex-l^ inst) inΓ inΔ = ¬ε-var (∋=-∋^-≢ (inst-∋= inst) inΔ)
 ss-¬ε+ (s-ex-l= regΓ x-in) inΓ inΔ = ¬ε-var (∋=-∋^-≢ (∋:=to∋= x-in) inΔ)
-ss-¬ε+ (s-arr s s₁) inΓ inΔ = let inΩ = ⊆-∋^-middle inΓ inΔ (ss-⊆ s) (ss-⊆ s₁)
-                              in ¬ε-arr (ss-¬ε- s inΓ inΩ) (ss-¬ε+ s₁ inΩ inΔ)
+ss-¬ε+ (s-arr s s₁) inΓ inΔ = let inΩ = ⊆-∋^-middle inΓ inΔ (ss-⊆ s₁) (ss-⊆ s)
+                              in ¬ε-arr (ss-¬ε- s inΩ inΔ) (ss-¬ε+ s₁ inΓ inΩ)
 ss-¬ε+ (s-∀ s) inΓ inΔ = ¬ε-∀ (ss-¬ε+ s (S∙ inΓ) (S∙ inΔ))
 
 ss-¬ε- (s-int regΓ) inΓ inΔ = ¬ε-int
 ss-¬ε- (s-var-∙ regΓ x) inΓ inΔ = ¬ε-var (∋∙-∋^-≢ x inΓ)
 ss-¬ε- (s-ex-r^ inst) inΓ inΔ = ¬ε-var (∋=-∋^-≢ (inst-∋= inst) inΔ)
 ss-¬ε- (s-ex-r= regΓ x-in) inΓ inΔ = ¬ε-var (∋=-∋^-≢ (∋:=to∋= x-in) inΔ)
-ss-¬ε- (s-arr s s₁) inΓ inΔ = let inΩ = ⊆-∋^-middle inΓ inΔ (ss-⊆ s) (ss-⊆ s₁) in ¬ε-arr (ss-¬ε+ s inΓ inΩ) (ss-¬ε- s₁ inΩ inΔ)
+ss-¬ε- (s-arr s s₁) inΓ inΔ = let inΩ = ⊆-∋^-middle inΓ inΔ (ss-⊆ s₁) (ss-⊆ s) in ¬ε-arr (ss-¬ε+ s inΩ inΔ) (ss-¬ε- s₁ inΓ inΩ)
 ss-¬ε- (s-∀ s) inΓ inΔ = ¬ε-∀ (ss-¬ε- s (S∙ inΓ) (S∙ inΔ))
 
 s-¬ε : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
@@ -75,9 +82,8 @@ s-¬ε : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
        → k ¬ε A
 s-¬ε (s-empty regΓ cloA grd) inΓ inΔ = ⊢c-^∈-¬ε cloA inΔ
 s-¬ε (s-type ss) inΓ inΔ = ss-¬ε+ ss inΓ inΔ
-s-¬ε (s-term-c cloA ap ⊢e s) inΓ inΔ = ¬ε-arr (⊢c-^∈-¬ε cloA inΓ) (s-¬ε s inΓ inΔ)
-s-¬ε (s-term-o opnA ⊢e ss s) inΓ inΔ = let inΩ = ⊆-∋^-middle inΓ inΔ (ss-⊆ ss) (s-⊆ s)
-                                       in ¬ε-arr (ss-¬ε- ss inΓ inΩ) (s-¬ε s inΩ inΔ)
+s-¬ε (s-term-c cloA ap ⊢e s) inΓ inΔ = ¬ε-arr (⊢c-^∈-¬ε cloA inΔ) (s-¬ε s inΓ inΔ)
+s-¬ε (s-term-o opnA ⊢e ss s) inΓ inΔ = let inΩ = ⊆-∋^-middle inΓ inΔ (s-⊆ s) (ss-⊆ ss) in ¬ε-arr (ss-¬ε- ss inΩ inΔ) (s-¬ε s inΓ inΩ)
 s-¬ε (s-∀l s upᶜ upᵉ upC upD) inΓ inΔ = ¬ε-∀ (s-¬ε s (S^ inΓ) (S= inΔ))
 s-¬ε (s-∀l-no s upᶜ upᵉ upC upD) inΓ inΔ = ¬ε-∀ (s-¬ε s (S^ inΓ) (S^ inΔ))
 s-¬ε (s-tapp s upᶜ) inΓ inΔ = ¬ε-∀ (s-¬ε s (S= inΓ) (S= inΔ))

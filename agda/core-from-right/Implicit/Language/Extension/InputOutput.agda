@@ -57,22 +57,21 @@ open import Implicit.Language.Extension.Base
              → Δ ∋= k
 
 ⊆/-^in-=out (ext-var x) ε-var inΓ = ⊆/x-^in-=out x inΓ
-⊆/-^in-=out (ext-arr ext ext₁) (ε-arr-l inA) inΓ = ⊆/-=in-=out ext₁ (⊆/-^in-=out ext inA inΓ)
-⊆/-^in-=out {A = A `→ B} {k = k} (ext-arr ext ext₁) (ε-arr-r ¬inA inB) inΓ with ε-dec {k = k} {A = A}
-... | inj₁ init = ⊆/-=in-=out ext₁ (⊆/-^in-=out ext init inΓ)
-... | inj₂ nint = ⊆/-^in-=out ext₁ inB (⊆/-^in-^out ext nint inΓ)
+⊆/-^in-=out {A = A `→ B} {k = k} (ext-arr ext ext₁) (ε-arr-l ninB inA) inΓ with ε-dec {k = k} {A = B}
+... | inj₁ init = ⊆/-=in-=out ext (⊆/-^in-=out ext₁ init inΓ)
+... | inj₂ nint = ⊆/-^in-=out ext inA (⊆/-^in-^out ext₁ nint inΓ)
+⊆/-^in-=out (ext-arr ext ext₁) (ε-arr-r inB) inΓ = ⊆/-=in-=out ext (⊆/-^in-=out ext₁ inB inΓ)
 ⊆/-^in-=out (ext-∀ ext) (ε-∀ inA) inΓ with ⊆/-^in-=out ext inA (S∙ inΓ)
 ... | S∙ r = r
-
 ⊆/-^in-^out (ext-int _) ninA inΓ = inΓ
 ⊆/-^in-^out (ext-var x) (¬ε-var x₁) inΓ = ⊆/x-^in-^out x x₁ inΓ
-⊆/-^in-^out (ext-arr ext ext₁) (¬ε-arr ninA ninA₁) inΓ = ⊆/-^in-^out ext₁ ninA₁ (⊆/-^in-^out ext ninA inΓ)
+⊆/-^in-^out (ext-arr ext ext₁) (¬ε-arr ninA ninA₁) inΓ = ⊆/-^in-^out ext ninA (⊆/-^in-^out ext₁ ninA₁ inΓ)
 ⊆/-^in-^out (ext-∀ ext) (¬ε-∀ ninA) inΓ with ⊆/-^in-^out ext ninA (S∙ inΓ)
 ... | S∙ r = r
 
 ⊆/-=in-=out (ext-int _) inΓ = inΓ
 ⊆/-=in-=out (ext-var x) inΓ = ⊆/x-=in-=out x inΓ
-⊆/-=in-=out (ext-arr ext ext₁) inΓ = ⊆/-=in-=out ext₁ (⊆/-=in-=out ext inΓ)
+⊆/-=in-=out (ext-arr ext ext₁) inΓ = ⊆/-=in-=out ext (⊆/-=in-=out ext₁ inΓ)
 ⊆/-=in-=out (ext-∀ ext) inΓ with ⊆/-=in-=out ext (S∙ inΓ)
 ... | S∙ r = r
 

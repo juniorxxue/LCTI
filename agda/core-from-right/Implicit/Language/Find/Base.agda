@@ -84,6 +84,24 @@ nonz-↑tyʲ nz-I (↑tyʲ-𝕚 upj) = nz-I
 nonz-↑tyʲ nz-C (↑tyʲ-𝕔 upj) = nz-C
 nonz-↑tyʲ nz-T (↑tyʲ-𝕥 upj upA) = nz-T
 
+data ¬find : Type m → Fin m → Counter m → Set where
+  f-∞ : k ¬ε A
+      → ¬find A k ∞
+  f-arr-𝕚 : k ¬ε A
+          → ¬find B k j
+          → ¬find (A `→ B) k (𝕚 j)
+  f-arr-𝕔 : ¬find B k j -- attention here
+          → ¬find (A `→ B) k (𝕔 j)
+  f-∀-𝕚 : ¬find A (#S k) (𝕚 j')
+            → (upj : ↑tyʲ0 j ⇘ j')
+            → ¬find (`∀ A) k (𝕚 j)
+  f-∀-𝕔     : ¬find A (#S k) (𝕔 j')
+            → (upj : ↑tyʲ0 j ⇘ j')
+            → ¬find (`∀ A) k (𝕔 j)
+  f-𝕥       : ¬find A (#S k) j'
+            → (upj : ↑tyʲ0 j ⇘ j')
+            → ¬find (`∀ A) k (𝕥₍ B ₎ j)
+
 
 -- find A k j
 -- at j-th position of A type, should have a bound variable, example: |-1 forall a. a -> a <: Int
@@ -91,12 +109,11 @@ data find : Type m → Fin m → Counter m → Set where
   f-∞       : k ε A
             → find A k ∞
   f-arr-𝕚-l : k ε A
+            → ¬find B k j
             → find (A `→ B) k (𝕚 j)
-  f-arr-𝕚-r : (¬inA : k ¬ε A)
-            → find B k j
+  f-arr-𝕚-r : find B k j
             → find (A `→ B) k (𝕚 j)
-  f-arr-𝕔   : (¬inA : k ¬ε A)
-            → find B k j
+  f-arr-𝕔   : find B k j
             → find (A `→ B) k (𝕔 j)
   f-∀-𝕚     : find A (#S k) (𝕚 j')
             → (upj : ↑tyʲ0 j ⇘ j')
@@ -111,16 +128,6 @@ data find : Type m → Fin m → Counter m → Set where
 find-ε : find A k ∞
        → k ε A
 find-ε (f-∞ x) = x
-
-{-
-find-arr-r : find B k ∞
-         → find (A `→ B) k ∞
-find-arr-r fd = f-∞ (ε-arr-r {!!} (find-ε fd))
--}
-
-find-arr-l : find A k ∞
-           → find (A `→ B) k ∞
-find-arr-l fd = f-∞ (ε-arr-l (find-ε fd))
 
 
 find-Z-false : find A k Z

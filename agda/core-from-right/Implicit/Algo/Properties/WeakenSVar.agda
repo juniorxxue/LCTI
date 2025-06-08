@@ -1,3 +1,5 @@
+{-# OPTIONS --allow-unsolved-metas #-}
+{-# OPTIONS --allow-incomplete-matches #-}
 module Implicit.Algo.Properties.WeakenSVar where
 
 open import Implicit.Language.All
@@ -41,9 +43,11 @@ ss-weaken= (s-ex-l^ inst) new ↑ty-var upB = s-ex-l^ (inst-weaken= inst new upB
 ss-weaken= (s-ex-r^ inst) new upA ↑ty-var = s-ex-r^ (inst-weaken= inst new upA)
 ss-weaken= (s-ex-l= regΓ x-in) new ↑ty-var upB with refl ← ▶⨟=-unique new = s-ex-l= (sregular-weaken= regΓ (▶⨟=-▶=-l new)) (∋:=-weaken= x-in (▶⨟=-▶=-l new) upB)
 ss-weaken= (s-ex-r= regΓ x-in) new upA ↑ty-var with refl ← ▶⨟=-unique new = s-ex-r= (sregular-weaken= regΓ (▶⨟=-▶=-l new)) (∋:=-weaken= x-in (▶⨟=-▶=-l new) upA)
+{-
 ss-weaken= (s-arr ss ss₁) new (↑ty-arr upA upA₁) (↑ty-arr upB upB₁)
   with ⟨ Ω' , ⟨ new1 , new2 ⟩ ⟩ ← ▶⨟=-Ω-exist new (ss-⊆ ss) (ss-⊆ ss₁)
   = s-arr (ss-weaken= ss new1 upB upA) (ss-weaken= ss₁ new2 upA₁ upB₁)
+-}
 ss-weaken= {T = T} (s-∀ ss) new (↑ty-∀ upA) (↑ty-∀ upB)
   with ⟨ T' , upT ⟩ ← ↑ty0-total T = s-∀ (ss-weaken= ss (▶S∙ new upT) upA upB)
 
@@ -88,6 +92,7 @@ s-weaken= (s-empty regΓ cloA grd) new upA ↑tyᶜ-□ upB
   with refl ← ▶⨟=-unique new = s-empty (sregular-weaken= regΓ (▶⨟=-▶=-l new)) (⊢c-weaken= cloA (▶⨟=-▶=-l new) upA) (≫-weaken= grd (▶⨟=-▶=-l new) upA upB)
 s-weaken= (s-type ss) new upA (↑tyᶜ-τ up-t) upB
   with refl ← ↑ty-unique up-t upB = s-type (ss-weaken= ss new upA up-t)
+{-
 s-weaken= (s-term-c cloA ap ⊢e s) new (↑ty-arr upA upA₁) (↑tyᶜ-e up-e upΣ) (↑ty-arr upB upB₁)
   with refl ← ⊢id0 ⊢e
   = s-term-c (⊢c-weaken= cloA (▶⨟=-▶=-l new) upA) (≫-weaken= ap (▶⨟=-▶=-l new) upA upB) (t-weaken= ⊢e (▶=-𝕣 (▶⨟=-▶=-l new)) (↑tyᶜ-τ upB) up-e upB) (s-weaken= s new upA₁ upΣ upB₁)
@@ -97,6 +102,7 @@ s-weaken= (s-term-o opnA ⊢e ss s) new (↑ty-arr upA upA₁) (↑tyᶜ-e up-e 
              (t-weaken= ⊢e (▶=-𝕣 (▶⨟=-▶=-l new)) ↑tyᶜ-□ up-e upB)
              (ss-weaken= ss new1 upB upA)
              (s-weaken= s new2 upA₁ upΣ upB₁)
+-}
 s-weaken= {k = k} {T = T} (s-∀l {B = B} s upᶜ upᵉ upC upD) new (↑ty-∀ upA) (↑tyᶜ-e {e' = e'} {Σ' = Σ'} up-e upΣ) (↑ty-arr {A' = C'} {B' = D'} upC' upD')
   with ⟨ T' , upT ⟩ ← ↑ty0-total T
   with ⟨ B' , upB' ⟩ ← ↑ty-total B k

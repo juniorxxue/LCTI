@@ -104,3 +104,14 @@ NonEmpty-NonZ ne-tapp (~tT ~J st) = nz-T
 ~t-strengthen,0 (~tI ⊢e ~t) (↑tmᶜ-e up-e upΣ) = ~tI (t-strengthen,0 ⊢e up-e) (~t-strengthen,0 ~t upΣ)
 ~t-strengthen,0 (~tC ⊢e ~t) (↑tmᶜ-e up-e upΣ) = ~tC (t-strengthen,0 ⊢e up-e) (~t-strengthen,0 ~t upΣ)
 ~t-strengthen,0 (~tT ~t st) (↑tmᶜ-⓪ upΣ) = ~tT (~t-strengthen,0 ~t upΣ) st
+
+
+
+~s-⊆-prv : Γ ⊢ ⟨ j , A ⟩ ~s Σ
+         → Γ ⊆ Δ
+         → Δ ⊢ ⟨ j , A ⟩ ~s Σ
+~s-⊆-prv ~sZ ext = ~sZ
+~s-⊆-prv ~s∞ ext = ~s∞
+~s-⊆-prv (~sI ⊢e ~s) ext = ~sI (t-⊆-prv ⊢e ext) (~s-⊆-prv ~s ext)
+~s-⊆-prv (~sC ⊢e ~s) ext = ~sC (t-⊆-prv ⊢e ext) (~s-⊆-prv ~s ext)
+~s-⊆-prv (~sT ~s st) ext = ~sT (~s-⊆-prv ~s ext) st

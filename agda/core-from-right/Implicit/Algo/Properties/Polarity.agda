@@ -13,14 +13,14 @@ ss-polarity+ (s-int regΓ) = ⊢r-int
 ss-polarity+ (s-var-∙ regΓ x) = ⊢r-var-∙ x
 ss-polarity+ (s-ex-l^ inst) = inst-⊢r inst
 ss-polarity+ (s-ex-l= regΓ x-in) = ∋:=-⊢r regΓ x-in
-ss-polarity+ (s-arr s s₁) = ⊢r-arr (ss-polarity- s) (⊆-⊢r' (ss-polarity+ s₁) (ss-⊆ s))
+ss-polarity+ (s-arr s s₁) = ⊢r-arr (⊆-⊢r' (ss-polarity- s) (ss-⊆ s₁)) (ss-polarity+ s₁)
 ss-polarity+ (s-∀ s) = ⊢r-∀ (ss-polarity+ s)
 
 ss-polarity- (s-int regΓ) = ⊢r-int
 ss-polarity- (s-var-∙ regΓ x) = ⊢r-var-∙ x
 ss-polarity- (s-ex-r^ inst) = inst-⊢r inst
 ss-polarity- (s-ex-r= regΓ x-in) = ∋:=-⊢r regΓ x-in
-ss-polarity- (s-arr s s₁) = ⊢r-arr (ss-polarity+ s) (⊆-⊢r' (ss-polarity- s₁) (ss-⊆ s))
+ss-polarity- (s-arr s s₁) = ⊢r-arr (⊆-⊢r' (ss-polarity+ s) (ss-⊆ s₁)) (ss-polarity- s₁)
 ss-polarity- (s-∀ s) = ⊢r-∀ (ss-polarity- s)
 
 

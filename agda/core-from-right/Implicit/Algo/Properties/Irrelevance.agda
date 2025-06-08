@@ -1,3 +1,5 @@
+{-# OPTIONS --allow-unsolved-metas #-}
+{-# OPTIONS --allow-incomplete-matches #-}
 module Implicit.Algo.Properties.Irrelevance where
 
 -- the irrelevance in altering (solutions and ex-vars in) typing environments
@@ -174,6 +176,11 @@ data _&_⇌s_&_ : Env n m → Env n m → Env n m → Env n m → Set where
 ⇌s-⊢c-l (⊢c-arr cloA cloA₁) tf = ⊢c-arr (⇌s-⊢c-l cloA tf) (⇌s-⊢c-l cloA₁ tf)
 ⇌s-⊢c-l (⊢c-∀ cloA) tf = ⊢c-∀ (⇌s-⊢c-l cloA (uvar tf))
 
+⇌s-⊢c-r : Δ ⊢c A
+        → Γ & Δ ⇌s Γ' & Δ'
+        → Δ' ⊢c A
+⇌s-⊢c-r cloA tf = {!!}
+
 ⇌s-⊢o-l : Γ ⊢o A
         → Γ & Δ ⇌s Γ' & Δ'
         → Γ' ⊢o A
@@ -231,8 +238,8 @@ ss-irrev (s-ex-l^ inst) tf = s-ex-l^ (⇌s-inst tf inst)
 ss-irrev (s-ex-r^ inst) tf = s-ex-r^ (⇌s-inst tf inst)
 ss-irrev (s-ex-l= regΓ x-in) tf with refl ← ⇌s-eq tf = s-ex-l= (⇌s-sregular-l regΓ tf) (⇌s-∋:=-l x-in tf)
 ss-irrev (s-ex-r= regΓ x-in) tf with refl ← ⇌s-eq tf = s-ex-r= (⇌s-sregular-l regΓ tf) (⇌s-∋:=-l x-in tf)
-ss-irrev (s-arr s s₁) tf with ⇌s-Ω (ss-⊆ s) tf
-... | ⟨ Ω' , tf' ⟩ = s-arr (ss-irrev s tf') (ss-irrev s₁ (⇌s-arr tf tf' (ss-⊆ s₁)))
+ss-irrev (s-arr s s₁) tf with ⇌s-Ω (ss-⊆ s₁) tf
+... | ⟨ Ω' , tf' ⟩ = s-arr (ss-irrev s (⇌s-arr tf tf' (ss-⊆ s))) (ss-irrev s₁ tf')
 ss-irrev (s-∀ s) tf = s-∀ (ss-irrev s (uvar tf))
 
 
@@ -256,9 +263,12 @@ t-irrev (⊢tapp ⊢e st) tf = ⊢tapp (t-irrev ⊢e tf) st
 
 s-irrev (s-empty regΓ cloA x) tf with refl ← ⇌s-eq tf = s-empty (⇌s-sregular-l regΓ tf) (⇌s-⊢c-l cloA tf) (⇌s-≫-l x tf)
 s-irrev (s-type ss) tf = s-type (ss-irrev ss tf)
-s-irrev (s-term-c cloA ap ⊢e s) tf = s-term-c (⇌s-⊢c-l cloA tf) (⇌s-≫-l ap tf) (t-irrev ⊢e (⇌s-⇌-l tf)) (s-irrev s tf)
-s-irrev (s-term-o opnA ⊢e ss s) tf with ⇌s-Ω (ss-⊆ ss) tf
+s-irrev (s-term-c cloA ap ⊢e s) tf = s-term-c (⇌s-⊢c-r cloA tf) {!!} (t-irrev ⊢e {!!}) (s-irrev s tf)
+-- s-term-c (⇌s-⊢c-l cloA tf) (⇌s-≫-l ap tf) (t-irrev ⊢e (⇌s-⇌-l tf)) (s-irrev s tf)
+s-irrev (s-term-o opnA ⊢e ss s) tf = {!!}
+{- with ⇌s-Ω (ss-⊆ ss) tf
 ... | ⟨ Ω' , tf' ⟩ = s-term-o (⇌s-⊢o-l opnA tf) (t-irrev ⊢e (⇌s-⇌-l tf)) (ss-irrev ss tf') (s-irrev s (⇌s-arr tf tf' (s-⊆ s)))
+-}
 s-irrev (s-∀l s upᶜ upᵉ upC upD) tf = s-∀l (s-irrev s (evar-sol tf)) upᶜ upᵉ upC upD
 s-irrev (s-∀l-no s upᶜ upᵉ upC upD) tf = s-∀l-no (s-irrev s (evar tf)) upᶜ upᵉ upC upD
 s-irrev (s-tapp s upᶜ) tf = s-tapp (s-irrev s (svar tf)) upᶜ
@@ -304,3 +314,9 @@ t-irrev-⊆' : 𝕣 Δ ⊢ Σ ⇒ e ⇒ A
            → Γ ⊆ Δ
            → 𝕣 Γ ⊢ Σ ⇒ e ⇒ A
 t-irrev-⊆' ⊢e ext = t-irrev ⊢e (⇌-symm (⊆-⇌ ext))
+
+
+s-irrev-⊆ : Γ ⊢ A ≤⁺ Σ ⊣ Γ ↪ B
+          → Γ ⊆ Δ
+          → Δ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
+s-irrev-⊆ s ext = s-irrev s {!!}

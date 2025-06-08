@@ -41,8 +41,8 @@ data _⊢_⌞_⌝_⊣_ : Env n m → Type m → Polar → Type m → Env n m →
     → Δ ⊢ A ⌞ ≤⁻ ⌝ (‶ X) ⊣ Δ
 
   s-arr :
-      Δ ⊢ C ⌞ ⋆ ≤ ⌝ A ⊣ Ω
-    → Ω ⊢ B ⌞ ≤ ⌝ D ⊣ Ψ
+      Ω ⊢ C ⌞ ⋆ ≤ ⌝ A ⊣ Ψ
+    → Δ ⊢ B ⌞ ≤ ⌝ D ⊣ Ω
     → Δ ⊢ A `→ B ⌞ ≤ ⌝ (C `→ D) ⊣ Ψ
 
   s-∀ :
@@ -113,17 +113,17 @@ data _⊢_≤⁺_⊣_↪_ where
     → Δ ⊢ A ≤⁺ (τ B) ⊣ Ψ ↪ B
 
   s-term-c :
-      (cloA : Δ ⊢c A)
-    → (ap : Δ ≫ A ⇘ A%)
-    → (⊢e : 𝕣 Δ ⊢ τ A% ⇒ e ⇒ A')
+      (cloA : Ψ ⊢c A)
+    → (ap : Ψ ≫ A ⇘ A%)
+    → (⊢e : 𝕣 Ψ ⊢ τ A% ⇒ e ⇒ A')
     → Δ ⊢ B ≤⁺ Σ ⊣ Ψ ↪ D
     → Δ ⊢ (A `→ B) ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ A% `→ D
 
   s-term-o :
-      (opnA : Δ ⊢o A)
-    → (⊢e : 𝕣 Δ ⊢ □ ⇒ e ⇒ C)
-    → (ss : Δ ⊢ C ⌞ ≤⁻ ⌝ A ⊣ Ω)
-    → Ω ⊢ B ≤⁺ Σ ⊣ Ψ ↪ D
+      (opnA : Ω ⊢o A)
+    → (⊢e : 𝕣 Ω ⊢ □ ⇒ e ⇒ C)
+    → (ss : Ω ⊢ C ⌞ ≤⁻ ⌝ A ⊣ Ψ)
+    → Δ ⊢ B ≤⁺ Σ ⊣ Ω ↪ D
     → Δ ⊢ A `→ B ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ C `→ D
 
   s-∀l :
@@ -157,6 +157,38 @@ data _⊢_≤⁺_⊣_↪_ where
     → Δ ⊢ A ≤⁺ (B ⓪↝ Σ) ⊣ Δ ↪ `∀ C
     → Δ ⊢ ‶ X ≤⁺ (B ⓪↝ Σ) ⊣ Δ ↪ `∀ C
 
+
+_ : ∅ , `∀ ((‶ #0 `→ ‶ #0) `→ ‶ #0) ⊢ τ Int ⇒ (` #0) · (ƛ (` #0)) ⇒ Int
+_ = ⊢app (⊢sub (⊢var (reg-S, reg-Z
+                       (⊢r-∀ (⊢r-arr (⊢r-arr (⊢r-var-∙ Z) (⊢r-var-∙ Z)) (⊢r-var-∙ Z)))) Z) ne-app gc-var
+               (s-∀l {B = Int} (s-term-c (⊢c-arr (⊢c-var-= Z) (⊢c-var-= Z)) (grd-arr (grd-var= (Z ↑ty-int)) (grd-var= (Z ↑ty-int))) (⊢lam₁
+                                                                                                                                      (⊢sub
+                                                                                                                                       (⊢var
+                                                                                                                                        (reg-S,
+                                                                                                                                         (reg-S=
+                                                                                                                                          (reg-S, reg-Z
+                                                                                                                                           (⊢r-∀ (⊢r-arr (⊢r-arr (⊢r-var-∙ Z) (⊢r-var-∙ Z)) (⊢r-var-∙ Z))))
+                                                                                                                                          ⊢r-int)
+                                                                                                                                         ⊢r-int)
+                                                                                                                                        Z)
+                                                                                                                                       ne-τ gc-var
+                                                                                                                                       (s-type
+                                                                                                                                        (s-int
+                                                                                                                                         (reg-Z
+                                                                                                                                          (reg-S,
+                                                                                                                                           (reg-S=
+                                                                                                                                            (reg-S, reg-Z
+                                                                                                                                             (⊢r-∀ (⊢r-arr (⊢r-arr (⊢r-var-∙ Z) (⊢r-var-∙ Z)) (⊢r-var-∙ Z))))
+                                                                                                                                            ⊢r-int)
+                                                                                                                                           ⊢r-int)))))) (s-type
+                                                       (s-ex-l^
+                                                        (⟹^0 ↑ty-int ⊢r-int
+                                                         (reg-Z
+                                                          (reg-S, reg-Z
+                                                           (⊢r-∀
+                                                            (⊢r-arr (⊢r-arr (⊢r-var-∙ Z) (⊢r-var-∙ Z)) (⊢r-var-∙ Z))))))))) (↑tyᶜ-τ ↑ty-int) (↑tyᵉ-ƛ ↑tyᵉ-var) (↑ty-arr ↑ty-int ↑ty-int) ↑ty-int))
+
+{-
 _ : ∅ , (Int `→ Int) , `∀ (‶ #0 `→ ‶ #0) ⊢ □ ⇒ (` #0 · ` #1) · (lit 1) ⇒ Int
 _ = ⊢app (⊢app (⊢sub (⊢var (reg-S, (reg-S, reg-Z (⊢r-arr ⊢r-int ⊢r-int))
                              (⊢r-∀ (⊢r-arr (⊢r-var-∙ Z) (⊢r-var-∙ Z)))) Z)
@@ -192,3 +224,4 @@ _ = ⊢app (⊢app (⊢sub (⊢var (reg-S, (reg-S, reg-Z (⊢r-arr ⊢r-int ⊢r
                                                                                        (⊢r-arr ⊢r-int ⊢r-int))
                                                                                       ⊢c-int grd-int)))) (↑tyᶜ-e ↑tyᵉ-lit ↑tyᶜ-□) ↑tyᵉ-var (↑ty-arr ↑ty-int ↑ty-int)
                                                                                       (↑ty-arr ↑ty-int ↑ty-int))))
+-}
