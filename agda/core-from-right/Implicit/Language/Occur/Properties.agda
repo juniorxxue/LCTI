@@ -1,5 +1,3 @@
-{-# OPTIONS --allow-unsolved-metas #-}
-{-# OPTIONS --allow-incomplete-matches #-}
 module Implicit.Language.Occur.Properties where
 
 open import Implicit.Language.Base
@@ -22,10 +20,8 @@ open import Implicit.Language.Occur.Base
                → A ↑ty k ⇘ varY
                → X ε A
         helper lt eq ↑ty-var rewrite helper' eq = ε-var
-↑ty-ε-≤ (ε-arr-l ninB inA') (↑ty-arr upA upA₁) lt = {!!}
--- ε-arr-l (↑ty-ε-≤ inA' upA lt)
-↑ty-ε-≤ (ε-arr-r inA') (↑ty-arr upA upA₁) lt = {!!}
--- ε-arr-r (¬ε-↑ty-≤ ninA upA lt) (↑ty-ε-≤ inA' upA₁ lt)
+↑ty-ε-≤ (ε-arr-l ninB inA') (↑ty-arr upA upA₁) lt = ε-arr-l (¬ε-↑ty-≤ ninB upA₁ lt) (↑ty-ε-≤ inA' upA lt)
+↑ty-ε-≤ (ε-arr-r inA') (↑ty-arr upA upA₁) lt = ε-arr-r (↑ty-ε-≤ inA' upA₁ lt)
 ↑ty-ε-≤ (ε-∀ inA') (↑ty-∀ upA) lt = ε-∀ (↑ty-ε-≤ inA' upA (s≤s lt))
 
 
@@ -34,10 +30,8 @@ open import Implicit.Language.Occur.Base
       → X #< k
       → inject₁ X ε A'
 ↑ty-ε ε-var ↑ty-var lt rewrite punchIn-inject lt = ε-var
-↑ty-ε (ε-arr-l ninB inA) (↑ty-arr up up₁) lt = {!!}
--- ε-arr-l (↑ty-ε inA up lt)
-↑ty-ε (ε-arr-r inA) (↑ty-arr up up₁) lt = {!!}
--- ε-arr-r (¬ε-↑ty' ninA up lt) (↑ty-ε inA up₁ lt)
+↑ty-ε (ε-arr-l ninB inA) (↑ty-arr up up₁) lt = ε-arr-l (¬ε-↑ty' ninB up₁ lt) (↑ty-ε inA up lt)
+↑ty-ε (ε-arr-r inA) (↑ty-arr up up₁) lt = ε-arr-r (↑ty-ε inA up₁ lt)
 ↑ty-ε (ε-∀ inA) (↑ty-∀ up) lt = ε-∀ (↑ty-ε inA up (s≤s lt))
 
 ↑ty-ε' : inject₁ X ε A'
@@ -46,10 +40,8 @@ open import Implicit.Language.Occur.Base
        → X ε A
 ↑ty-ε' ε-var lt upA rewrite punchIn-inject lt with ↑ty-var-inv-helper upA refl
 ... | refl = ε-var
-↑ty-ε' (ε-arr-l ninB inA) lt (↑ty-arr upA upA₁) = {!!}
--- ε-arr-l (↑ty-ε' inA lt upA)
-↑ty-ε' (ε-arr-r inA) lt (↑ty-arr upA upA₁) = {!!}
--- ε-arr-r (¬ε-↑ty'-inv ¬inA upA lt) (↑ty-ε' inA lt upA₁)
+↑ty-ε' (ε-arr-l ninB inA) lt (↑ty-arr upA upA₁) = ε-arr-l (¬ε-↑ty'-inv ninB upA₁ lt) (↑ty-ε' inA lt upA)
+↑ty-ε' (ε-arr-r inA) lt (↑ty-arr upA upA₁) = ε-arr-r (↑ty-ε' inA lt upA₁)
 ↑ty-ε' (ε-∀ inA) lt (↑ty-∀ upA) = ε-∀ (↑ty-ε' inA (s≤s lt) upA)
 
 
@@ -69,9 +61,9 @@ open import Implicit.Language.Occur.Base
 ... | yes refl = inj₁ ε-var
 ... | no ¬p = inj₂ (¬ε-var (≢-sym ¬p))
 ε-dec {k = k} {A = A `→ B} with ε-dec {k = k} {A = A} | ε-dec {k = k} {A = B}
-... | inj₁ p | _ = {!!}
--- inj₁ (ε-arr-l p)
-... | inj₂ p | inj₁ p' = {!!} -- inj₁ (ε-arr-r p p')
+... | inj₁ p | inj₁ p' = inj₁ (ε-arr-r p')
+... | inj₁ p | inj₂ p' = inj₁ (ε-arr-l p' p)
+... | inj₂ p | inj₁ p' = inj₁ (ε-arr-r p')
 ... | inj₂ p | inj₂ p' = inj₂ (¬ε-arr p p')
 ε-dec {k = k} {A = `∀ A} with ε-dec {k = #S k} {A = A}
 ... | inj₁ p = inj₁ (ε-∀ p)
@@ -83,10 +75,8 @@ open import Implicit.Language.Occur.Base
       → k₂ #≤ k₁
       → #S k₁ ε A'
 ε-↑ty ε-var ↑ty-var sm rewrite punchIn-≤ sm = ε-var
-ε-↑ty (ε-arr-l ninB kε) (↑ty-arr ↑ty ↑ty₁) sm = {!!}
--- ε-arr-l (ε-↑ty kε ↑ty sm)
-ε-↑ty (ε-arr-r kε) (↑ty-arr ↑ty ↑ty₁) sm = {!!}
--- ε-arr-r (¬ε-↑ty ninA ↑ty sm) (ε-↑ty kε ↑ty₁ sm)
+ε-↑ty (ε-arr-l ninB kε) (↑ty-arr ↑ty ↑ty₁) sm = ε-arr-l (¬ε-↑ty ninB ↑ty₁ sm) (ε-↑ty kε ↑ty sm)
+ε-↑ty (ε-arr-r kε) (↑ty-arr ↑ty ↑ty₁) sm = ε-arr-r (ε-↑ty kε ↑ty₁ sm)
 ε-↑ty (ε-∀ kε) (↑ty-∀ ↑ty) sm = ε-∀ (ε-↑ty kε ↑ty (s≤s sm))
 
 ε-↑ty0 : k ε A
