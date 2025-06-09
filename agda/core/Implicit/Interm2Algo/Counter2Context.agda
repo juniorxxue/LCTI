@@ -118,3 +118,13 @@ data _⊢_~t_ : Env n m → Counter m × Type m → Context n m → Set where
 ~irrev (~I ⊢e ~j) ext = ~I (t-irrev-⊆ ⊢e ext) (~irrev ~j ext)
 ~irrev (~C ⊢e ~j) ext = ~C (t-irrev-⊆ ⊢e ext) (~irrev ~j ext)
 ~irrev (~T ~j st) ext = ~T (~irrev ~j ext) st
+
+
+~irrev' : Ω ⊢ ⟨ j , D ⟩ ~s Σ
+        → Γ ⊆ Ω
+        → Γ ⊢ ⟨ j , D ⟩ ~s Σ
+~irrev' ~Z ext = ~Z
+~irrev' ~∞ ext = ~∞
+~irrev' (~I ⊢e ~j) ext = ~I (t-irrev-⊆' ⊢e ext) (~irrev' ~j ext)
+~irrev' (~C ⊢e ~j) ext = ~C (t-irrev-⊆' ⊢e ext) (~irrev' ~j ext)
+~irrev' (~T ~j st) ext = ~T (~irrev' ~j ext) st

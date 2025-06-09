@@ -4,30 +4,30 @@ open import Implicit.Language.All
 open import Implicit.Language.ExtraDefs
 
 variable
-  j₁ j₁' : Counter m
+  𝕛  𝕛' : Counter m
 
 infix 3 _ε'_by_↪_
 data _ε'_by_↪_ : Fin m → Type m → Counter m → Counter m → Set where
   ε-var : (isoinf : IsoInf j)
         → k ε' (‶ k) by j ↪ ∞
   ε-arr-𝕚 : k ¬ε A
-        → k ε' B by j ↪ j'
-        → k ε' (A `→ B) by (𝕚 j) ↪ (𝕚 j')
+        → k ε' B by j ↪ 𝕛'
+        → k ε' (A `→ B) by (𝕚 j) ↪ (𝕚 𝕛')
   ε-arr-𝕔 : k ¬ε A
-        → k ε' B by j ↪ j'
-        → k ε' (A `→ B) by (𝕔 j) ↪ (𝕔 j')
-  ε-∀-𝕚 : #S k ε' A by 𝕚 j' ↪ j₁'
+        → k ε' B by j ↪ 𝕛'
+        → k ε' (A `→ B) by (𝕔 j) ↪ (𝕔 𝕛')
+  ε-∀-𝕚 : #S k ε' A by 𝕚 j' ↪ 𝕛'
         → (upj : ↑tyʲ0 j ⇘ j')
-        → (upj₁ : ↑tyʲ0 j₁ ⇘ j₁')
-        → k ε' `∀ A by (𝕚 j) ↪ j₁
-  ε-∀-𝕔 : #S k ε' A by 𝕔 j' ↪ j₁'
+        → (upj₁ : ↑tyʲ0 𝕛 ⇘ 𝕛')
+        → k ε' `∀ A by (𝕚 j) ↪ 𝕛
+  ε-∀-𝕔 : #S k ε' A by 𝕔 j' ↪ 𝕛'
         → (upj : ↑tyʲ0 j ⇘ j')
-        → (upj₁ : ↑tyʲ0 j₁ ⇘ j₁')
-        → k ε' `∀ A by (𝕔 j) ↪ j₁
-  ε-∀-𝕥 : #S k ε' A by j' ↪ j₁'
+        → (upj₁ : ↑tyʲ0 𝕛 ⇘ 𝕛')
+        → k ε' `∀ A by (𝕔 j) ↪ 𝕛
+  ε-∀-𝕥 : #S k ε' A by j' ↪ 𝕛'
         → (upj : ↑tyʲ0 j ⇘ j')
-        → (upj₁ : ↑tyʲ0 j₁ ⇘ j₁')
-        → k ε' `∀ A by (𝕥₍ B ₎ j) ↪ 𝕥₍ B ₎ j₁
+        → (upj₁ : ↑tyʲ0 𝕛 ⇘ 𝕛')
+        → k ε' `∀ A by (𝕥₍ B ₎ j) ↪ 𝕥₍ B ₎ 𝕛
 
 ε'j→ε' : k ε' A by j ↪ j'
        → k ε' A
@@ -82,9 +82,9 @@ data _⊢_#_⌞_⌝_ : Env n m → Counter m → Type m → Polar → Type m →
     → (upj : ↑tyʲ0 j ⇘ j')
     → Δ ⊢ j # `∀ A ⌞ ≤⁺ ⌝ C `→ D
   s-∀l-tail :
-      Δ ,= B ⊢ j₁ # A ⌞ ≤⁺ ⌝ C' `→ D'
+      Δ ,= B ⊢ 𝕛 # A ⌞ ≤⁺ ⌝ C' `→ D'
     → (ic : (𝕚𝕔 j))
-    → (tail : #0 ε' A by j' ↪ j₁)
+    → (tail : #0 ε' A by j' ↪ 𝕛)
     → (upC : ↑ty0 C ⇘ C')
     → (upD : ↑ty0 D ⇘ D')
     → (upj : ↑tyʲ0 j ⇘ j')

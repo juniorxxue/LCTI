@@ -30,7 +30,8 @@ s-conv (s-∀l s ic fd upC upD (↑tyʲ-𝕚 upj)) (ε-∀-𝕚 newj upj₁ upj�
   with refl ← ↑tyʲ-unique upj upj₁ = s-∀l (s-conv s newj (S= inΔ {!!}) {!!}) {!!} {!!} upC upD upj₂
 s-conv (s-∀l s ic fd upC upD upj) (ε-∀-𝕔 newj upj₁ upj₂) inΔ mt = {!!} -- same as above
 s-conv (s-∀l-tail s ic tail upC upD upj) (ε-∀-𝕚 newj upj₁ upj₂) inΔ mt
-  with () ← ε'-unique (ε'j→ε' newj) (ε'j→ε' tail)
+   = {!!}
+--  with () ← ε'-unique (ε'j→ε' newj) (ε'j→ε' tail)
 s-conv (s-∀l-tail s ic tail upC upD upj) (ε-∀-𝕔 newj upj₁ upj₂) inΔ mt
   with () ← ε'-unique (ε'j→ε' newj) (ε'j→ε' tail)
 s-conv (s-tapp s upj) newj inΔ mt = {!!}
@@ -124,7 +125,8 @@ sound-s (s-∀l-𝕚 {A = A} {B = B} s upᶜ upj upᵉ upC upD) with ε'-dec #0 
 ... | inj₁ p
   with ⟨ B' , upB ⟩ ← ↑ty0-total B
   with truncated s Z (Z upB) p
-... | justrun newj mt = s-∀l-tail (s-conv (sound-s s) newj (Z upB) mt) case-𝕚 newj upC upD (↑tyʲ-𝕚 upj)
+... | justrun newj mt = s-∀l-tail {!sound-s s!} {!!} {!!} {!!} {!!} {!!}
+-- s-∀l-tail (s-conv (sound-s s) newj (Z upB) mt) case-𝕚 newj upC upD (↑tyʲ-𝕚 upj)
 ... | in-type fd = s-∀l (sound-s s) case-𝕚 fd upC upD (↑tyʲ-𝕚 upj)
 -- s-∀l-tail {!sound-s s!} case-𝕚 {!!} upC upD (↑tyʲ-𝕚 upj)
 sound-s (s-∀l-𝕚 {A = A} s upᶜ upj upᵉ upC upD) | inj₂ ¬p = s-∀l (sound-s s) case-𝕚 (s-find'0 s upᵉ upᶜ ¬p) upC upD (↑tyʲ-𝕚 upj)
