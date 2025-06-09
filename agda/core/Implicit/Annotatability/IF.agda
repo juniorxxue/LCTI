@@ -73,7 +73,7 @@ data _⊢_⦂_⟶_ : Env n m → Term n m → Type m → Term n m → Set where
   -- two extra rules
   ela-∀i  : Γ ,∙ ⊢ e' ⦂ A ⟶ e₁
          → (upe : ↑tyᵉ0 e ⇘ e')
-         → Γ ⊢ e ⦂ `∀ A ⟶ Λ e₁
+         → Γ ⊢ e ⦂ `∀ A ⟶ Λ (e₁ ⦂ A)
   ela-∀e  : Γ ⊢ e ⦂ `∀ A ⟶ e'
           → ⟦ B ⟧ A ⇘ A*
           → Γ ⊢ e ⦂ A* ⟶ e' ⓪ B
@@ -85,6 +85,6 @@ annotatability (ela-lit regΓ wfg₁) = {!!}
 annotatability (ela-var regΓ wfg₁ x) = {!!}
 annotatability (ela-lam ⊢e) = ⊢lam₁ (annotatability ⊢e)
 annotatability (ela-app ⊢e x ⊢e₁) = {!!}
-annotatability (ela-∀i ⊢e upe) = {!annotatability ⊢e!}
+annotatability (ela-∀i ⊢e upe) = ⊢sub (⊢tabs (⊢ann (annotatability ⊢e))) {!!} gc-tlam nz-∞
 annotatability (ela-∀e ⊢e x) with annotatability ⊢e
 ... | ih = ⊢tapp {!!} x
