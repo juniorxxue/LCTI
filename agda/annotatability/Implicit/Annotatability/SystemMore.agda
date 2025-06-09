@@ -429,3 +429,4 @@ annotatability (ela-lit regΓ wfg₁) = ⊢sub (⊢lit regΓ) (s-int (reg-Z reg�
 annotatability (ela-var regΓ wfg₁ x) = ⊢sub (⊢var regΓ x) (s-refl-∞ (reg-Z regΓ) {!!}) gc-var nz-∞
 annotatability (ela-lam ⊢e) = ⊢lam₁ (annotatability ⊢e)
 annotatability (ela-app ⊢e x ⊢e₁) = ⊢app₂ {!!} (⊢ann (annotatability ⊢e₁))
+annotatability (ela-∀i up ⊢e) = {!!}
