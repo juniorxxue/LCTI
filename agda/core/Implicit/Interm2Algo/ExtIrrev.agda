@@ -10,6 +10,11 @@ data _⊆_w/t_w/c_ : Env n m → Env n m → Type m → Counter m → Set where
      → Γ ⊆ Γ w/t A w/c Z
   ⊆∞ : (ext : Γ ⊆ Δ w/t A)
      → Γ ⊆ Δ w/t A w/c ∞
+{-
+  ⊆-iso : (ext : Γ ⊆ Δ w/v X)
+        → IsoInf j
+        → Γ ⊆ Δ w/t (‶ X) w/c (𝕚 j)
+-}
   ⊆I : (ext : Γ ⊆ Ω w/t A)
      → Ω ⊆ Δ w/t B w/c j
      → Γ ⊆ Δ w/t (A `→ B) w/c (𝕚 j)
@@ -186,7 +191,6 @@ data _⊆_w/t_w/c_ : Env n m → Env n m → Type m → Counter m → Set where
   with ⟨ B' , upB ⟩ ← ↑ty0-total B  = ⊆∀-I-no (⊆/c-irrev-== ext (=⟹^S new1 upB) (=⟹^S new2 upB)) upj
 ⊆/c-irrev-== {B = B} (⊆∀-C-no ext upj) new1 new2
   with ⟨ B' , upB ⟩ ← ↑ty0-total B  = ⊆∀-C-no (⊆/c-irrev-== ext (=⟹^S new1 upB) (=⟹^S new2 upB)) upj
-
 
 ⊆/v-irrev-^= : Γ ⊆ Δ w/v k
              → Γ ∋^ k

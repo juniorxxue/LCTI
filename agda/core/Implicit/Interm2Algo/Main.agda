@@ -1,6 +1,7 @@
 module Implicit.Interm2Algo.Main where
 
 open import Implicit.Language.All
+open import Implicit.Language.ExtraDefs
 open import Implicit.Algo.All
 open import Implicit.Interm.Base
 open import Implicit.Interm.Properties.Regularity
@@ -11,8 +12,7 @@ open import Implicit.Interm2Algo.ExtIrrev
 open import Implicit.Interm2Algo.EnvDiff
 open import Implicit.Interm2Algo.OpenClose
 -- open import Implicit.Interm2Algo.Find
-open import Implicit.Interm2Algo.WillExport
-open import Implicit.Interm2Algo.Conv2
+-- open import Implicit.Interm2Algo.WillExport
 
 s+-⊆/ : Δ ⊢ j # A ⌞ ≤⁺ ⌝ B
       → Δ ⊆ Δ w/t A w/c j
@@ -43,7 +43,7 @@ s+-⊆/ (s-tapp s upj) = ⊆∀-T (s+-⊆/ s) upj
 s+-⊆/ (s-svar-𝕚 inΓ s) = ⊆I-X (s-sregular s)
 s+-⊆/ (s-svar-𝕔 inΓ s) = ⊆C-X (s-sregular s)
 s+-⊆/ (s-svar-𝕥 inΓ s) = ⊆T-X (s-sregular s)
-s+-⊆/ (s-∀l-tail x ic tail upC upD upj) = {!!}
+s+-⊆/ (s-∀l-tail s ic ettB tail upC upD upj) = {!s+-⊆/ s!}
 
 complete-ss+ : Δ ⊢ ∞ # A ⌞ ≤⁺ ⌝ B
              → Γ ⊆ Δ w/t A
@@ -112,19 +112,9 @@ complete-s (s-svar-𝕔 inΓ s) (⊆C-X regΓ) (~C ⊢e ~j) = s-svar-term inΓ (
 complete-s (s-svar-𝕥 inΓ s) (⊆T-X regΓ) (~T ~j st) = s-svar-tapp inΓ (complete-s s (s+-⊆/ s) (~T ~j st))
 complete-s (s-∀l x ic fd upC upD (↑tyʲ-𝕚 upj)) (⊆∀-I-no x₁ upj₁) (~I ⊢e x₂) = {!!}
 complete-s (s-∀l x ic fd upC upD (↑tyʲ-𝕔 upj)) (⊆∀-C-no x₁ upj₁) (~C ⊢e x₂) = {!!}
-complete-s (s-∀l-tail s ic tail upC upD (↑tyʲ-𝕚 upj)) (⊆∀-I x upj₁) (~I ⊢e x₂)
-  with refl ← ↑tyʲ-unique upj upj₁ = s-∀l (complete-s s {!!} {!!}) {!!} {!!} upC upD -- false
-complete-s (s-∀l-tail s ic tail upC upD (↑tyʲ-𝕚 upj)) (⊆∀-I-no x upj₁) ~j'@(~I {Σ = Σ} {e = e} ⊢e ~j)
-  with ⟨ Σ' , upΣ ⟩ ← ↑tyᶜ0-total Σ
-  with ⟨ e' , upe ⟩ ← ↑tyᵉ0-total e
-  with refl ← ↑tyʲ-unique upj upj₁
-  with ~j-weaken ← ~weaken^0 ~j' (↑ty-arr upC upD) (↑tyᶜ-e upe upΣ) (↑tyʲ-𝕚 upj)
-  with ⟨ σ , newσ ⟩ ← σ-exist tail ~j-weaken
-  with ih ← complete-s s (irrev-lemma0 x tail {!!}) newσ
-  = s-∀l (s-conv ih ~j-weaken newσ tail)
-  -- (complete-s s (irrev-lemma0 x tail {!!}) (~weaken^0 {!!} (↑ty-arr upC upD) (↑tyᶜ-e upe upΣ) {!!}))
-         upΣ upe upC upD
-complete-s (s-∀l-tail s ic tail upC upD (↑tyʲ-𝕔 upj)) x (~C ⊢e x₂) = {!!}
+complete-s (s-∀l-tail s ic ettB tail upC upD upj) (⊆∀-I ext upj₁) (~I ⊢e ~j) = s-∀l (complete-s s {!!} {!!}) {!!} {!!} {!!} {!!}
+complete-s (s-∀l-tail s ic ettB tail upC upD upj) (⊆∀-I-no ext upj₁) (~I ⊢e ~j) = s-∀l (complete-s s {!!} {!!}) {!!} {!!} {!!} {!!}
+complete-s (s-∀l-tail s ic ettB tail upC upD upj) ext (~C ⊢e ~j) = {!!}
 
 complete-s0 : Γ ⋈ ⊢ j # A ⌞ ≤⁺ ⌝ B
             → Γ ⊢ ⟨ j , B ⟩ ~t Σ

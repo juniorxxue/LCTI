@@ -23,7 +23,7 @@ s-sregular (s-tapp s upj) with s-sregular s
 s-sregular (s-svar-𝕚 _ x) = s-sregular x
 s-sregular (s-svar-𝕔 _ x) = s-sregular x
 s-sregular (s-svar-𝕥 x x₁) = s-sregular x₁
-s-sregular (s-∀l-tail x ic tail upC upD upj) = {!!}
+s-sregular (s-∀l-tail x ic tail mt upC upD upj) = {!!}
 
 t-tregular : Γ ⊢ j # e ⦂ A
            → TRegular Γ
@@ -89,7 +89,7 @@ s-⊢rʲ (s-svar-r x inΔ) = j-∞
 s-⊢rʲ (s-svar-𝕚 _ x) = s-⊢rʲ x
 s-⊢rʲ (s-svar-𝕔 _ x) = s-⊢rʲ x
 s-⊢rʲ (s-svar-𝕥 x x₁) = s-⊢rʲ x₁
-s-⊢rʲ (s-∀l-tail x ic tail upC upD upj) = {!!}
+s-⊢rʲ (s-∀l-tail x ic tail mt upC upD upj) = {!!}
 
 ⊢r-⋈ : Γ ⊢rʲ j
      → 𝕣 Γ ⊢rʲ j

@@ -6,37 +6,39 @@ open import Implicit.Language.ExtraDefs
 variable
   𝕛  𝕛' : Counter m
 
-infix 3 _ε'_by_↪_
-data _ε'_by_↪_ : Fin m → Type m → Counter m → Counter m → Set where
-  ε-var : (isoinf : IsoInf j)
-        → k ε' (‶ k) by j ↪ ∞
-  ε-arr-𝕚 : k ¬ε A
-        → k ε' B by j ↪ 𝕛'
-        → k ε' (A `→ B) by (𝕚 j) ↪ (𝕚 𝕛')
-  ε-arr-𝕔 : k ¬ε A
-        → k ε' B by j ↪ 𝕛'
-        → k ε' (A `→ B) by (𝕔 j) ↪ (𝕔 𝕛')
-  ε-∀-𝕚 : #S k ε' A by 𝕚 j' ↪ 𝕛'
-        → (upj : ↑tyʲ0 j ⇘ j')
-        → (upj₁ : ↑tyʲ0 𝕛 ⇘ 𝕛')
-        → k ε' `∀ A by (𝕚 j) ↪ 𝕛
-  ε-∀-𝕔 : #S k ε' A by 𝕔 j' ↪ 𝕛'
-        → (upj : ↑tyʲ0 j ⇘ j')
-        → (upj₁ : ↑tyʲ0 𝕛 ⇘ 𝕛')
-        → k ε' `∀ A by (𝕔 j) ↪ 𝕛
-  ε-∀-𝕥 : #S k ε' A by j' ↪ 𝕛'
-        → (upj : ↑tyʲ0 j ⇘ j')
-        → (upj₁ : ↑tyʲ0 𝕛 ⇘ 𝕛')
-        → k ε' `∀ A by (𝕥₍ B ₎ j) ↪ 𝕥₍ B ₎ 𝕛
+-- j A C B
+-- assumption: #0 ε' A
+-- j # A ≤ B ⟹ T
+infix 3 _#_≤_⟹_
+data _#_≤_⟹_ : Counter m → Type (1 + m) → Type m → Type m → Set where
+  ett-var : -- IsoInf j -- this is no need
+            j # ‶ X ≤ B ⟹ B
+  ett-arr-𝕚 : j # B ≤ D ⟹ T
+            → (𝕚 j) # A `→ B ≤ C `→ D ⟹ T
+  ett-arr-𝕔 : j # B ≤ D ⟹ T
+            → (𝕔 j) # A `→ B ≤ C `→ D ⟹ T
+  ett-∀-𝕚 : (𝕚 j') # A ≤ B' `→ C' ⟹ T'
+          → (upB : ↑ty0 B ⇘ B')
+          → (upC : ↑ty0 C ⇘ C')
+          → (upT : ↑ty0 T ⇘ T')
+          → (upj : ↑tyʲ0 j ⇘ j')
+          → (𝕚 j) # `∀ A ≤ B `→ C ⟹ T
+  ett-∀-𝕔 : (𝕔 j') # A ≤ B' `→ C' ⟹ T'
+          → (upB : ↑ty0 B ⇘ B')
+          → (upC : ↑ty0 C ⇘ C')
+          → (upT : ↑ty0 T ⇘ T')
+          → (upj : ↑tyʲ0 j ⇘ j')
+          → (𝕔 j) # `∀ A ≤ B `→ C ⟹ T
+  ett-∀-𝕥 : j' # A ≤ C' ⟹ T'
+          → (upC : ↑ty0 C ⇘ C')
+          → (upT : ↑ty0 T ⇘ T')
+          → (upj : ↑tyʲ0 j ⇘ j')
+          → 𝕥₍ B ₎ j # `∀ A ≤ C ⟹ T
 
-ε'j→ε' : k ε' A by j ↪ j'
-       → k ε' A
-ε'j→ε' (ε-var x) = ε-var
-ε'j→ε' (ε-arr-𝕚 x inA) = ε-arr x (ε'j→ε' inA)
-ε'j→ε' (ε-arr-𝕔 x inA) = ε-arr x (ε'j→ε' inA)
-ε'j→ε' (ε-∀-𝕚 inA upj upj₁) = ε-∀ (ε'j→ε' inA)
-ε'j→ε' (ε-∀-𝕔 inA upj upj₁) = ε-∀ (ε'j→ε' inA)
-ε'j→ε' (ε-∀-𝕥 inA upj upj₁) = ε-∀ (ε'j→ε' inA)
+ett-example1 : (𝕚 (𝕚 ∞)) # Int `→ (`∀ `∀ (‶ (Fin 3 ∋⦂ #2))) ≤ Int `→ Int `→ Int ⟹ Int `→ Int
+ett-example1 = ett-arr-𝕚 (ett-∀-𝕚 (ett-∀-𝕚 (ett-var)
+  ↑ty-int ↑ty-int (↑ty-arr ↑ty-int ↑ty-int) ↑tyʲ-∞)
+  ↑ty-int ↑ty-int (↑ty-arr ↑ty-int ↑ty-int) ↑tyʲ-∞)
 
 
 ----------------------------------------------------------------------
@@ -82,9 +84,10 @@ data _⊢_#_⌞_⌝_ : Env n m → Counter m → Type m → Polar → Type m →
     → (upj : ↑tyʲ0 j ⇘ j')
     → Δ ⊢ j # `∀ A ⌞ ≤⁺ ⌝ C `→ D
   s-∀l-tail :
-      Δ ,= B ⊢ 𝕛 # A ⌞ ≤⁺ ⌝ C' `→ D'
+      Δ ,= B ⊢ j' # A ⌞ ≤⁺ ⌝ C' `→ D'
     → (ic : (𝕚𝕔 j))
-    → (tail : #0 ε' A by j' ↪ 𝕛)
+    → (ettB : j # A ≤ C `→ D ⟹ B)
+    → (tail : #0 ε' A)
     → (upC : ↑ty0 C ⇘ C')
     → (upD : ↑ty0 D ⇘ D')
     → (upj : ↑tyʲ0 j ⇘ j')
@@ -114,11 +117,6 @@ data _⊢_#_⌞_⌝_ : Env n m → Counter m → Type m → Polar → Type m →
       Δ ∋ X := B
     → Δ ⊢ (𝕥₍ A ₎ j) # B ⌞ ≤⁺ ⌝ `∀ C
     → Δ ⊢ (𝕥₍ A ₎ j) # ‶ X ⌞ ≤⁺ ⌝ `∀ C
-
-
-foo : ∅ ⋈ ⊢ 𝕚 ∞ # (`∀ (‶ #0)) ⌞ ≤⁺ ⌝ (Int `→ Int)
-foo = s-∀l-tail {B = Int `→ Int} (s-svar-l (reg-S= (reg-Z reg-Z) (⊢r-arr ⊢r-int ⊢r-int)) (Z (↑ty-arr ↑ty-int ↑ty-int)))
-                case-𝕚 (ε-var (i∞-i i∞-z)) ↑ty-int ↑ty-int (↑tyʲ-𝕚 ↑tyʲ-∞)
 
 
 
