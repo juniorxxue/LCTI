@@ -118,8 +118,10 @@ complete-s (s-∀l-tail s ic tail upC upD (↑tyʲ-𝕚 upj)) (⊆∀-I-no x upj
   with ⟨ Σ' , upΣ ⟩ ← ↑tyᶜ0-total Σ
   with ⟨ e' , upe ⟩ ← ↑tyᵉ0-total e
   with refl ← ↑tyʲ-unique upj upj₁
-  with ih ← complete-s s (irrev-lemma0 x tail {!!}) {!!}
-  = s-∀l {!ih!}
+  with ~j-weaken ← ~weaken^0 ~j' (↑ty-arr upC upD) (↑tyᶜ-e upe upΣ) (↑tyʲ-𝕚 upj)
+  with ⟨ σ , newσ ⟩ ← σ-exist tail ~j-weaken
+  with ih ← complete-s s (irrev-lemma0 x tail {!!}) newσ
+  = s-∀l (s-conv ih ~j-weaken newσ tail)
   -- (complete-s s (irrev-lemma0 x tail {!!}) (~weaken^0 {!!} (↑ty-arr upC upD) (↑tyᶜ-e upe upΣ) {!!}))
          upΣ upe upC upD
 complete-s (s-∀l-tail s ic tail upC upD (↑tyʲ-𝕔 upj)) x (~C ⊢e x₂) = {!!}
