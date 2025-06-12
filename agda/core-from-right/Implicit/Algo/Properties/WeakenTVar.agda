@@ -105,10 +105,6 @@ s-weaken, {T = T} (s-∀l-no s upᶜ upᵉ upC upD) (↑tmᶜ-e {e' = e'} {Σ' =
 s-weaken, {T = T} (s-tapp s upᶜ) (↑tmᶜ-⓪ {Σ' = Σ'} upΣ) new
   with ⟨ Σ″ , upΣ″ ⟩ ← ↑tyᶜ0-total Σ'
   with ⟨ T' , upT ⟩ ← ↑ty0-total T = s-tapp (s-weaken, s (↑tmᶜ-↑tyᶜ-comm upΣ upΣ″ upᶜ) (▶sS= new upT)) upΣ″
-s-weaken, (s-svar-term inΓ s) (↑tmᶜ-e up-e upΣ) new
-  with refl ← ▶s⨟,-unique new = s-svar-term (∋:=-weaken,s inΓ (▶s⨟,-▶s,-l new)) (s-weaken, s (↑tmᶜ-e up-e upΣ) new)
-s-weaken, (s-svar-tapp inΓ s) (↑tmᶜ-⓪ upΣ) new
-  with refl ← ▶s⨟,-unique new = s-svar-tapp (∋:=-weaken,s inΓ (▶s⨟,-▶s,-l new)) (s-weaken, s (↑tmᶜ-⓪ upΣ) new)
 
 s-weaken,0 : Γ ⋈ ⊢ A ≤⁺ Σ ⊣ Δ ⋈ ↪ B
            → ↑tmᶜ0 Σ ⇘ Σ'

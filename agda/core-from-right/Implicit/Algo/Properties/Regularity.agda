@@ -61,8 +61,6 @@ s-env-in (s-∀l-no s upᶜ upᵉ upC upD) with s-env-in s
 ... | reg-S^ r = r
 s-env-in (s-tapp s upᶜ) with s-env-in s
 ... | reg-S= r regA = r
-s-env-in (s-svar-term inΓ s) = s-env-in s
-s-env-in (s-svar-tapp inΓ s) = s-env-in s
 
 s-env-out : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
           → SRegular Δ
@@ -145,8 +143,6 @@ s-⊢rᶜ (s-∀l-no s upᶜ upᵉ upC upD) with s-⊢rᶜ s
 ... | ⊢rᶜ-term r = ⊢rᶜ-term (⊢rᶜ-strengthen^0 r upᶜ)
 s-⊢rᶜ (s-tapp s upᶜ) with s-env-in s
 ... | reg-S= r regA = ⊢rᶜ-tapp regA (⊢rᶜ-strengthen=0 (s-⊢rᶜ s) upᶜ)
-s-⊢rᶜ (s-svar-term inΓ s) = s-⊢rᶜ s
-s-⊢rᶜ (s-svar-tapp inΓ s) = s-⊢rᶜ s
 
 t-⊢rᶜ : Γ ⊢ Σ ⇒ e ⇒ A
       → Γ ⊢rᶜ Σ
@@ -177,8 +173,6 @@ s-⊢r (s-term-o opnA ⊢e ss s) = ⊢r-arr {!!} {!!}
 s-⊢r (s-∀l s upᶜ upᵉ upC upD) = ⊢r-strengthen^0 (s-⊢r s) (↑ty-arr upC upD)
 s-⊢r (s-∀l-no s upᶜ upᵉ upC upD) = ⊢r-strengthen^0 (s-⊢r s) (↑ty-arr upC upD)
 s-⊢r (s-tapp s upᶜ) = ⊢r-∀ (⊢r-◆0 (s-⊢r s))
-s-⊢r (s-svar-term inΓ s) = s-⊢r s
-s-⊢r (s-svar-tapp inΓ s) = s-⊢r s
 
 
 t-⊢r (⊢lit regΓ) = ⊢r-int

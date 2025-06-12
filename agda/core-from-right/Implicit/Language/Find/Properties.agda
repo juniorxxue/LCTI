@@ -17,10 +17,6 @@ open import Implicit.Language.Find.Base
 ¬find-¬ε (f-∀-𝕚 ¬fd upj) = ¬ε-∀ (¬find-¬ε ¬fd)
 ¬find-¬ε (f-∀-𝕔 ¬fd upj) = ¬ε-∀ (¬find-¬ε ¬fd)
 ¬find-¬ε (f-𝕥 ¬fd upj) = ¬ε-∀ (¬find-¬ε ¬fd)
-¬find-¬ε f-var₁ = {!!}
-¬find-¬ε f-var₂ = {!!}
-¬find-¬ε f-var₃ = {!!}
-
 
 
 ↑ty-find : find A X j

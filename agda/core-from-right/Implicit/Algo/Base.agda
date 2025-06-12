@@ -51,9 +51,11 @@ data _⊢_⌞_⌝_⊣_ : Env n m → Type m → Polar → Type m → Env n m →
 
 infix 3 _⊢_⇒_⇒_
 infix 3 _⊢_≤⁺_⊣_↪_
+infix 3 _⊨_⟹_
 
 data _⊢_⇒_⇒_ : Env n m → Context n m → Term n m → Type m → Set
 data _⊢_≤⁺_⊣_↪_ : Env n m → Type m → Context n m → Env n m → Type m → Set
+data _⊨_⟹_ : Env n m → Context n m → Type m → Set
 
 data _⊢_⇒_⇒_ where
 
@@ -147,81 +149,19 @@ data _⊢_≤⁺_⊣_↪_ where
     → (upᶜ : ↑tyᶜ0 Σ ⇘ Σ')
     → Δ ⊢ `∀ A ≤⁺ (B ⓪↝ Σ) ⊣ Ψ ↪ `∀ C
 
-  s-svar-term :
-      Δ ∋ X := A
-    → Δ ⊢ A ≤⁺ ([ e ]↝ Σ) ⊣ Δ ↪ B `→ C
-    → Δ ⊢ ‶ X ≤⁺ ([ e ]↝ Σ) ⊣ Δ ↪ B `→ C
+  s-evar-infers :
+      (infs : 𝕣 Δ ⊨ [ e ]↝ Σ ⟹ A)
+    → (inst : [ A / X ] Δ ⟹ Ψ) -- implies Γ ∋^k
+    → Δ ⊢ ‶ X ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ A
 
-  s-svar-tapp :
-      Δ ∋ X := A
-    → Δ ⊢ A ≤⁺ (B ⓪↝ Σ) ⊣ Δ ↪ `∀ C
-    → Δ ⊢ ‶ X ≤⁺ (B ⓪↝ Σ) ⊣ Δ ↪ `∀ C
+data _⊨_⟹_ where
+  infs-z : (regΓ : TRegular Γ)
+         → (regA : Γ ⊢r A)
+         → Γ ⊨ τ A ⟹ A
+  infs-s : (⊢e : Γ ⊢ □ ⇒ e ⇒ A)
+         → Γ ⊨ Σ ⟹ B
+         → Γ ⊨ [ e ]↝ Σ ⟹ A `→ B
 
 
-_ : ∅ , `∀ ((‶ #0 `→ ‶ #0) `→ ‶ #0) ⊢ τ Int ⇒ (` #0) · (ƛ (` #0)) ⇒ Int
-_ = ⊢app (⊢sub (⊢var (reg-S, reg-Z
-                       (⊢r-∀ (⊢r-arr (⊢r-arr (⊢r-var-∙ Z) (⊢r-var-∙ Z)) (⊢r-var-∙ Z)))) Z) ne-app gc-var
-               (s-∀l {B = Int} (s-term-c (⊢c-arr (⊢c-var-= Z) (⊢c-var-= Z)) (grd-arr (grd-var= (Z ↑ty-int)) (grd-var= (Z ↑ty-int))) (⊢lam₁
-                                                                                                                                      (⊢sub
-                                                                                                                                       (⊢var
-                                                                                                                                        (reg-S,
-                                                                                                                                         (reg-S=
-                                                                                                                                          (reg-S, reg-Z
-                                                                                                                                           (⊢r-∀ (⊢r-arr (⊢r-arr (⊢r-var-∙ Z) (⊢r-var-∙ Z)) (⊢r-var-∙ Z))))
-                                                                                                                                          ⊢r-int)
-                                                                                                                                         ⊢r-int)
-                                                                                                                                        Z)
-                                                                                                                                       ne-τ gc-var
-                                                                                                                                       (s-type
-                                                                                                                                        (s-int
-                                                                                                                                         (reg-Z
-                                                                                                                                          (reg-S,
-                                                                                                                                           (reg-S=
-                                                                                                                                            (reg-S, reg-Z
-                                                                                                                                             (⊢r-∀ (⊢r-arr (⊢r-arr (⊢r-var-∙ Z) (⊢r-var-∙ Z)) (⊢r-var-∙ Z))))
-                                                                                                                                            ⊢r-int)
-                                                                                                                                           ⊢r-int)))))) (s-type
-                                                       (s-ex-l^
-                                                        (⟹^0 ↑ty-int ⊢r-int
-                                                         (reg-Z
-                                                          (reg-S, reg-Z
-                                                           (⊢r-∀
-                                                            (⊢r-arr (⊢r-arr (⊢r-var-∙ Z) (⊢r-var-∙ Z)) (⊢r-var-∙ Z))))))))) (↑tyᶜ-τ ↑ty-int) (↑tyᵉ-ƛ ↑tyᵉ-var) (↑ty-arr ↑ty-int ↑ty-int) ↑ty-int))
-
-{-
-_ : ∅ , (Int `→ Int) , `∀ (‶ #0 `→ ‶ #0) ⊢ □ ⇒ (` #0 · ` #1) · (lit 1) ⇒ Int
-_ = ⊢app (⊢app (⊢sub (⊢var (reg-S, (reg-S, reg-Z (⊢r-arr ⊢r-int ⊢r-int))
-                             (⊢r-∀ (⊢r-arr (⊢r-var-∙ Z) (⊢r-var-∙ Z)))) Z)
-                             ne-app gc-var
-                             (s-∀l (s-term-o (⊢o-var-^ Z) (⊢var (reg-S^
-                                                                  (reg-S, (reg-S, reg-Z (⊢r-arr ⊢r-int ⊢r-int))
-                                                                   (⊢r-∀ (⊢r-arr (⊢r-var-∙ Z) (⊢r-var-∙ Z)))))
-                                                                   (S^ (S, Z) (↑ty-arr ↑ty-int ↑ty-int))) (s-ex-r^
-                                                                                                            (⟹^0 (↑ty-arr ↑ty-int ↑ty-int) (⊢r-arr ⊢r-int ⊢r-int)
-                                                                                                             (reg-Z
-                                                                                                              (reg-S, (reg-S, reg-Z (⊢r-arr ⊢r-int ⊢r-int))
-                                                                                                               (⊢r-∀ (⊢r-arr (⊢r-var-∙ Z) (⊢r-var-∙ Z)))))))
-                                                     (s-svar-term (Z (↑ty-arr ↑ty-int ↑ty-int))
-                                                     (s-term-c ⊢c-int grd-int (⊢sub
-                                                                                (⊢lit
-                                                                                 (reg-S=
-                                                                                  (reg-S, (reg-S, reg-Z (⊢r-arr ⊢r-int ⊢r-int))
-                                                                                   (⊢r-∀ (⊢r-arr (⊢r-var-∙ Z) (⊢r-var-∙ Z))))
-                                                                                  (⊢r-arr ⊢r-int ⊢r-int)))
-                                                                                ne-τ gc-i
-                                                                                (s-type
-                                                                                 (s-int
-                                                                                  (reg-Z
-                                                                                   (reg-S=
-                                                                                    (reg-S, (reg-S, reg-Z (⊢r-arr ⊢r-int ⊢r-int))
-                                                                                     (⊢r-∀ (⊢r-arr (⊢r-var-∙ Z) (⊢r-var-∙ Z))))
-                                                                                    (⊢r-arr ⊢r-int ⊢r-int))))))
-                                                                                    (s-empty
-                                                                                      (reg-S=
-                                                                                       (reg-Z
-                                                                                        (reg-S, (reg-S, reg-Z (⊢r-arr ⊢r-int ⊢r-int))
-                                                                                         (⊢r-∀ (⊢r-arr (⊢r-var-∙ Z) (⊢r-var-∙ Z)))))
-                                                                                       (⊢r-arr ⊢r-int ⊢r-int))
-                                                                                      ⊢c-int grd-int)))) (↑tyᶜ-e ↑tyᵉ-lit ↑tyᶜ-□) ↑tyᵉ-var (↑ty-arr ↑ty-int ↑ty-int)
-                                                                                      (↑ty-arr ↑ty-int ↑ty-int))))
--}
+-- forall a. a -> a
+-- (id 1)

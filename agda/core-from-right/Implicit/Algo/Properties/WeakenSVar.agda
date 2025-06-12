@@ -125,14 +125,6 @@ s-weaken= {k = k} {T = T} (s-∀l-no s upᶜ upᵉ upC upD) new (↑ty-∀ upA) 
 s-weaken= {T = T} (s-tapp s upᶜ) new (↑ty-∀ upA) (↑tyᶜ-⓪ {Σ' = Σ'} upA' upΣ) (↑ty-∀ upB)
   with ⟨ Σ″ , upΣ″ ⟩ ← ↑tyᶜ0-total Σ'
   with ⟨ T' , upT ⟩ ← ↑ty0-total T = s-tapp (s-weaken= s (▶S= new upT upA') upA (↑tyᶜ-comm0' upΣ upΣ″ upᶜ) upB) upΣ″
-s-weaken= {k = k} (s-svar-term {A = A} inΓ s) new ↑ty-var (↑tyᶜ-e up-e upΣ) (↑ty-arr upB upB₁)
-  with ⟨ A' , upA' ⟩ ← ↑ty-total A k
-  with refl ← ▶⨟=-unique new
-  = s-svar-term (∋:=-weaken= inΓ (▶⨟=-▶=-l new) upA') (s-weaken= s new upA' (↑tyᶜ-e up-e upΣ) (↑ty-arr upB upB₁))
-s-weaken= {k = k} (s-svar-tapp {A = A} inΓ s) new ↑ty-var (↑tyᶜ-⓪ upA upΣ) (↑ty-∀ upB)
-  with ⟨ A' , upA' ⟩ ← ↑ty-total A k
-  with refl ← ▶⨟=-unique new
-  = s-svar-tapp (∋:=-weaken= inΓ (▶⨟=-▶=-l new) upA') (s-weaken= s new upA' (↑tyᶜ-⓪ upA upΣ) (↑ty-∀ upB))
 
 
 s-weaken=0 : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B

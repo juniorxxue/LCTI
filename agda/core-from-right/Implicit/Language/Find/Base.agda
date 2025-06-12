@@ -102,17 +102,21 @@ data ¬find : Type m → Fin m → Counter m → Set where
   f-𝕥       : ¬find A (#S k) j'
             → (upj : ↑tyʲ0 j ⇘ j')
             → ¬find (`∀ A) k (𝕥₍ B ₎ j)
-  f-var₁ : ¬find (‶ X) k (𝕚 j)
-  f-var₂ : ¬find (‶ X) k (𝕔 j)
-  f-var₃ : ¬find (‶ X) k (𝕥₍ B ₎ j)
+
+data IsoInf : Counter m → Set where
+  i∞-z : IsoInf (Counter m ∋⦂ ∞)
+  i∞-i : IsoInf j
+       → IsoInf (𝕚 j)
 
 -- find A k j
 -- at j-th position of A type, should have a bound variable, example: |-1 forall a. a -> a <: Int
 data find : Type m → Fin m → Counter m → Set where
   f-∞       : k ε A
             → find A k ∞
+  f-iso     : IsoInf j
+            → find (‶ k) k j
   f-arr-𝕚-l : k ε A
-            → ¬find B k j
+            → k ¬ε B
             → find (A `→ B) k (𝕚 j)
   f-arr-𝕚-r : find B k j
             → find (A `→ B) k (𝕚 j)
@@ -131,11 +135,12 @@ data find : Type m → Fin m → Counter m → Set where
 find-ε : find A k ∞
        → k ε A
 find-ε (f-∞ x) = x
+find-ε (f-iso x) = ε-var
 
 
 find-Z-false : find A k Z
              → ⊥
-find-Z-false ()
+find-Z-false (f-iso ())
 
 
 infix 3 _⊢rʲ_

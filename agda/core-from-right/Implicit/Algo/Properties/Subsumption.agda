@@ -60,8 +60,6 @@ s-refined-p (s-∀l s upᶜ upᵉ upC upD) = s-strengthen=0 (s-refined-p s) (↑
 s-refined-p (s-∀l-no s upᶜ upᵉ upC upD) = s-strengthen^0 (s-refined-p s) (↑ty-arr upC upD) (↑ty-arr upC upD) (↑tyᶜ-e upᵉ upᶜ)
 -- s-strengthen=0 (s-refined-p s) (↑ty-arr upC upD) (↑ty-arr upC upD) (↑tyᶜ-e upᵉ upᶜ)
 s-refined-p (s-tapp s upᶜ) = s-tapp (s-refined-p s) upᶜ
-s-refined-p (s-svar-term inΓ s) = s-refined-p s
-s-refined-p (s-svar-tapp inΓ s) = s-refined-p s
 
 
 ⊢to≤ (⊢lit regΓ) = s-empty (reg-Z regΓ) ⊢c-int grd-int

@@ -1,3 +1,5 @@
+{-# OPTIONS --allow-unsolved-metas #-}
+{-# OPTIONS --allow-incomplete-matches #-}
 module Implicit.Algo.Properties.Extension where
 
 open import Implicit.Language.All
@@ -35,8 +37,6 @@ s-⊆ (s-∀l-no s upᶜ upᵉ upC upD) with s-⊆ s
 ... | evar r = r
 s-⊆ (s-tapp s upᶜ) with s-⊆ s
 ... | svar r regA = r
-s-⊆ (s-svar-term inΓ s) = s-⊆ s
-s-⊆ (s-svar-tapp inΓ s) = s-⊆ s
 
 inst-⊆/x : [ A / X ] Γ ⟹ Δ
          → Γ ⊆ Δ w/v X
