@@ -106,6 +106,11 @@ s-trans (s-svar-term inΓ s) (s-term-c cloA ap ⊢e s2) (≊S newΣ) = s-svar-te
 s-trans (s-svar-term inΓ s) (s-term-o opnA ⊢e ss s2) (≊S newΣ)
   with ⊢r-arr regA regB ← s-⊢r s = ⊥-elim (⊢r-⊢o-false regA opnA)
 s-trans (s-svar-tapp inΓ s) (s-tapp s2 upᶜ) (≊⓪ newΣ) = s-svar-tapp inΓ (s-trans s (s-tapp s2 upᶜ) (≊⓪ newΣ))
+s-trans (s-evar-infers (infs-s x infs) inst) s2 (≊S newΣ) = ⊥-elim (≊-infs-false infs newΣ)
+  where ≊-infs-false : Γ ⊨ Σ ⟹ A
+             → Σ ≊ Σ'
+             → ⊥
+        ≊-infs-false (infs-s x infs) (≊S newΣ) = ≊-infs-false infs newΣ
 
 {-
   with reg-S= regΓ regB ← s-env-out s1

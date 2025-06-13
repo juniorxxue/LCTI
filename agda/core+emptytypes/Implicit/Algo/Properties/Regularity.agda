@@ -61,6 +61,7 @@ s-env-in (s-tapp s upᶜ) with s-env-in s
 ... | reg-S= r regA = r
 s-env-in (s-svar-term inΓ s) = s-env-in s
 s-env-in (s-svar-tapp inΓ s) = s-env-in s
+s-env-in (s-evar-infers x inst) = inst-env-in inst
 
 s-env-out : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
           → SRegular Δ
@@ -129,6 +130,17 @@ data _⊢rᶜ_ : Env n m → Context n m → Set where
 ⊢rᶜ-⋈ (⊢rᶜ-term reg) = ⊢rᶜ-term (⊢rᶜ-⋈ reg)
 ⊢rᶜ-⋈ (⊢rᶜ-tapp regA regΓ) = ⊢rᶜ-tapp (⊢r-𝕣' regA) (⊢rᶜ-⋈ regΓ)
 
+⊢rᶜ-𝕣 : 𝕣 Γ ⊢rᶜ Σ
+      → Γ ⊢rᶜ Σ
+⊢rᶜ-𝕣 ⊢rᶜ-empty = ⊢rᶜ-empty
+⊢rᶜ-𝕣 (⊢rᶜ-τ regA) = ⊢rᶜ-τ (⊢r-𝕣 regA)
+⊢rᶜ-𝕣 (⊢rᶜ-term regΣ) = ⊢rᶜ-term (⊢rᶜ-𝕣 regΣ)
+⊢rᶜ-𝕣 (⊢rᶜ-tapp regA regΣ) = ⊢rᶜ-tapp (⊢r-𝕣 regA) (⊢rᶜ-𝕣 regΣ)
+
+infs-⊢rᶜ : Γ ⊨ Σ ⟹ A
+         → Γ ⊢rᶜ Σ
+infs-⊢rᶜ (infs-z regΓ regA) = ⊢rᶜ-τ regA
+infs-⊢rᶜ (infs-s x infs) = ⊢rᶜ-term (infs-⊢rᶜ infs)
 
 s-⊢rᶜ : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
       → Γ ⊢rᶜ Σ
@@ -144,6 +156,8 @@ s-⊢rᶜ (s-tapp s upᶜ) with s-env-in s
 ... | reg-S= r regA = ⊢rᶜ-tapp regA (⊢rᶜ-strengthen=0 (s-⊢rᶜ s) upᶜ)
 s-⊢rᶜ (s-svar-term inΓ s) = s-⊢rᶜ s
 s-⊢rᶜ (s-svar-tapp inΓ s) = s-⊢rᶜ s
+s-⊢rᶜ (s-evar-infers tfs inst) with infs-⊢rᶜ tfs
+... | ⊢rᶜ-term r = ⊢rᶜ-term (⊢rᶜ-𝕣 r)
 
 t-⊢rᶜ : Γ ⊢ Σ ⇒ e ⇒ A
       → Γ ⊢rᶜ Σ
@@ -166,6 +180,8 @@ s-⊢r : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
      → Γ ⊢r B
 t-⊢r : Γ ⊢ Σ ⇒ e ⇒ A
      → Γ ⊢r A
+infs-⊢r : Γ ⊨ Σ ⟹ A
+        → Γ ⊢r A
 
 s-⊢r (s-empty regΓ cloA x) = ⊢c-≫-⊢r regΓ cloA x
 s-⊢r (s-type ss) = ss-polarity+ ss
@@ -176,7 +192,7 @@ s-⊢r (s-∀l-no s upᶜ upᵉ upC upD) = ⊢r-strengthen^0 (s-⊢r s) (↑ty-a
 s-⊢r (s-tapp s upᶜ) = ⊢r-∀ (⊢r-◆0 (s-⊢r s))
 s-⊢r (s-svar-term inΓ s) = s-⊢r s
 s-⊢r (s-svar-tapp inΓ s) = s-⊢r s
-
+s-⊢r (s-evar-infers tfs inst) = ⊢r-𝕣 (infs-⊢r tfs)
 
 t-⊢r (⊢lit regΓ) = ⊢r-int
 t-⊢r (⊢var regΓ x∈Γ) = ∋⦂-⊢r regΓ x∈Γ
@@ -190,6 +206,9 @@ t-⊢r (⊢sub ⊢e ne gc s) = ⊢r-𝕣' (s-⊢r s)
 t-⊢r (⊢tabs ⊢e) = ⊢r-∀ (t-⊢r ⊢e)
 t-⊢r (⊢tapp ⊢e st) with t-⊢rᶜ ⊢e
 ... | ⊢rᶜ-tapp regA regΓ = st0-⊢r (t-⊢r ⊢e) regA st
+
+infs-⊢r (infs-z regΓ regA) = regA
+infs-⊢r (infs-s x infs) = ⊢r-arr (t-⊢r x) (infs-⊢r infs)
 
 
 ----------------------------------------------------------------------

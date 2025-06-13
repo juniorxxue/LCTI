@@ -36,6 +36,7 @@ s-⊆ (s-tapp s upᶜ) with s-⊆ s
 ... | svar r regA = r
 s-⊆ (s-svar-term inΓ s) = s-⊆ s
 s-⊆ (s-svar-tapp inΓ s) = s-⊆ s
+s-⊆ (s-evar-infers infs inst) = inst-⊆ inst
 
 inst-⊆/x : [ A / X ] Γ ⟹ Δ
          → Γ ⊆ Δ w/v X
@@ -64,4 +65,3 @@ ss--⊆/ (s-ex-r^ inst) = ext-var (inst-⊆/x inst)
 ss--⊆/ (s-ex-r= regΓ x-in) = ext-var (⊆/x-refl regΓ (⊢c-var-= (∋:=to∋= x-in)))
 ss--⊆/ (s-arr s s₁) = ext-arr (ss+-⊆/ s) (ss--⊆/ s₁)
 ss--⊆/ (s-∀ s) = ext-∀ (ss--⊆/ s)
-

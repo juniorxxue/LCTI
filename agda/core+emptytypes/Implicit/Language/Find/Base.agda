@@ -84,13 +84,20 @@ nonz-↑tyʲ nz-I (↑tyʲ-𝕚 upj) = nz-I
 nonz-↑tyʲ nz-C (↑tyʲ-𝕔 upj) = nz-C
 nonz-↑tyʲ nz-T (↑tyʲ-𝕥 upj upA) = nz-T
 
+data IsoInf : Counter m → Set where
+  i∞-z : IsoInf (Counter m ∋⦂ 𝕚 ∞)
+  i∞-i : IsoInf j
+       → IsoInf (𝕚 j)
 
 -- find A k j
 -- at j-th position of A type, should have a bound variable, example: |-1 forall a. a -> a <: Int
 data find : Type m → Fin m → Counter m → Set where
-  f-∞       : k ε A
+  f-∞       : (inA : k ε A)
             → find A k ∞
-  f-arr-𝕚-l : k ε A
+  f-iso     : (inA : k ε A)
+            → (iso : IsoInf j)
+            → find A k j
+  f-arr-𝕚-l : (inA : k ε A)
             → find (A `→ B) k (𝕚 j)
   f-arr-𝕚-r : (¬inA : k ¬ε A)
             → find B k j
@@ -110,7 +117,7 @@ data find : Type m → Fin m → Counter m → Set where
 
 find-ε : find A k ∞
        → k ε A
-find-ε (f-∞ x) = x
+find-ε (f-∞ inA) = inA
 
 {-
 find-arr-r : find B k ∞
@@ -120,13 +127,11 @@ find-arr-r fd = f-∞ (ε-arr-r {!!} (find-ε fd))
 
 find-arr-l : find A k ∞
            → find (A `→ B) k ∞
-find-arr-l fd = f-∞ (ε-arr-l (find-ε fd))
-
+find-arr-l (f-∞ inA) = f-∞ (ε-arr-l inA)
 
 find-Z-false : find A k Z
              → ⊥
-find-Z-false ()
-
+find-Z-false (f-iso inA ())
 
 infix 3 _⊢rʲ_
 data _⊢rʲ_ : Env n m → Counter m → Set where

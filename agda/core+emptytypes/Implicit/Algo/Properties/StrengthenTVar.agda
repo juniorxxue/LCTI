@@ -1,3 +1,5 @@
+{-# OPTIONS --allow-unsolved-metas #-}
+{-# OPTIONS --allow-incomplete-matches #-}
 module Implicit.Algo.Properties.StrengthenTVar where
 
 open import Implicit.Language.All

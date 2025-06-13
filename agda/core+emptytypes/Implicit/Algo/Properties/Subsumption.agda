@@ -37,6 +37,10 @@ subsumption :  Γ ⊢ Σ ⇒ e ⇒ A
              → Γ ⋈ ⊢ A ≤⁺ Σ' ⊣ Γ ⋈ ↪ A'
              → Γ ⊢ Σ' ⇒ e ⇒ A'
 
+infs-sub' : 𝕣 Γ ⊨ Σ ⟹ A
+          → SRegular Γ
+          → Γ ⊢ A ≤⁺ Σ ⊣ Γ ↪ A
+
 subsumption0 : Γ ⊢ □ ⇒ e ⇒ A
              → Γ ⊢ τ A ⇒ e ⇒ A
 subsumption0 ⊢e = subsumption ⊢e ≊Z (s-type (s-refl (reg-Z (t-env ⊢e)) (⊢r-weaken⋈0 (t-⊢r ⊢e))))
@@ -58,6 +62,18 @@ s-refined-p (s-∀l-no s upᶜ upᵉ upC upD) = s-strengthen^0 (s-refined-p s) (
 s-refined-p (s-tapp s upᶜ) = s-tapp (s-refined-p s) upᶜ
 s-refined-p (s-svar-term inΓ s) = s-refined-p s
 s-refined-p (s-svar-tapp inΓ s) = s-refined-p s
+s-refined-p (s-evar-infers (infs-s ⊢e infs) inst)
+  with regA ← (⊆-⊢r (⊢r-𝕣 (t-⊢r ⊢e)) (inst-⊆ inst))
+  with ih ← infs-sub' infs (inst-env-in inst)
+--  with ih' ← (infs-sub' (infs-irrev-⊆ infs (inst-⊆ inst)) (inst-env-out inst))
+  = s-term-c (⊢r-⊢c regA) (⊢r-≫-eq regA) (t-irrev-⊆ (subsumption0 ⊢e) (inst-⊆ inst)) {!!}
+  -- (infs-sub' (infs-irrev-⊆ infs (inst-⊆ inst)) (inst-env-out inst))
+
+infs-sub' (infs-z regΓ regA) regΓ' = s-type (s-refl regΓ' (⊢r-𝕣 regA))
+infs-sub' (infs-s ⊢e infs) regΓ'
+  with regA ← (⊢r-𝕣 (t-⊢r ⊢e))
+  = s-term-c (⊢r-⊢c regA) (⊢r-≫-eq regA) (subsumption0 ⊢e) (infs-sub' infs regΓ')
+
 
 
 ⊢to≤ (⊢lit regΓ) = s-empty (reg-Z regΓ) ⊢c-int grd-int
