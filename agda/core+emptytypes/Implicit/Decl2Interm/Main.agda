@@ -127,7 +127,8 @@ find-≫-∙ (f-∀-𝕔 fd upj) ninΓ inΓ (grd-var= x) = ⊥-elim (εᵍ-:=-fa
 find-≫-∙ (f-∀-𝕔 fd upj) ninΓ inΓ (grd-∀ grd) = f-∀-𝕔 (find-≫-∙ fd (S∙ ninΓ) (S∙ inΓ) grd) upj
 find-≫-∙ (f-𝕥 fd upj) ninΓ inΓ (grd-var= x) = ⊥-elim (εᵍ-:=-false x (ε-∀ (find-ε-gen fd)) ninΓ)
 find-≫-∙ (f-𝕥 fd upj) ninΓ inΓ (grd-∀ grd) = f-𝕥 (find-≫-∙ fd (S∙ ninΓ) (S∙ inΓ) grd) upj
-
+find-≫-∙ (f-iso iso) ninΓ inΓ (grd-var= x) = ⊥-elim (εᵍ-:=-false x ε-var ninΓ)
+find-≫-∙ (f-iso iso) ninΓ inΓ (grd-var∙ x) = f-iso iso
 
 find-≫-∙0 : find A% #0 j
           → Γ ,∙ ≫ A ⇘ A%

@@ -172,6 +172,12 @@ data _≋_ : Counter m → Counter m → Set where
   = 𝕥≋ (↑ty-≋ new up1 up2)
 
 
+iso-≋-false : ∀ {nj}
+            → j ≋ nj
+            → IsoInf j
+            → ⊥
+iso-≋-false (𝕚≋ ~j) (i∞-i iso) = iso-≋-false ~j iso
+
 find-≋ : ∀ {nj}
        → find A k j
        → j ≋ nj
@@ -188,6 +194,7 @@ find-≋ (f-∀-𝕔 fd upj) (𝕔≋ {nj = nj} ~j)
 find-≋ (f-𝕥 fd upj) (𝕥≋ {nj = nj} ~j)
   with ⟨ nj' , upnj ⟩ ← ↑tyʲ0-total nj
   = f-𝕥 (find-≋ fd (↑ty-≋ ~j upj upnj)) upnj
+find-≋ (f-iso iso) ~j = ⊥-elim (iso-≋-false ~j iso)
 
 
 s-trans-∞ : Γ ⊢ ∞ # A ≤ B

@@ -164,6 +164,8 @@ find-≫-∙ (f-arr-𝕔 ¬inA fd) ninΓ inΓ (grd-arr grd grd₁) = f-arr-𝕔 
 find-≫-∙ (f-∀-𝕚 fd upj) ninΓ inΓ (grd-∀ grd) = f-∀-𝕚 (find-≫-∙ fd (S∙ ninΓ) (S∙ inΓ) grd) upj
 find-≫-∙ (f-∀-𝕔 fd upj) ninΓ inΓ (grd-∀ grd) = f-∀-𝕔 (find-≫-∙ fd (S∙ ninΓ) (S∙ inΓ) grd) upj
 find-≫-∙ (f-𝕥 fd upj) ninΓ inΓ (grd-∀ grd) = f-𝕥 (find-≫-∙ fd (S∙ ninΓ) (S∙ inΓ) grd) upj
+find-≫-∙ (f-iso iso) ninΓ inΓ (grd-var= x) = ⊥-elim (∋∙-∋:=-false inΓ x)
+find-≫-∙ (f-iso iso) ninΓ inΓ (grd-var∙ x) = f-iso iso
 
 
 sound : Γ ⊢i j # A ⌞ ≤ ⌝ B
