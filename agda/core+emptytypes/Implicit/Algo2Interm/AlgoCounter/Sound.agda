@@ -11,6 +11,9 @@ tc-sound : Γ ⊢ Σ ⇒ e ⇒ A ↡ j
 sc-sound : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B ↡ j
          → Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
 
+infsc-sound : Γ ⊨ Σ ⟹ A ↡ j
+            → Γ ⊨ Σ ⟹ A
+
 tc-sound (⊢lit regΓ) = ⊢lit regΓ
 tc-sound (⊢var regΓ x∈Γ) = ⊢var regΓ x∈Γ
 tc-sound (⊢ann ⊢e) = ⊢ann (tc-sound ⊢e)
@@ -32,6 +35,10 @@ sc-sound (s-svar-term inΓ s) = s-svar-term inΓ (sc-sound s)
 sc-sound (s-svar-tapp inΓ s) = s-svar-tapp inΓ (sc-sound s)
 sc-sound (s-∀l-no-𝕚 x upᶜ upj upᵉ upC upD) = s-∀l-no (sc-sound x) upᶜ upᵉ upC upD
 sc-sound (s-∀l-no-𝕔 x upᶜ upj upᵉ upC upD) = s-∀l-no (sc-sound x) upᶜ upᵉ upC upD
+sc-sound (s-evar-infers infs inst) = s-evar-infers (infsc-sound infs) inst
+
+infsc-sound (infs-z regΓ regA) = infs-z regΓ regA
+infsc-sound (infs-s ⊢e infs) = infs-s (tc-sound ⊢e) (infsc-sound infs)
 
 ----------------------------------------------------------------------
 --+                         useful lemmas                          +--
@@ -45,3 +52,7 @@ tc-id0 ⊢e = ⊢id0 (tc-sound ⊢e)
 sc-⊆ : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B ↡ j
      → Γ ⊆ Δ
 sc-⊆ s = s-⊆ (sc-sound s)
+
+tc-⊢r : Γ ⊢ Σ ⇒ e ⇒ A ↡ j
+      → Γ ⊢r A
+tc-⊢r ⊢e = t-⊢r (tc-sound ⊢e)

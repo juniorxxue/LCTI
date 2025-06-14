@@ -14,6 +14,7 @@ open import Implicit.Algo.Properties.StrengthenEVar
 open import Implicit.Algo.Properties.Weaken
 open import Implicit.Algo.Properties.Irrelevance
 open import Implicit.Algo.Properties.Trans
+open import Implicit.Algo.Properties.SubIrrelevance
 
 ≊-weaken : Σ₁ ≊ Σ₂
          → ↑tmᶜ0 Σ₁ ⇘ Σ₁'
@@ -65,9 +66,7 @@ s-refined-p (s-svar-tapp inΓ s) = s-refined-p s
 s-refined-p (s-evar-infers (infs-s ⊢e infs) inst)
   with regA ← (⊆-⊢r (⊢r-𝕣 (t-⊢r ⊢e)) (inst-⊆ inst))
   with ih ← infs-sub' infs (inst-env-in inst)
---  with ih' ← (infs-sub' (infs-irrev-⊆ infs (inst-⊆ inst)) (inst-env-out inst))
-  = s-term-c (⊢r-⊢c regA) (⊢r-≫-eq regA) (t-irrev-⊆ (subsumption0 ⊢e) (inst-⊆ inst)) {!!}
-  -- (infs-sub' (infs-irrev-⊆ infs (inst-⊆ inst)) (inst-env-out inst))
+  = s-term-c (⊢r-⊢c regA) (⊢r-≫-eq regA) (t-irrev-⊆ (subsumption0 ⊢e) (inst-⊆ inst)) (s-irrev-⊆ ih (inst-⊆ inst))
 
 infs-sub' (infs-z regΓ regA) regΓ' = s-type (s-refl regΓ' (⊢r-𝕣 regA))
 infs-sub' (infs-s ⊢e infs) regΓ'

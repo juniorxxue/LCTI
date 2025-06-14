@@ -28,6 +28,18 @@ data _⊢_~t_ : Env n m → Counter m × Type m → Context n m → Set where
      → (st : ⟦ A ⟧ B ⇘ B*)
      → Γ ⊢ ⟨ 𝕥₍ A ₎ j , `∀ B ⟩ ~t A ⓪↝ Σ
 
+infix 3 _⊢_~inf_
+data _⊢_~inf_ : Env n m → Counter m × Type m → Context n m → Set where
+
+  ~i∞ : ∀ {Γ : Env n m} {A }
+    → Γ ⊢ ⟨ ∞ , A ⟩ ~inf τ A
+
+  ~iI : ∀ {Γ : Env n m} {j A B Σ e}
+    → (⊢e : Γ ⊢ Z # e ⦂ A)
+    → Γ ⊢ ⟨ j , B ⟩ ~inf Σ
+    → Γ ⊢ ⟨ 𝕚 j , A `→ B ⟩ ~inf ([ e ]↝ Σ)
+
+
 infix 3 _⊢_~s_
 data _⊢_~s_ : Env n m → Counter m × Type m → Context n m → Set where
 
@@ -58,6 +70,28 @@ data _⊢_~s_ : Env n m → Counter m × Type m → Context n m → Set where
 ~s-~t (~sI ⊢e ~s) = ~tI ⊢e (~s-~t ~s)
 ~s-~t (~sC ⊢e ~s) = ~tC ⊢e (~s-~t ~s)
 ~s-~t (~sT ~s st) = ~tT (~s-~t ~s) st
+
+~t-~s : 𝕣 Γ ⊢ ⟨ j , A ⟩ ~t Σ
+      → Γ ⊢ ⟨ j , A ⟩ ~s Σ
+~t-~s ~tZ = ~sZ
+~t-~s ~t∞ = ~s∞
+~t-~s (~tI ⊢e ~t) = ~sI ⊢e (~t-~s ~t )
+~t-~s (~tC ⊢e ~t) = ~sC ⊢e (~t-~s ~t )
+~t-~s (~tT ~t st) = ~sT (~t-~s ~t ) st
+
+~infs-~t : Γ ⊢ ⟨ j , A ⟩ ~inf Σ
+         → Γ ⊢ ⟨ j , A ⟩ ~t Σ
+~infs-~t ~i∞ = ~t∞
+~infs-~t (~iI ⊢e ~inf) = ~tI ⊢e (~infs-~t ~inf)
+
+~s-irrev-⊆ : Γ ⊢ ⟨ j , A ⟩ ~s Σ
+           → Γ ⊆ Δ
+           → Δ ⊢ ⟨ j , A ⟩ ~s Σ
+~s-irrev-⊆ ~sZ ext = ~sZ
+~s-irrev-⊆ ~s∞ ext = ~s∞
+~s-irrev-⊆ (~sI ⊢e ~s) ext = ~sI (t-⊆-prv ⊢e ext) (~s-irrev-⊆ ~s ext)
+~s-irrev-⊆ (~sC ⊢e ~s) ext = ~sC (t-⊆-prv ⊢e ext) (~s-irrev-⊆ ~s ext)
+~s-irrev-⊆ (~sT ~s st) ext = ~sT (~s-irrev-⊆ ~s ext) st
 
 NonEmpty-NonZ : NonEmpty Σ
               → Γ ⊢ ⟨ j , A ⟩ ~t Σ

@@ -12,9 +12,11 @@ open import Implicit.Algo.Base
 
 infix 3 _⊢_⇒_⇒_↡_
 infix 3 _⊢_≤⁺_⊣_↪_↡_
+infix 3 _⊨_⟹_↡_
 
 data _⊢_⇒_⇒_↡_ : Env n m → Context n m → Term n m → Type m → Counter m → Set
 data _⊢_≤⁺_⊣_↪_↡_ : Env n m → Type m → Context n m → Env n m → Type m → Counter m → Set
+data _⊨_⟹_↡_ : Env n m → Context n m → Type m → Counter m → Set
 
 
 data _⊢_⇒_⇒_↡_ where
@@ -139,3 +141,16 @@ data _⊢_≤⁺_⊣_↪_↡_ where
       Δ ∋ X := A
     → Δ ⊢ A ≤⁺ (B ⓪↝ Σ) ⊣ Δ ↪ `∀ C ↡ (𝕥₍ B ₎ j)
     → Δ ⊢ ‶ X ≤⁺ (B ⓪↝ Σ) ⊣ Δ ↪ `∀ C ↡ (𝕥₍ B ₎ j)
+
+  s-evar-infers :
+      (infs : 𝕣 Δ ⊨ [ e ]↝ Σ ⟹ A ↡ (𝕚 j))
+    → (inst : [ A / X ] Δ ⟹ Ψ) -- implies Γ ∋^k
+    → Δ ⊢ ‶ X ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ A ↡ (𝕚 j)
+
+data _⊨_⟹_↡_ where
+  infs-z : (regΓ : TRegular Γ)
+         → (regA : Γ ⊢r A)
+         → Γ ⊨ τ A ⟹ A ↡ ∞
+  infs-s : (⊢e : Γ ⊢ □ ⇒ e ⇒ A ↡ Z)
+         → Γ ⊨ Σ ⟹ B ↡ j
+         → Γ ⊨ [ e ]↝ Σ ⟹ A `→ B ↡ 𝕚 j

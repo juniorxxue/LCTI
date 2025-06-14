@@ -30,11 +30,18 @@ tc-~ : Γ ⊢ Σ ⇒ e ⇒ A ↡ j
 sc-~ : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B ↡ j
      → Δ ⊢ ⟨ j , B ⟩ ~s Σ
 
+infs-~ : Γ ⊨ Σ ⟹ A ↡ j
+       → Γ ⊢ ⟨ j , A ⟩ ~t Σ
+
 sound : Γ ⊢ Σ ⇒ e ⇒ A ↡ j
       → Γ ⊢ j # e ⦂ A
 
 sound-s : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B ↡ j
         → Δ ⊢ j # A ⌞ ≤⁺ ⌝ B
+
+sound-infs : 𝕣 Γ ⊨ Σ ⟹ A ↡ j
+           → Γ ⊆ Δ
+           → Δ ⊢ j # A ⌞ ≤⁺ ⌝ A
 
 tc-~ (⊢lit regΓ) = ~tZ
 tc-~ (⊢var regΓ x∈Γ) = ~tZ
@@ -63,6 +70,11 @@ sc-~ (s-svar-term inΓ s) = sc-~ s
 sc-~ (s-svar-tapp inΓ s) = sc-~ s
 sc-~ (s-∀l-no-𝕚 s upᶜ upj upᵉ upC upD) = ~s-strengthen^0 (sc-~ s) (↑ty-arr upC upD) (↑tyᶜ-e upᵉ upᶜ) (↑tyʲ-𝕚 upj)
 sc-~ (s-∀l-no-𝕔 s upᶜ upj upᵉ upC upD) = ~s-strengthen^0 (sc-~ s) (↑ty-arr upC upD) (↑tyᶜ-e upᵉ upᶜ) (↑tyʲ-𝕔 upj)
+sc-~ (s-evar-infers infs inst)
+  with ih ← infs-~ infs = ~s-irrev-⊆ (~t-~s ih) (inst-⊆ inst)
+
+infs-~ (infs-z regΓ regA) = ~t∞
+infs-~ (infs-s ⊢e infs) = ~tI (sound ⊢e) (infs-~ infs)
 
 sound (⊢lit regΓ) = ⊢lit regΓ
 sound (⊢var regΓ x∈Γ) = ⊢var regΓ x∈Γ
@@ -91,3 +103,7 @@ sound-s (s-svar-term inΓ s) with sc-~ s
 sound-s (s-svar-tapp inΓ s) = s-svar-𝕥 inΓ (sound-s s)
 sound-s (s-∀l-no-𝕚 s upᶜ upj upᵉ upC upD) = s-∀l-no-appear (sound-s s) case-𝕚 (s-¬ε (sc-sound s) Z Z) upC upD (↑tyʲ-𝕚 upj)
 sound-s (s-∀l-no-𝕔 s upᶜ upj upᵉ upC upD) = s-∀l-no-appear (sound-s s) case-𝕔 (s-¬ε (sc-sound s) Z Z) upC upD (↑tyʲ-𝕔 upj)
+sound-s (s-evar-infers (infs-s ⊢e infs) inst) = s-svar-𝕚 (inst-∋:= inst) (sound-infs (infs-s ⊢e infs) (inst-⊆ inst))
+
+sound-infs (infs-z regΓ regA) inst = s-refl-∞ (⊆-sregular' inst) (⊆-⊢r (⊢r-𝕣 regA) inst)
+sound-infs (infs-s ⊢e infs) inst = s-arr₂ (s-refl-∞ (⊆-sregular' inst) ((⊆-⊢r (⊢r-𝕣 (tc-⊢r ⊢e)) inst))) (sound-infs infs inst)

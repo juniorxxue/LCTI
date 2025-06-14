@@ -7,3 +7,7 @@ open import Implicit.Algo.Base
 open import Implicit.Algo.Properties.Extension
 
 
+postulate
+  s-irrev-⊆ : Γ ⊢ A ≤⁺ Σ ⊣ Γ ↪ B
+            → Γ ⊆ Δ
+            → Δ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B

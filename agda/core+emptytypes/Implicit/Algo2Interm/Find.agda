@@ -6,6 +6,11 @@ open import Implicit.Algo.All
 open import Implicit.Algo2Interm.AlgoCounter.All
 open import Implicit.Algo2Interm.Context2Counter
 
+infs-isoinf : Γ ⊨ [ e ]↝ Σ ⟹ A ↡ j
+            → IsoInf j
+infs-isoinf (infs-s ⊢e (infs-z regΓ regA)) = i∞-z
+infs-isoinf (infs-s ⊢e (infs-s ⊢e₁ infs)) = i∞-i (infs-isoinf (infs-s ⊢e₁ infs))
+
 ss-find-l : Γ ⊢ A ⌞ ≤⁺ ⌝ B ⊣ Δ
               → Γ ∋^ k
               → Δ ∋= k
@@ -36,6 +41,8 @@ s-find (s-svar-term in' s) inΓ inΔ = ⊥-elim (∋^-∋=-false inΓ inΔ)
 s-find (s-svar-tapp in' s) inΓ inΔ = ⊥-elim (∋^-∋=-false inΓ inΔ)
 s-find (s-∀l-no-𝕚 s upᶜ upj upᵉ upC upD) inΓ inΔ = f-∀-𝕚 (s-find s (S^ inΓ) (S^ inΔ)) upj
 s-find (s-∀l-no-𝕔 s upᶜ upj upᵉ upC upD) inΓ inΔ = f-∀-𝕔 (s-find s (S^ inΓ) (S^ inΔ)) upj
+s-find (s-evar-infers infs inst) inΓ inΔ
+  with ε-var ← ^in-=out-ε (ext-var (inst-⊆/x inst)) inΓ inΔ = f-iso ε-var (infs-isoinf infs)
 
 s-find0 : Γ ,^ ⊢ A ≤⁺ [ e' ]↝ Σ' ⊣ Δ ,= B ↪ C `→ D ↡ j
               → ↑tyᵉ0 e ⇘ e'
@@ -83,3 +90,4 @@ s-¬ε (s-∀l-no s upᶜ upᵉ upC upD) inΓ inΔ = ¬ε-∀ (s-¬ε s (S^ inΓ
 s-¬ε (s-tapp s upᶜ) inΓ inΔ = ¬ε-∀ (s-¬ε s (S= inΓ) (S= inΔ))
 s-¬ε (s-svar-term x s) inΓ inΔ = ¬ε-var (∋=-∋^-≢ (∋:=to∋= x) inΓ)
 s-¬ε (s-svar-tapp x s) inΓ inΔ = ¬ε-var (∋=-∋^-≢ (∋:=to∋= x) inΓ)
+s-¬ε (s-evar-infers infs inst) inΓ inΔ = ¬ε-var (∋=-∋^-≢ (inst-∋= inst) inΔ)
