@@ -41,9 +41,9 @@ s+-⊆/ (s-∀l-no-appear s case-𝕚 fd upC upD (↑tyʲ-𝕚 upj)) | r = ⊆�
 s+-⊆/ (s-∀l-no-appear s case-𝕔 fd upC upD (↑tyʲ-𝕔 upj)) | r = ⊆∀-C-no r upj
 s+-⊆/ (s-svar-l x inΔ) = ⊆∞ (ext-var (⊆/x-refl x (⊢c-var-= (∋:=to∋= inΔ))))
 s+-⊆/ (s-tapp s upj) = ⊆∀-T (s+-⊆/ s) upj
-s+-⊆/ (s-svar-𝕚 inΓ s) = ⊆I-X (s-sregular s)
-s+-⊆/ (s-svar-𝕔 inΓ s) = ⊆C-X (s-sregular s)
-s+-⊆/ (s-svar-𝕥 inΓ s) = ⊆T-X (s-sregular s)
+s+-⊆/ (s-svar-𝕚 inΓ s) = ⊆I-X (s-sregular s) (⊢c-var-= (∋:=to∋= inΓ))
+s+-⊆/ (s-svar-𝕔 inΓ s) = ⊆C-X (s-sregular s) (⊢c-var-= (∋:=to∋= inΓ))
+s+-⊆/ (s-svar-𝕥 inΓ s) = ⊆T-X (s-sregular s) (⊢c-var-= (∋:=to∋= inΓ))
 
 complete-ss+ : Δ ⊢ ∞ # A ⌞ ≤⁺ ⌝ B
              → Γ ⊆ Δ w/t A
@@ -107,9 +107,9 @@ complete-s (s-tapp s upj) (⊆∀-T ext upj₁) (~T {Σ = Σ} ~j st)
   with ⟨ Σ' , upΣ ⟩ ← ↑tyᶜ0-total Σ
   with reg-S= r regA ← s-sregular s
   with svar ext' regA₁ ← ⊆/c-⊆ ext = s-tapp (complete-s s ext (~weaken=0 ~j (st-↑ty (⊢r-¬ε (s+-polarity s) Z) st) upΣ upj regA₁)) upΣ
-complete-s (s-svar-𝕚 inΓ s) (⊆I-X regΓ) (~I ⊢e ~j) = s-svar-term inΓ (complete-s s (s+-⊆/ s) (~I ⊢e ~j))
-complete-s (s-svar-𝕔 inΓ s) (⊆C-X regΓ) (~C ⊢e ~j) = s-svar-term inΓ (complete-s s (s+-⊆/ s) (~C ⊢e ~j))
-complete-s (s-svar-𝕥 inΓ s) (⊆T-X regΓ) (~T ~j st) = s-svar-tapp inΓ (complete-s s (s+-⊆/ s) (~T ~j st))
+complete-s (s-svar-𝕚 inΓ s) (⊆I-X regΓ cloA) (~I ⊢e ~j) = s-svar-term inΓ (complete-s s (s+-⊆/ s) (~I ⊢e ~j))
+complete-s (s-svar-𝕔 inΓ s) (⊆C-X regΓ cloA) (~C ⊢e ~j) = s-svar-term inΓ (complete-s s (s+-⊆/ s) (~C ⊢e ~j))
+complete-s (s-svar-𝕥 inΓ s) (⊆T-X regΓ cloA) (~T ~j st) = s-svar-tapp inΓ (complete-s s (s+-⊆/ s) (~T ~j st))
 complete-s (s-∀l s ic fd upC upD (↑tyʲ-𝕚 upj)) (⊆∀-I-no ext upj₁) (~I ⊢e j~)
   with refl ← ↑tyʲ-unique upj upj₁
   with () ← ⊆/c-find-∋= ext Z fd
@@ -128,41 +128,42 @@ complete-s (s-∀l-no-appear s case-𝕔 fd upC upD (↑tyʲ-𝕔 upj)) (⊆∀-
   with refl ← ↑tyʲ-unique upj upj₁
   = let weaken-j~ = (~weaken^0 (~C ⊢e j~) (↑ty-arr upC upD) (↑tyᶜ-e upe upΣ)) (↑tyʲ-𝕔 upj)
     in s-∀l-no (complete-s s ext weaken-j~) upΣ upe upC upD
+complete-s (s-svar-𝕚 inΓ s) (⊆Inf-X extx iso) (~I ⊢e j~) = {!!}
 
-complete-s0 : Γ ⋈ ⊢ j # A ⌞ ≤⁺ ⌝ B
-            → Γ ⊢ ⟨ j , B ⟩ ~t Σ
-            → Γ ⋈ ⊢ A ≤⁺ Σ ⊣ Γ ⋈ ↪ B
-complete-s0 s j~Σ = complete-s s (s+-⊆/ s) (~t-~s j~Σ)
+-- complete-s0 : Γ ⋈ ⊢ j # A ⌞ ≤⁺ ⌝ B
+--             → Γ ⊢ ⟨ j , B ⟩ ~t Σ
+--             → Γ ⋈ ⊢ A ≤⁺ Σ ⊣ Γ ⋈ ↪ B
+-- complete-s0 s j~Σ = complete-s s (s+-⊆/ s) (~t-~s j~Σ)
 
-complete : Γ ⊢ j # e ⦂ A
-         → Γ ⊢ ⟨ j , A ⟩ ~t Σ
-         → Γ ⊢ Σ ⇒ e ⇒ A
-complete (⊢lit cloΓ) ~Z = ⊢lit cloΓ
-complete (⊢var cloΓ x∈Γ) ~Z = ⊢var cloΓ x∈Γ
-complete (⊢ann ⊢e) ~Z = ⊢ann (complete ⊢e ~∞)
-complete (⊢lam₁ ⊢e) ~∞ = ⊢lam₁ (complete ⊢e ~∞)
-complete (⊢lam₂ ⊢e) (~I {Σ = Σ} ⊢e₁ j~Σ)
-  with reg-S, regΓ regA ← t-tregular ⊢e
-  with ⟨ Σ' , upΣ ⟩ ← ↑tmᶜ0-total Σ
-  = ⊢lam₂ ⊢e₁ upΣ (complete ⊢e (~weaken,0 j~Σ upΣ regA))
-complete (⊢app₁ ⊢e ⊢e₁) j~Σ = ⊢app (complete ⊢e (~C (complete ⊢e₁ ~∞) j~Σ))
-complete (⊢app₂ ⊢e ⊢e₁) j~Σ = ⊢app (complete ⊢e (~I (complete ⊢e₁ ~Z) j~Σ))
-complete (⊢sub ⊢e B≤A x j≢Z) j~Σ = ⊢sub (complete ⊢e ~Z) (nonempty j≢Z j~Σ) x (complete-s0 B≤A j~Σ)
-  where nonempty : NonZ j
-                 → Γ ⊢ ⟨ j , A ⟩ ~t Σ
-                 → NonEmpty Σ
-        nonempty nz-∞ ~∞ = ne-τ
-        nonempty nz-I (~I ⊢e j~Σ) = ne-app
-        nonempty nz-C (~C ⊢e j~Σ) = ne-app
-        nonempty nz-T (~T ~j st) = ne-tapp
-complete (⊢tabs ⊢e) ~Z = ⊢tabs (complete ⊢e ~Z)
-complete (⊢tapp ⊢e st) ~j = ⊢tapp (complete ⊢e (~T ~j st)) st
+-- complete : Γ ⊢ j # e ⦂ A
+--          → Γ ⊢ ⟨ j , A ⟩ ~t Σ
+--          → Γ ⊢ Σ ⇒ e ⇒ A
+-- complete (⊢lit cloΓ) ~Z = ⊢lit cloΓ
+-- complete (⊢var cloΓ x∈Γ) ~Z = ⊢var cloΓ x∈Γ
+-- complete (⊢ann ⊢e) ~Z = ⊢ann (complete ⊢e ~∞)
+-- complete (⊢lam₁ ⊢e) ~∞ = ⊢lam₁ (complete ⊢e ~∞)
+-- complete (⊢lam₂ ⊢e) (~I {Σ = Σ} ⊢e₁ j~Σ)
+--   with reg-S, regΓ regA ← t-tregular ⊢e
+--   with ⟨ Σ' , upΣ ⟩ ← ↑tmᶜ0-total Σ
+--   = ⊢lam₂ ⊢e₁ upΣ (complete ⊢e (~weaken,0 j~Σ upΣ regA))
+-- complete (⊢app₁ ⊢e ⊢e₁) j~Σ = ⊢app (complete ⊢e (~C (complete ⊢e₁ ~∞) j~Σ))
+-- complete (⊢app₂ ⊢e ⊢e₁) j~Σ = ⊢app (complete ⊢e (~I (complete ⊢e₁ ~Z) j~Σ))
+-- complete (⊢sub ⊢e B≤A x j≢Z) j~Σ = ⊢sub (complete ⊢e ~Z) (nonempty j≢Z j~Σ) x (complete-s0 B≤A j~Σ)
+--   where nonempty : NonZ j
+--                  → Γ ⊢ ⟨ j , A ⟩ ~t Σ
+--                  → NonEmpty Σ
+--         nonempty nz-∞ ~∞ = ne-τ
+--         nonempty nz-I (~I ⊢e j~Σ) = ne-app
+--         nonempty nz-C (~C ⊢e j~Σ) = ne-app
+--         nonempty nz-T (~T ~j st) = ne-tapp
+-- complete (⊢tabs ⊢e) ~Z = ⊢tabs (complete ⊢e ~Z)
+-- complete (⊢tapp ⊢e st) ~j = ⊢tapp (complete ⊢e (~T ~j st)) st
 
--- corollaries
-complete-0 : Γ ⊢ Z # e ⦂ A
-           → Γ ⊢ □ ⇒ e ⇒ A
-complete-0 ⊢e = complete ⊢e ~Z
+-- -- corollaries
+-- complete-0 : Γ ⊢ Z # e ⦂ A
+--            → Γ ⊢ □ ⇒ e ⇒ A
+-- complete-0 ⊢e = complete ⊢e ~Z
 
-complete-∞ : Γ ⊢ ∞ # e ⦂ A
-           → Γ ⊢ τ A ⇒ e ⇒ A
-complete-∞ ⊢e = complete ⊢e ~∞
+-- complete-∞ : Γ ⊢ ∞ # e ⦂ A
+--            → Γ ⊢ τ A ⇒ e ⇒ A
+-- complete-∞ ⊢e = complete ⊢e ~∞

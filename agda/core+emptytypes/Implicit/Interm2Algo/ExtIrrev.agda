@@ -32,10 +32,13 @@ data _⊆_w/t_w/c_ : Env n m → Env n m → Type m → Counter m → Set where
        → (upj : ↑tyʲ0 j ⇘ j')
        → Γ ⊆ Δ w/t `∀ A w/c 𝕥₍ B ₎ j
   ⊆I-X : (regΓ : SRegular Δ)
+       → (cloA : Δ ⊢c (‶ X))
        → Δ ⊆ Δ w/t ‶ X w/c 𝕚 j
   ⊆C-X : (regΓ : SRegular Δ)
+       → (cloA : Δ ⊢c (‶ X))
        → Δ ⊆ Δ w/t ‶ X w/c 𝕔 j
   ⊆T-X : (regΓ : SRegular Δ)
+       → (cloA : Δ ⊢c (‶ X))
        → Δ ⊆ Δ w/t ‶ X w/c 𝕥₍ A ₎ j
   ⊆Inf-X : (extx : Γ ⊆ Δ w/v X)
          → (iso : IsoInf (𝕚 j))
@@ -57,9 +60,9 @@ data _⊆_w/t_w/c_ : Env n m → Env n m → Type m → Counter m → Set where
 ... | evar r = r
 ⊆/c-⊆ (⊆∀-T ext upj) with ⊆/c-⊆ ext
 ... | svar r regA = r
-⊆/c-⊆ (⊆I-X regΓ) = ⊆-refl regΓ
-⊆/c-⊆ (⊆C-X regΓ) = ⊆-refl regΓ
-⊆/c-⊆ (⊆T-X regΓ) = ⊆-refl regΓ
+⊆/c-⊆ (⊆I-X regΓ cloA) = ⊆-refl regΓ
+⊆/c-⊆ (⊆C-X regΓ cloA) = ⊆-refl regΓ
+⊆/c-⊆ (⊆T-X regΓ cloA) = ⊆-refl regΓ
 ⊆/c-⊆ (⊆Inf-X extx iso) = ⊆/x-⊆ extx
 
 ----------------------------------------------------------------------
@@ -183,9 +186,9 @@ data _⊆_w/t_w/c_ : Env n m → Env n m → Type m → Counter m → Set where
 ⊆/c-irrev-== {B = B} (⊆∀-T ext upj) new1 new2
   with svar r regA ← ⊆/c-⊆ ext
   with ⟨ B' , upB ⟩ ← ↑ty0-total B = ⊆∀-T (⊆/c-irrev-== ext (=⟹=S new1 upB regA) (=⟹=S new2 upB (⊆-⊢r regA r))) upj
-⊆/c-irrev-== (⊆I-X regΓ) new1 new2 with refl ← =⟹-unique new1 new2 = ⊆I-X (=⟹-sregular new1)
-⊆/c-irrev-== (⊆C-X regΓ) new1 new2 with refl ← =⟹-unique new1 new2 = ⊆C-X (=⟹-sregular new1)
-⊆/c-irrev-== (⊆T-X regΓ) new1 new2 with refl ← =⟹-unique new1 new2 = ⊆T-X (=⟹-sregular new1)
+⊆/c-irrev-== (⊆I-X regΓ cloA) new1 new2 with refl ← =⟹-unique new1 new2 = ⊆I-X (=⟹-sregular new1) (=⟹-⊢c cloA new1)
+⊆/c-irrev-== (⊆C-X regΓ cloA) new1 new2 with refl ← =⟹-unique new1 new2 = ⊆C-X (=⟹-sregular new1) (=⟹-⊢c cloA new1)
+⊆/c-irrev-== (⊆T-X regΓ cloA) new1 new2 with refl ← =⟹-unique new1 new2 = ⊆T-X (=⟹-sregular new1) (=⟹-⊢c cloA new1)
 ⊆/c-irrev-== {B = B} (⊆∀-I-no ext upj) new1 new2
   with ⟨ B' , upB ⟩ ← ↑ty0-total B  = ⊆∀-I-no (⊆/c-irrev-== ext (=⟹^S new1 upB) (=⟹^S new2 upB)) upj
 ⊆/c-irrev-== {B = B} (⊆∀-C-no ext upj) new1 new2
@@ -238,18 +241,10 @@ data _⊆_w/t_w/c_ : Env n m → Env n m → Type m → Counter m → Set where
   with refl ← ↑tyʲ-unique upj upj₁ = ⊆∀-I-no (⊆/c-irrev-^= ext (S^ inΓ) (=⟹^S newΔ (proj₂ (↑ty0-total B))) fd) upj
 ⊆/c-irrev-^= {B = B} (⊆∀-C-no ext upj) inΓ newΔ (f-∀-𝕔 fd upj₁)
   with refl ← ↑tyʲ-unique upj upj₁ = ⊆∀-C-no (⊆/c-irrev-^= ext (S^ inΓ) (=⟹^S newΔ (proj₂ (↑ty0-total B))) fd) upj
-⊆/c-irrev-^= (⊆I ext ext₁) inΓ newΔ (f-iso (ε-arr-l inA) iso) with inst-exist newΔ (⊆/c-⊆ ext₁) (⊆/-^in-=out ext inA inΓ)
-... | ⟨ Ω' , inst-Ω ⟩ = ⊆I (⊆/-irrev-^= ext inΓ inst-Ω inA) (⊆/c-irrev-== ext₁ inst-Ω newΔ)
-⊆/c-irrev-^= (⊆I ext ext₁) inΓ newΔ (f-iso (ε-arr-r ¬inA inA) i∞-z) = ⊆I ext (⊆/c-irrev-^= ext₁ (⊆/-^in-^out ext ¬inA inΓ) newΔ (f-∞ inA))
-⊆/c-irrev-^= (⊆I ext ext₁) inΓ newΔ (f-iso (ε-arr-r ¬inA inA) (i∞-i iso)) = ⊆I ext (⊆/c-irrev-^= ext₁ (⊆/-^in-^out ext ¬inA inΓ) newΔ (f-iso inA iso))
-⊆/c-irrev-^= {k = k} (⊆∀-I ext upj) inΓ newΔ (f-iso (ε-∀ inA) iso)
-  = ⊆∀-I (⊆/c-irrev-^= {k = #S k} ext (S^ inΓ) (=⟹=S newΔ {!!} {!!}) (f-iso inA {!!})) upj
-⊆/c-irrev-^= (⊆∀-I-no ext upj) inΓ newΔ  (f-iso inA iso)
-  = ⊆∀-I-no {!!} {!!}
-⊆/c-irrev-^= (⊆I-X regΓ) inΓ newΔ (f-iso inA iso) = {!!}
-⊆/c-irrev-^= (⊆C-X regΓ) inΓ newΔ (f-iso inA iso) = {!!}
-⊆/c-irrev-^= (⊆T-X regΓ) inΓ newΔ (f-iso inA iso) = {!!}
-⊆/c-irrev-^= (⊆Inf-X extx iso) inΓ newΔ (f-iso inA iso₁) = {!!}
+⊆/c-irrev-^= (⊆I-X regΓ cloA) inΓ newΔ (f-iso iso) = ⊥-elim (⊢c-^∈-false ε-var inΓ cloA)
+⊆/c-irrev-^= (⊆C-X regΓ cloA) inΓ newΔ (f-iso iso) = ⊥-elim (⊢c-^∈-false ε-var inΓ cloA)
+⊆/c-irrev-^= (⊆T-X regΓ cloA) inΓ newΔ (f-iso iso) = ⊥-elim (⊢c-^∈-false ε-var inΓ cloA)
+⊆/c-irrev-^= (⊆Inf-X extx iso) inΓ newΔ (f-iso iso₁) = ⊆Inf-X (⊆/v-irrev-^= extx inΓ newΔ) iso
 
 ⊆/c-irrev-^=0 : Γ ,^ ⊆ Δ ,= B₁ w/t A w/c j
               → find A #0 j
@@ -258,161 +253,165 @@ data _⊆_w/t_w/c_ : Env n m → Env n m → Type m → Counter m → Set where
 ⊆/c-irrev-^=0 {B₂ = B₂} ext fd regB with ⊆/c-⊆ ext
 ... | evar-sol r regA = ⊆/c-irrev-^= ext Z (=⟹=0 (proj₂ (↑ty0-total B₂)) regB (⊆-sregular' r)) fd
 
--- ----------------------------------------------------------------------
--- --+                       another transform                        +--
--- ----------------------------------------------------------------------
+----------------------------------------------------------------------
+--+                       another transform                        +--
+----------------------------------------------------------------------
 
 
--- ◎-∋∙ : Γ ∋∙ X
---      → Γ ◎ k ⇘ Γ'
---      → Γ' ∋∙ X
--- ◎-∋∙ Z (◎S∙ newΓ) = Z
--- ◎-∋∙ (S∙ inΓ) (◎S∙ newΓ) = S∙ (◎-∋∙ inΓ newΓ)
--- ◎-∋∙ (S= inΓ) ◎Z = S^ inΓ
--- ◎-∋∙ (S= inΓ) (◎S= newΓ) = S= (◎-∋∙ inΓ newΓ)
--- ◎-∋∙ (S^ inΓ) (◎S^ newΓ) = S^ (◎-∋∙ inΓ newΓ)
--- ◎-∋∙ (S, inΓ) (◎S, newΓ) = S, (◎-∋∙ inΓ newΓ)
+◎-∋∙ : Γ ∋∙ X
+     → Γ ◎ k ⇘ Γ'
+     → Γ' ∋∙ X
+◎-∋∙ Z (◎S∙ newΓ) = Z
+◎-∋∙ (S∙ inΓ) (◎S∙ newΓ) = S∙ (◎-∋∙ inΓ newΓ)
+◎-∋∙ (S= inΓ) ◎Z = S^ inΓ
+◎-∋∙ (S= inΓ) (◎S= newΓ) = S= (◎-∋∙ inΓ newΓ)
+◎-∋∙ (S^ inΓ) (◎S^ newΓ) = S^ (◎-∋∙ inΓ newΓ)
+◎-∋∙ (S, inΓ) (◎S, newΓ) = S, (◎-∋∙ inΓ newΓ)
 
 
 
--- ◎-∋=-≢ : Γ ∋= X
---        → Γ ◎ k ⇘ Γ'
---        → X ≢ k
---        → Γ' ∋= X
--- ◎-∋=-≢ Z ◎Z neq = ⊥-elim (neq refl)
--- ◎-∋=-≢ Z (◎S= newΓ) neq = Z
--- ◎-∋=-≢ (S∙ inΓ) (◎S∙ newΓ) neq = S∙ (◎-∋=-≢ inΓ newΓ (≢-pred neq))
--- ◎-∋=-≢ (S^ inΓ) (◎S^ newΓ) neq = S^ (◎-∋=-≢ inΓ newΓ (≢-pred neq))
--- ◎-∋=-≢ (S= inΓ) ◎Z neq = S^ inΓ
--- ◎-∋=-≢ (S= inΓ) (◎S= newΓ) neq = S= (◎-∋=-≢ inΓ newΓ (≢-pred neq))
--- ◎-∋=-≢ (S, inΓ) (◎S, newΓ) neq = S, (◎-∋=-≢ inΓ newΓ neq)
+◎-∋=-≢ : Γ ∋= X
+       → Γ ◎ k ⇘ Γ'
+       → X ≢ k
+       → Γ' ∋= X
+◎-∋=-≢ Z ◎Z neq = ⊥-elim (neq refl)
+◎-∋=-≢ Z (◎S= newΓ) neq = Z
+◎-∋=-≢ (S∙ inΓ) (◎S∙ newΓ) neq = S∙ (◎-∋=-≢ inΓ newΓ (≢-pred neq))
+◎-∋=-≢ (S^ inΓ) (◎S^ newΓ) neq = S^ (◎-∋=-≢ inΓ newΓ (≢-pred neq))
+◎-∋=-≢ (S= inΓ) ◎Z neq = S^ inΓ
+◎-∋=-≢ (S= inΓ) (◎S= newΓ) neq = S= (◎-∋=-≢ inΓ newΓ (≢-pred neq))
+◎-∋=-≢ (S, inΓ) (◎S, newΓ) neq = S, (◎-∋=-≢ inΓ newΓ neq)
 
--- ◎-⊢c : Γ ⊢c A
---      → Γ ◎ k ⇘ Γ'
---      → k ¬ε A
---      → Γ' ⊢c A
--- ◎-⊢c ⊢c-int newΓ ninA = ⊢c-int
--- ◎-⊢c (⊢c-var-∙ inΔ) newΓ (¬ε-var x) = ⊢c-var-∙ (◎-∋∙ inΔ newΓ)
--- ◎-⊢c (⊢c-var-= inΔ) newΓ (¬ε-var x) = ⊢c-var-= (◎-∋=-≢ inΔ newΓ x)
--- ◎-⊢c (⊢c-arr cloA cloA₁) newΓ (¬ε-arr ninA ninA₁) = ⊢c-arr (◎-⊢c cloA newΓ ninA) (◎-⊢c cloA₁ newΓ ninA₁)
--- ◎-⊢c (⊢c-∀ cloA) newΓ (¬ε-∀ ninA) = ⊢c-∀ (◎-⊢c cloA (◎S∙ newΓ) ninA)
+◎-⊢c : Γ ⊢c A
+     → Γ ◎ k ⇘ Γ'
+     → k ¬ε A
+     → Γ' ⊢c A
+◎-⊢c ⊢c-int newΓ ninA = ⊢c-int
+◎-⊢c (⊢c-var-∙ inΔ) newΓ (¬ε-var x) = ⊢c-var-∙ (◎-∋∙ inΔ newΓ)
+◎-⊢c (⊢c-var-= inΔ) newΓ (¬ε-var x) = ⊢c-var-= (◎-∋=-≢ inΔ newΓ x)
+◎-⊢c (⊢c-arr cloA cloA₁) newΓ (¬ε-arr ninA ninA₁) = ⊢c-arr (◎-⊢c cloA newΓ ninA) (◎-⊢c cloA₁ newΓ ninA₁)
+◎-⊢c (⊢c-∀ cloA) newΓ (¬ε-∀ ninA) = ⊢c-∀ (◎-⊢c cloA (◎S∙ newΓ) ninA)
 
 
--- ◎-total : Ω ∋= k
---         → ∃[ Ω' ](Ω ◎ k ⇘ Ω')
--- ◎-total (Z {Δ = Δ}) = ⟨ Δ ,^ , ◎Z ⟩
--- ◎-total (S∙ inΩ) = ⟨ ◎-total inΩ .proj₁ ,∙ , ◎S∙ (◎-total inΩ .proj₂) ⟩
--- ◎-total (S^ inΩ) = ⟨ ◎-total inΩ .proj₁ ,^ , ◎S^ (◎-total inΩ .proj₂) ⟩
--- ◎-total (S= {B = B} inΩ) = ⟨ ◎-total inΩ .proj₁ ,= B , ◎S= (◎-total inΩ .proj₂) ⟩
--- ◎-total (S, {A = A} inΩ) = ⟨ (◎-total inΩ .proj₁ , A) , ◎S, (◎-total inΩ .proj₂) ⟩
+◎-total : Ω ∋= k
+        → ∃[ Ω' ](Ω ◎ k ⇘ Ω')
+◎-total (Z {Δ = Δ}) = ⟨ Δ ,^ , ◎Z ⟩
+◎-total (S∙ inΩ) = ⟨ ◎-total inΩ .proj₁ ,∙ , ◎S∙ (◎-total inΩ .proj₂) ⟩
+◎-total (S^ inΩ) = ⟨ ◎-total inΩ .proj₁ ,^ , ◎S^ (◎-total inΩ .proj₂) ⟩
+◎-total (S= {B = B} inΩ) = ⟨ ◎-total inΩ .proj₁ ,= B , ◎S= (◎-total inΩ .proj₂) ⟩
+◎-total (S, {A = A} inΩ) = ⟨ (◎-total inΩ .proj₁ , A) , ◎S, (◎-total inΩ .proj₂) ⟩
 
--- ◎-∋= : Γ ◎ k ⇘ Γ'
---      → Γ ∋= k
--- ◎-∋= ◎Z = Z
--- ◎-∋= (◎S∙ newΓ) = S∙ (◎-∋= newΓ)
--- ◎-∋= (◎S= newΓ) = S= (◎-∋= newΓ)
--- ◎-∋= (◎S^ newΓ) = S^ (◎-∋= newΓ)
--- ◎-∋= (◎S, newΓ) = S, (◎-∋= newΓ)
+◎-∋= : Γ ◎ k ⇘ Γ'
+     → Γ ∋= k
+◎-∋= ◎Z = Z
+◎-∋= (◎S∙ newΓ) = S∙ (◎-∋= newΓ)
+◎-∋= (◎S= newΓ) = S= (◎-∋= newΓ)
+◎-∋= (◎S^ newΓ) = S^ (◎-∋= newΓ)
+◎-∋= (◎S, newΓ) = S, (◎-∋= newΓ)
 
--- ◎-⊢r : Γ ⊢r A
---      → Γ ◎ k ⇘ Γ'
---      → Γ' ⊢r A
--- ◎-⊢r ⊢r-int newΓ = ⊢r-int
--- ◎-⊢r (⊢r-var-∙ inΓ) newΓ = ⊢r-var-∙ (◎-∋∙ inΓ newΓ)
--- ◎-⊢r (⊢r-arr regA regA₁) newΓ = ⊢r-arr (◎-⊢r regA newΓ) (◎-⊢r regA₁ newΓ)
--- ◎-⊢r (⊢r-∀ regA) newΓ = ⊢r-∀ (◎-⊢r regA (◎S∙ newΓ))
+◎-⊢r : Γ ⊢r A
+     → Γ ◎ k ⇘ Γ'
+     → Γ' ⊢r A
+◎-⊢r ⊢r-int newΓ = ⊢r-int
+◎-⊢r (⊢r-var-∙ inΓ) newΓ = ⊢r-var-∙ (◎-∋∙ inΓ newΓ)
+◎-⊢r (⊢r-arr regA regA₁) newΓ = ⊢r-arr (◎-⊢r regA newΓ) (◎-⊢r regA₁ newΓ)
+◎-⊢r (⊢r-∀ regA) newΓ = ⊢r-∀ (◎-⊢r regA (◎S∙ newΓ))
 
--- ◎-sregular : SRegular Γ
---            → Γ ◎ k ⇘ Γ'
---            → SRegular Γ'
--- ◎-sregular (reg-S∙ regΓ) (◎S∙ newΓ) = reg-S∙ (◎-sregular regΓ newΓ)
--- ◎-sregular (reg-S^ regΓ) (◎S^ newΓ) = reg-S^ (◎-sregular regΓ newΓ)
--- ◎-sregular (reg-S= regΓ regA) ◎Z = reg-S^ regΓ
--- ◎-sregular (reg-S= regΓ regA) (◎S= newΓ) = reg-S= (◎-sregular regΓ newΓ) (◎-⊢r regA newΓ)
+◎-sregular : SRegular Γ
+           → Γ ◎ k ⇘ Γ'
+           → SRegular Γ'
+◎-sregular (reg-S∙ regΓ) (◎S∙ newΓ) = reg-S∙ (◎-sregular regΓ newΓ)
+◎-sregular (reg-S^ regΓ) (◎S^ newΓ) = reg-S^ (◎-sregular regΓ newΓ)
+◎-sregular (reg-S= regΓ regA) ◎Z = reg-S^ regΓ
+◎-sregular (reg-S= regΓ regA) (◎S= newΓ) = reg-S= (◎-sregular regΓ newΓ) (◎-⊢r regA newΓ)
 
--- ◎-unique : Γ ◎ k ⇘ Γ'
---          → Γ ◎ k ⇘ Δ'
---          → Γ' ≡ Δ'
--- ◎-unique ◎Z ◎Z = refl
--- ◎-unique (◎S∙ new1) (◎S∙ new2) = cong _,∙ (◎-unique new1 new2)
--- ◎-unique (◎S= new1) (◎S= new2) = cong₂ _,=_ (◎-unique new1 new2) refl
--- ◎-unique (◎S^ new1) (◎S^ new2) = cong _,^ (◎-unique new1 new2)
--- ◎-unique (◎S, new1) (◎S, new2) = cong₂ _,_ (◎-unique new1 new2) refl
+◎-unique : Γ ◎ k ⇘ Γ'
+         → Γ ◎ k ⇘ Δ'
+         → Γ' ≡ Δ'
+◎-unique ◎Z ◎Z = refl
+◎-unique (◎S∙ new1) (◎S∙ new2) = cong _,∙ (◎-unique new1 new2)
+◎-unique (◎S= new1) (◎S= new2) = cong₂ _,=_ (◎-unique new1 new2) refl
+◎-unique (◎S^ new1) (◎S^ new2) = cong _,^ (◎-unique new1 new2)
+◎-unique (◎S, new1) (◎S, new2) = cong₂ _,_ (◎-unique new1 new2) refl
 
--- ⊆/v-irrev-^^ : Γ ⊆ Δ w/v X
---              → Γ ◎ k ⇘ Γ'
---              → Δ ◎ k ⇘ Δ'
---              → X ≢ k
---              → Γ' ⊆ Δ' w/v X
--- ⊆/v-irrev-^^ (ext-Z^ regΓ regA) (◎S^ newΓ) (◎S= newΔ) neq
---   with refl ← ◎-unique newΓ newΔ = ext-Z^ (◎-sregular regΓ newΓ) (◎-⊢r regA newΓ)
--- ⊆/v-irrev-^^ (ext-Z∙ regΓ) (◎S∙ newΓ) (◎S∙ newΔ) neq
---   with refl ← ◎-unique newΓ newΔ = ext-Z∙ (◎-sregular regΓ newΓ)
--- ⊆/v-irrev-^^ (ext-Z= regΓ regA) ◎Z newΔ neq = ⊥-elim (neq refl)
--- ⊆/v-irrev-^^ (ext-Z= regΓ regA) (◎S= newΓ) (◎S= newΔ) neq
---   with refl ← ◎-unique newΓ newΔ = ext-Z= (◎-sregular regΓ newΓ) (◎-⊢r regA newΓ)
--- ⊆/v-irrev-^^ (ext-S^ ext) (◎S^ newΓ) (◎S^ newΔ) neq = ext-S^ (⊆/v-irrev-^^ ext newΓ newΔ (≢-pred neq))
--- ⊆/v-irrev-^^ (ext-S∙ ext) (◎S∙ newΓ) (◎S∙ newΔ) neq = ext-S∙ (⊆/v-irrev-^^ ext newΓ newΔ (≢-pred neq))
--- ⊆/v-irrev-^^ (ext-S= ext regA) ◎Z ◎Z neq = ext-S^ ext
--- ⊆/v-irrev-^^ (ext-S= ext regA) (◎S= newΓ) (◎S= newΔ) neq = ext-S= (⊆/v-irrev-^^ ext newΓ newΔ (≢-pred neq)) (◎-⊢r regA newΓ)
+⊆/v-irrev-^^ : Γ ⊆ Δ w/v X
+             → Γ ◎ k ⇘ Γ'
+             → Δ ◎ k ⇘ Δ'
+             → X ≢ k
+             → Γ' ⊆ Δ' w/v X
+⊆/v-irrev-^^ (ext-Z^ regΓ regA) (◎S^ newΓ) (◎S= newΔ) neq
+  with refl ← ◎-unique newΓ newΔ = ext-Z^ (◎-sregular regΓ newΓ) (◎-⊢r regA newΓ)
+⊆/v-irrev-^^ (ext-Z∙ regΓ) (◎S∙ newΓ) (◎S∙ newΔ) neq
+  with refl ← ◎-unique newΓ newΔ = ext-Z∙ (◎-sregular regΓ newΓ)
+⊆/v-irrev-^^ (ext-Z= regΓ regA) ◎Z newΔ neq = ⊥-elim (neq refl)
+⊆/v-irrev-^^ (ext-Z= regΓ regA) (◎S= newΓ) (◎S= newΔ) neq
+  with refl ← ◎-unique newΓ newΔ = ext-Z= (◎-sregular regΓ newΓ) (◎-⊢r regA newΓ)
+⊆/v-irrev-^^ (ext-S^ ext) (◎S^ newΓ) (◎S^ newΔ) neq = ext-S^ (⊆/v-irrev-^^ ext newΓ newΔ (≢-pred neq))
+⊆/v-irrev-^^ (ext-S∙ ext) (◎S∙ newΓ) (◎S∙ newΔ) neq = ext-S∙ (⊆/v-irrev-^^ ext newΓ newΔ (≢-pred neq))
+⊆/v-irrev-^^ (ext-S= ext regA) ◎Z ◎Z neq = ext-S^ ext
+⊆/v-irrev-^^ (ext-S= ext regA) (◎S= newΓ) (◎S= newΔ) neq = ext-S= (⊆/v-irrev-^^ ext newΓ newΔ (≢-pred neq)) (◎-⊢r regA newΓ)
 
--- ⊆/-irrev-^^ : Γ ⊆ Δ w/t A
---             → k ¬ε A
---             → Γ ◎ k ⇘ Γ'
---             → Δ ◎ k ⇘ Δ'
---             → Γ' ⊆ Δ' w/t A
--- ⊆/-irrev-^^ (ext-int x) ninA newΓ newΔ with refl ← ◎-unique newΓ newΔ = ⊆/-refl (◎-sregular x newΓ) ⊢c-int
--- ⊆/-irrev-^^ (ext-var x) (¬ε-var x₁) newΓ newΔ = ext-var (⊆/v-irrev-^^ x newΓ newΔ x₁)
--- ⊆/-irrev-^^ (ext-arr ext ext₁) (¬ε-arr ninA ninA₁) newΓ newΔ
---   with ⟨ Ω' , ◎Ω ⟩ ← ◎-total (⊆/-=in-=out ext (◎-∋= newΓ)) = ext-arr (⊆/-irrev-^^ ext ninA newΓ ◎Ω) (⊆/-irrev-^^ ext₁ ninA₁ ◎Ω newΔ)
--- ⊆/-irrev-^^ (ext-∀ ext) (¬ε-∀ ninA) newΓ newΔ = ext-∀ (⊆/-irrev-^^ ext ninA (◎S∙ newΓ) (◎S∙ newΔ))
+⊆/-irrev-^^ : Γ ⊆ Δ w/t A
+            → k ¬ε A
+            → Γ ◎ k ⇘ Γ'
+            → Δ ◎ k ⇘ Δ'
+            → Γ' ⊆ Δ' w/t A
+⊆/-irrev-^^ (ext-int x) ninA newΓ newΔ with refl ← ◎-unique newΓ newΔ = ⊆/-refl (◎-sregular x newΓ) ⊢c-int
+⊆/-irrev-^^ (ext-var x) (¬ε-var x₁) newΓ newΔ = ext-var (⊆/v-irrev-^^ x newΓ newΔ x₁)
+⊆/-irrev-^^ (ext-arr ext ext₁) (¬ε-arr ninA ninA₁) newΓ newΔ
+  with ⟨ Ω' , ◎Ω ⟩ ← ◎-total (⊆/-=in-=out ext (◎-∋= newΓ)) = ext-arr (⊆/-irrev-^^ ext ninA newΓ ◎Ω) (⊆/-irrev-^^ ext₁ ninA₁ ◎Ω newΔ)
+⊆/-irrev-^^ (ext-∀ ext) (¬ε-∀ ninA) newΓ newΔ = ext-∀ (⊆/-irrev-^^ ext ninA (◎S∙ newΓ) (◎S∙ newΔ))
 
--- ⊆/-irrev-^^0 : Γ ,= B ⊆ Δ ,= B w/t A
---              → #0 ¬ε A
---              → Γ ,^ ⊆ Δ ,^ w/t A
--- ⊆/-irrev-^^0 ext nin = ⊆/-irrev-^^ ext nin ◎Z ◎Z
+⊆/-irrev-^^0 : Γ ,= B ⊆ Δ ,= B w/t A
+             → #0 ¬ε A
+             → Γ ,^ ⊆ Δ ,^ w/t A
+⊆/-irrev-^^0 ext nin = ⊆/-irrev-^^ ext nin ◎Z ◎Z
 
--- ⊆/v-irrev-^ : Γ ⊆ Δ w/v k
---             → Γ ◎ k ⇘ Γ'
---             → Γ' ⊆ Δ w/v k
--- ⊆/v-irrev-^ (ext-Z= regΓ regA) ◎Z = ext-Z^ regΓ regA
--- ⊆/v-irrev-^ (ext-S^ ext) (◎S^ newΓ) = ext-S^ (⊆/v-irrev-^ ext newΓ)
--- ⊆/v-irrev-^ (ext-S∙ ext) (◎S∙ newΓ) = ext-S∙ (⊆/v-irrev-^ ext newΓ)
--- ⊆/v-irrev-^ (ext-S= ext regA) (◎S= newΓ) = ext-S= (⊆/v-irrev-^ ext newΓ) (◎-⊢r regA newΓ)
+⊆/v-irrev-^ : Γ ⊆ Δ w/v k
+            → Γ ◎ k ⇘ Γ'
+            → Γ' ⊆ Δ w/v k
+⊆/v-irrev-^ (ext-Z= regΓ regA) ◎Z = ext-Z^ regΓ regA
+⊆/v-irrev-^ (ext-S^ ext) (◎S^ newΓ) = ext-S^ (⊆/v-irrev-^ ext newΓ)
+⊆/v-irrev-^ (ext-S∙ ext) (◎S∙ newΓ) = ext-S∙ (⊆/v-irrev-^ ext newΓ)
+⊆/v-irrev-^ (ext-S= ext regA) (◎S= newΓ) = ext-S= (⊆/v-irrev-^ ext newΓ) (◎-⊢r regA newΓ)
 
--- ⊆/-irrev-^ : Γ ⊆ Δ w/t A
---            → k ε A
---            → Γ ◎ k ⇘ Γ'
---            → Γ' ⊆ Δ w/t A
--- ⊆/-irrev-^ (ext-var x) ε-var newΓ = ext-var (⊆/v-irrev-^ x newΓ)
--- ⊆/-irrev-^ (ext-arr ext ext₁) (ε-arr-l inA) newΓ = ext-arr (⊆/-irrev-^ ext inA newΓ) ext₁
--- ⊆/-irrev-^ (ext-arr ext ext₁) (ε-arr-r x inA) newΓ
---   with ⟨ Ω' , ◎Ω ⟩ ← ◎-total (⊆/-=in-=out ext (◎-∋= newΓ)) = ext-arr (⊆/-irrev-^^ ext x newΓ ◎Ω) (⊆/-irrev-^ ext₁ inA ◎Ω)
--- ⊆/-irrev-^ (ext-∀ ext) (ε-∀ inA) newΓ = ext-∀ (⊆/-irrev-^ ext inA (◎S∙ newΓ))
+⊆/-irrev-^ : Γ ⊆ Δ w/t A
+           → k ε A
+           → Γ ◎ k ⇘ Γ'
+           → Γ' ⊆ Δ w/t A
+⊆/-irrev-^ (ext-var x) ε-var newΓ = ext-var (⊆/v-irrev-^ x newΓ)
+⊆/-irrev-^ (ext-arr ext ext₁) (ε-arr-l inA) newΓ = ext-arr (⊆/-irrev-^ ext inA newΓ) ext₁
+⊆/-irrev-^ (ext-arr ext ext₁) (ε-arr-r x inA) newΓ
+  with ⟨ Ω' , ◎Ω ⟩ ← ◎-total (⊆/-=in-=out ext (◎-∋= newΓ)) = ext-arr (⊆/-irrev-^^ ext x newΓ ◎Ω) (⊆/-irrev-^ ext₁ inA ◎Ω)
+⊆/-irrev-^ (ext-∀ ext) (ε-∀ inA) newΓ = ext-∀ (⊆/-irrev-^ ext inA (◎S∙ newΓ))
 
--- ⊆/c-irrev-^ : Γ ⊆ Δ w/t A w/c j
---             → find A k j
---             → Γ ◎ k ⇘ Γ'
---             → Γ' ⊆ Δ w/t A w/c j
+⊆/c-irrev-^ : Γ ⊆ Δ w/t A w/c j
+            → find A k j
+            → Γ ◎ k ⇘ Γ'
+            → Γ' ⊆ Δ w/t A w/c j
 
--- ⊆/c-irrev-^ (⊆Z regΓ) fd newΓ = ⊥-elim (find-Z-false fd)
--- ⊆/c-irrev-^ (⊆∞ ext) fd newΓ = ⊆∞ (⊆/-irrev-^ ext (find-ε fd) newΓ)
--- ⊆/c-irrev-^ (⊆I ext ext₁) (f-arr-𝕚-l x) newΓ = ⊆I (⊆/-irrev-^ ext x newΓ) ext₁
--- ⊆/c-irrev-^ (⊆I ext ext₁) (f-arr-𝕚-r ¬inA fd) newΓ
---   with ⟨ Ω' , ◎Ω ⟩ ← ◎-total (⊆/-=in-=out ext (◎-∋= newΓ)) = ⊆I (⊆/-irrev-^^ ext ¬inA newΓ ◎Ω) (⊆/c-irrev-^ ext₁ fd ◎Ω)
--- ⊆/c-irrev-^ (⊆C cloA ext) (f-arr-𝕔 ¬inA fd) newΓ = ⊆C (◎-⊢c cloA newΓ ¬inA) (⊆/c-irrev-^ ext fd newΓ)
--- ⊆/c-irrev-^ (⊆∀-I ext upj') (f-∀-𝕚 fd upj) newΓ
---   with refl ← ↑tyʲ-unique upj upj' = ⊆∀-I (⊆/c-irrev-^ ext fd (◎S^ newΓ)) upj'
--- ⊆/c-irrev-^ (⊆∀-C ext upj') (f-∀-𝕔 fd upj) newΓ
---   with refl ← ↑tyʲ-unique upj upj' = ⊆∀-C (⊆/c-irrev-^ ext fd (◎S^ newΓ)) upj'
--- ⊆/c-irrev-^ (⊆∀-T ext upj) (f-𝕥 fd upj₁) newΓ
---   with refl ← ↑tyʲ-unique upj upj₁ = ⊆∀-T (⊆/c-irrev-^ ext fd (◎S= newΓ)) upj
--- ⊆/c-irrev-^ (⊆∀-I-no ext upj) (f-∀-𝕚 fd upj₁) newΓ
---   with refl ← ↑tyʲ-unique upj upj₁ = ⊆∀-I-no (⊆/c-irrev-^ ext fd (◎S^ newΓ)) upj
--- ⊆/c-irrev-^ (⊆∀-C-no ext upj) (f-∀-𝕔 fd upj₁) newΓ
---   with refl ← ↑tyʲ-unique upj upj₁ = ⊆∀-C-no (⊆/c-irrev-^ ext fd (◎S^ newΓ)) upj
+⊆/c-irrev-^ (⊆Z regΓ) fd newΓ = ⊥-elim (find-Z-false fd)
+⊆/c-irrev-^ (⊆∞ ext) fd newΓ = ⊆∞ (⊆/-irrev-^ ext (find-ε fd) newΓ)
+⊆/c-irrev-^ (⊆I ext ext₁) (f-arr-𝕚-l x) newΓ = ⊆I (⊆/-irrev-^ ext x newΓ) ext₁
+⊆/c-irrev-^ (⊆I ext ext₁) (f-arr-𝕚-r ¬inA fd) newΓ
+  with ⟨ Ω' , ◎Ω ⟩ ← ◎-total (⊆/-=in-=out ext (◎-∋= newΓ)) = ⊆I (⊆/-irrev-^^ ext ¬inA newΓ ◎Ω) (⊆/c-irrev-^ ext₁ fd ◎Ω)
+⊆/c-irrev-^ (⊆C cloA ext) (f-arr-𝕔 ¬inA fd) newΓ = ⊆C (◎-⊢c cloA newΓ ¬inA) (⊆/c-irrev-^ ext fd newΓ)
+⊆/c-irrev-^ (⊆∀-I ext upj') (f-∀-𝕚 fd upj) newΓ
+  with refl ← ↑tyʲ-unique upj upj' = ⊆∀-I (⊆/c-irrev-^ ext fd (◎S^ newΓ)) upj'
+⊆/c-irrev-^ (⊆∀-C ext upj') (f-∀-𝕔 fd upj) newΓ
+  with refl ← ↑tyʲ-unique upj upj' = ⊆∀-C (⊆/c-irrev-^ ext fd (◎S^ newΓ)) upj'
+⊆/c-irrev-^ (⊆∀-T ext upj) (f-𝕥 fd upj₁) newΓ
+  with refl ← ↑tyʲ-unique upj upj₁ = ⊆∀-T (⊆/c-irrev-^ ext fd (◎S= newΓ)) upj
+⊆/c-irrev-^ (⊆∀-I-no ext upj) (f-∀-𝕚 fd upj₁) newΓ
+  with refl ← ↑tyʲ-unique upj upj₁ = ⊆∀-I-no (⊆/c-irrev-^ ext fd (◎S^ newΓ)) upj
+⊆/c-irrev-^ (⊆∀-C-no ext upj) (f-∀-𝕔 fd upj₁) newΓ
+  with refl ← ↑tyʲ-unique upj upj₁ = ⊆∀-C-no (⊆/c-irrev-^ ext fd (◎S^ newΓ)) upj
+⊆/c-irrev-^ (⊆I-X regΓ cloA) (f-iso iso) newΓ = ⊆Inf-X (⊆/v-irrev-^ (⊆/x-refl regΓ cloA) newΓ) iso
+⊆/c-irrev-^ (⊆C-X regΓ cloA) (f-iso ()) newΓ
+⊆/c-irrev-^ (⊆T-X regΓ cloA) (f-iso ()) newΓ
+⊆/c-irrev-^ (⊆Inf-X extx iso) (f-iso iso₁) newΓ = ⊆Inf-X (⊆/v-irrev-^ extx newΓ) iso
 
--- ⊆/c-irrev-^0 : Γ ,= B ⊆ Δ ,= B w/t A w/c j
---              → find A #0 j
---              → Γ ,^ ⊆ Δ ,= B w/t A w/c j
--- ⊆/c-irrev-^0 ext fd = ⊆/c-irrev-^ ext fd ◎Z
+⊆/c-irrev-^0 : Γ ,= B ⊆ Δ ,= B w/t A w/c j
+             → find A #0 j
+             → Γ ,^ ⊆ Δ ,= B w/t A w/c j
+⊆/c-irrev-^0 ext fd = ⊆/c-irrev-^ ext fd ◎Z

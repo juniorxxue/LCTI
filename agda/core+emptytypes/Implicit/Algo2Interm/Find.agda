@@ -42,7 +42,7 @@ s-find (s-svar-tapp in' s) inΓ inΔ = ⊥-elim (∋^-∋=-false inΓ inΔ)
 s-find (s-∀l-no-𝕚 s upᶜ upj upᵉ upC upD) inΓ inΔ = f-∀-𝕚 (s-find s (S^ inΓ) (S^ inΔ)) upj
 s-find (s-∀l-no-𝕔 s upᶜ upj upᵉ upC upD) inΓ inΔ = f-∀-𝕔 (s-find s (S^ inΓ) (S^ inΔ)) upj
 s-find (s-evar-infers infs inst) inΓ inΔ
-  with ε-var ← ^in-=out-ε (ext-var (inst-⊆/x inst)) inΓ inΔ = f-iso ε-var (infs-isoinf infs)
+  with ε-var ← ^in-=out-ε (ext-var (inst-⊆/x inst)) inΓ inΔ = f-iso (infs-isoinf infs)
 
 s-find0 : Γ ,^ ⊢ A ≤⁺ [ e' ]↝ Σ' ⊣ Δ ,= B ↪ C `→ D ↡ j
               → ↑tyᵉ0 e ⇘ e'

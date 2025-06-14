@@ -4,6 +4,7 @@ open import Implicit.Language.Base
 open import Implicit.Language.Shift.All
 open import Implicit.Language.Lookup.All
 open import Implicit.Language.Occur.Base
+open import Implicit.Language.OpenClose.Base
 
 ↑ty-ε-≤ : #S X ε A'
         → A ↑ty k ⇘ A'
@@ -107,3 +108,14 @@ open import Implicit.Language.Occur.Base
             → k ¬εᵍ Γ
             → ⊥
 εᵍ-:=-false inΓ inA ¬inΓ = ε-¬ε-false inA (εᵍ-:=-¬ε ¬inΓ inΓ)
+
+
+⊢c-^∈-false : k ε A
+            → Γ ∋^ k
+            → Γ ⊢c A
+            → ⊥
+⊢c-^∈-false ε-var inΓ (⊢c-var-∙ x) = ∋^-∋∙-false inΓ x
+⊢c-^∈-false ε-var inΓ (⊢c-var-= x) = ∋^-∋=-false inΓ x
+⊢c-^∈-false (ε-arr-l inA) inΓ (⊢c-arr cloA cloA₁) = ⊢c-^∈-false inA inΓ cloA
+⊢c-^∈-false (ε-arr-r ¬inA inA) inΓ (⊢c-arr cloA cloA₁) = ⊢c-^∈-false inA inΓ cloA₁
+⊢c-^∈-false (ε-∀ inA) inΓ (⊢c-∀ cloA) = ⊢c-^∈-false inA (S∙ inΓ) cloA
