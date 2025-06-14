@@ -15,7 +15,7 @@ data _⊢_⌞_⌝_⊣_ : Env n m → Type m → Polar → Type m → Env n m →
 
   s-var-∙ :
       (regΓ : SRegular Δ)
-    → Δ ∋∙ X
+    → (inΔ : Δ ∋∙ X)
     → Δ ⊢ (‶ X) ⌞ ≤ ⌝ (‶ X) ⊣ Δ
 
   s-ex-l^ :
