@@ -9,6 +9,11 @@ open import Implicit.Decl.Equiv renaming (complete to v2→v1)
 
 open import Implicit.Interm2Decl.Main renaming (sound to sound-this)
 
+si→sd : Γ ⊢i j # A ⌞ ≤⁺ ⌝ B
+      → Γ ⊢r A
+      → Γ ⊢d¹ j # A ≤ B
+si→sd s regA = v2→v1 (sound-this s (⊢r-≫-eq regA) (⊢r-≫-eq (s+-polarity s)))
+
 ⊢sound : Γ ⊢i j # e ⦂ A
        → Γ ⊢d j # e ⦂ A
 ⊢sound (⊢lit regΓ) = ⊢lit regΓ
@@ -18,6 +23,6 @@ open import Implicit.Interm2Decl.Main renaming (sound to sound-this)
 ⊢sound (⊢lam₂ ⊢e) = ⊢lam₂ (⊢sound ⊢e)
 ⊢sound (⊢app₁ ⊢e ⊢e₁) = ⊢app₁ (⊢sound ⊢e) (⊢sound ⊢e₁)
 ⊢sound (⊢app₂ ⊢e ⊢e₁) = ⊢app₂ (⊢sound ⊢e) (⊢sound ⊢e₁)
-⊢sound (⊢sub ⊢e B≤A gc j≢Z) = ⊢sub (⊢sound ⊢e) (v2→v1 (sound-this B≤A (⊢r-≫-eq (⊢r-𝕣 (t-⊢r-this (⊢sound ⊢e)))) (⊢r-≫-eq (⊢r-𝕣 (t-⊢r-that (⊢sub ⊢e B≤A gc j≢Z)))))) gc j≢Z
+⊢sound (⊢sub ⊢e B≤A gc j≢Z) = ⊢sub (⊢sound ⊢e) (si→sd B≤A (⊢r-𝕣 (t-⊢r-that ⊢e))) gc j≢Z
 ⊢sound (⊢tabs ⊢e) = ⊢tabs (⊢sound ⊢e)
 ⊢sound (⊢tapp ⊢e st) = ⊢tapp (⊢sound ⊢e) st
