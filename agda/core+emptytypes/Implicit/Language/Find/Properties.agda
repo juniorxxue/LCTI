@@ -1,5 +1,3 @@
-{-# OPTIONS --allow-unsolved-metas #-}
-{-# OPTIONS --allow-incomplete-matches #-}
 module Implicit.Language.Find.Properties where
 
 
@@ -8,6 +6,17 @@ open import Implicit.Language.Shift.All
 open import Implicit.Language.Occur.All
 open import Implicit.Language.Find.Base
 
+↑tyʲ-iso : IsoInf j
+         → j ↑tyʲ k ⇘ j'
+         → IsoInf j'
+↑tyʲ-iso i∞-z (↑tyʲ-𝕚 ↑tyʲ-∞) = i∞-z
+↑tyʲ-iso (i∞-i iso) (↑tyʲ-𝕚 upj) = i∞-i (↑tyʲ-iso iso upj)
+
+↑tyʲ-iso' : IsoInf j'
+         → j ↑tyʲ k ⇘ j'
+         → IsoInf j
+↑tyʲ-iso' i∞-z (↑tyʲ-𝕚 ↑tyʲ-∞) = i∞-z
+↑tyʲ-iso' (i∞-i iso) (↑tyʲ-𝕚 upj) = i∞-i (↑tyʲ-iso' iso upj)
 
 ↑ty-find : find A X j
          → A ↑ty k ⇘ A'
@@ -15,6 +24,7 @@ open import Implicit.Language.Find.Base
          → X #< k
          → find A' (inject₁ X) j'
 ↑ty-find (f-∞ x) upA ↑tyʲ-∞ lt = f-∞ (↑ty-ε x upA lt)
+↑ty-find (f-iso x) ↑ty-var upj lt rewrite punchIn-inject lt = f-iso (↑tyʲ-iso x upj)
 ↑ty-find (f-arr-𝕚-l x) (↑ty-arr upA upA₁) (↑tyʲ-𝕚 upj) lt = f-arr-𝕚-l (↑ty-ε x upA lt)
 ↑ty-find (f-arr-𝕚-r ¬inA fd) (↑ty-arr upA upA₁) (↑tyʲ-𝕚 upj) lt = f-arr-𝕚-r (↑ty-¬ε-prv ¬inA upA lt) (↑ty-find fd upA₁ upj lt)
 ↑ty-find (f-arr-𝕔 ¬inA fd) (↑ty-arr upA upA₁) (↑tyʲ-𝕔 upj) lt = f-arr-𝕔 (↑ty-¬ε-prv ¬inA upA lt) (↑ty-find fd upA₁ upj lt)
@@ -38,6 +48,8 @@ open import Implicit.Language.Find.Base
           → X #< k
           → find A X j
 ↑ty-find' (f-∞ x) upA ↑tyʲ-∞ lt = f-∞ (↑ty-ε' x lt upA)
+↑ty-find' (f-iso x) upA upj lt rewrite punchIn-inject lt with ↑ty-var-inv-helper upA refl
+... | refl = f-iso (↑tyʲ-iso' x upj)
 ↑ty-find' (f-arr-𝕚-l x) (↑ty-arr upA upA₁) (↑tyʲ-𝕚 upj) lt = f-arr-𝕚-l (↑ty-ε' x lt upA)
 ↑ty-find' (f-arr-𝕚-r ¬inA fd) (↑ty-arr upA upA₁) (↑tyʲ-𝕚 upj) lt = f-arr-𝕚-r (¬ε-↑ty'-inv ¬inA upA lt) (↑ty-find' fd upA₁ upj lt)
 ↑ty-find' (f-arr-𝕔 ¬inA fd) (↑ty-arr upA upA₁) (↑tyʲ-𝕔 upj) lt = f-arr-𝕔 (¬ε-↑ty'-inv ¬inA upA lt) (↑ty-find' fd upA₁ upj lt)
@@ -58,6 +70,7 @@ open import Implicit.Language.Find.Base
 find-ε-gen : find A k j
            → k ε A
 find-ε-gen (f-∞ x) = x
+find-ε-gen (f-iso iso) = ε-var
 find-ε-gen (f-arr-𝕚-l x) = ε-arr-l x
 find-ε-gen (f-arr-𝕚-r ¬inA fd) = ε-arr-r ¬inA (find-ε-gen fd)
 find-ε-gen (f-arr-𝕔 ¬inA fd) = ε-arr-r ¬inA (find-ε-gen fd)

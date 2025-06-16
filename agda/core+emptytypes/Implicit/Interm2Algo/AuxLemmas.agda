@@ -176,6 +176,14 @@ inst-=⟹ (⟹^S inst up1) = =⟹^S (inst-=⟹ inst) up1
 inst-=⟹ (⟹∙S inst up1) = =⟹∙S (inst-=⟹ inst) up1
 inst-=⟹ (⟹=S inst up1 regB) = =⟹=S (inst-=⟹ inst) up1 (⊆-⊢r regB (inst-⊆ inst))
 
+inst-=⟹' : [ A / X ] Γ ⟹ Δ'
+           → Γ ⊆ Δ w/v X
+           → [ A / X ] Δ =⟹ Δ'
+inst-=⟹' (⟹^0 up regA env) (ext-Z^ regΓ regA₁) = =⟹=0 up regA regΓ
+inst-=⟹' (⟹^S inst up1) (ext-S^ extx) = =⟹^S (inst-=⟹' inst extx) up1
+inst-=⟹' (⟹∙S inst up1) (ext-S∙ extx) = =⟹∙S (inst-=⟹' inst extx) up1
+inst-=⟹' (⟹=S inst up1 regB) (ext-S= extx regA) = =⟹=S (inst-=⟹' inst extx) up1 (⊆-⊢r regB (⊆/x-⊆ extx))
+
 ⊆-^out-^in : Δ ∋^ k
            → Γ ⊆ Δ
            → Γ ∋^ k
@@ -192,6 +200,27 @@ complete-false₁ : k ε' B
                 → ⊥
 complete-false₁ inB1 inB2 ninA inA
   with refl ← ε'-unique inB1 inB2 = ε-¬ε-false inA ninA
+
+
+complete-false₂ : Γ ⊆ Δ w/t A
+                → k ε A
+                → Δ ∋^ k
+                → ⊥
+complete-false₂ ext inA inΔ
+  with inΓ ← ⊆-^out-^in inΔ (⊆/-⊆ ext) = ⊥-elim (∋^-∋=-false inΔ (⊆/-^in-=out ext inA inΓ))
+
+complete-false₃ : Δ ⊢r A
+                → k ε' A
+                → Δ ∋^ k
+                → ⊥
+complete-false₃ regA inA inΔ = ⊢c-^∈-false (ε'-ε inA) inΔ (⊢r-⊢c regA)
+
+complete-infs : Γ ⊢ ⟨ j , B ⟩ ~s Σ
+              → Γ ⊢r B
+              → IsoInf j
+              → 𝕣 Γ ⊨ Σ ⟹ B
+complete-infs (~I ⊢e ~∞) (⊢r-arr regB regB₁) i∞-z = infs-s ⊢e (infs-z (t-env ⊢e) (⊢r-𝕣' regB₁))
+complete-infs (~I ⊢e ~j) (⊢r-arr regB regB₁) (i∞-i iso) = infs-s ⊢e (complete-infs ~j regB₁ iso)
 
 data Complete (A : Type m) (j : Counter m) (Σ : Context n m) (Γ : Env n m) (Δ : Env n m) (B : Type m) : Set where
   normal :     (cond : ¬ (∃[ k ](k ε' A) × Γ ∋^ k))

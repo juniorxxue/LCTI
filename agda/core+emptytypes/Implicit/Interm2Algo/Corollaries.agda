@@ -12,14 +12,8 @@ open import Implicit.Interm2Algo.EnvDiff
 open import Implicit.Interm2Algo.OpenClose
 open import Implicit.Interm2Algo.Find
 open import Implicit.Interm2Algo.AuxLemmas
-open import Implicit.Interm2Algo.Main
+open import Implicit.Interm2Algo.Main2
 
-
-
-complete-s0 : Γ ⋈ ⊢ j # A ⌞ ≤⁺ ⌝ B
-            → Γ ⊢ ⟨ j , B ⟩ ~t Σ
-            → Γ ⋈ ⊢ A ≤⁺ Σ ⊣ Γ ⋈ ↪ B
-complete-s0 s j~Σ = complete-s s (s+-⊆/ s) (~t-~s j~Σ)
 
 complete : Γ ⊢ j # e ⦂ A
          → Γ ⊢ ⟨ j , A ⟩ ~t Σ

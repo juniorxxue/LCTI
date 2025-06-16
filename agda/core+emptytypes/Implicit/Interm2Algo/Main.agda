@@ -13,70 +13,6 @@ open import Implicit.Interm2Algo.OpenClose
 open import Implicit.Interm2Algo.Find
 open import Implicit.Interm2Algo.AuxLemmas
 
-complete-false₂ : Γ ⊆ Δ w/t A
-                → k ε A
-                → Δ ∋^ k
-                → ⊥
-complete-false₂ ext inA inΔ
-  with inΓ ← ⊆-^out-^in inΔ (⊆/-⊆ ext) = ⊥-elim (∋^-∋=-false inΔ (⊆/-^in-=out ext inA inΓ))
-
-complete-false₃ : Δ ⊢r A
-                → k ε' A
-                → Δ ∋^ k
-                → ⊥
-complete-false₃ regA inA inΔ = ⊢c-^∈-false (ε'-ε inA) inΔ (⊢r-⊢c regA)
-
-complete-infs : Γ ⊢ ⟨ j , B ⟩ ~s Σ
-              → Γ ⊢r B
-              → IsoInf j
-              → 𝕣 Γ ⊨ Σ ⟹ B
-complete-infs (~I ⊢e ~∞) (⊢r-arr regB regB₁) i∞-z = infs-s ⊢e (infs-z (t-env ⊢e) (⊢r-𝕣' regB₁))
-complete-infs (~I ⊢e ~j) (⊢r-arr regB regB₁) (i∞-i iso) = infs-s ⊢e (complete-infs ~j regB₁ iso)
-{-
-
-s+-¬ε-prv : Δ ⊢ j # A ⌞ ≤⁺ ⌝ B
-         → k ¬ε A
-         → k ¬ε B
-
-s--¬ε-prv : Δ ⊢ ∞ # A ⌞ ≤⁻ ⌝ B
-         → k ¬ε B
-         → k ¬ε A
-
-s+-¬ε-prv (s-refl regΔ cloA grd) ninA = {!!}
-s+-¬ε-prv (s-int regΔ) ninA = ninA
-s+-¬ε-prv (s-var-∙ regΔ inΔ) ninA = ninA
-s+-¬ε-prv (s-arr₁ s s₁) (¬ε-arr ninA ninA₁) = ¬ε-arr (s--¬ε-prv s ninA) (s+-¬ε-prv s₁ ninA₁)
-s+-¬ε-prv (s-arr₂ s s₁) (¬ε-arr ninA ninA₁) = ¬ε-arr (s--¬ε-prv s ninA) (s+-¬ε-prv s₁ ninA₁)
-s+-¬ε-prv (s-arr₃ cloA grd s) (¬ε-arr ninA ninA₁) = ¬ε-arr {!!} (s+-¬ε-prv s ninA₁)
-s+-¬ε-prv (s-∀ s) (¬ε-∀ ninA) = ¬ε-∀ (s+-¬ε-prv s ninA)
-s+-¬ε-prv (s-∀l s ic fd upC upD upj) (¬ε-∀ ninA)
-  with ih ← s+-¬ε-prv s ninA = ¬ε-arr {!!} {!!}
-s+-¬ε-prv (s-∀l-no-appear s ic fd upC upD upj) (¬ε-∀ ninA)
-  with ih ← s+-¬ε-prv s ninA  = {!!}
-s+-¬ε-prv (s-tapp s upj) (¬ε-∀ ninA) = ¬ε-∀ (s+-¬ε-prv s ninA)
-s+-¬ε-prv (s-svar-l x inΔ) (¬ε-var x₁) = {!!}
-s+-¬ε-prv (s-svar-𝕚 x s) ninA = {!!}
-s+-¬ε-prv (s-svar-𝕔 x s) ninA = {!!}
-s+-¬ε-prv (s-svar-𝕥 x s) ninA = {!!}
-
-s--¬ε-prv s ninB = {!!}
-
-
-
-inst-∋^-exist : Γ ∋^ k
-              → SRegular Γ
-              → Γ ⊢r A
-              → k ¬ε A
-              → ∃[ Δ ]([ A / k ] Γ ⟹ Δ)
-inst-∋^-exist Z regΓ regA ninA = {!!}
-inst-∋^-exist (S∙ inΓ) (reg-S∙ regΓ) regA ninA
-  with ⟨ A' , pA ⟩ ← ↑ty-surjective ninA
-  with inst-∋^-exist inΓ regΓ (⊢r-strengthen∙0 regA {!!}) {!!}
-... | ⟨ Δ' , inst ⟩ = ⟨ (Δ' ,∙) , ⟹∙S inst {!!} ⟩
-inst-∋^-exist (S= inΓ) regΓ regA ninA = {!!}
-inst-∋^-exist (S^ inΓ) regΓ regA ninA = {!!}
--}
-
 complete-s :  Δ ⊢ j # A ⌞ ≤⁺ ⌝ B
             → Γ ⊆ Δ w/t A w/c j
             → Γ ⊢ ⟨ j , B ⟩ ~s Σ
@@ -144,7 +80,8 @@ complete-s {j = 𝕚 j} (s-svar-𝕚 x s) (⊆Inf-X extx iso) ~j'@(~I ⊢e ~j)
 ... | special inA inΓ^ tail newΔ s₁ = ⊥-elim (⊢c-^∈-false (ε'-ε inA) inΓ^ (⊢r-⊢c (∋:=-⊢r (s-sregular s) x)))
 complete-s {j = 𝕔 j} (s-arr₃ cloA grd s) (⊆C cloA₁ ext) (~C ⊢e ~j) with complete-s s ext ~j
 ... | normal cond s₁ = normal (λ cond' → cond (case₁ cond')) (s-term-c cloA₁ (⊆-⊢c-≫ (⊆/c-⊆ ext) cloA₁ grd) ⊢e s₁)
-... | special inA inΓ^ tail newΔ s₁ = special (ε-arr (⊢c-^∈-¬ε cloA₁ inΓ^) inA) inΓ^ (ett-arr tail) newΔ (s-term-c cloA₁ (⊆-⊢c-≫ (⊆/c-⊆ ext) cloA₁ grd) ⊢e s₁)
+... | special inA inΓ^ tail newΔ s₁
+  = special (ε-arr (⊢c-^∈-¬ε cloA₁ inΓ^) inA) inΓ^ (ett-arr tail) newΔ (s-term-c cloA₁ (⊆-⊢c-≫ (⊆/c-⊆ ext) cloA₁ grd) ⊢e s₁)
 -- copy the logic from forall-L-i
 complete-s {j = 𝕔 j} (s-∀l s ic fd upC upD (↑tyʲ-𝕔 upj)) (⊆∀-C ext upj₁) ~j'@(~C {Σ = Σ} {e = e} ⊢e ~j)
   with ⟨ Σ' , upΣ ⟩ ← ↑tyᶜ0-total Σ
