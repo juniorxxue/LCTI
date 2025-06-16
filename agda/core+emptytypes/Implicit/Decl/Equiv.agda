@@ -3,9 +3,6 @@ module Implicit.Decl.Equiv where
 open import Implicit.Language.All
 open import Implicit.Decl.Subtyping renaming (_⊢_#_≤_ to _⊢¹_#_≤_)
 open import Implicit.Decl.SubtypingV2 renaming (_⊢_#_≤_ to _⊢²_#_≤_)
-open import Implicit.Decl.AuxLemmas
-
-
 
 ▶∙-punchOut-helper : Γ ∋∙ X
                    → Γ ▶ #0 ,∙⇘ Γ'

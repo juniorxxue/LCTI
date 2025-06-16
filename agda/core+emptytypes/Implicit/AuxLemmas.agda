@@ -95,6 +95,21 @@ data _𝕗𝕧_ : Type m → HitMis m → Set where
 ... | ⟨ hit H , fv ⟩ = ⟨ H , fv-∀-h fv ⟩
 ... | ⟨ mis H , fv ⟩ = ⟨ H , fv-∀-m fv ⟩
 
+data NonAccess : Env n m → HitMis m → Set where
+  ok   : NonAccess (Γ ⋈) H
+  mis^ : NonAccess (Δ ,^) (mis H)
+  mis∙ : NonAccess Δ H
+       → NonAccess (Δ ,∙) (mis H)
+  mis= : NonAccess Δ H
+       → NonAccess (Δ ,= A) (mis H)
+
+
+infix 3 _⊢⊠_
+data _⊢⊠_ (Δ : Env n m) (A : Type m) : Set where
+  block : A 𝕗𝕧 H
+        → NonAccess Δ H
+        → Δ ⊢⊠ A
+
 infix 3 _ⅆ_⊆_ⅆ_kp_
 data _ⅆ_⊆_ⅆ_kp_ : Env n m → Env n m → Env n m → Env n m → HitMis m → Set where
   ⅆ⋈ : (regΓ : TRegular Γ)

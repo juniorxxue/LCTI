@@ -210,6 +210,39 @@ t-⊢r (⊢tapp ⊢e st) with t-⊢rᶜ ⊢e
 infs-⊢r (infs-z regΓ regA) = regA
 infs-⊢r (infs-s x infs) = ⊢r-arr (t-⊢r x) (infs-⊢r infs)
 
+ss+-⊢c : Γ ⊢ A ⌞ ≤⁺ ⌝ B ⊣ Δ
+       → Δ ⊢c A
+
+ss--⊢c : Γ ⊢ A ⌞ ≤⁻ ⌝ B ⊣ Δ
+       → Δ ⊢c B
+
+ss+-⊢c (s-int regΓ) = ⊢c-int
+ss+-⊢c (s-var-∙ regΓ inΔ) = ⊢c-var-∙ inΔ
+ss+-⊢c (s-ex-l^ inst) = ⊢c-var-= (inst-∋= inst)
+ss+-⊢c (s-ex-l= regΓ x-in) = ⊢c-var-= (∋:=to∋= x-in)
+ss+-⊢c (s-arr s s₁) = ⊢c-arr (⊆-⊢c (ss--⊢c s) (ss-⊆ s₁)) (ss+-⊢c s₁)
+ss+-⊢c (s-∀ s) = ⊢c-∀ (ss+-⊢c s)
+
+ss--⊢c (s-int regΓ) = ⊢c-int
+ss--⊢c (s-var-∙ regΓ inΔ) = ⊢c-var-∙ inΔ
+ss--⊢c (s-ex-r^ inst) = ⊢c-var-= (inst-∋= inst)
+ss--⊢c (s-ex-r= regΓ x-in) = ⊢c-var-= (∋:=to∋= x-in)
+ss--⊢c (s-arr s s₁) = ⊢c-arr (⊆-⊢c (ss+-⊢c s) (ss-⊆ s₁)) (ss--⊢c s₁)
+ss--⊢c (s-∀ s) = ⊢c-∀ (ss--⊢c s)
+
+s-⊢c : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
+     → Δ ⊢c A
+s-⊢c (s-empty regΓ cloA grd) = cloA
+s-⊢c (s-type ss) = ss+-⊢c ss
+s-⊢c (s-term-c cloA ap ⊢e s) = ⊢c-arr (⊆-⊢c cloA (s-⊆ s)) (s-⊢c s)
+s-⊢c (s-term-o opnA ⊢e ss s) = ⊢c-arr (⊆-⊢c (ss--⊢c ss) (s-⊆ s)) (s-⊢c s)
+s-⊢c (s-∀l s upᶜ upᵉ upC upD) = ⊢c-∀ (⊢c-◆0 (s-⊢c s))
+s-⊢c (s-∀l-no s upᶜ upᵉ upC upD) = ⊢c-∀ (⊢c-◇0 (s-⊢c s))
+s-⊢c (s-tapp s upᶜ) = ⊢c-∀ (⊢c-◆0 (s-⊢c s))
+s-⊢c (s-svar-term x s) = ⊢c-var-= (∋:=to∋= x)
+s-⊢c (s-svar-tapp x s) = ⊢c-var-= (∋:=to∋= x)
+s-⊢c (s-evar-infers infs inst) = ⊢c-var-= (inst-∋= inst)
+
 
 ----------------------------------------------------------------------
 --+                           Extension                            +--
