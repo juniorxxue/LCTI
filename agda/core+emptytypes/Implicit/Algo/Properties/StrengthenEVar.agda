@@ -1,5 +1,3 @@
-{-# OPTIONS --allow-unsolved-metas #-}
-{-# OPTIONS --allow-incomplete-matches #-}
 module Implicit.Algo.Properties.StrengthenEVar where
 
 open import Implicit.Language.All
@@ -102,6 +100,17 @@ t-strengthen^ : Γ ⊢ Σ' ⇒ e' ⇒ A'
               → Σ ↑tyᶜ k ⇘ Σ'
               → Γ' ⊢ Σ ⇒ e ⇒ A
 
+infs-strengthen^ : Γ ⊨ Σ' ⟹ A'
+                 → Γ ◀ k ^⇘ Γ'
+                 → A ↑ty k ⇘ A'
+                 → Σ ↑tyᶜ k ⇘ Σ'
+                 → Γ' ⊨ Σ ⟹ A
+infs-strengthen^ (infs-z regΓ regA) newΓ upA (↑tyᶜ-τ up-t)
+  with refl ← ↑ty-unique-inver upA up-t = infs-z (tregular-strengthen^ regΓ newΓ) (⊢r-strengthen^ regA newΓ up-t)
+infs-strengthen^ (infs-s ⊢e infs) newΓ (↑ty-arr upA upA₁) (↑tyᶜ-e up-e upΣ) =
+  infs-s (t-strengthen^ ⊢e newΓ upA up-e ↑tyᶜ-□) (infs-strengthen^ infs newΓ upA₁ upΣ)
+
+
 s-strengthen^ : Γ ⊢ A' ≤⁺ Σ' ⊣ Δ ↪ B'
               → Γ ◀ k ^⇘ Γ'
               → Δ ◀ k ^⇘ Δ'
@@ -186,7 +195,8 @@ s-strengthen^ (s-svar-tapp inΓ s) newΓ newΔ ↑ty-var (↑ty-∀ upB) (↑ty�
   with regA ← ∋:=-⊢r (s-env-in s) inΓ
   with ⟨ pA , uppA ⟩ ← ⊢r-◀^-↑ty-surjective regA newΔ
   = s-svar-tapp (∋:=-strengthen^-reg (s-env-in s) inΓ newΔ uppA) (s-strengthen^ s newΔ newΔ uppA (↑ty-∀ upB) (↑tyᶜ-⓪ upA upΣ))
-
+s-strengthen^ (s-evar-infers infs inst) newΓ newΔ ↑ty-var upB (↑tyᶜ-e up-e upΣ)
+  = s-evar-infers (infs-strengthen^ infs (◀^-𝕣 newΓ) upB (↑tyᶜ-e up-e upΣ)) (inst-strengthen^ inst newΓ newΔ upB)
 
 s-strengthen^0 : Γ ,^ ⊢ A' ≤⁺ Σ' ⊣ Δ ,^ ↪ B'
                  → ↑ty0 B ⇘ B'

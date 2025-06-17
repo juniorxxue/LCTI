@@ -1,5 +1,3 @@
-{-# OPTIONS --allow-unsolved-metas #-}
-{-# OPTIONS --allow-incomplete-matches #-}
 module Implicit.Algo.Properties.StrengthenTVar where
 
 open import Implicit.Language.All
@@ -50,6 +48,14 @@ t-strengthen, : Γ ⊢ Σ' ⇒ e' ⇒ A
               → e ↑tm k ⇘ e'
               → Γ' ⊢ Σ ⇒ e ⇒ A
 
+infs-strengthen, : Γ ⊨ Σ' ⟹ A
+                 → Γ ◀ k ,⇘ Γ'
+                 → Σ ↑tmᶜ k ⇘ Σ'
+                 → Γ' ⊨ Σ ⟹ A
+infs-strengthen, (infs-z regΓ regA) newΓ ↑tmᶜ-τ = infs-z (tregular-strengthen, regΓ newΓ) (⊢r-strengthen, regA newΓ)
+infs-strengthen, (infs-s ⊢e infs) newΓ (↑tmᶜ-e up-e upΣ) = infs-s (t-strengthen, ⊢e newΓ ↑tmᶜ-□ up-e) (infs-strengthen, infs newΓ upΣ)
+
+
 s-strengthen, : Γ ⊢ A ≤⁺ Σ' ⊣ Δ ↪ B
               → Γ ◀ k ,⇘ Γ'
               → Δ ◀ k ,⇘ Δ'
@@ -90,6 +96,8 @@ s-strengthen, (s-svar-term inΓ s) newΓ newΔ (↑tmᶜ-e up-e upΣ)
   with refl ← ◀,-unique newΓ newΔ = s-svar-term (∋:=-strengthen, inΓ newΓ) (s-strengthen, s newΓ newΓ (↑tmᶜ-e up-e upΣ))
 s-strengthen, (s-svar-tapp inΓ s) newΓ newΔ (↑tmᶜ-⓪ upΣ)
   with refl ← ◀,-unique newΓ newΔ = s-svar-tapp (∋:=-strengthen, inΓ newΓ) (s-strengthen, s newΓ newΓ (↑tmᶜ-⓪ upΣ))
+s-strengthen, (s-evar-infers infs inst) newΓ newΔ (↑tmᶜ-e up-e upΣ)
+  = s-evar-infers (infs-strengthen, infs (◀,-𝕣 newΓ) (↑tmᶜ-e up-e upΣ)) (inst-strengthen, inst newΓ newΔ)
 
 -- corollaries
 s-strengthen,0 : Γ , T ⋈ ⊢ A ≤⁺ Σ' ⊣ Δ , T ⋈  ↪ B

@@ -1,5 +1,3 @@
-{-# OPTIONS --allow-unsolved-metas #-}
-{-# OPTIONS --allow-incomplete-matches #-}
 module Implicit.Algo.Properties.WeakenTVar where
 
 open import Implicit.Language.All
@@ -58,6 +56,13 @@ t-weaken, : Γ ⊢ Σ ⇒ e ⇒ A
           → e ↑tm k ⇘ e'
           → Γ' ⊢ Σ' ⇒ e' ⇒ A
 
+infs-weaken, : Γ ⊨ Σ ⟹ A
+             → Γ ▶ k , T ⇘ Γ'
+             → Σ ↑tmᶜ k ⇘ Σ'
+             → Γ' ⊨ Σ' ⟹ A
+infs-weaken, (infs-z regΓ regA) new ↑tmᶜ-τ = infs-z (tregular-weaken, regΓ new) (⊢r-weaken, regA new)
+infs-weaken, (infs-s ⊢e infs) new (↑tmᶜ-e up-e upΣ) = infs-s (t-weaken, ⊢e new ↑tmᶜ-□ up-e) (infs-weaken, infs new upΣ)
+
 s-weaken, : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
           → Σ ↑tmᶜ k ⇘ Σ'
           → Γ ⨟ Δ ▶s k , T ⇘ Γ' ⨟ Δ'
@@ -105,6 +110,7 @@ s-weaken, (s-svar-term inΓ s) (↑tmᶜ-e up-e upΣ) new
   with refl ← ▶s⨟,-unique new = s-svar-term (∋:=-weaken,s inΓ (▶s⨟,-▶s,-l new)) (s-weaken, s (↑tmᶜ-e up-e upΣ) new)
 s-weaken, (s-svar-tapp inΓ s) (↑tmᶜ-⓪ upΣ) new
   with refl ← ▶s⨟,-unique new = s-svar-tapp (∋:=-weaken,s inΓ (▶s⨟,-▶s,-l new)) (s-weaken, s (↑tmᶜ-⓪ upΣ) new)
+s-weaken, (s-evar-infers infs inst) (↑tmᶜ-e up-e upΣ) new = s-evar-infers (infs-weaken, infs (▶,-▶s,-𝕣 (▶s⨟,-▶s,-l new)) (↑tmᶜ-e up-e upΣ)) (inst-weaken,s inst new)
 
 s-weaken,0 : Γ ⋈ ⊢ A ≤⁺ Σ ⊣ Δ ⋈ ↪ B
            → ↑tmᶜ0 Σ ⇘ Σ'
