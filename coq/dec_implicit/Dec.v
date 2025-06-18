@@ -2,6 +2,7 @@ Require Import Syntax.
 Require Import Algo.
 Require Import Lia.
 From Hammer Require Import Tactics.
+From Coq Require Import Extraction.
 Require Import Coq.Program.Equality.
 Require Import Coq.Arith.Compare_dec.
 Require Import Coq.Arith.PeanoNat.
@@ -949,3 +950,5 @@ Proof. hauto lq: on use: dec_ty_sub_ctx_infs'. Qed.
 Theorem dec_infs : forall Γ Σ,
   {A | infs Γ Σ A} + {~ exists A, infs Γ Σ A}.
 Proof. hauto lq: on use: dec_ty_sub_ctx_infs'. Qed.
+
+Recursive Extraction dec_ty.
