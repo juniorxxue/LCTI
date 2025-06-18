@@ -186,7 +186,7 @@ complete+ (s-∀l-no-appear grd₁ regA s case-𝕔 fd upC upD upj) (grd-∀ grd
 complete+ (s-tapp x regA s upj) (grd-var= x₁) = s-svar-𝕥 x₁ (s-tapp (complete+ s x) upj)
 complete+ (s-tapp x regA s upj) (grd-∀ grd)
   with reg-S= regΓ regA ← s2-sregular s = s-tapp (complete+ s (≫-trans0 regΓ regA x grd)) upj
-complete+ (s-top regΔ) x = s-top regΔ
+complete+ (s-top regΔ regA) x = s-top+ regΔ (⊢r-≫-⊢c x regA)
 
 complete- (s-int regΔ) grd-int = s-int regΔ
 complete- (s-int regΔ) (grd-var= x) = s-svar-r x (s-int regΔ)
@@ -202,8 +202,8 @@ complete- s'@(s-∀ s) (grd-var= x)
   with ⊢r-∀ regA ← ∋:=-⊢r (s2-sregular s') x
   = s-svar-r x (s-∀ (complete- s (⊢r-≫-eq regA)))
 complete- (s-∀ s) (grd-∀ grd) = s-∀ (complete- s grd)
-complete- (s-top regΔ) grd-top = s-top regΔ
-complete- (s-top regΔ) (grd-var= x) = s-svar-r x (s-top regΔ)
+complete- (s-top regΔ regA) grd-top = s-top- regΔ regA
+complete- (s-top regΔ regA) (grd-var= x) = s-svar-r x (s-top- regΔ regA)
 
 complete0 : Γ ⊢d j # A ≤ B
           → Γ ⊢i j # A ⌞ ≤⁺ ⌝ B

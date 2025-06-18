@@ -1,5 +1,3 @@
-{-# OPTIONS --allow-unsolved-metas #-}
-{-# OPTIONS --allow-incomplete-matches #-}
 module Implicit.Language.Occur.Properties where
 
 open import Implicit.Language.Base
@@ -60,6 +58,7 @@ open import Implicit.Language.OpenClose.Base
 
 ε-dec : (k ε A) ⊎ (k ¬ε A)
 ε-dec {k = k} {A = Int} = inj₂ ¬ε-int
+ε-dec {k = k} {A = Top} = inj₂ {!!}
 ε-dec {k = k} {A = ‶ X} with k #≟ X
 ... | yes refl = inj₁ ε-var
 ... | no ¬p = inj₂ (¬ε-var (≢-sym ¬p))

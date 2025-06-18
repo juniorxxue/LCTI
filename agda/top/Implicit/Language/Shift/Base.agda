@@ -150,6 +150,8 @@ infix 3 _¬ε_
 data _¬ε_ : Fin m → Type m → Set where
   ¬ε-int :
       k ¬ε Int
+  ¬ε-top :
+      k ¬ε Top
   ¬ε-var :
       k' ≢ k
     → k ¬ε (‶ k')

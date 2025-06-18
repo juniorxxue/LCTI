@@ -1,5 +1,3 @@
-{-# OPTIONS --allow-unsolved-metas #-}
-{-# OPTIONS --allow-incomplete-matches #-}
 module Implicit.Language.Shift.Properties where
 
 open import Implicit.Language.Base
@@ -83,6 +81,7 @@ open import Implicit.Language.Shift.Base
 ↑ty-¬ε : A ↑ty k ⇘ A'
        → k ¬ε A'
 ↑ty-¬ε ↑ty-int = ¬ε-int
+↑ty-¬ε ↑ty-top = ¬ε-top
 ↑ty-¬ε {k = k} (↑ty-var {X = X}) = ¬ε-var (punchInᵢ≢i k X)
 ↑ty-¬ε (↑ty-arr upA upA₁) = ¬ε-arr (↑ty-¬ε upA) (↑ty-¬ε upA₁)
 ↑ty-¬ε (↑ty-∀ upA) = ¬ε-∀ (↑ty-¬ε upA)
@@ -94,6 +93,7 @@ open import Implicit.Language.Shift.Base
          → A ↑ty k₂ ⇘ D
          → D ↑ty (inject₁ k₁) ⇘ C
 ↑ty-comm k₁≤k₂ ↑ty-int ↑ty-int ↑ty-int = ↑ty-int
+↑ty-comm k₁≤k₂ ↑ty-top ↑ty-top ↑ty-top = ↑ty-top
 ↑ty-comm {k₁ = k₁} {k₂} k₁≤k₂ (↑ty-var {X = X}) ↑ty-var ↑ty-var
   rewrite sym (punchIn-comm {x = X} {j = k₁} {k = k₂} k₁≤k₂) = ↑ty-var
 ↑ty-comm k₁≤k₂ (↑ty-arr up1 up4) (↑ty-arr up2 up5) (↑ty-arr up3 up6) =
@@ -215,6 +215,7 @@ private variable
 ↑ty-surjective : k ¬ε A'
                → ∃[ A ](A ↑ty k ⇘ A')
 ↑ty-surjective ¬ε-int = ⟨ Int , ↑ty-int ⟩
+↑ty-surjective ¬ε-top = ⟨ Top , ↑ty-top ⟩
 ↑ty-surjective (¬ε-var x) = ⟨ (‶ punchOut (≢-sym x)) , (↑ty-punchOut (≢-sym x)) ⟩
 ↑ty-surjective (¬ε-arr ¬inA' ¬inA'') = ⟨ ↑ty-surjective ¬inA' .proj₁ `→ ↑ty-surjective ¬inA'' .proj₁ ,
                                         ↑ty-arr (↑ty-surjective ¬inA' .proj₂)
@@ -294,6 +295,7 @@ private variable
        → k₂ #≤ k₁
        → (#S k₁) ¬ε T'
 ¬ε-↑ty ¬ε-int ↑ty-int lt = ¬ε-int
+¬ε-↑ty ¬ε-top ↑ty-top lt = ¬ε-top
 ¬ε-↑ty (¬ε-var x) ↑ty-var lt rewrite sym (punchIn-≤ lt) = ¬ε-var (punchIn-≢ x)
 ¬ε-↑ty (¬ε-arr ¬inT ¬inT₁) (↑ty-arr upT upT₁) lt = ¬ε-arr (¬ε-↑ty ¬inT upT lt) (¬ε-↑ty ¬inT₁ upT₁ lt)
 ¬ε-↑ty (¬ε-∀ ¬inT) (↑ty-∀ upT) lt = ¬ε-∀ (¬ε-↑ty ¬inT upT (s≤s lt))
@@ -309,6 +311,7 @@ private variable
          → k₂ #≤ k₁
          → k₁ ¬ε T
 ¬ε-↑ty-≤ ¬ε-int ↑ty-int lt = ¬ε-int
+¬ε-↑ty-≤ ¬ε-top ↑ty-top lt = ¬ε-top
 ¬ε-↑ty-≤ (¬ε-var x) ↑ty-var lt = ¬ε-var (helper lt x)
   where helper : ∀ {m} {k₁ : Fin m} {k₂ X}
                → k₂ #≤ k₁
@@ -328,6 +331,7 @@ private variable
       → X #< k
       → inject₁ X ¬ε A'
 ¬ε-↑ty' ¬ε-int ↑ty-int lt = ¬ε-int
+¬ε-↑ty' ¬ε-top ↑ty-top lt = ¬ε-top
 ¬ε-↑ty' (¬ε-var x) ↑ty-var lt = ¬ε-var (≢-sym (punchIn-inject-neq lt (≢-sym x)))
 ¬ε-↑ty' (¬ε-arr ninA ninA₁) (↑ty-arr up up₁) lt = ¬ε-arr (¬ε-↑ty' ninA up lt) (¬ε-↑ty' ninA₁ up₁ lt)
 ¬ε-↑ty' (¬ε-∀ ninA) (↑ty-∀ up) lt = ¬ε-∀ (¬ε-↑ty' ninA up (s≤s lt))
@@ -343,6 +347,7 @@ private variable
             → X #< k
             → X ¬ε A
 ¬ε-↑ty'-inv ¬ε-int ↑ty-int lt = ¬ε-int
+¬ε-↑ty'-inv ¬ε-top ↑ty-top lt = ¬ε-top
 ¬ε-↑ty'-inv (¬ε-var x) ↑ty-var lt = ¬ε-var λ where
   refl → x (sym (punchIn-inject lt))
 ¬ε-↑ty'-inv (¬ε-arr ninA ninA₁) (↑ty-arr upA upA₁) lt = ¬ε-arr (¬ε-↑ty'-inv ninA upA lt) (¬ε-↑ty'-inv ninA₁ upA₁ lt)
@@ -359,6 +364,7 @@ private variable
            → X #< k
            → inject₁ X ¬ε A'
 ↑ty-¬ε-prv ¬ε-int ↑ty-int lt = ¬ε-int
+↑ty-¬ε-prv ¬ε-top ↑ty-top lt = ¬ε-top
 ↑ty-¬ε-prv (¬ε-var x) ↑ty-var lt = ¬ε-var (≢-sym (punchIn-inject-neq lt (≢-sym x)))
 ↑ty-¬ε-prv (¬ε-arr ¬inA ¬inA₁) (↑ty-arr upA upA₁) lt = ¬ε-arr (↑ty-¬ε-prv ¬inA upA lt) (↑ty-¬ε-prv ¬inA₁ upA₁ lt)
 ↑ty-¬ε-prv (¬ε-∀ ¬inA) (↑ty-∀ upA) lt = ¬ε-∀ (↑ty-¬ε-prv ¬inA upA (s≤s lt))
