@@ -128,4 +128,18 @@ sub_ctx : Env -> Typ -> Context -> Env -> Typ -> Prop :=
 | s_svar_tapp : forall Δ x Σ A B C,
     lookupExTy Δ x A ->
     sub_ctx Δ A (CtxTApp B Σ) Δ (All C) ->
-    sub_ctx Δ (TVar x) (CtxTApp B Σ) Δ (All C).
+    sub_ctx Δ (TVar x) (CtxTApp B Σ) Δ (All C)
+| s_evar_infers : forall Δ x e Σ Ψ A,
+    infs Δ (CtxTrm e Σ) A ->
+    substEnv A x Δ Ψ ->
+    sub_ctx Δ (TVar x) (CtxTrm e Σ) Ψ A
+with
+infs : Env -> Context -> Typ -> Prop :=
+| infs_z : forall Γ A,
+    TRegular Γ ->
+    RegularTyp Γ A ->
+    infs Γ (CtxTyp A) A
+| infs_s : forall Γ e Σ A B,
+    ty Γ CtxEmpty e A ->
+    infs Γ Σ B ->
+    infs Γ (CtxTrm e Σ) (Arr A B).
