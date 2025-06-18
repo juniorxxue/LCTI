@@ -575,14 +575,14 @@ Lemma sub_ctx_SRegular_in : forall Δ A Σ Δ' B,
   sub_ctx Δ A Σ Δ' B -> SRegular Δ.
 Proof.
   intros * Hsub. dependent induction Hsub;
-    try sfirstorder use: sub_SRegular_in; sauto lq: on.
+    sauto lq: on rew: off use: sub_SRegular_in.
 Qed.
 
 Lemma sub_ctx_SRegular_out : forall Δ A Σ Δ' B,
   sub_ctx Δ A Σ Δ' B -> SRegular Δ'.
 Proof.
   intros * Hsub. dependent induction Hsub;
-    try sfirstorder use: sub_SRegular_out; sauto lq: on.
+    ecrush use: sub_SRegular_out.
 Qed.
 
 Lemma TRegularTyp_strengthen_TmCons : forall Γ A B,
@@ -593,14 +593,16 @@ Lemma TRegularTyp_strengthen_SepCons : forall Γ A,
   TRegular Γ -> RegularTyp (SepCons Γ) A -> RegularTyp Γ A.
 Proof. sauto lq: on use: RegularTyp_weaken_gen. Qed.
 
-Lemma ty_sub_ctx_det' : forall n,
+Lemma ty_sub_ctx_infs_det' : forall n,
   (forall Γ Σ e A A', tm_size e + ctx_size Σ < n ->
     ty Γ Σ e A -> ty Γ Σ e A' -> A = A') /\
   (forall Δ A Σ Δ1 Δ2 A1 A2, ctx_size Σ < n ->
-    sub_ctx Δ A Σ Δ1 A1 -> sub_ctx Δ A Σ Δ2 A2 -> Δ1 = Δ2 /\ A1 = A2).
+    sub_ctx Δ A Σ Δ1 A1 -> sub_ctx Δ A Σ Δ2 A2 -> Δ1 = Δ2 /\ A1 = A2) /\
+  (forall Γ Σ A1 A2, ctx_size Σ < n ->
+    infs Γ Σ A1 -> infs Γ Σ A2 -> A1 = A2).
 Proof.
-  intro n. induction n. split; try lia.
-  destruct IHn as [IHty IHsub]. split.
+  intro n. induction n. repeat split; try lia.
+  destruct IHn as [IHty [IHsub IHinfs]]. split.
   - intros Γ Σ e A A' Hlt Hty1 Hty2. generalize dependent A'.
     dependent induction Hty1; intros; dependent destruction Hty2; simpl in *;
       try sfirstorder use: NonEmpty_false, lookupTm_det;
@@ -612,28 +614,44 @@ Proof.
       assert (Hlt'': ctx_size Σ < n). { specialize (tm_size_gt0 g). lia. }
       eapply IHty in Hty1; eauto; simpl; try lia. subst.
       eapply IHsub with (Δ1 := (Γ ⋈)) in H1; eauto; simpl; try lia. sfirstorder. 
-  - intros Δ A Σ Δ1 Δ2 A1 A2 Hlt Hsub1 Hsub2.
-    generalize dependent A2. generalize dependent Δ2.
-    dependent induction Hsub1; intros; dependent destruction Hsub2; simpl in *;
-      try sfirstorder use: grd_typ_det, sub_det, open_close_false;
-      try solve [try rewrite ctx_size_ty_shift in *; try rewrite tm_size_ty_shift_tm in *;
-                 eapply IHHsub1 in Hsub2; try lia; sfirstorder use: ty_unshift_det].
-    + eapply grd_typ_det in H0; eauto. subst.
-      eapply IHty in H1; eauto; simpl; try lia. subst.
-      eapply IHsub in Hsub1; eauto; simpl; try lia. sfirstorder.
-    + eapply IHty in H0; eauto; simpl; try lia. subst.
-      eapply sub_det in H1; eauto; simpl; try lia. subst.
-      eapply IHsub in Hsub1; eauto; simpl; try lia. sfirstorder.
-    + eapply lookupExTy_det in H; eauto. subst. sfirstorder.
-    + eapply lookupExTy_det in H; eauto. subst. sfirstorder.
+  - split.
+    + intros Δ A Σ Δ1 Δ2 A1 A2 Hlt Hsub1 Hsub2.
+      generalize dependent A2. generalize dependent Δ2.
+      dependent induction Hsub1; intros; dependent destruction Hsub2; simpl in *;
+        try sfirstorder use: grd_typ_det, sub_det, open_close_false;
+        try solve [try rewrite ctx_size_ty_shift in *; try rewrite tm_size_ty_shift_tm in *;
+                  eapply IHHsub1 in Hsub2; try lia; sfirstorder use: ty_unshift_det].
+      * eapply grd_typ_det in H0; eauto. subst.
+        eapply IHty in H1; eauto; simpl; try lia. subst.
+        eapply IHsub in Hsub1; eauto; simpl; try lia. sfirstorder.
+      * eapply IHty in H0; eauto; simpl; try lia. subst.
+        eapply sub_det in H1; eauto; simpl; try lia. subst.
+        eapply IHsub in Hsub1; eauto; simpl; try lia. sfirstorder.
+      * eapply lookupExTy_det in H; eauto. subst. sfirstorder.
+      * sauto lq: on rew: off use: substEnv_Ex, lookupEx_ExTy.
+      * eapply lookupExTy_det in H; eauto. subst. sfirstorder.
+      * sauto lq: on rew: off use: substEnv_Ex, lookupEx_ExTy.
+      * dependent destruction H. dependent destruction H2.
+        eapply IHty in H; eauto; simpl; try lia. subst.
+        eapply IHinfs in H0; eauto; simpl; try lia. subst.
+        eapply substEnv_det in H1; eauto; simpl; try lia.
+    + intros Γ Σ A1 A2 Hlt Hinf1 Hinf2.
+      generalize dependent A2.
+      dependent induction Hinf1; intros; dependent destruction Hinf2; simpl in *; try sfirstorder.
+      eapply IHty in H; eauto; simpl; try lia. subst.
+      eapply IHinfs in Hinf1; eauto; simpl; try lia. scongruence.
 Qed.
 
 Lemma ty_det : forall Γ Σ e A A', ty Γ Σ e A -> ty Γ Σ e A' -> A = A'.
-Proof. sauto lq: on use: ty_sub_ctx_det'. Qed.
+Proof. qauto l: on use: ty_sub_ctx_infs_det'. Qed.
 
 Lemma sub_ctx_det : forall Δ A Σ Δ1 Δ2 A1 A2,
   sub_ctx Δ A Σ Δ1 A1 -> sub_ctx Δ A Σ Δ2 A2 -> Δ1 = Δ2 /\ A1 = A2.
-Proof. hauto lq: on rew: off use: ty_sub_ctx_det'. Qed.
+Proof. hauto lq: on rew: off use: ty_sub_ctx_infs_det'. Qed.
+
+Lemma infs_det : forall Γ Σ A1 A2,
+  infs Γ Σ A1 -> infs Γ Σ A2 -> A1 = A2.
+Proof. qauto l: on use: ty_sub_ctx_infs_det'. Qed.
 
 Lemma eq_dec_env : forall (Γ : Env) Γ',
   {Γ = Γ'} + {Γ <> Γ'}.
@@ -711,14 +729,16 @@ Fixpoint num_all (A : Typ) : nat :=
   | _ => 0
   end.
 
-Lemma dec_ty_sub_ctx' : forall n,
+Lemma dec_ty_sub_ctx_infs' : forall n,
   (forall Γ Σ e, tm_size e + ctx_size Σ < n ->
     {A | ty Γ Σ e A} + {~ exists A, ty Γ Σ e A}) *
   (forall k m Δ A Σ, ctx_size Σ < n -> num_solved Δ A < k -> num_all A < m ->
-    {Δ' : Env & {A' : Typ & sub_ctx Δ A Σ Δ' A'}} + {~ exists Δ' A', sub_ctx Δ A Σ Δ' A'}).
+    {Δ' : Env & {A' : Typ & sub_ctx Δ A Σ Δ' A'}} + {~ exists Δ' A', sub_ctx Δ A Σ Δ' A'}) *
+  (forall Γ Σ, ctx_size Σ < n ->
+    {A | infs Γ Σ A} + {~ exists A, infs Γ Σ A}).
 Proof.
-  intro n. induction n. split; try lia.
-  destruct IHn as [IHty IHsub]. split.
+  intro n. induction n. repeat split; try lia.
+  destruct IHn as [[IHty IHsub] IHinfs]. repeat split.
   - intros Γ Σ e Hlt.
     assert (Sub: GenericConsumer e -> NonEmpty Σ -> {A | ty Γ Σ e A} + {~ exists A, ty Γ Σ e A}).
     { intros Hgc Hne.
@@ -806,12 +826,26 @@ Proof.
               ** destruct A'; sauto qb: on drew: off.
               ** right. intros [Δ'' [A'' Hcontra]].
                  dependent destruction Hcontra; try sfirstorder.
-                 eapply lookupExTy_det in Hlk; eauto. subst.
-                 eapply sub_ctx_det in Hcontra; try sfirstorder.
+                 --- eapply lookupExTy_det in Hlk; eauto. subst.
+                     eapply sub_ctx_det in Hcontra; try sfirstorder.
+                 --- sauto lq: on rew: off use: substEnv_Ex, lookupEx_ExTy.
            ++ right. intros [Δ' [A' Hcontra]].
               dependent destruction Hcontra; try sfirstorder.
-              eapply lookupExTy_det in Hlk; eauto. sfirstorder.
-        -- sauto lq: on rew: off.
+              ** eapply lookupExTy_det in Hlk; eauto. sfirstorder.
+              ** hauto lq: on rew: off use: substEnv_Ex, lookupEx_ExTy.
+        -- assert (Hlt': ctx_size Σ < n). { simpl in *. lia. }
+           eapply IHinfs with (Γ := Δ) (Σ := Σ) in Hlt' as Hinf.
+           assert (Hlt'': tm_size t + ctx_size CtxEmpty < n). { simpl in *. lia. }
+           eapply IHty with (Γ := Δ) (Σ := CtxEmpty) (e := t) in Hlt'' as Hty; eauto.
+           destruct Hinf as [[B Hinf] | Hninf]. 2 : sauto lq: on drew: off.
+           destruct Hty as [[A Hty] | Hnty]. 2 : sauto lq: on drew: off.
+           destruct (dec_substEnv (Arr A B) n0 Δ) as [[Ψ Hsubst] | Hnsubst].
+           ** sauto lq: on.
+           ** right. intros [Δ' [A' Hcontra]].
+              dependent destruction Hcontra; try sfirstorder.
+              dependent destruction H.
+              eapply infs_det in Hinf; eauto. subst.
+              eapply ty_det in Hty; eauto. subst. sfirstorder.
       * destruct (dec_close Δ A1) as [Hc | Hnc].
         -- destruct (dec_open Δ A1) as [Ho | Hno].
            sfirstorder use: open_close_false.
@@ -891,12 +925,27 @@ Proof.
             right. intros [Δ'' [A'' Hcontra]]. dependent destruction Hcontra; try sfirstorder.
             eapply sub_ctx_det in Hsub; eauto. sfirstorder.
         -- right. intros [Δ'' [A'' Hcontra]]. dependent destruction Hcontra; try sfirstorder. 
+  - intros Γ Σ Hlt.
+    destruct Σ. 1, 4 : sauto lq: on rew: off.
+    + destruct (dec_TRegular Γ). 2 : sauto q: on rew: off.
+      destruct (dec_RegularTyp Γ t) as [Hreg' | Hnreg]. 2 : sauto lq: on.
+      sauto lq: on.
+    + assert (Hlt': tm_size t + ctx_size CtxEmpty < n). { simpl in *. lia. }
+      eapply IHty with (Γ := Γ) in Hlt' as Hty.
+      destruct Hty as [[A Hty] | Hnty]. 2 : sauto lq: on rew: off.
+      assert (Hlt'' : ctx_size Σ < n). { simpl in *. lia. }
+      eapply IHinfs with (Γ := Γ) (Σ := Σ) in Hlt'' as Hinf; eauto.
+      destruct Hinf as [[A' Hinf] | Hninf]; sauto lq: on rew: off.
 Qed.
 
 Theorem dec_ty : forall Γ Σ e,
   {A | ty Γ Σ e A} + {~ exists A, ty Γ Σ e A}.
-Proof. hauto lq: on use: dec_ty_sub_ctx'. Qed.
+Proof. hauto lq: on use: dec_ty_sub_ctx_infs'. Qed.
 
 Theorem dec_sub_ctx : forall Δ A Σ,
   {Δ' : Env & {A' : Typ & sub_ctx Δ A Σ Δ' A'}} + {~ exists Δ' A', sub_ctx Δ A Σ Δ' A'}.
-Proof. hauto lq: on use: dec_ty_sub_ctx'. Qed.
+Proof. hauto lq: on use: dec_ty_sub_ctx_infs'. Qed.
+
+Theorem dec_infs : forall Γ Σ,
+  {A | infs Γ Σ A} + {~ exists A, infs Γ Σ A}.
+Proof. hauto lq: on use: dec_ty_sub_ctx_infs'. Qed.
