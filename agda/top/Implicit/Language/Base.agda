@@ -15,6 +15,7 @@ infixr 8  `∀_
 
 data Type : ℕ → Set where
   Int    : Type m
+  Top    : Type m
   ‶_     : (X : Fin m) → Type m
   _`→_   : (A : Type m) → (B : Type m) → Type m
   `∀_    : (A : Type (1 + m)) → Type m

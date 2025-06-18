@@ -1,3 +1,5 @@
+{-# OPTIONS --allow-unsolved-metas #-}
+{-# OPTIONS --allow-incomplete-matches #-}
 module Implicit.Language.EnvOps.Regular where
 
 -- some properties about regular, but put here for avoiding dependency

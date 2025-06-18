@@ -8,6 +8,8 @@ infix 3 _⊢r_
 data _⊢r_ : Env n m → Type m → Set where
   ⊢r-int :
       Γ ⊢r Int
+  ⊢r-top :
+      Γ ⊢r Top
   ⊢r-var-∙ :
       (inΓ : Γ ∋∙ X)
     → Γ ⊢r ‶ X

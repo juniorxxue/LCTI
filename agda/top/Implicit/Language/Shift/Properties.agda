@@ -1,3 +1,5 @@
+{-# OPTIONS --allow-unsolved-metas #-}
+{-# OPTIONS --allow-incomplete-matches #-}
 module Implicit.Language.Shift.Properties where
 
 open import Implicit.Language.Base
@@ -41,6 +43,7 @@ open import Implicit.Language.Shift.Base
   → A ↑ty k ⇘ A₂
   → A₁ ≡ A₂
 ↑ty-unique ↑ty-int ↑ty-int = refl
+↑ty-unique ↑ty-top ↑ty-top = refl
 ↑ty-unique ↑ty-var ↑ty-var = refl
 ↑ty-unique (↑ty-arr up1 up3) (↑ty-arr up2 up4) rewrite ↑ty-unique up1 up2 | ↑ty-unique up3 up4 = refl
 ↑ty-unique (↑ty-∀ up1) (↑ty-∀ up2) rewrite ↑ty-unique up1 up2 = refl
@@ -50,6 +53,7 @@ open import Implicit.Language.Shift.Base
                   → T₁ ≡ T₂
                   → A ≡ B
 ↑ty-unique-inver' ↑ty-int ↑ty-int eqT = refl
+↑ty-unique-inver' ↑ty-top ↑ty-top eqT = refl
 ↑ty-unique-inver' {k = k} (↑ty-var {X = X}) (↑ty-var {X = Y}) eqT = cong ‶_ (punchIn-injective k X Y (‶-injective eqT))
 ↑ty-unique-inver' (↑ty-arr upA upA₁) (↑ty-arr upB upB₁) refl rewrite ↑ty-unique-inver' upA upB refl | ↑ty-unique-inver' upA₁ upB₁ refl = refl
 ↑ty-unique-inver' (↑ty-∀ upA) (↑ty-∀ upB) refl rewrite ↑ty-unique-inver' upA upB refl = refl
@@ -64,6 +68,7 @@ open import Implicit.Language.Shift.Base
   → ∃ λ A'
   → A ↑ty k ⇘ A'
 ↑ty-total Int k = ⟨ Int , ↑ty-int ⟩
+↑ty-total Top k = ⟨ Top , ↑ty-top ⟩
 ↑ty-total (‶ X) k = ⟨ ‶ punchIn k X , ↑ty-var ⟩
 ↑ty-total (A `→ A₁) k = ⟨ ↑ty-total A k .proj₁ `→ ↑ty-total A₁ k .proj₁ ,
                          ↑ty-arr (↑ty-total A k .proj₂) (↑ty-total A₁ k .proj₂) ⟩
@@ -120,6 +125,7 @@ private variable
             ------------------
             → A ↑ty k₁ ⇘ B
 ↑ty-comm-v2 lt ↑ty-int ↑ty-int ↑ty-int = ↑ty-int
+↑ty-comm-v2 lt ↑ty-top ↑ty-top ↑ty-top = ↑ty-top
 ↑ty-comm-v2 {k₁ = k₁} {k₂} lt (↑ty-var {X = X}) up2 (↑ty-var {X = Y})
   with eq1 ← ↑ty-var-inv-eq up2
   with eq2 ← punchIn-comm {x = Y} {j = k₁} {k = k₂} lt
@@ -143,6 +149,7 @@ private variable
          → A ↑ty k₁ ⇘ B
          → B ↑ty #S k₂ ⇘ C
 ↑ty-comm' k₁≤k₂ ↑ty-int ↑ty-int ↑ty-int = ↑ty-int
+↑ty-comm' k₁≤k₂ ↑ty-top ↑ty-top ↑ty-top = ↑ty-top
 ↑ty-comm' {k₁ = k₁} {k₂} k₁≤k₂ (↑ty-var {X = X}) ↑ty-var ↑ty-var
   rewrite punchIn-comm {x = X} {j = k₁} {k = k₂} k₁≤k₂ = ↑ty-var
 ↑ty-comm' k₁≤k₂ (↑ty-arr up1 up4) (↑ty-arr up2 up5) (↑ty-arr up3 up6) =

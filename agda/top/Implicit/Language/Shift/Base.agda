@@ -9,6 +9,7 @@ open import Implicit.Language.Base
 -- type shift
 ↑ty : Fin (1 + m) → Type m → Type (1 + m)
 ↑ty k Int      = Int
+↑ty k Top      = Top
 ↑ty k (‶ X)    = ‶ punchIn k X
 ↑ty k (A `→ B) = ↑ty k A `→ ↑ty k B
 ↑ty k (`∀ A)   = `∀ (↑ty (#S k) A)
@@ -77,6 +78,8 @@ infix 3 _↑ty_⇘_
 data _↑ty_⇘_ : Type m → Fin (1 + m) → Type (1 + m) → Set where
   ↑ty-int :
       Int ↑ty k ⇘ Int
+  ↑ty-top :
+      Top ↑ty k ⇘ Top
   ↑ty-var :
       (‶ X) ↑ty k ⇘ ‶ punchIn k X
   ↑ty-arr :

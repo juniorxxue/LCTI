@@ -1,3 +1,5 @@
+{-# OPTIONS --allow-unsolved-metas #-}
+{-# OPTIONS --allow-incomplete-matches #-}
 module Implicit.Language.OpenClose.Base where
 
 open import Implicit.Language.Base
@@ -34,6 +36,8 @@ infix 3 _⊢c_
 data _⊢c_ : Env n m → Type m → Set where
   ⊢c-int :
       Δ ⊢c Int
+  ⊢c-top :
+      Δ ⊢c Top
   ⊢c-var-∙ :
       (inΔ : Δ ∋∙ X)
     → Δ ⊢c ‶ X

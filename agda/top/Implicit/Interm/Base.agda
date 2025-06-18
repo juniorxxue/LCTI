@@ -16,6 +16,14 @@ data _⊢_#_⌞_⌝_ : Env n m → Counter m → Type m → Polar → Type m →
   s-int :
       (regΔ : SRegular Δ)
     → Δ ⊢ ∞ # Int ⌞ ≤ ⌝ Int
+  s-top+ :
+      (regΔ : SRegular Δ)
+    → (Δ ⊢c A)
+    → Δ ⊢ ∞ # A ⌞ ≤⁺ ⌝ Top
+  s-top- :
+      (regΔ : SRegular Δ)
+    → (regA : Δ ⊢r A)
+    → Δ ⊢ ∞ # A ⌞ ≤⁻ ⌝ Top
   s-var-∙ :
       (regΔ : SRegular Δ)
     → (inΔ : Δ ∋∙ X)
@@ -58,13 +66,13 @@ data _⊢_#_⌞_⌝_ : Env n m → Counter m → Type m → Polar → Type m →
     → Δ ⊢ 𝕥₍ B ₎ j # `∀ A ⌞ ≤⁺ ⌝ `∀ C
   -- two atomic rules
   s-svar-l : ∀ {X A}
-    → (SRegular Δ)
     → (inΔ : Δ ∋ X := A)
-    → Δ ⊢ ∞ # ‶ X ⌞ ≤⁺ ⌝ A
+    → Δ ⊢ ∞ # A ⌞ ≤⁺ ⌝ B
+    → Δ ⊢ ∞ # ‶ X ⌞ ≤⁺ ⌝ B
   s-svar-r : ∀ {X A}
-    → (SRegular Δ)
     → (inΔ : Δ ∋ X := A)
-    → Δ ⊢ ∞ # A ⌞ ≤⁻ ⌝ ‶ X
+    → Δ ⊢ ∞ # B ⌞ ≤⁻ ⌝ A
+    → Δ ⊢ ∞ # B ⌞ ≤⁻ ⌝ ‶ X
   s-svar-𝕚 :
       Δ ∋ X := C
     → Δ ⊢ (𝕚 j) # C ⌞ ≤⁺ ⌝ A `→ B
@@ -82,6 +90,8 @@ s-refl-∞ : SRegular Γ
          → Γ ⊢r A
          → Γ ⊢ ∞ # A ⌞ ≤ ⌝ A
 s-refl-∞ regΓ ⊢r-int = s-int regΓ
+s-refl-∞ {≤ = ≤⁺} x ⊢r-top = s-top+ x ⊢c-top
+s-refl-∞ {≤ = ≤⁻} x ⊢r-top = s-top- x ⊢r-top
 s-refl-∞ regΓ (⊢r-var-∙ inΓ) = s-var-∙ regΓ inΓ
 s-refl-∞ regΓ (⊢r-arr regA regA₁) = s-arr₁ (s-refl-∞ regΓ regA) (s-refl-∞ regΓ regA₁)
 s-refl-∞ regΓ (⊢r-∀ regA) = s-∀ (s-refl-∞ (reg-S∙ regΓ) regA)
@@ -129,101 +139,5 @@ data _⊢_#_⦂_ : Env n m → Counter m → Term n m → Type m → Set where
         → (st : ⟦ A ⟧ B ⇘ B*)
         → Γ ⊢ j # e ⓪ A ⦂ B*
 
--- small note: e @ A must be inferreable, and in the form of
--- (e @ A) e', e' could only be checked
-{-
-infix 3 _⇉_
-data _⇉_ : Counter → Counter → Set where
-  ⇉Z : Z ⇉ j
-  ⇉I : j ⇉ j′
-     → 𝕚 j ⇉ 𝕚 j′
-  ⇉IC : j ⇉ j′
-     → 𝕚 j ⇉ 𝕔 j′
-  ⇉C : j ⇉ j′
-     → 𝕔 j ⇉ 𝕔 j′
--}
 
-{-
-s-trans : Γ ⊢ j # A ⌞ ≤⁺ ⌝ B
-        → j ⇉ j′
-        → Γ ⊢ j′ # B ⌞ ≤⁺ ⌝ C
-        → Γ ⊢ j′ # A ⌞ ≤⁺ ⌝ C
-s-trans (s-refl cloΓ cloA) ⇉Z s2 = s2
-s-trans (s-arr₂ opnA s1 s3) (⇉I newj) s2 = {!!}
-s-trans (s-∀l s1 ic fd stC stD) (⇉I newj) (s-arr₂ opnA s2 s3) = s-∀l (s-trans s1 (⇉I newj) {!!}) case-𝕚 {!!} {!!} {!!}
-s-trans s1 (⇉IC newj) s2 = {!!}
-s-trans s1 (⇉C newj) s2 = {!!}
--}
-
-
--- sub-gen : Γ ⊢ j # e ⦂ A
---         → j ⇉ j′
---         → Γ ⋈ ⊢ j′ # A ⌞ ≤⁺ ⌝ B
---         → Γ ⊢ j′ # e ⦂ B
--- sub-gen {j′ = Z} ⊢e ⇉Z (s-refl cloΓ cloA) = ⊢e
--- sub-gen {j′ = ∞} (⊢lit cloΓ) ⇉Z s = ⊢sub (⊢lit cloΓ) s gc-i nz-∞
--- sub-gen {j′ = ∞} (⊢var cloΓ x∈Γ) ⇉Z s = ⊢sub (⊢var cloΓ x∈Γ) s gc-var nz-∞
--- sub-gen {j′ = ∞} (⊢ann ⊢e) ⇉Z s = ⊢sub (⊢ann ⊢e) s gc-ann nz-∞
--- sub-gen {j′ = ∞} (⊢app₁ ⊢e ⊢e₁) ⇉Z s = ⊢app₁ (sub-gen ⊢e (⇉C ⇉Z) (s-arr₃ _ s)) ⊢e₁
--- sub-gen {j′ = ∞} (⊢app₂ ⊢e ⊢e₁) ⇉Z s = ⊢app₁ (sub-gen ⊢e (⇉IC ⇉Z) (s-arr₃ _ s)) (sub-gen ⊢e₁ ⇉Z (s-refl-∞ (clo-Z _) _))
--- sub-gen {j′ = ∞} (⊢tabs ⊢e) ⇉Z s = ⊢sub (⊢tabs ⊢e) s gc-tlam nz-∞
--- sub-gen {j′ = 𝕚 j′} (⊢var cloΓ x∈Γ) newj s = ⊢sub (⊢var cloΓ x∈Γ) s gc-var nz-I
--- sub-gen {j′ = 𝕚 j′} (⊢ann ⊢e) newj s = ⊢sub (⊢ann ⊢e) s gc-ann nz-I
--- sub-gen {j′ = 𝕚 j′} (⊢lam₂ ⊢e) (⇉I newj) (s-arr₂ opnA s s₁) = {!!} false
--- sub-gen {j′ = 𝕚 j′} (⊢app₁ ⊢e ⊢e₁) newj s = ⊢app₁ (sub-gen ⊢e (⇉C newj) (s-arr₃ _ s)) ⊢e₁
--- sub-gen {j′ = 𝕚 j′} (⊢app₂ ⊢e ⊢e₁) newj s = ⊢app₁ (sub-gen ⊢e (⇉IC newj) (s-arr₃ _ s)) (sub-gen ⊢e₁ ⇉Z (s-refl-∞ (clo-Z _) _))
--- sub-gen {j′ = 𝕚 j′} (⊢sub ⊢e B≤A x j≢Z) newj s = ⊢sub ⊢e {!!} x nz-I
--- sub-gen {j′ = 𝕚 j′} (⊢tabs ⊢e) newj s = ⊢sub (⊢tabs ⊢e) s gc-tlam nz-I
--- sub-gen {j′ = 𝕔 j′} ⊢e newj s = {!!}
--- {-
--- sub-gen : Γ ⊢ Z # e ⦂ A
---         → Γ ⋈ ⊢ j # A ⌞ ≤⁺ ⌝ B
---         → Γ ⊢ j # e ⦂ B
--- sub-gen {j = Z} ⊢e (s-refl cloΓ cloA) = ⊢e
--- sub-gen {j = ∞} (⊢lit cloΓ) s = ⊢sub (⊢lit cloΓ) s gc-i nz-∞
--- sub-gen {j = ∞} (⊢var cloΓ x∈Γ) s = ⊢sub (⊢var cloΓ x∈Γ) s gc-var nz-∞
--- sub-gen {j = ∞} (⊢ann ⊢e) s = ⊢sub (⊢ann ⊢e) s gc-ann nz-∞
--- sub-gen {j = ∞} (⊢app₁ ⊢e ⊢e₁) s = {!!}
--- sub-gen {j = ∞} (⊢app₂ ⊢e ⊢e₁) s = {!!}
--- sub-gen {j = ∞} (⊢tabs ⊢e) s = ⊢sub (⊢tabs ⊢e) s gc-tlam nz-∞
--- sub-gen {j = 𝕚 j} ⊢e s = {!!}
--- sub-gen {j = 𝕔 j} ⊢e s = {!!}
--- -}
-
-{-
-down : Counter (1 + m) → Counter m
-down Z = Z
-down ∞ = ∞
-down (𝕚 j) = 𝕚 (down j)
-down (𝕔 j) = 𝕔 (down j)
-down (𝕥₍ x ₎ j) = 𝕥₍ Int ₎ (down j)
-
-need : Term n m → Counter m
-need (lit i) = Z
-need (` x) = Z
-need (ƛ e) = 𝕚 (need e)
-need (e₁ · e₂) with need e₁
-... | Z = Z
-... | ∞ = ∞
-... | 𝕚 r = r
-... | 𝕔 r = r
-... | 𝕥₍ A ₎ r = 𝕥₍ A ₎ r
-need (e ⦂ A) = Z
-need (Λ e) = down (need e)
-need (e ⓪ A) = need e
-
-annota : Γ ⊢ j # e ⦂ A
-       → need (e) ≡ Z
-       → Γ ⊢ Z # e ⦂ A
-annota (⊢lit regΓ) refl = ⊢lit regΓ
-annota (⊢var regΓ x∈Γ) refl = ⊢var regΓ x∈Γ
-annota (⊢ann ⊢e) refl = ⊢ann ⊢e
-annota (⊢app₁ {e₁ = e₁} {e₂ = e₂} ⊢e ⊢e₁) eq with need e₁ | annota ⊢e {!!}
-... | Z | r = ⊢app₁ {!!} ⊢e₁
-... | 𝕚 Z | r = ⊢app₁ {!!} ⊢e₁
-... | 𝕔 Z | r = ⊢app₁ {!!} ⊢e₁
-annota (⊢app₂ ⊢e ⊢e₁) eq = {!!}
-annota (⊢sub ⊢e B≤A gc j≢Z) eq = {!!}
-annota (⊢tabs ⊢e) eq = ⊢tabs ⊢e
-annota (⊢tapp ⊢e st) eq = {!!}
--}
+-- _ : ∅ , `∀ (‶ #0 `→ ‶ #0 `→ ‶ #0) , Top ⊢ Z # (` #1) · (lit 1) · (` #0) ⦂ Top

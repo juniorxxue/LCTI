@@ -1,3 +1,5 @@
+{-# OPTIONS --allow-unsolved-metas #-}
+{-# OPTIONS --allow-incomplete-matches #-}
 module Implicit.Language.EnvOps.RemoveSVar where
 
 open import Implicit.Language.Base
@@ -229,6 +231,7 @@ sregular-strengthen= (reg-S= sreg regA) (◀S= newΓ x) = reg-S= (sregular-stren
               → B ↑ty k ⇘ B'
               → Γ' ≫ A ⇘ B
 ≫-strengthen= grd-int regΓ newΓ ↑ty-int ↑ty-int = grd-int
+≫-strengthen= grd-top regΓ newΓ ↑ty-top ↑ty-top = grd-top
 ≫-strengthen= (grd-var= x) regΓ newΓ ↑ty-var upB = grd-var= (∋:=-strengthen=-reg regΓ x newΓ upB)
 ≫-strengthen= (grd-var∙ x) regΓ newΓ (↑ty-var  {X = X} {k = k}) upB with ↑ty-var-inv-helper upB refl
 ... | refl = grd-var∙ (∋∙-strengthen= x newΓ)
