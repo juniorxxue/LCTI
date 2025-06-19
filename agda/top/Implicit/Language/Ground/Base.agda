@@ -11,6 +11,7 @@ data _≫_⇘_ : Env n m → Type m → Type m → Set
 data _≫_⇘_ where
   grd-int : Δ ≫ Int ⇘ Int
   grd-top : Δ ≫ Top ⇘ Top
+  grd-bot : Δ ≫ Bot ⇘ Bot
   grd-var= : Δ ∋ X := A
            → Δ ≫ (‶ X) ⇘ A
   grd-var∙ : Δ ∋∙ X

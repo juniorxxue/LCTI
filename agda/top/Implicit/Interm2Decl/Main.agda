@@ -72,7 +72,7 @@ sd-strengthen= (s-tapp grd regA' s upj₁) new (↑ty-∀ upA) (↑ty-∀ upB) (
            (sd-strengthen= s (◀S= new upA₁) upA% upB (↑tyʲ-comm0' upj upj₁ upj'))
            upj'
 sd-strengthen= (s-top regΔ regA) x upA ↑ty-top ↑tyʲ-∞ = s-top (sregular-strengthen= regΔ x) (⊢r-strengthen= regA x upA)
-
+sd-strengthen= (s-bot regΔ regA) x ↑ty-bot upB ↑tyʲ-∞ = s-bot (sregular-strengthen= regΔ x) (⊢r-strengthen= regA x upB)
 
 sd-strengthen=0 : Γ ,= T ⊢d j' # A' ≤ B'
                   → ↑ty0 A ⇘ A'
@@ -87,6 +87,7 @@ sd-refl-∞ : SRegular Γ
           → Γ ⊢d ∞ # A ≤ A
 sd-refl-∞ regΓ ⊢r-int = s-int regΓ
 sd-refl-∞ regΓ ⊢r-top = s-top regΓ ⊢r-top
+sd-refl-∞ regΓ ⊢r-bot = s-bot regΓ ⊢r-bot
 sd-refl-∞ regΓ (⊢r-var-∙ inΓ) = s-var-∙ regΓ inΓ
 sd-refl-∞ regΓ (⊢r-arr regA regA₁) = s-arr₁ (sd-refl-∞ regΓ regA) (sd-refl-∞ regΓ regA₁)
 sd-refl-∞ regΓ (⊢r-∀ regA) = s-∀ (sd-refl-∞ (reg-S∙ regΓ) regA)
@@ -97,6 +98,7 @@ sd-refl-∞ regΓ (⊢r-∀ regA) = s-∀ (sd-refl-∞ (reg-S∙ regΓ) regA)
          → A₁ ≡ A₂
 ≫-unique grd-int grd-int = refl
 ≫-unique grd-top grd-top = refl
+≫-unique grd-bot grd-bot = refl
 ≫-unique (grd-var= x) (grd-var= x₁) = ∋:=-unique x x₁
 ≫-unique (grd-var= x) (grd-var∙ x₁) = ⊥-elim (∋∙-∋:=-false x₁ x)
 ≫-unique (grd-var∙ x) (grd-var= x₁) = ⊥-elim (∋∙-∋:=-false x x₁)
@@ -112,6 +114,7 @@ sd-refl-∞ regΓ (⊢r-∀ regA) = s-∀ (sd-refl-∞ (reg-S∙ regΓ) regA)
          → Γ' ≫ B ⇘ C
 ≫-trans regΓ grd-int new ninΓ grd-int = grd-int
 ≫-trans regΓ grd-top new ninΓ grd-top = grd-top
+≫-trans regΓ grd-bot new ninΓ grd-bot = grd-bot
 ≫-trans regΓ (grd-var= x) new ninΓ (grd-var= x₁)
   with refl ← ∙⟹-:=-eq x new x₁ = ⊢r-≫-eq (∙⟹-⊢r (∋:=-⊢r regΓ x) new (εᵍ-:=-¬ε ninΓ x))
 ≫-trans regΓ (grd-var= x) new ninΓ (grd-var∙ x₁) = ⊥-elim (∙⟹-:=-∙-false x new x₁)
@@ -127,6 +130,7 @@ sd-refl-∞ regΓ (⊢r-∀ regA) = s-∀ (sd-refl-∞ (reg-S∙ regΓ) regA)
         → ∃[ A% ](Γ ≫ A ⇘ A%)
 ≫-total regΓ ⊢c-int = ⟨ Int , grd-int ⟩
 ≫-total regΓ ⊢c-top = ⟨ Top , grd-top ⟩
+≫-total regΓ ⊢c-bot = ⟨ Bot , grd-bot ⟩
 ≫-total regΓ (⊢c-var-∙ {X = X} inΔ) = ⟨ ‶ X , grd-var∙ inΔ ⟩
 ≫-total regΓ (⊢c-var-= inΔ) with ∋:=-total inΔ
 ... | ⟨ A' , in1 ⟩ = ⟨ A' , grd-var= in1 ⟩
@@ -142,6 +146,8 @@ sd-refl-∞ regΓ (⊢r-∀ regA) = s-∀ (sd-refl-∞ (reg-S∙ regΓ) regA)
        → Γ ≫ A ⇘ A%
        → k ¬ε A%
 ¬ε-≫-∙ ¬ε-int inΓ ninΓ grd-int = ¬ε-int
+¬ε-≫-∙ ¬ε-top inΓ ninΓ grd-top = ¬ε-top
+¬ε-≫-∙ ¬ε-bot inΓ ninΓ grd-bot = ¬ε-bot
 ¬ε-≫-∙ (¬ε-var x) inΓ ninΓ (grd-var= x₁) = εᵍ-:=-¬ε ninΓ x₁
 ¬ε-≫-∙ (¬ε-var x) inΓ ninΓ (grd-var∙ x₁) = ¬ε-var x
 ¬ε-≫-∙ (¬ε-arr ninA ninA₁) inΓ ninΓ (grd-arr grd grd₁) = ¬ε-arr (¬ε-≫-∙ ninA inΓ ninΓ grd) (¬ε-≫-∙ ninA₁ inΓ ninΓ grd₁)
@@ -184,6 +190,8 @@ sound (s-refl regΔ cloA grd) grd1 grd2
 sound (s-int regΔ) grd-int grd-int = s-int regΔ
 sound (s-top+ regΔ regA) grd1 grd-top = s-top regΔ (⊢c-≫-⊢r regΔ regA grd1)
 sound (s-top- regΔ regA) grd1 grd-top = s-top regΔ (⊢c-≫-⊢r regΔ (⊢r-⊢c regA) grd1)
+sound (s-bot+ regΔ regB) grd-bot grd2 = s-bot regΔ (⊢c-≫-⊢r regΔ (⊢r-⊢c regB) grd2)
+sound (s-bot- regΔ regB) grd-bot grd2 = s-bot regΔ (⊢c-≫-⊢r regΔ regB grd2)
 sound (s-var-∙ regΔ inΔ) (grd-var= x) (grd-var= x₁) = ⊥-elim (∋∙-∋:=-false inΔ x₁)
 sound (s-var-∙ regΔ inΔ) (grd-var= x) (grd-var∙ x₁) = ⊥-elim (∋∙-∋:=-false inΔ x)
 sound (s-var-∙ regΔ inΔ) (grd-var∙ x) (grd-var= x₁) = ⊥-elim (∋∙-∋:=-false inΔ x₁)

@@ -9,6 +9,7 @@ open import Implicit.Interm.All renaming (_⊢_#_⌞_⌝_ to _⊢i_#_⌞_⌝_)
         → Γ ⊢c A
 ⊢r-≫-⊢c grd-int regA = ⊢c-int
 ⊢r-≫-⊢c grd-top regA = ⊢c-top
+⊢r-≫-⊢c grd-bot regA = ⊢c-bot
 ⊢r-≫-⊢c (grd-var= x) regA = ⊢c-var-= (∋:=to∋= x)
 ⊢r-≫-⊢c (grd-var∙ x) regA = ⊢c-var-∙ x
 ⊢r-≫-⊢c (grd-arr grd grd₁) (⊢r-arr regA regA₁) = ⊢c-arr (⊢r-≫-⊢c grd regA) (⊢r-≫-⊢c grd₁ regA₁)
@@ -23,6 +24,7 @@ open import Implicit.Interm.All renaming (_⊢_#_⌞_⌝_ to _⊢i_#_⌞_⌝_)
          → Γ' ≫ A ⇘ C
 ≫-trans regΓ grd-int new nin grd-int = grd-int
 ≫-trans regΓ grd-top new nin grd-top = grd-top
+≫-trans regΓ grd-bot new nin grd-bot = grd-bot
 ≫-trans regΓ (grd-var= x) new nin grd2 with ⊢r-≫-eq' (∙⟹-⊢r (∋:=-⊢r regΓ x) new (εᵍ-:=-¬ε nin x)) grd2
 ... | refl = grd-var= (∙⟹-∋:=-prv x new)
 ≫-trans regΓ (grd-var∙ x) new nin (grd-var= x₁) = grd-var= x₁
@@ -50,6 +52,8 @@ open import Implicit.Interm.All renaming (_⊢_#_⌞_⌝_ to _⊢i_#_⌞_⌝_)
         → k ¬ε B
         → Γ' ≫ A ⇘ B
 ≫-trans' regΓ grd-int new ninΓ ninB = grd-int
+≫-trans' regΓ grd-top new ninΓ ninB = grd-top
+≫-trans' regΓ grd-bot new ninΓ ninB = grd-bot
 ≫-trans' regΓ (grd-var= x) new ninΓ ninB = grd-var= (◈-neq-∋:= x new (◈-∋:=-neq new x))
 ≫-trans' regΓ (grd-var∙ x) new ninΓ (¬ε-var x₁) = grd-var∙ (◈-neq-∋∙ x new x₁)
 ≫-trans' regΓ (grd-arr grd grd₁) new ninΓ (¬ε-arr ninB ninB₁) = grd-arr (≫-trans' regΓ grd new ninΓ ninB)
@@ -80,6 +84,8 @@ open import Implicit.Interm.All renaming (_⊢_#_⌞_⌝_ to _⊢i_#_⌞_⌝_)
        → Γ ≫ A ⇘ A%
        → k ¬ε A
 ¬ε-≫-∙ ¬ε-int inΓ ninΓ grd-int = ¬ε-int
+¬ε-≫-∙ ¬ε-top inΓ ninΓ grd-top = ¬ε-top
+¬ε-≫-∙ ¬ε-bot inΓ ninΓ grd-bot = ¬ε-bot
 ¬ε-≫-∙ (¬ε-var x) inΓ ninΓ (grd-var∙ x₁) = ¬ε-var x
 ¬ε-≫-∙ (¬ε-arr ninA ninA₁) inΓ ninΓ (grd-arr grd grd₁) = ¬ε-arr (¬ε-≫-∙ ninA inΓ ninΓ grd) (¬ε-≫-∙ ninA₁ inΓ ninΓ grd₁)
 ¬ε-≫-∙ ninA inΓ ninΓ (grd-var= x) = ¬ε-var (≢-sym (∋∙-∋:=-≢ x inΓ))
@@ -187,6 +193,8 @@ complete+ (s-tapp x regA s upj) (grd-var= x₁) = s-svar-𝕥 x₁ (s-tapp (comp
 complete+ (s-tapp x regA s upj) (grd-∀ grd)
   with reg-S= regΓ regA ← s2-sregular s = s-tapp (complete+ s (≫-trans0 regΓ regA x grd)) upj
 complete+ (s-top regΔ regA) x = s-top+ regΔ (⊢r-≫-⊢c x regA)
+complete+ (s-bot regΔ regA) grd-bot = s-bot+ regΔ regA
+complete+ (s-bot regΔ regA) (grd-var= x) = s-svar-l x (s-bot+ regΔ regA)
 
 complete- (s-int regΔ) grd-int = s-int regΔ
 complete- (s-int regΔ) (grd-var= x) = s-svar-r x (s-int regΔ)
@@ -204,6 +212,7 @@ complete- s'@(s-∀ s) (grd-var= x)
 complete- (s-∀ s) (grd-∀ grd) = s-∀ (complete- s grd)
 complete- (s-top regΔ regA) grd-top = s-top- regΔ regA
 complete- (s-top regΔ regA) (grd-var= x) = s-svar-r x (s-top- regΔ regA)
+complete- (s-bot regΔ regA) grd = s-bot- regΔ (⊢r-≫-⊢c grd regA)
 
 complete0 : Γ ⊢d j # A ≤ B
           → Γ ⊢i j # A ⌞ ≤⁺ ⌝ B

@@ -30,6 +30,8 @@ data ⟦_/_⟧_⇘_ : Fin (1 + m) → Type m → Type (1 + m) → Type m → Set
       ⟦ k / A ⟧ Int ⇘ Int
   st-top :
       ⟦ k / A ⟧ Top ⇘ Top
+  st-bot :
+      ⟦ k / A ⟧ Bot ⇘ Bot
   st-var :
       (stx : ⟦ k / A ⟧ˣ X ⇘ B)
     → ⟦ k / A ⟧ (‶ X) ⇘ B

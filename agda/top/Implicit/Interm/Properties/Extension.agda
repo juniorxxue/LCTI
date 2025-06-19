@@ -27,6 +27,8 @@ s-⊆-prv (s-tapp s upj) ext with s-sregular s
 s-⊆-prv (s-svar-𝕚 inΓ s) ext = s-svar-𝕚 (⊆-∋:= inΓ ext) (s-⊆-prv s ext)
 s-⊆-prv (s-svar-𝕔 inΓ s) ext = s-svar-𝕔 (⊆-∋:= inΓ ext) (s-⊆-prv s ext)
 s-⊆-prv (s-svar-𝕥 inΓ s) ext = s-svar-𝕥 (⊆-∋:= inΓ ext) (s-⊆-prv s ext)
+s-⊆-prv (s-bot+ regΔ regA) ext = s-bot+ (⊆-sregular' ext) (⊆-⊢r regA ext)
+s-⊆-prv (s-bot- regΔ regA) ext = s-bot- (⊆-sregular' ext) (⊆-⊢c regA ext)
 
 infix 3 _⊆t_
 data _⊆t_ : Env n m → Env n m → Set where
@@ -101,12 +103,14 @@ data _⊆t_ : Env n m → Env n m → Set where
 ⊆t-⊢r (⊢r-var-∙ inΓ) ext = ⊢r-var-∙ (⊆t-∋∙ inΓ ext)
 ⊆t-⊢r (⊢r-arr regA regA₁) ext = ⊢r-arr (⊆t-⊢r regA ext) (⊆t-⊢r regA₁ ext)
 ⊆t-⊢r (⊢r-∀ regA) ext = ⊢r-∀ (⊆t-⊢r regA (uvar ext))
+⊆t-⊢r ⊢r-bot x = ⊢r-bot
 
 ⊆t-⊢c : Γ ⊢c A
       → Γ ⊆t Δ
       → Δ ⊢c A
 ⊆t-⊢c ⊢c-int ext = ⊢c-int
 ⊆t-⊢c ⊢c-top ext = ⊢c-top
+⊆t-⊢c ⊢c-bot ext = ⊢c-bot
 ⊆t-⊢c (⊢c-var-∙ inΔ) ext = ⊢c-var-∙ (⊆t-∋∙ inΔ ext)
 ⊆t-⊢c (⊢c-var-= inΔ) ext = ⊢c-var-= (⊆t-∋= inΔ ext)
 ⊆t-⊢c (⊢c-arr cloA cloA₁) ext = ⊢c-arr (⊆t-⊢c cloA ext) (⊆t-⊢c cloA₁ ext)
@@ -136,6 +140,7 @@ data _⊆t_ : Env n m → Env n m → Set where
         → Γ ⊢c A
         → Δ ≫ A ⇘ B
 ⊆t-⊢c-≫ grd-int ext ⊢c-int = grd-int
+⊆t-⊢c-≫ grd-bot ext ⊢c-bot = grd-bot
 ⊆t-⊢c-≫ grd-top ext ⊢c-top = grd-top
 ⊆t-⊢c-≫ (grd-var= x) ext (⊢c-var-∙ inΔ) = ⊥-elim (∋∙-∋:=-false inΔ x)
 ⊆t-⊢c-≫ (grd-var= x) ext (⊢c-var-= inΔ) = grd-var= (⊆t-∋:= x ext)
@@ -167,6 +172,8 @@ s-⊆-prv-gen (s-tapp s st) ext with s-sregular s
 s-⊆-prv-gen (s-svar-𝕚 inΓ s) ext = s-svar-𝕚 (⊆t-∋:= inΓ ext) (s-⊆-prv-gen s ext)
 s-⊆-prv-gen (s-svar-𝕔 inΓ s) ext = s-svar-𝕔 (⊆t-∋:= inΓ ext) (s-⊆-prv-gen s ext)
 s-⊆-prv-gen (s-svar-𝕥 inΓ s) ext = s-svar-𝕥 (⊆t-∋:= inΓ ext) (s-⊆-prv-gen s ext)
+s-⊆-prv-gen (s-bot+ regΔ regA) ext = s-bot+ (⊆t-sregular regΔ ext) (⊆t-⊢r regA ext)
+s-⊆-prv-gen (s-bot- regΔ regA) ext = s-bot- (⊆t-sregular regΔ ext) (⊆t-⊢c regA ext)
 
 t-⊆-prv-gen : Γ ⊢ j # e ⦂ A
         → Γ ⊆t Δ

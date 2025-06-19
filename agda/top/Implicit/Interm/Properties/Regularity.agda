@@ -26,6 +26,8 @@ s-sregular (s-svar-𝕔 _ x) = s-sregular x
 s-sregular (s-svar-𝕥 x x₁) = s-sregular x₁
 s-sregular (s-top+ regΔ cloA) = regΔ
 s-sregular (s-top- regΔ regA) = regΔ
+s-sregular (s-bot+ regΔ regA) = regΔ
+s-sregular (s-bot- regΔ regA) = regΔ
 
 t-tregular : Γ ⊢ j # e ⦂ A
            → TRegular Γ
@@ -103,6 +105,8 @@ s-⊢rʲ (s-svar-𝕔 _ x) = s-⊢rʲ x
 s-⊢rʲ (s-svar-𝕥 x x₁) = s-⊢rʲ x₁
 s-⊢rʲ (s-top+ regΔ cloA) = j-∞
 s-⊢rʲ (s-top- regΔ regA) = j-∞
+s-⊢rʲ (s-bot+ regΔ regA) = j-∞
+s-⊢rʲ (s-bot- regΔ regA) = j-∞
 
 ⊢r-⋈ : Γ ⊢rʲ j
      → 𝕣 Γ ⊢rʲ j

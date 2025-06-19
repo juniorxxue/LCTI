@@ -55,10 +55,10 @@ open import Implicit.Language.OpenClose.Base
 ε-¬ε-false (ε-∀ inA) (¬ε-∀ ¬inA) = ε-¬ε-false inA ¬inA
 
 
-
 ε-dec : (k ε A) ⊎ (k ¬ε A)
 ε-dec {k = k} {A = Int} = inj₂ ¬ε-int
-ε-dec {k = k} {A = Top} = inj₂ {!!}
+ε-dec {k = k} {A = Top} = inj₂ ¬ε-top
+ε-dec {k = k} {A = Bot} = inj₂ ¬ε-bot
 ε-dec {k = k} {A = ‶ X} with k #≟ X
 ... | yes refl = inj₁ ε-var
 ... | no ¬p = inj₂ (¬ε-var (≢-sym ¬p))

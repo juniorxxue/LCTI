@@ -1,5 +1,3 @@
-{-# OPTIONS --allow-unsolved-metas #-}
-{-# OPTIONS --allow-incomplete-matches #-}
 module Implicit.Language.Extension.Properties where
 
 open import Implicit.Language.Base
@@ -61,6 +59,8 @@ open import Implicit.Language.OpenClose.Base
      → Γ ⊆ Δ
      → Δ ⊢r A
 ⊆-⊢r ⊢r-int ext = ⊢r-int
+⊆-⊢r ⊢r-top ext = ⊢r-top
+⊆-⊢r ⊢r-bot ext = ⊢r-bot
 ⊆-⊢r (⊢r-var-∙ inΓ) ext = ⊢r-var-∙ (⊆-∋∙ inΓ ext)
 ⊆-⊢r (⊢r-arr regA regA₁) ext = ⊢r-arr (⊆-⊢r regA ext) (⊆-⊢r regA₁ ext)
 ⊆-⊢r (⊢r-∀ regA) ext = ⊢r-∀ (⊆-⊢r regA (uvar ext))
@@ -69,6 +69,8 @@ open import Implicit.Language.OpenClose.Base
      → Γ ⊆ Δ
      → Δ ⊢c A
 ⊆-⊢c ⊢c-int ext = ⊢c-int
+⊆-⊢c ⊢c-top ext = ⊢c-top
+⊆-⊢c ⊢c-bot ext = ⊢c-bot
 ⊆-⊢c (⊢c-var-∙ inΔ) ext = ⊢c-var-∙ (⊆-∋∙ inΔ ext)
 ⊆-⊢c (⊢c-var-= inΔ) ext = ⊢c-var-= (⊆-∋= inΔ ext)
 ⊆-⊢c (⊢c-arr cloA cloA₁) ext = ⊢c-arr (⊆-⊢c cloA ext) (⊆-⊢c cloA₁ ext)
@@ -78,6 +80,8 @@ open import Implicit.Language.OpenClose.Base
       → Γ ⊆ Δ
       → Γ ⊢r A
 ⊆-⊢r' ⊢r-int ext = ⊢r-int
+⊆-⊢r' ⊢r-top ext = ⊢r-top
+⊆-⊢r' ⊢r-bot ext = ⊢r-bot
 ⊆-⊢r' (⊢r-var-∙ inΓ) ext = ⊢r-var-∙ (⊆-∋∙' inΓ ext)
 ⊆-⊢r' (⊢r-arr regA regA₁) ext = ⊢r-arr (⊆-⊢r' regA ext) (⊆-⊢r' regA₁ ext)
 ⊆-⊢r' (⊢r-∀ regA) ext = ⊢r-∀ (⊆-⊢r' regA (uvar ext))
@@ -113,6 +117,8 @@ reg-⊆/ : SRegular Δ
        → Δ ⊢r A
        → Δ ⊆ Δ w/t A
 reg-⊆/ senv ⊢r-int = ext-int senv
+reg-⊆/ senv ⊢r-top = ext-int senv
+reg-⊆/ senv ⊢r-top = ext-int senv
 reg-⊆/ senv (⊢r-var-∙ inΓ) = ext-var (reg-⊆/x∙ senv inΓ)
 reg-⊆/ senv (⊢r-arr regA regA₁) = ext-arr (reg-⊆/ senv regA) (reg-⊆/ senv regA₁)
 reg-⊆/ senv (⊢r-∀ regA) = ext-∀ (reg-⊆/ (reg-S∙ senv) regA)

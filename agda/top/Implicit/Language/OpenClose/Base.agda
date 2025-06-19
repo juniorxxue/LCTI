@@ -38,6 +38,8 @@ data _⊢c_ : Env n m → Type m → Set where
       Δ ⊢c Int
   ⊢c-top :
       Δ ⊢c Top
+  ⊢c-bot :
+      Δ ⊢c Bot
   ⊢c-var-∙ :
       (inΔ : Δ ∋∙ X)
     → Δ ⊢c ‶ X

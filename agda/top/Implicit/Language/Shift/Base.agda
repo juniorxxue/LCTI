@@ -10,6 +10,7 @@ open import Implicit.Language.Base
 ↑ty : Fin (1 + m) → Type m → Type (1 + m)
 ↑ty k Int      = Int
 ↑ty k Top      = Top
+↑ty k Bot      = Bot
 ↑ty k (‶ X)    = ‶ punchIn k X
 ↑ty k (A `→ B) = ↑ty k A `→ ↑ty k B
 ↑ty k (`∀ A)   = `∀ (↑ty (#S k) A)
@@ -80,6 +81,8 @@ data _↑ty_⇘_ : Type m → Fin (1 + m) → Type (1 + m) → Set where
       Int ↑ty k ⇘ Int
   ↑ty-top :
       Top ↑ty k ⇘ Top
+  ↑ty-bot :
+      Bot ↑ty k ⇘ Bot
   ↑ty-var :
       (‶ X) ↑ty k ⇘ ‶ punchIn k X
   ↑ty-arr :
@@ -152,6 +155,8 @@ data _¬ε_ : Fin m → Type m → Set where
       k ¬ε Int
   ¬ε-top :
       k ¬ε Top
+  ¬ε-bot :
+      k ¬ε Bot
   ¬ε-var :
       k' ≢ k
     → k ¬ε (‶ k')

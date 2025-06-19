@@ -15,6 +15,14 @@ data _⊢_#_≤_ : Env n m → Counter m → Type m → Type m → Set where
   s-int :
       (regΔ : SRegular Δ)
     → Δ ⊢ ∞ # Int ≤ Int
+  s-top :
+      (regΔ : SRegular Δ)
+    → (regA : Δ ⊢r A)
+    → Δ ⊢ ∞ # A ≤ Top
+  s-bot :
+      (regΔ : SRegular Δ)
+    → (regA : Δ ⊢r A)
+    → Δ ⊢ ∞ # Bot ≤ A
   s-var-∙ :
       (regΔ : SRegular Δ)
     → (inΔ : Δ ∋∙ X)
@@ -74,6 +82,8 @@ s1-⊢r-l (s-∀ s) = ⊢r-∀ (s1-⊢r-l s)
 s1-⊢r-l (s-∀l regB st s ic fd upj) = st0-⊢r' (s1-⊢r-l s) regB st
 s1-⊢r-l (s-∀l-no-appear regB st s ic fd) = st0-⊢r' (s1-⊢r-l s) regB st
 s1-⊢r-l (s-tapp regB st s upC) = st0-⊢r' (s1-⊢r-l s) regB st
+s1-⊢r-l (s-top regΔ regA) = regA
+s1-⊢r-l (s-bot regΔ regA) = ⊢r-bot
 
 s1-⊢r-r (s-refl regΔ cloA) = cloA
 s1-⊢r-r (s-int regΔ) = ⊢r-int
@@ -85,6 +95,8 @@ s1-⊢r-r (s-∀ s) = ⊢r-∀ (s1-⊢r-r s)
 s1-⊢r-r (s-∀l regB st s ic fd upj) = s1-⊢r-r s
 s1-⊢r-r (s-tapp regB st s upC) = ⊢r-∀ (⊢r-weaken∙0 (s1-⊢r-r s) upC)
 s1-⊢r-r (s-∀l-no-appear regB st s ic fd) = s1-⊢r-r s
+s1-⊢r-r (s-top regΔ regA) = ⊢r-top
+s1-⊢r-r (s-bot regΔ regA) = regA
 
 s1-strengthen= : Γ ⊢ j' # A' ≤ B'
               → Γ ◀ k =⇘ Γ'
@@ -95,6 +107,8 @@ s1-strengthen= : Γ ⊢ j' # A' ≤ B'
 s1-strengthen= (s-refl regΔ cloA) new upA upB ↑tyʲ-Z
   with refl ← ↑ty-unique-inver upA upB = s-refl (sregular-strengthen= regΔ new) (⊢r-strengthen= cloA new upB)
 s1-strengthen= (s-int regΔ) new ↑ty-int ↑ty-int ↑tyʲ-∞ = s-int (sregular-strengthen= regΔ new)
+s1-strengthen= (s-top regΔ regA) new upA ↑ty-top ↑tyʲ-∞ = s-top (sregular-strengthen= regΔ new) (⊢r-strengthen= regA new upA)
+s1-strengthen= (s-bot regΔ regA) new ↑ty-bot upA ↑tyʲ-∞ = s-bot (sregular-strengthen= regΔ new) (⊢r-strengthen= regA new upA)
 s1-strengthen= {B = ‶ X} (s-var-∙ regΔ inΔ) new ↑ty-var upB ↑tyʲ-∞
   with refl ← ↑ty-var-inv upB refl = s-var-∙ (sregular-strengthen= regΔ new) (∋∙-strengthen= inΔ new)
 s1-strengthen= (s-arr₁ s s₁) new (↑ty-arr upA upA₁) (↑ty-arr upB upB₁) ↑tyʲ-∞
@@ -146,6 +160,8 @@ s1-weaken, : Γ ⊢ j # A ≤ B
           → Γ' ⊢ j # A ≤ B
 s1-weaken, (s-refl regΔ cloA) new = s-refl (sregular-weaken,s regΔ new) (⊢r-weaken,s cloA new)
 s1-weaken, (s-int regΔ) new = s-int (sregular-weaken,s regΔ new)
+s1-weaken, (s-top regΔ regA) new = s-top (sregular-weaken,s regΔ new) (⊢r-weaken,s regA new)
+s1-weaken, (s-bot regΔ regA) new = s-bot (sregular-weaken,s regΔ new) (⊢r-weaken,s regA new)
 s1-weaken, (s-var-∙ regΔ inΔ) new = s-var-∙ (sregular-weaken,s regΔ new) (∋∙-weaken,s inΔ new)
 s1-weaken, (s-arr₁ s s₁) new = s-arr₁ (s1-weaken, s new) (s1-weaken, s₁ new)
 s1-weaken, (s-arr₂ s s₁) new = s-arr₂ (s1-weaken, s new) (s1-weaken, s₁ new)
@@ -173,6 +189,8 @@ s1-strengthen^ : Γ ⊢ j' # A' ≤ B'
 s1-strengthen^ (s-refl regΔ cloA) new upA upB ↑tyʲ-Z
   with refl ← ↑ty-unique-inver upA upB = s-refl (sregular-strengthen^ regΔ new) (⊢r-strengthen^ cloA new upB)
 s1-strengthen^ (s-int regΔ) new ↑ty-int ↑ty-int ↑tyʲ-∞ = s-int (sregular-strengthen^ regΔ new)
+s1-strengthen^ (s-top regΔ regA) new upA ↑ty-top ↑tyʲ-∞ = s-top (sregular-strengthen^ regΔ new) (⊢r-strengthen^ regA new upA)
+s1-strengthen^ (s-bot regΔ regA) new ↑ty-bot upA ↑tyʲ-∞ = s-bot (sregular-strengthen^ regΔ new) (⊢r-strengthen^ regA new upA)
 s1-strengthen^ {B = ‶ X} (s-var-∙ regΔ inΔ) new ↑ty-var upB ↑tyʲ-∞
   with refl ← ↑ty-var-inv upB refl = s-var-∙ (sregular-strengthen^ regΔ new) (∋∙-strengthen^ inΔ new)
 s1-strengthen^ (s-arr₁ s s₁) new (↑ty-arr upA upA₁) (↑ty-arr upB upB₁) ↑tyʲ-∞

@@ -246,6 +246,7 @@ sregular-strengthen^ (reg-S= regΓ regA) (◀S= new x) = reg-S= (sregular-streng
               → Γ' ≫ A ⇘ B
 ≫-strengthen^ grd-int regΓ newΓ ↑ty-int ↑ty-int = grd-int
 ≫-strengthen^ grd-top regΓ newΓ ↑ty-top ↑ty-top = grd-top
+≫-strengthen^ grd-bot regΓ newΓ ↑ty-bot ↑ty-bot = grd-bot
 ≫-strengthen^ (grd-var= x) regΓ newΓ ↑ty-var upB = grd-var= (∋:=-strengthen^-reg regΓ x newΓ upB)
 ≫-strengthen^ (grd-var∙ x) regΓ newΓ (↑ty-var  {X = X} {k = k}) upB with ↑ty-var-inv-helper upB refl
 ... | refl = grd-var∙ (∋∙-strengthen^ x newΓ)

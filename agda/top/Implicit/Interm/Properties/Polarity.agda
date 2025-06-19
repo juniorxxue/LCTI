@@ -25,6 +25,7 @@ s+-polarity (s-tapp s upj) = ⊢r-∀ (⊢r-◆0 (s+-polarity s))
 s+-polarity (s-svar-𝕚 _ x) = s+-polarity x
 s+-polarity (s-svar-𝕔 inΓ s) = s+-polarity s
 s+-polarity (s-svar-𝕥 inΓ s) = s+-polarity s
+s+-polarity (s-bot+ regΔ regA) = regA
 
 s--polarity (s-int regΔ) = ⊢r-int
 s--polarity (s-top- regΔ regA) = regA
@@ -32,6 +33,7 @@ s--polarity (s-var-∙ regΔ inΔ) = ⊢r-var-∙ inΔ
 s--polarity (s-arr₁ s s₁) = ⊢r-arr (s+-polarity s) (s--polarity s₁)
 s--polarity (s-∀ s) = ⊢r-∀ (s--polarity s)
 s--polarity (s-svar-r x inΔ) = s--polarity inΔ
+s--polarity (s-bot- regΔ regA) = ⊢r-bot
 -- ∋:=-⊢r x inΔ
 
 
@@ -76,6 +78,7 @@ s-⊢c-l {≤ = ≤⁻} s = ⊢r-⊢c (s--polarity s)
 s-⊢c-l {≤ = ≤⁺} (s-svar-𝕚 inΓ s) = ⊢c-var-= (∋:=to∋= inΓ)
 s-⊢c-l {≤ = ≤⁺} (s-svar-𝕔 inΓ s) = ⊢c-var-= (∋:=to∋= inΓ)
 s-⊢c-l {≤ = ≤⁺} (s-svar-𝕥 inΓ s) = ⊢c-var-= (∋:=to∋= inΓ)
+s-⊢c-l {≤ = ≤⁺} (s-bot+ regΔ regA) = ⊢c-bot
 
 s-⊢c-r {≤ = ≤⁺} s = ⊢r-⊢c (s+-polarity s)
 s-⊢c-r {≤ = ≤⁻} (s-int regΔ) = ⊢c-int
@@ -84,4 +87,5 @@ s-⊢c-r {≤ = ≤⁻} (s-var-∙ regΔ inΔ) = ⊢c-var-∙ inΔ
 s-⊢c-r {≤ = ≤⁻} (s-arr₁ s s₁) = ⊢c-arr (s-⊢c-l s) (s-⊢c-r s₁)
 s-⊢c-r {≤ = ≤⁻} (s-∀ s) = ⊢c-∀ (s-⊢c-r s)
 s-⊢c-r {≤ = ≤⁻} (s-svar-r x inΔ) = ⊢c-var-= (∋:=to∋= x)
+s-⊢c-r {≤ = ≤⁻} (s-bot- regΔ regA) = regA
 -- ⊢c-var-= (∋:=to∋= inΔ)

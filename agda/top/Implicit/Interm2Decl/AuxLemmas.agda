@@ -11,6 +11,8 @@ open import Implicit.Interm.All renaming (_⊢_#_⌞_⌝_ to _⊢i_#_⌞_⌝_)
        → k ¬ε A
        → A₁ ≡ A₂
 ≫-same grd-int new grd-int ¬ε-int = refl
+≫-same grd-top new grd-top ¬ε-top = refl
+≫-same grd-bot new grd-bot ¬ε-bot = refl
 ≫-same (grd-var= x) new (grd-var= x₁) (¬ε-var x₂) = ◈-∋:=-neq-unique new x₂ x x₁
 ≫-same (grd-var= x) new (grd-var∙ x₁) (¬ε-var x₂) = let in2 = ◈-neq-∋:= x new x₂
                                                     in ⊥-elim (∋∙-∋:=-false x₁ in2)

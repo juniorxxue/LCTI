@@ -10,6 +10,8 @@ data _⊢r_ : Env n m → Type m → Set where
       Γ ⊢r Int
   ⊢r-top :
       Γ ⊢r Top
+  ⊢r-bot :
+      Γ ⊢r Bot
   ⊢r-var-∙ :
       (inΓ : Γ ∋∙ X)
     → Γ ⊢r ‶ X

@@ -24,6 +24,14 @@ data _⊢_#_⌞_⌝_ : Env n m → Counter m → Type m → Polar → Type m →
       (regΔ : SRegular Δ)
     → (regA : Δ ⊢r A)
     → Δ ⊢ ∞ # A ⌞ ≤⁻ ⌝ Top
+  s-bot+ :
+      (regΔ : SRegular Δ)
+    → (regA : Δ ⊢r A)
+    → Δ ⊢ ∞ # Bot ⌞ ≤⁺ ⌝ A
+  s-bot- :
+      (regΔ : SRegular Δ)
+    → (regA : Δ ⊢c A)
+    → Δ ⊢ ∞ # Bot ⌞ ≤⁻ ⌝ A
   s-var-∙ :
       (regΔ : SRegular Δ)
     → (inΔ : Δ ∋∙ X)
@@ -95,6 +103,8 @@ s-refl-∞ {≤ = ≤⁻} x ⊢r-top = s-top- x ⊢r-top
 s-refl-∞ regΓ (⊢r-var-∙ inΓ) = s-var-∙ regΓ inΓ
 s-refl-∞ regΓ (⊢r-arr regA regA₁) = s-arr₁ (s-refl-∞ regΓ regA) (s-refl-∞ regΓ regA₁)
 s-refl-∞ regΓ (⊢r-∀ regA) = s-∀ (s-refl-∞ (reg-S∙ regΓ) regA)
+s-refl-∞ {≤ = ≤⁺} regΓ ⊢r-bot = s-bot+ regΓ ⊢r-bot
+s-refl-∞ {≤ = ≤⁻} regΓ ⊢r-bot = s-bot- regΓ ⊢c-bot
 
 ----------------------------------------------------------------------
 --+                             Typing                             +--

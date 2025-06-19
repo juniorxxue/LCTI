@@ -54,6 +54,10 @@ infix 3 _⊆_w/t_
 data _⊆_w/t_ : Env n m → Env n m → Type m → Set where
   ext-int : (SRegular Γ)
           → Γ ⊆ Γ w/t Int
+  ext-top : (SRegular Γ)
+          → Γ ⊆ Γ w/t Top
+  ext-bot : (SRegular Γ)
+          → Γ ⊆ Γ w/t Bot
   ext-var : Γ ⊆ Δ w/v X
           → Γ ⊆ Δ w/t ‶ X
   ext-arr : Γ ⊆ Ω w/t A

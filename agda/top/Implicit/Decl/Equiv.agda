@@ -42,6 +42,10 @@ st-⊢r'' (⊢r-arr regA regA₁) new regT (st-var stx-eq) = st-⊢r'' regA₁ n
 st-⊢r'' (⊢r-arr regA regA₁) new regT (st-arr st st₁) = ⊢r-arr (st-⊢r'' regA new regT st) (st-⊢r'' regA₁ new regT st₁)
 st-⊢r'' (⊢r-∀ regA) new regT (st-var stx-eq) = ⊢r-var-∙ (▶∙-∋∙ new)
 st-⊢r'' (⊢r-∀ regA) new regT (st-∀ up st) = ⊢r-∀ (st-⊢r'' regA (▶S∙ new) (⊢r-weaken∙0 regT up) st)
+st-⊢r'' ⊢r-top x₁ x₂ st-top = ⊢r-top
+st-⊢r'' ⊢r-bot x₁ x₂ st-bot = ⊢r-bot
+st-⊢r'' ⊢r-top x ⊢r-top (st-var stx-eq) = ⊢r-var-∙ (▶∙-∋∙ x)
+st-⊢r'' ⊢r-bot x ⊢r-bot (st-var stx-eq) = ⊢r-var-∙ (▶∙-∋∙ x)
 
 
 infix 3 _▶'_,=_⇘_
@@ -129,6 +133,8 @@ data _▶'_,=_⇘_ : Env n m → Fin (1 + m) → Type m → Env n (1 + m) → Se
 ≫-↑ty-st' {T = T} {k = k} (⊢r-∀ regA) upT new (grd-∀ grd) (↑ty-∀ upA*)
   with ⟨ T' , upT' ⟩ ← ↑ty0-total T
   with ⟨ T1 , upT1 ⟩ ← ↑ty-total T' (#S k) = st-∀ upT' (≫-↑ty-st' regA upT1 (∙⟹∙S new (↑ty-comm0 upT' upT1 upT)) grd upA*)
+≫-↑ty-st' ⊢r-top x₁ new grd-top ↑ty-top = st-top
+≫-↑ty-st' ⊢r-bot x₁ new grd-bot ↑ty-bot = st-bot
 
 ≫-↑ty-st'0 : Γ ,∙ ⊢r A
            → Γ ⊢r B
@@ -145,6 +151,8 @@ st-↑ty-≫ : ⟦ k / B ⟧ A ⇘ A*
          → Γ ▶' k ,= B ⇘ Γ'
          → Γ' ≫ A ⇘ A*'
 st-↑ty-≫ st-int ↑ty-int regA* new = grd-int
+st-↑ty-≫ st-top ↑ty-top regA* new = grd-top
+st-↑ty-≫ st-bot ↑ty-bot regA* new = grd-bot
 st-↑ty-≫ (st-var stx-eq) upA* regA* new = grd-var= (▶'=-∋:= new upA*)
 st-↑ty-≫ {k = k} (st-var (stx-neq ¬p)) ↑ty-var (⊢r-var-∙ inΓ) new rewrite punchIn-punchOut {i = k} ¬p
   = grd-var∙ (▶'-∋∙ new ¬p inΓ)
@@ -163,6 +171,8 @@ sound : Γ ⊢¹ j # A ≤ B
       → Γ ⊢² j # A ≤ B
 sound (s-refl regΔ cloA) = s-refl regΔ cloA
 sound (s-int regΔ) = s-int regΔ
+sound (s-top regΔ regA) = s-top regΔ regA
+sound (s-bot regΔ regA) = s-bot regΔ regA
 sound (s-var-∙ regΔ inΔ) = s-var-∙ regΔ inΔ
 sound (s-arr₁ s s₁) = s-arr₁ (sound s) (sound s₁)
 sound (s-arr₂ s s₁) = s-arr₂ (sound s) (sound s₁)
@@ -192,6 +202,8 @@ complete : Γ ⊢² j # A ≤ B
          → Γ ⊢¹ j # A ≤ B
 complete (s-refl regΔ cloA) = s-refl regΔ cloA
 complete (s-int regΔ) = s-int regΔ
+complete (s-top regΔ regA) = s-top regΔ regA
+complete (s-bot regΔ regA) = s-bot regΔ regA
 complete (s-var-∙ regΔ inΔ) = s-var-∙ regΔ inΔ
 complete (s-arr₁ s s₁) = s-arr₁ (complete s) (complete s₁)
 complete (s-arr₂ s s₁) = s-arr₂ (complete s) (complete s₁)
