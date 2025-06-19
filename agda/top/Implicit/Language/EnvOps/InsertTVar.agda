@@ -1,5 +1,3 @@
-{-# OPTIONS --allow-unsolved-metas #-}
-{-# OPTIONS --allow-incomplete-matches #-}
 module Implicit.Language.EnvOps.InsertTVar where
 
 open import Implicit.Language.Base
@@ -262,6 +260,8 @@ data _⨟_▶s_,_⇘_⨟_ : Env n m → Env n m → Fin (1 + n) → Type m → E
            → Γ ▶ k , T ⇘ Γ'
            → Γ' ⊢r A
 ⊢r-weaken, ⊢r-int new = ⊢r-int
+⊢r-weaken, ⊢r-top new = ⊢r-top
+⊢r-weaken, ⊢r-bot new = ⊢r-bot
 ⊢r-weaken, (⊢r-var-∙ inΓ) new = ⊢r-var-∙ (∋∙-weaken, inΓ new)
 ⊢r-weaken, (⊢r-arr regA regA₁) new = ⊢r-arr (⊢r-weaken, regA new) (⊢r-weaken, regA₁ new)
 ⊢r-weaken, {T = T} (⊢r-∀ regA) new
@@ -272,6 +272,8 @@ data _⨟_▶s_,_⇘_⨟_ : Env n m → Env n m → Fin (1 + n) → Type m → E
             → Γ ▶s k , T ⇘ Γ'
             → Γ' ⊢r A
 ⊢r-weaken,s ⊢r-int new = ⊢r-int
+⊢r-weaken,s ⊢r-top new = ⊢r-top
+⊢r-weaken,s ⊢r-bot new = ⊢r-bot
 ⊢r-weaken,s (⊢r-var-∙ inΓ) new = ⊢r-var-∙ (∋∙-weaken,s inΓ new)
 ⊢r-weaken,s (⊢r-arr regA regA₁) new = ⊢r-arr (⊢r-weaken,s regA new) (⊢r-weaken,s regA₁ new)
 ⊢r-weaken,s {T = T} (⊢r-∀ regA) new
@@ -281,6 +283,8 @@ data _⨟_▶s_,_⇘_⨟_ : Env n m → Env n m → Fin (1 + n) → Type m → E
            → Γ ▶ k , T ⇘ Γ'
            → Γ' ⊢c A
 ⊢c-weaken, ⊢c-int new = ⊢c-int
+⊢c-weaken, ⊢c-top new = ⊢c-top
+⊢c-weaken, ⊢c-bot new = ⊢c-bot
 ⊢c-weaken, (⊢c-var-∙ inΔ) new = ⊢c-var-∙ (∋∙-weaken, inΔ new)
 ⊢c-weaken, (⊢c-var-= inΔ) new = ⊢c-var-= (∋=-weaken, inΔ new)
 ⊢c-weaken, (⊢c-arr cloA cloA₁) new = ⊢c-arr (⊢c-weaken, cloA new) (⊢c-weaken, cloA₁ new)
@@ -301,6 +305,8 @@ data _⨟_▶s_,_⇘_⨟_ : Env n m → Env n m → Fin (1 + n) → Type m → E
            → Γ ▶s k , T ⇘ Γ'
            → Γ' ⊢c A
 ⊢c-weaken,s ⊢c-int new = ⊢c-int
+⊢c-weaken,s ⊢c-top new = ⊢c-top
+⊢c-weaken,s ⊢c-bot new = ⊢c-bot
 ⊢c-weaken,s (⊢c-var-∙ inΔ) new = ⊢c-var-∙ (∋∙-weaken,s inΔ new)
 ⊢c-weaken,s (⊢c-var-= inΔ) new = ⊢c-var-= (∋=-weaken,s inΔ new)
 ⊢c-weaken,s (⊢c-arr cloA cloA₁) new = ⊢c-arr (⊢c-weaken,s cloA new) (⊢c-weaken,s cloA₁ new)
@@ -345,6 +351,8 @@ sregular-weaken,s (reg-S= regΓ regA) (▶sS= new x) = reg-S= (sregular-weaken,s
           → Γ ▶s k , T ⇘ Γ'
           → Γ' ≫ A ⇘ B
 ≫-weaken,s grd-int new = grd-int
+≫-weaken,s grd-top new = grd-top
+≫-weaken,s grd-bot new = grd-bot
 ≫-weaken,s (grd-var= x) new = grd-var= (∋:=-weaken,s x new)
 ≫-weaken,s (grd-var∙ x) new = grd-var∙ (∋∙-weaken,s x new)
 ≫-weaken,s (grd-arr grd grd₁) new = grd-arr (≫-weaken,s grd new) (≫-weaken,s grd₁ new)

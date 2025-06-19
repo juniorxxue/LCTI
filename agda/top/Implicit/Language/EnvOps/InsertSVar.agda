@@ -1,5 +1,3 @@
-{-# OPTIONS --allow-unsolved-metas #-}
-{-# OPTIONS --allow-incomplete-matches #-}
 module Implicit.Language.EnvOps.InsertSVar where
 
 open import Implicit.Language.Base
@@ -124,6 +122,8 @@ data _⨟_▶_,=_⇘_⨟_ : Env n m → Env n m → Fin (1 + m) → Type m → E
            → A ↑ty k ⇘ A'
            → Γ' ⊢r A'
 ⊢r-weaken= ⊢r-int new ↑ty-int = ⊢r-int
+⊢r-weaken= ⊢r-top new ↑ty-top = ⊢r-top
+⊢r-weaken= ⊢r-bot new ↑ty-bot = ⊢r-bot
 ⊢r-weaken= (⊢r-var-∙ inΓ) new ↑ty-var = ⊢r-var-∙ (∋∙-weaken= inΓ new)
 ⊢r-weaken= (⊢r-arr regA regA₁) new (↑ty-arr upA upA₁) = ⊢r-arr (⊢r-weaken= regA new upA) (⊢r-weaken= regA₁ new upA₁)
 ⊢r-weaken= {T = T} (⊢r-∀ regA) new (↑ty-∀ upA)
@@ -218,6 +218,8 @@ sregular-weaken= (reg-S= regΓ regA) (▶S= new x x₁) = reg-S= (sregular-weake
            → A ↑ty k ⇘ A'
            → Γ' ⊢c A'
 ⊢c-weaken= ⊢c-int new ↑ty-int = ⊢c-int
+⊢c-weaken= ⊢c-top new ↑ty-top = ⊢c-top
+⊢c-weaken= ⊢c-bot new ↑ty-bot = ⊢c-bot
 ⊢c-weaken= (⊢c-var-∙ inΔ) new ↑ty-var = ⊢c-var-∙ (∋∙-weaken= inΔ new)
 ⊢c-weaken= (⊢c-var-= inΔ) new ↑ty-var = ⊢c-var-= (∋=-weaken= inΔ new)
 ⊢c-weaken= (⊢c-arr cloA cloA₁) new (↑ty-arr upA upA₁) = ⊢c-arr (⊢c-weaken= cloA new upA) (⊢c-weaken= cloA₁ new upA₁)
@@ -240,6 +242,8 @@ sregular-weaken= (reg-S= regΓ regA) (▶S= new x x₁) = reg-S= (sregular-weake
           → B ↑ty k ⇘ B'
           → Γ' ≫ A' ⇘ B'
 ≫-weaken= grd-int new ↑ty-int ↑ty-int = grd-int
+≫-weaken= grd-top new ↑ty-top ↑ty-top = grd-top
+≫-weaken= grd-bot new ↑ty-bot ↑ty-bot = grd-bot
 ≫-weaken= (grd-var= x) new ↑ty-var upB = grd-var= (∋:=-weaken= x new upB)
 ≫-weaken= (grd-var∙ x) new ↑ty-var ↑ty-var = grd-var∙ (∋∙-weaken= x new)
 ≫-weaken= (grd-arr grd grd₁) new (↑ty-arr upA upA₁) (↑ty-arr upB upB₁) = grd-arr (≫-weaken= grd new upA upB) (≫-weaken= grd₁ new upA₁ upB₁)

@@ -1,5 +1,3 @@
-{-# OPTIONS --allow-unsolved-metas #-}
-{-# OPTIONS --allow-incomplete-matches #-}
 module Implicit.Language.EnvOps.InsertUVar where
 
 open import Implicit.Language.Base
@@ -93,6 +91,8 @@ data _▶_,∙⇘_ : Env n m → Fin (1 + m) → Env n (1 + m) → Set where
            → A ↑ty k ⇘ A'
            → Γ' ⊢r A'
 ⊢r-weaken∙ ⊢r-int new ↑ty-int = ⊢r-int
+⊢r-weaken∙ ⊢r-top new ↑ty-top = ⊢r-top
+⊢r-weaken∙ ⊢r-bot new ↑ty-bot = ⊢r-bot
 ⊢r-weaken∙ (⊢r-var-∙ inΓ) new ↑ty-var = ⊢r-var-∙ (∋∙-weaken∙ inΓ new)
 ⊢r-weaken∙ (⊢r-arr regA regA₁) new (↑ty-arr upA upA₁) = ⊢r-arr (⊢r-weaken∙ regA new upA) (⊢r-weaken∙ regA₁ new upA₁)
 ⊢r-weaken∙ (⊢r-∀ regA) new (↑ty-∀ upA) = ⊢r-∀ (⊢r-weaken∙ regA (▶S∙ new) upA)

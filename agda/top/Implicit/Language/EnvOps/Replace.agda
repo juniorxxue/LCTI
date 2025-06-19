@@ -1,5 +1,3 @@
-{-# OPTIONS --allow-unsolved-metas #-}
-{-# OPTIONS --allow-incomplete-matches #-}
 module Implicit.Language.EnvOps.Replace where
 
 open import Implicit.Language.Base
@@ -140,6 +138,8 @@ env-◆◇-false (◇S^ newΓ1) (◆S^ newΓ2) = env-◆◇-false newΓ1 newΓ2
      → Γ ◆ k ⇘ Γ'
      → Γ' ⊢r A
 ⊢r-◆ ⊢r-int new = ⊢r-int
+⊢r-◆ ⊢r-top new = ⊢r-top
+⊢r-◆ ⊢r-bot new = ⊢r-bot
 ⊢r-◆ (⊢r-var-∙ inΓ) new = ⊢r-var-∙ (◆-∙∈ inΓ new)
 ⊢r-◆ (⊢r-arr regA regA₁) new = ⊢r-arr (⊢r-◆ regA new) (⊢r-◆ regA₁ new)
 ⊢r-◆ (⊢r-∀ regA) new = ⊢r-∀ (⊢r-◆ regA (◆S∙ new))
@@ -153,6 +153,8 @@ env-◆◇-false (◇S^ newΓ1) (◆S^ newΓ2) = env-◆◇-false newΓ1 newΓ2
      → Γ ◆ k ⇘ Γ'
      → Γ' ⊢c A
 ⊢c-◆ ⊢c-int new = ⊢c-int
+⊢c-◆ ⊢c-top new = ⊢c-top
+⊢c-◆ ⊢c-bot new = ⊢c-bot
 ⊢c-◆ (⊢c-var-∙ inΔ) new = ⊢c-var-∙ (◆-∙∈ inΔ new)
 ⊢c-◆ {k = k} (⊢c-var-= {X = X} inΔ) new with k #≟ X
 ... | yes refl = ⊢c-var-∙ (◆-=∈-≡ inΔ new)
@@ -169,6 +171,8 @@ env-◆◇-false (◇S^ newΓ1) (◆S^ newΓ2) = env-◆◇-false newΓ1 newΓ2
      → Γ ◇ k ⇘ Γ'
      → Γ' ⊢c A
 ⊢c-◇ ⊢c-int new = ⊢c-int
+⊢c-◇ ⊢c-top new = ⊢c-top
+⊢c-◇ ⊢c-bot new = ⊢c-bot
 ⊢c-◇ (⊢c-var-∙ inΔ) new = ⊢c-var-∙ (◇-∙∈ inΔ new)
 ⊢c-◇ (⊢c-var-= inΔ) new = ⊢c-var-= (◇-=∈ inΔ new)
 ⊢c-◇ (⊢c-arr cloA cloA₁) new = ⊢c-arr (⊢c-◇ cloA new) (⊢c-◇ cloA₁ new)
@@ -259,6 +263,8 @@ data [_/_]_∙⟹_ : Type m → Fin m → Env n m → Env n m → Set where
       → k ¬ε A
       → Γ' ⊢r A
 ∙⟹-⊢r ⊢r-int new ¬ε-int = ⊢r-int
+∙⟹-⊢r ⊢r-top new ¬ε-top = ⊢r-top
+∙⟹-⊢r ⊢r-bot new ¬ε-bot = ⊢r-bot
 ∙⟹-⊢r (⊢r-var-∙ inΓ) new (¬ε-var x) = ⊢r-var-∙ (∙⟹-∋∙ inΓ x new)
 ∙⟹-⊢r (⊢r-arr regA regA₁) new (¬ε-arr ninA ninA₁) = ⊢r-arr (∙⟹-⊢r regA new ninA) (∙⟹-⊢r regA₁ new ninA₁)
 ∙⟹-⊢r {T = T} (⊢r-∀ regA) new (¬ε-∀ ninA)

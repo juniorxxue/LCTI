@@ -1,5 +1,3 @@
-{-# OPTIONS --allow-unsolved-metas #-}
-{-# OPTIONS --allow-incomplete-matches #-}
 module Implicit.Language.EnvOps.RemoveSVar where
 
 open import Implicit.Language.Base
@@ -123,6 +121,8 @@ data _∋='_ : Env n m → Fin m → Set where
         → Γ ∋=' k
         → k ¬ε A
 ⊢r-¬ε ⊢r-int inΓ = ¬ε-int
+⊢r-¬ε ⊢r-top inΓ = ¬ε-top
+⊢r-¬ε ⊢r-bot inΓ = ¬ε-bot
 ⊢r-¬ε (⊢r-var-∙ inΓ₁) inΓ = ¬ε-var (∋∙-∋='-≢ inΓ inΓ₁)
 ⊢r-¬ε (⊢r-arr regA regA₁) inΓ = ¬ε-arr (⊢r-¬ε regA inΓ) (⊢r-¬ε regA₁ inΓ)
 ⊢r-¬ε (⊢r-∀ regA) inΓ = ¬ε-∀ (⊢r-¬ε regA (S∙ inΓ))
@@ -174,6 +174,8 @@ data _∋='_ : Env n m → Fin m → Set where
                → A ↑ty k ⇘ A'
                → Γ' ⊢r A
 ⊢r-strengthen= ⊢r-int newΓ ↑ty-int = ⊢r-int
+⊢r-strengthen= ⊢r-top newΓ ↑ty-top = ⊢r-top
+⊢r-strengthen= ⊢r-bot newΓ ↑ty-bot = ⊢r-bot
 ⊢r-strengthen= (⊢r-var-∙ inΓ) newΓ ↑ty-var = ⊢r-var-∙ (∋∙-strengthen= inΓ newΓ)
 ⊢r-strengthen= (⊢r-arr regA regA₁) newΓ (↑ty-arr upA upA₁) = ⊢r-arr (⊢r-strengthen= regA newΓ upA)
                                                                     (⊢r-strengthen= regA₁ newΓ upA₁)
@@ -190,6 +192,8 @@ data _∋='_ : Env n m → Fin m → Set where
                → A ↑ty k ⇘ A'
                → Γ' ⊢c A
 ⊢c-strengthen= ⊢c-int newΓ ↑ty-int = ⊢c-int
+⊢c-strengthen= ⊢c-top newΓ ↑ty-top = ⊢c-top
+⊢c-strengthen= ⊢c-bot newΓ ↑ty-bot = ⊢c-bot
 ⊢c-strengthen= (⊢c-var-∙ inΔ) newΓ ↑ty-var = ⊢c-var-∙ (∋∙-strengthen= inΔ newΓ)
 ⊢c-strengthen= (⊢c-var-= inΔ) newΓ ↑ty-var = ⊢c-var-= (∋=-strengthen= inΔ newΓ)
 ⊢c-strengthen= (⊢c-arr cloA cloA₁) newΓ (↑ty-arr upA upA₁) = ⊢c-arr (⊢c-strengthen= cloA newΓ upA)

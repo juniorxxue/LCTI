@@ -1,5 +1,3 @@
-{-# OPTIONS --allow-unsolved-metas #-}
-{-# OPTIONS --allow-incomplete-matches #-}
 module Implicit.Language.EnvOps.Regular where
 
 -- some properties about regular, but put here for avoiding dependency
@@ -104,6 +102,8 @@ st-⊢r : Γ ⊢r B
       → ⟦ k / A ⟧ B ⇘ B*
       → Γ' ⊢r B*
 st-⊢r ⊢r-int newΓ regA st-int = ⊢r-int
+st-⊢r ⊢r-top newΓ regA st-top = ⊢r-top
+st-⊢r ⊢r-bot newΓ regA st-bot = ⊢r-bot
 st-⊢r (⊢r-var-∙ inΓ) newΓ regA (st-var stx) = stx-⊢r inΓ newΓ regA stx
 st-⊢r (⊢r-arr upB upB₁) newΓ regA (st-arr stB stB₁) = ⊢r-arr (st-⊢r upB newΓ regA stB) (st-⊢r upB₁ newΓ regA stB₁)
 st-⊢r (⊢r-∀ upB) newΓ regA (st-∀ up stB) = ⊢r-∀ (st-⊢r upB (◀S∙ newΓ) (⊢r-weaken∙0 regA up) stB)
@@ -121,6 +121,8 @@ st-⊢r' : Γ' ⊢r B*
        → ⟦ k / A ⟧ B ⇘ B*
        → Γ ⊢r B
 st-⊢r' ⊢r-int new regA st-int = ⊢r-int
+st-⊢r' ⊢r-top new regA st-top = ⊢r-top
+st-⊢r' ⊢r-bot new regA st-bot = ⊢r-bot
 st-⊢r' regB new regA (st-var stx-eq) = ⊢r-var-∙ (◀∙-∋∙ new)
 st-⊢r' (⊢r-var-∙ inΓ) new regA (st-var (stx-neq ¬p)) = ⊢r-var-∙ (∋∙-strengthen∙' ¬p inΓ new)
 st-⊢r' (⊢r-arr regB regB₁) new regA (st-arr st st₁) = ⊢r-arr (st-⊢r' regB new regA st) (st-⊢r' regB₁ new regA st₁)

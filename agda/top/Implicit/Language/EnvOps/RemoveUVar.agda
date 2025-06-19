@@ -1,5 +1,3 @@
-{-# OPTIONS --allow-unsolved-metas #-}
-{-# OPTIONS --allow-incomplete-matches #-}
 module Implicit.Language.EnvOps.RemoveUVar where
 
 open import Implicit.Language.Base
@@ -104,6 +102,8 @@ data _◀_∙⇘_ : Env n (1 + m) → Fin (1 + m) → Env n m → Set where
                → A ↑ty k ⇘ A'
                → Γ' ⊢r A
 ⊢r-strengthen∙ ⊢r-int new ↑ty-int = ⊢r-int
+⊢r-strengthen∙ ⊢r-top new ↑ty-top = ⊢r-top
+⊢r-strengthen∙ ⊢r-bot new ↑ty-bot = ⊢r-bot
 ⊢r-strengthen∙ (⊢r-var-∙ inΓ) new ↑ty-var = ⊢r-var-∙ (∋∙-strengthen∙ inΓ new)
 ⊢r-strengthen∙ (⊢r-arr regA regA₁) new (↑ty-arr upA upA₁) = ⊢r-arr (⊢r-strengthen∙ regA new upA)
                                                                    (⊢r-strengthen∙ regA₁ new upA₁)

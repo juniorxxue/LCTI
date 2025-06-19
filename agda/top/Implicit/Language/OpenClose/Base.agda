@@ -1,5 +1,3 @@
-{-# OPTIONS --allow-unsolved-metas #-}
-{-# OPTIONS --allow-incomplete-matches #-}
 module Implicit.Language.OpenClose.Base where
 
 open import Implicit.Language.Base
@@ -95,3 +93,5 @@ open-close Γ (`∀ A) with open-close (Γ ,∙) A
 ⊢c-^∈-¬ε (⊢c-var-= inΓ₁) inΓ = ¬ε-var (∋=-∋^-≢ inΓ₁ inΓ)
 ⊢c-^∈-¬ε (⊢c-arr cloA cloA₁) inΓ = ¬ε-arr (⊢c-^∈-¬ε cloA inΓ) (⊢c-^∈-¬ε cloA₁ inΓ)
 ⊢c-^∈-¬ε (⊢c-∀ cloA) inΓ = ¬ε-∀ (⊢c-^∈-¬ε cloA (S∙ inΓ))
+⊢c-^∈-¬ε ⊢c-top x = ¬ε-top
+⊢c-^∈-¬ε ⊢c-bot x = ¬ε-bot

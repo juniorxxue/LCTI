@@ -1,5 +1,3 @@
-{-# OPTIONS --allow-unsolved-metas #-}
-{-# OPTIONS --allow-incomplete-matches #-}
 module Implicit.Language.Subst.Properties where
 
 open import Implicit.Language.Base
@@ -19,6 +17,8 @@ st-unique :
   → ⟦ k / A ⟧ B ⇘ B₂
   → B₁ ≡ B₂
 st-unique st-int st-int = refl
+st-unique st-top st-top = refl
+st-unique st-bot st-bot = refl
 st-unique (st-var stx1) (st-var stx2) = stx-unique stx1 stx2
 st-unique (st-arr st1 st3) (st-arr st2 st4) rewrite st-unique st1 st2 | st-unique st3 st4 = refl
 st-unique (st-∀ up st1) (st-∀ up₁ st2) rewrite ↑ty-unique up up₁ | st-unique st1 st2 = refl
@@ -31,6 +31,8 @@ stx-total A k X with k #≟ X
 
 st-total : ∀ (A : Type m) k B → ∃[ B* ](⟦ k / A ⟧ B ⇘ B*)
 st-total A k Int = ⟨ Int , st-int ⟩
+st-total A k Top = ⟨ Top , st-top ⟩
+st-total A k Bot = ⟨ Bot , st-bot ⟩
 st-total A k (‶ X) with stx-total A k X
 ... | ⟨ A' , stx ⟩ = ⟨ A' , st-var stx ⟩
 st-total A k (B `→ B₁) = ⟨ st-total A k B .proj₁ `→ st-total A k B₁ .proj₁ ,
@@ -59,6 +61,8 @@ st0-unique st1 st2 = st-unique st1 st2
   → ⟦ k / T ⟧ A' ⇘ B
   → A ≡ B
 ↑ty-st-eq ↑ty-int st-int = refl
+↑ty-st-eq ↑ty-top st-top = refl
+↑ty-st-eq ↑ty-bot st-bot = refl
 ↑ty-st-eq {k = k} (↑ty-var {X = X}) (st-var stx) = ↑ty-stx-eq stx refl
 ↑ty-st-eq (↑ty-arr up up₁) (st-arr st st₁) rewrite ↑ty-st-eq up st | ↑ty-st-eq up₁ st₁ = refl
 ↑ty-st-eq (↑ty-∀ up) (st-∀ up₁ st) = cong `∀_ (↑ty-st-eq up st)
@@ -153,6 +157,8 @@ punchIn-punchOut' {m = suc m} {k₁ = #S k₁} {X = #S X} {k₂ = #S k₂} ¬p (
             ----------------------
             → ⟦ (inject₁ k₁) / B' ⟧ A' ⇘ A*'
 ↑ty-st-comm k₁≤k₂ st-int ↑ty-int up2 ↑ty-int = st-int
+↑ty-st-comm k₁≤k₂ st-top ↑ty-top up2 ↑ty-top = st-top
+↑ty-st-comm k₁≤k₂ st-bot ↑ty-bot up2 ↑ty-bot = st-bot
 ↑ty-st-comm k₁≤k₂ (st-var stx) ↑ty-var up2 up3 = st-var (↑ty-stx-comm k₁≤k₂ stx up2 up3)
 ↑ty-st-comm k₁≤k₂ (st-arr st st₁) (↑ty-arr up1 up4) up2 (↑ty-arr up3 up5) =
   st-arr (↑ty-st-comm k₁≤k₂ st up1 up2 up3) (↑ty-st-comm k₁≤k₂ st₁ up4 up2 up5)
@@ -203,6 +209,8 @@ stx-neq-inv ¬p (stx-neq ¬p₁) = refl
             → ⟦ (inject₁ k₁) / B' ⟧ A' ⇘ C
             → A*' ≡ C
 ↑ty-st-comm-eq lt st-int ↑ty-int upB ↑ty-int st-int = refl
+↑ty-st-comm-eq lt st-top ↑ty-top upB ↑ty-top st-top = refl
+↑ty-st-comm-eq lt st-bot ↑ty-bot upB ↑ty-bot st-bot = refl
 ↑ty-st-comm-eq lt (st-var stx) ↑ty-var upB upA* (st-var stx₁) = ↑ty-stx-comm-eq lt stx upB upA* stx₁
 ↑ty-st-comm-eq lt (st-arr stA stA₁) (↑ty-arr upA upA₁) upB (↑ty-arr upA* upA*₁) (st-arr stA' stA'')
   = cong₂ _`→_ (↑ty-st-comm-eq lt stA upA upB upA* stA') (↑ty-st-comm-eq lt stA₁ upA₁ upB upA*₁ stA'')
@@ -261,6 +269,8 @@ stx-neq-inv ¬p (stx-neq ¬p₁) = refl
             → ⟦ (inject₁ k₁) / B' ⟧ A' ⇘ A*'
             → A* ≡ C
 ↑ty-st-comm-eq' lt st-int ↑ty-int upB ↑ty-int st-int = refl
+↑ty-st-comm-eq' lt st-top ↑ty-top upB ↑ty-top st-top = refl
+↑ty-st-comm-eq' lt st-bot ↑ty-bot upB ↑ty-bot st-bot = refl
 ↑ty-st-comm-eq' lt (st-var stx) ↑ty-var upB upC (st-var stx₁) = ↑ty-stx-comm-eq' lt stx upB upC stx₁
 ↑ty-st-comm-eq' lt (st-arr stA stA₁) (↑ty-arr upA upA₁) upB (↑ty-arr upC upC₁) (st-arr stA' stA'')
   = cong₂ _`→_ (↑ty-st-comm-eq' lt stA upA upB upC stA') (↑ty-st-comm-eq' lt stA₁ upA₁ upB upC₁ stA'')
@@ -347,6 +357,8 @@ stx-neq-inv ¬p (stx-neq ¬p₁) = refl
              --------------------
              → A* ↑ty k₁ ⇘ A*'
 ↑ty-st-comm1 lt st-int upT ↑ty-int st-int = ↑ty-int
+↑ty-st-comm1 lt (st-top) upT ↑ty-top st-top = ↑ty-top
+↑ty-st-comm1 lt (st-bot) upT ↑ty-bot st-bot = ↑ty-bot
 ↑ty-st-comm1 lt (st-var stx) upT ↑ty-var (st-var stx₁) = ↑ty-stx-comm1 lt stx upT stx₁
 ↑ty-st-comm1 lt (st-arr stA stA₁) upT (↑ty-arr upA upA₁) (st-arr stA' stA'') =
   ↑ty-arr (↑ty-st-comm1 lt stA upT upA stA') (↑ty-st-comm1 lt stA₁ upT upA₁ stA'')
@@ -371,6 +383,8 @@ stx-neq-inv ¬p (stx-neq ¬p₁) = refl
               --------------------
               → ⟦ #S k₂ / T' ⟧ A' ⇘ A*'
 ↑ty-st-comm1' lt st-int upT ↑ty-int ↑ty-int = st-int
+↑ty-st-comm1' lt st-top upT ↑ty-top ↑ty-top = st-top
+↑ty-st-comm1' lt st-bot upT ↑ty-bot ↑ty-bot = st-bot
 ↑ty-st-comm1' lt (st-var stx) upT ↑ty-var upA* = st-var (↑ty-stx-comm1' lt stx upT upA*)
 ↑ty-st-comm1' lt (st-arr stA stA₁) upT (↑ty-arr upA upA₁) (↑ty-arr upA* upA*₁) =
   st-arr (↑ty-st-comm1' lt stA upT upA upA*) (↑ty-st-comm1' lt stA₁ upT upA₁ upA*₁)
@@ -474,6 +488,8 @@ st-st-comm-eq : ∀ {k₁ : Fin (1 + m)} {k₂ T U U* U*₂ V T* V' U1 U2}
 
 
 st-st-comm-eq lt st-int st-int upV st-int stU st-int = refl
+st-st-comm-eq lt st-top st-top upV st-top stU st-top = refl
+st-st-comm-eq lt st-bot st-bot upV st-bot stU st-bot = refl
 st-st-comm-eq lt (st-var stx) stU* upV (st-var stx₁) stU stT* = stx-stx-comm-eq lt stx stU* upV stx₁ stU stT*
 st-st-comm-eq lt (st-arr stT1 stT3) (st-arr stU* stU*₁) upV (st-arr stT2 stT4) stU (st-arr stT* stT*₁)
   with st-st-comm-eq lt stT1 stU* upV stT2 stU stT* | st-st-comm-eq lt stT3 stU*₁ upV stT4 stU stT*₁
@@ -498,6 +514,8 @@ st-↑ty : k ¬ε A
        → ⟦ k / B ⟧ A ⇘ A*
        → A* ↑ty k ⇘ A
 st-↑ty ¬ε-int st-int = ↑ty-int
+st-↑ty ¬ε-top st-top = ↑ty-top
+st-↑ty ¬ε-bot st-bot = ↑ty-bot
 st-↑ty (¬ε-var x) (st-var stx-eq) = ⊥-elim (x refl)
 st-↑ty (¬ε-var x) (st-var (stx-neq ¬p)) = ↑ty-punchOut ¬p
 st-↑ty (¬ε-arr ¬inA ¬inA₁) (st-arr st st₁) = ↑ty-arr (st-↑ty ¬inA st) (st-↑ty ¬inA₁ st₁)

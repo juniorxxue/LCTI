@@ -1,5 +1,3 @@
-{-# OPTIONS --allow-unsolved-metas #-}
-{-# OPTIONS --allow-incomplete-matches #-}
 module Implicit.Language.EnvOps.RemoveEVar where
 
 open import Implicit.Language.Base
@@ -118,6 +116,8 @@ data _∋^'_ : Env n m → Fin m → Set where
                → A ↑ty k ⇘ A'
                → Γ' ⊢r A
 ⊢r-strengthen^ ⊢r-int new ↑ty-int = ⊢r-int
+⊢r-strengthen^ ⊢r-top new ↑ty-top = ⊢r-top
+⊢r-strengthen^ ⊢r-bot new ↑ty-bot = ⊢r-bot
 ⊢r-strengthen^ (⊢r-var-∙ inΓ) new ↑ty-var = ⊢r-var-∙ (∋∙-strengthen^ inΓ new)
 ⊢r-strengthen^ (⊢r-arr regA regA₁) new (↑ty-arr upA upA₁) = ⊢r-arr (⊢r-strengthen^ regA new upA)
                                                                    (⊢r-strengthen^ regA₁ new upA₁)
@@ -165,6 +165,8 @@ sregular-strengthen^ (reg-S= regΓ regA) (◀S= new x) = reg-S= (sregular-streng
         → Γ ∋^' k
         → k ¬ε A
 ⊢r-¬ε-^ ⊢r-int inΓ = ¬ε-int
+⊢r-¬ε-^ ⊢r-top inΓ = ¬ε-top
+⊢r-¬ε-^ ⊢r-bot inΓ = ¬ε-bot
 ⊢r-¬ε-^ (⊢r-var-∙ inΓ₁) inΓ = ¬ε-var (∋∙-∋^'-≢ inΓ inΓ₁)
 ⊢r-¬ε-^ (⊢r-arr regA regA₁) inΓ = ¬ε-arr (⊢r-¬ε-^ regA inΓ) (⊢r-¬ε-^ regA₁ inΓ)
 ⊢r-¬ε-^ (⊢r-∀ regA) inΓ = ¬ε-∀ (⊢r-¬ε-^ regA (S∙ inΓ))
@@ -222,6 +224,8 @@ sregular-strengthen^ (reg-S= regΓ regA) (◀S= new x) = reg-S= (sregular-streng
                → A ↑ty k ⇘ A'
                → Γ' ⊢c A
 ⊢c-strengthen^ ⊢c-int new ↑ty-int = ⊢c-int
+⊢c-strengthen^ ⊢c-top new ↑ty-top = ⊢c-top
+⊢c-strengthen^ ⊢c-bot new ↑ty-bot = ⊢c-bot
 ⊢c-strengthen^ (⊢c-var-∙ inΔ) new ↑ty-var = ⊢c-var-∙ (∋∙-strengthen^ inΔ new)
 ⊢c-strengthen^ (⊢c-var-= inΔ) new ↑ty-var = ⊢c-var-= (∋=-strengthen^ inΔ new)
 ⊢c-strengthen^ (⊢c-arr cloA cloA₁) new (↑ty-arr upA upA₁) = ⊢c-arr (⊢c-strengthen^ cloA new upA)

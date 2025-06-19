@@ -1,5 +1,3 @@
-{-# OPTIONS --allow-unsolved-metas #-}
-{-# OPTIONS --allow-incomplete-matches #-}
 module Implicit.Language.EnvOps.RemoveTVar where
 
 open import Implicit.Language.Base
@@ -111,6 +109,8 @@ data _◀_,⇘_ : Env (1 + n) m → Fin (1 + n) → Env n m → Set where
                → Γ ◀ k ,⇘ Γ'
                → Γ' ⊢r A
 ⊢r-strengthen, ⊢r-int newΓ = ⊢r-int
+⊢r-strengthen, ⊢r-top newΓ = ⊢r-top
+⊢r-strengthen, ⊢r-bot newΓ = ⊢r-bot
 ⊢r-strengthen, (⊢r-var-∙ inΓ) newΓ = ⊢r-var-∙ (∋∙-strengthen, inΓ newΓ)
 ⊢r-strengthen, (⊢r-arr regA regA₁) newΓ = ⊢r-arr (⊢r-strengthen, regA newΓ) (⊢r-strengthen, regA₁ newΓ)
 ⊢r-strengthen, (⊢r-∀ regA) newΓ = ⊢r-∀ (⊢r-strengthen, regA (◀S∙ newΓ))
@@ -141,6 +141,8 @@ sregular-strengthen, (reg-S= regΓ regA) (◀S= newΓ) = reg-S= (sregular-streng
                → Γ ◀ k ,⇘ Γ'
                → Γ' ⊢c A
 ⊢c-strengthen, ⊢c-int newΓ = ⊢c-int
+⊢c-strengthen, ⊢c-top newΓ = ⊢c-top
+⊢c-strengthen, ⊢c-bot newΓ = ⊢c-bot
 ⊢c-strengthen, (⊢c-var-∙ inΔ) newΓ = ⊢c-var-∙ (∋∙-strengthen, inΔ newΓ)
 ⊢c-strengthen, (⊢c-var-= inΔ) newΓ = ⊢c-var-= (∋=-strengthen, inΔ newΓ)
 ⊢c-strengthen, (⊢c-arr cloA cloA₁) newΓ = ⊢c-arr (⊢c-strengthen, cloA newΓ) (⊢c-strengthen, cloA₁ newΓ)
@@ -158,6 +160,8 @@ sregular-strengthen, (reg-S= regΓ regA) (◀S= newΓ) = reg-S= (sregular-streng
               → Γ ◀ k ,⇘ Γ'
               → Γ' ≫ A ⇘ B
 ≫-strengthen, grd-int newΓ = grd-int
+≫-strengthen, grd-top newΓ = grd-top
+≫-strengthen, grd-bot newΓ = grd-bot
 ≫-strengthen, (grd-var= x) newΓ = grd-var= (∋:=-strengthen, x newΓ)
 ≫-strengthen, (grd-var∙ x) newΓ = grd-var∙ (∋∙-strengthen, x newΓ)
 ≫-strengthen, (grd-arr grdA grdA₁) newΓ = grd-arr (≫-strengthen, grdA newΓ) (≫-strengthen, grdA₁ newΓ)

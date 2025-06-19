@@ -1,5 +1,3 @@
-{-# OPTIONS --allow-unsolved-metas #-}
-{-# OPTIONS --allow-incomplete-matches #-}
 module Implicit.Language.Regular.Properties where
 
 open import Implicit.Language.Base
@@ -33,10 +31,14 @@ open import Implicit.Language.Regular.Base
 ⊢r-𝕣 (⊢r-var-∙ inΓ) = ⊢r-var-∙ (∋∙-𝕣 inΓ)
 ⊢r-𝕣 (⊢r-arr regA regA₁) = ⊢r-arr (⊢r-𝕣 regA) (⊢r-𝕣 regA₁)
 ⊢r-𝕣 (⊢r-∀ regA) = ⊢r-∀ (⊢r-𝕣 regA)
+⊢r-𝕣 ⊢r-top = ⊢r-top
+⊢r-𝕣 ⊢r-bot = ⊢r-bot
 
 ⊢r-𝕣' : Γ ⊢r A
       → 𝕣 Γ ⊢r A
 ⊢r-𝕣' ⊢r-int = ⊢r-int
+⊢r-𝕣' ⊢r-top = ⊢r-top
+⊢r-𝕣' ⊢r-bot = ⊢r-bot
 ⊢r-𝕣' (⊢r-var-∙ inΓ) = ⊢r-var-∙ (∋∙-𝕣' inΓ)
 ⊢r-𝕣' (⊢r-arr regA regA₁) = ⊢r-arr (⊢r-𝕣' regA) (⊢r-𝕣' regA₁)
 ⊢r-𝕣' (⊢r-∀ regA) = ⊢r-∀ (⊢r-𝕣' regA)
@@ -44,6 +46,8 @@ open import Implicit.Language.Regular.Base
 ⊢r-⊢c : Γ ⊢r A
       → Γ ⊢c A
 ⊢r-⊢c ⊢r-int = ⊢c-int
+⊢r-⊢c ⊢r-top = ⊢c-top
+⊢r-⊢c ⊢r-bot = ⊢c-bot
 ⊢r-⊢c (⊢r-var-∙ inΓ) = ⊢c-var-∙ inΓ
 ⊢r-⊢c (⊢r-arr regA regA₁) = ⊢c-arr (⊢r-⊢c regA) (⊢r-⊢c regA₁)
 ⊢r-⊢c (⊢r-∀ regA) = ⊢c-∀ (⊢r-⊢c regA)

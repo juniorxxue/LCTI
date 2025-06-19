@@ -1,5 +1,3 @@
-{-# OPTIONS --allow-unsolved-metas #-}
-{-# OPTIONS --allow-incomplete-matches #-}
 module Implicit.Language.EnvOps.InsertEVar where
 
 open import Implicit.Language.Base
@@ -164,6 +162,8 @@ data _⨟_▶_,^⇘_⨟_ : Env n m → Env n m → Fin (1 + m) → Env n (1 + m)
             → A ↑ty k ⇘ A'
             → Γ' ⊢r A'
 ⊢r-weaken^ ⊢r-int newΓ ↑ty-int = ⊢r-int
+⊢r-weaken^ ⊢r-top newΓ ↑ty-top = ⊢r-top
+⊢r-weaken^ ⊢r-bot newΓ ↑ty-bot = ⊢r-bot
 ⊢r-weaken^ (⊢r-var-∙ inΓ) newΓ ↑ty-var = ⊢r-var-∙ (∋∙-weaken^ inΓ newΓ)
 ⊢r-weaken^ (⊢r-arr regA regA₁) newΓ (↑ty-arr upA upA₁) = ⊢r-arr (⊢r-weaken^ regA newΓ upA) (⊢r-weaken^ regA₁ newΓ upA₁)
 ⊢r-weaken^ (⊢r-∀ regA) newΓ (↑ty-∀ upA) = ⊢r-∀ (⊢r-weaken^ regA (▶S∙ newΓ) upA)
@@ -173,6 +173,8 @@ data _⨟_▶_,^⇘_⨟_ : Env n m → Env n m → Fin (1 + m) → Env n (1 + m)
             → A ↑ty k ⇘ A'
             → Γ' ⊢c A'
 ⊢c-weaken^ ⊢c-int newΓ ↑ty-int = ⊢c-int
+⊢c-weaken^ ⊢c-top newΓ ↑ty-top = ⊢c-top
+⊢c-weaken^ ⊢c-bot newΓ ↑ty-bot = ⊢c-bot
 ⊢c-weaken^ (⊢c-var-∙ inΔ) newΓ ↑ty-var = ⊢c-var-∙ (∋∙-weaken^ inΔ newΓ)
 ⊢c-weaken^ (⊢c-var-= inΔ) newΓ ↑ty-var = ⊢c-var-= (∋=-weaken^ inΔ newΓ)
 ⊢c-weaken^ (⊢c-arr cloA cloA₁) newΓ (↑ty-arr upA upA₁) = ⊢c-arr (⊢c-weaken^ cloA newΓ upA) (⊢c-weaken^ cloA₁ newΓ upA₁)
@@ -193,6 +195,8 @@ data _⨟_▶_,^⇘_⨟_ : Env n m → Env n m → Fin (1 + m) → Env n (1 + m)
           → B ↑ty k ⇘ B'
           → Γ' ≫ A' ⇘ B'
 ≫-weaken^ grd-int newΓ ↑ty-int ↑ty-int = grd-int
+≫-weaken^ grd-top newΓ ↑ty-top ↑ty-top = grd-top
+≫-weaken^ grd-bot newΓ ↑ty-bot ↑ty-bot = grd-bot
 ≫-weaken^ (grd-var= x) newΓ ↑ty-var upB = grd-var= (∋:=-weaken^ x upB newΓ)
 ≫-weaken^ (grd-var∙ x) newΓ ↑ty-var ↑ty-var = grd-var∙ (∋∙-weaken^ x newΓ)
 ≫-weaken^ (grd-arr grd grd₁) newΓ (↑ty-arr upA upA₁) (↑ty-arr upB upB₁) = grd-arr (≫-weaken^ grd newΓ upA upB)
