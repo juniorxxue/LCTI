@@ -134,11 +134,6 @@ ground env (TForall tyA) = do
   tyA' <- ground (EUvar env) tyA
   return $ TForall tyA'
 
-transform :: Counter -> Typ -> Context
-transform Inf tyA = CFullType tyA
-transform (N 0) _ = CEmpty
-transform (N n) (TArr tyA tyB) | n > 0 = CParType tyA (transform (N (n-1)) tyB)
-
 sub :: (Env, Env) -> Typ -> Context -> WriterT Log Maybe (Env, Typ)
 -- sub (a1, a2) b c | trace ("sub " ++ show a1 ++ ";" ++ show a2 ++ " |- " ++ show b ++ " <: " ++ show c) False = undefined
 sub (env, senv) tyA CEmpty | closed (envConcat env senv) tyA = do
@@ -159,28 +154,14 @@ sub (env, senv) (TArr tyA tyB) (CTerm e h) | closed (envConcat env senv) tyA = d
   tell $ indentAll _log2
   return (senv', TArr tyC tyD)
 sub (env, senv) (TArr tyA tyB) (CTerm e h) | open (envConcat env senv) tyA = do
-  let count = have (envConcat env senv) tyA
-  case isLessEqThan (need e) count of
-    True -> do
-      (tyC, _log1) <- peek $ infer (envConcat env senv) (transform count tyA) e
-      (senv1, _log2) <- peek $ ssubN (env, senv) tyC tyA
-      ((senv2, tyD), _log3) <- peek $ sub (env, senv1) tyB h
-      tell ["[S-Term-Open-1] " ++ logSubFull (env, senv) (TArr tyA tyB) (CTerm e h) senv2 (TArr tyC tyD)]
-      tell $ indentAll _log1
-      tell $ indentAll _log2
-      tell $ indentAll _log3
-      return (senv2, TArr tyC tyD)
-    False -> do
-      ((senv1, tyD), _log1) <- peek $ sub (env, senv) tyB h
-      grdA <- ground (envConcat env senv1) tyA
-      let count2 = have (envConcat env senv1) grdA
-      (tyC, _log2) <- peek $ infer (envConcat env senv1) (transform count2 grdA) e
-      (senv2, _log3) <- peek $ ssubN (env, senv1) tyC tyA
-      tell ["[S-Term-Open-2] " ++ logSubFull (env, senv) (TArr tyA tyB) (CTerm e h) senv2 (TArr tyC tyD)]
-      tell $ indentAll _log1
-      tell $ indentAll _log2
-      tell $ indentAll _log3
-      return (senv2, TArr tyC tyD)
+  (tyC, _log1) <- peek $ infer (envConcat env senv) CEmpty e
+  (senv1, _log2) <- peek $ ssubN (env, senv) tyC tyA
+  ((senv2, tyD), _log3) <- peek $ sub (env, senv1) tyB h
+  tell ["[S-Term-Open] " ++ logSubFull (env, senv) (TArr tyA tyB) (CTerm e h) senv2 (TArr tyC tyD)]
+  tell $ indentAll _log1
+  tell $ indentAll _log2
+  tell $ indentAll _log3
+  return (senv2, TArr tyC tyD)
 sub (env, senv) (TForall tyA) (CTerm e h) = do
   ((ESvar _ senv' , tyB), _log1) <- peek $ sub (env, EEvar senv) tyA (shiftTyContext0 (CTerm e h))
   tell ["[S-Forall-L] " ++ logSubFull (env, senv) (TForall tyA) (CTerm e h) senv' (unshiftTyp0 tyB)]
@@ -226,11 +207,6 @@ infer env (CTerm tm2 h) (Abs tm) = do
   tell ["[Ty-Abs2] " ++ logInferFull env (CTerm tm2 h) (Abs tm) (TArr tyA tyB)]
   tell $ indentAll _log1
   tell $ indentAll _log2
-  return $ TArr tyA tyB
-infer env (CParType tyA h) (Abs tm) = do
-  (tyB, _log) <- peek $ infer (ETrm tyA env) (shiftContext0 h) tm
-  tell ["[Ty-Abs-Par] " ++ logInferFull env (CParType tyA h) (Abs tm) (TArr tyA tyB)]
-  tell $ indentAll _log
   return $ TArr tyA tyB
 infer env h g | genericConsumer g && nonEmptyContext h = do
   (tyA, _log1) <- peek $ infer env CEmpty g

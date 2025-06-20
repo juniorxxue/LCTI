@@ -25,26 +25,6 @@ prd Inf = Inf
 prd (N n) | n > 0 = N (n - 1)
 prd (N 0) = N 0
 
-have :: Env -> Typ -> Counter
--- have env tyA | trace ("have " ++ show env ++ " |- " ++ show tyA) False = undefined
-have env TInt = Inf
-have env (TVar k) = if isEvar env k then N 0 else Inf
-have env (TArr tyA tyB) = if closed env tyA
-                          then suc $ have env tyB
-                          else N 0
-have env (TForall tyA) = have (EUvar env) tyA
-
-need :: Trm -> Counter
--- need a | trace ("need " ++ show a) False = undefined
-need (Lit _) = N 0
-need (Var _) = N 0
-need (Abs e) = suc $ need e
-need (App t1 t2) = prd (need t1)
-need (Ann e tyA) = N 0
-need (TAbs e) = N 0
-need (TApp e tyA) = N 0
-
-
 instance Eq Counter where
   Inf == Inf = True
   Inf == _ = False

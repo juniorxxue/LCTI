@@ -40,14 +40,13 @@ instance Show Env where
   show (ESvar ty env) = show env ++ " , =" ++ show ty
   show (EEvar env) = show env ++ " , ^"
 
-data Context = CEmpty | CFullType Typ | CTerm Trm Context | CTApp Typ Context | CParType Typ Context
+data Context = CEmpty | CFullType Typ | CTerm Trm Context | CTApp Typ Context
 
 instance Show Context where
   show CEmpty = "□"
   show (CFullType ty) = show ty
   show (CTerm trm ctx) = "[" ++ show trm ++ "]" ++ " ↝ " ++ show ctx
   show (CTApp ty ctx) = show ty ++ " @↝ " ++ show ctx
-  show (CParType ty ctx) = show "[" ++ show ty ++ "]" ++ " ↝ " ++ show ctx
 
 genericConsumer :: Trm -> Bool
 genericConsumer (Lit _) = True
