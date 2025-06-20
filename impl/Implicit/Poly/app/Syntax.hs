@@ -82,6 +82,15 @@ isUvar (EEvar env) k = if | k == 0 -> False
 isUvar (ESvar _ env) k = if | k == 0 -> False
                             | otherwise -> isUvar env (k - 1)
 
+isSvar :: Env -> Int -> Bool
+isSvar EEmpty _ = False
+isSvar (ETrm _ env) k = isSvar env k
+isSvar (EUvar env) k = if | k == 0 -> False
+                          | otherwise -> isSvar env (k - 1)
+isSvar (EEvar env) k = if | k == 0 -> False
+                          | otherwise -> isSvar env (k - 1)
+isSvar (ESvar _ env) k = if | k == 0 -> True
+                            | otherwise -> isSvar env (k - 1)
 
 closed :: Env -> Typ -> Bool
 -- closed env ty | trace ("closed " ++ show env ++ " |- " ++ show ty) False = undefined

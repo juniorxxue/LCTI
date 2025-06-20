@@ -39,6 +39,15 @@ logSSubFull (env, senv) ty1 ty2 envout =
     show ty2 ++ " ⊣ " ++ 
     red ++ show envout ++ reset
 
+logInfers :: Env -> Context -> String
+logInfers env ctx = show env ++ " ⊢ " ++ show ctx ++ " ⇒ "
+
+logInfersFull :: Env -> Context -> Typ -> String
+logInfersFull env ctx ty = 
+  grey ++ show env ++ " ⊢ " ++ reset ++
+  show ctx ++ " ⇒ " ++
+  bold ++ show ty ++ reset
+
 logInfer :: Env -> Context -> Trm -> String
 logInfer env ctx tm = show env ++ " ⊢ " ++ show ctx ++ " ⇒ " ++ show tm ++ " ⇒ "
 

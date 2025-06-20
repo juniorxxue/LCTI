@@ -172,7 +172,41 @@ sub (env, senv) (TForall tyA) (CTApp tyB h) = do
   tell ["[S-Forall-TApp] " ++ logSubFull (env, senv) (TForall tyA) (CTApp tyB h) senv' (TForall tyC)]
   tell $ indentAll _log1
   return (senv', TForall tyC)
+sub (env, senv) (TVar k) (CTerm e h) | isSvar (envConcat env senv) k = do
+  tyA <- findSol (envConcat env senv) k
+  ((senv', tyBC), _log) <- peek $ sub (env, senv) tyA (CTerm e h)
+  tell ["[S-Svar-Term] " ++ logSubFull (env, senv) (TVar k) (CTerm e h) senv' tyBC]
+  tell $ indentAll _log
+  return (senv', tyBC)
+sub (env, senv) (TVar k) (CTApp tyT h) | isSvar (envConcat env senv) k = do
+  tyA <- findSol (envConcat env senv) k
+  ((senv', tyBC), _log) <- peek $ sub (env, senv) tyA (CTApp tyT h)
+  tell ["[S-Svar-TApp] " ++ logSubFull (env, senv) (TVar k) (CTApp tyT h) senv' tyBC]
+  tell $ indentAll _log
+  return (senv', tyBC)
+sub (env, senv) (TVar k) (CTerm e h) | isUvar (envConcat env senv) k = do
+  (tyA, _log) <- peek $ infers (envConcat env senv) (CTerm e h)
+  case inst senv k tyA of
+    Just newenv -> do
+      tell ["[S-Infers] " ++ logSubFull (env, senv) (TVar k) (CTerm e h) newenv tyA]
+      tell $ indentAll _log
+      return (newenv, tyA)
+    Nothing -> lift Nothing
 sub _ _ _ = lift Nothing
+
+-- TODO: change the name of the rules
+infers :: Env -> Context -> WriterT Log Maybe Typ
+infers env (CFullType tyA) = do
+  tell ["[CI-Type] " ++ logInfersFull env (CFullType tyA) tyA]
+  return tyA
+infers env (CTerm tm h) = do
+  (tyA, _log1) <- peek $ infer env CEmpty tm
+  (tyB, _log2) <- peek $ infers env h
+  tell ["[CI-Term] " ++ logInfersFull env (CTerm tm h) (TArr tyA tyB)]
+  tell $ indentAll _log1
+  tell $ indentAll _log2
+  return $ TArr tyA tyB
+infers _ _ = lift Nothing
 
 -- sub (EEmpty, (ESvar TInt EEmpty)) (TArr (TVar 0) (TVar 0)) (CTerm (Lit 42) CEmpty)
 
