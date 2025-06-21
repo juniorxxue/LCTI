@@ -249,14 +249,14 @@ infer env h g | genericConsumer g && nonEmptyContext h = do
   tell $ indentAll _log1
   tell $ indentAll _log2
   return tyB
-infer e CEmpty (TAbs tm) = do
-  (tyA, _log) <- peek $ infer (EUvar e) CEmpty tm
-  tell ["[Ty-TAbs] " ++ logInferFull e CEmpty (TAbs tm) (TForall tyA)]
+infer env CEmpty (TAbs tm) = do
+  (tyA, _log) <- peek $ infer (EUvar env) CEmpty tm
+  tell ["[Ty-TAbs] " ++ logInferFull env CEmpty (TAbs tm) (TForall tyA)]
   tell $ indentAll _log
   return $ TForall tyA
-infer e h (TApp tm tyA) = do
-  (TForall tyB, _log) <- peek $ infer e (CTApp tyA h) tm
-  tell ["[Ty-TApp] " ++ logInferFull e h (TApp tm tyA) (substTyp0 tyA tyB)]
+infer env h (TApp tm tyA) = do
+  (TForall tyB, _log) <- peek $ infer env (CTApp tyA h) tm
+  tell ["[Ty-TApp] " ++ logInferFull env h (TApp tm tyA) (substTyp0 tyA tyB)]
   tell $ indentAll _log
   return (substTyp0 tyA tyB)
 infer _ _ _ = lift Nothing
