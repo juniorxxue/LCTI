@@ -15,6 +15,7 @@ shiftTyp k (TVar x) = if | x < k -> TVar x
                          | otherwise -> TVar (x + 1)
 shiftTyp k (TArr t1 t2) = TArr (shiftTyp k t1) (shiftTyp k t2)
 shiftTyp k (TForall t) = TForall (shiftTyp (k + 1) t)
+shiftTyp k (TList t) = TList (shiftTyp k t)
 
 shiftTyp0 :: Typ -> Typ
 shiftTyp0 = shiftTyp 0
@@ -26,6 +27,7 @@ substTyp k tyA (TVar x) = if | k == x -> tyA
                           where punchOut i j = if j > i then j - 1 else j
 substTyp k tyA (TArr t1 t2) = TArr (substTyp k tyA t1) (substTyp k tyA t2)
 substTyp k tyA (TForall tyB) = TForall (substTyp (k + 1) (shiftTyp0 tyA) tyB)
+substTyp k tyA (TList tyB) = TList (substTyp k tyA tyB)
 
 substTyp0 :: Typ -> Typ -> Typ
 -- substTyp0 a b | trace ("substTyp0 " ++ show a ++ " " ++ show b) False = undefined
@@ -44,6 +46,8 @@ shiftTerm k (App t1 t2) = App (shiftTerm k t1) (shiftTerm k t2)
 shiftTerm k (Ann t ty) = Ann (shiftTerm k t) ty
 shiftTerm k (TAbs t) = TAbs (shiftTerm k t)
 shiftTerm k (TApp t ty) = TApp (shiftTerm k t) ty
+shiftTerm _ Nil = Nil
+shiftTerm k (Cons t1 t2) = Cons (shiftTerm k t1) (shiftTerm k t2)
 
 shiftTerm0 :: Trm -> Trm
 shiftTerm0 = shiftTerm 0
@@ -68,6 +72,8 @@ shiftTyTerm k (App t1 t2) = App (shiftTyTerm k t1) (shiftTyTerm k t2)
 shiftTyTerm k (Ann t ty) = Ann (shiftTyTerm k t) (shiftTyp k ty)
 shiftTyTerm k (TAbs t) = TAbs (shiftTyTerm (1 + k) t)
 shiftTyTerm k (TApp t ty) = TApp (shiftTyTerm k t) (shiftTyp k ty)
+shiftTyTerm _ Nil = Nil
+shiftTyTerm k (Cons t1 t2) = Cons (shiftTyTerm k t1) (shiftTyTerm k t2)
 
 -- type shift in context
 shiftTyContext :: Int -> Context -> Context

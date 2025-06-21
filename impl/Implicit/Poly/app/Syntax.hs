@@ -6,14 +6,15 @@ module Syntax where
 import Debug.Trace
 
 type Log = [String]
-data Typ = TInt | TVar Int | TArr Typ Typ | TForall Typ deriving (Eq)
-data Trm = Lit Int | Var Int | Abs Trm | App Trm Trm | Ann Trm Typ | TAbs Trm | TApp Trm Typ
+data Typ = TInt | TVar Int | TArr Typ Typ | TForall Typ | TList Typ deriving (Eq)
+data Trm = Lit Int | Var Int | Abs Trm | App Trm Trm | Ann Trm Typ | TAbs Trm | TApp Trm Typ | Nil | Cons Trm Trm 
 
 instance Show Typ where
   show TInt = "Int"
   show (TVar i) = "t" ++ show i
   show (TArr t1 t2) = "(" ++ show t1 ++ " → " ++ show t2 ++ ")"
   show (TForall t) = "∀. " ++ show t
+  show (TList t) = "[" ++ show t ++ "]"
 
 instance Show Trm where
   show (Lit i) = "lit " ++ show i
@@ -23,6 +24,8 @@ instance Show Trm where
   show (Ann t ty) = "(" ++ show t ++ " : " ++ show ty ++ ")"
   show (TAbs t) = "(Λ. " ++ show t ++ ")"
   show (TApp t ty) = "(" ++ show t ++ " @" ++ show ty ++ ")"
+  show Nil = "[]"
+  show (Cons t1 t2) = "(" ++ show t1 ++ " :: " ++ show t2 ++ ")"
 
 data Env = EEmpty | ETrm Typ Env | EUvar Env | EEvar Env | ESvar Typ Env
 
@@ -53,6 +56,7 @@ genericConsumer (Lit _) = True
 genericConsumer (Var _) = True
 genericConsumer (Ann _ _) = True
 genericConsumer (TAbs _) = True
+genericConsumer (Cons _ _) = True
 genericConsumer _ = False
 
 
@@ -98,6 +102,7 @@ closed _ TInt = True
 closed senv (TVar x) = not $ isEvar senv x
 closed senv (TArr t1 t2) = closed senv t1 && closed senv t2
 closed senv (TForall t) = closed (EUvar senv) t
+closed senv (TList t) = closed senv t
 
 open :: Env -> Typ -> Bool
 -- open env ty | trace ("open " ++ show env ++ " |- " ++ show ty) False = undefined
