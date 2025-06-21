@@ -31,10 +31,10 @@ data Env = EEmpty | ETrm Typ Env | EUvar Env | EEvar Env | ESvar Typ Env
 
 envConcat :: Env -> Env -> Env
 envConcat env EEmpty = env
-envConcat env (ETrm ty senv) = envConcat (ETrm ty env) senv
-envConcat env (EUvar senv) = envConcat (EUvar env) senv
-envConcat env (EEvar senv) = envConcat (EEvar env) senv
-envConcat env (ESvar ty senv) = envConcat (ESvar ty env) senv
+envConcat env (ETrm ty senv) = ETrm ty (envConcat env senv)
+envConcat env (EUvar senv) = EUvar (envConcat env senv)
+envConcat env (EEvar senv) = EEvar (envConcat env senv)
+envConcat env (ESvar ty senv) = ESvar ty (envConcat env senv)
 
 instance Show Env where
   show EEmpty = "∅"
