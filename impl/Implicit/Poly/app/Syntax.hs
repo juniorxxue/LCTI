@@ -6,26 +6,30 @@ module Syntax where
 import Debug.Trace
 
 type Log = [String]
-data Typ = TInt | TVar Int | TArr Typ Typ | TForall Typ | TList Typ deriving (Eq)
-data Trm = Lit Int | Var Int | Abs Trm | App Trm Trm | Ann Trm Typ | TAbs Trm | TApp Trm Typ | Nil | Cons Trm Trm 
+data Typ = TInt | TBool | TVar Int | TArr Typ Typ | TForall Typ | TList Typ | TProd Typ Typ deriving (Eq)
+data Trm = LitInt Int | LitBool Bool | Var Int | Abs Trm | App Trm Trm | Ann Trm Typ | TAbs Trm | TApp Trm Typ | Nil | Cons | Pair
 
 instance Show Typ where
   show TInt = "Int"
+  show TBool = "Bool"
   show (TVar i) = "t" ++ show i
   show (TArr t1 t2) = "(" ++ show t1 ++ " → " ++ show t2 ++ ")"
   show (TForall t) = "∀. " ++ show t
   show (TList t) = "[" ++ show t ++ "]"
+  show (TProd t1 t2) = "(" ++ show t1 ++ " × " ++ show t2 ++ ")"
 
 instance Show Trm where
-  show (Lit i) = "lit " ++ show i
+  show (LitInt i) = show i
+  show (LitBool b) = show b
   show (Var i) = "e" ++ show i
   show (Abs t) = "(λ. " ++ show t ++ ")"
   show (App t1 t2) = "(" ++ show t1 ++ " " ++ show t2 ++ ")"
   show (Ann t ty) = "(" ++ show t ++ " : " ++ show ty ++ ")"
   show (TAbs t) = "(Λ. " ++ show t ++ ")"
   show (TApp t ty) = "(" ++ show t ++ " @" ++ show ty ++ ")"
-  show Nil = "[]"
-  show (Cons t1 t2) = "(" ++ show t1 ++ " :: " ++ show t2 ++ ")"
+  show Nil = "Nil"
+  show Cons = "Cons"
+  show Pair = "Pair"
 
 data Env = EEmpty | ETrm Typ Env | EUvar Env | EEvar Env | ESvar Typ Env
 
@@ -52,10 +56,13 @@ instance Show Context where
   show (CTApp ty ctx) = show ty ++ " @↝ " ++ show ctx
 
 genericConsumer :: Trm -> Bool
-genericConsumer (Lit _) = True
+genericConsumer (LitInt _) = True
+genericConsumer (LitBool _) = True
 genericConsumer (Var _) = True
 genericConsumer (Ann _ _) = True
 genericConsumer (TAbs _) = True
+genericConsumer Cons = True
+genericConsumer Pair = True
 genericConsumer _ = False
 
 
@@ -98,10 +105,12 @@ isSvar (ESvar _ env) k = if | k == 0 -> True
 closed :: Env -> Typ -> Bool
 -- closed env ty | trace ("closed " ++ show env ++ " |- " ++ show ty) False = undefined
 closed _ TInt = True
+closed _ TBool = True
 closed senv (TVar x) = not $ isEvar senv x
 closed senv (TArr t1 t2) = closed senv t1 && closed senv t2
 closed senv (TForall t) = closed (EUvar senv) t
 closed senv (TList t) = closed senv t
+closed senv (TProd t1 t2) = closed senv t1 && closed senv t2
 
 open :: Env -> Typ -> Bool
 -- open env ty | trace ("open " ++ show env ++ " |- " ++ show ty) False = undefined
