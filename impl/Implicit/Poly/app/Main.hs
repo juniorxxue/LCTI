@@ -90,10 +90,10 @@ ssubN :: (Env, Env) -> Typ -> Typ -> WriterT Log Maybe Env
 -- ssubN (a1, a2) b c | trace ("ssub " ++ show a1 ++ ";" ++ show a2 ++ " |- " ++ show b ++ " <:- " ++ show c) False = undefined
 ssubN (env, senv) TInt TInt = do
   tell ["[S-Int] " ++ logSSubFull (env, senv) TInt TInt senv]
-  return env
+  return senv
 ssubN (env, senv) (TVar a) (TVar b) | isUvar (envConcat env senv) a && a == b = do
     tell ["[S-Refl] " ++ logSSubFull (env, senv) (TVar a) (TVar b) senv]
-    return env
+    return senv
 ssubN (env, senv) tyA (TVar a) | isEvar senv a = do
   case inst senv a tyA of
     Just newenv -> do
