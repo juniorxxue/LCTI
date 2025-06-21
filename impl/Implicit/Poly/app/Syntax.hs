@@ -56,7 +56,6 @@ genericConsumer (Lit _) = True
 genericConsumer (Var _) = True
 genericConsumer (Ann _ _) = True
 genericConsumer (TAbs _) = True
-genericConsumer (Cons _ _) = True
 genericConsumer _ = False
 
 
