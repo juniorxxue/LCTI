@@ -7,7 +7,7 @@ import Debug.Trace
 
 type Log = [String]
 data Typ = TInt | TVar Int | TArr Typ Typ | TForall Typ | TList Typ deriving (Eq)
-data Trm = Lit Int | Var Int | Abs Trm | App Trm Trm | Ann Trm Typ | TAbs Trm | TApp Trm Typ | Nil | Cons Trm Trm 
+data Trm = Lit Int | Var Int | Abs Trm | App Trm Trm | Ann Trm Typ | TAbs Trm | TApp Trm Typ
 
 instance Show Typ where
   show TInt = "Int"
@@ -24,8 +24,6 @@ instance Show Trm where
   show (Ann t ty) = "(" ++ show t ++ " : " ++ show ty ++ ")"
   show (TAbs t) = "(Λ. " ++ show t ++ ")"
   show (TApp t ty) = "(" ++ show t ++ " @" ++ show ty ++ ")"
-  show Nil = "[]"
-  show (Cons t1 t2) = "(" ++ show t1 ++ " :: " ++ show t2 ++ ")"
 
 data Env = EEmpty | ETrm Typ Env | EUvar Env | EEvar Env | ESvar Typ Env
 

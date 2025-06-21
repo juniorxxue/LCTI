@@ -46,8 +46,6 @@ shiftTerm k (App t1 t2) = App (shiftTerm k t1) (shiftTerm k t2)
 shiftTerm k (Ann t ty) = Ann (shiftTerm k t) ty
 shiftTerm k (TAbs t) = TAbs (shiftTerm k t)
 shiftTerm k (TApp t ty) = TApp (shiftTerm k t) ty
-shiftTerm _ Nil = Nil
-shiftTerm k (Cons t1 t2) = Cons (shiftTerm k t1) (shiftTerm k t2)
 
 shiftTerm0 :: Trm -> Trm
 shiftTerm0 = shiftTerm 0
@@ -72,8 +70,6 @@ shiftTyTerm k (App t1 t2) = App (shiftTyTerm k t1) (shiftTyTerm k t2)
 shiftTyTerm k (Ann t ty) = Ann (shiftTyTerm k t) (shiftTyp k ty)
 shiftTyTerm k (TAbs t) = TAbs (shiftTyTerm (1 + k) t)
 shiftTyTerm k (TApp t ty) = TApp (shiftTyTerm k t) (shiftTyp k ty)
-shiftTyTerm _ Nil = Nil
-shiftTyTerm k (Cons t1 t2) = Cons (shiftTyTerm k t1) (shiftTyTerm k t2)
 
 -- type shift in context
 shiftTyContext :: Int -> Context -> Context

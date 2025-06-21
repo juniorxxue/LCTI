@@ -24,7 +24,7 @@ lookupEnv k (ESvar _ env) = shiftTyp0 <$> lookupEnv k env
 lookupEnv _ _ = lift Nothing
 
 findSol :: Env -> Int -> WriterT Log Maybe Typ
--- findSol a b | trace ("findSol " ++ show a ++ " |- " ++ show b) False = undefined
+findSol a b | trace ("findSol " ++ show a ++ " |- " ++ show b) False = undefined
 findSol EEmpty _ = lift Nothing
 findSol (ESvar ty _) 0 = return ty
 findSol (ESvar _ senv) k | k > 0 = do
@@ -52,7 +52,7 @@ inst (ESvar ty senv) k tyA | k > 0 = do
 inst _ _ _ = Nothing
 
 ssubP :: (Env, Env) -> Typ -> Typ -> WriterT Log Maybe Env
--- ssubP (a1, a2) b c | trace ("ssub " ++ show a1 ++ ";" ++ show a2 ++ " |- " ++ show b ++ " <:+ " ++ show c) False = undefined
+ssubP (a1, a2) b c | trace ("ssub " ++ show a1 ++ ";" ++ show a2 ++ " |- " ++ show b ++ " <:+ " ++ show c) False = undefined
 ssubP (env, senv) TInt TInt = do
   tell ["[S-Int] " ++ logSSubFull (env, senv) TInt TInt senv]
   return senv
@@ -91,7 +91,7 @@ ssubP (env, senv) (TList tyA) (TList tyB) = do
 ssubP _ _ _ = lift Nothing
 
 ssubN :: (Env, Env) -> Typ -> Typ -> WriterT Log Maybe Env
--- ssubN (a1, a2) b c | trace ("ssub " ++ show a1 ++ ";" ++ show a2 ++ " |- " ++ show b ++ " <:- " ++ show c) False = undefined
+ssubN (a1, a2) b c | trace ("ssub " ++ show a1 ++ ";" ++ show a2 ++ " |- " ++ show b ++ " <:- " ++ show c) False = undefined
 ssubN (env, senv) TInt TInt = do
   tell ["[S-Int] " ++ logSSubFull (env, senv) TInt TInt senv]
   return senv
@@ -131,7 +131,7 @@ ssubN _ _ _ = lift Nothing
 
 
 ground :: Env -> Typ -> WriterT Log Maybe Typ
--- ground a b | trace ("ground " ++ show a ++ " |- " ++ show b) False = undefined
+ground a b | trace ("ground " ++ show a ++ " |- " ++ show b) False = undefined
 ground _ TInt = return TInt
 ground env (TVar k) | isUvar env k = return (TVar k)
 ground env (TVar k) = findSol env k
@@ -147,7 +147,7 @@ ground env (TList tyA) = do
   return $ TList tyA'
 
 sub :: (Env, Env) -> Typ -> Context -> WriterT Log Maybe (Env, Typ)
--- sub (a1, a2) b c | trace ("sub " ++ show a1 ++ ";" ++ show a2 ++ " |- " ++ show b ++ " <: " ++ show c) False = undefined
+sub (a1, a2) b c | trace ("sub " ++ show a1 ++ ";" ++ show a2 ++ " |- " ++ show b ++ " <: " ++ show c) False = undefined
 sub (env, senv) tyA CEmpty | closed (envConcat env senv) tyA = do
   grdA <- ground (envConcat env senv) tyA
   tell ["[S-Empty] " ++ logSubFull (env, senv) tyA CEmpty senv grdA]
@@ -223,7 +223,7 @@ infers _ _ = lift Nothing
 -- sub (EEmpty, (ESvar TInt EEmpty)) (TArr (TVar 0) (TVar 0)) (CTerm (Lit 42) CEmpty)
 
 infer :: Env -> Context -> Trm -> WriterT Log Maybe Typ
--- infer a b c | trace ("infer " ++ show a ++ " |- " ++ show b ++ " => " ++ show c) False = undefined
+infer a b c | trace ("infer " ++ show a ++ " |- " ++ show b ++ " => " ++ show c) False = undefined
 infer env CEmpty (Lit n) = do
   tell ["[Ty-Int] " ++ logInferFull env CEmpty (Lit n) TInt]
   return TInt
@@ -271,23 +271,23 @@ infer env h (TApp tm tyA) = do
   tell ["[Ty-TApp] " ++ logInferFull env h (TApp tm tyA) (substTyp0 tyA tyB)]
   tell $ indentAll _log
   return (substTyp0 tyA tyB)
-infer env (CFullType (TList tyA)) Nil = do
-  tell ["[Ty-Nil] " ++ logInferFull env (CFullType (TList tyA)) Nil (TList tyA)]
-  return (TList tyA)
-infer env (CFullType (TList tyA)) (Cons tm1 tm2) = do
-  (_, _log1) <- peek $ infer env (CFullType tyA) tm1
-  (_, _log2) <- peek $ infer env (CFullType (TList tyA)) tm2
-  tell ["[Ty-Cons1] " ++ logInferFull env (CFullType (TList tyA)) (Cons tm1 tm2) (TList tyA)]
-  tell $ indentAll _log1
-  tell $ indentAll _log2
-  return (TList tyA)
-infer env CEmpty (Cons tm1 tm2) = do
-  (tyA, _log1) <- peek $ infer env CEmpty tm1
-  (_, _log2) <- peek $ infer env (CFullType (TList tyA)) tm2
-  tell ["[Ty-Cons2] " ++ logInferFull env CEmpty (Cons tm1 tm2) (TList tyA)]
-  tell $ indentAll _log1
-  tell $ indentAll _log2
-  return (TList tyA)
+-- infer env (CFullType (TList tyA)) Nil = do
+--   tell ["[Ty-Nil] " ++ logInferFull env (CFullType (TList tyA)) Nil (TList tyA)]
+--   return (TList tyA)
+-- infer env (CFullType (TList tyA)) (Cons tm1 tm2) = do
+--   (_, _log1) <- peek $ infer env (CFullType tyA) tm1
+--   (_, _log2) <- peek $ infer env (CFullType (TList tyA)) tm2
+--   tell ["[Ty-Cons1] " ++ logInferFull env (CFullType (TList tyA)) (Cons tm1 tm2) (TList tyA)]
+--   tell $ indentAll _log1
+--   tell $ indentAll _log2
+--   return (TList tyA)
+-- infer env CEmpty (Cons tm1 tm2) = do
+--   (tyA, _log1) <- peek $ infer env CEmpty tm1
+--   (_, _log2) <- peek $ infer env (CFullType (TList tyA)) tm2
+--   tell ["[Ty-Cons2] " ++ logInferFull env CEmpty (Cons tm1 tm2) (TList tyA)]
+--   tell $ indentAll _log1
+--   tell $ indentAll _log2
+--   return (TList tyA)
 infer _ _ _ = lift Nothing
 
 
@@ -299,6 +299,16 @@ idTrm = TAbs (Ann (Abs (Var 0)) (TArr (TVar 0) (TVar 0)))
 
 idTrm' :: Typ -> Trm
 idTrm' ty = Ann (Abs (Var 0)) (TArr ty ty)
+
+listPrims :: Env
+-- Cons(1) : forall a. a -> [a] -> [a], Nil(0) : forall a. [a]
+listPrims = ETrm (TForall (TList (TVar 0))) $ ETrm (TForall (TArr (TVar 0) (TArr (TList (TVar 0)) (TList (TVar 0))))) EEmpty
+
+nil :: Trm
+nil = Var 0
+
+cons :: Trm -> Trm -> Trm
+cons = App . App (Var 1)
 
 main :: IO ()
 main = do
@@ -334,17 +344,17 @@ main = do
                               (Lit 1))
                          (TArr (TArr TInt TInt) TInt))
       -- id [1, 2]
-      test_list1 = infer EEmpty CEmpty (App idTrm (Cons (Lit 1) (Cons (Lit 2) Nil)))
+      test_list1 = infer listPrims CEmpty (App idTrm (cons (Lit 1) nil))
       -- id @ [Int] []
-      test_list2 = infer EEmpty CEmpty (App (TApp idTrm (TList TInt)) Nil)
+      test_list2 = infer listPrims CEmpty (App (TApp idTrm (TList TInt)) nil)
       -- rejected: id @ [Int -> Int] [forall a. a -> a]
-      test_list3 = infer EEmpty CEmpty (App (TApp idTrm (TList (TArr TInt TInt))) (Cons idTrm Nil))
+      test_list3 = infer listPrims CEmpty (App (TApp idTrm (TList (TArr TInt TInt))) (cons idTrm nil))
       -- id [id]
-      test_list4 = infer EEmpty CEmpty (App idTrm (Cons idTrm Nil))
+      test_list4 = infer listPrims CEmpty (App idTrm (cons idTrm nil))
       -- id [id @ (Int -> Int)]
-      test_list5 = infer EEmpty CEmpty (App idTrm (Cons (TApp idTrm (TArr TInt TInt)) Nil))
+      test_list5 = infer listPrims CEmpty (App idTrm (cons (TApp idTrm (TArr TInt TInt)) nil))
       -- id @ [Int -> Int] [id @ Int]
-      test_list6 = infer EEmpty CEmpty (App (TApp idTrm (TList (TArr TInt TInt))) (Cons (TApp idTrm TInt) Nil))
+      test_list6 = infer listPrims CEmpty (App (TApp idTrm (TList (TArr TInt TInt))) (cons (TApp idTrm TInt) nil))
   forM_ [ex_id, ex_id1, ex_idInt, ex_idInt1, ex_f1, ex_gid, ex_gid1, ex_g2, test_list1, test_list2, test_list3, test_list4, test_list5, test_list6] $ \ex -> case runWriterT ex of
     Just (tyA, logs) -> do
       putStrLn $ "inferred type: " ++ show tyA
