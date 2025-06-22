@@ -82,7 +82,7 @@ ssubP (env, senv) (TArr tyA tyB) (TArr tyC tyD) = do
   tell $ indentAll _log2
   return senv2
 ssubP (env, senv) (TForall tyA) (TForall tyB) = do
-  (senv', _log) <- peek $ ssubP (env, EUvar senv) tyA tyB
+  (EUvar senv', _log) <- peek $ ssubP (env, EUvar senv) tyA tyB
   tell ["[S-Forall] " ++ logSSubFull (env, senv) (TForall tyA) (TForall tyB) senv']
   tell $ indentAll _log
   return senv'
