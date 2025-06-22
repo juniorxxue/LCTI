@@ -152,7 +152,8 @@ data _ⅆ_≋_ⅆ_ : Env n m → Env n m → Env n m → Env n m → Set where
 ⅆ-⊆/ dd (ext-arr ext ext₁) with ⅆ-total-mid dd (⊆/-⊆ ext) (⊆/-⊆ ext₁)
 ... | ⟨ Ω' , ⟨ dd1 , dd2 ⟩ ⟩ = ext-arr (ⅆ-⊆/ dd1 ext) (ⅆ-⊆/ dd2 ext₁)
 ⅆ-⊆/ dd (ext-∀ ext) = ext-∀ (ⅆ-⊆/ (ⅆS∙ dd) ext)
-
+ⅆ-⊆/ dd (ext-arr-n ext ext₁) with ⅆ-total-mid dd (⊆/-⊆ ext) (⊆/-⊆ ext₁)
+... | ⟨ Ω' , ⟨ dd1 , dd2 ⟩ ⟩ = ext-arr-n (ⅆ-⊆/ dd1 ext) (ⅆ-⊆/ dd2 ext₁)
 
 ⅆk-total :  Γ ⅆ Γ' ⊆ Δ ⅆ Δ' kp H
          → Γ ⊆ Ω
@@ -232,6 +233,8 @@ s+-subirrev (s-ex-l^ inst) fv-var tf = s-ex-l^ (ⅆk-inst inst tf)
 s+-subirrev (s-ex-l= regΓ x-in) fv-var tf with refl ← ⅆk-input-eq tf = s-ex-l= (⊆-regular' regΓ (ⅆk-⊆-l tf)) (ⅆk-∋:= tf refl x-in)
 s+-subirrev (s-arr s s₁) (fv-arr fv fv₁ cb) tf with ⅆk-total tf (ss-⊆ s) (ss-⊆ s₁)
 ... | ⟨ Ω' , ⟨ dd1 , dd2 ⟩ ⟩ = s-arr (s--subirrev s fv (ⅆk-or-l dd1 cb)) (s+-subirrev s₁ fv₁ (ⅆk-or-r dd2 cb))
+s+-subirrev (s-arr-n s s₁) (fv-arr fv fv₁ cb) tf with ⅆk-total tf (ss-⊆ s) (ss-⊆ s₁)
+... | ⟨ Ω' , ⟨ dd1 , dd2 ⟩ ⟩ = s-arr-n (s+-subirrev s fv₁ (ⅆk-or-r dd1 cb)) (s--subirrev s₁ fv (ⅆk-or-l dd2 cb))
 s+-subirrev (s-∀ s) (fv-∀-h fv) tf = s-∀ (s+-subirrev s fv (ⅆS∙∙-hit tf))
 s+-subirrev (s-∀ s) (fv-∀-m fv) tf = s-∀ (s+-subirrev s fv (ⅆS∙∙-mis tf))
 
@@ -241,6 +244,8 @@ s--subirrev (s-ex-r^ inst) fv-var tf = s-ex-r^ (ⅆk-inst inst tf)
 s--subirrev (s-ex-r= regΓ x-in) fv-var tf with refl ← ⅆk-input-eq tf = s-ex-r= (⊆-regular' regΓ (ⅆk-⊆-l tf)) (ⅆk-∋:= tf refl x-in)
 s--subirrev (s-arr s s₁) (fv-arr fv fv₁ cb) tf with ⅆk-total tf (ss-⊆ s) (ss-⊆ s₁)
 ... | ⟨ Ω' , ⟨ dd1 , dd2 ⟩ ⟩ = s-arr (s+-subirrev s fv (ⅆk-or-l dd1 cb)) (s--subirrev s₁ fv₁ (ⅆk-or-r dd2 cb))
+s--subirrev (s-arr-n s s₁) (fv-arr fv fv₁ cb) tf with ⅆk-total tf (ss-⊆ s) (ss-⊆ s₁)
+... | ⟨ Ω' , ⟨ dd1 , dd2 ⟩ ⟩ = s-arr-n (s--subirrev s fv₁ (ⅆk-or-r dd1 cb)) (s+-subirrev s₁ fv (ⅆk-or-l dd2 cb))
 s--subirrev (s-∀ s) (fv-∀-h fv) tf = s-∀ (s--subirrev s fv (ⅆS∙∙-hit tf))
 s--subirrev (s-∀ s) (fv-∀-m fv) tf = s-∀ (s--subirrev s fv (ⅆS∙∙-mis tf))
 

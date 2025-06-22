@@ -1,3 +1,5 @@
+{-# OPTIONS --allow-unsolved-metas #-}
+{-# OPTIONS --allow-incomplete-matches #-}
 module Implicit.Interm2Algo.AuxLemmas where
 
 open import Implicit.Language.All
@@ -30,7 +32,7 @@ s+-⊆/ (s-var-∙ regΔ inΔ) = ⊆∞ (ext-var (reg-⊆/x∙ regΔ inΔ))
 s+-⊆/ (s-arr₁ s s₁) with s+-⊆/ s₁
 ... | ⊆∞ x = ⊆∞ (ext-arr (s--⊆/ s) x)
 s+-⊆/ (s-arr₂ s s₁) = ⊆I (s--⊆/ s) (s+-⊆/ s₁)
-s+-⊆/ (s-arr₃ cloA grd s) = ⊆C cloA (s+-⊆/ s)
+s+-⊆/ (s-arr₃ cloA grd s) = ⊆C (s+-⊆/ s)
 s+-⊆/ (s-∀ s) with s+-⊆/ s
 ... | ⊆∞ x = ⊆∞ (ext-∀ x)
 s+-⊆/ (s-∀l s ic fd upC upD upj) with s+-⊆/ s
@@ -73,7 +75,7 @@ data _ε'_ : Fin m → Type m → Set where
 ε'-ε : k ε' A
      → k ε A
 ε'-ε ε-var = ε-var
-ε'-ε (ε-arr x inA) = ε-arr-r x (ε'-ε inA)
+ε'-ε (ε-arr x inA) = ε-arr-r (ε'-ε inA)
 ε'-ε (ε-∀ inA) = ε-∀ (ε'-ε inA)
 
 ⊆/x-exsol' : Γ ⊆ Δ
@@ -111,6 +113,7 @@ complete-ss+ (s-arr₁ s s₁) (ext-arr ext ext₁)
   with ⟨ Ψ , diff ⟩ ← ⅆ-total (⊆/-⊆ ext) (⊆/-⊆ ext₁)
   with ih ← complete-ss- {Γ = Ψ} s (ⅆ-⊆/ diff ext)
   = s-arr (s--subirrev-final ih diff (⊆/-⊢c ext)) (complete-ss+ s₁ ext₁)
+complete-ss+ (s-arr₁ s s₁) (ext-arr-n ext ext₁) = {!!}
 complete-ss+ (s-∀ s) (ext-∀ ext) = s-∀ (complete-ss+ s ext)
 complete-ss+ (s-svar-l x inΔ) ext'@(ext-var x₁) with ⊆/x-=out-in x₁ (∋:=to∋= inΔ)
 ... | is-ex inΓ = s-ex-l^ (⊆/x-^in-=out-inst inΓ inΔ x₁)
@@ -124,6 +127,7 @@ complete-ss- (s-arr₁ s s₁) (ext-arr ext ext₁)
   with ⟨ Ψ , diff ⟩  ← ⅆ-total (⊆/-⊆ ext) (⊆/-⊆ ext₁)
   with ih ← complete-ss+ {Γ = Ψ} s (ⅆ-⊆/ diff ext)
   = s-arr (s+-subirrev-final ih diff (⊆/-⊢c ext)) (complete-ss- s₁ ext₁)
+complete-ss- (s-arr₁ s s₁) (ext-arr-n ext ext₁) = {!!}
 complete-ss- (s-∀ s) (ext-∀ ext) = s-∀ (complete-ss- s ext)
 complete-ss- (s-svar-r x inΔ) ext'@(ext-var x₁) with ⊆/x-=out-in x₁ (∋:=to∋= inΔ)
 ... | is-ex inΓ = s-ex-r^ (⊆/x-^in-=out-inst inΓ inΔ x₁)
@@ -249,6 +253,7 @@ ss-complete (s-arr {A = A} s s₁) | special {k = k} inA inΓ^ tail newΔ (s-typ
 ... | inj₁ inA' = normal (λ where ⟨ k , ⟨ ε-arr x' inB , inΓ ⟩ ⟩ → complete-false₁ inB inA x' inA')
                         (s-type (s-arr s s₁))
 ... | inj₂ ¬inA = special (ε-arr ¬inA inA) (⊆-^out-^in inΓ^ (ss-⊆ s)) (ett-arr tail) newΔ (s-type (s-arr s s₂))
+ss-complete (s-arr-n s s₁) = {!!}
 ss-complete (s-∀ s) with ss-complete s
 ... | normal cond s₁ = normal (λ cond2 → cond (case₂ cond2)) (s-type (s-∀ s))
 ... | special inA (S∙ inΓ^) tail (=⟹∙S newΔ up1) (s-type s₁)

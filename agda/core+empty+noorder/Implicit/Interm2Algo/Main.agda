@@ -13,6 +13,11 @@ open import Implicit.Interm2Algo.OpenClose
 open import Implicit.Interm2Algo.Find
 open import Implicit.Interm2Algo.AuxLemmas
 
+postulate
+  ⅆ-⊆/c : Δ ⅆ Δ' ≋ Γ ⅆ Γ'
+     → Γ' ⊆ Δ' w/t A w/c j
+     → Γ ⊆ Δ w/t A w/c j
+
 complete-s :  Δ ⊢ j # A ⌞ ≤⁺ ⌝ B
             → Γ ⊆ Δ w/t A w/c j
             → Γ ⊢ ⟨ j , B ⟩ ~s Σ
@@ -20,28 +25,20 @@ complete-s :  Δ ⊢ j # A ⌞ ≤⁺ ⌝ B
 
 complete-s {j = Z} (s-refl regΔ cloA grd) (⊆Z regΓ) ~Z = normal (⊢c-¬ε' cloA) (s-empty regΔ cloA grd)
 complete-s {j = ∞} s (⊆∞ ext) ~∞ = ss-complete (complete-ss+ s ext)
-complete-s {j = 𝕚 j} (s-arr₂ s s₁) (⊆I ext ext₁) (~I ⊢e ~j) with ⊆/-openclose ext
--- A is open
-complete-s {j = 𝕚 j} (s-arr₂ {A = A} s s₁) (⊆I ext ext₁) (~I ⊢e ~j) | inj₁ opnA
+complete-s {j = 𝕚 j} (s-arr₂ s s₁) (⊆I ext ext₁) (~I ⊢e ~j)
   with ⟨ Ψ , diff ⟩ ← ⅆ-total (⊆/-⊆ ext) (⊆/c-⊆ ext₁)
   with ih ← complete-ss- {Γ = Ψ} s (ⅆ-⊆/ diff ext)
   with ih' ← s--subirrev-final ih diff (⊆/-⊢c ext)
   with complete-s s₁ ext₁ (~irrev ~j (⊆/-⊆ ext))
-... | normal cond s₂ = normal
-  (λ where ⟨ k , ⟨ ε-arr x' inB , inΓ ⟩ ⟩ → cond ⟨ k , ⟨ inB , ⊆/-^in-^out (ss--⊆/ ih') x' inΓ ⟩ ⟩)
-  (s-term-o opnA ⊢e ih' s₂)
-... | special {k = k} inA inΓ^ tail newΔ s₂ with ε-dec {k = k} {A = A}
-... | inj₁ inA' = ⊥-elim (complete-false₂ ext inA' inΓ^)
-... | inj₂ ¬inA = special (ε-arr ¬inA inA) (⊆-^out-^in inΓ^ (ss-⊆ ih')) (ett-arr tail) newΔ (s-term-o opnA ⊢e ih' s₂)
--- A is close
-complete-s {j = 𝕚 j} (s-arr₂ {A = A} s s₁) (⊆I ext ext₁) (~I ⊢e ~j) | inj₂ cloA
-  with refl ← ⊆/-⊢c-eq ext cloA
-  with grd ← ⊆-⊢c-≫ (⊆/c-⊆ ext₁) cloA (s--≫ s)
-  with complete-s s₁ ext₁ ~j
-... | normal cond s₂ = normal (λ cond' → cond (case₁ cond')) (s-term-c cloA grd (subsumption0 ⊢e) s₂)
-... | special {k = k} inA inΓ^ tail newΔ s₂ with ε-dec {k = k} {A = A}
-... | inj₁ inA' = ⊥-elim (⊢c-^∈-false inA' inΓ^ cloA)
-... | inj₂ ¬inA = special (ε-arr ¬inA inA) inΓ^ (ett-arr tail) newΔ (s-term-c cloA grd (subsumption0 ⊢e) s₂)
+... | normal cond s₂ = normal (λ where ⟨ k , ⟨ ε-arr x' inB , inΓ ⟩ ⟩ → cond ⟨ k , ⟨ inB , ⊆/-^in-^out (ss--⊆/ ih') x' inΓ ⟩ ⟩)
+                              (s-term-o ⊢e ih' s₂)
+... | special inA inΓ^ tail newΔ s₂ = special (ε-arr (^in-^out-¬ε ext (⊆-^out-^in inΓ^ (ss-⊆ ih')) inΓ^) inA) (⊆-^out-^in inΓ^ (ss-⊆ ih')) (ett-arr tail) newΔ (s-term-o ⊢e ih' s₂)
+complete-s {j = 𝕚 j} (s-arr₂ s s₁) (⊆I-n ext ext₁) (~I ⊢e ~j)
+  with ⟨ Ψ , diff ⟩ ← ⅆ-total (⊆/c-⊆ ext) (⊆/-⊆ ext₁)
+  with ih ← complete-ss- s ext₁
+  with complete-s s₁ (ⅆ-⊆/c diff ext) (~irrev ~j (ⅆ-r-⊆ diff))
+... | normal cond s₂ = normal {!!} (s-term-o-n {!!} {!!} {!!})
+... | special inA inΓ^ tail newΔ s₂ = {!!}
 complete-s {j = 𝕚 j} (s-∀l s ic fd upC upD (↑tyʲ-𝕚 upj)) (⊆∀-I ext upj₁) ~j'@(~I {Σ = Σ} {e = e} ⊢e ~j)
   with ⟨ Σ' , upΣ ⟩ ← ↑tyᶜ0-total Σ
   with ⟨ e' , upe ⟩ ← ↑tyᵉ0-total e
@@ -78,10 +75,11 @@ complete-s {j = 𝕚 j} (s-svar-𝕚 x s) (⊆Inf-X extx iso) ~j'@(~I ⊢e ~j)
   with complete-s s (s+-⊆/ s) ~j'
 ... | normal cond s₁ = normal (λ { ⟨ k' , ⟨ ε-var , inΓ' ⟩ ⟩ → ∋^-∋=-false inΓ' inΓ }) (s-svar-term x s₁)
 ... | special inA inΓ^ tail newΔ s₁ = ⊥-elim (⊢c-^∈-false (ε'-ε inA) inΓ^ (⊢r-⊢c (∋:=-⊢r (s-sregular s) x)))
-complete-s {j = 𝕔 j} (s-arr₃ cloA grd s) (⊆C cloA₁ ext) (~C ⊢e ~j) with complete-s s ext ~j
-... | normal cond s₁ = normal (λ cond' → cond (case₁ cond')) (s-term-c cloA₁ (⊆-⊢c-≫ (⊆/c-⊆ ext) cloA₁ grd) ⊢e s₁)
+complete-s {j = 𝕔 j} (s-arr₃ cloA grd s) (⊆C ext) (~C ⊢e ~j) with complete-s s ext ~j
+... | normal cond s₁ = normal (λ cond' → cond (case₁ cond')) (s-term-c-n s₁ grd {!!})
 ... | special inA inΓ^ tail newΔ s₁
-  = special (ε-arr (⊢c-^∈-¬ε cloA₁ inΓ^) inA) inΓ^ (ett-arr tail) newΔ (s-term-c cloA₁ (⊆-⊢c-≫ (⊆/c-⊆ ext) cloA₁ grd) ⊢e s₁)
+  = {!!}
+  -- special (ε-arr (⊢c-^∈-¬ε cloA₁ inΓ^) inA) inΓ^ (ett-arr tail) newΔ (s-term-c cloA₁ (⊆-⊢c-≫ (⊆/c-⊆ ext) cloA₁ grd) ⊢e s₁)
 -- copy the logic from forall-L-i
 complete-s {j = 𝕔 j} (s-∀l s ic fd upC upD (↑tyʲ-𝕔 upj)) (⊆∀-C ext upj₁) ~j'@(~C {Σ = Σ} {e = e} ⊢e ~j)
   with ⟨ Σ' , upΣ ⟩ ← ↑tyᶜ0-total Σ

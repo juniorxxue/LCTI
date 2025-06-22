@@ -1,3 +1,5 @@
+{-# OPTIONS --allow-unsolved-metas #-}
+{-# OPTIONS --allow-incomplete-matches #-}
 module Implicit.Interm2Algo.ExtIrrev where
 
 open import Implicit.Language.All
@@ -13,8 +15,10 @@ data _⊆_w/t_w/c_ : Env n m → Env n m → Type m → Counter m → Set where
   ⊆I : (ext : Γ ⊆ Ω w/t A)
      → Ω ⊆ Δ w/t B w/c j
      → Γ ⊆ Δ w/t (A `→ B) w/c (𝕚 j)
-  ⊆C : (cloA : Γ ⊢c A)
-     → Γ ⊆ Δ w/t B w/c j
+  ⊆I-n : Γ ⊆ Ω w/t B w/c j
+       → (ext : Ω ⊆ Δ w/t A)
+     → Γ ⊆ Δ w/t (A `→ B) w/c (𝕚 j)
+  ⊆C :  Γ ⊆ Δ w/t B w/c j
      → Γ ⊆ Δ w/t (A `→ B) w/c (𝕔 j)
   ⊆∀-I : Γ ,^ ⊆ Δ ,= B w/t A w/c (𝕚 j')
        → (upj : ↑tyʲ0 j ⇘ j')
@@ -49,7 +53,7 @@ data _⊆_w/t_w/c_ : Env n m → Env n m → Type m → Counter m → Set where
 ⊆/c-⊆ (⊆Z regΓ) = ⊆-refl regΓ
 ⊆/c-⊆ (⊆∞ x) = ⊆/-⊆ x
 ⊆/c-⊆ (⊆I ext ext₁) = ⊆-trans (⊆/-⊆ ext) (⊆/c-⊆ ext₁)
-⊆/c-⊆ (⊆C x ext) = ⊆/c-⊆ ext
+⊆/c-⊆ (⊆C ext) = ⊆/c-⊆ ext
 ⊆/c-⊆ (⊆∀-I ext upj) with ⊆/c-⊆ ext
 ... | evar-sol r regA = r
 ⊆/c-⊆ (⊆∀-C ext upj) with ⊆/c-⊆ ext
@@ -64,6 +68,8 @@ data _⊆_w/t_w/c_ : Env n m → Env n m → Type m → Counter m → Set where
 ⊆/c-⊆ (⊆C-X regΓ cloA) = ⊆-refl regΓ
 ⊆/c-⊆ (⊆T-X regΓ cloA) = ⊆-refl regΓ
 ⊆/c-⊆ (⊆Inf-X extx iso) = ⊆/x-⊆ extx
+⊆/c-⊆ (⊆I-n x ext) = ⊆-trans (⊆/c-⊆ x) (⊆/-⊆ ext)
+
 
 ----------------------------------------------------------------------
 --+                              inst                              +--
@@ -165,6 +171,8 @@ data _⊆_w/t_w/c_ : Env n m → Env n m → Type m → Counter m → Set where
 ⊆/-irrev-== (ext-var x) newΓ newΔ = ext-var (⊆/x-irrev-== x newΓ newΔ)
 ⊆/-irrev-== (ext-arr ext ext₁) newΓ newΔ = let ⟨ Ω' , inst ⟩ = inst-exist' newΓ (⊆/-⊆ ext)
                      in ext-arr (⊆/-irrev-== ext newΓ inst) (⊆/-irrev-== ext₁ inst newΔ)
+⊆/-irrev-== (ext-arr-n ext ext₁) newΓ newΔ = let ⟨ Ω' , inst ⟩ = inst-exist' newΓ (⊆/-⊆ ext)
+                     in ext-arr-n (⊆/-irrev-== ext newΓ inst) (⊆/-irrev-== ext₁ inst newΔ)
 ⊆/-irrev-== {B = B} (ext-∀ ext) newΓ newΔ = let ⟨ B' , upB ⟩ = ↑ty0-total B
                                                      in ext-∀ (⊆/-irrev-== ext (=⟹∙S newΓ upB) (=⟹∙S newΔ upB))
 
@@ -176,7 +184,9 @@ data _⊆_w/t_w/c_ : Env n m → Env n m → Type m → Counter m → Set where
 ⊆/c-irrev-== (⊆∞ ext) new1 new2 = ⊆∞ (⊆/-irrev-== ext new1 new2)
 ⊆/c-irrev-== (⊆I ext ext₁) new1 new2
   with ⟨ Ω , inst ⟩ ← inst-exist' new1 (⊆/-⊆ ext) = ⊆I (⊆/-irrev-== ext new1 inst) (⊆/c-irrev-== ext₁ inst new2)
-⊆/c-irrev-== (⊆C x ext) new1 new2 = ⊆C (=⟹-⊢c x new1) (⊆/c-irrev-== ext new1 new2)
+⊆/c-irrev-== (⊆I-n ext ext₁) new1 new2
+  with ⟨ Ω , inst ⟩ ← inst-exist' new1 (⊆/c-⊆ ext) = ⊆I-n (⊆/c-irrev-== ext new1 inst) (⊆/-irrev-== ext₁ inst new2)
+⊆/c-irrev-== (⊆C ext) new1 new2 = ⊆C (⊆/c-irrev-== ext new1 new2)
 ⊆/c-irrev-== {B = B} (⊆∀-I ext upj) new1 new2
   with evar-sol r regA ← ⊆/c-⊆ ext
   with ⟨ B' , upB ⟩ ← ↑ty0-total B = ⊆∀-I (⊆/c-irrev-== ext (=⟹^S new1 upB) (=⟹=S new2 upB regA)) upj
@@ -213,7 +223,12 @@ data _⊆_w/t_w/c_ : Env n m → Env n m → Type m → Counter m → Set where
 ⊆/-irrev-^= (ext-var x) inΓ newΔ ε-var = ext-var (⊆/v-irrev-^= x inΓ newΔ)
 ⊆/-irrev-^= (ext-arr ext ext₁) inΓ newΔ (ε-arr-l inA) with inst-exist newΔ (⊆/-⊆ ext₁) (⊆/-^in-=out ext inA inΓ)
 ... | ⟨ Ω' , newΩ ⟩ = ext-arr (⊆/-irrev-^= ext inΓ newΩ inA) (⊆/-irrev-== ext₁ newΩ newΔ)
-⊆/-irrev-^= (ext-arr ext ext₁) inΓ newΔ (ε-arr-r ¬inA inB) = ext-arr ext (⊆/-irrev-^= ext₁ (⊆/-^in-^out ext ¬inA inΓ) newΔ inB)
+⊆/-irrev-^= {A = A `→ B} {k = k} (ext-arr ext ext₁) inΓ newΔ (ε-arr-r inB) with ε-dec {k = k} {A = A}
+... | inj₁ inA
+  with ⟨ Ω' , newΩ ⟩ ← inst-exist newΔ (⊆/-⊆ ext₁) (⊆/-^in-=out ext inA inΓ) = ext-arr (⊆/-irrev-^= ext inΓ newΩ inA) (⊆/-irrev-== ext₁ newΩ newΔ)
+... | inj₂ ¬inA = ext-arr ext (⊆/-irrev-^= ext₁ (⊆/-^in-^out ext ¬inA inΓ) newΔ inB)
+⊆/-irrev-^= (ext-arr-n ext ext₁) inΓ newΔ (ε-arr-l inA) = {!inst-exist newΔ (⊆/-⊆ ext₁) (⊆/-^in-=out ext inA inΓ)!}
+⊆/-irrev-^= (ext-arr-n ext ext₁) inΓ newΔ (ε-arr-r inA) = {!!}
 ⊆/-irrev-^= {B = B} (ext-∀ ext) inΓ newΔ (ε-∀ inA) = ext-∀ (⊆/-irrev-^= ext (S∙ inΓ) (=⟹∙S newΔ (proj₂ (↑ty0-total B))) inA)
 
 ⊆/c-irrev-^= : Γ ⊆ Δ w/t A w/c j
@@ -225,9 +240,10 @@ data _⊆_w/t_w/c_ : Env n m → Env n m → Type m → Counter m → Set where
 ⊆/c-irrev-^= (⊆∞ ext) inΓ newΔ fd = ⊆∞ (⊆/-irrev-^= ext inΓ newΔ (find-ε fd))
 ⊆/c-irrev-^= (⊆I ext ext₁) inΓ newΔ (f-arr-𝕚-l x) with inst-exist newΔ (⊆/c-⊆ ext₁) (⊆/-^in-=out ext x inΓ)
 ... | ⟨ Ω' , inst-Ω ⟩ = ⊆I (⊆/-irrev-^= ext inΓ inst-Ω x) (⊆/c-irrev-== ext₁ inst-Ω newΔ)
-⊆/c-irrev-^= (⊆I ext ext₁) inΓ newΔ (f-arr-𝕚-r ¬inA fd) =
-  ⊆I ext (⊆/c-irrev-^= ext₁ (⊆/-^in-^out ext ¬inA inΓ) newΔ fd)
-⊆/c-irrev-^= (⊆C x ext) inΓ newΔ (f-arr-𝕔 ¬inA fd) = ⊆C x (⊆/c-irrev-^= ext inΓ newΔ fd)
+⊆/c-irrev-^= (⊆I ext ext₁) inΓ newΔ (f-arr-𝕚-r fd) = {!!}
+--  ⊆I ext (⊆/c-irrev-^= ext₁ (⊆/-^in-^out ext ¬inA inΓ) newΔ fd)
+⊆/c-irrev-^= (⊆I-n ext ext₁) inΓ newΔ fd = {!!}
+⊆/c-irrev-^= (⊆C ext) inΓ newΔ (f-arr-𝕔 fd) = ⊆C (⊆/c-irrev-^= ext inΓ newΔ fd)
 ⊆/c-irrev-^= {B = B} (⊆∀-I ext upj') inΓ newΔ (f-∀-𝕚 fd upj) with ⊆/c-⊆ ext
 ... | evar-sol r regA
    with refl ← ↑tyʲ-unique upj upj' = ⊆∀-I (⊆/c-irrev-^= ext (S^ inΓ) (=⟹=S newΔ (proj₂ (↑ty0-total B)) regA) fd) upj'
@@ -245,6 +261,7 @@ data _⊆_w/t_w/c_ : Env n m → Env n m → Type m → Counter m → Set where
 ⊆/c-irrev-^= (⊆C-X regΓ cloA) inΓ newΔ (f-iso iso) = ⊥-elim (⊢c-^∈-false ε-var inΓ cloA)
 ⊆/c-irrev-^= (⊆T-X regΓ cloA) inΓ newΔ (f-iso iso) = ⊥-elim (⊢c-^∈-false ε-var inΓ cloA)
 ⊆/c-irrev-^= (⊆Inf-X extx iso) inΓ newΔ (f-iso iso₁) = ⊆Inf-X (⊆/v-irrev-^= extx inΓ newΔ) iso
+
 
 ⊆/c-irrev-^=0 : Γ ,^ ⊆ Δ ,= B₁ w/t A w/c j
               → find A #0 j
@@ -381,8 +398,9 @@ data _⊆_w/t_w/c_ : Env n m → Env n m → Type m → Counter m → Set where
            → Γ' ⊆ Δ w/t A
 ⊆/-irrev-^ (ext-var x) ε-var newΓ = ext-var (⊆/v-irrev-^ x newΓ)
 ⊆/-irrev-^ (ext-arr ext ext₁) (ε-arr-l inA) newΓ = ext-arr (⊆/-irrev-^ ext inA newΓ) ext₁
-⊆/-irrev-^ (ext-arr ext ext₁) (ε-arr-r x inA) newΓ
-  with ⟨ Ω' , ◎Ω ⟩ ← ◎-total (⊆/-=in-=out ext (◎-∋= newΓ)) = ext-arr (⊆/-irrev-^^ ext x newΓ ◎Ω) (⊆/-irrev-^ ext₁ inA ◎Ω)
+⊆/-irrev-^ (ext-arr ext ext₁) (ε-arr-r inA) newΓ
+  with ⟨ Ω' , ◎Ω ⟩ ← ◎-total (⊆/-=in-=out ext (◎-∋= newΓ)) = {!!}
+  -- ext-arr (⊆/-irrev-^^ ext newΓ ◎Ω) (⊆/-irrev-^ ext₁ inA ◎Ω)
 ⊆/-irrev-^ (ext-∀ ext) (ε-∀ inA) newΓ = ext-∀ (⊆/-irrev-^ ext inA (◎S∙ newΓ))
 
 ⊆/c-irrev-^ : Γ ⊆ Δ w/t A w/c j
@@ -393,9 +411,10 @@ data _⊆_w/t_w/c_ : Env n m → Env n m → Type m → Counter m → Set where
 ⊆/c-irrev-^ (⊆Z regΓ) fd newΓ = ⊥-elim (find-Z-false fd)
 ⊆/c-irrev-^ (⊆∞ ext) fd newΓ = ⊆∞ (⊆/-irrev-^ ext (find-ε fd) newΓ)
 ⊆/c-irrev-^ (⊆I ext ext₁) (f-arr-𝕚-l x) newΓ = ⊆I (⊆/-irrev-^ ext x newΓ) ext₁
-⊆/c-irrev-^ (⊆I ext ext₁) (f-arr-𝕚-r ¬inA fd) newΓ
-  with ⟨ Ω' , ◎Ω ⟩ ← ◎-total (⊆/-=in-=out ext (◎-∋= newΓ)) = ⊆I (⊆/-irrev-^^ ext ¬inA newΓ ◎Ω) (⊆/c-irrev-^ ext₁ fd ◎Ω)
-⊆/c-irrev-^ (⊆C cloA ext) (f-arr-𝕔 ¬inA fd) newΓ = ⊆C (◎-⊢c cloA newΓ ¬inA) (⊆/c-irrev-^ ext fd newΓ)
+⊆/c-irrev-^ (⊆I ext ext₁) (f-arr-𝕚-r fd) newΓ
+  with ⟨ Ω' , ◎Ω ⟩ ← ◎-total (⊆/-=in-=out ext (◎-∋= newΓ)) = {!!}
+  -- ⊆I (⊆/-irrev-^^ ext ¬inA newΓ ◎Ω) (⊆/c-irrev-^ ext₁ fd ◎Ω)
+⊆/c-irrev-^ (⊆C ext) (f-arr-𝕔 fd) newΓ = ⊆C (⊆/c-irrev-^ ext fd newΓ)
 ⊆/c-irrev-^ (⊆∀-I ext upj') (f-∀-𝕚 fd upj) newΓ
   with refl ← ↑tyʲ-unique upj upj' = ⊆∀-I (⊆/c-irrev-^ ext fd (◎S^ newΓ)) upj'
 ⊆/c-irrev-^ (⊆∀-C ext upj') (f-∀-𝕔 fd upj) newΓ

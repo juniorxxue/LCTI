@@ -1,3 +1,5 @@
+{-# OPTIONS --allow-unsolved-metas #-}
+{-# OPTIONS --allow-incomplete-matches #-}
 module Implicit.Interm2Algo.Find where
 
 open import Implicit.Language.All
@@ -12,8 +14,8 @@ open import Implicit.Interm2Algo.ExtIrrev
 ⊆/c-find (⊆∞ ext) in1 in2 = f-∞ (^in-=out-ε ext in1 in2)
 ⊆/c-find {A = A `→ B} {k = k} (⊆I ext ext₁) in1 in2 with ε-dec {k = k} {A}
 ... | inj₁ p = f-arr-𝕚-l p
-... | inj₂ ¬p = f-arr-𝕚-r ¬p (⊆/c-find ext₁ (⊆/-^in-^out ext ¬p in1) in2)
-⊆/c-find (⊆C cloA ext) in1 in2 = f-arr-𝕔 (⊢c-^∈-¬ε cloA in1) (⊆/c-find ext in1 in2)
+... | inj₂ ¬p = f-arr-𝕚-r (⊆/c-find ext₁ (⊆/-^in-^out ext ¬p in1) in2)
+⊆/c-find (⊆C ext) in1 in2 = f-arr-𝕔 (⊆/c-find ext in1 in2)
 ⊆/c-find (⊆∀-I ext upj) in1 in2 = f-∀-𝕚 (⊆/c-find ext (S^ in1) (S= in2)) upj
 ⊆/c-find (⊆∀-I-no ext upj) in1 in2 = f-∀-𝕚 (⊆/c-find ext (S^ in1) (S^ in2)) upj
 ⊆/c-find (⊆∀-C ext upj) in1 in2 = f-∀-𝕔 (⊆/c-find ext (S^ in1) (S= in2)) upj
@@ -37,8 +39,9 @@ open import Implicit.Interm2Algo.ExtIrrev
               → Δ ∋= k
 ⊆/c-find-∋= (⊆∞ ext) inΓ (f-∞ x) = ⊆/-^in-=out ext x inΓ
 ⊆/c-find-∋= (⊆I ext ext₁) inΓ (f-arr-𝕚-l x) = ⊆-∋= (⊆/-^in-=out ext x inΓ) (⊆/c-⊆ ext₁)
-⊆/c-find-∋= (⊆I ext ext₁) inΓ (f-arr-𝕚-r ¬inA fd) = ⊆/c-find-∋= ext₁ (⊆/-^in-^out ext ¬inA inΓ) fd
-⊆/c-find-∋= (⊆C cloA ext) inΓ (f-arr-𝕔 ¬inA fd) = ⊆/c-find-∋= ext inΓ fd
+⊆/c-find-∋= (⊆I ext ext₁) inΓ (f-arr-𝕚-r fd) = {!!}
+-- ⊆/c-find-∋= ext₁ (⊆/-^in-^out ext ¬inA inΓ) fd
+⊆/c-find-∋= (⊆C ext) inΓ (f-arr-𝕔 fd) = ⊆/c-find-∋= ext inΓ fd
 ⊆/c-find-∋= (⊆∀-I ext upj) inΓ (f-∀-𝕚 fd upj₁)
   with refl ← ↑tyʲ-unique upj upj₁
   with S= r ← ⊆/c-find-∋= ext (S^ inΓ) fd = r
