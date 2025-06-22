@@ -66,6 +66,7 @@ data wf : Type m → Counter m → Set where
 ⊆/c-wf (⊆C-X regΓ) = wf-𝕔-var
 ⊆/c-wf (⊆T-X regΓ) = wf-𝕥-var
 
+{-
 ⊆/c-find-dec : ∀ k
              → wf A j
              → (find A k j) ⊎ (¬find A k j)
@@ -93,6 +94,7 @@ data wf : Type m → Counter m → Set where
 ⊆/c-find-dec k (wf-𝕥 wf₁ upj) with ⊆/c-find-dec (#S k) wf₁
 ... | inj₁ x = inj₁ (f-𝕥 x upj)
 ... | inj₂ y = inj₂ (f-𝕥 y upj)
+-}
 
 
 ⊆/c-find : Γ ⊆ Δ w/t A w/c j

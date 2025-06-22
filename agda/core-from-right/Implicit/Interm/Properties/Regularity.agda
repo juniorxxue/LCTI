@@ -1,3 +1,5 @@
+{-# OPTIONS --allow-unsolved-metas #-}
+{-# OPTIONS --allow-incomplete-matches #-}
 module Implicit.Interm.Properties.Regularity where
 
 open import Implicit.Language.All hiding (_⊢rʲ_)
@@ -22,7 +24,6 @@ s-sregular (s-svar-r x inΔ) = x
 s-sregular (s-tapp s upj) with s-sregular s
 ... | reg-S= r regA = r
 s-sregular (s-svar-𝕚 _ x) = s-sregular x
-s-sregular (s-svar-𝕔 _ x) = s-sregular x
 s-sregular (s-svar-𝕥 x x₁) = s-sregular x₁
 
 t-tregular : Γ ⊢ j # e ⦂ A

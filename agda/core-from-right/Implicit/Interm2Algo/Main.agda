@@ -10,7 +10,7 @@ open import Implicit.Interm2Algo.Counter2Context
 open import Implicit.Interm2Algo.ExtIrrev
 open import Implicit.Interm2Algo.EnvDiff
 open import Implicit.Interm2Algo.OpenClose
-open import Implicit.Interm2Algo.Find
+-- open import Implicit.Interm2Algo.Find
 
 s+-⊆/ : Δ ⊢ j # A ⌞ ≤⁺ ⌝ B
       → Δ ⊆ Δ w/t A w/c j
