@@ -144,6 +144,10 @@ reg-⊆/ senv (⊢r-∀ regA) = ext-∀ (reg-⊆/ (reg-S∙ senv) regA)
   with refl ← ⊆/-⊢c-eq ext₁ cloA₁ = refl
 ⊆/-⊢c-eq (ext-∀ ext) (⊢c-∀ cloA)
   with refl ← ⊆/-⊢c-eq ext cloA = refl
+⊆/-⊢c-eq (ext-arr-n x₁ x₂) (⊢c-arr x x₃)
+  with refl ← ⊆/-⊢c-eq x₁ x₃
+  with refl ← ⊆/-⊢c-eq x₂ x
+  = refl
 
 ⊆/-∙out-∙in : Δ ∋∙ X
             → Γ ⊆ Δ w/v X
@@ -175,6 +179,7 @@ reg-⊆/ senv (⊢r-∀ regA) = ext-∀ (reg-⊆/ (reg-S∙ senv) regA)
 ⊆/-⊆ (ext-arr ext ext₁) = ⊆-trans (⊆/-⊆ ext) (⊆/-⊆ ext₁)
 ⊆/-⊆ (ext-∀ ext) with ⊆/-⊆ ext
 ... | uvar r = r
+⊆/-⊆ (ext-arr-n x x₁) = ⊆-trans (⊆/-⊆ x) (⊆/-⊆ x₁)
 
 ⊆/x-refl : SRegular Γ
        → Γ ⊢c ‶ X
@@ -220,6 +225,7 @@ reg-⊆/ senv (⊢r-∀ regA) = ext-∀ (reg-⊆/ (reg-S∙ senv) regA)
 ⊆/-⊢c (ext-var x) = ⊆/x-⊢c x
 ⊆/-⊢c (ext-arr ext ext₁) = ⊢c-arr (⊆-⊢c (⊆/-⊢c ext) (⊆/-⊆ ext₁)) (⊆/-⊢c ext₁)
 ⊆/-⊢c (ext-∀ ext) = ⊢c-∀ (⊆/-⊢c ext)
+⊆/-⊢c (ext-arr-n x x₁) = ⊢c-arr (⊆/-⊢c x₁) (⊆-⊢c (⊆/-⊢c x) (⊆/-⊆ x₁))
 
 
 ⊆-regular : SRegular Γ

@@ -59,5 +59,8 @@ data _⊆_w/t_ : Env n m → Env n m → Type m → Set where
   ext-arr : Γ ⊆ Ω w/t A
           → Ω ⊆ Δ w/t B
           → Γ ⊆ Δ w/t A `→ B
+  ext-arr-n : Γ ⊆ Ω w/t B
+            → Ω ⊆ Δ w/t A
+            → Γ ⊆ Δ w/t A `→ B
   ext-∀   : Γ ,∙ ⊆ Δ ,∙ w/t A
           → Γ ⊆ Δ w/t `∀ A

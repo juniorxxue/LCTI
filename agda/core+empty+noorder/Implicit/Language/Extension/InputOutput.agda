@@ -58,23 +58,29 @@ open import Implicit.Language.Extension.Base
 
 ⊆/-^in-=out (ext-var x) ε-var inΓ = ⊆/x-^in-=out x inΓ
 ⊆/-^in-=out (ext-arr ext ext₁) (ε-arr-l inA) inΓ = ⊆/-=in-=out ext₁ (⊆/-^in-=out ext inA inΓ)
-⊆/-^in-=out {A = A `→ B} {k = k} (ext-arr ext ext₁) (ε-arr-r ¬inA inB) inΓ with ε-dec {k = k} {A = A}
+⊆/-^in-=out {A = A `→ B} {k = k} (ext-arr ext ext₁) (ε-arr-r inB) inΓ with ε-dec {k = k} {A = A}
 ... | inj₁ init = ⊆/-=in-=out ext₁ (⊆/-^in-=out ext init inΓ)
 ... | inj₂ nint = ⊆/-^in-=out ext₁ inB (⊆/-^in-^out ext nint inΓ)
 ⊆/-^in-=out (ext-∀ ext) (ε-∀ inA) inΓ with ⊆/-^in-=out ext inA (S∙ inΓ)
 ... | S∙ r = r
+⊆/-^in-=out {A = A `→ B} {k = k} (ext-arr-n x₁ x₂) (ε-arr-l x₃) x with ε-dec {k = k} {A = B}
+... | inj₁ init = ⊆/-=in-=out x₂ (⊆/-^in-=out x₁ init x)
+... | inj₂ nint = ⊆/-^in-=out x₂ x₃ (⊆/-^in-^out x₁ nint x)
+⊆/-^in-=out (ext-arr-n x₁ x₂) (ε-arr-r x₃) x = ⊆/-=in-=out x₂ (⊆/-^in-=out x₁ x₃ x)
 
 ⊆/-^in-^out (ext-int _) ninA inΓ = inΓ
 ⊆/-^in-^out (ext-var x) (¬ε-var x₁) inΓ = ⊆/x-^in-^out x x₁ inΓ
 ⊆/-^in-^out (ext-arr ext ext₁) (¬ε-arr ninA ninA₁) inΓ = ⊆/-^in-^out ext₁ ninA₁ (⊆/-^in-^out ext ninA inΓ)
 ⊆/-^in-^out (ext-∀ ext) (¬ε-∀ ninA) inΓ with ⊆/-^in-^out ext ninA (S∙ inΓ)
 ... | S∙ r = r
+⊆/-^in-^out (ext-arr-n x₂ x₃) (¬ε-arr x x₄) x₁ = ⊆/-^in-^out x₃ x (⊆/-^in-^out x₂ x₄ x₁)
 
 ⊆/-=in-=out (ext-int _) inΓ = inΓ
 ⊆/-=in-=out (ext-var x) inΓ = ⊆/x-=in-=out x inΓ
 ⊆/-=in-=out (ext-arr ext ext₁) inΓ = ⊆/-=in-=out ext₁ (⊆/-=in-=out ext inΓ)
 ⊆/-=in-=out (ext-∀ ext) inΓ with ⊆/-=in-=out ext (S∙ inΓ)
 ... | S∙ r = r
+⊆/-=in-=out (ext-arr-n x₁ x₂) x = ⊆/-=in-=out x₂ (⊆/-=in-=out x₁ x)
 
 ⊆/x-^in-=out-eq : Γ ⊆ Δ w/v X
                  → Γ ∋^ k
