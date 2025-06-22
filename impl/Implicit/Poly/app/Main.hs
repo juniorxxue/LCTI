@@ -191,10 +191,14 @@ sub (env, senv) (TForall tyA) (CTerm e h) = do
   tell $ indentAll _log1
   return (senv', unshiftTyp0 tyB)
 sub (env, senv) (TForall tyA) (CTApp tyB h) = do
-  ((ESvar _ senv', tyC), _log1) <- peek $ sub (env, ESvar tyB senv) tyA (shiftTyContext0 h)
-  tell ["[S-Forall-TApp] " ++ logSubFull (env, senv) (TForall tyA) (CTApp tyB h) senv' (TForall tyC)]
+  ((senv', tyC), _log1) <- peek $ sub (env, ESvar tyB senv) tyA (shiftTyContext0 h)
+  senv'' <- case senv' of
+    ESvar _ senv'' -> return senv''
+    EEvar senv'' -> return senv''
+    _ -> lift Nothing
+  tell ["[S-Forall-TApp] " ++ logSubFull (env, senv) (TForall tyA) (CTApp tyB h) senv'' (TForall tyC)]
   tell $ indentAll _log1
-  return (senv', TForall tyC)
+  return (senv'', TForall tyC)
 sub (env, senv) (TVar k) (CTerm e h) | isSvar (envConcat env senv) k = do
   tyA <- findSol (envConcat env senv) k
   ((senv', tyBC), _log) <- peek $ sub (env, senv) tyA (CTerm e h)
