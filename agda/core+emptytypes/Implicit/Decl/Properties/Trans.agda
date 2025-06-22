@@ -39,20 +39,19 @@ data _≋_ : Counter m → Counter m → Set where
   refl≋ : j ≋ j
 
 
-
 ↑ty-≋ : ∀ {nj nj'}
       → j ≋ nj
       → j ↑tyʲ k ⇘ j'
       → nj ↑tyʲ k ⇘ nj'
       → j' ≋ nj'
-{-
 ↑ty-≋ Z≋ ↑tyʲ-Z up2 = Z≋
 ↑ty-≋ (𝕚≋ new) (↑tyʲ-𝕚 up1) (↑tyʲ-𝕚 up2) = 𝕚≋ (↑ty-≋ new up1 up2)
 ↑ty-≋ (𝕔≋ new) (↑tyʲ-𝕔 up1) (↑tyʲ-𝕔 up2) = 𝕔≋ (↑ty-≋ new up1 up2)
 ↑ty-≋ (𝕥≋ new) (↑tyʲ-𝕥 up1 upA) (↑tyʲ-𝕥 up2 upA₁)
   with refl ← ↑ty-unique upA upA₁
   = 𝕥≋ (↑ty-≋ new up1 up2)
--}
+↑ty-≋ refl≋ upj upnj
+  with refl ← ↑tyʲ-unique upj upnj = refl≋
 
 ≋-isoinf : ∀ {nj}
          → j ≋ nj

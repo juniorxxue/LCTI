@@ -158,6 +158,7 @@ data _≋_ : Counter m → Counter m → Set where
   𝕥≋ : ∀ {nj}
      → j ≋ nj
      → 𝕥₍ A ₎ j ≋ 𝕥₍ A ₎ nj
+--  ≋refl : j ≋ j
 
 ↑ty-≋ : ∀ {nj nj'}
       → j ≋ nj
