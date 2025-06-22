@@ -1,3 +1,5 @@
+{-# OPTIONS --allow-unsolved-metas #-}
+{-# OPTIONS --allow-incomplete-matches #-}
 module Implicit.Algo2Interm.Main where
 
 open import Implicit.Language.All
@@ -18,6 +20,7 @@ sound-ss (s-ex-l= regΓ x-in) = s-svar-l regΓ x-in
 sound-ss (s-ex-r= regΓ x-in) = s-svar-r regΓ x-in
 sound-ss (s-arr s s₁) = s-arr₁ (s-⊆-prv (sound-ss s) (ss-⊆ s₁)) (sound-ss s₁)
 sound-ss (s-∀ s) = s-∀ (sound-ss s)
+sound-ss (s-arr-n s s₁) = s-arr₁ (sound-ss s₁) (s-⊆-prv (sound-ss s) (ss-⊆ s₁))
 
 ----------------------------------------------------------------------
 --+                           main logic                           +--
@@ -59,9 +62,9 @@ tc-~ (⊢tapp ⊢e st) with tc-~ ⊢e
 
 sc-~ (s-empty regΓ cloA x) = ~sZ
 sc-~ (s-type ss) = ~s∞
-sc-~ (s-term-c cloA ap ⊢e s) with tc-id0 ⊢e
+sc-~ (s-term-c ap ⊢e s) with tc-id0 ⊢e
 ... | refl = ~sC (t-⊆-prv (sound ⊢e) (sc-⊆ s)) (sc-~ s)
-sc-~ s'@(s-term-o opnA ⊢e ss s) = ~sI (t-⊆-prv (sound ⊢e) (sc-⊆ s')) (sc-~ s)
+sc-~ s'@(s-term-o ⊢e ss s) = ~sI (t-⊆-prv (sound ⊢e) (sc-⊆ s')) (sc-~ s)
 sc-~ (s-∀l-𝕚 s upᶜ upj upᵉ upC upD) = ~s-strengthen=0 (sc-~ s) (↑ty-arr upC upD) (↑tyᶜ-e upᵉ upᶜ) (↑tyʲ-𝕚 upj)
 sc-~ (s-∀l-𝕔 s upᶜ upj upᵉ upC upD) = ~s-strengthen=0 (sc-~ s) (↑ty-arr upC upD) (↑tyᶜ-e upᵉ upᶜ) (↑tyʲ-𝕔 upj)
 sc-~ (s-tapp {B = B} {C = C} s upᶜ upj)
@@ -72,6 +75,9 @@ sc-~ (s-∀l-no-𝕚 s upᶜ upj upᵉ upC upD) = ~s-strengthen^0 (sc-~ s) (↑t
 sc-~ (s-∀l-no-𝕔 s upᶜ upj upᵉ upC upD) = ~s-strengthen^0 (sc-~ s) (↑ty-arr upC upD) (↑tyᶜ-e upᵉ upᶜ) (↑tyʲ-𝕔 upj)
 sc-~ (s-evar-infers infs inst)
   with ih ← infs-~ infs = ~s-irrev-⊆ (~t-~s ih) (inst-⊆ inst)
+sc-~ (s-term-c-n x ap ⊢e)
+  with refl ← tc-id0 ⊢e = ~sC (sound ⊢e) (sc-~ x)
+sc-~ s'@(s-term-o-n x ⊢e ss) = ~sI (t-⊆-prv (sound ⊢e) (ss-⊆ ss)) (~s-irrev-⊆ (sc-~ x) (ss-⊆ ss))
 
 infs-~ (infs-z regΓ regA) = ~t∞
 infs-~ (infs-s ⊢e infs) = ~tI (sound ⊢e) (infs-~ infs)
@@ -91,9 +97,9 @@ sound (⊢tapp ⊢e st) = ⊢tapp (sound ⊢e) st
 
 sound-s (s-empty regΓ cloA x) = s-refl regΓ cloA x
 sound-s (s-type ss) = sound-ss ss
-sound-s (s-term-c cloA ap ⊢e s) with tc-id0 ⊢e
-... | refl = s-arr₃ (⊆-⊢c cloA (sc-⊆ s)) (⊆-⊢c-≫' (sc-⊆ s) cloA ap) (sound-s s)
-sound-s (s-term-o opnA ⊢e ss s) = s-arr₂ (s-⊆-prv (sound-ss ss) (sc-⊆ s)) (sound-s s)
+sound-s (s-term-c ap ⊢e s) with tc-id0 ⊢e
+... | refl = s-arr₃ (⊆-⊢c {!!} (sc-⊆ s)) (⊆-⊢c-≫' (sc-⊆ s) {!!} ap) (sound-s s)
+sound-s (s-term-o ⊢e ss s) = s-arr₂ (s-⊆-prv (sound-ss ss) (sc-⊆ s)) (sound-s s)
 sound-s (s-∀l-𝕚 s upᶜ upj upᵉ upC upD) = s-∀l (sound-s s) case-𝕚 (s-find0 s upᵉ upᶜ) upC upD (↑tyʲ-𝕚 upj)
 sound-s (s-∀l-𝕔 s upᶜ upj upᵉ upC upD) = s-∀l (sound-s s) case-𝕔 (s-find0 s upᵉ upᶜ) upC upD (↑tyʲ-𝕔 upj)
 sound-s (s-tapp s upᶜ upj) = s-tapp (sound-s s) upj
@@ -104,6 +110,8 @@ sound-s (s-svar-tapp inΓ s) = s-svar-𝕥 inΓ (sound-s s)
 sound-s (s-∀l-no-𝕚 s upᶜ upj upᵉ upC upD) = s-∀l-no-appear (sound-s s) case-𝕚 (s-¬ε (sc-sound s) Z Z) upC upD (↑tyʲ-𝕚 upj)
 sound-s (s-∀l-no-𝕔 s upᶜ upj upᵉ upC upD) = s-∀l-no-appear (sound-s s) case-𝕔 (s-¬ε (sc-sound s) Z Z) upC upD (↑tyʲ-𝕔 upj)
 sound-s (s-evar-infers (infs-s ⊢e infs) inst) = s-svar-𝕚 (inst-∋:= inst) (sound-infs (infs-s ⊢e infs) (inst-⊆ inst))
+sound-s (s-term-c-n s ap ⊢e) = s-arr₃ {!!} ap (sound-s s)
+sound-s (s-term-o-n s ⊢e ss) = s-arr₂ (sound-ss ss) (s-⊆-prv (sound-s s) (ss-⊆ ss))
 
 sound-infs (infs-z regΓ regA) inst = s-refl-∞ (⊆-sregular' inst) (⊆-⊢r (⊢r-𝕣 regA) inst)
 sound-infs (infs-s ⊢e infs) inst = s-arr₂ (s-refl-∞ (⊆-sregular' inst) ((⊆-⊢r (⊢r-𝕣 (tc-⊢r ⊢e)) inst))) (sound-infs infs inst)

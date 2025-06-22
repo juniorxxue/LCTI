@@ -21,13 +21,14 @@ ss-⊆ (s-ex-r= regΓ x-in) = ⊆-refl regΓ
 ss-⊆ (s-arr s s₁) = ⊆-trans (ss-⊆ s) (ss-⊆ s₁)
 ss-⊆ (s-∀ s) with ss-⊆ s
 ... | uvar r = r
+ss-⊆ (s-arr-n x x₁) = ⊆-trans (ss-⊆ x) (ss-⊆ x₁)
 
 s-⊆ : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
     → Γ ⊆ Δ
 s-⊆ (s-empty regΓ cloA x) = ⊆-refl regΓ
 s-⊆ (s-type ss) = ss-⊆ ss
-s-⊆ (s-term-c cloA ap ⊢e s) = s-⊆ s
-s-⊆ (s-term-o opnA ⊢e x s) = ⊆-trans (ss-⊆ x) (s-⊆ s)
+s-⊆ (s-term-c ap ⊢e s) = s-⊆ s
+s-⊆ (s-term-o ⊢e x s) = ⊆-trans (ss-⊆ x) (s-⊆ s)
 s-⊆ (s-∀l s upᶜ upᵉ upC upD) with s-⊆ s
 ... | evar-sol r regA = r
 s-⊆ (s-∀l-no s upᶜ upᵉ upC upD) with s-⊆ s
@@ -37,6 +38,8 @@ s-⊆ (s-tapp s upᶜ) with s-⊆ s
 s-⊆ (s-svar-term inΓ s) = s-⊆ s
 s-⊆ (s-svar-tapp inΓ s) = s-⊆ s
 s-⊆ (s-evar-infers infs inst) = inst-⊆ inst
+s-⊆ (s-term-c-n x ap ⊢e) = s-⊆ x
+s-⊆ (s-term-o-n x ⊢e ss) = ⊆-trans (s-⊆ x) (ss-⊆ ss)
 
 inst-⊆/x : [ A / X ] Γ ⟹ Δ
          → Γ ⊆ Δ w/v X
@@ -58,6 +61,7 @@ ss+-⊆/ (s-ex-l^ inst) = ext-var (inst-⊆/x inst)
 ss+-⊆/ (s-ex-l= regΓ x-in) = ext-var (⊆/x-refl regΓ (⊢c-var-= (∋:=to∋= x-in)))
 ss+-⊆/ (s-arr s s₁) = ext-arr (ss--⊆/ s) (ss+-⊆/ s₁)
 ss+-⊆/ (s-∀ s) = ext-∀ (ss+-⊆/ s)
+ss+-⊆/ (s-arr-n x x₁) = ext-arr-n (ss+-⊆/ x) (ss--⊆/ x₁)
 
 ss--⊆/ (s-int regΓ) = ext-int regΓ
 ss--⊆/ (s-var-∙ regΓ x) = ext-var (⊆/x-refl regΓ (⊢c-var-∙ x))
@@ -65,3 +69,4 @@ ss--⊆/ (s-ex-r^ inst) = ext-var (inst-⊆/x inst)
 ss--⊆/ (s-ex-r= regΓ x-in) = ext-var (⊆/x-refl regΓ (⊢c-var-= (∋:=to∋= x-in)))
 ss--⊆/ (s-arr s s₁) = ext-arr (ss+-⊆/ s) (ss--⊆/ s₁)
 ss--⊆/ (s-∀ s) = ext-∀ (ss--⊆/ s)
+ss--⊆/ (s-arr-n x x₁) = ext-arr-n (ss--⊆/ x) (ss+-⊆/ x₁)

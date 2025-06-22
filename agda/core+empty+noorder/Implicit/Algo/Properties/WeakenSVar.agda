@@ -1,3 +1,5 @@
+{-# OPTIONS --allow-unsolved-metas #-}
+{-# OPTIONS --allow-incomplete-matches #-}
 module Implicit.Algo.Properties.WeakenSVar where
 
 open import Implicit.Language.All
@@ -98,13 +100,12 @@ s-weaken= (s-empty regΓ cloA grd) new upA ↑tyᶜ-□ upB
   with refl ← ▶⨟=-unique new = s-empty (sregular-weaken= regΓ (▶⨟=-▶=-l new)) (⊢c-weaken= cloA (▶⨟=-▶=-l new) upA) (≫-weaken= grd (▶⨟=-▶=-l new) upA upB)
 s-weaken= (s-type ss) new upA (↑tyᶜ-τ up-t) upB
   with refl ← ↑ty-unique up-t upB = s-type (ss-weaken= ss new upA up-t)
-s-weaken= (s-term-c cloA ap ⊢e s) new (↑ty-arr upA upA₁) (↑tyᶜ-e up-e upΣ) (↑ty-arr upB upB₁)
+s-weaken= (s-term-c ap ⊢e s) new (↑ty-arr upA upA₁) (↑tyᶜ-e up-e upΣ) (↑ty-arr upB upB₁)
   with refl ← ⊢id0 ⊢e
-  = s-term-c (⊢c-weaken= cloA (▶⨟=-▶=-l new) upA) (≫-weaken= ap (▶⨟=-▶=-l new) upA upB) (t-weaken= ⊢e (▶=-𝕣 (▶⨟=-▶=-l new)) (↑tyᶜ-τ upB) up-e upB) (s-weaken= s new upA₁ upΣ upB₁)
-s-weaken= (s-term-o opnA ⊢e ss s) new (↑ty-arr upA upA₁) (↑tyᶜ-e up-e upΣ) (↑ty-arr upB upB₁)
+  = s-term-c (≫-weaken= ap (▶⨟=-▶=-l new) upA upB) (t-weaken= ⊢e (▶=-𝕣 (▶⨟=-▶=-l new)) (↑tyᶜ-τ upB) up-e upB) (s-weaken= s new upA₁ upΣ upB₁)
+s-weaken= (s-term-o ⊢e ss s) new (↑ty-arr upA upA₁) (↑tyᶜ-e up-e upΣ) (↑ty-arr upB upB₁)
   with ⟨ Ω' , ⟨ new1 , new2 ⟩ ⟩ ← ▶⨟=-Ω-exist new (ss-⊆ ss) (s-⊆ s)
-  = s-term-o (⊢o-weaken= opnA (▶⨟=-▶=-l new) upA)
-             (t-weaken= ⊢e (▶=-𝕣 (▶⨟=-▶=-l new)) ↑tyᶜ-□ up-e upB)
+  = s-term-o (t-weaken= ⊢e (▶=-𝕣 (▶⨟=-▶=-l new)) ↑tyᶜ-□ up-e upB)
              (ss-weaken= ss new1 upB upA)
              (s-weaken= s new2 upA₁ upΣ upB₁)
 s-weaken= {k = k} {T = T} (s-∀l {B = B} s upᶜ upᵉ upC upD) new (↑ty-∀ upA) (↑tyᶜ-e {e' = e'} {Σ' = Σ'} up-e upΣ) (↑ty-arr {A' = C'} {B' = D'} upC' upD')

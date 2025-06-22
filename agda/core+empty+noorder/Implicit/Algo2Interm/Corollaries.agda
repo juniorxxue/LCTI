@@ -70,12 +70,16 @@ tc-complete (⊢tapp ⊢e st) with tc-complete ⊢e
 
 sc-complete (s-empty regΓ cloA x) = subs ~sZ (s-empty regΓ cloA x)
 sc-complete (s-type ss) = subs ~s∞ (s-type ss)
-sc-complete (s-term-c cloA ap ⊢e s) with sc-complete s | tc-complete ⊢e
+sc-complete (s-term-c ap ⊢e s) with sc-complete s | tc-complete ⊢e
 ... | subs j~Σ s₁ | typs ~t∞ ⊢e₁ = subs (~sC (t-⊆-prv (sound ⊢e₁) (sc-⊆ s₁)) j~Σ)
-                                        (s-term-c cloA ap ⊢e₁ s₁)
-sc-complete s'@(s-term-o opnA ⊢e ss s) with sc-complete s | tc-complete ⊢e
+                                        (s-term-c ap ⊢e₁ s₁)
+sc-complete (s-term-c-n s ap ⊢e) with sc-complete s | tc-complete ⊢e
+... | subs j~Σ s₁ | typs ~t∞ ⊢e₁ = subs (~sC (sound ⊢e₁) j~Σ) (s-term-c-n s₁ ap ⊢e₁)
+sc-complete s'@(s-term-o ⊢e ss s) with sc-complete s | tc-complete ⊢e
 ... | subs j~Σ s₁ | typs ~tZ ⊢e₁ = subs (~sI (t-⊆-prv (sound ⊢e₁) (s-⊆ s')) j~Σ)
-                                        (s-term-o opnA ⊢e₁ ss s₁)
+                                        (s-term-o ⊢e₁ ss s₁)
+sc-complete s'@(s-term-o-n s ⊢e ss) with sc-complete s | tc-complete ⊢e
+... | subs j~Σ s₁ | typs ~tZ ⊢e₁ = subs (~sI (t-⊆-prv (sound ⊢e₁) (ss-⊆ ss)) (~s-irrev-⊆ j~Σ (ss-⊆ ss))) (s-term-o-n s₁ ⊢e₁ ss)
 sc-complete (s-∀l s upᶜ upᵉ upC upD) with sc-complete s
 sc-complete (s-∀l s upᶜ upᵉ upC upD) | subs {𝕚 j} j~Σ s₁
   with ⟨ j' , ↑tyʲ-𝕚 upj' ⟩ ← ↑tyʲ0-exist j~Σ (↑tyᶜ-e upᵉ upᶜ)

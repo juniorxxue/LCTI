@@ -1,3 +1,5 @@
+{-# OPTIONS --allow-unsolved-metas #-}
+{-# OPTIONS --allow-incomplete-matches #-}
 module Implicit.Algo.Properties.SubIrrelevance where
 
 -- the irrelevance in altering (unsolving unrelated solutions in) subtyping environments
@@ -122,6 +124,7 @@ ss+-⊆-prv-gen (s-arr s s₁) (opn-arr opnA opnA₁) exts
   with ⟨ Ω' , ⟨ exts1 , exts2 ⟩ ⟩ ← ⊆⊆-Ω-exist exts (ss-⊆ s) (ss-⊆ s₁)
   = s-arr (ss--⊆-prv-gen s opnA exts1) (ss+-⊆-prv-gen s₁ (⊢ok-⊆ opnA₁ (ss-⊆ s)) exts2)
 ss+-⊆-prv-gen (s-∀ s) (opn-∀ opnA) exts = s-∀ (ss+-⊆-prv-gen s opnA (⊆-S∙∙ exts))
+ss+-⊆-prv-gen (s-arr-n s s₁) (opn-arr opnA opnA₁) exts = {!!}
 
 ss--⊆-prv-gen (s-int regΓ) opn-int exts
   with refl ← ⊆⊆-one-input exts
@@ -137,6 +140,7 @@ ss--⊆-prv-gen (s-arr s s₁) (opn-arr opnA opnA₁) exts
   with ⟨ Ω' , ⟨ exts1 , exts2 ⟩ ⟩ ← ⊆⊆-Ω-exist exts (ss-⊆ s) (ss-⊆ s₁)
   = s-arr (ss+-⊆-prv-gen s opnA exts1) (ss--⊆-prv-gen s₁ (⊢ok-⊆ opnA₁ (ss-⊆ s)) exts2)
 ss--⊆-prv-gen (s-∀ s) (opn-∀ opnA) exts = s-∀ (ss--⊆-prv-gen s opnA (⊆-S∙∙ exts))
+ss--⊆-prv-gen (s-arr-n s s₁) (opn-arr opnA opnA₁) exts = {!!}
 
 exts-∋^-prv : Γ₁ ∋^ X
             → Γ₁ ⊆ Δ₁ ∣ Γ₂ ⊆ Δ₂ by k
@@ -169,13 +173,13 @@ s-⊆-prv-gen (s-empty regΓ cloA grd) opnA exts
   with refl ← ⊆⊆-one-input exts
   = s-empty (⊆-sregular' ext) (⊆-⊢c cloA ext) (⊆-⊢c-≫' ext cloA grd)
 s-⊆-prv-gen (s-type ss) opnA exts = s-type (ss+-⊆-prv-gen ss opnA exts)
-s-⊆-prv-gen (s-term-c cloA ap ⊢e s) (opn-arr opnA opnA₁) exts
+s-⊆-prv-gen (s-term-c ap ⊢e s) (opn-arr opnA opnA₁) exts
   with ext ← ⊆⊆-⊆-l exts
-  = s-term-c (⊆-⊢c cloA ext) (⊆-⊢c-≫' ext cloA ap) (t-irrev-⊆ ⊢e ext) (s-⊆-prv-gen s opnA₁ exts)
-s-⊆-prv-gen (s-term-o opnA₁ ⊢e ss s) (opn-arr opnA opnA₂) exts
+  = s-term-c {!!} (t-irrev-⊆ ⊢e ext) (s-⊆-prv-gen s opnA₁ exts)
+s-⊆-prv-gen (s-term-o ⊢e ss s) (opn-arr opnA opnA₂) exts
   with ext ← ⊆⊆-⊆-l exts
   with ⟨ Ω' , ⟨ exts1 , exts2 ⟩ ⟩ ← ⊆⊆-Ω-exist exts (ss-⊆ ss) (s-⊆ s)
-  = s-term-o (exts-open-prv exts opnA₁ opnA) (t-irrev-⊆ ⊢e ext) (ss--⊆-prv-gen ss opnA exts1) (s-⊆-prv-gen s (⊢ok-⊆ opnA₂ (ss-⊆ ss)) exts2)
+  = s-term-o (t-irrev-⊆ ⊢e ext) (ss--⊆-prv-gen ss opnA exts1) (s-⊆-prv-gen s (⊢ok-⊆ opnA₂ (ss-⊆ ss)) exts2)
 s-⊆-prv-gen {k = k} (s-∀l s upᶜ upᵉ upC upD) (opn-∀ opnA) exts
   with reg-S= r regA ← s-env-out s
   with ext ← ⊆⊆-⊆-ll exts
@@ -191,6 +195,8 @@ s-⊆-prv-gen (s-svar-tapp x s) (opn-var x₁) exts
   with refl ← ⊆⊆-one-input exts = s-svar-tapp (⊆-∋:= x ext) (s-⊆-prv-gen s (⊢r-⊢ok (∋:=-⊢r (s-env-in s) x)) exts)
 s-⊆-prv-gen (s-evar-infers infs inst) (opn-var x) exts
   with ext ← ⊆⊆-⊆-l exts = s-evar-infers (infs-irrev-⊆ infs ext) (⊆⊆-inst inst exts (⊢oˣ-∋^-#< x (inst-∋^ inst)))
+s-⊆-prv-gen (s-term-c-n s ap ⊢e) opn exts = {!!}
+s-⊆-prv-gen (s-term-o-n s ⊢e ss) opn exts = {!!}
 
 s-irrev-⊆ : Γ ⊢ A ≤⁺ Σ ⊣ Γ ↪ B
           → Γ ⊆ Δ

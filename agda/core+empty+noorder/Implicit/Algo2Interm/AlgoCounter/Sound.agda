@@ -26,8 +26,8 @@ tc-sound {e = e ⓪ A} (⊢tapp s st) = ⊢tapp (tc-sound s) st
 
 sc-sound (s-empty regΓ cloA x) = s-empty regΓ cloA x
 sc-sound (s-type ss) = s-type ss
-sc-sound (s-term-c cloA ap ⊢e s) = s-term-c cloA ap (tc-sound ⊢e) (sc-sound s)
-sc-sound (s-term-o opnA ⊢e ss s) = s-term-o opnA (tc-sound ⊢e) ss (sc-sound s)
+sc-sound (s-term-c ap ⊢e s) = s-term-c ap (tc-sound ⊢e) (sc-sound s)
+sc-sound (s-term-o ⊢e ss s) = s-term-o (tc-sound ⊢e) ss (sc-sound s)
 sc-sound (s-∀l-𝕚 s upᶜ upj upᵉ upC upD) = s-∀l (sc-sound s) upᶜ upᵉ upC upD
 sc-sound (s-∀l-𝕔 s upᶜ upj upᵉ upC upD) = s-∀l (sc-sound s) upᶜ upᵉ upC upD
 sc-sound (s-tapp s upᶜ upj) = s-tapp (sc-sound s) upᶜ
@@ -36,6 +36,8 @@ sc-sound (s-svar-tapp inΓ s) = s-svar-tapp inΓ (sc-sound s)
 sc-sound (s-∀l-no-𝕚 x upᶜ upj upᵉ upC upD) = s-∀l-no (sc-sound x) upᶜ upᵉ upC upD
 sc-sound (s-∀l-no-𝕔 x upᶜ upj upᵉ upC upD) = s-∀l-no (sc-sound x) upᶜ upᵉ upC upD
 sc-sound (s-evar-infers infs inst) = s-evar-infers (infsc-sound infs) inst
+sc-sound (s-term-c-n x ap ⊢e) = s-term-c-n (sc-sound x) ap (tc-sound ⊢e)
+sc-sound (s-term-o-n x ⊢e ss) = s-term-o-n (sc-sound x) (tc-sound ⊢e) ss
 
 infsc-sound (infs-z regΓ regA) = infs-z regΓ regA
 infsc-sound (infs-s ⊢e infs) = infs-s (tc-sound ⊢e) (infsc-sound infs)

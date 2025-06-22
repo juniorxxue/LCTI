@@ -11,15 +11,6 @@ open import Implicit.Interm.All renaming (_⊢_#_⌞_⌝_ to _⊢i_#_⌞_⌝_)
 ⊢d-refl-eq (s-arr₁ s s₁) = cong₂ _`→_ (sym (⊢d-refl-eq s)) (⊢d-refl-eq s₁)
 ⊢d-refl-eq (s-∀ s) = cong `∀_ (⊢d-refl-eq s)
 
-⊢r-≫-⊢c : Γ ≫ A ⇘ A%
-        → Γ ⊢r A%
-        → Γ ⊢c A
-⊢r-≫-⊢c grd-int regA = ⊢c-int
-⊢r-≫-⊢c (grd-var= x) regA = ⊢c-var-= (∋:=to∋= x)
-⊢r-≫-⊢c (grd-var∙ x) regA = ⊢c-var-∙ x
-⊢r-≫-⊢c (grd-arr grd grd₁) (⊢r-arr regA regA₁) = ⊢c-arr (⊢r-≫-⊢c grd regA) (⊢r-≫-⊢c grd₁ regA₁)
-⊢r-≫-⊢c (grd-∀ grd) (⊢r-∀ regA) = ⊢c-∀ (⊢r-≫-⊢c grd regA)
-
 
 ≫-trans : SRegular Γ
         → Γ ≫ A ⇘ B

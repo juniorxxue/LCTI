@@ -1,3 +1,5 @@
+{-# OPTIONS --allow-unsolved-metas #-}
+{-# OPTIONS --allow-incomplete-matches #-}
 module Implicit.Algo.Properties.Regularity where
 
 open import Implicit.Language.All
@@ -42,6 +44,7 @@ ss-env-in (s-ex-r= regΓ x-in) = regΓ
 ss-env-in (s-arr s s₁) = ss-env-in s
 ss-env-in (s-∀ s) with ss-env-in s
 ... | reg-S∙ r = r
+ss-env-in (s-arr-n x x₁) = ss-env-in x
 
 ss-env-out : Γ ⊢ A ⌞ ≤ ⌝ B ⊣ Δ
            → SRegular Δ
@@ -51,8 +54,8 @@ s-env-in : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
          → SRegular Γ
 s-env-in (s-empty cloΓ cloA x) = cloΓ
 s-env-in (s-type ss) = ss-env-in ss
-s-env-in (s-term-c cloA ap ⊢e s) = s-env-in s
-s-env-in (s-term-o opnA ⊢e x s) = ss-env-in x
+s-env-in (s-term-c ap ⊢e s) = s-env-in s
+s-env-in (s-term-o ⊢e x s) = ss-env-in x
 s-env-in (s-∀l s upᶜ upᵉ upC upD) with s-env-in s
 ... | reg-S^ r = r
 s-env-in (s-∀l-no s upᶜ upᵉ upC upD) with s-env-in s
@@ -62,6 +65,8 @@ s-env-in (s-tapp s upᶜ) with s-env-in s
 s-env-in (s-svar-term inΓ s) = s-env-in s
 s-env-in (s-svar-tapp inΓ s) = s-env-in s
 s-env-in (s-evar-infers x inst) = inst-env-in inst
+s-env-in (s-term-c-n x ap ⊢e) = s-env-in x
+s-env-in (s-term-o-n x ⊢e ss) = s-env-in x
 
 s-env-out : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
           → SRegular Δ
@@ -146,8 +151,8 @@ s-⊢rᶜ : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
       → Γ ⊢rᶜ Σ
 s-⊢rᶜ (s-empty regΓ cloA grd) = ⊢rᶜ-empty
 s-⊢rᶜ (s-type ss) = ⊢rᶜ-τ (ss-polarity+ ss)
-s-⊢rᶜ (s-term-c cloA ap ⊢e s) = ⊢rᶜ-term (s-⊢rᶜ s)
-s-⊢rᶜ (s-term-o opnA ⊢e ss s) = ⊢rᶜ-term (⊆-⊢rᶜ' (s-⊢rᶜ s) (ss-⊆ ss))
+s-⊢rᶜ (s-term-c ap ⊢e s) = ⊢rᶜ-term (s-⊢rᶜ s)
+s-⊢rᶜ (s-term-o ⊢e ss s) = ⊢rᶜ-term (⊆-⊢rᶜ' (s-⊢rᶜ s) (ss-⊆ ss))
 s-⊢rᶜ (s-∀l s upᶜ upᵉ upC upD) with s-⊢rᶜ s
 ... | ⊢rᶜ-term r = ⊢rᶜ-term (⊢rᶜ-strengthen^0 r upᶜ)
 s-⊢rᶜ (s-∀l-no s upᶜ upᵉ upC upD) with s-⊢rᶜ s
@@ -158,6 +163,8 @@ s-⊢rᶜ (s-svar-term inΓ s) = s-⊢rᶜ s
 s-⊢rᶜ (s-svar-tapp inΓ s) = s-⊢rᶜ s
 s-⊢rᶜ (s-evar-infers tfs inst) with infs-⊢rᶜ tfs
 ... | ⊢rᶜ-term r = ⊢rᶜ-term (⊢rᶜ-𝕣 r)
+s-⊢rᶜ (s-term-c-n x ap ⊢e) = ⊢rᶜ-term (s-⊢rᶜ x)
+s-⊢rᶜ (s-term-o-n x ⊢e ss) = ⊢rᶜ-term (s-⊢rᶜ x)
 
 t-⊢rᶜ : Γ ⊢ Σ ⇒ e ⇒ A
       → Γ ⊢rᶜ Σ
@@ -185,14 +192,19 @@ infs-⊢r : Γ ⊨ Σ ⟹ A
 
 s-⊢r (s-empty regΓ cloA x) = ⊢c-≫-⊢r regΓ cloA x
 s-⊢r (s-type ss) = ss-polarity+ ss
-s-⊢r (s-term-c cloA ap ⊢e s) = ⊢r-arr (⊢c-≫-⊢r (s-env-in s) cloA ap) (s-⊢r s)
-s-⊢r (s-term-o opnA ⊢e ss s) = ⊢r-arr (⊢r-𝕣 (t-⊢r ⊢e)) (⊆-⊢r' (s-⊢r s) (ss-⊆ ss))
+s-⊢r (s-term-c ap ⊢e s) with t-⊢rᶜ ⊢e
+... | ⊢rᶜ-τ regA = ⊢r-arr (⊢r-𝕣 regA) (s-⊢r s)
+-- ⊢r-arr (⊢c-≫-⊢r (s-env-in s) cloA ap) (s-⊢r s)
+s-⊢r (s-term-o ⊢e ss s) = ⊢r-arr (⊢r-𝕣 (t-⊢r ⊢e)) (⊆-⊢r' (s-⊢r s) (ss-⊆ ss))
 s-⊢r (s-∀l s upᶜ upᵉ upC upD) = ⊢r-strengthen^0 (s-⊢r s) (↑ty-arr upC upD)
 s-⊢r (s-∀l-no s upᶜ upᵉ upC upD) = ⊢r-strengthen^0 (s-⊢r s) (↑ty-arr upC upD)
 s-⊢r (s-tapp s upᶜ) = ⊢r-∀ (⊢r-◆0 (s-⊢r s))
 s-⊢r (s-svar-term inΓ s) = s-⊢r s
 s-⊢r (s-svar-tapp inΓ s) = s-⊢r s
 s-⊢r (s-evar-infers tfs inst) = ⊢r-𝕣 (infs-⊢r tfs)
+s-⊢r (s-term-c-n x ap ⊢e) with t-⊢rᶜ ⊢e
+... | ⊢rᶜ-τ regA = ⊢r-arr (⊆-⊢r' (⊢r-𝕣 regA) (s-⊆ x)) (s-⊢r x)
+s-⊢r (s-term-o-n x ⊢e ss) = ⊢r-arr (⊆-⊢r' (⊢r-𝕣 (t-⊢r ⊢e)) (s-⊆ x)) (s-⊢r x)
 
 t-⊢r (⊢lit regΓ) = ⊢r-int
 t-⊢r (⊢var regΓ x∈Γ) = ∋⦂-⊢r regΓ x∈Γ
@@ -222,6 +234,7 @@ ss+-⊢c (s-ex-l^ inst) = ⊢c-var-= (inst-∋= inst)
 ss+-⊢c (s-ex-l= regΓ x-in) = ⊢c-var-= (∋:=to∋= x-in)
 ss+-⊢c (s-arr s s₁) = ⊢c-arr (⊆-⊢c (ss--⊢c s) (ss-⊆ s₁)) (ss+-⊢c s₁)
 ss+-⊢c (s-∀ s) = ⊢c-∀ (ss+-⊢c s)
+ss+-⊢c (s-arr-n x x₁) = ⊢c-arr {!!} {!!}
 
 ss--⊢c (s-int regΓ) = ⊢c-int
 ss--⊢c (s-var-∙ regΓ inΔ) = ⊢c-var-∙ inΔ
@@ -229,33 +242,35 @@ ss--⊢c (s-ex-r^ inst) = ⊢c-var-= (inst-∋= inst)
 ss--⊢c (s-ex-r= regΓ x-in) = ⊢c-var-= (∋:=to∋= x-in)
 ss--⊢c (s-arr s s₁) = ⊢c-arr (⊆-⊢c (ss+-⊢c s) (ss-⊆ s₁)) (ss--⊢c s₁)
 ss--⊢c (s-∀ s) = ⊢c-∀ (ss--⊢c s)
+ss--⊢c (s-arr-n x x₁) = {!!}
 
 s-⊢c : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
      → Δ ⊢c A
 s-⊢c (s-empty regΓ cloA grd) = cloA
 s-⊢c (s-type ss) = ss+-⊢c ss
-s-⊢c (s-term-c cloA ap ⊢e s) = ⊢c-arr (⊆-⊢c cloA (s-⊆ s)) (s-⊢c s)
-s-⊢c (s-term-o opnA ⊢e ss s) = ⊢c-arr (⊆-⊢c (ss--⊢c ss) (s-⊆ s)) (s-⊢c s)
+s-⊢c (s-term-c ap ⊢e s) = {!!}
+-- ⊢c-arr (⊆-⊢c cloA (s-⊆ s)) (s-⊢c s)
+s-⊢c (s-term-o ⊢e ss s) = ⊢c-arr (⊆-⊢c (ss--⊢c ss) (s-⊆ s)) (s-⊢c s)
 s-⊢c (s-∀l s upᶜ upᵉ upC upD) = ⊢c-∀ (⊢c-◆0 (s-⊢c s))
 s-⊢c (s-∀l-no s upᶜ upᵉ upC upD) = ⊢c-∀ (⊢c-◇0 (s-⊢c s))
 s-⊢c (s-tapp s upᶜ) = ⊢c-∀ (⊢c-◆0 (s-⊢c s))
 s-⊢c (s-svar-term x s) = ⊢c-var-= (∋:=to∋= x)
 s-⊢c (s-svar-tapp x s) = ⊢c-var-= (∋:=to∋= x)
 s-⊢c (s-evar-infers infs inst) = ⊢c-var-= (inst-∋= inst)
+s-⊢c (s-term-c-n x ap ⊢e) = {!!}
+s-⊢c (s-term-o-n x ⊢e ss) = ⊢c-arr (ss--⊢c ss) (⊆-⊢c {!!} {!!})
 
 
 ----------------------------------------------------------------------
 --+                           Extension                            +--
 ----------------------------------------------------------------------
-
-{- this lemma is correct and provable
-   but requires several irrevelence lemmas, but is heavy to prove, thus avoid this lemma in its call site
+{-
 s-⊆/ : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
      → Γ ⊆ Δ w/t A
 s-⊆/ (s-empty regΓ cloA grd) = ⊆/-refl regΓ cloA
 s-⊆/ (s-type ss) = ss+-⊆/ ss
-s-⊆/ (s-term-c cloA ap ⊢e s) = ext-arr (⊆/-refl (s-env-in s) cloA) (s-⊆/ s)
-s-⊆/ (s-term-o opnA ⊢e ss s) = ext-arr (ss--⊆/ ss) (s-⊆/ s)
+s-⊆/ (s-term-c ap ⊢e s) = ext-arr {!!} (s-⊆/ s)
+s-⊆/ (s-term-o ⊢e ss s) = ext-arr (ss--⊆/ ss) (s-⊆/ s)
 s-⊆/ (s-∀l s upᶜ upᵉ upC upD) = ext-∀ {!s-⊆/ s!}
 s-⊆/ (s-∀l-no s upᶜ upᵉ upC upD) = ext-∀ {!s-⊆/ s!}
 s-⊆/ (s-tapp s upᶜ) = ext-∀ {!s-⊆/ s!}

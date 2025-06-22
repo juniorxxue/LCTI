@@ -45,6 +45,11 @@ data _⊢_⌞_⌝_⊣_ : Env n m → Type m → Polar → Type m → Env n m →
     → Ω ⊢ B ⌞ ≤ ⌝ D ⊣ Ψ
     → Δ ⊢ A `→ B ⌞ ≤ ⌝ (C `→ D) ⊣ Ψ
 
+  s-arr-n :
+      Δ ⊢ B ⌞ ≤ ⌝ D ⊣ Ω
+    → Ω ⊢ C ⌞ ⋆ ≤ ⌝ A ⊣ Ψ
+    → Δ ⊢ A `→ B ⌞ ≤ ⌝ (C `→ D) ⊣ Ψ
+
   s-∀ :
       Δ ,∙ ⊢ A ⌞ ≤ ⌝ B ⊣ Ψ ,∙
     → Δ ⊢ `∀ A ⌞ ≤ ⌝ (`∀ B) ⊣ Ψ
@@ -115,17 +120,27 @@ data _⊢_≤⁺_⊣_↪_ where
     → Δ ⊢ A ≤⁺ (τ B) ⊣ Ψ ↪ B
 
   s-term-c :
-      (cloA : Δ ⊢c A)
-    → (ap : Δ ≫ A ⇘ A%)
+      (ap : Δ ≫ A ⇘ A%)
     → (⊢e : 𝕣 Δ ⊢ τ A% ⇒ e ⇒ A')
     → Δ ⊢ B ≤⁺ Σ ⊣ Ψ ↪ D
     → Δ ⊢ (A `→ B) ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ A% `→ D
 
+  s-term-c-n :
+      Δ ⊢ B ≤⁺ Σ ⊣ Ψ ↪ D
+    → (ap : Ψ ≫ A ⇘ A%)
+    → (⊢e : 𝕣 Ψ ⊢ τ A% ⇒ e ⇒ A')
+    → Δ ⊢ (A `→ B) ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ A% `→ D
+
   s-term-o :
-      (opnA : Δ ⊢o A)
-    → (⊢e : 𝕣 Δ ⊢ □ ⇒ e ⇒ C)
+      (⊢e : 𝕣 Δ ⊢ □ ⇒ e ⇒ C)
     → (ss : Δ ⊢ C ⌞ ≤⁻ ⌝ A ⊣ Ω)
     → Ω ⊢ B ≤⁺ Σ ⊣ Ψ ↪ D
+    → Δ ⊢ A `→ B ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ C `→ D
+
+  s-term-o-n :
+      Δ ⊢ B ≤⁺ Σ ⊣ Ω ↪ D
+    → (⊢e : 𝕣 Ω ⊢ □ ⇒ e ⇒ C) -- the env here doesn't matter
+    → (ss : Ω ⊢ C ⌞ ≤⁻ ⌝ A ⊣ Ψ)
     → Δ ⊢ A `→ B ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ C `→ D
 
   s-∀l :

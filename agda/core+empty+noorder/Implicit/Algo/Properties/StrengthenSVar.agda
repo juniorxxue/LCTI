@@ -1,3 +1,5 @@
+{-# OPTIONS --allow-unsolved-metas #-}
+{-# OPTIONS --allow-incomplete-matches #-}
 module Implicit.Algo.Properties.StrengthenSVar where
 
 open import Implicit.Language.All
@@ -149,16 +151,14 @@ s-strengthen= (s-empty regΓ cloA x) newΓ newΔ upA upB ↑tyᶜ-□
   with refl ← ◀=-unique newΓ newΔ = s-empty (sregular-strengthen= regΓ newΓ) (⊢c-strengthen= cloA newΓ upA) (≫-strengthen= x regΓ newΔ upA upB)
 s-strengthen= (s-type ss) newΓ newΔ upA upB (↑tyᶜ-τ up-t)
   with refl ← ↑ty-unique-inver upB up-t = s-type (ss-strengthen= ss newΓ newΔ upA up-t)
-s-strengthen= (s-term-c cloA ap ⊢e s) newΓ newΔ (↑ty-arr upA upA₁) (↑ty-arr upB upB₁) (↑tyᶜ-e up-e upΣ)
+s-strengthen= (s-term-c ap ⊢e s) newΓ newΔ (↑ty-arr upA upA₁) (↑ty-arr upB upB₁) (↑tyᶜ-e up-e upΣ)
   with refl ← ⊢id0 ⊢e
-  = s-term-c (⊢c-strengthen= cloA newΓ upA)
-             (≫-strengthen= ap (s-env-in s) newΓ upA upB)
+  = s-term-c (≫-strengthen= ap (s-env-in s) newΓ upA upB)
              (t-strengthen= ⊢e (◀=-𝕣 newΓ) upB up-e (↑tyᶜ-τ upB))
              (s-strengthen= s newΓ newΔ upA₁ upB₁ upΣ)
-s-strengthen= (s-term-o opnA ⊢e ss s) newΓ newΔ (↑ty-arr upA upA₁) (↑ty-arr upB upB₁) (↑tyᶜ-e up-e upΣ)
+s-strengthen= (s-term-o ⊢e ss s) newΓ newΔ (↑ty-arr upA upA₁) (↑ty-arr upB upB₁) (↑tyᶜ-e up-e upΣ)
   with ⟨ Ω' , newΩ ⟩ ← ◀=-⊆-total (ss-⊆ ss) newΓ
-  = s-term-o (⊢o-strengthen= opnA newΓ upA)
-             (t-strengthen= ⊢e (◀=-𝕣 newΓ) upB up-e ↑tyᶜ-□)
+  = s-term-o (t-strengthen= ⊢e (◀=-𝕣 newΓ) upB up-e ↑tyᶜ-□)
              (ss-strengthen= ss newΓ newΩ upB upA)
              (s-strengthen= s newΩ newΔ upA₁ upB₁ upΣ)
 s-strengthen= (s-∀l s upᶜ upᵉ upC upD) newΓ newΔ (↑ty-∀ upA) (↑ty-arr {A = A} {B = B} upB upB₁) (↑tyᶜ-e {e = e} {Σ = Σ} up-e upΣ)

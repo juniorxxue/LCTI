@@ -131,6 +131,16 @@ data _&_⇌s_&_ : Env n m → Env n m → Env n m → Env n m → Set where
 ⇌s-∋∙-l (S^ inΓ) (evar-sol tf) = S^ (⇌s-∋∙-l inΓ tf)
 ⇌s-∋∙-l (S⋈ inΓ) (mark x) = S⋈ (⇌-∋∙ inΓ x)
 
+⇌s-∋∙-r : Δ ∋∙ X
+        → Γ & Δ ⇌s Γ' & Δ'
+        → Δ' ∋∙ X
+⇌s-∋∙-r Z (uvar tf) = Z
+⇌s-∋∙-r (S∙ inΓ) (uvar tf) = S∙ (⇌s-∋∙-r inΓ tf)
+⇌s-∋∙-r (S= inΓ) (evar-sol tf) = S= (⇌s-∋∙-r inΓ tf)
+⇌s-∋∙-r (S= inΓ) (svar tf) = S= (⇌s-∋∙-r inΓ tf)
+⇌s-∋∙-r (S^ inΓ) (evar tf) = S^ (⇌s-∋∙-r inΓ tf)
+⇌s-∋∙-r (S⋈ inΓ) (mark x) = S⋈ (⇌-∋∙ inΓ x)
+
 ⇌s-∋=-l : Γ ∋= X
         → Γ & Δ ⇌s Γ' & Δ'
         → Γ' ∋= X
@@ -159,6 +169,16 @@ data _&_⇌s_&_ : Env n m → Env n m → Env n m → Env n m → Set where
 ⇌s-∋:=-l (S^ inΓ up) (evar tf) = S^ (⇌s-∋:=-l inΓ tf) up
 ⇌s-∋:=-l (S^ inΓ up) (evar-sol tf) = S^ (⇌s-∋:=-l inΓ tf) up
 ⇌s-∋:=-l (S= inΓ up) (svar tf) = S= (⇌s-∋:=-l inΓ tf) up
+
+⇌s-∋:=-r : Δ ∋ X := A
+        → Γ & Δ ⇌s Γ' & Δ'
+        → Δ' ∋ X := A
+⇌s-∋:=-r (Z up) (evar-sol tf) = Z up
+⇌s-∋:=-r (Z up) (svar tf) = Z up
+⇌s-∋:=-r (S∙ inΓ up) (uvar tf) = S∙ (⇌s-∋:=-r inΓ tf) up
+⇌s-∋:=-r (S^ inΓ up) (evar tf) = S^ (⇌s-∋:=-r inΓ tf) up
+⇌s-∋:=-r (S= inΓ up) (evar-sol tf) = S= (⇌s-∋:=-r inΓ tf) up
+⇌s-∋:=-r (S= inΓ up) (svar tf) = S= (⇌s-∋:=-r inΓ tf) up
 
 
 ⇌s-⊢r-l : Γ ⊢r A
@@ -205,6 +225,15 @@ data _&_⇌s_&_ : Env n m → Env n m → Env n m → Env n m → Set where
 ⇌s-≫-l (grd-arr grd grd₁) tf = grd-arr (⇌s-≫-l grd tf) (⇌s-≫-l grd₁ tf)
 ⇌s-≫-l (grd-∀ grd) tf = grd-∀ (⇌s-≫-l grd (uvar tf))
 
+⇌s-≫-r : Δ ≫ A ⇘ B
+       → Γ & Δ ⇌s Γ' & Δ'
+       → Δ' ≫ A ⇘ B
+⇌s-≫-r grd-int tf = grd-int
+⇌s-≫-r (grd-var= x) tf = grd-var= (⇌s-∋:=-r x tf)
+⇌s-≫-r (grd-var∙ x) tf = grd-var∙ (⇌s-∋∙-r x tf)
+⇌s-≫-r (grd-arr grd grd₁) tf = grd-arr (⇌s-≫-r grd tf) (⇌s-≫-r grd₁ tf)
+⇌s-≫-r (grd-∀ grd) tf = grd-∀ (⇌s-≫-r grd (uvar tf))
+
 ⇌s-⇌-l : Γ & Δ ⇌s Γ' & Δ'
        → 𝕣 Γ ⇌ 𝕣 Γ'
 ⇌s-⇌-l (uvar tf) = uvar (⇌s-⇌-l tf)
@@ -213,6 +242,13 @@ data _&_⇌s_&_ : Env n m → Env n m → Env n m → Env n m → Set where
 ⇌s-⇌-l (svar tf) = svar (⇌s-⇌-l tf)
 ⇌s-⇌-l (mark x) = x
 
+⇌s-⇌-r : Γ & Δ ⇌s Γ' & Δ'
+       → 𝕣 Δ ⇌ 𝕣 Δ'
+⇌s-⇌-r (uvar tf) = uvar (⇌s-⇌-r tf)
+⇌s-⇌-r (evar tf) = evar (⇌s-⇌-r tf)
+⇌s-⇌-r (evar-sol tf) = svar (⇌s-⇌-r tf)
+⇌s-⇌-r (svar tf) = svar (⇌s-⇌-r tf)
+⇌s-⇌-r (mark x) = x
 
 
 ⇌s-inst : Γ & Δ ⇌s Γ' & Δ'
@@ -235,6 +271,8 @@ ss-irrev (s-ex-r= regΓ x-in) tf with refl ← ⇌s-eq tf = s-ex-r= (⇌s-sregul
 ss-irrev (s-arr s s₁) tf with ⇌s-Ω (ss-⊆ s) tf
 ... | ⟨ Ω' , tf' ⟩ = s-arr (ss-irrev s tf') (ss-irrev s₁ (⇌s-arr tf tf' (ss-⊆ s₁)))
 ss-irrev (s-∀ s) tf = s-∀ (ss-irrev s (uvar tf))
+ss-irrev (s-arr-n s s₁) tf with ⇌s-Ω (ss-⊆ s) tf
+... | ⟨ Ω' , tf' ⟩ = s-arr-n (ss-irrev s tf') (ss-irrev s₁ (⇌s-arr tf tf' (ss-⊆ s₁)))
 
 
 t-irrev : Γ ⊢ Σ ⇒ e ⇒ A
@@ -261,15 +299,18 @@ t-irrev (⊢tapp ⊢e st) tf = ⊢tapp (t-irrev ⊢e tf) st
 
 s-irrev (s-empty regΓ cloA x) tf with refl ← ⇌s-eq tf = s-empty (⇌s-sregular-l regΓ tf) (⇌s-⊢c-l cloA tf) (⇌s-≫-l x tf)
 s-irrev (s-type ss) tf = s-type (ss-irrev ss tf)
-s-irrev (s-term-c cloA ap ⊢e s) tf = s-term-c (⇌s-⊢c-l cloA tf) (⇌s-≫-l ap tf) (t-irrev ⊢e (⇌s-⇌-l tf)) (s-irrev s tf)
-s-irrev (s-term-o opnA ⊢e ss s) tf with ⇌s-Ω (ss-⊆ ss) tf
-... | ⟨ Ω' , tf' ⟩ = s-term-o (⇌s-⊢o-l opnA tf) (t-irrev ⊢e (⇌s-⇌-l tf)) (ss-irrev ss tf') (s-irrev s (⇌s-arr tf tf' (s-⊆ s)))
+s-irrev (s-term-c ap ⊢e s) tf = s-term-c (⇌s-≫-l ap tf) (t-irrev ⊢e (⇌s-⇌-l tf)) (s-irrev s tf)
+s-irrev (s-term-o ⊢e ss s) tf with ⇌s-Ω (ss-⊆ ss) tf
+... | ⟨ Ω' , tf' ⟩ = s-term-o (t-irrev ⊢e (⇌s-⇌-l tf)) (ss-irrev ss tf') (s-irrev s (⇌s-arr tf tf' (s-⊆ s)))
 s-irrev (s-∀l s upᶜ upᵉ upC upD) tf = s-∀l (s-irrev s (evar-sol tf)) upᶜ upᵉ upC upD
 s-irrev (s-∀l-no s upᶜ upᵉ upC upD) tf = s-∀l-no (s-irrev s (evar tf)) upᶜ upᵉ upC upD
 s-irrev (s-tapp s upᶜ) tf = s-tapp (s-irrev s (svar tf)) upᶜ
 s-irrev (s-svar-term inΓ s) tf with refl ← ⇌s-eq tf = s-svar-term (⇌s-∋:=-l inΓ tf) (s-irrev s tf)
 s-irrev (s-svar-tapp inΓ s) tf with refl ← ⇌s-eq tf = s-svar-tapp (⇌s-∋:=-l inΓ tf) (s-irrev s tf)
 s-irrev (s-evar-infers infs inst) tf = s-evar-infers (infs-irrev infs (⇌s-⇌-l tf)) (⇌s-inst tf inst)
+s-irrev (s-term-c-n x₁ ap ⊢e) x = s-term-c-n (s-irrev x₁ x) (⇌s-≫-r ap x) (t-irrev ⊢e (⇌s-⇌-r x))
+s-irrev (s-term-o-n s ⊢e ss) tf with ⇌s-Ω (s-⊆ s) tf
+... | ⟨ Ω' , tf' ⟩ = s-term-o-n (s-irrev s tf') (t-irrev ⊢e (⇌s-⇌-r tf')) (ss-irrev ss (⇌s-arr tf tf' (ss-⊆ ss)))
 
 infs-irrev (infs-z regΓ regA) tf = infs-z (⇌-tregular regΓ tf) (⇌-⊢r regA tf)
 infs-irrev (infs-s x infs) tf = infs-s (t-irrev x tf) (infs-irrev infs tf)

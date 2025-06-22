@@ -78,3 +78,13 @@ open import Implicit.Language.EnvOps.All
 ⊆-⊢c-≫' ext (⊢c-var-= inΔ) (grd-var∙ x) = ⊥-elim (∋∙-∋=-false x inΔ)
 ⊆-⊢c-≫' ext (⊢c-arr cloA cloA₁) (grd-arr grd grd₁) = grd-arr (⊆-⊢c-≫' ext cloA grd) (⊆-⊢c-≫' ext cloA₁ grd₁)
 ⊆-⊢c-≫' ext (⊢c-∀ cloA) (grd-∀ grd) = grd-∀ (⊆-⊢c-≫' (uvar ext) cloA grd)
+
+
+⊢r-≫-⊢c : Γ ≫ A ⇘ A%
+        → Γ ⊢r A%
+        → Γ ⊢c A
+⊢r-≫-⊢c grd-int regA = ⊢c-int
+⊢r-≫-⊢c (grd-var= x) regA = ⊢c-var-= (∋:=to∋= x)
+⊢r-≫-⊢c (grd-var∙ x) regA = ⊢c-var-∙ x
+⊢r-≫-⊢c (grd-arr grd grd₁) (⊢r-arr regA regA₁) = ⊢c-arr (⊢r-≫-⊢c grd regA) (⊢r-≫-⊢c grd₁ regA₁)
+⊢r-≫-⊢c (grd-∀ grd) (⊢r-∀ regA) = ⊢c-∀ (⊢r-≫-⊢c grd regA)
