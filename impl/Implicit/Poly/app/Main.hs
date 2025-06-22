@@ -1,17 +1,19 @@
-{-# LANGUAGE MultiWayIf, LambdaCase, RankNTypes, TypeSynonymInstances #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE TypeSynonymInstances #-}
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+
 {-# HLINT ignore "Redundant multi-way if" #-}
 {-# HLINT ignore "Use if" #-}
 module Main where
-import Control.Monad.Writer
-import Control.Monad (forM_)
-import Debug.Trace
-import System.IO (hFlush, stdout)
 
-import Syntax
-import DeBruijn
+import Control.Monad (forM_)
+import Control.Monad.Writer
 import Counter
+import DeBruijn
+import Debug.Trace
 import Log
+import Syntax
+import System.IO (hFlush, stdout)
 
 lookupEnv :: Int -> Env -> WriterT Log Maybe Typ
 lookupEnv 0 (ETrm ty _) = do
@@ -62,18 +64,18 @@ ssubP (env, senv) TBool TBool = do
 ssubP (env, senv) (TVar a) (TVar b) | isUvar (envConcat env senv) a && a == b = do
   tell ["[S-Refl] " ++ logSSubFull (env, senv) (TVar a) (TVar b) senv]
   return senv
-ssubP (env, senv) (TVar a) tyA | isEvar senv a = do
-  case inst senv a tyA of
-    Just newenv -> do
-      tell ["[S-Ex-L] " ++ logSSubFull (env, senv) (TVar a) tyA newenv]
-      return newenv
-    Nothing -> lift Nothing
+ssubP (env, senv) (TVar a) tyA | isEvar senv a = case inst senv a tyA of
+  Just newenv -> do
+    tell ["[S-Ex-L] " ++ logSSubFull (env, senv) (TVar a) tyA newenv]
+    return newenv
+  Nothing -> lift Nothing
 ssubP (env, senv) (TVar a) tyA = do
   tyB <- findSol senv a
-  if tyA == tyB then do
-    tell ["[S-Sol-L] " ++ logSSubFull (env, senv) (TVar a) tyA senv]
-    return senv
-  else lift Nothing
+  if tyA == tyB
+    then do
+      tell ["[S-Sol-L] " ++ logSSubFull (env, senv) (TVar a) tyA senv]
+      return senv
+    else lift Nothing
 ssubP (env, senv) (TArr tyA tyB) (TArr tyC tyD) = do
   (senv1, _log1) <- peek $ ssubN (env, senv) tyC tyA
   (senv2, _log2) <- peek $ ssubP (env, senv1) tyB tyD
@@ -91,6 +93,22 @@ ssubP (env, senv) (TList tyA) (TList tyB) = do
   tell ["[S-List] " ++ logSSubFull (env, senv) (TList tyA) (TList tyB) senv']
   tell $ indentAll _log
   return senv'
+ssubP (env, senv) (TProd tyA tyB) (TProd tyC tyD) = do
+  (senv1, _log1) <- peek $ ssubP (env, senv) tyA tyC
+  (senv2, _log2) <- peek $ ssubP (env, senv1) tyB tyD
+  tell ["[S-Prod] " ++ logSSubFull (env, senv) (TProd tyA tyB) (TProd tyC tyD) senv2]
+  tell $ indentAll _log1
+  tell $ indentAll _log2
+  return senv2
+ssubP (env, senv) (TST tyA tyB) (TST tyC tyD) = do
+  (senv1, _log1) <- peek $ ssubP (env, senv) tyA tyC
+  (senv2, _log2) <- peek $ ssubP (env, senv1) tyC tyA
+  (senv3, _log3) <- peek $ ssubP (env, senv2) tyB tyD
+  tell ["[S-ST] " ++ logSSubFull (env, senv) (TST tyA tyB) (TST tyC tyD) senv2]
+  tell $ indentAll _log1
+  tell $ indentAll _log2
+  tell $ indentAll _log3
+  return senv3
 ssubP _ _ _ = lift Nothing
 
 ssubN :: (Env, Env) -> Typ -> Typ -> WriterT Log Maybe Env
@@ -102,39 +120,54 @@ ssubN (env, senv) TBool TBool = do
   tell ["[S-Bool] " ++ logSSubFull (env, senv) TBool TBool senv]
   return senv
 ssubN (env, senv) (TVar a) (TVar b) | isUvar (envConcat env senv) a && a == b = do
-    tell ["[S-Refl] " ++ logSSubFull (env, senv) (TVar a) (TVar b) senv]
-    return senv
-ssubN (env, senv) tyA (TVar a) | isEvar senv a = do
-  case inst senv a tyA of
-    Just newenv -> do
-      tell ["[S-Ex-R] " ++ logSSubFull (env, senv) (TVar a) tyA newenv]
-      return newenv
-    Nothing -> lift Nothing
+  tell ["[S-Refl] " ++ logSSubFull (env, senv) (TVar a) (TVar b) senv]
+  return senv
+ssubN (env, senv) tyA (TVar a) | isEvar senv a = case inst senv a tyA of
+  Just newenv -> do
+    tell ["[S-Ex-R] " ++ logSSubFull (env, senv) (TVar a) tyA newenv]
+    return newenv
+  Nothing -> lift Nothing
 ssubN (env, senv) tyA (TVar a) = do
   tyB <- findSol senv a
-  if tyA == tyB then do
-    tell ["[S-Sol-R] " ++ logSSubFull (env, senv) tyA (TVar a) senv]
-    return senv
-  else lift Nothing
+  if tyA == tyB
+    then do
+      tell ["[S-Sol-R] " ++ logSSubFull (env, senv) tyA (TVar a) senv]
+      return senv
+    else lift Nothing
 ssubN (env, senv) (TArr tyA tyB) (TArr tyC tyD) = do
-    (senv1, _log1) <- peek $ ssubP (env, senv) tyC tyA
-    (senv2, _log2) <- peek $ ssubN (env, senv1) tyB tyD
-    tell ["[S-Arr] " ++ logSSubFull (env, senv) (TArr tyA tyB) (TArr tyC tyD) senv2]
-    tell $ indentAll _log1
-    tell $ indentAll _log2
-    return senv2
+  (senv1, _log1) <- peek $ ssubP (env, senv) tyC tyA
+  (senv2, _log2) <- peek $ ssubN (env, senv1) tyB tyD
+  tell ["[S-Arr] " ++ logSSubFull (env, senv) (TArr tyA tyB) (TArr tyC tyD) senv2]
+  tell $ indentAll _log1
+  tell $ indentAll _log2
+  return senv2
 ssubN (env, senv) (TForall tyA) (TForall tyB) = do
-    (EUvar senv', _log) <- peek $ ssubN (env, EUvar senv) tyA tyB
-    tell ["[S-Forall] " ++ logSSubFull (env, senv) (TForall tyA) (TForall tyB) senv']
-    tell $ indentAll _log
-    return senv'
+  (EUvar senv', _log) <- peek $ ssubN (env, EUvar senv) tyA tyB
+  tell ["[S-Forall] " ++ logSSubFull (env, senv) (TForall tyA) (TForall tyB) senv']
+  tell $ indentAll _log
+  return senv'
 ssubN (env, senv) (TList tyA) (TList tyB) = do
   (senv', _log) <- peek $ ssubN (env, senv) tyA tyB
   tell ["[S-List] " ++ logSSubFull (env, senv) (TList tyA) (TList tyB) senv']
   tell $ indentAll _log
   return senv'
+ssubN (env, senv) (TProd tyA tyB) (TProd tyC tyD) = do
+  (senv1, _log1) <- peek $ ssubN (env, senv) tyA tyC
+  (senv2, _log2) <- peek $ ssubN (env, senv1) tyB tyD
+  tell ["[S-Prod] " ++ logSSubFull (env, senv) (TProd tyA tyB) (TProd tyC tyD) senv2]
+  tell $ indentAll _log1
+  tell $ indentAll _log2
+  return senv2
+ssubN (env, senv) (TST tyA tyB) (TST tyC tyD) = do
+  (senv1, _log1) <- peek $ ssubN (env, senv) tyA tyC
+  (senv2, _log2) <- peek $ ssubN (env, senv1) tyC tyA
+  (senv3, _log3) <- peek $ ssubN (env, senv2) tyB tyD
+  tell ["[S-ST] " ++ logSSubFull (env, senv) (TST tyA tyB) (TST tyC tyD) senv3]
+  tell $ indentAll _log1
+  tell $ indentAll _log2
+  tell $ indentAll _log3
+  return senv3
 ssubN _ _ _ = lift Nothing
-
 
 ground :: Env -> Typ -> WriterT Log Maybe Typ
 ground a b | trace ("ground " ++ show a ++ " |- " ++ show b) False = undefined
@@ -156,6 +189,10 @@ ground env (TProd tyA tyB) = do
   tyA' <- ground env tyA
   tyB' <- ground env tyB
   return $ TProd tyA' tyB'
+ground env (TST tyA tyB) = do
+  tyA' <- ground env tyA
+  tyB' <- ground env tyB
+  return $ TST tyA' tyB'
 
 sub :: (Env, Env) -> Typ -> Context -> WriterT Log Maybe (Env, Typ)
 sub (a1, a2) b c | trace ("sub " ++ show a1 ++ ";" ++ show a2 ++ " |- " ++ show b ++ " <: " ++ show c) False = undefined
@@ -186,7 +223,7 @@ sub (env, senv) (TArr tyA tyB) (CTerm e h) | open (envConcat env senv) tyA = do
   tell $ indentAll _log3
   return (senv2, TArr tyC tyD)
 sub (env, senv) (TForall tyA) (CTerm e h) = do
-  ((ESvar _ senv' , tyB), _log1) <- peek $ sub (env, EEvar senv) tyA (shiftTyContext0 (CTerm e h))
+  ((ESvar _ senv', tyB), _log1) <- peek $ sub (env, EEvar senv) tyA (shiftTyContext0 (CTerm e h))
   tell ["[S-Forall-L] " ++ logSubFull (env, senv) (TForall tyA) (CTerm e h) senv' (unshiftTyp0 tyB)]
   tell $ indentAll _log1
   return (senv', unshiftTyp0 tyB)
@@ -304,89 +341,181 @@ infer env CEmpty Pair = do
   let tyPair = TForall $ TForall $ TArr (TVar 1) $ TArr (TVar 0) $ TProd (TVar 1) (TVar 0)
   tell ["[Ty-Pair] " ++ logInferFull env CEmpty Pair tyPair]
   return tyPair
+infer env CEmpty ST = do
+  let tyST = TForall $ TForall $ TArr (TVar 1) $ TArr (TVar 0) $ TST (TVar 1) (TVar 0)
+  tell ["[Ty-ST] " ++ logInferFull env CEmpty ST tyST]
+  return tyST
 infer _ _ _ = lift Nothing
-
-
-idTyp :: Typ
-idTyp = TForall (TArr (TVar 0) (TVar 0))
-
-idTrm :: Trm
-idTrm = TAbs (Ann (Abs (Var 0)) (TArr (TVar 0) (TVar 0)))
-
-idTrm' :: Typ -> Trm
-idTrm' ty = Ann (Abs (Var 0)) (TArr ty ty)
-
-cons :: Trm -> Trm -> Trm
-cons = App . App Cons
-
-pair :: Trm -> Trm -> Trm
-pair = App . App Pair
-
-chooseTyp :: Typ
-chooseTyp = TForall $ TArr (TVar 0) $ TArr (TVar 0) (TVar 0)
 
 main :: IO ()
 main = do
   -- print idTyp
   let
-      -- /\a. (\x. x : a -> a)
-      ex_id = infer EEmpty CEmpty idTrm
-      -- id 1
-      ex_id1 = infer EEmpty CEmpty (App idTrm (LitInt 1))
-      -- id @Int
-      ex_idInt = infer EEmpty CEmpty (TApp idTrm TInt)
-      -- id @Int 1
-      ex_idInt1 = infer EEmpty CEmpty (App (TApp idTrm TInt) (LitInt 42))
-      -- f : forall a. a -> a
-      -- f 1
-      ex_f1 = infer (ETrm (TForall (TArr (TVar 0) (TVar 0))) EEmpty) CEmpty (App (Var 0) (LitInt 42))
-      -- g : forall a. (Int -> a) -> a
-      -- g (\x. x)
-      ex_gid = infer (ETrm (TForall (TArr (TArr TInt (TVar 0)) (TVar 0))) EEmpty) CEmpty (App (Var 0) (Abs (Var 0)))
-      -- test order-insensitive
-      -- g : forall a. (a -> a) -> a -> a
-      -- g (\x. x) 1
-      ex_gid1 = infer (ETrm (TForall (TArr (TArr (TVar 0) (TVar 0)) (TArr (TVar 0) (TVar 0)))) EEmpty) CEmpty (App (App (Var 0) (Abs (Var 0))) (LitInt 1))
-      -- spine-local
-      -- g : forall a. b. (a -> a) -> b -> ((a -> a) -> b)
-      -- (g (\x. x) (lit 1)) : ((Int -> Int) -> Int))
-      ex_g2 = infer (ETrm (TForall (TForall (TArr (TArr (TVar 1) (TVar 1))
-                                                  (TArr (TVar 0)
-                                                        (TArr (TArr (TVar 1) (TVar 1))
-                                                              (TVar 0)))))) EEmpty)
-                    CEmpty
-                    (Ann (App (App (Var 0) (Abs (Var 0)))
-                              (LitInt 1))
-                         (TArr (TArr TInt TInt) TInt))
-      -- id [1, 2]
-      test_list1 = infer EEmpty CEmpty (App idTrm (cons (LitInt 1) (cons (LitInt 2) Nil)))
-      -- id @ [Int] []
-      test_list2 = infer EEmpty CEmpty (App (TApp idTrm (TList TInt)) Nil)
-      -- rejected: id @ [Int -> Int] [forall a. a -> a]
-      test_list3 = infer EEmpty CEmpty (App (TApp idTrm (TList (TArr TInt TInt))) (cons idTrm Nil))
-      -- id [id]
-      test_list4 = infer EEmpty CEmpty (App idTrm (cons idTrm Nil))
-      -- id [id @ (Int -> Int)]
-      test_list5 = infer EEmpty CEmpty (App idTrm (cons (TApp idTrm (TArr TInt TInt)) Nil))
-      -- id @ [Int -> Int] [id @ Int]
-      test_list6 = infer EEmpty CEmpty (App (TApp idTrm (TList (TArr TInt TInt))) (cons (TApp idTrm TInt) Nil))
-      -- (1, True)
-      test_pair1 = infer EEmpty CEmpty (pair (LitInt 1) (LitBool True))
+      -- id : forall a. a -> a
+      idTyp = TForall (TArr (TVar 0) (TVar 0))
+      -- id = /\a. \x. x : a -> a
+      idTrm = TAbs (Ann (Abs (Var 0)) (TArr (TVar 0) (TVar 0)))
+      -- choose : forall a. a -> a -> a
+      chooseTyp = TForall $ TArr (TVar 0) $ TArr (TVar 0) (TVar 0)
+      -- auto : (forall a. a -> a) -> (forall a. a -> a)
+      autoTyp = idTyp `TArr` idTyp
+      -- auto' : forall a. (forall b. b -> b) -> a -> a
+      auto'Typ = TForall $ TArr idTyp $ TArr (TVar 0) (TVar 0)
+      -- poly : (forall a. a -> a) -> Int × Bool
+      polyTyp = idTyp `TArr` TProd TInt TBool
+      -- head : forall a. [a] -> a
+      headTyp = TForall $ TArr (TList (TVar 0)) (TVar 0)
+      -- tail : forall a. [a] -> [a]
+      tailTyp = TForall $ TArr (TList (TVar 0)) (TList (TVar 0))
+      -- length : forall a. [a] -> Int
+      lengthTyp = TForall $ TArr (TList (TVar 0)) TInt
+      -- single : forall a. a -> [a]
+      singleTyp = TForall $ TArr (TVar 0) (TList (TVar 0))
+      -- append : forall a. [a] -> [a] -> [a]
+      appendTyp = TForall $ TArr (TList (TVar 0)) $ TArr (TList (TVar 0)) (TList (TVar 0))
+      -- inc : Int -> Int
+      incTyp = TArr TInt TInt
+      -- map : forall a b. (a -> b) -> [a] -> [b]
+      mapTyp = TForall $ TForall $ TArr (TArr (TVar 1) (TVar 0)) $ TArr (TList (TVar 1)) (TList (TVar 0))
+      -- app : forall a b. (a -> b) -> a -> b
+      appTyp = TForall $ TForall $ TArr (TArr (TVar 1) (TVar 0)) $ TArr (TVar 1) (TVar 0)
+      -- revapp : forall a b. a -> (a -> b) -> b
+      revappTyp = TForall $ TForall $ TArr (TVar 1) $ TArr (TArr (TVar 1) (TVar 0)) (TVar 0)
+      -- runST : forall a. (forall b. ST b a) -> a
+      runSTTyp = TForall $ TArr (TForall $ TST (TVar 0) (TVar 1)) (TVar 0)
+      -- argST : forall a. ST a Int
+      argSTTyp = TForall $ TST (TVar 0) TInt
+
       -- A1: \x. \y. y  Ann~>  /\a. /\b. (\x. \y. y) : a -> b -> b
-      ex_a1 = infer EEmpty CEmpty $ TAbs $ TAbs $ Ann (Abs (Abs (Var 0))) (TArr (TVar 1) (TArr (TVar 0) (TVar 0)))
+      exA1 = infer EEmpty CEmpty (Abs (Abs (Var 0)))
+      exA1Ann = infer EEmpty CEmpty $ TAbs $ TAbs $ Ann (Abs (Abs (Var 0))) (TArr (TVar 1) (TArr (TVar 0) (TVar 0)))
       -- A2: choose id
-      ex_a2 = infer (ETrm idTyp (ETrm chooseTyp EEmpty)) CEmpty $ (Var 1) `App` (Var 0)
-      -- A3: choose Nil id
-      ex_a3 = infer (ETrm (TList idTyp) (ETrm chooseTyp EEmpty)) CEmpty $ (Var 1) `App` (Nil `Ann` (TList idTyp)) `App` (Var 0)
-      -- [ex_id, ex_id1, ex_idInt, ex_idInt1, ex_f1, ex_gid, ex_gid1, ex_g2, test_list1, test_list2, test_list3, test_list4, test_list5, test_list6, test_pair1]
-  forM_ [ex_a1, ex_a2, ex_a3] $ \ex -> case runWriterT ex of
-    Just (tyA, logs) -> do
-      putStrLn $ "inferred type: " ++ show tyA
-      mapM_ putStrLn logs
-      hFlush stdout
-    Nothing -> print "Nothing"
+      exA2 = infer (ETrm idTyp (ETrm chooseTyp EEmpty)) CEmpty $ Var 1 `App` Var 0
+      -- A3: choose Nil ids Ann~> choose (Nil : [forall a. a -> a]) ids
+      exA3 = infer (ETrm (TList idTyp) (ETrm chooseTyp EEmpty)) CEmpty $ Var 1 `App` Nil `App` Var 0
+      exA3Ann = infer (ETrm (TList idTyp) (ETrm chooseTyp EEmpty)) CEmpty $ Var 1 `App` (Nil `Ann` TList idTyp) `App` Var 0
+      -- A4: \x. x x Ann~> (\x. x x) : (forall a. a -> a) -> (forall a. a -> a)
+      exA4 = infer EEmpty CEmpty $ Abs (App (Var 0) (Var 0))
+      exA4Ann = infer EEmpty CEmpty $ Abs (App (Var 0) (Var 0)) `Ann` autoTyp
+      -- A5: id auto
+      exA5 = infer (ETrm idTyp (ETrm autoTyp EEmpty)) CEmpty $ Var 0 `App` Var 1
+      -- A6: id auto'
+      exA6 = infer (ETrm idTyp (ETrm auto'Typ EEmpty)) CEmpty $ Var 0 `App` Var 1
+      -- [x] A7: choose id auto
+      exA7 = infer (ETrm chooseTyp (ETrm idTyp (ETrm autoTyp EEmpty))) CEmpty $ Var 0 `App` Var 1 `App` Var 2
+      -- [x] A8: choose id auto'
+      exA8 = infer (ETrm chooseTyp (ETrm idTyp (ETrm auto'Typ EEmpty))) CEmpty $ Var 0 `App` Var 1 `App` Var 2
+      -- A9: f (choose id) ids
+      -- where f : forall a. (a -> a) -> [a] -> a
+      fTyp = TForall $ TArr (TArr (TVar 0) (TVar 0)) $ TArr (TList (TVar 0)) (TVar 0)
+      exA9 = infer (ETrm fTyp (ETrm chooseTyp (ETrm idTyp (ETrm (TList idTyp) EEmpty)))) CEmpty $ Var 0 `App` (Var 1 `App` Var 2) `App` Var 3
+      -- A10: poly id
+      exA10 = infer (ETrm polyTyp (ETrm idTyp EEmpty)) CEmpty $ Var 0 `App` Var 1
+      -- A11: poly (\x. x) Ann~> poly (/\a. \x. x : a -> a)
+      exA11 = infer (ETrm polyTyp EEmpty) CEmpty $ Var 0 `App` Abs (Var 0)
+      exA11Ann = infer (ETrm polyTyp EEmpty) CEmpty $ Var 0 `App` idTrm
+      -- A12: id poly (\x. x)
+      exA12 = infer (ETrm idTyp (ETrm polyTyp EEmpty)) CEmpty $ Var 0 `App` Var 1 `App` Abs (Var 0)
+      exA12Ann = infer (ETrm idTyp (ETrm polyTyp EEmpty)) CEmpty $ Var 0 `App` Var 1 `App` idTrm
+      -- B1: \f. (f 1, f True) Ann~> \f. (f 1, f True) : (forall a. a -> a) -> Int × Bool
+      exB1 = infer EEmpty CEmpty $ Abs (Pair `App` (Var 0 `App` LitInt 1) `App` (Var 0 `App` LitBool True))
+      exB1Ann = infer EEmpty CEmpty $ Abs (Pair `App` (Var 0 `App` LitInt 1) `App` (Var 0 `App` LitBool True)) `Ann` (idTyp `TArr` TProd TInt TBool)
+      -- B2: \xs. poly (head xs) Ann~> \xs. poly (head xs) : [forall a. a -> a] -> Int × Bool
+      exB2 = infer (ETrm polyTyp (ETrm headTyp EEmpty)) CEmpty $ Abs (Var 1 `App` (Var 2 `App` Var 0))
+      exB2Ann = infer (ETrm polyTyp (ETrm headTyp EEmpty)) CEmpty $ Abs (Var 1 `App` (Var 2 `App` Var 0)) `Ann` (TList idTyp `TArr` TProd TInt TBool)
+      -- C1: length ids
+      exC1 = infer (ETrm lengthTyp (ETrm (TList idTyp) EEmpty)) CEmpty $ Var 0 `App` Var 1
+      -- C2: tail ids
+      exC2 = infer (ETrm tailTyp (ETrm (TList idTyp) EEmpty)) CEmpty $ Var 0 `App` Var 1
+      -- C3: head ids
+      exC3 = infer (ETrm headTyp (ETrm (TList idTyp) EEmpty)) CEmpty $ Var 0 `App` Var 1
+      -- C4: single id
+      exC4 = infer (ETrm singleTyp (ETrm idTyp EEmpty)) CEmpty $ Var 0 `App` Var 1
+      -- C5: cons id ids
+      exC5 = infer (ETrm idTyp (ETrm (TList idTyp) EEmpty)) CEmpty $ Cons `App` Var 0 `App` Var 1
+      -- C6: cons (\x. x) ids Ann~> cons (/\a. \x. x : a -> a) ids
+      exC6 = infer (ETrm (TList idTyp) EEmpty) CEmpty $ Cons `App` Abs (Var 0) `App` Var 0
+      exC6Ann = infer (ETrm (TList idTyp) EEmpty) CEmpty $ Cons `App` idTrm `App` Var 0
+      -- [x] C7: append (single inc) (single ids)
+      exC7 = infer (ETrm appendTyp (ETrm singleTyp (ETrm incTyp (ETrm (TList idTyp) EEmpty)))) CEmpty $ Var 0 `App` (Var 1 `App` Var 2) `App` (Var 1 `App` Var 3)
+      -- C8: append (single id) ids
+      exC8 = infer (ETrm appendTyp (ETrm singleTyp (ETrm idTyp (ETrm (TList idTyp) EEmpty)))) CEmpty $ Var 0 `App` (Var 1 `App` Var 2) `App` Var 3
+      -- C9: map poly (single id)
+      exC9 = infer (ETrm mapTyp (ETrm polyTyp (ETrm singleTyp (ETrm idTyp EEmpty)))) CEmpty $ Var 0 `App` Var 1 `App` (Var 2 `App` Var 3)
+      -- [x] C10: map head (single ids)
+      exC10 = infer (ETrm mapTyp (ETrm headTyp (ETrm singleTyp (ETrm (TList idTyp) EEmpty)))) CEmpty $ Var 0 `App` Var 1 `App` (Var 2 `App` Var 3)
+      -- D1: app poly id
+      exD1 = infer (ETrm appTyp (ETrm polyTyp (ETrm idTyp EEmpty))) CEmpty $ Var 0 `App` Var 1 `App` Var 2
+      -- D2: revapp id poly
+      exD2 = infer (ETrm revappTyp (ETrm idTyp (ETrm polyTyp EEmpty))) CEmpty $ Var 0 `App` Var 1 `App` Var 2
+      -- D3: runST argST
+      exD3 = infer (ETrm runSTTyp (ETrm argSTTyp EEmpty)) CEmpty $ Var 0 `App` Var 1
+      -- [x] D4: app runST argST
+      exD4 = infer (ETrm appTyp (ETrm runSTTyp (ETrm argSTTyp EEmpty))) CEmpty $ Var 0 `App` Var 1 `App` Var 2
+      -- [x] D5: revapp argST runST
+      exD5 = infer (ETrm revappTyp (ETrm argSTTyp (ETrm runSTTyp EEmpty))) CEmpty $ Var 0 `App` Var 1 `App` Var 2
+      -- h : Int -> (forall a. a -> a)
+      hTyp = TArr TInt idTyp
+      -- k : forall a. a -> [a] -> a
+      kTyp = TForall $ TArr (TVar 0) $ TArr (TList (TVar 0)) (TVar 0)
+      -- lst : [forall a. Int -> a -> a]
+      lstTyp = TList $ TForall $ TArr TInt $ TArr (TVar 0) (TVar 0)
+      -- r : (forall a. a -> forall b. b -> b) -> Int
+      rTyp = TArr (TForall (TArr (TVar 0) idTyp)) TInt
+      -- [x] E1: k h lst
+      exE1 = infer (ETrm kTyp (ETrm hTyp (ETrm lstTyp EEmpty))) CEmpty $ Var 0 `App` Var 1 `App` Var 2
+      -- [x] E2: k (\x. h x) lst Ann~> k (/\a. \x. h x : a -> a)
+      exE2 = infer (ETrm kTyp (ETrm hTyp (ETrm lstTyp EEmpty))) CEmpty $ Var 0 `App` Abs (Var 2 `App` Var 0) `App` Var 2
+      -- [x] E3: r (\x. \y. y) Ann~> r (/\a. /\b. (\x. \y. y) : a -> b -> b)
+      exE3 = infer (ETrm rTyp EEmpty) CEmpty $ Var 0 `App` Abs (Abs (Var 0))
+      exE3Ann = infer (ETrm rTyp EEmpty) CEmpty $ Var 0 `App` TAbs (TAbs (Ann (Abs $ Abs $ Var 0) (TArr (TVar 0) (TArr (TVar 1) (TVar 1)))))
 
-
-
-
--- closed (EEvar EEmpty) (TArr (TVar 0) TInt)
+  forM_
+    [ exA1,
+      exA1Ann,
+      exA2,
+      exA3,
+      exA3Ann,
+      exA4,
+      exA4Ann,
+      exA5,
+      exA6,
+      exA7,
+      exA8,
+      exA9,
+      exA10,
+      exA11,
+      exA11Ann,
+      exA12,
+      exA12Ann,
+      exB1,
+      exB1Ann,
+      exB2,
+      exB2Ann,
+      exC1,
+      exC2,
+      exC3,
+      exC4,
+      exC5,
+      exC6,
+      exC6Ann,
+      exC7,
+      exC8,
+      exC9,
+      exC10,
+      exD1,
+      exD2,
+      exD3,
+      exD4,
+      exD5,
+      exE1,
+      exE2,
+      exE3,
+      exE3Ann
+    ]
+    $ \ex -> case runWriterT ex of
+      Just (tyA, logs) -> do
+        putStrLn $ "inferred type: " ++ show tyA
+        mapM_ putStrLn logs
+        hFlush stdout
+      Nothing -> print "Nothing"

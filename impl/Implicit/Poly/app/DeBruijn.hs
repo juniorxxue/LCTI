@@ -18,6 +18,7 @@ shiftTyp k (TArr t1 t2) = TArr (shiftTyp k t1) (shiftTyp k t2)
 shiftTyp k (TForall t) = TForall (shiftTyp (k + 1) t)
 shiftTyp k (TList t) = TList (shiftTyp k t)
 shiftTyp k (TProd t1 t2) = TProd (shiftTyp k t1) (shiftTyp k t2)
+shiftTyp k (TST t1 t2) = TST (shiftTyp k t1) (shiftTyp k t2)
 
 shiftTyp0 :: Typ -> Typ
 shiftTyp0 = shiftTyp 0
@@ -32,6 +33,7 @@ substTyp k tyA (TArr t1 t2) = TArr (substTyp k tyA t1) (substTyp k tyA t2)
 substTyp k tyA (TForall tyB) = TForall (substTyp (k + 1) (shiftTyp0 tyA) tyB)
 substTyp k tyA (TList tyB) = TList (substTyp k tyA tyB)
 substTyp k tyA (TProd tyB1 tyB2) = TProd (substTyp k tyA tyB1) (substTyp k tyA tyB2)
+substTyp k tyA (TST tyB1 tyB2) = TST (substTyp k tyA tyB1) (substTyp k tyA tyB2)
 
 substTyp0 :: Typ -> Typ -> Typ
 -- substTyp0 a b | trace ("substTyp0 " ++ show a ++ " " ++ show b) False = undefined
@@ -54,6 +56,7 @@ shiftTerm k (TApp t ty) = TApp (shiftTerm k t) ty
 shiftTerm _ Nil = Nil
 shiftTerm _ Cons = Cons
 shiftTerm _ Pair = Pair
+shiftTerm _ ST = ST
 
 shiftTerm0 :: Trm -> Trm
 shiftTerm0 = shiftTerm 0
@@ -82,6 +85,7 @@ shiftTyTerm k (TApp t ty) = TApp (shiftTyTerm k t) (shiftTyp k ty)
 shiftTyTerm _ Nil = Nil
 shiftTyTerm _ Cons = Cons
 shiftTyTerm _ Pair = Pair
+shiftTyTerm _ ST = ST
 
 -- type shift in context
 shiftTyContext :: Int -> Context -> Context

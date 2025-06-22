@@ -6,8 +6,8 @@ module Syntax where
 import Debug.Trace
 
 type Log = [String]
-data Typ = TInt | TBool | TVar Int | TArr Typ Typ | TForall Typ | TList Typ | TProd Typ Typ deriving (Eq)
-data Trm = LitInt Int | LitBool Bool | Var Int | Abs Trm | App Trm Trm | Ann Trm Typ | TAbs Trm | TApp Trm Typ | Nil | Cons | Pair
+data Typ = TInt | TBool | TVar Int | TArr Typ Typ | TForall Typ | TList Typ | TProd Typ Typ | TST Typ Typ deriving (Eq)
+data Trm = LitInt Int | LitBool Bool | Var Int | Abs Trm | App Trm Trm | Ann Trm Typ | TAbs Trm | TApp Trm Typ | Nil | Cons | Pair | ST
 
 instance Show Typ where
   show TInt = "Int"
@@ -17,6 +17,7 @@ instance Show Typ where
   show (TForall t) = "∀. " ++ show t
   show (TList t) = "[" ++ show t ++ "]"
   show (TProd t1 t2) = "(" ++ show t1 ++ " × " ++ show t2 ++ ")"
+  show (TST t1 t2) = "(ST " ++ show t1 ++ " " ++ show t2 ++ ")"
 
 instance Show Trm where
   show (LitInt i) = show i
@@ -30,6 +31,7 @@ instance Show Trm where
   show Nil = "Nil"
   show Cons = "Cons"
   show Pair = "Pair"
+  show ST = "ST"
 
 data Env = EEmpty | ETrm Typ Env | EUvar Env | EEvar Env | ESvar Typ Env
 
@@ -111,6 +113,7 @@ closed senv (TArr t1 t2) = closed senv t1 && closed senv t2
 closed senv (TForall t) = closed (EUvar senv) t
 closed senv (TList t) = closed senv t
 closed senv (TProd t1 t2) = closed senv t1 && closed senv t2
+closed senv (TST t1 t2) = closed senv t1 && closed senv t2
 
 open :: Env -> Typ -> Bool
 -- open env ty | trace ("open " ++ show env ++ " |- " ++ show ty) False = undefined
