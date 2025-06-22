@@ -318,6 +318,9 @@ cons = App . App Cons
 pair :: Trm -> Trm -> Trm
 pair = App . App Pair
 
+chooseTyp :: Typ
+chooseTyp = TForall $ TArr (TVar 0) $ TArr (TVar 0) (TVar 0)
+
 main :: IO ()
 main = do
   -- print idTyp
@@ -365,7 +368,14 @@ main = do
       test_list6 = infer EEmpty CEmpty (App (TApp idTrm (TList (TArr TInt TInt))) (cons (TApp idTrm TInt) Nil))
       -- (1, True)
       test_pair1 = infer EEmpty CEmpty (pair (LitInt 1) (LitBool True))
-  forM_ [ex_id, ex_id1, ex_idInt, ex_idInt1, ex_f1, ex_gid, ex_gid1, ex_g2, test_list1, test_list2, test_list3, test_list4, test_list5, test_list6, test_pair1] $ \ex -> case runWriterT ex of
+      -- A1: \x. \y. y  Ann~>  /\a. /\b. (\x. \y. y) : a -> b -> b
+      ex_a1 = infer EEmpty CEmpty $ TAbs $ TAbs $ Ann (Abs (Abs (Var 0))) (TArr (TVar 1) (TArr (TVar 0) (TVar 0)))
+      -- A2: choose id
+      ex_a2 = infer (ETrm idTyp (ETrm chooseTyp EEmpty)) CEmpty $ (Var 1) `App` (Var 0)
+      -- A3: choose Nil id
+      ex_a3 = infer (ETrm (TList idTyp) (ETrm chooseTyp EEmpty)) CEmpty $ (Var 1) `App` (Nil `Ann` (TList idTyp)) `App` (Var 0)
+      -- [ex_id, ex_id1, ex_idInt, ex_idInt1, ex_f1, ex_gid, ex_gid1, ex_g2, test_list1, test_list2, test_list3, test_list4, test_list5, test_list6, test_pair1]
+  forM_ [ex_a1, ex_a2, ex_a3] $ \ex -> case runWriterT ex of
     Just (tyA, logs) -> do
       putStrLn $ "inferred type: " ++ show tyA
       mapM_ putStrLn logs
