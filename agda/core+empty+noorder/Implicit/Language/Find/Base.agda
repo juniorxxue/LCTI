@@ -94,8 +94,6 @@ data IsoInf : Counter m → Set where
 data find : Type m → Fin m → Counter m → Set where
   f-∞       : (inA : k ε A)
             → find A k ∞
-  f-iso     : (iso : IsoInf j)
-            → find (‶ k) k j
   f-arr-𝕚-l : (inA : k ε A)
             → find (A `→ B) k (𝕚 j)
   f-arr-𝕚-r : find B k j
@@ -128,7 +126,7 @@ find-arr-l (f-∞ inA) = f-∞ (ε-arr-l inA)
 
 find-Z-false : find A k Z
              → ⊥
-find-Z-false (f-iso ())
+find-Z-false ()
 
 infix 3 _⊢rʲ_
 data _⊢rʲ_ : Env n m → Counter m → Set where

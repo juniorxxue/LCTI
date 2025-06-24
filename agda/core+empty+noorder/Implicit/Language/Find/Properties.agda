@@ -24,7 +24,6 @@ open import Implicit.Language.Find.Base
          → X #< k
          → find A' (inject₁ X) j'
 ↑ty-find (f-∞ x) upA ↑tyʲ-∞ lt = f-∞ (↑ty-ε x upA lt)
-↑ty-find (f-iso x) ↑ty-var upj lt rewrite punchIn-inject lt = f-iso (↑tyʲ-iso x upj)
 ↑ty-find (f-arr-𝕚-l x) (↑ty-arr upA upA₁) (↑tyʲ-𝕚 upj) lt = f-arr-𝕚-l (↑ty-ε x upA lt)
 ↑ty-find (f-arr-𝕚-r fd) (↑ty-arr upA upA₁) (↑tyʲ-𝕚 upj) lt = f-arr-𝕚-r (↑ty-find fd upA₁ upj lt)
 ↑ty-find (f-arr-𝕔 fd) (↑ty-arr upA upA₁) (↑tyʲ-𝕔 upj) lt = f-arr-𝕔 (↑ty-find fd upA₁ upj lt)
@@ -48,8 +47,6 @@ open import Implicit.Language.Find.Base
           → X #< k
           → find A X j
 ↑ty-find' (f-∞ x) upA ↑tyʲ-∞ lt = f-∞ (↑ty-ε' x lt upA)
-↑ty-find' (f-iso x) upA upj lt rewrite punchIn-inject lt with ↑ty-var-inv-helper upA refl
-... | refl = f-iso (↑tyʲ-iso' x upj)
 ↑ty-find' (f-arr-𝕚-l x) (↑ty-arr upA upA₁) (↑tyʲ-𝕚 upj) lt = f-arr-𝕚-l (↑ty-ε' x lt upA)
 ↑ty-find' (f-arr-𝕚-r fd) (↑ty-arr upA upA₁) (↑tyʲ-𝕚 upj) lt = f-arr-𝕚-r (↑ty-find' fd upA₁ upj lt)
 ↑ty-find' (f-arr-𝕔 fd) (↑ty-arr upA upA₁) (↑tyʲ-𝕔 upj) lt = f-arr-𝕔 (↑ty-find' fd upA₁ upj lt)
@@ -70,7 +67,6 @@ open import Implicit.Language.Find.Base
 find-ε-gen : find A k j
            → k ε A
 find-ε-gen (f-∞ x) = x
-find-ε-gen (f-iso iso) = ε-var
 find-ε-gen (f-arr-𝕚-l x) = ε-arr-l x
 find-ε-gen (f-arr-𝕚-r fd) = ε-arr-r (find-ε-gen fd)
 find-ε-gen (f-arr-𝕔 fd) = ε-arr-r (find-ε-gen fd)

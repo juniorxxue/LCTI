@@ -37,7 +37,6 @@ s-⊆ (s-tapp s upᶜ) with s-⊆ s
 ... | svar r regA = r
 s-⊆ (s-svar-term inΓ s) = s-⊆ s
 s-⊆ (s-svar-tapp inΓ s) = s-⊆ s
-s-⊆ (s-evar-infers infs inst) = inst-⊆ inst
 s-⊆ (s-term-c-n x ap ⊢e) = s-⊆ x
 s-⊆ (s-term-o-n x ⊢e ss) = ⊆-trans (s-⊆ x) (ss-⊆ ss)
 

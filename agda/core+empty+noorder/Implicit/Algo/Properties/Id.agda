@@ -37,9 +37,6 @@ id-↑tm (id-⓪ id₁ st) (↑tmᶜ-⓪ upΣ) = id-⓪ (id-↑tm id₁ upΣ) st
 s-id' : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
       → Id Σ B
 
-infs-id' : Γ ⊨ Σ ⟹ A
-         → Id Σ A
-
 ⊢id' (⊢lit regΓ) = id-□
 ⊢id' (⊢var regΓ x∈Γ) = id-□
 ⊢id' (⊢ann ⊢e) = id-□
@@ -69,10 +66,7 @@ s-id' (s-tapp {B = B} {C = C} s upᶜ)
   with ⟨ B* , stB ⟩ ← st0-total B C = id-⓪ (id-st' (s-id' s) (↑tyᶜ-st upᶜ) stB) stB
 s-id' (s-svar-term inΓ s) = s-id' s
 s-id' (s-svar-tapp inΓ s) = s-id' s
-s-id' (s-evar-infers infs inst) = infs-id' infs
 
-infs-id' (infs-z regΓ regA) = id-τ
-infs-id' (infs-s x infs) = id-e (infs-id' infs)
 
 
 ⊢id0 : Γ ⊢ τ B ⇒ e ⇒ A

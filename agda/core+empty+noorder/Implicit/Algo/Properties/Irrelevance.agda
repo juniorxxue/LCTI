@@ -283,10 +283,6 @@ s-irrev : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
         → Γ & Δ ⇌s Γ' & Δ'
         → Γ' ⊢ A ≤⁺ Σ ⊣ Δ' ↪ B
 
-infs-irrev : Γ ⊨ Σ ⟹ A
-           → Γ ⇌ Δ
-           → Δ ⊨ Σ ⟹ A
-
 t-irrev (⊢lit regΓ) tf = ⊢lit (⇌-tregular regΓ tf)
 t-irrev (⊢var regΓ x∈Γ) tf = ⊢var (⇌-tregular regΓ tf) (⇌-∋⦂ x∈Γ tf)
 t-irrev (⊢ann ⊢e) tf = ⊢ann (t-irrev ⊢e tf)
@@ -307,13 +303,10 @@ s-irrev (s-∀l-no s upᶜ upᵉ upC upD) tf = s-∀l-no (s-irrev s (evar tf)) u
 s-irrev (s-tapp s upᶜ) tf = s-tapp (s-irrev s (svar tf)) upᶜ
 s-irrev (s-svar-term inΓ s) tf with refl ← ⇌s-eq tf = s-svar-term (⇌s-∋:=-l inΓ tf) (s-irrev s tf)
 s-irrev (s-svar-tapp inΓ s) tf with refl ← ⇌s-eq tf = s-svar-tapp (⇌s-∋:=-l inΓ tf) (s-irrev s tf)
-s-irrev (s-evar-infers infs inst) tf = s-evar-infers (infs-irrev infs (⇌s-⇌-l tf)) (⇌s-inst tf inst)
 s-irrev (s-term-c-n x₁ ap ⊢e) x = s-term-c-n (s-irrev x₁ x) (⇌s-≫-r ap x) (t-irrev ⊢e (⇌s-⇌-r x))
 s-irrev (s-term-o-n s ⊢e ss) tf with ⇌s-Ω (s-⊆ s) tf
 ... | ⟨ Ω' , tf' ⟩ = s-term-o-n (s-irrev s tf') (t-irrev ⊢e (⇌s-⇌-r tf')) (ss-irrev ss (⇌s-arr tf tf' (ss-⊆ ss)))
 
-infs-irrev (infs-z regΓ regA) tf = infs-z (⇌-tregular regΓ tf) (⇌-⊢r regA tf)
-infs-irrev (infs-s x infs) tf = infs-s (t-irrev x tf) (infs-irrev infs tf)
 
 ⇌-refl : TRegular Γ
        → Γ ⇌ Γ
@@ -356,8 +349,3 @@ s-irrev-⊆-gen : Γ ⋈ ⊢ A ≤⁺ Σ ⊣ Γ ⋈ ↪ B
           → Δ ⋈ ⊢ A ≤⁺ Σ ⊣ Δ ⋈ ↪ B
 s-irrev-⊆-gen s ext = s-irrev s (mark (⊆-⇌ ext))
 
-infs-irrev-⊆ : 𝕣 Γ ⊨ Σ ⟹ A
-             → Γ ⊆ Δ
-             → 𝕣 Δ ⊨ Σ ⟹ A
-infs-irrev-⊆ (infs-z regΓ regA) ext = infs-z (⇌-tregular regΓ (⊆-⇌ ext)) (⊢r-𝕣' (⊆-⊢r (⊢r-𝕣 regA) ext))
-infs-irrev-⊆ (infs-s x infs) ext = infs-s (t-irrev-⊆ x ext) (infs-irrev-⊆ infs ext)

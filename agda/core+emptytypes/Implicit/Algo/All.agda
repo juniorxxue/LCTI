@@ -14,3 +14,5 @@ open import Implicit.Algo.Properties.Regularity public
 
 open import Implicit.Algo.Properties.Irrelevance public
 open import Implicit.Algo.Properties.Subsumption public
+open import Implicit.Algo.Properties.OpenK public
+open import Implicit.Algo.Properties.SubIrrelevance public

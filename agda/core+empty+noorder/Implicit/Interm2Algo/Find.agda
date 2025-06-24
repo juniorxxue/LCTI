@@ -24,8 +24,6 @@ open import Implicit.Interm2Algo.ExtIrrev
 ⊆/c-find (⊆I-X regΓ cloA) in1 in2 = ⊥-elim (∋^-∋=-false in1 in2)
 ⊆/c-find (⊆C-X regΓ cloA) in1 in2 = ⊥-elim (∋^-∋=-false in1 in2)
 ⊆/c-find (⊆T-X regΓ cloA) in1 in2 = ⊥-elim (∋^-∋=-false in1 in2)
-⊆/c-find (⊆Inf-X extx iso) in1 in2
-  with ε-var ← ^in-=out-ε (ext-var extx) in1 in2 = f-iso iso
 
 
 ⊆/c-find0 : Γ ,^ ⊆ Δ ,= B w/t A w/c j
@@ -57,5 +55,3 @@ open import Implicit.Interm2Algo.ExtIrrev
 ⊆/c-find-∋= (⊆∀-T ext upj) inΓ (f-𝕥 fd upj₁)
   with refl ← ↑tyʲ-unique upj upj₁
   with S= r ← ⊆/c-find-∋= ext (S= inΓ) fd = r
-⊆/c-find-∋= (⊆I-X regΓ cloA) inΓ (f-iso iso) = ⊥-elim (⊢c-^∈-false ε-var inΓ cloA)
-⊆/c-find-∋= (⊆Inf-X extx iso₁) inΓ (f-iso iso) = ⊆/x-^in-=out extx inΓ

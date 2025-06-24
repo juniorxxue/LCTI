@@ -193,8 +193,6 @@ s-⊆-prv-gen (s-svar-term x s) (opn-var x₁) exts
 s-⊆-prv-gen (s-svar-tapp x s) (opn-var x₁) exts
   with ext ← ⊆⊆-⊆-l exts
   with refl ← ⊆⊆-one-input exts = s-svar-tapp (⊆-∋:= x ext) (s-⊆-prv-gen s (⊢r-⊢ok (∋:=-⊢r (s-env-in s) x)) exts)
-s-⊆-prv-gen (s-evar-infers infs inst) (opn-var x) exts
-  with ext ← ⊆⊆-⊆-l exts = s-evar-infers (infs-irrev-⊆ infs ext) (⊆⊆-inst inst exts (⊢oˣ-∋^-#< x (inst-∋^ inst)))
 s-⊆-prv-gen (s-term-c-n s ap ⊢e) opn exts = {!!}
 s-⊆-prv-gen (s-term-o-n s ⊢e ss) opn exts = {!!}
 

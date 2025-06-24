@@ -39,7 +39,6 @@ s-subsumtion (s-∀l-no s upᶜ upᵉ upC upD) new = {!!}
 s-subsumtion (s-tapp s upᶜ) (≊⓪ new x) = s-tapp (s-subsumtion s {!!}) {!!}
 s-subsumtion (s-svar-term x s) (≊S new) = s-svar-term x (s-subsumtion s (≊S new))
 s-subsumtion (s-svar-tapp x s) (≊⓪ new x₁) = s-svar-tapp x (s-subsumtion s (≊⓪ new x₁))
-s-subsumtion (s-evar-infers infs inst) (≊S new) = {!!}
 
 subsumption : Γ ⊢ Σ ⇒ e ⇒ A
              → Σ ≊ Σ' by A
