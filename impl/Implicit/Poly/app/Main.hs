@@ -461,12 +461,13 @@ main = do
       exD2 = infer (ETrm revappTyp (ETrm idTyp (ETrm polyTyp EEmpty))) CEmpty $ Var 0 `App` Var 1 `App` Var 2
       -- D3: runST argST
       exD3 = infer (ETrm runSTTyp (ETrm argSTTyp EEmpty)) CEmpty $ Var 0 `App` Var 1
-      -- [x] D4: app runST argST Ann~> app (\x. runST (/\a. x @a) : (forall a. ST a Int) -> Int) argST
+      -- D4: app runST argST Ann~> app (\x. runST (/\a. x @a) : (forall a. ST a Int) -> Int) argST
       exD4 = infer (ETrm appTyp (ETrm runSTTyp (ETrm argSTTyp EEmpty))) CEmpty $ Var 0 `App` Var 1 `App` Var 2
       exD4Ann = infer (ETrm appTyp (ETrm runSTTyp (ETrm argSTTyp EEmpty))) CEmpty $ Var 0 `App` (Abs (Var 2 `App` TAbs (Var 0 `TApp` TVar 0)) `Ann` TArr argSTTyp TInt) `App` Var 2
-      -- [x] D5: revapp argST runST Ann~> revapp argST (\x. runST (/\a. x @a) : (forall a. ST a Int) -> Int)
+      -- D5: revapp argST runST Ann~> revapp argST (runST @Int) / revapp argST (\x. runST (/\a. x @a) : (forall a. ST a Int) -> Int)
       exD5 = infer (ETrm revappTyp (ETrm argSTTyp (ETrm runSTTyp EEmpty))) CEmpty $ Var 0 `App` Var 1 `App` Var 2
-      exD5Ann = infer (ETrm revappTyp (ETrm argSTTyp (ETrm runSTTyp EEmpty))) CEmpty $ Var 0 `App` Var 1 `App` (Abs (Var 3 `App` TAbs (Var 0 `TApp` TVar 0)) `Ann` TArr argSTTyp TInt)
+      exD5Ann = infer (ETrm revappTyp (ETrm argSTTyp (ETrm runSTTyp EEmpty))) CEmpty $ Var 0 `App` Var 1 `App` (Var 2 `TApp` TInt)
+      exD5Ann' = infer (ETrm revappTyp (ETrm argSTTyp (ETrm runSTTyp EEmpty))) CEmpty $ Var 0 `App` Var 1 `App` (Abs (Var 3 `App` TAbs (Var 0 `TApp` TVar 0)) `Ann` TArr argSTTyp TInt)
       -- h : Int -> (forall a. a -> a)
       hTyp = TArr TInt idTyp
       -- k : forall a. a -> [a] -> a
@@ -475,7 +476,7 @@ main = do
       lstTyp = TList $ TForall $ TArr TInt $ TArr (TVar 0) (TVar 0)
       -- r : (forall a. a -> forall b. b -> b) -> Int
       rTyp = TArr (TForall (TArr (TVar 0) idTyp)) TInt
-      -- [?] E1: k h lst
+      -- E1: k h lst
       exE1 = infer (ETrm kTyp (ETrm hTyp (ETrm lstTyp EEmpty))) CEmpty $ Var 0 `App` Var 1 `App` Var 2
       -- exE1' = infer (ETrm chooseTyp (ETrm hTyp (ETrm (TForall $ TArr TInt $ TArr (TVar 0) (TVar 0)) EEmpty))) CEmpty $ Var 0 `App` Var 1 `App` Abs (Var 2 `App` Var 0)
       -- E2: k (\x. h x) lst Ann~> k (/\a. \x. h x : Int -> a -> a) lst
@@ -530,11 +531,12 @@ main = do
       exD4Ann,
       exD5,
       exD5Ann,
-      exE1,
-      exE2,
-      exE2Ann,
-      exE3,
-      exE3Ann
+      exD5Ann'
+      -- exE1,
+      -- exE2,
+      -- exE2Ann,
+      -- exE3,
+      -- exE3Ann
     ]
     $ \ex -> case runWriterT ex of
       Just (tyA, logs) -> do
