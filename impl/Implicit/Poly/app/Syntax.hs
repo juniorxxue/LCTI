@@ -14,7 +14,7 @@ instance Show Typ where
   show TBool = "Bool"
   show (TVar i) = "t" ++ show i
   show (TArr t1 t2) = "(" ++ show t1 ++ " → " ++ show t2 ++ ")"
-  show (TForall t) = "∀. " ++ show t
+  show (TForall t) = "(∀. " ++ show t ++ ")"
   show (TList t) = "[" ++ show t ++ "]"
   show (TProd t1 t2) = "(" ++ show t1 ++ " × " ++ show t2 ++ ")"
   show (TST t1 t2) = "(ST " ++ show t1 ++ " " ++ show t2 ++ ")"

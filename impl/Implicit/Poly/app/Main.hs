@@ -28,7 +28,7 @@ lookupEnv _ _ = lift Nothing
 findSol :: Env -> Int -> WriterT Log Maybe Typ
 findSol a b | trace ("findSol " ++ show a ++ " |- " ++ show b) False = undefined
 findSol EEmpty _ = lift Nothing
-findSol (ESvar ty _) 0 = return ty
+findSol (ESvar ty _) 0 = return $ shiftTyp0 ty
 findSol (ESvar _ senv) k | k > 0 = do
   ty' <- findSol senv (k - 1)
   return $ shiftTyp0 ty'
@@ -41,6 +41,7 @@ findSol (EEvar senv) k | k > 0 = do
 findSol _ _ = lift Nothing
 
 inst :: Env -> Int -> Typ -> Maybe Env
+inst env k a | trace ("inst " ++ show env ++ " " ++ show k ++ " " ++ show a) False = undefined
 inst (EEvar senv) 0 tyA = Just $ ESvar (unshiftTyp0 tyA) senv
 inst (EEvar senv) k tyA | k > 0 = do
   env' <- inst senv (k - 1) (unshiftTyp0 tyA)
@@ -102,7 +103,7 @@ ssubP (env, senv) (TProd tyA tyB) (TProd tyC tyD) = do
   return senv2
 ssubP (env, senv) (TST tyA tyB) (TST tyC tyD) = do
   (senv1, _log1) <- peek $ ssubP (env, senv) tyA tyC
-  (senv2, _log2) <- peek $ ssubP (env, senv1) tyC tyA
+  (senv2, _log2) <- peek $ ssubN (env, senv1) tyC tyA
   (senv3, _log3) <- peek $ ssubP (env, senv2) tyB tyD
   tell ["[S-ST] " ++ logSSubFull (env, senv) (TST tyA tyB) (TST tyC tyD) senv2]
   tell $ indentAll _log1
@@ -160,7 +161,7 @@ ssubN (env, senv) (TProd tyA tyB) (TProd tyC tyD) = do
   return senv2
 ssubN (env, senv) (TST tyA tyB) (TST tyC tyD) = do
   (senv1, _log1) <- peek $ ssubN (env, senv) tyA tyC
-  (senv2, _log2) <- peek $ ssubN (env, senv1) tyC tyA
+  (senv2, _log2) <- peek $ ssubP (env, senv1) tyC tyA
   (senv3, _log3) <- peek $ ssubN (env, senv2) tyB tyD
   tell ["[S-ST] " ++ logSSubFull (env, senv) (TST tyA tyB) (TST tyC tyD) senv3]
   tell $ indentAll _log1
@@ -408,9 +409,11 @@ main = do
       exA7Ann = infer (ETrm chooseTyp (ETrm idTyp (ETrm autoTyp EEmpty))) CEmpty $ Var 0 `App` (Var 1 `TApp` idTyp) `App` Var 2
       -- choose id : (forall a. a -> a) -> forall a. a -> a
       -- auto' : forall a. (forall b. b -> b) -> a -> a
-      -- [?] A8: choose id auto' Ann~> choose id (/\a. \x. auto' x @ a))
+      -- A8: choose id auto' Ann~> choose (/\a. \f. id f @a : (forall b. b -> b) -> a -> a) auto' / choose (/\a. \f. \x. id f x : (forall b. b -> b) -> a -> a) auto'
       exA8 = infer (ETrm chooseTyp (ETrm idTyp (ETrm auto'Typ EEmpty))) CEmpty $ Var 0 `App` Var 1 `App` Var 2
       -- exA8Ann = infer (ETrm chooseTyp (ETrm idTyp (ETrm auto'Typ EEmpty))) CEmpty $ Var 0 `App` (Var 1 `TApp` TForall (TArr (TArr (TVar 0) (TVar 0)) (TArr (TVar 0) (TVar 0)))) `App` (TAbs (Abs (Var 3 `App` (Ann (TApp (Var 0) (TVar 0)) (TArr (TVar 0) (TVar 0)))) `Ann` (TArr (TArr (TVar 0) (TVar 0)) (TArr (TVar 0) (TVar 0)))))
+      exA8Ann = infer (ETrm chooseTyp (ETrm idTyp (ETrm auto'Typ EEmpty))) CEmpty $ Var 0 `App` TAbs (Abs (Var 2 `App` (Var 0 `TApp` TVar 0)) `Ann` TArr idTyp (TArr (TVar 0) (TVar 0))) `App` Var 2
+      exA8Ann' = infer (ETrm chooseTyp (ETrm idTyp (ETrm auto'Typ EEmpty))) CEmpty $ Var 0 `App` TAbs (Abs (Abs (Var 3 `App` Var 1 `App` Var 0)) `Ann` TArr idTyp (TArr (TVar 0) (TVar 0))) `App` Var 2
       -- A9: f (choose id) ids
       -- where f : forall a. (a -> a) -> [a] -> a
       fTyp = TForall $ TArr (TArr (TVar 0) (TVar 0)) $ TArr (TList (TVar 0)) (TVar 0)
@@ -458,10 +461,12 @@ main = do
       exD2 = infer (ETrm revappTyp (ETrm idTyp (ETrm polyTyp EEmpty))) CEmpty $ Var 0 `App` Var 1 `App` Var 2
       -- D3: runST argST
       exD3 = infer (ETrm runSTTyp (ETrm argSTTyp EEmpty)) CEmpty $ Var 0 `App` Var 1
-      -- [x] D4: app runST argST
+      -- [x] D4: app runST argST Ann~> app (\x. runST (/\a. x @a) : (forall a. ST a Int) -> Int) argST
       exD4 = infer (ETrm appTyp (ETrm runSTTyp (ETrm argSTTyp EEmpty))) CEmpty $ Var 0 `App` Var 1 `App` Var 2
-      -- [x] D5: revapp argST runST
+      exD4Ann = infer (ETrm appTyp (ETrm runSTTyp (ETrm argSTTyp EEmpty))) CEmpty $ Var 0 `App` (Abs (Var 2 `App` TAbs (Var 0 `TApp` TVar 0)) `Ann` TArr argSTTyp TInt) `App` Var 2
+      -- [x] D5: revapp argST runST Ann~> revapp argST (\x. runST (/\a. x @a) : (forall a. ST a Int) -> Int)
       exD5 = infer (ETrm revappTyp (ETrm argSTTyp (ETrm runSTTyp EEmpty))) CEmpty $ Var 0 `App` Var 1 `App` Var 2
+      exD5Ann = infer (ETrm revappTyp (ETrm argSTTyp (ETrm runSTTyp EEmpty))) CEmpty $ Var 0 `App` Var 1 `App` (Abs (Var 3 `App` TAbs (Var 0 `TApp` TVar 0)) `Ann` TArr argSTTyp TInt)
       -- h : Int -> (forall a. a -> a)
       hTyp = TArr TInt idTyp
       -- k : forall a. a -> [a] -> a
@@ -472,10 +477,10 @@ main = do
       rTyp = TArr (TForall (TArr (TVar 0) idTyp)) TInt
       -- [?] E1: k h lst
       exE1 = infer (ETrm kTyp (ETrm hTyp (ETrm lstTyp EEmpty))) CEmpty $ Var 0 `App` Var 1 `App` Var 2
-      exE1' = infer (ETrm chooseTyp (ETrm hTyp (ETrm (TForall $ TArr TInt $ TArr (TVar 0) (TVar 0)) EEmpty))) CEmpty $ Var 0 `App` Var 1 `App` Abs (Var 2 `App` Var 0)
-      -- [?] E2: k (\x. h x) lst Ann~> k ((\x. /\a. h x : a -> a) : Int -> forall a. a -> a) lst
+      -- exE1' = infer (ETrm chooseTyp (ETrm hTyp (ETrm (TForall $ TArr TInt $ TArr (TVar 0) (TVar 0)) EEmpty))) CEmpty $ Var 0 `App` Var 1 `App` Abs (Var 2 `App` Var 0)
+      -- E2: k (\x. h x) lst Ann~> k (/\a. \x. h x : Int -> a -> a) lst
       exE2 = infer (ETrm kTyp (ETrm hTyp (ETrm lstTyp EEmpty))) CEmpty $ Var 0 `App` Abs (Var 2 `App` Var 0) `App` Var 2
-      exE2Ann = infer (ETrm kTyp (ETrm hTyp (ETrm lstTyp EEmpty))) CEmpty $ Var 0 `App` (Abs (TAbs ((Var 2 `App` Var 0) `Ann` TArr (TVar 0) (TVar 0))) `Ann` TArr TInt idTyp) `App` Var 2
+      exE2Ann = infer (ETrm kTyp (ETrm hTyp (ETrm lstTyp EEmpty))) CEmpty $ Var 0 `App` TAbs (Abs ((Var 2 `App` Var 0) `TApp` TVar 0) `Ann` TArr TInt (TArr (TVar 0) (TVar 0))) `App` Var 2
       -- E3: r (\x. \y. y) Ann~> r (/\ a. (\x. /\ b. (\y. y : b -> b)) : a -> forall b. b -> b)
       exE3 = infer (ETrm rTyp EEmpty) CEmpty $ Var 0 `App` Abs (Abs (Var 0))
       exE3Ann = infer (ETrm rTyp EEmpty) CEmpty $ Var 0 `App` TAbs (Abs (TAbs (Abs (Var 0) `Ann`TArr (TVar 0) (TVar 0))) `Ann` TArr (TVar 0) idTyp)
@@ -493,7 +498,8 @@ main = do
       exA7,
       exA7Ann,
       exA8,
-      -- exA8Ann,
+      exA8Ann,
+      exA8Ann',
       exA9,
       exA10,
       exA11,
@@ -521,9 +527,10 @@ main = do
       exD2,
       exD3,
       exD4,
+      exD4Ann,
       exD5,
+      exD5Ann,
       exE1,
-      exE1',
       exE2,
       exE2Ann,
       exE3,
