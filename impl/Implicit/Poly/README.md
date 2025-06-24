@@ -33,9 +33,9 @@ TODO:
 | D1     | `app poly id`                     | `app poly id`                                                     | ✅     |
 | D2     | `revapp id poly`                  | `revapp id poly`                                                  | ✅     |
 | D3     | `runST argST`                     | `runST argST`                                                     | ✅     |
-| D4     | `app runST argST`                 | `app (\x. runST (/\a. x @a) : (forall a. ST a Int) -> Int) argST` | ✅     |
-| D5     | `revapp argST runST`              | `revapp argST (runST @ Int)`                                      | ✅     |
-| E1, E2 | `k h lst`/`k (\x. h x) lst`       | `k (/\a. \x. h x : Int -> a -> a) lst`                            | ✅     |
+| D4     | `app runST argST`                 | `app (\x. runST (/\a. x @a) : (forall a. ST a Int) -> Int) argST` | Ann    |
+| D5     | `revapp argST runST`              | `revapp argST (runST @ Int)`                                      | Ann    |
+| E1, E2 | `k h lst`/`k (\x. h x) lst`       | `k (/\a. \x. h x : Int -> a -> a) lst`                            | Ann    |
 | E3     | `r (\x. \y. y)`                   | `r (/\a. (\x. /\b. (\y. y : b -> b)) : a -> forall b. b -> b)`    | Ann    |
 
 **Legend:**
