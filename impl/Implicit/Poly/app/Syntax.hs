@@ -1,4 +1,4 @@
-{-# LANGUAGE MultiWayIf, LambdaCase, RankNTypes, TypeSynonymInstances #-}
+{-# LANGUAGE RankNTypes, TypeSynonymInstances #-}
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 {-# HLINT ignore "Redundant multi-way if" #-}
 module Syntax where
@@ -10,28 +10,28 @@ data Typ = TInt | TBool | TVar Int | TArr Typ Typ | TForall Typ | TList Typ | TP
 data Trm = LitInt Int | LitBool Bool | Var Int | Abs Trm | App Trm Trm | Ann Trm Typ | TAbs Trm | TApp Trm Typ | Nil | Cons | Pair | ST
 
 instance Show Typ where
-  show TInt = "Int"
-  show TBool = "Bool"
-  show (TVar i) = "t" ++ show i
-  show (TArr t1 t2) = "(" ++ show t1 ++ " → " ++ show t2 ++ ")"
-  show (TForall t) = "(∀. " ++ show t ++ ")"
-  show (TList t) = "[" ++ show t ++ "]"
-  show (TProd t1 t2) = "(" ++ show t1 ++ " × " ++ show t2 ++ ")"
-  show (TST t1 t2) = "(ST " ++ show t1 ++ " " ++ show t2 ++ ")"
+  showsPrec _ TInt = showString "Int"
+  showsPrec _ TBool = showString "Bool"
+  showsPrec _ (TVar i) = showString "t" . shows i
+  showsPrec p (TArr t1 t2) = showParen (p > 0) $ showsPrec 1 t1 . showString " → " . shows t2
+  showsPrec p (TForall t) = showParen (p > 0) $ showString "∀. " . shows t
+  showsPrec _ (TList t) = showString "[" . shows t . showString "]"
+  showsPrec p (TProd t1 t2) = showParen (p > 1) $ showsPrec 1 t1 . showString " × " . showsPrec 1 t2
+  showsPrec p (TST t1 t2) = showParen (p > 1) $ showString "ST " . showsPrec 1 t1 . showString " " . showsPrec 1 t2
 
 instance Show Trm where
-  show (LitInt i) = show i
-  show (LitBool b) = show b
-  show (Var i) = "e" ++ show i
-  show (Abs t) = "(λ. " ++ show t ++ ")"
-  show (App t1 t2) = "(" ++ show t1 ++ " " ++ show t2 ++ ")"
-  show (Ann t ty) = "(" ++ show t ++ " : " ++ show ty ++ ")"
-  show (TAbs t) = "(Λ. " ++ show t ++ ")"
-  show (TApp t ty) = "(" ++ show t ++ " @" ++ show ty ++ ")"
-  show Nil = "Nil"
-  show Cons = "Cons"
-  show Pair = "Pair"
-  show ST = "ST"
+  showsPrec _ (LitInt i) = shows i
+  showsPrec _ (LitBool b) = shows b
+  showsPrec _ (Var i) = showString "e" . shows i
+  showsPrec p (Abs t) = showParen (p > 0) $ showString "λ. " . shows t
+  showsPrec p (App t1 t2) = showParen (p > 9) $ showsPrec 9 t1 . showString " " . showsPrec 10 t2
+  showsPrec p (Ann t ty) = showParen (p > 1) $ showsPrec 1 t . showString " : " . shows ty
+  showsPrec p (TAbs t) = showParen (p > 0) $ showString "Λ. " . shows t
+  showsPrec p (TApp t ty) = showParen (p > 9) $ showsPrec 9 t . showString " @" . showsPrec 10 ty
+  showsPrec _ Nil = showString "Nil"
+  showsPrec _ Cons = showString "Cons"
+  showsPrec _ Pair = showString "Pair"
+  showsPrec _ ST = showString "ST"
 
 data Env = EEmpty | ETrm Typ Env | EUvar Env | EEvar Env | ESvar Typ Env
 
@@ -76,33 +76,24 @@ nonEmptyContext _ = True
 isEvar :: Env -> Int -> Bool
 isEvar EEmpty _ = False
 isEvar (ETrm _ env) k = isEvar env k
-isEvar (EUvar env) k = if | k == 0 -> False
-                          | otherwise -> isEvar env (k - 1)
-isEvar (EEvar env) k = if | k == 0 -> True
-                          | otherwise -> isEvar env (k - 1)
-isEvar (ESvar _ env) k = if | k == 0 -> False
-                            | otherwise -> isEvar env (k - 1)
+isEvar (EUvar env) k = not (k == 0) && isEvar env (k - 1)
+isEvar (EEvar env) k = (k == 0) || isEvar env (k - 1)
+isEvar (ESvar _ env) k = not (k == 0) && isEvar env (k - 1)
 
 isUvar :: Env -> Int -> Bool
 -- isUvar a b  | trace ("isUvar " ++ show a ++ " in " ++ show b) False = undefined
 isUvar EEmpty _ = False
 isUvar (ETrm _ env) k = isUvar env k
-isUvar (EUvar env) k = if | k == 0 -> True
-                          | otherwise -> isUvar env (k - 1)
-isUvar (EEvar env) k = if | k == 0 -> False
-                          | otherwise -> isUvar env (k - 1)
-isUvar (ESvar _ env) k = if | k == 0 -> False
-                            | otherwise -> isUvar env (k - 1)
+isUvar (EUvar env) k = (k == 0) || isUvar env (k - 1)
+isUvar (EEvar env) k = not (k == 0) && isUvar env (k - 1)
+isUvar (ESvar _ env) k = not (k == 0) && isUvar env (k - 1)
 
 isSvar :: Env -> Int -> Bool
 isSvar EEmpty _ = False
 isSvar (ETrm _ env) k = isSvar env k
-isSvar (EUvar env) k = if | k == 0 -> False
-                          | otherwise -> isSvar env (k - 1)
-isSvar (EEvar env) k = if | k == 0 -> False
-                          | otherwise -> isSvar env (k - 1)
-isSvar (ESvar _ env) k = if | k == 0 -> True
-                            | otherwise -> isSvar env (k - 1)
+isSvar (EUvar env) k = not (k == 0) && isSvar env (k - 1)
+isSvar (EEvar env) k = not (k == 0) && isSvar env (k - 1)
+isSvar (ESvar _ env) k = (k == 0) || isSvar env (k - 1)
 
 closed :: Env -> Typ -> Bool
 -- closed env ty | trace ("closed " ++ show env ++ " |- " ++ show ty) False = undefined
