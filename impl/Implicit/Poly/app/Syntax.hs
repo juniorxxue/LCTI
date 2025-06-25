@@ -44,10 +44,10 @@ envConcat env (ESvar ty senv) = ESvar ty (envConcat env senv)
 
 instance Show Env where
   show EEmpty = "∅"
-  show (ETrm ty env) = show env ++ " , : " ++ show ty
-  show (EUvar env) = show env ++ " , • "
-  show (ESvar ty env) = show env ++ " , =" ++ show ty
-  show (EEvar env) = show env ++ " , ^"
+  show (ETrm ty env) = show env ++ ", :" ++ show ty
+  show (EUvar env) = show env ++ ", •"
+  show (ESvar ty env) = show env ++ ", =" ++ show ty
+  show (EEvar env) = show env ++ ", ^"
 
 data Context = CEmpty | CFullType Typ | CTerm Trm Context | CTApp Typ Context
 
@@ -76,24 +76,24 @@ nonEmptyContext _ = True
 isEvar :: Env -> Int -> Bool
 isEvar EEmpty _ = False
 isEvar (ETrm _ env) k = isEvar env k
-isEvar (EUvar env) k = not (k == 0) && isEvar env (k - 1)
-isEvar (EEvar env) k = (k == 0) || isEvar env (k - 1)
-isEvar (ESvar _ env) k = not (k == 0) && isEvar env (k - 1)
+isEvar (EUvar env) k = (k /= 0) && isEvar env (k - 1)
+isEvar (EEvar env) k = k == 0 || isEvar env (k - 1)
+isEvar (ESvar _ env) k = (k /= 0) && isEvar env (k - 1)
 
 isUvar :: Env -> Int -> Bool
 -- isUvar a b  | trace ("isUvar " ++ show a ++ " in " ++ show b) False = undefined
 isUvar EEmpty _ = False
 isUvar (ETrm _ env) k = isUvar env k
-isUvar (EUvar env) k = (k == 0) || isUvar env (k - 1)
-isUvar (EEvar env) k = not (k == 0) && isUvar env (k - 1)
-isUvar (ESvar _ env) k = not (k == 0) && isUvar env (k - 1)
+isUvar (EUvar env) k = k == 0 || isUvar env (k - 1)
+isUvar (EEvar env) k = (k /= 0) && isUvar env (k - 1)
+isUvar (ESvar _ env) k = (k /= 0) && isUvar env (k - 1)
 
 isSvar :: Env -> Int -> Bool
 isSvar EEmpty _ = False
 isSvar (ETrm _ env) k = isSvar env k
-isSvar (EUvar env) k = not (k == 0) && isSvar env (k - 1)
-isSvar (EEvar env) k = not (k == 0) && isSvar env (k - 1)
-isSvar (ESvar _ env) k = (k == 0) || isSvar env (k - 1)
+isSvar (EUvar env) k = (k /= 0) && isSvar env (k - 1)
+isSvar (EEvar env) k = (k /= 0) && isSvar env (k - 1)
+isSvar (ESvar _ env) k = k == 0 || isSvar env (k - 1)
 
 closed :: Env -> Typ -> Bool
 -- closed env ty | trace ("closed " ++ show env ++ " |- " ++ show ty) False = undefined
