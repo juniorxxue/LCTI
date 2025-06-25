@@ -336,13 +336,13 @@ Proof.
     + clear TVarL TVarR. simpl in *.
       assert (Hlt1: ty_size B1 + ty_size A1 < n) by lia.
       assert (Hlt2: ty_size A2 + ty_size B2 < n) by lia.
-      eapply IHn with (Δ := Δ) (p := neg p) in Hlt1 as IHn1.
-      destruct IHn1 as [[Ω Hsub1] | Hneg1].
-      * eapply IHn with (Δ := Ω) (p := p) in Hlt2 as IHn2.
-        destruct IHn2 as [[Ψ Hsub2] | Hneg2].
+      eapply IHn with (Δ := Δ) (p := p) in Hlt2 as IHn2.
+      destruct IHn2 as [[Ω Hsub2] | Hneg2].
+      * eapply IHn with (Δ := Ω) (p := neg p) in Hlt1 as IHn1.
+        destruct IHn1 as [[Ψ Hsub1] | Hneg1].
         -- sauto lq: on.
         -- right. intros [Ψ' Hc]. dependent destruction Hc.
-           eapply sub_det in Hsub1; eauto. subst. sfirstorder.
+           eapply sub_det in Hsub2; eauto. subst. sfirstorder.
       * sauto lq: on.
     + sauto lq: on.
   - destruct B.
@@ -622,12 +622,18 @@ Proof.
         try sfirstorder use: grd_typ_det, sub_det, open_close_false;
         try solve [try rewrite ctx_size_ty_shift in *; try rewrite tm_size_ty_shift_tm in *;
                   eapply IHHsub1 in Hsub2; try lia; sfirstorder use: ty_unshift_det].
-      * eapply grd_typ_det in H0; eauto. subst.
-        eapply IHty in H1; eauto; simpl; try lia. subst.
-        eapply IHsub in Hsub1; eauto; simpl; try lia. sfirstorder.
-      * eapply IHty in H0; eauto; simpl; try lia. subst.
-        eapply sub_det in H1; eauto; simpl; try lia. subst.
-        eapply IHsub in Hsub1; eauto; simpl; try lia. sfirstorder.
+      * eapply IHsub in Hsub1; eauto; simpl; try lia.
+        destruct Hsub1 as [Heq1 Heq2]. subst.
+        eapply grd_typ_det in H0; eauto. subst.
+        eapply IHty in H1; eauto; simpl; try lia.
+      * eapply IHsub in Hsub1; eauto; simpl; try lia.
+        hauto lq: on rew: off use: open_close_false.
+      * eapply IHsub in Hsub1; eauto; simpl; try lia.
+        hauto lq: on rew: off use: open_close_false.
+      * eapply IHsub in Hsub1; eauto; simpl; try lia.
+        destruct Hsub1 as [Heq1 Heq2]. subst.
+        eapply IHty in H0; eauto; simpl; try lia. subst.
+        eapply sub_det in H1; eauto; simpl; try lia.
       * eapply lookupExTy_det in H; eauto. subst. sfirstorder.
       * sauto lq: on rew: off use: substEnv_Ex, lookupEx_ExTy.
       * eapply lookupExTy_det in H; eauto. subst. sfirstorder.
@@ -847,31 +853,38 @@ Proof.
               dependent destruction H.
               eapply infs_det in Hinf; eauto. subst.
               eapply ty_det in Hty; eauto. subst. sfirstorder.
-      * destruct (dec_close Δ A1) as [Hc | Hnc].
-        -- destruct (dec_open Δ A1) as [Ho | Hno].
+      * assert (Hlt': ctx_size Σ < n). { simpl in *. lia. }
+        eapply IHsub with (Δ := Δ) (A := A2) in Hlt' as Hsub; eauto.
+        destruct Hsub as [[Ω [A2' Hsub]] | Hnsub]. 2 : sauto lq: on drew: off.
+        destruct (dec_close Ω A1) as [Hc | Hnc].
+        -- destruct (dec_open Ω A1) as [Ho | Hno].
            sfirstorder use: open_close_false.
-           destruct (dec_grd_typ Δ A1) as [[A1' Hgrd] | Hngrd]. 2 : sauto lq: on.
-           assert (Hlt': ctx_size Σ < n). { simpl in *. lia. }
-           eapply IHsub with (Δ := Δ) (A := A2) in Hlt' as Hsub; eauto.
-           destruct Hsub as [[Δ'' [A2' Hsub]] | Hnsub]. 2 : sauto lq: on.
-           assert (Hlt'': tm_size t + ctx_size (CtxTyp A1') < n). { simpl in *. lia. }
-           eapply IHty with (Γ := rm_sep Δ) in Hlt'' as Hty.
-           destruct Hty as [[A'' Hty] | Hnty]. sauto lq: on.
-           right. intros [Δ' [A' Hcontra]]. dependent destruction Hcontra; try sfirstorder.
-           eapply grd_typ_det in Hgrd; eauto. subst. eapply sub_ctx_det in Hsub; eauto.
-        -- destruct (dec_open Δ A1) as [Ho | Hno]. 2 : sauto lq: on.
-           assert (Hlt': tm_size t + ctx_size CtxEmpty < n). { simpl in *. lia. }
-           eapply IHty with (Γ := rm_sep Δ) in Hlt' as Hty.
-           destruct Hty as [[A'' Hty] | Hnty]. 2 : sauto lq: on.
-           assert (Hlt'': ctx_size Σ < n). { simpl in *. lia. }
-           destruct (dec_sub Δ A'' Neg A1) as [[Ω Hsub] | Hnsub].
-           ++ eapply IHsub with (Δ := Ω) (A := A2) in Hlt'' as Hsub'; eauto.
-              destruct Hsub' as [[Ψ [D Hsub']] | Hnsub']. sauto l: on.
-              right. intros [Ψ' [D' Hcontra]]. dependent destruction Hcontra; try sfirstorder.
-              eapply ty_det in Hty; eauto. subst.
-              eapply sub_det in Hsub; eauto. sfirstorder.
-           ++ right. intros [Ψ' [D' Hcontra]]. dependent destruction Hcontra; try sfirstorder.
-              eapply ty_det in Hty; eauto. sfirstorder.
+           destruct (dec_grd_typ Ω A1) as [[A1' Hgrd] | Hngrd].
+           ++ assert (Hlt'': tm_size t + ctx_size (CtxTyp A1') < n). { simpl in *. lia. }
+              eapply IHty with (Γ := rm_sep Ω) in Hlt'' as Hty.
+              destruct Hty as [[A'' Hty] | Hnty]. sauto q: on dep: on.
+              right. intros [Ω' [A' Hcontra]]. dependent destruction Hcontra; try sfirstorder.
+              ** eapply sub_ctx_det in Hsub; eauto. destruct Hsub as [Heq1 Heq2]. subst. 
+                 eapply grd_typ_det in Hgrd; eauto. subst. sfirstorder.
+              ** eapply sub_ctx_det in Hsub; eauto. destruct Hsub as [Heq1 Heq2]. subst. scongruence.
+           ++ right. intros [Ω' [A' Hcontra]]. dependent destruction Hcontra; try sfirstorder;
+              eapply sub_ctx_det in Hsub; eauto; destruct Hsub as [Heq1 Heq2]; sfirstorder.
+        -- destruct (dec_open Ω A1) as [Ho | Hno].
+           ++ assert (Hlt'': tm_size t + ctx_size CtxEmpty < n). { simpl in *. lia. }
+              eapply IHty with (Γ := rm_sep Ω) in Hlt'' as Hty.
+              destruct Hty as [[C Hty] | Hnty].
+              ** destruct (dec_sub Ω C Neg A1) as [[Ψ Hsub'] | Hnsub']. sauto l: on.
+                 right. intros [Ω' [A' Hcontra]].
+                 dependent destruction Hcontra; try sfirstorder.
+                 --- eapply sub_ctx_det in Hsub; eauto. sfirstorder.
+                 --- eapply sub_ctx_det in Hsub; eauto. destruct Hsub as [Heq1 Heq2]. subst.
+                     eapply ty_det in Hty; eauto. sfirstorder.
+              ** right. intros [Ω' [A' Hcontra]].
+                 dependent destruction Hcontra; try sfirstorder;
+                   eapply sub_ctx_det in Hsub; eauto; destruct Hsub as [Heq1 Heq2]; sfirstorder.
+           ++ right. intros [Ω' [A' Hcontra]].
+              dependent destruction Hcontra; try sfirstorder;
+                eapply sub_ctx_det in Hsub; eauto; sfirstorder.
       * assert (Hlt': ctx_size (CtxTrm (ty_shift_tm t 0) (ty_shift_ctx Σ 0)) < S n).
         { simpl in *. rewrite tm_size_ty_shift_tm. rewrite ctx_size_ty_shift. lia. }
         assert (Hlt'': num_all A < m). { simpl in *. lia. }
