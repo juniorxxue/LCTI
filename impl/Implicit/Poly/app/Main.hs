@@ -8,7 +8,6 @@ module Main where
 
 import Control.Monad (forM_)
 import Control.Monad.Writer
-import Counter
 import DeBruijn
 import Debug.Trace
 import Log
@@ -531,12 +530,12 @@ main = do
       exD4Ann,
       exD5,
       exD5Ann,
-      exD5Ann'
-      -- exE1,
-      -- exE2,
-      -- exE2Ann,
-      -- exE3,
-      -- exE3Ann
+      exD5Ann',
+      exE1,
+      exE2,
+      exE2Ann,
+      exE3,
+      exE3Ann
     ]
     $ \ex -> case runWriterT ex of
       Just (tyA, logs) -> do

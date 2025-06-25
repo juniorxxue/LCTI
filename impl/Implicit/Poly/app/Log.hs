@@ -3,13 +3,10 @@
 {-# HLINT ignore "Redundant multi-way if" #-}
 module Log where
 import Control.Monad.Writer
-import Control.Monad (forM_)
 
 import Syntax
-import Counter
-import DeBruijn
 
-grey, red, bold, reset :: String
+grey, red, bold, blue, reset :: String
 grey  = "\ESC[90m"   -- Grey color (bright black)
 red   = "\ESC[31m"   -- Red color
 bold  = "\ESC[1m"    -- Bold text
