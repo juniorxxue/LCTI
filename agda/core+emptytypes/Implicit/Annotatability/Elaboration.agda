@@ -25,14 +25,21 @@ data _⊢_⦂_⟶_ : Env n m → Term n m → Type m → Term n m → Set where
            → Γ ⊢ A 𝕄 B `→ C
            → Γ ⊢ e₂ ⦂ B ⟶ e₂'
            → Γ ⊢ e₁ · e₂ ⦂ C ⟶ e₁' · (e₂' ⦂ B)
+  ela-app-g : Γ ⊢ e₁ ⦂ A ⟶ e₁'
+           → Γ ⊢ A 𝕄 B `→ C
+           → Γ ⊢ e₂ ⦂ B ⟶ e₂'
+           → GenericConsumer e₂
+           → Γ ⊢ e₁ · e₂ ⦂ C ⟶ e₁' · e₂'
   -- two extra rules
   ela-∀i  : Γ ,∙ ⊢ e' ⦂ A ⟶ e₁
          → (upe : ↑tyᵉ0 e ⇘ e')
          → Γ ⊢ e ⦂ `∀ A ⟶ Λ (e₁ ⦂ A)
+{-
   ela-∀e  : Γ ⊢ e ⦂ `∀ A ⟶ e'
           → ⟦ B ⟧ A ⇘ A*
           → Γ ⊢r B
           → Γ ⊢ e ⦂ A* ⟶ e' ⓪ B
+-}
 
 
 ela-tregular : Γ ⊢ e ⦂ A ⟶ e'
@@ -42,9 +49,9 @@ ela-tregular (ela-var regΓ x) = regΓ
 ela-tregular (ela-lam s) with ela-tregular s
 ... | reg-S, r regA = r
 ela-tregular (ela-app s x s₁) = ela-tregular s
+ela-tregular (ela-app-g s x s₁ gc) = ela-tregular s
 ela-tregular (ela-∀i s upe) with ela-tregular s
 ... | reg-S∙ r = r
-ela-tregular (ela-∀e s x regB) = ela-tregular s
 
 
 𝕄-⊢r : Γ ⊢r A
@@ -61,5 +68,6 @@ ela-⊢r (ela-lam ⊢e) with ela-tregular ⊢e
 ... | reg-S, r regA = ⊢r-arr regA (⊢r-strengthen,0 (ela-⊢r ⊢e))
 ela-⊢r (ela-app ⊢e x ⊢e₁) with 𝕄-⊢r (ela-⊢r ⊢e) x
 ... | ⊢r-arr r r₁ = r₁
+ela-⊢r (ela-app-g ⊢e x ⊢e₁ gc) with 𝕄-⊢r (ela-⊢r ⊢e) x
+... | ⊢r-arr r r₁ = r₁
 ela-⊢r (ela-∀i ⊢e upe) = ⊢r-∀ (ela-⊢r ⊢e)
-ela-⊢r (ela-∀e ⊢e x regB) = st0-⊢r (ela-⊢r ⊢e) regB x
