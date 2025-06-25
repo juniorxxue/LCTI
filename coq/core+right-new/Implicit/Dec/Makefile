@@ -7,7 +7,7 @@ all: $(COQMAKEFILE)
 	+$(MAKE) -f $(COQMAKEFILE) all
 
 $(COQMAKEFILE): Makefile $(VS)
-	coq_makefile -R . dec $(VS) -o $(COQMAKEFILE)
+	coq_makefile -R . Dec $(VS) -o $(COQMAKEFILE)
 
 clean: $(COQMAKEFILE)
 	-$(COQMAKE) clean
