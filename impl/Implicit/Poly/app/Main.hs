@@ -485,6 +485,16 @@ main = do
       exE3 = infer (ETrm rTyp EEmpty) CEmpty $ Var 0 `App` Abs (Abs (Var 0))
       exE3Ann = infer (ETrm rTyp EEmpty) CEmpty $ Var 0 `App` TAbs (Abs (TAbs (Abs (Var 0) `Ann`TArr (TVar 0) (TVar 0))) `Ann` TArr (TVar 0) idTyp)
 
+      -- FreezeML paper additions
+      -- F5: auto id
+      exF5 = infer (ETrm autoTyp (ETrm idTyp EEmpty)) CEmpty $ Var 0 `App` Var 1
+      -- F6: cons (head ids) ids
+      exF6 = infer (ETrm headTyp (ETrm (TList idTyp) EEmpty)) CEmpty $ Cons `App` (Var 0 `App` Var 1) `App` Var 1
+      -- F7: head ids 3
+      exF7 = infer (ETrm headTyp (ETrm (TList idTyp) EEmpty)) CEmpty $ Var 0 `App` Var 1 `App` LitInt 3
+      -- F8: choose (head ids)
+      exF8 = infer (ETrm chooseTyp (ETrm headTyp (ETrm (TList idTyp) EEmpty))) CEmpty $ Var 0 `App` (Var 1 `App` Var 2)
+
   forM_
     [ exA1,
       exA1Ann,
@@ -535,7 +545,11 @@ main = do
       exE2,
       exE2Ann,
       exE3,
-      exE3Ann
+      exE3Ann,
+      exF5,
+      exF6,
+      exF7,
+      exF8
     ]
     $ \ex -> case runWriterT ex of
       Just (tyA, logs) -> do
