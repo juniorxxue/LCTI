@@ -37,6 +37,10 @@ TODO:
 | D5     | `revapp argST runST`              | `revapp argST (runST @ Int)`                                      | Ann    |
 | E1, E2 | `k h lst`/`k (\x. h x) lst`       | `k (/\a. \x. h x : Int -> a -> a) lst`                            | Ann    |
 | E3     | `r (\x. \y. y)`                   | `r (/\a. (\x. /\b. (\y. y : b -> b)) : a -> forall b. b -> b)`    | Ann    |
+| F5     | `auto id`                         | `auto id`                                                         | ✅     |
+| F6     | `cons (head ids) ids`             | `cons (head ids) ids`                                             | ✅     |
+| F7     | `head ids 3`                      | `head ids 3`                                                      | ✅     |
+| F8     | `choose (head ids)`               | `choose (head ids)`                                               | ✅     |
 
 **Legend:**
 - ✅ Can be typed
