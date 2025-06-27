@@ -495,6 +495,9 @@ main = do
       -- F8: choose (head ids)
       exF8 = infer (ETrm chooseTyp (ETrm headTyp (ETrm (TList idTyp) EEmpty))) CEmpty $ Var 0 `App` (Var 1 `App` Var 2)
 
+      -- Spine-local type inference
+      exPair = infer EEmpty CEmpty $ (Pair `App` Abs (Var 0) `App` LitInt 1) `Ann` ((TInt `TArr` TInt) `TProd` TInt)
+
   forM_
     [ exA1,
       exA1Ann,
@@ -549,7 +552,8 @@ main = do
       exF5,
       exF6,
       exF7,
-      exF8
+      exF8,
+      exPair
     ]
     $ \ex -> case runWriterT ex of
       Just (tyA, logs) -> do
