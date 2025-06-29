@@ -71,6 +71,30 @@ data WFS : Env n m → HitMis m → Set where
   wfs-mis^ : WFS Γ H
            → WFS (Γ ,^) (mis H)
 
+data WFR : Env n m → HitMis m → Set where
+  wfr-base : WFT Γ H
+          → WFR (Γ ⋈) H
+  wfr-hit  : WFR Γ H
+           → WFR (Γ ,∙) (hit H)
+  wfr-mis∙ : WFR Γ H
+           → WFR (Γ ,∙) (mis H)
+  wfr-mis= : WFR Γ H
+           → WFR (Γ ,= A) (mis H)
+  wfr-mis^ : WFR Γ H
+           → WFR (Γ ,^) (mis H)
+
+data WFC : Env n m → HitMis m → Set where
+  wfc-base : WFT Γ H
+           → WFC (Γ ⋈) H
+  wfc-hit=  : WFC Γ H
+           → WFC (Γ ,= A) (hit H)
+  wfc-mis∙ : WFC Γ H
+           → WFC (Γ ,∙) (mis H)
+  wfc-mis= : WFC Γ H
+           → WFC (Γ ,= A) (mis H)
+  wfc-mis^ : WFC Γ H
+           → WFC (Γ ,^) (mis H)
+
 
 infix 3 _⊢t_
 data _⊢t_ (Γ : Env n m) (A : Type m) : Set where
@@ -78,6 +102,20 @@ data _⊢t_ (Γ : Env n m) (A : Type m) : Set where
          → A 𝕗𝕧 H
          → WFS Γ H
          → Γ ⊢t A
+
+infix 3 _⊢r'_
+data _⊢r'_ (Γ : Env n m) (A : Type m) : Set where
+  justrs : ∀ {H}
+         → A 𝕗𝕧 H
+         → WFR Γ H
+         → Γ ⊢r' A
+
+infix 3 _⊢c'_
+data _⊢c'_ (Γ : Env n m) (A : Type m) : Set where
+  justcs : ∀ {H}
+         → A 𝕗𝕧 H
+         → WFC Γ H
+         → Γ ⊢c' A
 
 data TRegularS : Env n m → Set where
   reg-Z : TRegularS ∅
@@ -171,3 +209,7 @@ data _⊨_#_⌞_⌝_ : Env n m → SCounter → Type m → Polar → Type m → 
 
 _ : ∅ ⋈ ⊨ 𝕥 Z # `∀ (‶ #0 `→ ‶ #0) ⌞ ≤⁺ ⌝ `∀ (‶ #0 `→ ‶ #0)
 _ = s-tapp (s-refl (reg-S∙ (reg-Z reg-Z)) (⊢c-arr (⊢c-var-∙ Z) (⊢c-var-∙ Z)) (grd-arr (grd-var∙ Z) (grd-var∙ Z)))
+
+postulate
+  s-sregulars : Γ ⊨ 𝕟 # A ⌞ ≤ ⌝ B
+            → SRegularS Γ
