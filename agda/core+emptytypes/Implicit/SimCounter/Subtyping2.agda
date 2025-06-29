@@ -1,6 +1,7 @@
 module Implicit.SimCounter.Subtyping2 where
 
 open import Implicit.Language.All
+open import Implicit.AuxLemmas
 
 data SCounter : Set where
   Z : SCounter
@@ -46,18 +47,75 @@ data Sfind : Type m → Fin m → SCounter → Set where
   f-𝕥       : Sfind A (#S k) 𝕟
             → Sfind (`∀ A) k (𝕥 𝕟)
 
+
+data WFT : Env n m → HitMis m → Set where
+  wft-base : WFT ∅ ∅
+  wft-hit  : WFT Γ H
+           → WFT (Γ ,∙) (hit H)
+  wft-mis∙ : WFT Γ H
+           → WFT (Γ ,∙) (mis H)
+  wft-mis= : WFT Γ H
+           → WFT (Γ ,= A) (mis H)
+  wft-mis^ : WFT Γ H
+           → WFT (Γ ,^) (mis H)
+  wft-,   : WFT Γ H
+           → WFT (Γ , A) H
+
+data WFS : Env n m → HitMis m → Set where
+  wfs-base : WFT Γ H
+           → WFS (Γ ⋈) H
+  wfs-mis∙ : WFS Γ H
+           → WFS (Γ ,∙) (mis H)
+  wfs-mis= : WFS Γ H
+           → WFS (Γ ,= A) (mis H)
+  wfs-mis^ : WFS Γ H
+           → WFS (Γ ,^) (mis H)
+
+
+infix 3 _⊢t_
+data _⊢t_ (Γ : Env n m) (A : Type m) : Set where
+  justts : ∀ {H}
+         → A 𝕗𝕧 H
+         → WFS Γ H
+         → Γ ⊢t A
+
+data TRegularS : Env n m → Set where
+  reg-Z : TRegularS ∅
+  reg-S, : TRegularS Γ
+         → (regA : Γ ⊢t A)
+         → TRegularS (Γ , A)
+  reg-S∙ : TRegularS Γ
+         → TRegularS (Γ ,∙)
+  reg-S^ : TRegularS Γ
+         → TRegularS (Γ ,^)
+  reg-S= : TRegularS Γ
+         → (regA : Γ ⊢t A) -- we never access this entry, it's only created by initials
+         → TRegularS (Γ ,= A)
+
+data SRegularS : Env n m → Set where
+  reg-Z : (regΓ : TRegularS Γ)
+        → SRegularS (Γ ⋈)
+  reg-S∙ : SRegularS Δ
+         → SRegularS (Δ ,∙)
+  reg-S^ : SRegularS Δ
+         → SRegularS (Δ ,^)
+  reg-S= : SRegularS Δ
+         → (regA : Δ ⊢t A)
+         → SRegularS (Δ ,= A)
+
+
 infix 3 _⊨_#_⌞_⌝_
 data _⊨_#_⌞_⌝_ : Env n m → SCounter → Type m → Polar → Type m → Set where
   s-refl :
-      (regΔ : SRegular Δ)
+      (regΔ : SRegularS Δ)
     → (cloA : Δ ⊢c A)
     → (grd : Δ ≫ A ⇘ A%)
     → Δ ⊨ Z # A ⌞ ≤⁺ ⌝ A%
   s-int :
-      (regΔ : SRegular Δ)
+      (regΔ : SRegularS Δ)
     → Δ ⊨ ∞ # Int ⌞ ≤ ⌝ Int
   s-var-∙ :
-      (regΔ : SRegular Δ)
+      (regΔ : SRegularS Δ)
     → (inΔ : Δ ∋∙ X)
     → Δ ⊨ ∞ # ‶ X ⌞ ≤ ⌝ ‶ X
   s-arr₁ :
@@ -88,11 +146,11 @@ data _⊨_#_⌞_⌝_ : Env n m → SCounter → Type m → Polar → Type m → 
     → Δ ⊨ 𝕥 𝕟 # `∀ A ⌞ ≤⁺ ⌝ `∀ C
   -- two atomic rules
   s-svar-l : ∀ {X A}
-    → (SRegular Δ)
+    → (SRegularS Δ)
     → (inΔ : Δ ∋ X := A)
     → Δ ⊨ ∞ # ‶ X ⌞ ≤⁺ ⌝ A
   s-svar-r : ∀ {X A}
-    → (SRegular Δ)
+    → (SRegularS Δ)
     → (inΔ : Δ ∋ X := A)
     → Δ ⊨ ∞ # A ⌞ ≤⁻ ⌝ ‶ X
   s-svar-𝕚 :
