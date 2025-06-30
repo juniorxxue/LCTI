@@ -29,7 +29,8 @@ data SIsoInf : SCounter → Set where
        → SIsoInf (𝕚 𝕟)
 
 data Sfind : Type m → Fin m → SCounter → Set where
-  f-∞       : Sfind A k ∞
+  f-∞       : k ε A
+            → Sfind A k ∞
   f-iso     : (iso : SIsoInf 𝕟)
             → Sfind (‶ k) k 𝕟
   f-arr-𝕚-l : (inA : k ε A)
@@ -213,3 +214,6 @@ _ = s-tapp (s-refl (reg-S∙ (reg-Z reg-Z)) (⊢c-arr (⊢c-var-∙ Z) (⊢c-var
 postulate
   s-sregulars : Γ ⊨ 𝕟 # A ⌞ ≤ ⌝ B
             → SRegularS Γ
+
+  ss-⊢r : Γ ⊨ 𝕟 # A ⌞ ≤⁺ ⌝ B
+        → Γ ⊢r B
