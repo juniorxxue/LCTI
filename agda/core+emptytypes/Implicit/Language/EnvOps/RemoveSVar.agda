@@ -236,6 +236,16 @@ sregular-strengthen= (reg-S= sreg regA) (◀S= newΓ x) = reg-S= (sregular-stren
                                                                                            (≫-strengthen= grd₁ regΓ newΓ upA₁ upB₁)
 ≫-strengthen= (grd-∀ grd) regΓ newΓ (↑ty-∀ upA) (↑ty-∀ upB) = grd-∀ (≫-strengthen= grd (reg-S∙ regΓ) (◀S∙ newΓ) upA upB)
 
+
+≫-strengthen=0 : Γ ,= T ≫ A' ⇘ B'
+               → SRegular Γ
+               → Γ ⊢r T
+               → ↑ty0 A ⇘ A'
+               → ↑ty0 B ⇘ B'
+               → Γ ≫ A ⇘ B
+≫-strengthen=0 grd regΓ regT upA upB = ≫-strengthen= grd (reg-S= regΓ regT) ◀Z upA upB
+
+
 -- aux lemmas
 ⊢r-◀=-↑ty-surjective : Γ ⊢r A
                     → Γ ◀ k =⇘ Γ'
