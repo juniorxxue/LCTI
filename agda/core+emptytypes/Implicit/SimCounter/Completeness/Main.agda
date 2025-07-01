@@ -8,13 +8,6 @@ open import Implicit.Interm.All
 open import Implicit.SimCounter.Completeness.Aux
 
 
-complete-tapp : Δ ,∙ ≫ B*' ⇘ A%
-              → ⟦ T ⟧ B ⇘ B*
-              → ↑ty0 B* ⇘ B*'
-              → Δ ⊢t T
-              → Δ ,= T ≫ B ⇘ A%
-complete-tapp grd st up regT = {!!}
-
 complete : Γ ⊨ 𝕟 # A ⌞ ≤⁺ ⌝ B
          → Bound Γ (⟨ 𝕟 , B ⟩) (⟨ j , C ⟩)
          → Free Γ Δ
@@ -56,15 +49,16 @@ complete (s-∀l s ic fd upC upD) (bd-i {j = j} {C = E} bd) fr (grd-arr {A% = A%
                    case-𝕚
                    (sfind-find fd (bd-i (bound-weaken=0 bd ⊢r-int upj upD upE)))
                    upA% upB% (↑tyʲ-𝕚 upj)
-complete (s-tapp s) (bd-t bd x x₁ x₂) fr (grd-∀ grd)
-  = s-tapp (complete s {!!} (fr-S∙= fr (free-⊢t x fr)) {!!}) {!!}
+complete (s-tapp s) (bd-t bd upj regT) fr (grd-∀ grd)
+  = s-tapp (complete s {!!} (fr-S∙= fr (free-⊢t regT fr)) {!!}) upj
+  -- s-tapp (complete s {!!} (fr-S∙= fr (free-⊢t x fr)) {!!}) {!!}
 complete (s-svar-l inΓ inΔ) bd-∞ fr grd
   with regA ← ⊢t-⊢r (free-⊢t (∋:=-⊢t inΓ inΔ) fr)
   with refl ← ⊢r-≫-eq' regA grd
   = s-svar-l (free-sregular inΓ fr) (free-∋:=' inΔ fr)
 complete (s-svar-𝕚 inΓ s) (bd-i bd) fr (grd-arr grd grd₁) = s-svar-𝕚 (free-∋:=' inΓ fr) (complete s (bd-i bd) fr (grd-arr grd grd₁))
 complete (s-svar-𝕔 inΓ s) (bd-c bd) fr (grd-arr grd grd₁) = s-svar-𝕔 (free-∋:=' inΓ fr) (complete s (bd-c bd) fr (grd-arr grd grd₁))
-complete (s-svar-𝕥 inΓ s) (bd-t bd x x₁ x₂) fr (grd-∀ grd) = s-svar-𝕥 (free-∋:=' inΓ fr) (complete s (bd-t bd x x₁ x₂) fr (grd-∀ grd))
+complete (s-svar-𝕥 inΓ s) (bd-t bd upj regT) fr (grd-∀ grd) = s-svar-𝕥 (free-∋:=' inΓ fr) (complete s (bd-t bd upj regT) fr (grd-∀ grd))
 
 complete- (s-int regΔ) fr grd-int = s-int (free-sregular regΔ fr)
 complete- (s-var-∙ regΔ inΔ) fr (grd-var= x) = s-svar-r (free-sregular regΔ fr) x
@@ -81,7 +75,7 @@ complete0 : Γ ⋈ ⊨ 𝕟 # A ⌞ ≤⁺ ⌝ B
           → Γ ⋈ ⊢ j # A ⌞ ≤⁺ ⌝ C
 complete0 ⊢e bd = complete ⊢e bd fr-⋈ (⊢r-≫-eq (bound-⊢r bd (ss-⊢r ⊢e)))
 
-
+{-
 ⊢tapp' : Γ ⊢ 𝕥₍ A ₎ j # e ⦂ `∀ B'
         → (up : ↑ty0 B ⇘ B')
         → Γ ⊢ j # e ⓪ A ⦂ B
@@ -102,3 +96,4 @@ complete-t {A = A} {j = j} {B = B} (⊨tapp ⊢e st regA) bd
   with ⟨ A' , upA ⟩ ← ↑ty0-total A
   with ⟨ j' , upj ⟩ ← ↑tyʲ0-total j
   with ⟨ B' , upB ⟩ ← ↑ty0-total B = ⊢tapp' (complete-t ⊢e (bd-t bd regA st upB)) upB
+  -}
