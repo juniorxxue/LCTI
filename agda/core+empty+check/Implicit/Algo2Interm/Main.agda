@@ -23,6 +23,25 @@ sound-ss (s-∀ s) = s-∀ (sound-ss s)
 --+                           main logic                           +--
 ----------------------------------------------------------------------
 
+agc-gc : AGenericConsumer e
+       → GenericConsumer e
+agc-gc gc-i = gc-i
+agc-gc gc-var = gc-var
+agc-gc gc-ann = gc-ann
+
+s-nonempty-case1 : Γ ⋈ ⊢ A₁ ≤⁺ [ e₁ ]↝ Σ ⊣ Γ ⋈ ↪ A ↡ j
+                 → NonZ j
+s-nonempty-case1 (s-term-c cloA ap ⊢e s) = nz-C
+s-nonempty-case1 (s-term-o opnA ⊢e ss s) = nz-I
+s-nonempty-case1 (s-∀l-𝕚 s upᶜ upj upᵉ upC upD) = nz-I
+s-nonempty-case1 (s-∀l-𝕔 s upᶜ upj upᵉ upC upD) = nz-C
+s-nonempty-case1 (s-∀l-no-𝕚 s upᶜ upj upᵉ upC upD) = nz-I
+s-nonempty-case1 (s-∀l-no-𝕔 s upᶜ upj upᵉ upC upD) = nz-C
+
+s-nonempty-case2 : Γ ⋈ ⊢ A₁ ≤⁺ A₁ ⓪↝ Σ ⊣ Γ ⋈ ↪ A ↡ j
+                 → NonZ j
+s-nonempty-case2 (s-tapp s upᶜ upj) = nz-T
+
 
 tc-~ : Γ ⊢ Σ ⇒ e ⇒ A ↡ j
      → Γ ⊢ ⟨ j , A ⟩ ~t Σ
@@ -54,6 +73,10 @@ tc-~ (⊢lam₁ ⊢e) with tc-id0 ⊢e
 tc-~ (⊢lam₂ ⊢e up-c ⊢e₁) = ~tI (sound ⊢e) (~t-strengthen,0 (tc-~ ⊢e₁) up-c)
 tc-~ (⊢sub ⊢e ne gc s) = ~s-~t (sc-~ s)
 tc-~ (⊢tabs ⊢e) = ~tZ
+tc-~ {e = Λ e} (⊢tabs-τ x) with tc-id0 x
+... | refl = ~t∞
+tc-~ {e = Λ e} (⊢tabs-term x s) = ~s-~t (sc-~ s)
+tc-~ {e = Λ e} (⊢tabs-tapp x s) = ~s-~t (sc-~ s)
 tc-~ (⊢tapp ⊢e st) with tc-~ ⊢e
 ... | ~tT r st₁ with refl ← st-unique st st₁ = r
 
@@ -85,9 +108,12 @@ sound (⊢app ⊢e) with tc-~ ⊢e
 sound (⊢lam₁ ⊢e) = ⊢lam₁ (sound ⊢e)
 sound (⊢lam₂ ⊢e up-c ⊢e₁) = ⊢lam₂ (sound ⊢e₁)
 sound (⊢sub ⊢e ne gc s) with sc-~ s
-... | r = ⊢sub (sound ⊢e) (sound-s s) gc (NonEmpty-NonZ ne (~s-~t r))
+... | r = ⊢sub (sound ⊢e) (sound-s s) (agc-gc gc) (NonEmpty-NonZ ne (~s-~t r))
 sound (⊢tabs ⊢e) = ⊢tabs (sound ⊢e)
 sound (⊢tapp ⊢e st) = ⊢tapp (sound ⊢e) st
+sound {e = Λ e} (⊢tabs-τ x) = ⊢tabs-∞ (sound x)
+sound {e = Λ e} (⊢tabs-term x s) = ⊢sub (sound x) (sound-s s) gc-tlam (s-nonempty-case1 s)
+sound {e = Λ e} (⊢tabs-tapp x s) = ⊢sub (sound x) (sound-s s) gc-tlam (s-nonempty-case2 s)
 
 sound-s (s-empty regΓ cloA x) = s-refl regΓ cloA x
 sound-s (s-type ss) = sound-ss ss

@@ -50,13 +50,27 @@ data _⊢_⇒_⇒_↡_ where
   ⊢sub :
       Γ ⊢ □ ⇒ g ⇒ A ↡ Z
     → (ne : NonEmpty Σ)
-    → (gc : GenericConsumer g)
+    → (gc : AGenericConsumer g)
     → (s : Γ ⋈ ⊢ A ≤⁺ Σ ⊣ Γ ⋈ ↪ B ↡ j)
     → Γ ⊢ Σ ⇒ g ⇒ B ↡ j
 
   ⊢tabs :
       Γ ,∙ ⊢ □ ⇒ e ⇒ A ↡ Z
     → Γ ⊢ □ ⇒ Λ e ⇒ `∀ A ↡ Z
+
+  ⊢tabs-τ :
+      Γ ,∙ ⊢ τ B ⇒ e ⇒ A ↡ ∞
+    → Γ ⊢ τ (`∀ B) ⇒ Λ e ⇒ `∀ A ↡ ∞
+
+  ⊢tabs-term :
+      Γ ⊢ □ ⇒ Λ e ⇒ A ↡ Z
+    → (s : Γ ⋈ ⊢ A ≤⁺ [ e₁ ]↝ Σ ⊣ Γ ⋈ ↪ B ↡ j)
+    → Γ ⊢ [ e₁ ]↝ Σ ⇒ Λ e ⇒ B ↡ j
+
+  ⊢tabs-tapp :
+      Γ ⊢ □ ⇒ Λ e ⇒ A ↡ Z
+    → (s : Γ ⋈ ⊢ A ≤⁺ A ⓪↝ Σ ⊣ Γ ⋈ ↪ B ↡ j)
+    → Γ ⊢ A ⓪↝ Σ ⇒ Λ e ⇒ B ↡ j
 
   ⊢tapp :
       Γ ⊢ A ⓪↝ Σ ⇒ e ⇒ `∀ B ↡ 𝕥₍ A ₎ j

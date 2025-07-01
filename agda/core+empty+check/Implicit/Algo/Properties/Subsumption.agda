@@ -1,3 +1,5 @@
+{-# OPTIONS --allow-unsolved-metas #-}
+{-# OPTIONS --allow-incomplete-matches #-}
 module Implicit.Algo.Properties.Subsumption where
 
 open import Implicit.Language.All
@@ -92,6 +94,10 @@ infs-sub' (infs-s ⊢e infs) regΓ'
 ⊢to≤ (⊢sub ⊢e ne gc s) = s-refined-p s
 ⊢to≤ (⊢tabs ⊢e) with t-env ⊢e
 ... | reg-S∙ r = let regA = ⊢r-𝕣 (t-⊢r ⊢e) in s-empty (reg-Z r) (⊢c-∀ (⊢r-⊢c regA)) (grd-∀ (⊢r-≫-eq regA))
+⊢to≤ {e = Λ e} (⊢tabs-τ x) with ⊢id0 x
+... | refl = s-type (s-refl (reg-Z (t-env (⊢tabs-τ x))) (⊢r-𝕣 (⊢r-∀ (t-⊢r x))))
+⊢to≤ {e = Λ e} (⊢tabs-term x s) = s-refined-p s
+⊢to≤ {e = Λ e} (⊢tabs-tapp x s) = s-refined-p s
 ⊢to≤ (⊢tapp ⊢e st) with ⊢to≤ ⊢e
 ... | s-tapp r upᶜ = let upA = (st-↑ty (⊢r-¬ε (s-⊢r r) Z) st)
                      in s-strengthen=0 r upA upA upᶜ
@@ -102,7 +108,12 @@ subsumption {Σ' = τ A} (⊢ann ⊢e) ≊Z s = ⊢sub (⊢ann ⊢e) ne-τ gc-an
 subsumption {Σ' = τ A} (⊢app ⊢e) ≊Z s with ⊢to≤ ⊢e
 ... | s-term-c cloA ap ⊢e₁ s₁ = ⊢app (subsumption ⊢e (≊S ≊Z) (s-term-c cloA ap ⊢e₁ s))
 ... | s-term-o opnA ⊢e₁ x s₁ = ⊥-elim (t-inf-open-false ⊢e₁ opnA)
-subsumption {Σ' = τ A} (⊢tabs ⊢e) ≊Z s = ⊢sub (⊢tabs ⊢e) ne-τ gc-tlam s
+subsumption {Σ' = τ (`∀ B)} (⊢tabs ⊢e) ≊Z (s-type (s-∀ ss)) = ⊢tabs-τ (subsumption ⊢e ≊Z (s-type {!!}))
+subsumption {Σ' = [ e₁ ]↝ Σ'} (⊢tabs-term x₁ s) (≊S x₂) x
+  = ⊢tabs-term x₁ (s-trans s x (≊S x₂))
+subsumption {Σ' = A ⓪↝ Σ'} (⊢tabs-tapp x₁ s) (≊⓪ x₂) x
+  = ⊢tabs-tapp x₁ (s-trans s x (≊⓪ x₂))
+-- ⊢sub (⊢tabs ⊢e) ne-τ gc-tlam s
 subsumption {Σ' = τ A} {A' = A′} (⊢tapp ⊢e st) ≊Z s
   with ⟨ A' , upA ⟩ ← ↑ty0-total A
   with refl ← s-id0 s

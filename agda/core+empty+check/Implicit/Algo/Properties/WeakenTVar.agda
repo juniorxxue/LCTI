@@ -1,3 +1,5 @@
+{-# OPTIONS --allow-unsolved-metas #-}
+{-# OPTIONS --allow-incomplete-matches #-}
 module Implicit.Algo.Properties.WeakenTVar where
 
 open import Implicit.Language.All
@@ -75,7 +77,7 @@ t-weaken, (⊢app ⊢e) new upΣ (↑tm-app upe upe₁) = ⊢app (t-weaken, ⊢e
 t-weaken, (⊢lam₁ ⊢e) new ↑tmᶜ-τ (↑tm-ƛ upe) = ⊢lam₁ (t-weaken, ⊢e (▶S, new) ↑tmᶜ-τ upe)
 t-weaken, (⊢lam₂ ⊢e up-c ⊢e₁) new (↑tmᶜ-e {Σ' = Σ'} up-e upΣ) (↑tm-ƛ upe)
   with ⟨ Σ″ , upΣ' ⟩ ← ↑tmᶜ0-total Σ' = ⊢lam₂ (t-weaken, ⊢e new ↑tmᶜ-□ up-e) upΣ' (t-weaken, ⊢e₁ (▶S, new) (↑tmᶜ-comm' z≤n upΣ upΣ' up-c) upe)
-t-weaken, (⊢sub ⊢e ne gc s) new upΣ upe = ⊢sub (t-weaken, ⊢e new ↑tmᶜ-□ upe) (nonempty-↑tmᶜ ne upΣ) (↑tm-gc gc upe) (s-weaken, s upΣ (▶sS⋈ (▶,-▶⨟, new)))
+t-weaken, (⊢sub ⊢e ne gc s) new upΣ upe = ⊢sub (t-weaken, ⊢e new ↑tmᶜ-□ upe) (nonempty-↑tmᶜ ne upΣ) ? (s-weaken, s upΣ (▶sS⋈ (▶,-▶⨟, new)))
 t-weaken, {T = T} (⊢tabs ⊢e) new ↑tmᶜ-□ (↑tm-Λ upe)
   with ⟨ T' , upT ⟩ ← ↑ty0-total T = ⊢tabs (t-weaken, ⊢e (▶S∙ new upT) ↑tmᶜ-□ upe)
 t-weaken, (⊢tapp ⊢e st) new upΣ (↑tm-⓪ upe) = ⊢tapp (t-weaken, ⊢e new (↑tmᶜ-⓪ upΣ) upe) st

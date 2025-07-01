@@ -51,6 +51,10 @@ infs-id' : Γ ⊨ Σ ⟹ A
 ... | r = id-e (id-↑tm r up-c)
 ⊢id' (⊢sub ⊢e ne gc s) = s-id' s
 ⊢id' (⊢tabs ⊢e) = id-□
+⊢id' (⊢tabs-τ ⊢e) with ⊢id' ⊢e
+... | id-τ = id-τ
+⊢id' (⊢tabs-term ⊢e s) = s-id' s
+⊢id' (⊢tabs-tapp ⊢e s) = s-id' s
 ⊢id' (⊢tapp ⊢e st') with ⊢id' ⊢e
 ... | id-⓪ r st
   with refl ← st-unique st st' = r

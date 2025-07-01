@@ -125,6 +125,9 @@ data _⊢_#_⦂_ : Env n m → Counter m → Term n m → Type m → Set where
   ⊢tabs :
       Γ ,∙ ⊢ Z # e ⦂ A
     → Γ ⊢ Z # Λ e ⦂ `∀ A
+  ⊢tabs-∞ :
+      Γ ,∙ ⊢ ∞ # e ⦂ A
+    → Γ ⊢ ∞ # Λ e ⦂ `∀ A
   ⊢tapp : Γ ⊢ 𝕥₍ A ₎ j # e ⦂ `∀ B
         → (st : ⟦ A ⟧ B ⇘ B*)
         → Γ ⊢ j # e ⓪ A ⦂ B*

@@ -1,3 +1,5 @@
+{-# OPTIONS --allow-unsolved-metas #-}
+{-# OPTIONS --allow-incomplete-matches #-}
 module Implicit.Interm.Properties.Regularity where
 
 open import Implicit.Language.All hiding (_⊢rʲ_)

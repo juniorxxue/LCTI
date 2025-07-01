@@ -89,13 +89,27 @@ data _⊢_⇒_⇒_ where
   ⊢sub :
       Γ ⊢ □ ⇒ g ⇒ A
     → (ne : NonEmpty Σ)
-    → (gc : GenericConsumer g)
+    → (gc : AGenericConsumer g)
     → (s : Γ ⋈ ⊢ A ≤⁺ Σ ⊣ Γ ⋈ ↪ B)
     → Γ ⊢ Σ ⇒ g ⇒ B
 
   ⊢tabs :
       Γ ,∙ ⊢ □ ⇒ e ⇒ A
     → Γ ⊢ □ ⇒ Λ e ⇒ `∀ A
+
+  ⊢tabs-τ :
+      Γ ,∙ ⊢ τ B ⇒ e ⇒ A
+    → Γ ⊢ τ (`∀ B) ⇒ Λ e ⇒ `∀ A
+
+  ⊢tabs-term :
+      Γ ⊢ □ ⇒ Λ e ⇒ A
+    → (s : Γ ⋈ ⊢ A ≤⁺ [ e₁ ]↝ Σ ⊣ Γ ⋈ ↪ B)
+    → Γ ⊢ [ e₁ ]↝ Σ ⇒ Λ e ⇒ B
+
+  ⊢tabs-tapp :
+      Γ ⊢ □ ⇒ Λ e ⇒ C
+    → (s : Γ ⋈ ⊢ C ≤⁺ A ⓪↝ Σ ⊣ Γ ⋈ ↪ B)
+    → Γ ⊢ A ⓪↝ Σ ⇒ Λ e ⇒ B
 
   ⊢tapp :
       Γ ⊢ A ⓪↝ Σ ⇒ e ⇒ `∀ B

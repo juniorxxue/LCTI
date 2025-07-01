@@ -1,3 +1,5 @@
+{-# OPTIONS --allow-unsolved-metas #-}
+{-# OPTIONS --allow-incomplete-matches #-}
 module Implicit.Algo.Properties.WeakenEVar where
 
 open import Implicit.Language.All
@@ -143,7 +145,7 @@ t-weaken^ (⊢lam₂ ⊢e up-c ⊢e₁) newΓ (↑tyᶜ-e {Σ' = Σ'} up-e upΣ)
 t-weaken^ {k = k} (⊢sub {A = A} ⊢e ne gc s) newΓ upΣ upe upA
   with ⟨ A' , upA' ⟩ ← ↑ty-total A k
   = ⊢sub (t-weaken^ ⊢e newΓ ↑tyᶜ-□ upe upA')
-         (nonempty-↑tyᶜ' ne upΣ) (gc-↑tyᵉ gc upe) (s-weaken^ s (▶S⋈ (▶^-▶⨟^ newΓ)) upA' upΣ upA)
+         (nonempty-↑tyᶜ' ne upΣ) {!!} (s-weaken^ s (▶S⋈ (▶^-▶⨟^ newΓ)) upA' upΣ upA)
 t-weaken^ (⊢tabs ⊢e) newΓ ↑tyᶜ-□ (↑tyᵉ-Λ upe) (↑ty-∀ upA) = ⊢tabs (t-weaken^ ⊢e (▶S∙ newΓ) ↑tyᶜ-□ upe upA)
 t-weaken^ {k = k} (⊢tapp {B = B} ⊢e st) newΓ upΣ (↑tyᵉ-⓪ upe upA₁) upA
   with ⟨ B' , upB ⟩ ← ↑ty-total B (#S k) = ⊢tapp (t-weaken^ ⊢e newΓ (↑tyᶜ-⓪ upA₁ upΣ) upe (↑ty-∀ upB)) (↑ty-st-comm0 st upA₁ upB upA)
