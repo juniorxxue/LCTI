@@ -1,5 +1,3 @@
-{-# OPTIONS --allow-unsolved-metas #-}
-{-# OPTIONS --allow-incomplete-matches #-}
 module Implicit.SimCounter.Completeness.Aux where
 
 open import Implicit.Language.All
@@ -27,12 +25,37 @@ data Bound : Env n m → SCounter × Type m → Counter m × Type m → Set wher
        → Bound Γ (⟨ 𝕥 𝕟 , `∀ A ⟩) (⟨ 𝕥₍ T ₎ j , `∀ B ⟩)
 
 postulate
-  bound-weaken=0 : Bound Γ (⟨ 𝕟 , A ⟩) (⟨ j , B ⟩)
+  ⊢t-weaken= : Γ ⊢t A
+            → Γ ▶ k ,= T ⇘ Γ'
+            → A ↑ty k ⇘ A'
+            → Γ' ⊢t A'
+
+
+bound-weaken= : Bound Γ (⟨ 𝕟 , A ⟩) (⟨ j , B ⟩)
+               → Γ ▶ k ,= T ⇘ Γ'
+               → j ↑tyʲ k ⇘ j'
+               → A ↑ty k ⇘ A'
+               → B ↑ty k  ⇘ B'
+               → Bound Γ' (⟨ 𝕟 , A' ⟩) (⟨ j' , B' ⟩)
+bound-weaken= (bd-z grd) newΓ ↑tyʲ-Z upA upB = bd-z (≫-weaken= grd newΓ upA upB)
+bound-weaken= (bd-∞ grd) newΓ ↑tyʲ-∞ upA upB = bd-∞ (≫-weaken= grd newΓ upA upB)
+bound-weaken= (bd-c bd grd) newΓ (↑tyʲ-𝕔 upj) (↑ty-arr upA upA₁) (↑ty-arr upB upB₁)
+  = bd-c (bound-weaken= bd newΓ upj upA₁ upB₁) (≫-weaken= grd newΓ upA upB)
+bound-weaken= (bd-i bd grd) newΓ (↑tyʲ-𝕚 upj) (↑ty-arr upA upA₁) (↑ty-arr upB upB₁)
+  = bd-i (bound-weaken= bd newΓ upj upA₁ upB₁) (≫-weaken= grd newΓ upA upB)
+bound-weaken= {k = k} {T = T} (bd-t bd upj₁ regT) newΓ (↑tyʲ-𝕥 {j' = j₁} upj upA₁) (↑ty-∀ upA) (↑ty-∀ upB)
+  with ⟨ T' , upT ⟩ ← ↑ty0-total T
+  with ⟨ j₁' , upj₃ ⟩ ← ↑tyʲ0-total j₁
+  = bd-t (bound-weaken= bd (▶S= newΓ upT upA₁) (↑tyʲ-comm0' upj upj₃ upj₁) upA upB) upj₃ (⊢t-weaken= regT newΓ upA₁)
+
+bound-weaken=0 : Bound Γ (⟨ 𝕟 , A ⟩) (⟨ j , B ⟩)
                → Γ ⊢r T
                → ↑tyʲ0 j ⇘ j'
                → ↑ty0 A ⇘ A'
                → ↑ty0 B ⇘ B'
                → Bound (Γ ,= T) (⟨ 𝕟 , A' ⟩) (⟨ j' , B' ⟩)
+bound-weaken=0 bd regT upj upA upB = bound-weaken= bd (▶Z regT) upj upA upB
+
 
 data Free : Env n m → Env n m → Set where
   fr-⋈ : Free (Γ ⋈) (Γ ⋈)
@@ -297,6 +320,18 @@ sfind-find (f-iso iso) (bd-i bd grd) = f-iso (sisoinf-isoinf iso (bd-i bd grd))
 sfind-find (f-arr-𝕚-l inA) (bd-i bd grd) = f-arr-𝕚-l inA
 sfind-find (f-arr-𝕚-r ¬inA fd) (bd-i bd grd) = f-arr-𝕚-r ¬inA (sfind-find fd bd)
 sfind-find (f-arr-𝕔 ¬inA fd) (bd-c bd grd) = f-arr-𝕔 ¬inA (sfind-find fd bd)
-sfind-find (f-∀-𝕚 fd) (bd-i bd grd) = f-∀-𝕚 {!!} {!!}
-sfind-find (f-∀-𝕔 fd) bd = {!!}
-sfind-find (f-𝕥 fd) bd = {!!}
+sfind-find (f-∀-𝕚 fd) (bd-i {B = B} {j = j} {C = C} {A = A} {A% = A%} bd grd)
+  with ⟨ j' , upj ⟩ ← ↑tyʲ0-total j
+  with ⟨ A%' , upA% ⟩ ← ↑ty0-total A%
+  with ⟨ B' , upB ⟩ ← ↑ty0-total B
+  with ⟨ C' , upC ⟩ ← ↑ty0-total C
+  with ⟨ A' , upA ⟩ ← ↑ty0-total A
+  = f-∀-𝕚 (sfind-find fd (bound-weaken=0 (bd-i bd grd) ⊢r-int (↑tyʲ-𝕚 upj) (↑ty-arr upA upB) (↑ty-arr upA% upC))) upj
+sfind-find (f-∀-𝕔 fd) (bd-c {B = B} {j = j} {C = C} {A = A} {A% = A%} bd grd)
+  with ⟨ j' , upj ⟩ ← ↑tyʲ0-total j
+  with ⟨ A%' , upA% ⟩ ← ↑ty0-total A%
+  with ⟨ B' , upB ⟩ ← ↑ty0-total B
+  with ⟨ C' , upC ⟩ ← ↑ty0-total C
+  with ⟨ A' , upA ⟩ ← ↑ty0-total A
+  = f-∀-𝕔 (sfind-find fd (bound-weaken=0 (bd-c bd grd) ⊢r-int (↑tyʲ-𝕔 upj) (↑ty-arr upA upB) (↑ty-arr upA% upC))) upj
+sfind-find (f-𝕥 fd) (bd-t bd upj regT) = f-𝕥 (sfind-find fd bd) upj
