@@ -1,5 +1,3 @@
-{-# OPTIONS --allow-unsolved-metas #-}
-{-# OPTIONS --allow-incomplete-matches #-}
 module Implicit.SimCounter.Completeness.Aux where
 
 open import Implicit.Language.All
@@ -303,8 +301,9 @@ sfind-find (f-∀-𝕔 fd) (bd-c {B = B} {j = j} {C = C} bd)
   with ⟨ j' , upj  ⟩ ← ↑tyʲ0-total j
   with ⟨ C' , upC ⟩ ← ↑ty0-total C
   with ⟨ B' , upB ⟩ ← ↑ty0-total B = f-∀-𝕔 (sfind-find fd (bd-c {A = Int} (bound-weaken=0 bd ⊢r-int upj upB upC))) upj
-sfind-find (f-𝕥 fd) bd = {!!}
+sfind-find (f-𝕥 fd) (bd-t bd upj regT) = f-𝕥 (sfind-find fd bd) upj
 
+{-
 bound-⊢r : Bound Γ (⟨ 𝕟 , A ⟩) (⟨ j , B ⟩)
          → Γ ⊢r A
          → Γ ⊢r B
@@ -314,3 +313,4 @@ bound-⊢r (bd-c bd) (⊢r-arr regA regA₁) = ⊢r-arr regA (bound-⊢r bd regA
 bound-⊢r (bd-i bd) (⊢r-arr regA regA₁) = ⊢r-arr regA (bound-⊢r bd regA₁)
 bound-⊢r (bd-t bd x₂ regT) (⊢r-∀ regA) = {!!}
 -- ⊢r-∀ (⊢r-weaken∙0 (st0-⊢r (⊢r-∀ (bound-⊢r bd regA)) (⊢t-⊢r x) x₁) x₂)
+-}

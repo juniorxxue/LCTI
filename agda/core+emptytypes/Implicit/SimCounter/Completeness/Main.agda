@@ -7,10 +7,9 @@ open import Implicit.SimCounter.Subtyping2
 open import Implicit.Interm.All
 open import Implicit.SimCounter.Completeness.Aux
 
-
 complete : Γ ⊨ 𝕟 # A ⌞ ≤⁺ ⌝ B
-         → Bound Γ (⟨ 𝕟 , B ⟩) (⟨ j , C ⟩)
          → Free Γ Δ
+         → Bound Δ (⟨ 𝕟 , B ⟩) (⟨ j , C ⟩)
          → Δ ≫ C ⇘ D
          → Δ ⊢ j # A ⌞ ≤⁺ ⌝ D
 
@@ -19,13 +18,34 @@ complete- : Γ ⊨ ∞ # A ⌞ ≤⁻ ⌝ B
          → Δ ≫ A ⇘ C
          → Δ ⊢ ∞ # C ⌞ ≤⁻ ⌝ B
 
-complete (s-refl regΔ cloA grd₁) bd-z fr grd = s-refl (free-sregular regΔ fr) (free-⊢c cloA fr) (free-≫ regΔ grd₁ fr grd)
-complete (s-int regΔ) bd-∞ fr grd-int = s-int (free-sregular regΔ fr)
-complete (s-var-∙ regΔ inΔ) bd-∞ fr (grd-var= x) = s-svar-l (free-sregular regΔ fr) x
-complete (s-var-∙ regΔ inΔ) bd-∞ fr (grd-var∙ x) = s-var-∙ (free-sregular regΔ fr) x
-complete (s-arr₁ s s₁) bd-∞ fr (grd-arr grd grd₁) = s-arr₁ (complete- s fr grd) (complete s₁ bd-∞ fr grd₁)
-complete (s-arr₂ s s₁) (bd-i bd) fr (grd-arr grd grd₁) = s-arr₂ (complete- s fr grd) (complete s₁ bd fr grd₁)
-complete (s-arr₃ cloA grd₁ s) (bd-c bd) fr (grd-arr grd grd₂) = s-arr₃ (free-⊢c cloA fr) (free-≫ (s-sregulars s) grd₁ fr grd) (complete s bd fr grd₂)
+complete (s-refl regΔ cloA grd₁) fr bd-z grd = s-refl (free-sregular regΔ fr) (free-⊢c cloA fr) (free-≫ regΔ grd₁ fr grd)
+complete (s-int regΔ) fr bd-∞ grd-int = s-int (free-sregular regΔ fr)
+complete (s-var-∙ regΔ inΔ) fr bd-∞ (grd-var= x) = s-svar-l (free-sregular regΔ fr) x
+complete (s-var-∙ regΔ inΔ) fr bd-∞ (grd-var∙ x) = s-var-∙ (free-sregular regΔ fr) x
+complete (s-arr₁ s s₁) fr bd-∞ (grd-arr grd grd₁) = s-arr₁ (complete- s fr grd) (complete s₁ fr bd-∞ grd₁)
+complete (s-arr₂ s s₁) fr (bd-i bd) (grd-arr grd grd₁) = s-arr₂ (complete- s fr grd) (complete s₁ fr bd grd₁)
+complete (s-arr₃ cloA grd₁ s) fr (bd-c bd) (grd-arr grd grd₂) = s-arr₃ (free-⊢c cloA fr) (free-≫ (s-sregulars s) grd₁ fr grd) (complete s fr bd grd₂)
+complete (s-∀ s) fr bd-∞ (grd-∀ grd) = s-∀ (complete s (fr-S∙ fr) bd-∞ grd)
+complete (s-∀l s ic fd upC upD) fr (bd-c {j = j} {C = E} bd) (grd-arr {A% = A%} {B% = B%} grd grd₁)
+  with ⟨ j' , upj ⟩ ← ↑tyʲ0-total j
+  with ⟨ A%' , upA% ⟩ ← ↑ty0-total A%
+  with ⟨ B%' , upB% ⟩ ← ↑ty0-total B%
+  with ⟨ E' , upE ⟩ ← ↑ty0-total E
+  with reg-S= r regA  ← s-sregulars s
+  = s-∀l (complete s (fr-S= fr) (bound-weaken=0 (bd-c bd) {!!} (↑tyʲ-𝕔 upj) (↑ty-arr upC upD) (↑ty-arr upC upE))
+                   (≫-weaken= (grd-arr grd grd₁) (▶Z {!!}) (↑ty-arr upC upE) (↑ty-arr upA% upB%)))
+         case-𝕔 (sfind-find fd (bd-c (bound-weaken=0 bd ⊢r-int upj upD upE))) upA% upB% (↑tyʲ-𝕔 upj)
+complete (s-∀l s ic fd upC upD) fr (bd-i {j = j} {C = E} bd) (grd-arr {A% = A%} {B% = B%} grd grd₁) = {!!}
+complete (s-tapp s) fr (bd-t bd upj regT) (grd-∀ grd) = s-tapp (complete s (fr-S∙= fr regT) bd {!!}) upj
+complete (s-svar-l x inΔ) fr bd-∞ grd
+  with regA ← ⊢t-⊢r (free-⊢t (∋:=-⊢t x inΔ) fr)
+  with refl ← ⊢r-≫-eq' regA grd
+  = s-svar-l (free-sregular x fr) (free-∋:=' inΔ fr)
+complete (s-svar-𝕚 x s) fr (bd-i bd) (grd-arr grd grd₁) = s-svar-𝕚 (free-∋:=' x fr) (complete s fr (bd-i bd) (grd-arr grd grd₁))
+complete (s-svar-𝕔 x s) fr (bd-c bd) (grd-arr grd grd₁) = s-svar-𝕔 (free-∋:=' x fr) (complete s fr (bd-c bd) (grd-arr grd grd₁))
+complete (s-svar-𝕥 x s) fr (bd-t bd upj regT) (grd-∀ grd) = s-svar-𝕥 (free-∋:=' x fr) (complete s fr (bd-t bd upj regT) (grd-∀ grd))
+
+{-
 complete (s-∀ s) bd-∞ fr (grd-∀ grd) = s-∀ (complete s bd-∞ (fr-S∙ fr) grd)
 complete (s-∀l s ic fd upC upD) (bd-c {j = j} {C = E} bd) fr (grd-arr {A% = A%} {B% = B%} grd grd₁)
   with ⟨ j' , upj ⟩ ← ↑tyʲ0-total j
@@ -74,6 +94,7 @@ complete0 : Γ ⋈ ⊨ 𝕟 # A ⌞ ≤⁺ ⌝ B
           → Bound (Γ ⋈) (⟨ 𝕟 , B ⟩) (⟨ j , C ⟩)
           → Γ ⋈ ⊢ j # A ⌞ ≤⁺ ⌝ C
 complete0 ⊢e bd = complete ⊢e bd fr-⋈ (⊢r-≫-eq (bound-⊢r bd (ss-⊢r ⊢e)))
+-}
 
 {-
 ⊢tapp' : Γ ⊢ 𝕥₍ A ₎ j # e ⦂ `∀ B'
