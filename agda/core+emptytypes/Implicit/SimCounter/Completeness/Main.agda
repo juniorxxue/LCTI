@@ -19,8 +19,8 @@ complete- : Γ ⊨ ∞ # B ≤ A
 
 complete (s-refl regΔ cloA) fr (bd-z grd) = s-refl {!!} {!!} grd
 complete (s-int regΔ) fr (bd-∞ grd-int) = s-int {!!}
-complete (s-var-∙ regΔ inΔ) fr (bd-∞ (grd-var= x)) = s-svar-l {!!} x
-complete (s-var-∙ regΔ inΔ) fr (bd-∞ (grd-var∙ x)) = s-var-∙ {!!} x
+complete (s-var-∙ regΔ inΔ) fr (bd-z grd) = {!!}
+complete (s-var-∙ regΔ inΔ) fr (bd-∞ grd) = {!!}
 complete (s-arr₁ s s₁) fr (bd-∞ (grd-arr grd grd₁)) = s-arr₁ (complete- s fr grd) (complete s₁ fr (bd-∞ grd₁))
 complete (s-arr₂ s s₁) fr bd = {!!}
 complete (s-arr₃ regA s) fr bd = {!!}

@@ -5,6 +5,7 @@ open import Implicit.AuxLemmas
 open import Implicit.SimCounter.Interm
 open import Implicit.SimCounter.Typing
 open import Implicit.SimCounter.Subtyping
+open import Implicit.SimCounter.RegularNew
 
 
 -- first we deal with bound variable

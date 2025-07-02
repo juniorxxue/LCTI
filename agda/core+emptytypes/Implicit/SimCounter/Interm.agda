@@ -1,6 +1,7 @@
 module Implicit.SimCounter.Interm where
 
 open import Implicit.Language.All
+open import Implicit.SimCounter.RegularNew
 
 ----------------------------------------------------------------------
 --+                           Subtyping                            +--
@@ -9,15 +10,15 @@ open import Implicit.Language.All
 infix 3 _⊢_#_⌞_⌝_
 data _⊢_#_⌞_⌝_ : Env n m → Counter m → Type m → Polar → Type m → Set where
   s-refl :
-      (regΔ : SRegular Δ)
+      (regΔ : SRegularS Δ)
     → (cloA : Δ ⊢c A)
     → (grd : Δ ≫ A ⇘ A%)
     → Δ ⊢ Z # A ⌞ ≤⁺ ⌝ A%
   s-int :
-      (regΔ : SRegular Δ)
+      (regΔ : SRegularS Δ)
     → Δ ⊢ ∞ # Int ⌞ ≤ ⌝ Int
   s-var-∙ :
-      (regΔ : SRegular Δ)
+      (regΔ : SRegularS Δ)
     → (inΔ : Δ ∋∙ X)
     → Δ ⊢ ∞ # ‶ X ⌞ ≤ ⌝ ‶ X
   s-arr₁ :
@@ -42,6 +43,7 @@ data _⊢_#_⌞_⌝_ : Env n m → Counter m → Type m → Polar → Type m →
     → (fd : find A #0 j')
     → (upj : ↑tyʲ0 j ⇘ j')
     → (st : ⟦ B ⟧ A ⇘ A*)
+    → (regB : Δ ⊢t B)
     → Δ ⊢ j # `∀ A ⌞ ≤⁺ ⌝ C `→ D
   s-∀l-no-appear :
       Δ ⊢ j # A* ⌞ ≤⁺ ⌝ C `→ D
@@ -49,6 +51,7 @@ data _⊢_#_⌞_⌝_ : Env n m → Counter m → Type m → Polar → Type m →
     → (fd : #0 ¬ε A)
     → (upj : ↑tyʲ0 j ⇘ j')
     → (st : ⟦ B ⟧ A ⇘ A*)
+    → (regB : Δ ⊢t B)
     → Δ ⊢ j # `∀ A ⌞ ≤⁺ ⌝ C `→ D
   s-tapp :
       Δ ,= B ⊢ j' # A ⌞ ≤⁺ ⌝ C
@@ -56,11 +59,11 @@ data _⊢_#_⌞_⌝_ : Env n m → Counter m → Type m → Polar → Type m →
     → Δ ⊢ 𝕥₍ B ₎ j # `∀ A ⌞ ≤⁺ ⌝ `∀ C
   -- two atomic rules
   s-svar-l : ∀ {X A}
-    → (SRegular Δ)
+    → (SRegularS Δ)
     → (inΔ : Δ ∋ X := A)
     → Δ ⊢ ∞ # ‶ X ⌞ ≤⁺ ⌝ A
   s-svar-r : ∀ {X A}
-    → (SRegular Δ)
+    → (SRegularS Δ)
     → (inΔ : Δ ∋ X := A)
     → Δ ⊢ ∞ # A ⌞ ≤⁻ ⌝ ‶ X
   s-svar-𝕚 :
@@ -76,13 +79,6 @@ data _⊢_#_⌞_⌝_ : Env n m → Counter m → Type m → Polar → Type m →
     → Δ ⊢ (𝕥₍ A ₎ j) # B ⌞ ≤⁺ ⌝ `∀ C
     → Δ ⊢ (𝕥₍ A ₎ j) # ‶ X ⌞ ≤⁺ ⌝ `∀ C
 
-s-refl-∞ : SRegular Γ
-         → Γ ⊢r A
-         → Γ ⊢ ∞ # A ⌞ ≤ ⌝ A
-s-refl-∞ regΓ ⊢r-int = s-int regΓ
-s-refl-∞ regΓ (⊢r-var-∙ inΓ) = s-var-∙ regΓ inΓ
-s-refl-∞ regΓ (⊢r-arr regA regA₁) = s-arr₁ (s-refl-∞ regΓ regA) (s-refl-∞ regΓ regA₁)
-s-refl-∞ regΓ (⊢r-∀ regA) = s-∀ (s-refl-∞ (reg-S∙ regΓ) regA)
 
 ----------------------------------------------------------------------
 --+                             Typing                             +--
@@ -91,10 +87,10 @@ s-refl-∞ regΓ (⊢r-∀ regA) = s-∀ (s-refl-∞ (reg-S∙ regΓ) regA)
 infix 3 _⊢_#_⦂_
 data _⊢_#_⦂_ : Env n m → Counter m → Term n m → Type m → Set where
   ⊢lit : ∀ {num : ℕ}
-    → (regΓ : TRegular Γ)
+    → (regΓ : TRegularS Γ)
     → Γ ⊢ Z # (lit num) ⦂ Int
   ⊢var :
-      (regΓ : TRegular Γ)
+      (regΓ : TRegularS Γ)
     → (x∈Γ : Γ ∋ x ⦂ A)
     → Γ ⊢ Z # ` x ⦂ A
   ⊢ann :

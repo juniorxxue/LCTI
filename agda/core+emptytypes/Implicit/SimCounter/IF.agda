@@ -15,9 +15,9 @@ data _⊢_𝕄_ : Env n m → Type m → Type m → Set where
 infix 3 _⊢_⦂_⟶_
 data _⊢_⦂_⟶_ : Env n m → Term n m → Type m → Term n m → Set where
 
-  ela-lit : (regΓ : TRegular Γ)
+  ela-lit : (regΓ : TRegularS Γ)
           → Γ ⊢ (lit n) ⦂ Int ⟶ (lit n)
-  ela-var : (regΓ : TRegular Γ)
+  ela-var : (regΓ : TRegularS Γ)
           → Γ ∋ x ⦂ A
           → Γ ⊢ ` x ⦂ A ⟶ ` x
   ela-lam : Γ , A ⊢ e ⦂ B ⟶ e'
@@ -43,7 +43,7 @@ annotatability (ela-var regΓ x) = {!!}
 annotatability (ela-lam ⊢e) = ⊨lam₁ (annotatability ⊢e)
 annotatability (ela-app ⊢e x ⊢e₁) = {!!}
 annotatability (ela-∀i ⊢e upe) = {!!}
-annotatability (ela-∀e ⊢e x x₁) = ⊨tapp {!!} x
+annotatability (ela-∀e ⊢e x x₁) = ⊨tapp {!annotatability ⊢e!} {!!} {!!}
 
 private variable
   𝕞 : SCounter
@@ -78,4 +78,5 @@ R-prv (⊨lam₂ ⊢e) (R-I rr) = ⊨lam₂ (R-prv ⊢e rr)
 R-prv (⊨app₁ ⊢e ⊢e₁) rr = ⊨app₁ (R-prv ⊢e (R-C rr)) ⊢e₁
 R-prv (⊨app₂ ⊢e ⊢e₁) rr = ⊨app₂ (R-prv ⊢e (R-I rr)) ⊢e₁
 R-prv (⊨sub ⊢e B≤A gc 𝕟≢Z) rr = ⊨sub ⊢e (R-s-prv B≤A rr) gc {!!}
-R-prv (⊨tapp ⊢e st) rr = ⊨tapp (R-prv ⊢e (R-T rr st)) st
+R-prv (⊨tapp ⊢e st regA) rr = ⊨tapp (R-prv ⊢e (R-T rr st)) st regA
+-- ⊨tapp (R-prv ⊢e (R-T rr st)) st

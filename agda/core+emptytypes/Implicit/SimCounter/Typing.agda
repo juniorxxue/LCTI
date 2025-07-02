@@ -2,6 +2,7 @@ module Implicit.SimCounter.Typing where
 
 open import Implicit.Language.All
 open import Implicit.SimCounter.Subtyping
+open import Implicit.SimCounter.RegularNew
 
 infix 3 _⊨_#_⦂_
 data _⊨_#_⦂_ : Env n m → SCounter → Term n m → Type m → Set where
