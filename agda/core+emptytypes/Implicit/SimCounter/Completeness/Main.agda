@@ -66,6 +66,6 @@ complete- (s-svar-r x inΔ) fr grd
 
 
 complete0 : Γ ⋈ ⊨ 𝕟 # A ⌞ ≤⁺ ⌝ B
-          → Bound (Γ ⋈) (⟨ 𝕟 , B ⟩) (⟨ j , C ⟩)
+          → Bound (Γ ⋈) (⟨ 𝕟 , B ⟩) (⟨ j , C ⟩) 
           → Γ ⋈ ⊢ j # A ⌞ ≤⁺ ⌝ C
 complete0 ⊢e bd = complete ⊢e fr-⋈ bd

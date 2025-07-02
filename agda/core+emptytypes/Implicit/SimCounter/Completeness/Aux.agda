@@ -24,6 +24,21 @@ data Bound : Env n m → SCounter × Type m → Counter m × Type m → Set wher
        → (regT : Γ ⊢t T)
        → Bound Γ (⟨ 𝕥 𝕟 , `∀ A ⟩) (⟨ 𝕥₍ T ₎ j , `∀ B ⟩)
 
+data BoundTyp : Env n m → SCounter × Type m → Counter m × Type m → Set where
+  bd-z : BoundTyp Γ (⟨ Z , A ⟩) (⟨ Z , A ⟩)
+  bd-∞ : BoundTyp Γ (⟨ ∞ , A ⟩) (⟨ ∞ , A ⟩)
+  bd-c : BoundTyp Γ (⟨ 𝕟 , B ⟩) (⟨ j , C ⟩)
+       → BoundTyp Γ (⟨ 𝕔 𝕟 , A `→ B ⟩) (⟨ 𝕔 j , A `→ C ⟩)
+  bd-i : BoundTyp Γ (⟨ 𝕟 , B ⟩) (⟨ j , C ⟩)
+       → BoundTyp Γ (⟨ 𝕚 𝕟 , A `→ B ⟩) (⟨ 𝕚 j , A `→ C ⟩)
+  bd-t : BoundTyp Γ (⟨ 𝕟 , A* ⟩) (⟨ j , B ⟩)
+       → Γ ⊢t T
+       → ⟦ T ⟧ A ⇘ A*
+       → ↑ty0 B ⇘ B'
+       → BoundTyp Γ (⟨ 𝕥 𝕟 , `∀ A ⟩) (⟨ 𝕥₍ T ₎ j , `∀ B' ⟩)
+
+
+
 postulate
   ⊢t-weaken= : Γ ⊢t A
             → Γ ▶ k ,= T ⇘ Γ'
