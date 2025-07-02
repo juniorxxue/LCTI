@@ -1,7 +1,7 @@
 module Implicit.SimCounter.Typing where
 
 open import Implicit.Language.All
-open import Implicit.SimCounter.Subtyping2
+open import Implicit.SimCounter.Subtyping
 
 infix 3 _⊨_#_⦂_
 data _⊨_#_⦂_ : Env n m → SCounter → Term n m → Type m → Set where
@@ -31,7 +31,7 @@ data _⊨_#_⦂_ : Env n m → SCounter → Term n m → Type m → Set where
     → Γ ⊨ 𝕟 # e₁ · e₂ ⦂ B
   ⊨sub :
       Γ ⊨ Z # g ⦂ A
-    → (B≤A : Γ ⋈ ⊨ 𝕟 # A ⌞ ≤⁺ ⌝ B)
+    → (B≤A : Γ ⋈ ⊨ 𝕟 # A ≤ B)
     → (gc : GenericConsumer g)
     → (𝕟≢Z : SNonZ 𝕟)
     → Γ ⊨ 𝕟 # g ⦂ B

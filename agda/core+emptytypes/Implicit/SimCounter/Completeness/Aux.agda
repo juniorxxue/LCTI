@@ -2,9 +2,9 @@ module Implicit.SimCounter.Completeness.Aux where
 
 open import Implicit.Language.All
 open import Implicit.AuxLemmas
-open import Implicit.Interm.All
+open import Implicit.SimCounter.Interm
 open import Implicit.SimCounter.Typing
-open import Implicit.SimCounter.Subtyping2
+open import Implicit.SimCounter.Subtyping
 
 
 -- first we deal with bound variable
@@ -79,8 +79,6 @@ data Free : Env n m → Env n m → Set where
         → Free (Γ ,∙) (Δ ,= A)
   fr-S∙ : Free Γ Δ
         → Free (Γ ,∙) (Δ ,∙)
-  fr-S= : Free Γ Δ
-        → Free (Γ ,= A) (Δ ,= A)
 
 free-wfs : WFS Γ H
          → Free Γ Δ
@@ -88,7 +86,6 @@ free-wfs : WFS Γ H
 free-wfs (wfs-base x) fr-⋈ = wfs-base x
 free-wfs (wfs-mis∙ wfs) (fr-S∙= fr x) = wfs-mis= (free-wfs wfs fr)
 free-wfs (wfs-mis∙ wfs) (fr-S∙ fr) = wfs-mis∙ (free-wfs wfs fr)
-free-wfs (wfs-mis= wfs) (fr-S= fr) = wfs-mis= (free-wfs wfs fr)
 
 free-⊢t : Γ ⊢t A
         → Free Γ Δ
@@ -105,7 +102,6 @@ free-sregulars : SRegularS Γ
 free-sregulars (reg-Z regΓ) fr-⋈ = reg-Z regΓ
 free-sregulars (reg-S∙ regΓ) (fr-S∙= fr x) = reg-S= (free-sregulars regΓ fr) x
 free-sregulars (reg-S∙ regΓ) (fr-S∙ fr) = reg-S∙ (free-sregulars regΓ fr)
-free-sregulars (reg-S= regΓ regA) (fr-S= fr) = reg-S= (free-sregulars regΓ fr) (free-⊢t regA fr)
 
 
 
@@ -114,18 +110,14 @@ free-sregulars (reg-S= regΓ regA) (fr-S= fr) = reg-S= (free-sregulars regΓ fr)
 free-∋:=' : Γ ∋ X := A
          → Free Γ Δ
          → Δ ∋ X := A
-free-∋:=' (Z up) (fr-S= fr) = Z up
 free-∋:=' (S∙ inΓ up) (fr-S∙= fr x) = S= (free-∋:=' inΓ fr) up
 free-∋:=' (S∙ inΓ up) (fr-S∙ fr) = S∙ (free-∋:=' inΓ fr) up
-free-∋:=' (S= inΓ up) (fr-S= fr) = S= (free-∋:=' inΓ fr) up
 
 free-∋= : Γ ∋= X
          → Free Γ Δ
          → Δ ∋= X
-free-∋= Z (fr-S= fr) = Z
 free-∋= (S∙ inΓ) (fr-S∙= fr x) = S= (free-∋= inΓ fr)
 free-∋= (S∙ inΓ) (fr-S∙ fr) = S∙ (free-∋= inΓ fr)
-free-∋= (S= inΓ) (fr-S= fr) = S= (free-∋= inΓ fr)
 
 free-∋∙ : Γ ∋∙ X
          → Free Γ Δ
@@ -138,9 +130,6 @@ free-∋∙ (S∙ inΓ) (fr-S∙= fr x) with free-∋∙ inΓ fr
 free-∋∙ (S∙ inΓ) (fr-S∙ fr) with free-∋∙ inΓ fr
 ... | inj₁ x = inj₁ (S∙ x)
 ... | inj₂ y = inj₂ (S∙ y)
-free-∋∙ (S= inΓ) (fr-S= fr) with free-∋∙ inΓ fr
-... | inj₁ x = inj₁ (S= x)
-... | inj₂ y = inj₂ (S= y)
 free-∋∙ (S⋈ inΓ) fr-⋈ = inj₁ (S⋈ inΓ)
 
 wfs-wfr : WFS Γ H
