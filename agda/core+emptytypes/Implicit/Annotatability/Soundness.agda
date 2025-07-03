@@ -21,7 +21,7 @@ data IFTerm : ℕ → Set where
 
 
 private variable
-  M N : IFTerm n
+  M N J K P : IFTerm n
 
 infix 3 _⊢_⦂_
 data _⊢_⦂_ : Env n m → IFTerm n → Type m → Set where
@@ -44,8 +44,7 @@ data _⊢_⦂_ : Env n m → IFTerm n → Type m → Set where
           → Γ ⊢ M ⦂ A*
 
 
-if-weaken∙0 :
-              Γ ⊢ M ⦂ A
+if-weaken∙0 : Γ ⊢ M ⦂ A
             → ↑ty0 A ⇘ A'
             → Γ ,∙ ⊢ M ⦂ A'
 
@@ -61,8 +60,6 @@ data Erasure : Term n m → IFTerm n → Set where
   era-tapp : Erasure e M
            → Erasure (e ⓪ A) M
 
-
-
 infix 3 _𝕞_
 data _𝕞_ : Type m → Type m → Set where
   𝕞-refl : A 𝕞 A
@@ -75,6 +72,7 @@ data _𝕞_ : Type m → Type m → Set where
        → (up : ↑ty0 B ⇘ B')
        → `∀ A 𝕞 `∀ B'
 
+{-
 s-mm : Γ ⊢ j # A ≤ B
      → A 𝕞 B
 s-mm (s-refl regΔ cloA) = 𝕞-refl
@@ -94,18 +92,60 @@ if-sub : Γ ⊢ M ⦂ A
 if-sub ⊢e 𝕞-refl = ⊢e
 if-sub ⊢e (𝕞-arr mm) = {!!}
 if-sub ⊢e (𝕞-subst mm x) = if-sub (ela-∀e ⊢e x) mm
-if-sub ⊢e (𝕞-∀ mm up) = ela-∀i {!if-sub ⊢e mm!}
+if-sub ⊢e (𝕞-∀ mm up) = ela-∀i (if-weaken∙0 (if-sub ⊢e mm) up)
+-}
+{-
+data Build : IFTerm n → Counter m → Type m → IFTerm n → Type m →  Set where
+  bd-z : Build M Z A M A
+  bd-∞ : Build M ∞ A M A
+  bd-c : Build M j B J C
+       → Γ ⊢ N ⦂ A
+       → Build M (𝕔 j) (A `→ B) (J · N)
+  bd-i : Build M j B J
+       → Γ ⊢ N ⦂ A
+       → Build M (𝕚 j) (A `→ B) (J · N)
+  bd-t : Build M j B J
+       → Build M (𝕥₍ T ₎ j) B J
+
+sound-gen : Γ ⊢ j # e ⦂ A
+          → Erasure e M
+          → Build M j A N
+          → Γ ⊢ N ⦂ A
+sound-gen (⊢lit regΓ) era-lit bd-z = ela-lit regΓ
+sound-gen (⊢var regΓ x∈Γ) era-var bd-z = ela-var regΓ x∈Γ
+sound-gen (⊢ann ⊢e) (era-ann era) bd-z = sound-gen ⊢e era bd-∞
+sound-gen (⊢lam₁ ⊢e) (era-lam era) bd-∞ = ela-lam (sound-gen ⊢e era bd-∞)
+sound-gen (⊢lam₂ ⊢e) (era-lam era) (bd-i bd x) = {!!}
+sound-gen (⊢app₁ ⊢e ⊢e₁) era bd = {!!}
+sound-gen (⊢app₂ ⊢e ⊢e₁) era bd = {!!}
+sound-gen (⊢sub ⊢e B≤A gc j≢Z) era bd = {!!}
+sound-gen (⊢tabs ⊢e) era bd = {!!}
+sound-gen (⊢tapp ⊢e st) era bd = {!!}
+-}
+
+infix 3 _⊢_▻_↪_
+data _⊢_▻_↪_ : Env n m → IFTerm n → Counter m × Type m → IFTerm n × Type m → Set where
+  ▻Z : Γ ⊢ M ▻ ⟨ Z , A ⟩ ↪ ⟨ M , A ⟩
+  ▻∞ : Γ ⊢ M ▻ ⟨ ∞ , A ⟩ ↪ ⟨ M , A ⟩
+  ▻I : Γ ⊢ (M · N) ▻ ⟨ j , B ⟩ ↪ ⟨ J , C ⟩
+     → Γ ⊢ N ⦂ A
+     → Γ ⊢ M ▻ ⟨ 𝕚 j , A `→ B ⟩ ↪ ⟨ J , C ⟩
+  ▻C : Γ ⊢ (M · N) ▻ ⟨ j , B ⟩ ↪ ⟨ J , C ⟩
+     → Γ ⊢ N ⦂ A
+     → Γ ⊢ M ▻ ⟨ 𝕔 j , A `→ B ⟩ ↪ ⟨ J , C ⟩
+
 
 sound : Γ ⊢ j # e ⦂ A
       → Erasure e M
-      → Γ ⊢ M ⦂ A
-sound (⊢lit regΓ) era-lit = ela-lit regΓ
-sound (⊢var regΓ x∈Γ) era-var = ela-var regΓ x∈Γ
-sound (⊢ann ⊢e) (era-ann era) = sound ⊢e era
-sound (⊢lam₁ ⊢e) (era-lam era) = ela-lam (sound ⊢e era)
-sound (⊢lam₂ ⊢e) (era-lam era) = ela-lam (sound ⊢e era)
-sound (⊢app₁ ⊢e ⊢e₁) (era-app era era₁) = ela-app (sound ⊢e era) 𝕄-arr (sound ⊢e₁ era₁)
-sound (⊢app₂ ⊢e ⊢e₁) (era-app era era₁) = ela-app (sound ⊢e era) 𝕄-arr (sound ⊢e₁ era₁)
-sound (⊢sub ⊢e B≤A gc j≢Z) era = {!sound ⊢e era!}
-sound (⊢tabs ⊢e) (era-tlam era) = ela-∀i (sound ⊢e era)
-sound (⊢tapp ⊢e st) (era-tapp era) = ela-∀e (sound ⊢e era) st
+      → Γ ⊢ M ▻ ⟨ j , A ⟩ ↪ ⟨ N , B ⟩
+      → Γ ⊢ N ⦂ B
+sound (⊢lit regΓ) era bd = {!!}
+sound (⊢var regΓ x∈Γ) era bd = {!!}
+sound (⊢ann ⊢e) era bd = {!!}
+sound (⊢lam₁ ⊢e) era bd = {!!}
+sound (⊢lam₂ ⊢e) (era-lam era) (▻I bd x) = {!sound ⊢e era ?!}
+sound (⊢app₁ ⊢e ⊢e₁) (era-app era era₁) bd = sound ⊢e era (▻C bd (sound ⊢e₁ era₁ ▻∞))
+sound (⊢app₂ ⊢e ⊢e₁) (era-app era era₁) bd = sound ⊢e era (▻I bd (sound ⊢e₁ era₁ ▻Z))
+sound (⊢sub ⊢e B≤A gc j≢Z) era bd = {!sound ⊢e era ▻Z !}
+sound (⊢tabs ⊢e) era bd = {!!}
+sound (⊢tapp ⊢e st) era bd = {!!}
