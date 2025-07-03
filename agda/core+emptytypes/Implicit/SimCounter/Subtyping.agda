@@ -62,7 +62,7 @@ data _⊨_#_≤_ : Env n m → SCounter → Type m → Type m → Set where
   s-var-∙ :
       (regΔ : SRegularS Δ)
     → (inΔ : Δ ∋∙ X)
-    → Δ ⊨ 𝕟 # ‶ X ≤ ‶ X
+    → Δ ⊨ ∞ # ‶ X ≤ ‶ X
   s-arr₁ :
       Δ ⊨ ∞ # C ≤ A
     → Δ ⊨ ∞ # B ≤ D

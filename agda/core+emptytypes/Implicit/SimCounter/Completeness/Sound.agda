@@ -100,14 +100,12 @@ sound (s-arr₁ s s₁) fr era-∞ = s-arr₁ (sound- s fr) (sound s₁ fr era-�
 sound (s-arr₂ s s₁) fr (era-𝕚 era) = s-arr₂ (sound- s fr) (sound s₁ fr era)
 sound (s-arr₃ cloA grd s) fr (era-𝕔 era) = s-arr₃ (free-⊢c-⊢t cloA fr) (sound s fr era)
 sound (s-∀ s) fr era-∞ = s-∀ (sound s (fr-S∙ fr) era-∞)
-sound (s-∀l s ic fd upj st regB) fr era
-  = {!!}
+sound (s-∀l s ic fd upj st regB) fr era = {!!}
   -- s-∀l (free-⊢t' regB fr) st (sound s fr era) (ic-sic ic era) (find-sfind fd (era-↑ty era upj)) ?
-sound (s-∀l-no-appear s ic fd upj st regB) fr era
-  = {!!}
+sound (s-∀l-no-appear s ic fd upj st regB) fr era = {!!}
   -- s-∀l-no-appear (free-⊢t' regB fr) st (sound s fr era) (ic-sic ic era) fd
 sound (s-tapp s upj) fr (era-𝕥 era) = s-tapp (sound s (fr-S∙= fr {!!}) (era-↑ty era upj))
 sound (s-svar-l x inΔ) fr era-∞ = s-var-∙ (free-sregulars' x fr) (free-∋∙' inΔ fr)
-sound (s-svar-𝕚 x s) fr era = s-var-∙ {!!} (free-∋∙' x fr)
-sound (s-svar-𝕔 x s) fr era = s-var-∙ {!!} (free-∋∙' x fr)
-sound (s-svar-𝕥 x s) fr era = s-var-∙ {!!} (free-∋∙' x fr)
+sound (s-svar-𝕚 x s) fr era = {!!}
+sound (s-svar-𝕔 x s) fr era = {!!}
+sound (s-svar-𝕥 x s) fr era = {!!}

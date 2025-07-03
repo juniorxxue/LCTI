@@ -72,15 +72,15 @@ data _⊢_#_⌞_⌝_↡_ : Env n m → Counter m → Type m → Polar → Type m
   s-svar-𝕚 :
       Δ ∋ X := C
     → Δ ⊢ (𝕚 j) # C ⌞ ≤⁺ ⌝ A `→ B ↡ D✦
-    → Δ ⊢ (𝕚 j) # ‶ X ⌞ ≤⁺ ⌝ A `→ B ↡ ‶ X
+    → Δ ⊢ (𝕚 j) # ‶ X ⌞ ≤⁺ ⌝ A `→ B ↡ D✦
   s-svar-𝕔 :
       Δ ∋ X := C
     → Δ ⊢ (𝕔 j) # C ⌞ ≤⁺ ⌝ A `→ B ↡ D✦
-    → Δ ⊢ (𝕔 j) # ‶ X ⌞ ≤⁺ ⌝ A `→ B ↡ ‶ X
+    → Δ ⊢ (𝕔 j) # ‶ X ⌞ ≤⁺ ⌝ A `→ B ↡ D✦
   s-svar-𝕥 :
       Δ ∋ X := B
     → Δ ⊢ (𝕥₍ A ₎ j) # B ⌞ ≤⁺ ⌝ `∀ C ↡ D✦
-    → Δ ⊢ (𝕥₍ A ₎ j) # ‶ X ⌞ ≤⁺ ⌝ `∀ C ↡ ‶ X
+    → Δ ⊢ (𝕥₍ A ₎ j) # ‶ X ⌞ ≤⁺ ⌝ `∀ C ↡ D✦
 
 {-
 data FunType (A : Type m) : Set where
@@ -119,6 +119,6 @@ sound-ela (s-∀l-no-appear s ic fd upj st regB) = ⟨ sound-ela s .proj₁ ,
 sound-ela (s-tapp s upj) = ⟨ `∀ sound-ela s .proj₁ , s-tapp (sound-ela s .proj₂) upj ⟩
 sound-ela (s-svar-l {X = X} x inΔ) = ⟨ ‶ X , s-svar-l x inΔ ⟩
 sound-ela (s-svar-r {X = X} x inΔ) = ⟨ ‶ X , s-svar-r x inΔ ⟩
-sound-ela (s-svar-𝕚 {X = X} x s) = ⟨ ‶ X , s-svar-𝕚 x (sound-ela s .proj₂) ⟩
-sound-ela (s-svar-𝕔 {X = X} x s) = ⟨ ‶ X , s-svar-𝕔 x (sound-ela s .proj₂) ⟩
-sound-ela (s-svar-𝕥 {X = X} x s) = ⟨ ‶ X , s-svar-𝕥 x (sound-ela s .proj₂) ⟩
+sound-ela (s-svar-𝕚 {X = X} x s) = ⟨ sound-ela s .proj₁ , s-svar-𝕚 x (sound-ela s .proj₂) ⟩
+sound-ela (s-svar-𝕔 {X = X} x s) = ⟨ sound-ela s .proj₁ , s-svar-𝕔 x (sound-ela s .proj₂) ⟩
+sound-ela (s-svar-𝕥 {X = X} x s) = ⟨ sound-ela s .proj₁ , s-svar-𝕥 x (sound-ela s .proj₂) ⟩
