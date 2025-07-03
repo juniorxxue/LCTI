@@ -21,7 +21,7 @@ data IFTerm : ℕ → Set where
 
 
 private variable
-  M N J K P : IFTerm n
+  M M' N N' J K P : IFTerm n
 
 infix 3 _⊢_⦂_
 data _⊢_⦂_ : Env n m → IFTerm n → Type m → Set where
@@ -123,29 +123,48 @@ sound-gen (⊢tabs ⊢e) era bd = {!!}
 sound-gen (⊢tapp ⊢e st) era bd = {!!}
 -}
 
-infix 3 _⊢_▻_↪_
-data _⊢_▻_↪_ : Env n m → IFTerm n → Counter m × Type m → IFTerm n × Type m → Set where
-  ▻Z : Γ ⊢ M ▻ ⟨ Z , A ⟩ ↪ ⟨ M , A ⟩
-  ▻∞ : Γ ⊢ M ▻ ⟨ ∞ , A ⟩ ↪ ⟨ M , A ⟩
-  ▻I : Γ ⊢ (M · N) ▻ ⟨ j , B ⟩ ↪ ⟨ J , C ⟩
-     → Γ ⊢ N ⦂ A
-     → Γ ⊢ M ▻ ⟨ 𝕚 j , A `→ B ⟩ ↪ ⟨ J , C ⟩
-  ▻C : Γ ⊢ (M · N) ▻ ⟨ j , B ⟩ ↪ ⟨ J , C ⟩
-     → Γ ⊢ N ⦂ A
-     → Γ ⊢ M ▻ ⟨ 𝕔 j , A `→ B ⟩ ↪ ⟨ J , C ⟩
+infix 3 _↑itm_⇘_
+data _↑itm_⇘_ : IFTerm n → Fin (1 + n) → IFTerm (1 + n) → Set where
+  ↑tm-lit : ∀ {num : ℕ}
+    → (lit num) ↑itm x ⇘ lit num
+  ↑tm-var :
+      (IFTerm n ∋⦂ (` x)) ↑itm y ⇘ ` (punchIn y x)
+  ↑tm-ƛ :
+      M ↑itm #S k ⇘ M'
+    → (ƛ M) ↑itm k ⇘ ƛ M'
+  ↑tm-app :
+      M ↑itm k ⇘ M'
+    → M ↑itm k ⇘ N'
+    → (M · N) ↑itm k ⇘ M' · N'
+
+infix 3 ↑itm0_⇘_
+↑itm0_⇘_ : IFTerm n → IFTerm (1 + n) → Set
+↑itm0_⇘_ M = _↑itm_⇘_ M #0
+
+{-
+data Eta : Counter m → IFTerm n → IFTerm n → Set where
+  Eta-z : Eta (Counter m ∋⦂ Z) M M
+  Eta-∞ : Eta (Counter m ∋⦂ ∞) M M
+  Eta-i : Eta j M N
+        → ↑itm0 N ⇘ N'
+        → Eta (𝕚 j) M (ƛ (N' · (` #0)))
+  Eta-c : Eta j M N
+        → ↑itm0 N ⇘ N'
+        → Eta (𝕔 j) M (ƛ (N' · (` #0)))
 
 
 sound : Γ ⊢ j # e ⦂ A
       → Erasure e M
-      → Γ ⊢ M ▻ ⟨ j , A ⟩ ↪ ⟨ N , B ⟩
-      → Γ ⊢ N ⦂ B
-sound (⊢lit regΓ) era bd = {!!}
-sound (⊢var regΓ x∈Γ) era bd = {!!}
-sound (⊢ann ⊢e) era bd = {!!}
-sound (⊢lam₁ ⊢e) era bd = {!!}
-sound (⊢lam₂ ⊢e) (era-lam era) (▻I bd x) = {!sound ⊢e era ?!}
-sound (⊢app₁ ⊢e ⊢e₁) (era-app era era₁) bd = sound ⊢e era (▻C bd (sound ⊢e₁ era₁ ▻∞))
-sound (⊢app₂ ⊢e ⊢e₁) (era-app era era₁) bd = sound ⊢e era (▻I bd (sound ⊢e₁ era₁ ▻Z))
-sound (⊢sub ⊢e B≤A gc j≢Z) era bd = {!sound ⊢e era ▻Z !}
-sound (⊢tabs ⊢e) era bd = {!!}
-sound (⊢tapp ⊢e st) era bd = {!!}
+      → Eta j M N
+      → Γ ⊢ N ⦂ A
+sound (⊢lit regΓ) era eta = {!!}
+sound (⊢var regΓ x∈Γ) era eta = {!!}
+sound (⊢ann ⊢e) era eta = {!!}
+sound (⊢lam₁ ⊢e) era eta = {!!}
+sound (⊢lam₂ ⊢e) (era-lam era) (Eta-i eta x) = {!!}
+sound (⊢app₁ ⊢e ⊢e₁) (era-app era era₁) eta = {!!}
+sound (⊢app₂ ⊢e ⊢e₁) era eta = {!!}
+sound (⊢sub ⊢e B≤A gc j≢Z) era eta = {!!}
+sound (⊢tabs ⊢e) era eta = {!!}
+sound (⊢tapp ⊢e st) era eta = {!!}
+-}
