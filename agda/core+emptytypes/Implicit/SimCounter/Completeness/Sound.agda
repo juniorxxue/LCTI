@@ -82,7 +82,27 @@ ic-sic : 𝕚𝕔 j
 ic-sic case-𝕚 (era-𝕚 era) = case-𝕚
 ic-sic case-𝕔 (era-𝕔 era) = case-𝕔
 
+data FunVar (A : Type m) : Set where
+  is-fun : ∀ {B C}
+         → A ≡ B `→ C
+         → FunVar A
 
+  is-var : ∀ {X}
+         → A ≡ ‶ X
+         → FunVar A
+
+s-fun : Δ ⊢ j # A* ⌞ ≤⁺ ⌝ C `→ D ↡ B✦
+      → FunVar B✦
+s-fun (s-refl regΔ cloA (grd-var= x)) = is-var refl
+s-fun (s-refl regΔ cloA (grd-arr grd grd₁)) = is-fun refl
+s-fun (s-arr₁ s s₁) = is-fun refl
+s-fun (s-arr₂ s s₁) = is-fun refl
+s-fun (s-arr₃ cloA grd s) = is-fun refl
+s-fun (s-∀l s ic fd upj st regB) = s-fun s
+s-fun (s-∀l-no-appear s ic fd upj st regB) = s-fun s
+s-fun (s-svar-l x inΔ) = is-var refl
+s-fun (s-svar-𝕚 x s) = is-var refl
+s-fun (s-svar-𝕔 x s) = is-var refl
 
 sound : Δ ⊢ j # A ⌞ ≤⁺ ⌝ B ↡ B✦
       → Free Γ Δ
@@ -102,10 +122,18 @@ sound (s-arr₃ cloA grd s) fr (era-𝕔 era) = s-arr₃ (free-⊢c-⊢t cloA fr
 sound (s-∀ s) fr era-∞ = s-∀ (sound s (fr-S∙ fr) era-∞)
 sound (s-∀l s ic fd upj st regB) fr era = {!!}
   -- s-∀l (free-⊢t' regB fr) st (sound s fr era) (ic-sic ic era) (find-sfind fd (era-↑ty era upj)) ?
-sound (s-∀l-no-appear s ic fd upj st regB) fr era = {!!}
+sound (s-∀l-no-appear s ic fd upj st regB) fr era with s-fun s
+... | is-fun refl = s-∀l-no-appear {!!} st (sound s fr era) {!!} fd
+... | is-var refl = s-∀l-no-appear-X {!!} st (sound s fr era) {!!} fd {!!}
   -- s-∀l-no-appear (free-⊢t' regB fr) st (sound s fr era) (ic-sic ic era) fd
 sound (s-tapp s upj) fr (era-𝕥 era) = s-tapp (sound s (fr-S∙= fr {!!}) (era-↑ty era upj))
 sound (s-svar-l x inΔ) fr era-∞ = s-var-∙ (free-sregulars' x fr) (free-∋∙' inΔ fr)
-sound (s-svar-𝕚 x s) fr era = {!!}
+sound (s-svar-𝕚 x s) fr era = s-var-∙ {!!} {!!}
 sound (s-svar-𝕔 x s) fr era = {!!}
 sound (s-svar-𝕥 x s) fr era = {!!}
+
+sound- (s-int regΔ) fr = s-int (free-sregulars' regΔ fr)
+sound- (s-var-∙ regΔ inΔ) fr = s-var-∙ (free-sregulars' regΔ fr) (free-∋∙-∋∙ inΔ fr)
+sound- (s-arr₁ s s₁) fr = s-arr₁ (sound s fr era-∞) (sound- s₁ fr)
+sound- (s-∀ s) fr = s-∀ (sound- s (fr-S∙ fr))
+sound- (s-svar-r x inΔ) fr = s-var-∙ (free-sregulars' x fr) (free-∋∙' inΔ fr)

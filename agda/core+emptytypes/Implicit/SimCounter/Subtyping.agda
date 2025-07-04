@@ -62,7 +62,7 @@ data _⊨_#_≤_ : Env n m → SCounter → Type m → Type m → Set where
   s-var-∙ :
       (regΔ : SRegularS Δ)
     → (inΔ : Δ ∋∙ X)
-    → Δ ⊨ ∞ # ‶ X ≤ ‶ X
+    → Δ ⊨ 𝕟 # ‶ X ≤ ‶ X
   s-arr₁ :
       Δ ⊨ ∞ # C ≤ A
     → Δ ⊨ ∞ # B ≤ D
@@ -92,6 +92,22 @@ data _⊨_#_≤_ : Env n m → SCounter → Type m → Type m → Set where
     → (ic : (S𝕚𝕔 𝕟))
     → (fd : #0 ¬ε A)
     → Γ ⊨ 𝕟 # `∀ A ≤ C `→ D
+  s-∀l-X :
+      (regB : Γ ⊢t B)
+    → (st : ⟦ B ⟧ A ⇘ A*)
+    → Γ ⊨ 𝕟 # A* ≤ ‶ X
+    → (ic : (S𝕚𝕔 𝕟))
+    → (fd : Sfind A #0 𝕟)
+    → (inΔ : Δ ∋∙ X)
+    → Γ ⊨ 𝕟 # `∀ A ≤ ‶ X
+  s-∀l-no-appear-X :
+      (regB : Γ ⊢t B)
+    → (st : ⟦ B ⟧ A ⇘ A*)
+    → Γ ⊨ 𝕟 # A* ≤ ‶ X
+    → (ic : (S𝕚𝕔 𝕟))
+    → (fd : #0 ¬ε A)
+    → (inΔ : Δ ∋∙ X)
+    → Γ ⊨ 𝕟 # `∀ A ≤ ‶ X
   s-tapp :
       Δ ,∙ ⊨ 𝕟 # A ≤ C
     → Δ ⊨ 𝕥 𝕟 # `∀ A ≤ `∀ C

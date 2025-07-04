@@ -20,6 +20,10 @@ data Bound : Env n m → SCounter × Type m → Counter m × Type m → Set wher
   bd-i : Bound Γ (⟨ 𝕟 , B ⟩) (⟨ j , C ⟩)
        → (grd : Γ ≫ A ⇘ A%)
        → Bound Γ (⟨ 𝕚 𝕟 , A `→ B ⟩) (⟨ 𝕚 j , A% `→ C ⟩)
+  bd-iX : (inΓ : Γ ∋ X := A)
+       → Bound Γ (⟨ 𝕚 𝕟 , ‶ X ⟩) (⟨ 𝕚 j , A ⟩)
+  bd-cX : (inΓ : Γ ∋ X := A)
+       → Bound Γ (⟨ 𝕔 𝕟 , ‶ X ⟩) (⟨ 𝕔 j , A ⟩)
   bd-t : Bound (Γ ,= T) (⟨ 𝕟 , A ⟩) (⟨ j' , B ⟩)
        → (upj : ↑tyʲ0 j ⇘ j')
        → (regT : Γ ⊢t T)
@@ -47,12 +51,14 @@ postulate
             → Γ' ⊢t A'
 
 
-bound-weaken= : Bound Γ (⟨ 𝕟 , A ⟩) (⟨ j , B ⟩)
+  bound-weaken= : Bound Γ (⟨ 𝕟 , A ⟩) (⟨ j , B ⟩)
                → Γ ▶ k ,= T ⇘ Γ'
                → j ↑tyʲ k ⇘ j'
                → A ↑ty k ⇘ A'
                → B ↑ty k  ⇘ B'
                → Bound Γ' (⟨ 𝕟 , A' ⟩) (⟨ j' , B' ⟩)
+
+{-
 bound-weaken= (bd-z grd) newΓ ↑tyʲ-Z upA upB = bd-z (≫-weaken= grd newΓ upA upB)
 bound-weaken= (bd-∞ grd) newΓ ↑tyʲ-∞ upA upB = bd-∞ (≫-weaken= grd newΓ upA upB)
 bound-weaken= (bd-c bd grd) newΓ (↑tyʲ-𝕔 upj) (↑ty-arr upA upA₁) (↑ty-arr upB upB₁)
@@ -63,6 +69,7 @@ bound-weaken= {k = k} {T = T} (bd-t bd upj₁ regT) newΓ (↑tyʲ-𝕥 {j' = j�
   with ⟨ T' , upT ⟩ ← ↑ty0-total T
   with ⟨ j₁' , upj₃ ⟩ ← ↑tyʲ0-total j₁
   = bd-t (bound-weaken= bd (▶S= newΓ upT upA₁) (↑tyʲ-comm0' upj upj₃ upj₁) upA upB) upj₃ (⊢t-weaken= regT newΓ upA₁)
+-}
 
 bound-weaken=0 : Bound Γ (⟨ 𝕟 , A ⟩) (⟨ j , B ⟩)
                → Γ ⊢r T
@@ -310,16 +317,19 @@ free-≫ regΓ (grd-var∙ x) fr (grd-var∙ x₁) = grd-var∙ x₁
 free-≫ regΓ (grd-arr grd1 grd3) fr (grd-arr grd2 grd4) = grd-arr (free-≫ regΓ grd1 fr grd2) (free-≫ regΓ grd3 fr grd4)
 free-≫ regΓ (grd-∀ grd1) fr (grd-∀ grd2) = grd-∀ (free-≫ (reg-S∙ regΓ) grd1 (fr-S∙ fr) grd2)
 
-
-sisoinf-isoinf : SIsoInf 𝕟
+postulate
+  sisoinf-isoinf : SIsoInf 𝕟
                → Bound Γ (⟨ 𝕟 , B ⟩) (⟨ j , C ⟩)
                → IsoInf j
+{-
 sisoinf-isoinf i∞-z (bd-i (bd-∞ grd₁) grd) = i∞-z
 sisoinf-isoinf (i∞-i iso) (bd-i bd grd) = i∞-i (sisoinf-isoinf iso bd)
+-}
 
-sfind-find : Sfind A k 𝕟
+  sfind-find : Sfind A k 𝕟
            → Bound Γ (⟨ 𝕟 , B ⟩) (⟨ j , C ⟩)
            → find A k j
+{-
 sfind-find (f-∞ x) (bd-∞ grd) = f-∞ x
 sfind-find (f-iso iso) (bd-i bd grd) = f-iso (sisoinf-isoinf iso (bd-i bd grd))
 sfind-find (f-arr-𝕚-l inA) (bd-i bd grd) = f-arr-𝕚-l inA
@@ -340,3 +350,4 @@ sfind-find (f-∀-𝕔 fd) (bd-c {B = B} {j = j} {C = C} {A = A} {A% = A%} bd gr
   with ⟨ A' , upA ⟩ ← ↑ty0-total A
   = f-∀-𝕔 (sfind-find fd (bound-weaken=0 (bd-c bd grd) ⊢r-int (↑tyʲ-𝕔 upj) (↑ty-arr upA upB) (↑ty-arr upA% upC))) upj
 sfind-find (f-𝕥 fd) (bd-t bd upj regT) = f-𝕥 (sfind-find fd bd) upj
+-}
