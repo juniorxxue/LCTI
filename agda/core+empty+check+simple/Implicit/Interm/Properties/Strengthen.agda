@@ -1,5 +1,3 @@
-{-# OPTIONS --allow-unsolved-metas #-}
-{-# OPTIONS --allow-incomplete-matches #-}
 module Implicit.Interm.Properties.Strengthen where
 
 open import Implicit.Language.All
@@ -40,6 +38,7 @@ t-strengthen, (⊢app₁ ⊢e ⊢e₁) newΓ (↑tm-app upe upe₁) = ⊢app₁ 
 t-strengthen, (⊢app₂ ⊢e ⊢e₁) newΓ (↑tm-app upe upe₁) = ⊢app₂ (t-strengthen, ⊢e newΓ upe) (t-strengthen, ⊢e₁ newΓ upe₁)
 t-strengthen, (⊢sub ⊢e B≤A gc j≢Z) newΓ upe = ⊢sub (t-strengthen, ⊢e newΓ upe) (s-strengthen, B≤A (◀S⋈ newΓ)) (↑tm-gc' gc upe) j≢Z
 t-strengthen, (⊢tabs ⊢e) newΓ (↑tm-Λ upe) = ⊢tabs (t-strengthen, ⊢e (◀S∙ newΓ) upe)
+t-strengthen, (⊢tabs-∞ ⊢e) newΓ (↑tm-Λ upe) = ⊢tabs-∞ (t-strengthen, ⊢e (◀S∙ newΓ) upe)
 t-strengthen, (⊢tapp ⊢e st) newΓ (↑tm-⓪ upe) = ⊢tapp (t-strengthen, ⊢e newΓ upe) st
 
 t-strengthen,0 : Γ , T ⊢ j # e' ⦂ A
@@ -130,6 +129,7 @@ t-strengthen= (⊢sub ⊢e B≤A gc j≢Z) newΓ upe upA upj
   with ⟨ preA , upp ⟩ ← ⊢r-◀=-↑ty-surjective r newΓ = ⊢sub (t-strengthen= ⊢e newΓ upe upp ↑tyʲ-Z) (s-strengthen= B≤A (◀S⋈ newΓ) upp upA upj)
                                                           (↑ty-gc' gc upe) (nonz-↑tyʲ' j≢Z upj)
 t-strengthen= (⊢tabs ⊢e) newΓ (↑tyᵉ-Λ upe) (↑ty-∀ upA) ↑tyʲ-Z = ⊢tabs (t-strengthen= ⊢e (◀S∙ newΓ) upe upA ↑tyʲ-Z)
+t-strengthen= (⊢tabs-∞ ⊢e) newΓ (↑tyᵉ-Λ upe) (↑ty-∀ upA) ↑tyʲ-∞ = ⊢tabs-∞ (t-strengthen= ⊢e (◀S∙ newΓ) upe upA ↑tyʲ-∞)
 t-strengthen= (⊢tapp ⊢e st) newΓ (↑tyᵉ-⓪ upe upA₁) upA upj
   with r ← t-⊢r ⊢e
   with ⟨ preA , ↑ty-∀ upp ⟩ ← ⊢r-◀=-↑ty-surjective r newΓ
@@ -218,6 +218,7 @@ t-strengthen^ (⊢sub ⊢e B≤A gc j≢Z) newΓ upe upA upj
   with ⟨ preA , upp ⟩ ← ⊢r-◀^-↑ty-surjective r newΓ = ⊢sub (t-strengthen^ ⊢e newΓ upe upp ↑tyʲ-Z) (s-strengthen^ B≤A (◀S⋈ newΓ) upp upA upj)
                                                           (↑ty-gc' gc upe) (nonz-↑tyʲ' j≢Z upj)
 t-strengthen^ (⊢tabs ⊢e) newΓ (↑tyᵉ-Λ upe) (↑ty-∀ upA) ↑tyʲ-Z = ⊢tabs (t-strengthen^ ⊢e (◀S∙ newΓ) upe upA ↑tyʲ-Z)
+t-strengthen^ (⊢tabs-∞ ⊢e) newΓ (↑tyᵉ-Λ upe) (↑ty-∀ upA) ↑tyʲ-∞ = ⊢tabs-∞ (t-strengthen^ ⊢e (◀S∙ newΓ) upe upA ↑tyʲ-∞)
 t-strengthen^ (⊢tapp ⊢e st) newΓ (↑tyᵉ-⓪ upe upA₁) upA upj
   with r ← t-⊢r ⊢e
   with ⟨ preA , ↑ty-∀ upp ⟩ ← ⊢r-◀^-↑ty-surjective r newΓ

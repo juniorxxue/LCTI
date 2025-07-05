@@ -24,8 +24,6 @@ tc-sound (⊢sub ⊢e ne gc s) = ⊢sub (tc-sound ⊢e) ne gc (sc-sound s)
 tc-sound (⊢tabs ⊢e) = ⊢tabs (tc-sound ⊢e)
 tc-sound {e = e ⓪ A} (⊢tapp s st) = ⊢tapp (tc-sound s) st
 tc-sound {e = Λ e} (⊢tabs-τ x) = ⊢tabs-τ (tc-sound x)
-tc-sound {e = Λ e} (⊢tabs-term x s) = ⊢tabs-term (tc-sound x) (sc-sound s)
-tc-sound {e = Λ e} (⊢tabs-tapp x s) = ⊢tabs-tapp (tc-sound x) (sc-sound s)
 
 sc-sound (s-empty regΓ cloA x) = s-empty regΓ cloA x
 sc-sound (s-type ss) = s-type ss

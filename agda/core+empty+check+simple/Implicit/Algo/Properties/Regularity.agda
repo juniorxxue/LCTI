@@ -24,8 +24,6 @@ t-env (⊢tabs ⊢e) with t-env ⊢e
 ... | reg-S∙ r = r
 t-env (⊢tabs-τ ⊢e) with t-env ⊢e
 ... | reg-S∙ r = r
-t-env (⊢tabs-term ⊢e s) = t-env ⊢e
-t-env (⊢tabs-tapp ⊢e s) = t-env ⊢e
 t-env (⊢tapp ⊢e st) = t-env ⊢e
 
 inst-env-in : [ A / X ] Γ ⟹ Δ
@@ -181,8 +179,6 @@ t-⊢rᶜ (⊢tapp ⊢e st) with t-⊢rᶜ ⊢e
 ... | ⊢rᶜ-tapp regA regΓ = regΓ
 t-⊢rᶜ (⊢tabs-τ ⊢e) with t-⊢rᶜ ⊢e
 ... | ⊢rᶜ-τ regA = ⊢rᶜ-τ (⊢r-∀ regA)
-t-⊢rᶜ (⊢tabs-term ⊢e s) = ⊢rᶜ-⋈ (s-⊢rᶜ s)
-t-⊢rᶜ (⊢tabs-tapp ⊢e s) = ⊢rᶜ-⋈ (s-⊢rᶜ s)
 
 s-⊢r : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
      → Γ ⊢r B
@@ -215,8 +211,6 @@ t-⊢r (⊢tabs ⊢e) = ⊢r-∀ (t-⊢r ⊢e)
 t-⊢r (⊢tapp ⊢e st) with t-⊢rᶜ ⊢e
 ... | ⊢rᶜ-tapp regA regΓ = st0-⊢r (t-⊢r ⊢e) regA st
 t-⊢r (⊢tabs-τ ⊢e) = ⊢r-∀ (t-⊢r ⊢e)
-t-⊢r (⊢tabs-term ⊢e s) = ⊢r-𝕣' (s-⊢r s)
-t-⊢r (⊢tabs-tapp ⊢e s) = ⊢r-𝕣' (s-⊢r s)
 
 infs-⊢r (infs-z regΓ regA) = regA
 infs-⊢r (infs-s x infs) = ⊢r-arr (t-⊢r x) (infs-⊢r infs)

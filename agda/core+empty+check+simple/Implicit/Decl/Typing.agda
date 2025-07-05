@@ -42,12 +42,13 @@ data _⊢_#_⦂_ : Env n m → Counter m → Term n m → Type m → Set where
   ⊢tabs :
       Γ ,∙ ⊢ Z # e ⦂ A
     → Γ ⊢ Z # Λ e ⦂ `∀ A
+  ⊢tabs-∞ :
+      Γ ,∙ ⊢ ∞ # e ⦂ A
+    → Γ ⊢ ∞ # Λ e ⦂ `∀ A
   ⊢tapp :
       Γ ⊢ 𝕥₍ A ₎ j # e ⦂ `∀ B
     → (st : ⟦ A ⟧ B ⇘ B*)
     → Γ ⊢ j # e ⓪ A ⦂ B*
-
-
 
 s-sregular : Γ ⊢ j # A ≤ B
            → SRegular Γ
@@ -76,6 +77,8 @@ t-tregular (⊢app₁ ⊢e ⊢e₁) = t-tregular ⊢e
 t-tregular (⊢app₂ ⊢e ⊢e₁) = t-tregular ⊢e
 t-tregular (⊢sub ⊢e B≤A gc j≢Z) = t-tregular ⊢e
 t-tregular (⊢tabs ⊢e) with t-tregular ⊢e
+... | reg-S∙ r = r
+t-tregular (⊢tabs-∞ ⊢e) with t-tregular ⊢e
 ... | reg-S∙ r = r
 t-tregular (⊢tapp ⊢e st) = t-tregular ⊢e
 
@@ -123,6 +126,7 @@ t-⊢rʲ (⊢app₂ ⊢e ⊢e₁) with t-⊢rʲ ⊢e
 ... | rj-𝕚 r = r
 t-⊢rʲ (⊢sub ⊢e B≤A gc j≢Z) = ⊢rʲ-⋈' (s-⊢rʲ B≤A)
 t-⊢rʲ (⊢tabs ⊢e) = rj-Z
+t-⊢rʲ (⊢tabs-∞ ⊢e) = rj-∞
 t-⊢rʲ (⊢tapp ⊢e st) with t-⊢rʲ ⊢e
 ... | rj-𝕥 r regA = r
 
@@ -141,6 +145,7 @@ t-⊢r (⊢app₂ ⊢e ⊢e₁) with t-⊢r ⊢e
 ... | ⊢r-arr r r₁ = r₁
 t-⊢r (⊢sub ⊢e B≤A gc j≢Z) = ⊢r-𝕣' (s1-⊢r-r B≤A)
 t-⊢r (⊢tabs ⊢e) = ⊢r-∀ (t-⊢r ⊢e)
+t-⊢r (⊢tabs-∞ ⊢e) = ⊢r-∀ (t-⊢r ⊢e)
 t-⊢r (⊢tapp ⊢e st) with t-⊢rʲ ⊢e
 ... | rj-𝕥 r regA = st0-⊢r (t-⊢r ⊢e) regA st
 

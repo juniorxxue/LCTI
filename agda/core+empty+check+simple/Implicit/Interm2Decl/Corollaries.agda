@@ -25,4 +25,5 @@ si→sd s regA = v2→v1 (sound-this s (⊢r-≫-eq regA) (⊢r-≫-eq (s+-polar
 ⊢sound (⊢app₂ ⊢e ⊢e₁) = ⊢app₂ (⊢sound ⊢e) (⊢sound ⊢e₁)
 ⊢sound (⊢sub ⊢e B≤A gc j≢Z) = ⊢sub (⊢sound ⊢e) (si→sd B≤A (⊢r-𝕣 (t-⊢r-that ⊢e))) gc j≢Z
 ⊢sound (⊢tabs ⊢e) = ⊢tabs (⊢sound ⊢e)
+⊢sound (⊢tabs-∞ ⊢e) = ⊢tabs-∞ (⊢sound ⊢e)
 ⊢sound (⊢tapp ⊢e st) = ⊢tapp (⊢sound ⊢e) st

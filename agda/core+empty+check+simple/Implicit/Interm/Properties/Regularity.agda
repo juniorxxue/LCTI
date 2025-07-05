@@ -1,5 +1,3 @@
-{-# OPTIONS --allow-unsolved-metas #-}
-{-# OPTIONS --allow-incomplete-matches #-}
 module Implicit.Interm.Properties.Regularity where
 
 open import Implicit.Language.All hiding (_⊢rʲ_)
@@ -40,6 +38,8 @@ t-tregular (⊢app₁ ⊢e ⊢e₁) = t-tregular ⊢e
 t-tregular (⊢app₂ ⊢e ⊢e₁) = t-tregular ⊢e
 t-tregular (⊢sub ⊢e B≤A x j≢Z) = t-tregular ⊢e
 t-tregular (⊢tabs ⊢e) with t-tregular ⊢e
+... | reg-S∙ r = r
+t-tregular (⊢tabs-∞ ⊢e) with t-tregular ⊢e
 ... | reg-S∙ r = r
 t-tregular {e = e ⓪ A} (⊢tapp ⊢e st) = t-tregular ⊢e
 
@@ -124,5 +124,6 @@ t-⊢rʲ (⊢app₂ ⊢e ⊢e₁) with t-⊢rʲ ⊢e
 ... | j-𝕚 r = r
 t-⊢rʲ (⊢sub ⊢e B≤A gc j≢Z) = ⊢r-⋈ (s-⊢rʲ B≤A)
 t-⊢rʲ (⊢tabs ⊢e) = j-Z
+t-⊢rʲ (⊢tabs-∞ ⊢e) = j-∞
 t-⊢rʲ (⊢tapp ⊢e st) with t-⊢rʲ ⊢e
 ... | j-𝕥 r x = r

@@ -1,5 +1,3 @@
-{-# OPTIONS --allow-unsolved-metas #-}
-{-# OPTIONS --allow-incomplete-matches #-}
 module Implicit.Interm.Properties.Extension where
 
 open import Implicit.Language.All
@@ -177,6 +175,7 @@ t-⊆-prv-gen (⊢app₁ ⊢e ⊢e₁) ext = ⊢app₁ (t-⊆-prv-gen ⊢e ext) 
 t-⊆-prv-gen (⊢app₂ ⊢e ⊢e₁) ext = ⊢app₂ (t-⊆-prv-gen ⊢e ext) (t-⊆-prv-gen ⊢e₁ ext)
 t-⊆-prv-gen (⊢sub ⊢e B≤A x j≢Z) ext = ⊢sub (t-⊆-prv-gen ⊢e ext) (s-⊆-prv-gen B≤A (mark ext)) x j≢Z
 t-⊆-prv-gen (⊢tabs ⊢e) ext = ⊢tabs (t-⊆-prv-gen ⊢e (uvar ext))
+t-⊆-prv-gen (⊢tabs-∞ ⊢e) ext = ⊢tabs-∞ (t-⊆-prv-gen ⊢e (uvar ext))
 t-⊆-prv-gen (⊢tapp ⊢e st) ext = ⊢tapp (t-⊆-prv-gen ⊢e ext) st
 
 ----------------------------------------------------------------------

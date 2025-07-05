@@ -20,4 +20,5 @@ open import Implicit.Decl2Interm.Main
 ⊢complete (⊢app₂ ⊢e ⊢e₁) = ⊢app₂ (⊢complete ⊢e) (⊢complete ⊢e₁)
 ⊢complete (⊢sub ⊢e B≤A gc j≢Z) = ⊢sub (⊢complete ⊢e) (complete+ (v1→v2 B≤A) (⊢r-≫-eq (⊢r-𝕣 (t-⊢r-this ⊢e)))) gc j≢Z
 ⊢complete (⊢tabs ⊢e) = ⊢tabs (⊢complete ⊢e)
+⊢complete (⊢tabs-∞ ⊢e) = ⊢tabs-∞ (⊢complete ⊢e)
 ⊢complete (⊢tapp ⊢e st) = ⊢tapp (⊢complete ⊢e) st

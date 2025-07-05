@@ -66,10 +66,6 @@ tc-complete (⊢tabs ⊢e) with tc-complete ⊢e
 ... | typs ~tZ ⊢e₁ = typs ~tZ (⊢tabs ⊢e₁)
 tc-complete (⊢tabs-τ ⊢e) with tc-complete ⊢e
 ... | typs ~t∞ ⊢e₁ = typs ~t∞ (⊢tabs-τ ⊢e₁)
-tc-complete (⊢tabs-term ⊢e s) with sc-complete s | tc-complete ⊢e
-... | subs j~Σ s₁ | typs ~tZ ⊢e₁ = typs (~s-~t j~Σ) (⊢tabs-term ⊢e₁ s₁)
-tc-complete (⊢tabs-tapp ⊢e s) with sc-complete s | tc-complete ⊢e
-... | subs j~Σ s₁ | typs ~tZ ⊢e₁ = typs (~s-~t j~Σ) (⊢tabs-tapp ⊢e₁ s₁)
 tc-complete (⊢tapp ⊢e st) with tc-complete ⊢e
 ... | typs (~tT j~Σ st₁) ⊢e₁
   with refl ← st-unique st st₁ = typs j~Σ (⊢tapp ⊢e₁ st)

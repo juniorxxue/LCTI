@@ -75,8 +75,6 @@ tc-~ (⊢sub ⊢e ne gc s) = ~s-~t (sc-~ s)
 tc-~ (⊢tabs ⊢e) = ~tZ
 tc-~ {e = Λ e} (⊢tabs-τ x) with tc-id0 x
 ... | refl = ~t∞
-tc-~ {e = Λ e} (⊢tabs-term x s) = ~s-~t (sc-~ s)
-tc-~ {e = Λ e} (⊢tabs-tapp x s) = ~s-~t (sc-~ s)
 tc-~ (⊢tapp ⊢e st) with tc-~ ⊢e
 ... | ~tT r st₁ with refl ← st-unique st st₁ = r
 
@@ -108,12 +106,10 @@ sound (⊢app ⊢e) with tc-~ ⊢e
 sound (⊢lam₁ ⊢e) = ⊢lam₁ (sound ⊢e)
 sound (⊢lam₂ ⊢e up-c ⊢e₁) = ⊢lam₂ (sound ⊢e₁)
 sound (⊢sub ⊢e ne gc s) with sc-~ s
-... | r = ⊢sub (sound ⊢e) (sound-s s) (agc-gc gc) (NonEmpty-NonZ ne (~s-~t r))
+... | r = ⊢sub (sound ⊢e) (sound-s s) gc (NonEmpty-NonZ ne (~s-~t r))
 sound (⊢tabs ⊢e) = ⊢tabs (sound ⊢e)
 sound (⊢tapp ⊢e st) = ⊢tapp (sound ⊢e) st
 sound {e = Λ e} (⊢tabs-τ x) = ⊢tabs-∞ (sound x)
-sound {e = Λ e} (⊢tabs-term x s) = ⊢sub (sound x) (sound-s s) gc-tlam (s-nonempty-case1 s)
-sound {e = Λ e} (⊢tabs-tapp x s) = ⊢sub (sound x) (sound-s s) gc-tlam (s-nonempty-case2 s)
 
 sound-s (s-empty regΓ cloA x) = s-refl regΓ cloA x
 sound-s (s-type ss) = sound-ss ss
