@@ -426,10 +426,10 @@ main = do
       exA10 = infer (ETrm polyTyp (ETrm idTyp EEmpty)) CEmpty $ Var 0 `App` Var 1
       -- A11: poly (\x. x) Ann~> poly (/\a. \x. x : a -> a)
       exA11 = infer (ETrm polyTyp EEmpty) CEmpty $ Var 0 `App` Abs (Var 0)
-      exA11Ann = infer (ETrm polyTyp EEmpty) CEmpty $ Var 0 `App` idTrm
-      -- A12: id poly (\x. x)
+      exA11Ann = infer (ETrm polyTyp EEmpty) CEmpty $ Var 0 `App` TAbs (Abs (Var 0))
+      -- A12: id poly (\x. x) Ann~> id poly (/\a. \x. x)
       exA12 = infer (ETrm idTyp (ETrm polyTyp EEmpty)) CEmpty $ Var 0 `App` Var 1 `App` Abs (Var 0)
-      exA12Ann = infer (ETrm idTyp (ETrm polyTyp EEmpty)) CEmpty $ Var 0 `App` Var 1 `App` idTrm
+      exA12Ann = infer (ETrm idTyp (ETrm polyTyp EEmpty)) CEmpty $ Var 0 `App` Var 1 `App` TAbs (Abs (Var 0))
       -- B1: \f. (f 1, f True) Ann~> \f. (f 1, f True) : (forall a. a -> a) -> Int × Bool
       exB1 = infer EEmpty CEmpty $ Abs (Pair `App` (Var 0 `App` LitInt 1) `App` (Var 0 `App` LitBool True))
       exB1Ann = infer EEmpty CEmpty $ Abs (Pair `App` (Var 0 `App` LitInt 1) `App` (Var 0 `App` LitBool True)) `Ann` (idTyp `TArr` TProd TInt TBool)
@@ -486,9 +486,9 @@ main = do
       -- E2: k (\x. h x) lst Ann~> k (/\a. \x. h x : Int -> a -> a) lst
       exE2 = infer (ETrm kTyp (ETrm hTyp (ETrm lstTyp EEmpty))) CEmpty $ Var 0 `App` Abs (Var 2 `App` Var 0) `App` Var 2
       exE2Ann = infer (ETrm kTyp (ETrm hTyp (ETrm lstTyp EEmpty))) CEmpty $ Var 0 `App` TAbs (Abs ((Var 2 `App` Var 0) `TApp` TVar 0) `Ann` TArr TInt (TArr (TVar 0) (TVar 0))) `App` Var 2
-      -- E3: r (\x. \y. y) Ann~> r (/\ a. (\x. /\ b. (\y. y : b -> b)) : a -> forall b. b -> b)
+      -- E3: r (\x. \y. y) Ann~> r (/\ a. (\x. /\ b. \y. y) : a -> forall b. b -> b)
       exE3 = infer (ETrm rTyp EEmpty) CEmpty $ Var 0 `App` Abs (Abs (Var 0))
-      exE3Ann = infer (ETrm rTyp EEmpty) CEmpty $ Var 0 `App` TAbs (Abs (TAbs (Abs (Var 0) `Ann`TArr (TVar 0) (TVar 0))) `Ann` TArr (TVar 0) idTyp)
+      exE3Ann = infer (ETrm rTyp EEmpty) CEmpty $ Var 0 `App` TAbs (Abs (TAbs (Abs (Var 0))) `Ann` TArr (TVar 0) idTyp)
 
       -- FreezeML paper additions
       -- F5: auto id
@@ -502,63 +502,65 @@ main = do
 
       -- Spine-local type inference
       exPair = infer EEmpty CEmpty $ (Pair `App` Abs (Var 0) `App` LitInt 1) `Ann` ((TInt `TArr` TInt) `TProd` TInt)
+      exPairAnn = infer EEmpty CEmpty $ (Pair `App` (Abs (Var 0) `Ann` TArr TInt TInt) `App` LitInt 1) `Ann` ((TInt `TArr` TInt) `TProd` TInt)
 
   forM_
     [ exA1,
       exA1Ann,
-      exA2
-      -- exA3,
-      -- exA3Ann,
-      -- exA4,
-      -- exA4Ann,
-      -- exA5,
-      -- exA6,
-      -- exA7,
-      -- exA7Ann,
-      -- exA8,
-      -- exA8Ann,
-      -- exA8Ann',
-      -- exA9,
-      -- exA10,
-      -- exA11,
-      -- exA11Ann,
-      -- exA12,
-      -- exA12Ann,
-      -- exB1,
-      -- exB1Ann,
-      -- exB2,
-      -- exB2Ann,
-      -- exC1,
-      -- exC2,
-      -- exC3,
-      -- exC4,
-      -- exC5,
-      -- exC6,
-      -- exC6Ann,
-      -- exC7,
-      -- exC7Ann,
-      -- exC8,
-      -- exC9,
-      -- exC10,
-      -- exC10Ann,
-      -- exD1,
-      -- exD2,
-      -- exD3,
-      -- exD4,
-      -- exD4Ann,
-      -- exD5,
-      -- exD5Ann,
-      -- exD5Ann',
-      -- exE1,
-      -- exE2,
-      -- exE2Ann,
-      -- exE3,
-      -- exE3Ann,
-      -- exF5,
-      -- exF6,
-      -- exF7,
-      -- exF8,
-      -- exPair
+      exA2,
+      exA3,
+      exA3Ann,
+      exA4,
+      exA4Ann,
+      exA5,
+      exA6,
+      exA7,
+      exA7Ann,
+      exA8,
+      exA8Ann,
+      exA8Ann',
+      exA9,
+      exA10,
+      exA11,
+      exA11Ann,
+      exA12,
+      exA12Ann,
+      exB1,
+      exB1Ann,
+      exB2,
+      exB2Ann,
+      exC1,
+      exC2,
+      exC3,
+      exC4,
+      exC5,
+      exC6,
+      exC6Ann,
+      exC7,
+      exC7Ann,
+      exC8,
+      exC9,
+      exC10,
+      exC10Ann,
+      exD1,
+      exD2,
+      exD3,
+      exD4,
+      exD4Ann,
+      exD5,
+      exD5Ann,
+      exD5Ann',
+      exE1,
+      exE2,
+      exE2Ann,
+      exE3,
+      exE3Ann,
+      exF5,
+      exF6,
+      exF7,
+      exF8,
+      exPair,
+      exPairAnn
     ]
     $ \ex -> case runWriterT ex of
       Just (tyA, logs) -> do
