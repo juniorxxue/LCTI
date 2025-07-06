@@ -2,7 +2,7 @@ module Implicit.Annotatability.IF where
 
 open import Implicit.Language.All
 -- open import Implicit.Decl.All
-open import Implicit.Decl.Typing
+open import Implicit.Annotatability.DeclPartial
 open import Implicit.Decl.Subtyping
 open import Implicit.Annotatability.Elaboration
 
@@ -184,18 +184,21 @@ annotatability (ela-lit reg) = ⊢sub (⊢lit reg) (s-int (reg-Z reg)) gc-i nz-�
 annotatability (ela-var reg x) = ⊢sub (⊢var reg x) (s-refl-∞ (reg-Z reg) (⊢r-𝕣 (∋⦂-⊢r reg x))) gc-var nz-∞
 annotatability (ela-lam ⊢e) = ⊢lam₁ (annotatability ⊢e)
 annotatability (ela-app ⊢e cv ⊢e₁) = ⊢app₂ (conv-sub (annotatability ⊢e) cv) (⊢ann (annotatability ⊢e₁))
+annotatability (ela-app-g ⊢e cv (ela-lit regΓ) gc-i) = ⊢app₂ (conv-sub (annotatability ⊢e) cv) (⊢lit regΓ)
+annotatability (ela-app-g ⊢e cv (ela-∀i ⊢e₁ upe) gc-i) =
+  ⊢app₂ (conv-sub (annotatability ⊢e) cv) (⊢tabs (⊢ann (annotatability ⊢e₁)))
+annotatability (ela-app-g ⊢e cv (ela-var regΓ x) gc-var)
+  = ⊢app₂ (conv-sub (annotatability ⊢e) cv) (⊢var regΓ x)
+annotatability (ela-app-g ⊢e cv (ela-∀i ⊢e₁ upe) gc-var)
+  = ⊢app₂ (conv-sub (annotatability ⊢e) cv) (⊢tabs (⊢ann (annotatability ⊢e₁)))
+annotatability (ela-app-g ⊢e cv (ela-∀i ⊢e₁ upe) gc-ann)
+  = ⊢app₂ (conv-sub (annotatability ⊢e) cv) (⊢tabs (⊢ann (annotatability ⊢e₁)))
+annotatability (ela-app-g ⊢e cv (ela-∀i ⊢e₁ upe) gc-tlam)
+  = ⊢app₂ (conv-sub (annotatability ⊢e) cv) (⊢tabs (⊢ann (annotatability ⊢e₁)))
 annotatability (ela-∀i ⊢e upe) = ⊢sub (⊢tabs (⊢ann (annotatability ⊢e)))
   (s-refl-∞ (reg-Z (ela-tregular (ela-∀i ⊢e upe))) (⊢r-𝕣 (⊢r-∀ (ela-⊢r ⊢e)))) gc-tlam nz-∞
-annotatability (ela-∀e ⊢e x regB) with annotatability ⊢e
-... | ih = ⊢tapp {!!} x
 
 
-test : Γ ⊢ j # e ⦂ `∀ A
-     → Γ ⊢ 𝕥₍ B ₎ j # e ⦂ `∀ A
-test (⊢var regΓ x∈Γ) = {!!}
-test (⊢ann ⊢e) = ⊢sub (⊢ann ⊢e) {!!} gc-ann nz-T
-test (⊢app₁ ⊢e ⊢e₁) = ⊢app₁ {!!} ⊢e₁
-test (⊢app₂ ⊢e ⊢e₁) = ⊢app₂ {!!} ⊢e₁
-test (⊢sub ⊢e B≤A gc j≢Z) = {!!}
-test (⊢tabs ⊢e) = {!!}
-test (⊢tapp ⊢e st) = ⊢tapp {!!} st
+annotatability' : Γ ⊢ e ⦂ A ⟶ e'
+                → Γ ⊢ Z # (e' ⦂ A) ⦂ A
+annotatability' ⊢e = ⊢ann (annotatability ⊢e)
