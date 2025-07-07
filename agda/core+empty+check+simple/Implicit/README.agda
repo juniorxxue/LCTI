@@ -11,7 +11,7 @@ import Implicit.Algo2Interm.Main
 open import Implicit.Algo2Interm.Corollaries renaming (sound0 to a→i0; sound∞ to a→i∞)
 
 -- (interm. <----> algo.) soundness
-import Implicit.Interm2Algo.Main2
+import Implicit.Interm2Algo.Main
 open import Implicit.Interm2Algo.Corollaries renaming (complete-0 to i→a0; complete-∞ to i→a∞)
 
 -- (decl. <----> interm.) completeness

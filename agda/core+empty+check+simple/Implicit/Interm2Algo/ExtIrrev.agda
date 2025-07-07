@@ -2,8 +2,6 @@ module Implicit.Interm2Algo.ExtIrrev where
 
 open import Implicit.Language.All
 
-open import Implicit.AuxLemmas
-
 infix 3 _⊆_w/t_w/c_
 data _⊆_w/t_w/c_ : Env n m → Env n m → Type m → Counter m → Set where
   ⊆Z : (regΓ : SRegular Γ)

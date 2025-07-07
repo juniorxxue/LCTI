@@ -1,7 +1,6 @@
 module Implicit.Decl.Trans where
 
 open import Implicit.Language.All
-open import Implicit.AuxLemmas
 open import Implicit.Decl.Subtyping
 
 

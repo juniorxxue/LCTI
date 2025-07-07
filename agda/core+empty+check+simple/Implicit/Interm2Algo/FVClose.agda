@@ -1,7 +1,6 @@
 module Implicit.Interm2Algo.FVClose where
 
 open import Implicit.Language.All
-open import Implicit.AuxLemmas
 
 data HClosed : Env n m → HitMis m → Set where
   hclo-Z : HClosed ∅ ∅

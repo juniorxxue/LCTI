@@ -11,8 +11,7 @@ open import Implicit.Interm2Algo.ExtIrrev
 open import Implicit.Interm2Algo.EnvDiff
 open import Implicit.Interm2Algo.OpenClose
 open import Implicit.Interm2Algo.Find
-open import Implicit.Interm2Algo.AuxLemmas
-open import Implicit.Interm2Algo.Main2
+open import Implicit.Interm2Algo.Main
 
 nonempty : NonZ j
          → Γ ⊢ ⟨ j , A ⟩ ~t Σ

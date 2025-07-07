@@ -3,6 +3,8 @@ module Implicit.Language.All where
 open import Implicit.Language.Prelude public
 open import Implicit.Language.Base public
 
+open import Implicit.Language.Bitmap public
+
 open import Implicit.Language.Shift.All public
 open import Implicit.Language.Subst.All public
 

@@ -256,3 +256,34 @@ reg-⊆/ senv (⊢r-∀ regA) = ext-∀ (reg-⊆/ (reg-S∙ senv) regA)
 ⊆-sregular' (evar-sol ext regA) = reg-S= (⊆-sregular' ext) regA
 ⊆-sregular' (svar ext regA) = reg-S= (⊆-sregular' ext) (⊆-⊢r regA ext)
 ⊆-sregular' (mark regΓ) = reg-Z regΓ
+
+
+
+-- could be proved via a inst-total
+-- however, the total requires a condition: B is shifted k times, which is a tricky to define in well-scoped settings: finite nubmers
+inst-exist : [ B / k ] Δ =⟹ Δ'
+           → Ω ⊆ Δ
+           → Ω ∋= k
+           → ∃[ Ω' ]( [ B / k ] Ω =⟹ Ω')
+inst-exist (=⟹=0  {A = A} up regA' regΓ) (svar {Γ = Γ} ext regA) Z = ⟨ Γ ,= A , =⟹=0 up (⊆-⊢r' regA' ext) (⊆-regular' regΓ ext) ⟩
+inst-exist (=⟹^S inst up1) (evar ext) (S^ inΩ) = ⟨ inst-exist inst ext inΩ .proj₁ ,^ ,
+                                                  =⟹^S (inst-exist inst ext inΩ .proj₂) up1 ⟩
+inst-exist (=⟹∙S inst up1) (uvar ext) (S∙ inΩ) = ⟨ inst-exist inst ext inΩ .proj₁ ,∙ ,
+                                                  =⟹∙S (inst-exist inst ext inΩ .proj₂) up1 ⟩
+inst-exist (=⟹=S inst up1 regB) (evar-sol ext regA) (S^ inΩ) = ⟨ inst-exist inst ext inΩ .proj₁ ,^ ,
+                                                           =⟹^S (inst-exist inst ext inΩ .proj₂) up1 ⟩
+inst-exist (=⟹=S inst up1 regB) (svar {A = A} ext regA) (S= inΩ) = ⟨ inst-exist inst ext inΩ .proj₁ ,= A ,
+                                                       =⟹=S (inst-exist inst ext inΩ .proj₂) up1 regA ⟩
+
+inst-exist' : [ B / k ] Γ =⟹ Γ'
+            → Γ ⊆ Ω
+            → ∃[ Ω' ]( [ B / k ] Ω =⟹ Ω')
+inst-exist' (=⟹=0 {A = A} up regA' reΓ) (svar {Δ = Δ} ext regA) = ⟨ Δ ,= A , =⟹=0 up (⊆-⊢r regA' ext) (⊆-regular reΓ ext) ⟩
+inst-exist' (=⟹^S inst up1) (evar ext) = ⟨ inst-exist' inst ext .proj₁ ,^ ,
+                                          =⟹^S (inst-exist' inst ext .proj₂) up1 ⟩
+inst-exist' (=⟹^S inst up1) (evar-sol {A = A} ext regA) = ⟨ inst-exist' inst ext .proj₁ ,= A ,
+                                                   =⟹=S (inst-exist' inst ext .proj₂) up1 regA ⟩
+inst-exist' (=⟹∙S inst up1) (uvar ext) = ⟨ inst-exist' inst ext .proj₁ ,∙ ,
+                                          =⟹∙S (inst-exist' inst ext .proj₂) up1 ⟩
+inst-exist' (=⟹=S inst up1 regB) (svar {A = A} ext regA) = ⟨ inst-exist' inst ext .proj₁ ,= A ,
+                                               =⟹=S (inst-exist' inst ext .proj₂) up1 (⊆-⊢r regB ext) ⟩
