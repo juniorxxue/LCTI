@@ -129,3 +129,20 @@ st0-⊢r' : Γ ⊢r B*
        → ⟦ A ⟧ B ⇘ B*
        → Γ ⊢r `∀ B
 st0-⊢r' regB* regA stB = ⊢r-∀ (st-⊢r' regB* ◀Z regA stB)
+
+
+
+
+st-⊢r'' : Γ ⊢r A*
+       → Γ ▶ k ,∙⇘ Γ'
+       → Γ ⊢r T
+       → ⟦ k / T ⟧ A ⇘ A*
+       → Γ' ⊢r A
+st-⊢r'' ⊢r-int new regT st-int = ⊢r-int
+st-⊢r'' ⊢r-int new regT (st-var stx-eq) = ⊢r-var-∙ (▶∙-∋∙ new)
+st-⊢r'' (⊢r-var-∙ inΓ) new regT (st-var stx-eq) = ⊢r-var-∙ (▶∙-∋∙ new)
+st-⊢r'' (⊢r-var-∙ inΓ) new regT (st-var (stx-neq ¬p)) = ⊢r-var-∙ (▶∙-punchOut ¬p inΓ new)
+st-⊢r'' (⊢r-arr regA regA₁) new regT (st-var stx-eq) = st-⊢r'' regA₁ new regA₁ (st-var stx-eq)
+st-⊢r'' (⊢r-arr regA regA₁) new regT (st-arr st st₁) = ⊢r-arr (st-⊢r'' regA new regT st) (st-⊢r'' regA₁ new regT st₁)
+st-⊢r'' (⊢r-∀ regA) new regT (st-var stx-eq) = ⊢r-var-∙ (▶∙-∋∙ new)
+st-⊢r'' (⊢r-∀ regA) new regT (st-∀ up st) = ⊢r-∀ (st-⊢r'' regA (▶S∙ new) (⊢r-weaken∙0 regT up) st)

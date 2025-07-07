@@ -1,8 +1,8 @@
 module Implicit.Interm2Decl.AuxLemmas where
 
 open import Implicit.Language.All
-open import Implicit.Decl.All renaming (_⊢_#_≤_ to _⊢d_#_≤_)
-open import Implicit.Interm.All renaming (_⊢_#_⌞_⌝_ to _⊢i_#_⌞_⌝_)
+open import Implicit.Decl.All
+open import Implicit.Interm.All
 
 
 ≫-same : Γ ≫ A ⇘ A₁

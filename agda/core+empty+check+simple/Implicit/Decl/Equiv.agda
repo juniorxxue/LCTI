@@ -1,47 +1,9 @@
 module Implicit.Decl.Equiv where
 
 open import Implicit.Language.All
-open import Implicit.Decl.Subtyping renaming (_⊢_#_≤_ to _⊢¹_#_≤_)
-open import Implicit.Decl.SubtypingV2 renaming (_⊢_#_≤_ to _⊢²_#_≤_)
+open import Implicit.Decl.Subtyping
+open import Implicit.Decl.SubtypingV2
 
-▶∙-punchOut-helper : Γ ∋∙ X
-                   → Γ ▶ #0 ,∙⇘ Γ'
-                   → Γ' ∋∙ #S X
-▶∙-punchOut-helper inΓ ▶Z = S∙ inΓ
-▶∙-punchOut-helper (S, inΓ) (▶S, new x) = S, (▶∙-punchOut-helper inΓ new)
-▶∙-punchOut-helper (S⋈ inΓ) (▶S⋈ new) = S⋈ (▶∙-punchOut-helper inΓ new)
-
-▶∙-punchOut : (¬p : k ≢ X)
-            → Γ ∋∙ punchOut ¬p
-            → Γ ▶ k ,∙⇘ Γ'
-            → Γ' ∋∙ X
-▶∙-punchOut {k = #0} {X = #0} ¬p inΓ new = ⊥-elim (¬p refl)
-▶∙-punchOut {k = #0} {X = #S X} ¬p inΓ ▶Z = S∙ inΓ
-▶∙-punchOut {k = #0} {X = #S X} ¬p (S, inΓ) (▶S, new x) = S, (▶∙-punchOut-helper inΓ new)
-▶∙-punchOut {k = #0} {X = #S X} ¬p (S⋈ inΓ) (▶S⋈ new) = S⋈ (▶∙-punchOut-helper inΓ new)
-▶∙-punchOut {k = #S k} {X = #0} ¬p (S, inΓ) (▶S, new x) = S, (▶∙-punchOut ¬p inΓ new)
-▶∙-punchOut {k = #S k} {X = #0} ¬p inΓ (▶S∙ new) = Z
-▶∙-punchOut {k = #S k} {X = #0} ¬p (S⋈ inΓ) (▶S⋈ new) = S⋈ (▶∙-punchOut ¬p inΓ new)
-▶∙-punchOut {k = #S k} {X = #S X} ¬p (S, inΓ) (▶S, new x) = S, (▶∙-punchOut ¬p inΓ new)
-▶∙-punchOut {k = #S k} {X = #S X} ¬p (S^ inΓ) (▶S^ new) = S^ (▶∙-punchOut (λ x → ¬p (cong #S x)) inΓ new)
-▶∙-punchOut {k = #S k} {X = #S X} ¬p (S∙ inΓ) (▶S∙ new) = S∙ (▶∙-punchOut (λ x → ¬p (cong #S x)) inΓ new)
-▶∙-punchOut {k = #S k} {X = #S X} ¬p (S= inΓ) (▶S= new x) = S= (▶∙-punchOut (λ x₁ → ¬p (cong #S x₁)) inΓ new)
-▶∙-punchOut {k = #S k} {X = #S X} ¬p (S⋈ inΓ) (▶S⋈ new) = S⋈ (▶∙-punchOut ¬p inΓ new)
-
-
-st-⊢r'' : Γ ⊢r A*
-       → Γ ▶ k ,∙⇘ Γ'
-       → Γ ⊢r T
-       → ⟦ k / T ⟧ A ⇘ A*
-       → Γ' ⊢r A
-st-⊢r'' ⊢r-int new regT st-int = ⊢r-int
-st-⊢r'' ⊢r-int new regT (st-var stx-eq) = ⊢r-var-∙ (▶∙-∋∙ new)
-st-⊢r'' (⊢r-var-∙ inΓ) new regT (st-var stx-eq) = ⊢r-var-∙ (▶∙-∋∙ new)
-st-⊢r'' (⊢r-var-∙ inΓ) new regT (st-var (stx-neq ¬p)) = ⊢r-var-∙ (▶∙-punchOut ¬p inΓ new)
-st-⊢r'' (⊢r-arr regA regA₁) new regT (st-var stx-eq) = st-⊢r'' regA₁ new regA₁ (st-var stx-eq)
-st-⊢r'' (⊢r-arr regA regA₁) new regT (st-arr st st₁) = ⊢r-arr (st-⊢r'' regA new regT st) (st-⊢r'' regA₁ new regT st₁)
-st-⊢r'' (⊢r-∀ regA) new regT (st-var stx-eq) = ⊢r-var-∙ (▶∙-∋∙ new)
-st-⊢r'' (⊢r-∀ regA) new regT (st-∀ up st) = ⊢r-∀ (st-⊢r'' regA (▶S∙ new) (⊢r-weaken∙0 regT up) st)
 
 
 infix 3 _▶'_,=_⇘_
@@ -159,56 +121,56 @@ st-↑ty-≫0 : ⟦ B ⟧ A ⇘ A*
           → Γ ,= B ≫ A ⇘ A*'
 st-↑ty-≫0 st regA upA* regB = st-↑ty-≫ st upA* regA (▶'Z regB)
 
-sound : Γ ⊢¹ j # A ≤ B
-      → Γ ⊢² j # A ≤ B
-sound (s-refl regΔ cloA) = s-refl regΔ cloA
-sound (s-int regΔ) = s-int regΔ
-sound (s-var-∙ regΔ inΔ) = s-var-∙ regΔ inΔ
-sound (s-arr₁ s s₁) = s-arr₁ (sound s) (sound s₁)
-sound (s-arr₂ s s₁) = s-arr₂ (sound s) (sound s₁)
-sound (s-arr₃ regA s) = s-arr₃ regA (sound s)
-sound (s-∀ s) = s-∀ (sound s)
-sound (s-∀l {B = B} {A* = A*} {C = C} {D = D} regB st s ic fd upj)
+⊢d→⊢d² : Γ ⊢d j # A ≤ B
+      → Γ ⊢d² j # A ≤ B
+⊢d→⊢d² (s-refl regΔ cloA) = s-refl regΔ cloA
+⊢d→⊢d² (s-int regΔ) = s-int regΔ
+⊢d→⊢d² (s-var-∙ regΔ inΔ) = s-var-∙ regΔ inΔ
+⊢d→⊢d² (s-arr₁ s s₁) = s-arr₁ (⊢d→⊢d² s) (⊢d→⊢d² s₁)
+⊢d→⊢d² (s-arr₂ s s₁) = s-arr₂ (⊢d→⊢d² s) (⊢d→⊢d² s₁)
+⊢d→⊢d² (s-arr₃ regA s) = s-arr₃ regA (⊢d→⊢d² s)
+⊢d→⊢d² (s-∀ s) = s-∀ (⊢d→⊢d² s)
+⊢d→⊢d² (s-∀l {B = B} {A* = A*} {C = C} {D = D} regB st s ic fd upj)
   with ⟨ C' , upC ⟩ ← ↑ty0-total C
   with ⟨ D' , upD ⟩ ← ↑ty0-total D
   with ⟨ A*' , upA* ⟩ ← ↑ty0-total A*
   with regA* ← s1-⊢r-l s
   with regA ← st-⊢r'' regA* ▶Z regB st
-  = s-∀l {B = B} {A% = A*'} (st-↑ty-≫0 st regA* upA* regB) regA (s2-weaken=0 (sound s) upA* (↑ty-arr upC upD) upj regB) ic fd upC upD upj
-sound (s-∀l-no-appear {B = B} {A* = A*} {j = j} {C = C} {D = D} regB st s ic fd)
+  = s-∀l {B = B} {A% = A*'} (st-↑ty-≫0 st regA* upA* regB) regA (s2-weaken=0 (⊢d→⊢d² s) upA* (↑ty-arr upC upD) upj regB) ic fd upC upD upj
+⊢d→⊢d² (s-∀l-no-appear {B = B} {A* = A*} {j = j} {C = C} {D = D} regB st s ic fd)
   with ⟨ C' , upC ⟩ ← ↑ty0-total C
   with ⟨ D' , upD ⟩ ← ↑ty0-total D
   with ⟨ A*' , upA* ⟩ ← ↑ty0-total A*
   with ⟨ j' , upj ⟩ ← ↑tyʲ0-total j
   with regA* ← s1-⊢r-l s
   with regA ← st-⊢r'' regA* ▶Z regB st
-  = s-∀l-no-appear (≫-weaken^ {k = #0} (⊢r-≫-eq regA*) ▶Z (st-↑ty fd st) upA*) regA (s2-weaken^0 (sound s) upA* (↑ty-arr upC upD) upj) ic fd upC upD upj
-sound (s-tapp {A* = A*} {j = j} regB st s upC)
+  = s-∀l-no-appear (≫-weaken^ {k = #0} (⊢r-≫-eq regA*) ▶Z (st-↑ty fd st) upA*) regA (s2-weaken^0 (⊢d→⊢d² s) upA* (↑ty-arr upC upD) upj) ic fd upC upD upj
+⊢d→⊢d² (s-tapp {A* = A*} {j = j} regB st s upC)
   with ⟨ A*' , upA* ⟩ ← ↑ty0-total A*
   with ⟨ j' , upj ⟩ ← ↑tyʲ0-total j
-  = s-tapp (st-↑ty-≫0 st (s1-⊢r-l s) upA* regB) (st-⊢r'' (s1-⊢r-l s) ▶Z regB st) (s2-weaken=0 (sound s) upA* upC upj regB) upj
+  = s-tapp (st-↑ty-≫0 st (s1-⊢r-l s) upA* regB) (st-⊢r'' (s1-⊢r-l s) ▶Z regB st) (s2-weaken=0 (⊢d→⊢d² s) upA* upC upj regB) upj
 
-complete : Γ ⊢² j # A ≤ B
-         → Γ ⊢¹ j # A ≤ B
-complete (s-refl regΔ cloA) = s-refl regΔ cloA
-complete (s-int regΔ) = s-int regΔ
-complete (s-var-∙ regΔ inΔ) = s-var-∙ regΔ inΔ
-complete (s-arr₁ s s₁) = s-arr₁ (complete s) (complete s₁)
-complete (s-arr₂ s s₁) = s-arr₂ (complete s) (complete s₁)
-complete (s-arr₃ regA s) = s-arr₃ regA (complete s)
-complete (s-∀ s) = s-∀ (complete s)
-complete (s-∀l {B = B} grd regA s ic fd upC upD upj)
+⊢d²→⊢d : Γ ⊢d² j # A ≤ B
+         → Γ ⊢d j # A ≤ B
+⊢d²→⊢d (s-refl regΔ cloA) = s-refl regΔ cloA
+⊢d²→⊢d (s-int regΔ) = s-int regΔ
+⊢d²→⊢d (s-var-∙ regΔ inΔ) = s-var-∙ regΔ inΔ
+⊢d²→⊢d (s-arr₁ s s₁) = s-arr₁ (⊢d²→⊢d s) (⊢d²→⊢d s₁)
+⊢d²→⊢d (s-arr₂ s s₁) = s-arr₂ (⊢d²→⊢d s) (⊢d²→⊢d s₁)
+⊢d²→⊢d (s-arr₃ regA s) = s-arr₃ regA (⊢d²→⊢d s)
+⊢d²→⊢d (s-∀ s) = s-∀ (⊢d²→⊢d s)
+⊢d²→⊢d (s-∀l {B = B} grd regA s ic fd upC upD upj)
   with reg-S= r regA₁ ← s2-sregular s
   with ⟨ preA% , upp ⟩ ← ↑ty-surjective (⊢r-¬ε (s2-⊢r-l s) Z)
-  = s-∀l regA₁ (≫-↑ty-st'0 regA regA₁ grd upp) (s1-strengthen=0 (complete s) upp (↑ty-arr upC upD) upj) ic fd upj
-complete (s-∀l-no-appear grd regA s ic fd upC upD upj)
+  = s-∀l regA₁ (≫-↑ty-st'0 regA regA₁ grd upp) (s1-strengthen=0 (⊢d²→⊢d s) upp (↑ty-arr upC upD) upj) ic fd upj
+⊢d²→⊢d (s-∀l-no-appear grd regA s ic fd upC upD upj)
   with reg-S^ r ← s2-sregular s
   with ⟨ preA% , upp ⟩ ← ↑ty-surjective (⊢r-¬ε-^ (s2-⊢r-l s) Z)
   with ⟨ preA , upA ⟩ ← ↑ty-surjective fd
   with refl ← ⊢r-≫-eq' (⊢r-weaken^0 (⊢r-strengthen∙0 regA upA) upA) grd
-  = s-∀l-no-appear ⊢r-int (↑ty-st upp) (s1-strengthen^0 (complete s) upp (↑ty-arr upC upD) upj) ic fd
-complete (s-tapp grd regA s upj)
+  = s-∀l-no-appear ⊢r-int (↑ty-st upp) (s1-strengthen^0 (⊢d²→⊢d s) upp (↑ty-arr upC upD) upj) ic fd
+⊢d²→⊢d (s-tapp grd regA s upj)
   with reg-S= r regA₁ ← s2-sregular s
   with ⟨ preA% , upp ⟩ ← ↑ty-surjective (⊢r-¬ε (s2-⊢r-l s) Z)
   with ⟨ preC , uppC ⟩ ← ↑ty-surjective (⊢r-¬ε (s2-⊢r-r s) Z)
-  = s-tapp regA₁ (≫-↑ty-st'0 regA regA₁ grd upp) (s1-strengthen=0 (complete s) upp uppC upj) uppC
+  = s-tapp regA₁ (≫-↑ty-st'0 regA regA₁ grd upp) (s1-strengthen=0 (⊢d²→⊢d s) upp uppC upj) uppC

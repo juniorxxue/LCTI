@@ -2,7 +2,7 @@ module Implicit.README where
 
 open import Implicit.Language.All
 import Implicit.Decl.All
-open import Implicit.Decl.Typing renaming (_⊢_#_⦂_ to _⊢d_#_⦂_)
+open import Implicit.Decl.Typing
 import Implicit.Interm.All
 open import Implicit.Algo.All
 

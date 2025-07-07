@@ -2,8 +2,10 @@ module Implicit.Language.EnvOps.InsertUVar where
 
 open import Implicit.Language.Base
 open import Implicit.Language.Shift.All
+open import Implicit.Language.Subst.All
 open import Implicit.Language.Lookup.All
-open import Implicit.Language.Regular.Base
+
+open import Implicit.Language.Regular.All
 open import Implicit.Language.OpenClose.Base
 open import Implicit.Language.Ground.Base
 open import Implicit.Language.EnvOps.Base
@@ -94,3 +96,30 @@ data _▶_,∙⇘_ : Env n m → Fin (1 + m) → Env n (1 + m) → Set where
 ⊢r-weaken∙ (⊢r-var-∙ inΓ) new ↑ty-var = ⊢r-var-∙ (∋∙-weaken∙ inΓ new)
 ⊢r-weaken∙ (⊢r-arr regA regA₁) new (↑ty-arr upA upA₁) = ⊢r-arr (⊢r-weaken∙ regA new upA) (⊢r-weaken∙ regA₁ new upA₁)
 ⊢r-weaken∙ (⊢r-∀ regA) new (↑ty-∀ upA) = ⊢r-∀ (⊢r-weaken∙ regA (▶S∙ new) upA)
+
+
+
+▶∙-punchOut-helper : Γ ∋∙ X
+                   → Γ ▶ #0 ,∙⇘ Γ'
+                   → Γ' ∋∙ #S X
+▶∙-punchOut-helper inΓ ▶Z = S∙ inΓ
+▶∙-punchOut-helper (S, inΓ) (▶S, new x) = S, (▶∙-punchOut-helper inΓ new)
+▶∙-punchOut-helper (S⋈ inΓ) (▶S⋈ new) = S⋈ (▶∙-punchOut-helper inΓ new)
+
+▶∙-punchOut : (¬p : k ≢ X)
+            → Γ ∋∙ punchOut ¬p
+            → Γ ▶ k ,∙⇘ Γ'
+            → Γ' ∋∙ X
+▶∙-punchOut {k = #0} {X = #0} ¬p inΓ new = ⊥-elim (¬p refl)
+▶∙-punchOut {k = #0} {X = #S X} ¬p inΓ ▶Z = S∙ inΓ
+▶∙-punchOut {k = #0} {X = #S X} ¬p (S, inΓ) (▶S, new x) = S, (▶∙-punchOut-helper inΓ new)
+▶∙-punchOut {k = #0} {X = #S X} ¬p (S⋈ inΓ) (▶S⋈ new) = S⋈ (▶∙-punchOut-helper inΓ new)
+▶∙-punchOut {k = #S k} {X = #0} ¬p (S, inΓ) (▶S, new x) = S, (▶∙-punchOut ¬p inΓ new)
+▶∙-punchOut {k = #S k} {X = #0} ¬p inΓ (▶S∙ new) = Z
+▶∙-punchOut {k = #S k} {X = #0} ¬p (S⋈ inΓ) (▶S⋈ new) = S⋈ (▶∙-punchOut ¬p inΓ new)
+▶∙-punchOut {k = #S k} {X = #S X} ¬p (S, inΓ) (▶S, new x) = S, (▶∙-punchOut ¬p inΓ new)
+▶∙-punchOut {k = #S k} {X = #S X} ¬p (S^ inΓ) (▶S^ new) = S^ (▶∙-punchOut (λ x → ¬p (cong #S x)) inΓ new)
+▶∙-punchOut {k = #S k} {X = #S X} ¬p (S∙ inΓ) (▶S∙ new) = S∙ (▶∙-punchOut (λ x → ¬p (cong #S x)) inΓ new)
+▶∙-punchOut {k = #S k} {X = #S X} ¬p (S= inΓ) (▶S= new x) = S= (▶∙-punchOut (λ x₁ → ¬p (cong #S x₁)) inΓ new)
+▶∙-punchOut {k = #S k} {X = #S X} ¬p (S⋈ inΓ) (▶S⋈ new) = S⋈ (▶∙-punchOut ¬p inΓ new)
+
