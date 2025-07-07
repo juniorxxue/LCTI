@@ -34,13 +34,6 @@ data _⊢_⦂_⟶_ : Env n m → Term n m → Type m → Term n m → Set where
   ela-∀i  : Γ ,∙ ⊢ e' ⦂ A ⟶ e₁
          → (upe : ↑tyᵉ0 e ⇘ e')
          → Γ ⊢ e ⦂ `∀ A ⟶ Λ (e₁ ⦂ A)
-{-
-  ela-∀e  : Γ ⊢ e ⦂ `∀ A ⟶ e'
-          → ⟦ B ⟧ A ⇘ A*
-          → Γ ⊢r B
-          → Γ ⊢ e ⦂ A* ⟶ e' ⓪ B
--}
-
 
 ela-tregular : Γ ⊢ e ⦂ A ⟶ e'
              → TRegular Γ

@@ -80,14 +80,14 @@ data _⊢_⟾_ : Env n m → Counter m × Type m → Counter m × Type m → Set
 ⟾-isoinf i∞-z (case-𝕚 (base x)) = i∞-i i∞-z
 ⟾-isoinf (i∞-i iso) (case-𝕚 cv) = i∞-i (⟾-isoinf iso cv)
 
-postulate
-  ⟾-weaken^0 : Γ ⊢ ⟨ j , A ⟩ ⟾ ⟨ 𝕛 , B ⟩
+
+⟾-weaken^0 : Γ ⊢ ⟨ j , A ⟩ ⟾ ⟨ 𝕛 , B ⟩
             → ↑tyʲ0 j ⇘ j'
             → ↑tyʲ0 𝕛 ⇘ 𝕛'
             → ↑ty0 A ⇘ A'
             → ↑ty0 B ⇘ B'
             → Γ ,^ ⊢ ⟨ j' , A' ⟩ ⟾ ⟨ 𝕛' , B' ⟩
-{-
+
 ⟾-weaken^0 (base x) ↑tyʲ-∞ (↑tyʲ-𝕚 ↑tyʲ-∞) upA upB = base (𝕄-weaken^0 x upA upB)
 ⟾-weaken^0 (case-𝕚 cv) (↑tyʲ-𝕚 upj) (↑tyʲ-𝕚 up𝕛) (↑ty-arr upA upA₁) (↑ty-arr upB upB₁)
   with refl ← ↑ty-unique upA upB = case-𝕚 (⟾-weaken^0 cv upj up𝕛 upA₁ upB₁)
@@ -95,7 +95,6 @@ postulate
   with refl ← ↑ty-unique upA upB = case-𝕔 (⟾-weaken^0 cv upj up𝕛 upA₁ upB₁)
 ⟾-weaken^0 (case-𝕥 cv upj₁ up𝕛₁ x upB*) (↑tyʲ-𝕥 upj upA₁) (↑tyʲ-𝕥 up𝕛 upA₂) (↑ty-∀ upA) (↑ty-∀ upB)
   = {!!}
--}
 
 find-iso-gen : k ε A
              → find A k (𝕚 ∞)
@@ -126,15 +125,15 @@ find-iso-gen (ε-∀ inA) = f-∀-𝕚 (find-iso-gen inA) ↑tyʲ-∞
 mm-sub : Γ ⊢ A 𝕄 B
        → SRegular Γ
        → Γ ⊢r A
-       → Γ ⊢ 𝕚 ∞ # A ≤ B
+       → Γ ⊢d 𝕚 ∞ # A ≤ B
 mm-sub 𝕄-arr regΓ (⊢r-arr regA regA₁) = s-arr₂ (s-refl-∞ regΓ regA) (s-refl-∞ regΓ regA₁)
 mm-sub (M-∀ {A = A} x st mm) regΓ regA with ε-dec {k = #0} {A = A}
 ... | inj₁ p = s-∀l x st (mm-sub mm regΓ (st0-⊢r regA x st)) case-𝕚 (find-iso-gen p) (↑tyʲ-𝕚 ↑tyʲ-∞)
 ... | inj₂ ¬p = s-∀l-no-appear x st (mm-sub mm regΓ (st0-⊢r regA x st)) case-𝕚 ¬p
 
-conv-sub-gen-s : Γ ⊢ j # A ≤ B
+conv-sub-gen-s : Γ ⊢d j # A ≤ B
                → Γ ⊢ ⟨ j , B ⟩ ⟾ ⟨ j' , C ⟩
-               → Γ ⊢ j' # A ≤ C  --- we need to generalize the conclusion
+               → Γ ⊢d j' # A ≤ C  --- we need to generalize the conclusion
 conv-sub-gen-s (s-int regΔ) (base ())
 conv-sub-gen-s (s-var-∙ regΔ inΔ) (base ())
 conv-sub-gen-s (s-arr₁ s s₁) (base 𝕄-arr) = s-arr₂ s s₁

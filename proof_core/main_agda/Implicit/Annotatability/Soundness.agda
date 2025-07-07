@@ -65,7 +65,7 @@ data Erasure : Term n m → IFTerm n → Set where
            → Erasure (e ⓪ A) M
 
 
-s-sound : Γ ⊢ j # A ≤ B
+s-sound : Γ ⊢d j # A ≤ B
         → Γ ⊢ A ⊑ B
 s-sound (s-refl regΔ cloA) = if-refl
 s-sound (s-int regΔ) = if-refl
@@ -78,7 +78,7 @@ s-sound (s-∀l regB st s ic fd upj) = if-∀L st regB (s-sound s)
 s-sound (s-∀l-no-appear regB st s ic fd) = if-∀L st regB (s-sound s)
 s-sound (s-tapp regB st s upC) = if-∀L st regB (if-trans (s-sound s) (if-∀R if-refl upC))
 
-sound : Γ ⊢ j # e ⦂ A
+sound : Γ ⊢d j # e ⦂ A
       → Erasure e M
       → Γ ⊢ M ⦂ A
 sound (⊢lit regΓ) era-lit = ela-lit regΓ
