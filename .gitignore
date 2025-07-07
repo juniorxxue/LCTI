@@ -44,8 +44,10 @@ live.*
 *.vok
 *.glob
 
-Proof/
-html/
+# Proof/
+# html/
 dist-newstyle/
 \#*\#
 .\#*
+
+.projectile
