@@ -614,7 +614,9 @@ Proof.
     + assert (Hlt': tm_size g < n). { eapply NonEmpty_ctx_size_gt0 in H. lia. }
       assert (Hlt'': ctx_size Σ < n). { specialize (tm_size_gt0 g). lia. }
       eapply IHty in Hty1; eauto; simpl; try lia. subst.
-      eapply IHsub with (Δ1 := (Γ ⋈)) in H1; eauto; simpl; try lia. sfirstorder. 
+      eapply IHsub with (Δ1 := (Γ ⋈)) in H1; eauto; simpl; try lia. sfirstorder.
+    + sauto lq: on rew: off.
+    + sauto lq: on rew: off. 
   - split.
     + intros Δ A Σ Δ1 Δ2 A1 A2 Hlt Hsub1 Hsub2.
       generalize dependent A2. generalize dependent Δ2.
@@ -736,6 +738,14 @@ Fixpoint num_all (A : Typ) : nat :=
   | _ => 0
   end.
 
+Lemma dec_is_TLam : forall e,
+  {e' | e = TLam e'} + {~ exists e', e = TLam e'}.
+Proof. sauto lq: on rew: off. Qed.
+
+Lemma dec_isCtxTyp : forall t,
+  {t' | t = CtxTyp t'} + {~ exists t', t = CtxTyp t'}.
+Proof. sauto lq: on rew: off. Qed.
+
 Lemma dec_ty_sub_ctx_infs' : forall n,
   (forall Γ Σ e, tm_size e + ctx_size Σ < n ->
     {A | ty Γ Σ e A} + {~ exists A, ty Γ Σ e A}) *
@@ -747,6 +757,28 @@ Proof.
   intro n. induction n. repeat split; try lia.
   destruct IHn as [[IHty IHsub] IHinfs]. repeat split.
   - intros Γ Σ e Hlt.
+    assert (Tabs: forall e' t, e = TLam e' -> Σ = CtxTyp t -> {A | ty Γ Σ e A} + {~ exists A, ty Γ Σ e A}).
+    { intros e' t Heq HΣ. subst.
+      destruct t. 1 - 3 : sauto q: on.
+      assert (Hlt': tm_size e' + ctx_size (CtxTyp t) < n) by (simpl in *; lia).
+      eapply IHty with (Γ := TyCons Γ) in Hlt' as Hty.
+      assert (Hlt''': tm_size e' + ctx_size CtxEmpty < n) by (simpl in *; lia).
+      eapply IHty with (Γ := TyCons Γ) in Hlt''' as Hty'.
+      destruct Hty as [[A Hty] | Hnty]. sauto lq: on.
+      destruct Hty' as [[A Hty'] | Hnty'].
+      + assert (Hlt'': ctx_size (CtxTyp (All t)) < n) by (simpl in *; lia).
+        eapply IHsub with (Δ := SepCons Γ) (A := All A) in Hlt'' as Hsub; eauto.
+        destruct Hsub as [[Γ' [B Hsub]] | Hnsub].
+        * destruct (eq_dec_env Γ' (SepCons Γ)); subst. sauto lq: on rew: off.
+          right. intros [B' Hc]. dependent destruction Hc; try sfirstorder use: NonEmpty_false.
+          dependent destruction Hc; try sfirstorder use: NonEmpty_false.
+          eapply ty_det in Hty'; eauto. subst.
+          eapply sub_ctx_det in Hsub; eauto. sfirstorder.
+        * right. intros [Γ' Hc]. dependent destruction Hc; try sfirstorder use: NonEmpty_false.
+          dependent destruction Hc; try sfirstorder use: NonEmpty_false.
+          eapply ty_det in Hty'; eauto. subst. sfirstorder.
+      + right. intros [Γ' Hc]. dependent destruction Hc; try sfirstorder use: NonEmpty_false.
+        dependent destruction Hc; try sfirstorder use: NonEmpty_false. }
     assert (Sub: GenericConsumer e -> NonEmpty Σ -> {A | ty Γ Σ e A} + {~ exists A, ty Γ Σ e A}).
     { intros Hgc Hne.
       eapply NonEmpty_ctx_size_gt0 in Hne as Hgt.
@@ -758,11 +790,22 @@ Proof.
       - eapply IHsub with (Δ := SepCons Γ) (A := A) in Hlt'' as Hsub; eauto.
         destruct Hsub as [[Γ' [A' Hsub']] | Hneg].
         + destruct (eq_dec_env (SepCons Γ) Γ'); subst. sauto lq: on.
+          destruct (dec_is_TLam e) as [[e' Heq] | Hntlam]; subst.
+          * destruct (dec_isCtxTyp Σ) as [[t' Heq] | Hntctx]; subst. hauto l: on use: Tabs.
+            right. intros [A'' Hc]. dependent destruction Hc; try sfirstorder use: NonEmpty_false.
+            eapply ty_det in Hty; eauto. subst. eapply sub_ctx_det in Hsub'; eauto. sfirstorder.
+          * right. intros [A'' Hc]. dependent destruction Hc; try sfirstorder use: NonEmpty_false.
+            eapply ty_det in Hty; eauto. subst. eapply sub_ctx_det in Hsub'; eauto. sfirstorder.
+        + destruct (dec_is_TLam e) as [[e' Heq] | Hntlam]; subst.
+          * destruct (dec_isCtxTyp Σ) as [[t' Heq] | Hntctx]; subst. hauto l: on use: Tabs.
+            right. intros [A'' Hc]. dependent destruction Hc; try sfirstorder use: NonEmpty_false.
+            eapply ty_det in Hty; eauto. subst. sfirstorder.
+          * right. intros [A'' Hc]. dependent destruction Hc; try sfirstorder use: NonEmpty_false.
+            eapply ty_det in Hty; eauto. subst. sfirstorder.
+      - destruct (dec_is_TLam e) as [[e' Heq] | Hntlam]; subst.
+        + destruct (dec_isCtxTyp Σ) as [[t' Heq] | Hntctx]; subst. hauto l: on use: Tabs.
           right. intros [Γ'' Hc]. dependent destruction Hc; try sfirstorder use: NonEmpty_false.
-          eapply ty_det in Hty; eauto; subst. eapply sub_ctx_det in Hsub'; eauto. sfirstorder.
-        + right. intros [Γ'' Hc]. dependent destruction Hc; try sfirstorder use: NonEmpty_false.
-          eapply ty_det in Hty; eauto; subst. sfirstorder.
-      - right. intros [Γ'' Hc]. dependent destruction Hc; try sfirstorder use: NonEmpty_false. }
+        + right. intros [Γ'' Hc]. dependent destruction Hc; try sfirstorder use: NonEmpty_false. }
     destruct e; simpl in *.
     + destruct (dec_CtxEmpty Σ); subst; try sfirstorder.
       destruct (dec_TRegular Γ); sauto q: on.
