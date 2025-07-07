@@ -310,6 +310,11 @@ infer env (CTerm tm2 h) (Abs tm) = do
   tell $ indentAll _log1
   tell $ indentAll _log2
   return $ TArr tyA tyB
+infer env (CFullType (TForall tyA)) (TAbs tm) = do
+  (_, _log) <- peek $ infer (EUvar env) (CFullType tyA) tm
+  tell ["[Ty-TAbs-Chk] " ++ logInferFull env (CFullType (TForall tyA)) (TAbs tm) (TForall tyA)]
+  tell $ indentAll _log
+  return $ TForall tyA
 infer env h g | genericConsumer g && nonEmptyContext h = do
   (tyA, _log1) <- peek $ infer env CEmpty g
   ((EEmpty, tyB), _log2) <- peek $ sub (env, EEmpty) tyA h

@@ -1,9 +1,5 @@
 Beyond the formalization, we extend our system with lists, pairs and ST Monad.
 
-TODO:
-- Replace the Label of the rules (for infer*s*) once the paper is updated
-- Check if ST is implmented correctly
-
 | ID     | Example Program                   | Translation                                                       | Status |
 | ------ | --------------------------------- | ----------------------------------------------------------------- | ------ |
 | A1     | `\x. \y. y`                       | `/\a. /\b. (\x. \y. y) : a -> b -> b`                             | Ann    |
