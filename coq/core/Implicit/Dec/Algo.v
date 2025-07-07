@@ -90,6 +90,15 @@ Inductive ty : Env -> Context -> Trm -> Typ -> Prop :=
     ty Γ (CtxTApp A Σ) e (All B) ->
     B' = subst B 0 A ->
     ty Γ Σ (TApp e A) B'
+| ty_tabs_ty : forall Γ e A B,
+    ty (TyCons Γ) (CtxTyp A) e B ->
+    ty Γ (CtxTyp (All A)) (TLam e) (All A)
+(* Note: ty_tabs_ty is slightly different from the agda version below, but they are equivalent,
+   ⊢tabs-τ :
+      Γ ,∙ ⊢ τ B ⇒ e ⇒ A
+    → Γ ⊢ τ (`∀ B) ⇒ Λ e ⇒ `∀ A
+   because the property that A => e => B implies that A = B is proved in the agda version.
+   In Rocq, we use this alternative definition to avoid proving the same property again. *)
 with
 sub_ctx : Env -> Typ -> Context -> Env -> Typ -> Prop :=
 | s_empty : forall Δ A A',
