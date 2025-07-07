@@ -134,6 +134,24 @@ env-◆◇-false (◇S^ newΓ1) (◆S^ newΓ2) = env-◆◇-false newΓ1 newΓ2
 ◆-∋= (◆S^ newΓ) = S^ (◆-∋= newΓ)
 
 
+◈-∋:=-neq : Γ ◈ k ⇘ Γ'
+          → Γ ∋ X := A
+          → X ≢ k
+◈-∋:=-neq ◈Z (S∙ inΓ up) = λ ()
+◈-∋:=-neq (◈S, new) (S, inΓ) = ◈-∋:=-neq new inΓ
+◈-∋:=-neq (◈S∙ new) (S∙ inΓ up) = ≢-suc (◈-∋:=-neq new inΓ)
+◈-∋:=-neq (◈S= new) (Z up) = λ ()
+◈-∋:=-neq (◈S= new) (S= inΓ up) = ≢-suc (◈-∋:=-neq new inΓ)
+◈-∋:=-neq (◈S^ new) (S^ inΓ up) = ≢-suc (◈-∋:=-neq new inΓ)
+
+
+∋∙-∋:=-≢ : Γ ∋ X := A
+         → Γ ∋∙ k
+         → k ≢ X
+∋∙-∋:=-≢ in1 in2 refl = ∋∙-∋:=-false in2 in1
+
+
+
 ⊢r-◆ : Γ ⊢r A
      → Γ ◆ k ⇘ Γ'
      → Γ' ⊢r A
@@ -354,5 +372,3 @@ data [_/_]_∙⟹_ : Type m → Fin m → Env n m → Env n m → Set where
 ∙⟹-∙-eq-false (S∙ inΓ) (∙⟹∙S newΓ up1) (S∙ inΓ') = ∙⟹-∙-eq-false inΓ newΓ inΓ'
 ∙⟹-∙-eq-false (S= inΓ) (∙⟹=S newΓ up1) (S= inΓ') = ∙⟹-∙-eq-false inΓ newΓ inΓ'
 ∙⟹-∙-eq-false (S^ inΓ) (∙⟹^S newΓ up1) (S^ inΓ') = ∙⟹-∙-eq-false inΓ newΓ inΓ'
-
-
