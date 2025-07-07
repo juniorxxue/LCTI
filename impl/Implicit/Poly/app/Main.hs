@@ -309,6 +309,23 @@ infer env (CTerm tm2 h) (Abs tm) = do
   tell $ indentAll _log1
   tell $ indentAll _log2
   return $ TArr tyA tyB
+infer env (CTerm tm2 h) (AbsAnn tyA tm) = do
+  (_, _log1) <- peek $ infer env (CFullType tyA) tm2
+  (tyB, _log2) <- peek $ infer (ETrm tyA env) (shiftContext0 h) tm
+  tell ["[Ty-AbsAnn] " ++ logInferFull env (CTerm tm2 h) (AbsAnn tyA tm) (TArr tyA tyB)]
+  tell $ indentAll _log1
+  tell $ indentAll _log2
+  return $ TArr tyA tyB
+infer env (CFullType (TArr tyA tyB)) (AbsAnn tyA' tm) | tyA == tyA' = do
+  (_, _log) <- peek $ infer (ETrm tyA env) (CFullType tyB) tm
+  tell ["[Ty-AbsAnn-Chk] " ++ logInferFull env (CFullType (TArr tyA tyB)) (AbsAnn tyA' tm) (TArr tyA tyB)]
+  tell $ indentAll _log
+  return $ TArr tyA tyB
+infer env CEmpty (AbsAnn tyA tm) = do
+  (tyB, _log) <- peek $ infer (ETrm tyA env) CEmpty tm
+  tell ["[Ty-AbsAnn] " ++ logInferFull env CEmpty (AbsAnn tyA tm) tyB]
+  tell $ indentAll _log
+  return $ TArr tyA tyB
 infer env (CFullType (TForall tyA)) (TAbs tm) = do
   (_, _log) <- peek $ infer (EUvar env) (CFullType tyA) tm
   tell ["[Ty-TAbs-Chk] " ++ logInferFull env (CFullType (TForall tyA)) (TAbs tm) (TForall tyA)]
@@ -394,14 +411,18 @@ main = do
       -- A1: \x. \y. y  Ann~>  /\a. /\b. (\x. \y. y) : a -> b -> b
       exA1 = infer EEmpty CEmpty (Abs (Abs (Var 0)))
       exA1Ann = infer EEmpty CEmpty $ TAbs $ TAbs $ Ann (Abs (Abs (Var 0))) (TArr (TVar 1) (TArr (TVar 0) (TVar 0)))
+      -- with AbsAnn: /\a. /\b. \x : a. \y : b. y
+      exA1Ann' = infer EEmpty CEmpty $ TAbs $ TAbs $ AbsAnn (TVar 1) $ AbsAnn (TVar 0) $ Var 0
       -- A2: choose id
       exA2 = infer (ETrm idTyp (ETrm chooseTyp EEmpty)) CEmpty $ Var 1 `App` Var 0
       -- A3: choose Nil ids Ann~> choose (Nil : [forall a. a -> a]) ids
       exA3 = infer (ETrm (TList idTyp) (ETrm chooseTyp EEmpty)) CEmpty $ Var 1 `App` Nil `App` Var 0
       exA3Ann = infer (ETrm (TList idTyp) (ETrm chooseTyp EEmpty)) CEmpty $ Var 1 `App` (Nil `Ann` TList idTyp) `App` Var 0
       -- A4: \x. x x Ann~> (\x. x x) : (forall a. a -> a) -> (forall a. a -> a)
+      -- with AbsAnn: \x : (forall a. a -> a). x x
       exA4 = infer EEmpty CEmpty $ Abs (App (Var 0) (Var 0))
       exA4Ann = infer EEmpty CEmpty $ Abs (App (Var 0) (Var 0)) `Ann` autoTyp
+      exA4Ann' = infer EEmpty CEmpty $ AbsAnn idTyp (App (Var 0) (Var 0))
       -- A5: id auto
       exA5 = infer (ETrm idTyp (ETrm autoTyp EEmpty)) CEmpty $ Var 0 `App` Var 1
       -- A6: id auto'
@@ -418,6 +439,8 @@ main = do
       -- exA8Ann = infer (ETrm chooseTyp (ETrm idTyp (ETrm auto'Typ EEmpty))) CEmpty $ Var 0 `App` (Var 1 `TApp` TForall (TArr (TArr (TVar 0) (TVar 0)) (TArr (TVar 0) (TVar 0)))) `App` (TAbs (Abs (Var 3 `App` (Ann (TApp (Var 0) (TVar 0)) (TArr (TVar 0) (TVar 0)))) `Ann` (TArr (TArr (TVar 0) (TVar 0)) (TArr (TVar 0) (TVar 0)))))
       exA8Ann = infer (ETrm chooseTyp (ETrm idTyp (ETrm auto'Typ EEmpty))) CEmpty $ Var 0 `App` TAbs (Abs (Var 2 `App` (Var 0 `TApp` TVar 0)) `Ann` TArr idTyp (TArr (TVar 0) (TVar 0))) `App` Var 2
       exA8Ann' = infer (ETrm chooseTyp (ETrm idTyp (ETrm auto'Typ EEmpty))) CEmpty $ Var 0 `App` TAbs (Abs (Abs (Var 3 `App` Var 1 `App` Var 0)) `Ann` TArr idTyp (TArr (TVar 0) (TVar 0))) `App` Var 2
+      -- with AbsAnn: choose (/\a. \f : forall b. b -> b. id f @a) auto'
+      exA8Ann'' = infer (ETrm chooseTyp (ETrm idTyp (ETrm auto'Typ EEmpty))) CEmpty $ Var 0 `App` TAbs (AbsAnn idTyp (Var 2 `App` (Var 0 `TApp` TVar 0)) `Ann` TArr idTyp (TArr (TVar 0) (TVar 0))) `App` Var 2
       -- A9: f (choose id) ids
       -- where f : forall a. (a -> a) -> [a] -> a
       fTyp = TForall $ TArr (TArr (TVar 0) (TVar 0)) $ TArr (TList (TVar 0)) (TVar 0)
@@ -433,9 +456,13 @@ main = do
       -- B1: \f. (f 1, f True) Ann~> \f. (f 1, f True) : (forall a. a -> a) -> Int × Bool
       exB1 = infer EEmpty CEmpty $ Abs (Pair `App` (Var 0 `App` LitInt 1) `App` (Var 0 `App` LitBool True))
       exB1Ann = infer EEmpty CEmpty $ Abs (Pair `App` (Var 0 `App` LitInt 1) `App` (Var 0 `App` LitBool True)) `Ann` (idTyp `TArr` TProd TInt TBool)
+      -- with AbsAnn: \f : forall a. a -> a. (f 1, f True)
+      exB1Ann' = infer EEmpty CEmpty $ AbsAnn idTyp (Pair `App` (Var 0 `App` LitInt 1) `App` (Var 0 `App` LitBool True))
       -- B2: \xs. poly (head xs) Ann~> \xs. poly (head xs) : [forall a. a -> a] -> Int × Bool
       exB2 = infer (ETrm polyTyp (ETrm headTyp EEmpty)) CEmpty $ Abs (Var 1 `App` (Var 2 `App` Var 0))
       exB2Ann = infer (ETrm polyTyp (ETrm headTyp EEmpty)) CEmpty $ Abs (Var 1 `App` (Var 2 `App` Var 0)) `Ann` (TList idTyp `TArr` TProd TInt TBool)
+      -- with AbsAnn: \xs : [forall a. a -> a]. poly (head xs)
+      exB2Ann' = infer (ETrm polyTyp (ETrm headTyp EEmpty)) CEmpty $ AbsAnn (TList idTyp) (Var 1 `App` (Var 2 `App` Var 0))
       -- C1: length ids
       exC1 = infer (ETrm lengthTyp (ETrm (TList idTyp) EEmpty)) CEmpty $ Var 0 `App` Var 1
       -- C2: tail ids
@@ -449,6 +476,8 @@ main = do
       -- C6: cons (\x. x) ids Ann~> cons (/\a. \x. x : a -> a) ids
       exC6 = infer (ETrm (TList idTyp) EEmpty) CEmpty $ Cons `App` Abs (Var 0) `App` Var 0
       exC6Ann = infer (ETrm (TList idTyp) EEmpty) CEmpty $ Cons `App` idTrm `App` Var 0
+      -- with AbsAnn: cons (/\a. \x : a. x) ids
+      exC6Ann' = infer (ETrm (TList idTyp) EEmpty) CEmpty $ Cons `App` TAbs (AbsAnn (TVar 0) (Var 0)) `App` Var 0
       -- C7: append (single inc) (single id) Ann~> append (single inc) (single (id @ Int))
       exC7 = infer (ETrm appendTyp (ETrm singleTyp (ETrm incTyp (ETrm idTyp EEmpty)))) CEmpty $ Var 0 `App` (Var 1 `App` Var 2) `App` (Var 1 `App` Var 3)
       exC7Ann = infer (ETrm appendTyp (ETrm singleTyp (ETrm incTyp (ETrm idTyp EEmpty)))) CEmpty $ Var 0 `App` (Var 1 `App` Var 2) `App` (Var 1 `App` (Var 3 `TApp` TInt))
@@ -468,6 +497,8 @@ main = do
       -- D4: app runST argST Ann~> app (\x. runST (/\a. x @a) : (forall a. ST a Int) -> Int) argST
       exD4 = infer (ETrm appTyp (ETrm runSTTyp (ETrm argSTTyp EEmpty))) CEmpty $ Var 0 `App` Var 1 `App` Var 2
       exD4Ann = infer (ETrm appTyp (ETrm runSTTyp (ETrm argSTTyp EEmpty))) CEmpty $ Var 0 `App` (Abs (Var 2 `App` TAbs (Var 0 `TApp` TVar 0)) `Ann` TArr argSTTyp TInt) `App` Var 2
+      -- with AbsAnn: app (\x : forall a. ST a Int. runST (/\a. x @a)) argST
+      exD4Ann' = infer (ETrm appTyp (ETrm runSTTyp (ETrm argSTTyp EEmpty))) CEmpty $ Var 0 `App` AbsAnn argSTTyp (Var 2 `App` TAbs (Var 0 `TApp` TVar 0)) `App` Var 2
       -- D5: revapp argST runST Ann~> revapp argST (runST @Int) / revapp argST (\x. runST (/\a. x @a) : (forall a. ST a Int) -> Int)
       exD5 = infer (ETrm revappTyp (ETrm argSTTyp (ETrm runSTTyp EEmpty))) CEmpty $ Var 0 `App` Var 1 `App` Var 2
       exD5Ann = infer (ETrm revappTyp (ETrm argSTTyp (ETrm runSTTyp EEmpty))) CEmpty $ Var 0 `App` Var 1 `App` (Var 2 `TApp` TInt)
@@ -483,13 +514,17 @@ main = do
       -- E1: k h lst
       exE1 = infer (ETrm kTyp (ETrm hTyp (ETrm lstTyp EEmpty))) CEmpty $ Var 0 `App` Var 1 `App` Var 2
       -- exE1' = infer (ETrm chooseTyp (ETrm hTyp (ETrm (TForall $ TArr TInt $ TArr (TVar 0) (TVar 0)) EEmpty))) CEmpty $ Var 0 `App` Var 1 `App` Abs (Var 2 `App` Var 0)
-      -- E2: k (\x. h x) lst Ann~> k (/\a. \x. h x : Int -> a -> a) lst
+      -- E2: k (\x. h x) lst Ann~> k (/\a. \x. h x @ a : Int -> a -> a) lst
       exE2 = infer (ETrm kTyp (ETrm hTyp (ETrm lstTyp EEmpty))) CEmpty $ Var 0 `App` Abs (Var 2 `App` Var 0) `App` Var 2
-      exE2Ann = infer (ETrm kTyp (ETrm hTyp (ETrm lstTyp EEmpty))) CEmpty $ Var 0 `App` TAbs (Abs ((Var 2 `App` Var 0) `TApp` TVar 0) `Ann` TArr TInt (TArr (TVar 0) (TVar 0))) `App` Var 2
+      exE2Ann = infer (ETrm kTyp (ETrm hTyp (ETrm lstTyp EEmpty))) CEmpty $ Var 0 `App` TAbs (Abs ((Var 2 `App` Var 0)) `Ann` TArr TInt (TArr (TVar 0) (TVar 0))) `App` Var 2
+      -- with AbsAnn: k (/\a. \x : Int. h x @ a) lst
+      exE2Ann' = infer (ETrm kTyp (ETrm hTyp (ETrm lstTyp EEmpty))) CEmpty $ Var 0 `App` TAbs (AbsAnn TInt (Var 2 `App` Var 0 `TApp` TVar 0)) `App` Var 2
       -- E3: r (\x. \y. y) Ann~> r (/\ a. (\x. /\ b. \y. y) : a -> forall b. b -> b)
       exE3 = infer (ETrm rTyp EEmpty) CEmpty $ Var 0 `App` Abs (Abs (Var 0))
       exE3Ann = infer (ETrm rTyp EEmpty) CEmpty $ Var 0 `App` TAbs (Abs (TAbs (Abs (Var 0))) `Ann` TArr (TVar 0) idTyp)
-
+      -- with AbsAnn: r (/\a. \x : a. /\b. \y : b. y)
+      exE3Ann' = infer (ETrm rTyp EEmpty) CEmpty $ Var 0 `App` TAbs (AbsAnn (TVar 0) (TAbs (AbsAnn (TVar 0) (Var 0))))
+      
       -- FreezeML paper additions
       -- F5: auto id
       exF5 = infer (ETrm autoTyp (ETrm idTyp EEmpty)) CEmpty $ Var 0 `App` Var 1
@@ -507,11 +542,13 @@ main = do
   forM_
     [ exA1,
       exA1Ann,
+      exA1Ann',
       exA2,
       exA3,
       exA3Ann,
       exA4,
       exA4Ann,
+      exA4Ann',
       exA5,
       exA6,
       exA7,
@@ -519,6 +556,7 @@ main = do
       exA8,
       exA8Ann,
       exA8Ann',
+      exA8Ann'',
       exA9,
       exA10,
       exA11,
@@ -527,8 +565,10 @@ main = do
       exA12Ann,
       exB1,
       exB1Ann,
+      exB1Ann',
       exB2,
       exB2Ann,
+      exB2Ann',
       exC1,
       exC2,
       exC3,
@@ -536,6 +576,7 @@ main = do
       exC5,
       exC6,
       exC6Ann,
+      exC6Ann',
       exC7,
       exC7Ann,
       exC8,
@@ -547,14 +588,17 @@ main = do
       exD3,
       exD4,
       exD4Ann,
+      exD4Ann',
       exD5,
       exD5Ann,
       exD5Ann',
       exE1,
       exE2,
       exE2Ann,
+      exE2Ann',
       exE3,
       exE3Ann,
+      exE3Ann',
       exF5,
       exF6,
       exF7,
