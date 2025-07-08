@@ -58,3 +58,4 @@ node_modules/
 src_htmls/
 html/
 submission.zip
+html_generator/src/_data/agdaModules.js
