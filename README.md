@@ -1,21 +1,27 @@
-# Supplementary materials of the paper "Local Contextual Type Inference"
+# Supplementary Materials for "Local Contextual Type Inference"
 
-We include mechanized proofs and implementations in this repository. They are categorized into three main directories:
+This repository contains mechanized proofs and implementations organized into three main directories:
 
 ## Core System
 
 ### Mechanized Proofs
 
-* `proof_core/main_agda/`: the main proof of the paper, written in Agda. It includes the formalization of the declarative system, the intermediate system (including matching subtyping), the algorithmic system and implicit system F, with all the lemmas and theorems shown in the paper, except for the decidability of the algorithm.
+* `proof_core/main_agda/`: Contains the main proof, written in Agda. This includes formalization of the declarative system, intermediate system (with matching subtyping), algorithmic system, and implicit system F, along with all lemmas and theorems presented in the paper, except for the decidability of the algorithm.
 
-You can run `make` in the `proof_core/main_agda/` directory to compile the Agda files, which requires `agda` and its standard library installed. We also provide a nicely rendered html version of the main proof in `proof_core/main_agda/html/Implicit.Paper.html`, which is a recommended way to read the proof.
+To compile the Agda files, run `make` in the `proof_core/main_agda/` directory. This requires `agda` and its standard library to be installed. We also provide a rendered HTML version of the main proof at `proof_core/main_agda/html/Implicit.Paper.html`, which is the recommended way to read the proof.
 
-* `proof_core/decidability_coq`: the decidability proof of the algorithmic system, written in Rocq Prover, you can run `make` in the `proof_core/decidability_coq/Dec` directory to compile the Rocq files, which requires `coq` installed, and `CoqHammer` library. We also include the rendered html version of the decidability proof in `proof_core/decidability_coq/html/toc.html` for easy reading.
+* `proof_core/decidability_coq`: Contains the decidability proof of the algorithmic system, written in Rocq Prover. To compile the Rocq files, run `make` in the `proof_core/decidability_coq/Dec` directory. This requires `coq` and the `CoqHammer` library to be installed. We also include a rendered HTML version of the decidability proof at `proof_core/decidability_coq/html/toc.html` for convenient reading.
 
 ### Implementations
 
-* `impl_core/Poly`: the Haskell implementation of the algorithmic system, including all the examples shown in the paper and table in the appendix. The command `cabal run` will print all the derivations of the examples.
+* `impl_core/`: Contains the Haskell implementation of the algorithmic system, including all examples shown in the paper and appendix table. Running `cabal run` will print all derivations for the examples.
 
 ## Right-to-Left Variant
 
+The proof for the right-to-left variant is located in `proof_variant_right2left/`, containing all results equivalent to the main proof.
+
+The implementation of the right-to-left variant is in `impl_variant_right2left/`.
+
 ## Systems with Top and Bottom Types
+
+We also provide a proof that extends the declarative system and matching subtyping with top and bottom types, with all related properties proven, located in `proof_core_top_bot/`.
