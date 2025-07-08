@@ -1,4 +1,4 @@
-module Implicit.Paper where
+module Implicit.README where
 
 ----------------------------------------------------------------------
 --+                           Section 3                            +--
