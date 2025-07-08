@@ -1,15 +1,36 @@
 #!/bin/sh
-CURRENT_PATH=$(pwd)
+ROOT_DIR=$(pwd)
 
-rm -rf $CURRENT_PATH/src_htmls
-mkdir -p $CURRENT_PATH/src_htmls
-cd $CURRENT_PATH/proof_core/main_agda/ && agda --html --html-dir=$CURRENT_PATH/src_htmls/core --html-highlight=code Implicit/README.agda
-# cd $CURRENT_PATH/proof_core_top_bot/main_agda/ && agda --html --html-dir=$CURRENT_PATH/src_htmls/core_top_bot --html-highlight=code Implicit/README.agda
-# cd $CURRENT_PATH/proof_variant_right2left/main_agda/ && agda --html --html-dir=$CURRENT_PATH/src_htmls/variant_right2left --html-highlight=code Implicit/README.agda
+build_agda_html() {
+    local proof_dir=$1
+    
+    echo "Building HTML for $proof_dir..."
+    
+    # Generate Agda HTML
+    cd $ROOT_DIR/$proof_dir/main_agda/ && agda --html --html-dir=$ROOT_DIR/src_htmls/$proof_dir --html-highlight=code Implicit/README.agda
+    
+    # Setup and build HTML generator
+    # Remove existing agda directory if it exists to avoid moving source inside it
+    rm -rf $ROOT_DIR/html_generator/src/agda
+    mv $ROOT_DIR/src_htmls/$proof_dir $ROOT_DIR/html_generator/src/agda
+    AGDA_PRJ_NAME=Implicit AGDA_PRJ_ROOT=README envsubst < $ROOT_DIR/html_generator/templates/src/_data/agdaModules.js > $ROOT_DIR/html_generator/src/_data/agdaModules.js
+    cp $ROOT_DIR/html_generator/templates/src/agda/agda.11tydata.js $ROOT_DIR/html_generator/src/agda/
+    
+    # Build and cleanup
+    cd $ROOT_DIR/html_generator && npm install && npm run build
+    rm -rf $ROOT_DIR/html_generator/src/agda
+    
+    # Remove existing html directory if it exists to avoid moving source inside it
+    rm -rf $ROOT_DIR/$proof_dir/main_agda/html
+    mv $ROOT_DIR/html_generator/_site/agda $ROOT_DIR/$proof_dir/main_agda/html
+    
+    echo "Completed building HTML for $proof_dir"
+}
 
-mv $CURRENT_PATH/src_htmls/core $CURRENT_PATH/html_generator/src/agda
-AGDA_PRJ_NAME=Implicit AGDA_PRJ_ROOT=README envsubst < $CURRENT_PATH/html_generator/templates/src/_data/agdaModules.js > $CURRENT_PATH/html_generator/src/_data/agdaModules.js
-cp $CURRENT_PATH/html_generator/templates/src/agda/agda.11tydata.js $CURRENT_PATH/html_generator/src/agda/agda.11tydata.js
-cd $CURRENT_PATH/html_generator && npm install && npm run build
-rm -rf $CURRENT_PATH/html_generator/src/agda
-mv $CURRENT_PATH/html_generator/_site/agda $CURRENT_PATH/proof_core/main_agda/html
+# Clean up and prepare
+rm -rf $ROOT_DIR/src_htmls && mkdir -p $ROOT_DIR/src_htmls
+
+# Build HTML for all proof directories
+build_agda_html "proof_core"
+# build_agda_html "proof_core_top_bot"
+build_agda_html "proof_variant_right2left"
