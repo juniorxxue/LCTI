@@ -4,19 +4,19 @@ module Implicit.Paper where
 --+                           Section 3                            +--
 ----------------------------------------------------------------------
 
--- Theorem 3.1 : s-refl-∞
+-- Theorem 3.1 (Reflexivity of Subtyping)
 import Implicit.Decl.Typing using (s-refl-∞)
 
--- Theorem 3.2 : s-trans'
+-- Theorem 3.2 (Transitivity of subtyping)
 import Implicit.Decl.Trans using (s-trans')
 
--- Theorem 3.3 : sound
+-- Theorem 3.3 (Soundness to Implicit System F)
 import Implicit.Annotatability.Soundness using (sound)
 
--- Theorem 3.4 : annotatability-real
+-- Theorem 3.4 (Annotatability to F𝑖)
 import Implicit.Annotatability.Corollaries using (annotatability-real)
 
--- Corollary 3.5: annotatability-real'
+-- Corollary 3.5 (Annotatability to F𝑖)
 import Implicit.Annotatability.Corollaries using (annotatability-real')
 
 ----------------------------------------------------------------------
