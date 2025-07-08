@@ -73,15 +73,15 @@ def run_make_commands():
     """Run make commands to generate HTML documentation."""
     print("Generating HTML documentation...")
     
-    # Run make in proof_core/main_agda/
-    agda_dir = REPO_DIR / "proof_core" / "main_agda"
-    if agda_dir.exists():
-        print(f"Running make in {agda_dir}")
+    # Run build_agda_html.sh for Agda HTML generation
+    build_script = REPO_DIR / "build_agda_html.sh"
+    if build_script.exists():
+        print(f"Running {build_script}")
         try:
-            subprocess.run(["make"], cwd=agda_dir, check=True)
+            subprocess.run(["sh", str(build_script)], cwd=REPO_DIR, check=True)
             print("Agda HTML generation completed")
         except subprocess.CalledProcessError as e:
-            print(f"Warning: make failed in {agda_dir}: {e}")
+            print(f"Warning: build_agda_html.sh failed: {e}")
     
     # Run make in proof_core/decidability_coq/Dec/
     coq_dec_dir = REPO_DIR / "proof_core" / "decidability_coq" / "Dec"
