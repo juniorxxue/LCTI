@@ -8,7 +8,7 @@ This repository contains mechanized proofs and implementations organized into th
 
 * `proof_core/main_agda/`: Contains the main proof, written in Agda. This includes formalization of the declarative system, intermediate system (with matching subtyping), algorithmic system, and implicit system F, along with all lemmas and theorems presented in the paper, except for the decidability of the algorithm.
 
-To compile the Agda files, run `make` in the `proof_core/main_agda/` directory. This requires `agda` and its standard library to be installed. We also provide a rendered HTML version of the main proof at `proof_core/main_agda/html/Implicit.Paper.html`, which is the recommended way to read the proof. In particular, `Paper.agda` or `Paper.html` states all the lemmas and theorem presented in the paper in order, and shows their corresponding code in Agda.
+To compile the Agda files, run `make` in the `proof_core/main_agda/` directory. This requires `agda` and its standard library to be installed. We also provide a rendered HTML version of the main proof at `proof_core/main_agda/html/Implicit.README.html`, which is the recommended way to read the proof. In particular, `README.agda` or `README.html` states all the lemmas and theorem presented in the paper in order, and shows their corresponding code in Agda.
 
 * `proof_core/decidability_coq/`: Contains the decidability proof of the algorithmic system, written in Rocq Prover. 
 

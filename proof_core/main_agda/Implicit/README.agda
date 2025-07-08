@@ -1,42 +1,75 @@
-module Implicit.README where
+module Implicit.Paper where
 
-open import Implicit.Language.All
-import Implicit.Decl.All
-open import Implicit.Decl.Typing
-import Implicit.Interm.All
-open import Implicit.Algo.All
+----------------------------------------------------------------------
+--+                           Section 3                            +--
+----------------------------------------------------------------------
 
--- (interm. <----> algo.) completeness
-import Implicit.Algo2Interm.Main
-open import Implicit.Algo2Interm.Corollaries renaming (sound0 to a→i0; sound∞ to a→i∞)
+-- Theorem 3.1 (Reflexivity of Subtyping)
+import Implicit.Decl.Typing using (s-refl-∞)
 
--- (interm. <----> algo.) soundness
-import Implicit.Interm2Algo.Main
-open import Implicit.Interm2Algo.Corollaries renaming (complete-0 to i→a0; complete-∞ to i→a∞)
+-- Theorem 3.2 (Transitivity of subtyping)
+import Implicit.Decl.Trans using (s-trans')
 
--- (decl. <----> interm.) completeness
-import Implicit.Decl2Interm.Main
-open import Implicit.Decl2Interm.Corollaries renaming (⊢complete to d→i)
+-- Theorem 3.3 (Soundness to Implicit System F)
+import Implicit.Annotatability.Soundness using (sound)
 
--- (decl. <----> interm.) soundness
-import Implicit.Interm2Decl.Main
-open import Implicit.Interm2Decl.Corollaries renaming (⊢sound to i→d)
+-- Theorem 3.4 (Annotatability to F𝑖)
+import Implicit.Annotatability.Corollaries using (annotatability-real)
 
+-- Corollary 3.5 (Annotatability to F𝑖)
+import Implicit.Annotatability.Corollaries using (annotatability-real')
 
-d→a0 : Γ ⊢d Z # e ⦂ A
-     → Γ ⊢ □ ⇒ e ⇒ A
-d→a0 ⊢e = i→a0 (d→i ⊢e)
+----------------------------------------------------------------------
+--+                           Section 4                            +--
+----------------------------------------------------------------------
+-- Theorem 4.1 (Generalized Soundness of Subtyping)
+import Implicit.Interm2Decl.Corollaries using (sound')
 
+-- Theorem 4.2 ((Generalized Completeness of Subtyping)
+import Implicit.Decl2Interm.Corollaries using (complete+'; complete-')
 
-d→a∞ : Γ ⊢d ∞ # e ⦂ A
-     → Γ ⊢ τ A ⇒ e ⇒ A
-d→a∞ ⊢e = i→a∞ (d→i ⊢e)
+-- Corollary 4.3 (Soundness)
+import Implicit.Interm2Decl.Corollaries using (sound0')
 
+-- Corollary 4.3 (Completeness)
+import Implicit.Decl2Interm.Corollaries using (complete+0')
 
-a→d0 : Γ ⊢ □ ⇒ e ⇒ A
-     → Γ ⊢d Z # e ⦂ A
-a→d0 ⊢e = i→d (a→i0 ⊢e)
+----------------------------------------------------------------------
+--+                           Section 5                            +--
+----------------------------------------------------------------------
 
-a→d∞ : Γ ⊢ τ A ⇒ e ⇒ A
-     → Γ ⊢d ∞ # e ⦂ A
-a→d∞ ⊢e = i→d (a→i∞ ⊢e)
+-- Lemma 5.1 (Subtyping Inference Implies Environment Extension under types)
+import Implicit.Algo.Properties.Regularity using (s-⊆/)
+
+-- Lemma 5.2 2 (Subtyping Checking Implies Environment Extension under types)
+import Implicit.Algo.Properties.Extension using (ss+-⊆/; ss--⊆/)
+
+-- Theorem 5.3 & 5.4 (Decidilibty of Typing and Subtyping)
+-- Proved in Rocq Prover, check the folder `decidability_coq/`
+
+-- Lemma 5.5 (Soundness of Instantiation)
+import Implicit.Algo2Interm.Find using (s-find)
+
+-- Theorem 5.6 (Generalized Soundness of Subtyping)
+import Implicit.Algo2Interm.Main using (sound-s)
+
+-- Theorem 5.7 (Generalized Soundness of Typing)
+import Implicit.Algo2Interm.Main using (sound)
+
+-- Corollary 5.8 (Soundness of Typing)
+import Implicit.Algo2Interm.Corollaries using (sound0; sound∞)
+
+-- Lemma 5.9 ((Typing implies Subtyping)
+import Implicit.Algo.Properties.Subsumption using (⊢to≤)
+
+-- Lemma 5.10 (Subsumption of Algo. Typing)
+import Implicit.Algo.Properties.Subsumption using (subsumption0)
+
+-- Theorem 5.11 (Generalized Completeness of Subtyping)
+import Implicit.Interm2Algo.Main using (complete-s)
+
+-- Theorem 5.12 (Generalized Completeness of Typing)
+import Implicit.Interm2Algo.Corollaries using (complete)
+
+-- Corollary 5.13 (Completeness of Typing)
+import Implicit.Interm2Algo.Corollaries using (complete-0; complete-∞)
