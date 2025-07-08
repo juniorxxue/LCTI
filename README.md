@@ -10,7 +10,7 @@ This repository contains mechanized proofs and implementations organized into th
 
 To compile the Agda files, run `make` in the `proof_core/main_agda/` directory. This requires `agda` and its standard library to be installed. We also provide a rendered HTML version of the main proof at `proof_core/main_agda/html/Implicit.Paper.html`, which is the recommended way to read the proof.
 
-* `proof_core/decidability_coq`: Contains the decidability proof of the algorithmic system, written in Rocq Prover. To compile the Rocq files, run `make` in the `proof_core/decidability_coq/Dec` directory. This requires `coq` and the `CoqHammer` library to be installed. We also include a rendered HTML version of the decidability proof at `proof_core/decidability_coq/html/toc.html` for convenient reading.
+* `proof_core/decidability_coq/`: Contains the decidability proof of the algorithmic system, written in Rocq Prover. To compile the Rocq files, run `make` in the `proof_core/decidability_coq/Dec` directory. This requires `coq` and the `CoqHammer` library to be installed. We also include a rendered HTML version of the decidability proof at `proof_core/decidability_coq/html/toc.html` for convenient reading.
 
 ### Implementations
 
