@@ -1,6 +1,10 @@
 Require Import Coq.Init.Nat.
 Require Import Coq.Arith.Compare_dec.
 
+(** * Syntax *)
+
+(** ** Types *)
+
 Inductive Typ : Set :=
 | Int  : Typ
 | TVar : nat -> Typ
@@ -11,6 +15,8 @@ Inductive Typ : Set :=
 Notation "‶ X"     := (TVar X) (at level 13, right associativity).
 Notation "A `→ B" := (Arr A B) (at level 11, right associativity).
 Notation "`∀ A"    := (All A) (at level 12, right associativity).
+
+(** ** Terms *)
 
 Inductive Trm : Set :=
 | Lit   : nat -> Trm
@@ -27,6 +33,8 @@ Notation "e ⦂ A"    := (Ann e A) (at level 50, left associativity).
 Notation "Λ~ e"     := (TLam e) (at level 52, right associativity).
 Notation "e @ A "   := (TApp e A) (at level 50, left associativity).
 
+(** ** Contexts *)
+
 Inductive Context : Set :=
 | CtxEmpty : Context
 | CtxTyp   : Typ -> Context
@@ -37,6 +45,8 @@ Notation "□"        := CtxEmpty (at level 50).
 Notation "τ~ A"      := (CtxTyp A) (at level 50).
 Notation "[ e ]↝ Σ" := (CtxTrm e Σ) (at level 53, right associativity).
 Notation "A ⓪↝ Σ"  := (CtxTApp A Σ) (at level 54, right associativity).
+
+(** ** Others *)
 
 Inductive NonEmpty : Context -> Prop :=
 | ne_τ    : forall A,   NonEmpty (CtxTyp A)
@@ -58,6 +68,8 @@ Definition GenericConsumer (e : Trm) : Prop :=
   | _         => False
   end.
 
+(** ** Environments *)
+
 (* The environment is a list of types, and the existential variables are in the tail *)
 
 Inductive Env : Set :=
@@ -74,6 +86,8 @@ Notation "Γ , ^"   := (ExCons Γ) (at level 60, right associativity).
 Notation "Γ , ⋅"   := (TyCons Γ) (at level 60, right associativity).
 Notation "Γ , = A" := (ExTyCons Γ A) (at level 60, right associativity).
 Notation "Γ ⋈"     := (SepCons Γ) (at level 55, right associativity).
+
+(** ** Shifts *)
 
 (* The function f(i,j) = if i<=j then j+1 else j *)
 Definition punchIn (k : nat) (X : nat) : nat :=
@@ -125,6 +139,8 @@ Fixpoint tm_shift_ctx (Σ : Context) (k : nat) : Context :=
   | CtxTApp A Σ => CtxTApp A (tm_shift_ctx Σ k)
   end.
 
+(** ** Lookup *)
+
 (* lookup an entry: term variable, won't bypass the ⋈, since assume in TypEnv *)
 Inductive lookupTm : Env -> nat -> Typ -> Prop :=
 | l_tm_Z     : forall Γ A, lookupTm (TmCons Γ A) 0 A
@@ -167,6 +183,8 @@ Inductive lookupExTy' : Env -> nat -> Prop :=
 | l_exty'_STExTy : forall Γ B x, lookupExTy' Γ x -> lookupExTy' (ExTyCons Γ B) (S x)
 | l_exty'_STm    : forall Γ A x, lookupExTy' Γ x -> lookupExTy' (TmCons Γ A) x.
 
+(** ** Subst *)
+
 (* A [k / T] *)
 Fixpoint subst (A : Typ) (k : nat) (T : Typ) : Typ :=
   match A with
@@ -179,6 +197,8 @@ Fixpoint subst (A : Typ) (k : nat) (T : Typ) : Typ :=
   | Arr A B => Arr (subst A k T) (subst B k T)
   | All A => All (subst A (S k) (ty_shift T 0))
   end.
+
+(** ** Regular *)
 
 (* a regular type, just like system-f types *)
 Inductive RegularTyp : Env -> Typ -> Prop :=
@@ -245,6 +265,9 @@ Inductive substEnv : Typ -> nat -> Env -> Env -> Prop :=
     RegularTyp Γ B ->
     substEnv A' (S k) (ExTyCons Γ B) (ExTyCons Γ' B).
 
+
+(** ** Open and Closed *)
+
 Inductive Polar : Set :=
 | Pos : Polar
 | Neg : Polar.
@@ -276,7 +299,7 @@ Inductive close : Env -> Typ -> Prop :=
     close Δ (TVar x)
 | c_var_exty : forall Δ x,
     lookupExTy' Δ x ->
-    close Δ (TVar x) 
+    close Δ (TVar x)
 | c_arr : forall Δ A B,
     close Δ A ->
     close Δ B ->

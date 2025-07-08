@@ -1,5 +1,7 @@
 Require Import Syntax.
 
+(** * Algorithmic Typing and Subtyping *)
+
 Inductive sub : Env -> Typ -> Polar -> Typ -> Env -> Prop :=
 | s_int : forall Δ p,
     SRegular Δ ->
@@ -55,7 +57,7 @@ Fixpoint rm_sep (Γ : Env) : Env :=
   | ExTyCons Γ' A => ExTyCons (rm_sep Γ') A
   | SepCons Γ'    => rm_sep Γ'
   end.
-    
+
 Inductive ty : Env -> Context -> Trm -> Typ -> Prop :=
 | ty_lit : forall Γ n,
     TRegular Γ ->

@@ -7,6 +7,10 @@ Require Import Coq.Program.Equality.
 Require Import Coq.Arith.Compare_dec.
 Require Import Coq.Arith.PeanoNat.
 
+(** * Decidability *)
+
+(** ** Sizes *)
+
 Fixpoint ty_size (A : Typ) : nat :=
   match A with
   | Int => 1
@@ -14,6 +18,8 @@ Fixpoint ty_size (A : Typ) : nat :=
   | Arr A1 A2 => 1 + ty_size A1 + ty_size A2
   | All A' => 1 + ty_size A'
   end.
+
+(** ** Decidability of Aux judgments *)
 
 Lemma dec_CtxEmpty Σ :
   {Σ = CtxEmpty} + {NonEmpty Σ}.
@@ -37,7 +43,7 @@ Proof.
         sauto q: on.
       * destruct (le_dec k n) as [Hle' | Hle'].
         -- left. exists (TVar n). simpl. unfold punchIn. sauto l: on.
-        -- assert (Heq: k = S n) by lia. subst. 
+        -- assert (Heq: k = S n) by lia. subst.
            right. intros [A' Heq].
            destruct A'; try sfirstorder.
            dependent destruction Heq. unfold punchIn in *.
@@ -266,6 +272,8 @@ Proof.
   sauto l: on use: lookupTy_Ex, lookupTy_ExTy, lookupEx_ExTy, substEnv_Ex, substEnv_det.
 Qed.
 
+(** ** Decidability of Subtyping Checking *)
+
 Lemma dec_sub' : forall n Δ A p B,
   ty_size A + ty_size B < n ->
   {Ω | sub Δ A p B Ω} + {~ exists Ω, sub Δ A p B Ω}.
@@ -290,7 +298,7 @@ Proof.
     + sauto lq: on.
     + sauto lq: on.
   - clear TVarR. destruct B.
-    + hauto lq: on use: TVarL. 
+    + hauto lq: on use: TVarL.
     + clear TVarL. destruct (dec_lookupTy Δ n0).
       * destruct (dec_lookupTy Δ n1).
         -- destruct (Nat.eq_dec n0 n1); subst.
@@ -387,7 +395,7 @@ Lemma NonEmpty_ctx_size_gt0 : forall Σ,
 Proof.
   intros Σ Hne. destruct Σ; simpl in *; try sfirstorder.
   sauto lq: on.
-Qed. 
+Qed.
 
 Lemma tm_size_gt0 : forall e, tm_size e > 0.
 Proof. induction e; simpl; lia. Qed.
@@ -550,7 +558,7 @@ Qed.
 
 Lemma TRegular_lookupTm_RegularTyp : forall x Γ A,
   TRegular Γ -> lookupTm Γ x A -> RegularTyp Γ A.
-Proof. 
+Proof.
   intros * Hreg Hlk.
   dependent induction Hlk;
      sauto lq: on use: RegularTyp_weaken_TmCons, RegularTyp_weaken_TyCons,
@@ -559,7 +567,7 @@ Qed.
 
 Lemma SRegular_lookupExTy_RegularTyp : forall x Γ A,
   SRegular Γ -> lookupExTy Γ x A -> RegularTyp Γ A.
-Proof. 
+Proof.
   intros * Hreg Hlk.
   dependent induction Hlk;
      sauto lq: on use: RegularTyp_weaken_TmCons, RegularTyp_weaken_TyCons,
@@ -593,6 +601,8 @@ Proof. sauto lq: on use: RegularTyp_weaken_gen. Qed.
 Lemma TRegularTyp_strengthen_SepCons : forall Γ A,
   TRegular Γ -> RegularTyp (SepCons Γ) A -> RegularTyp Γ A.
 Proof. sauto lq: on use: RegularTyp_weaken_gen. Qed.
+
+(** ** Determinism of Typing and Subtyping *)
 
 Lemma ty_sub_ctx_infs_det' : forall n,
   (forall Γ Σ e A A', tm_size e + ctx_size Σ < n ->
@@ -677,7 +687,7 @@ Lemma dec_open : forall Δ A,
 Proof.
   intros Δ A. generalize dependent Δ.
   induction A; intro Δ.
-  - sauto lq: on. 
+  - sauto lq: on.
   - destruct (dec_lookupEx Δ n); sauto lq: on.
   - specialize (IHA1 Δ). specialize (IHA2 Δ). sauto q: on.
   - specialize (IHA (TyCons Δ)). sauto q: on.
@@ -739,6 +749,8 @@ Proof. sauto lq: on rew: off. Qed.
 Lemma dec_isCtxTyp : forall t,
   {t' | t = CtxTyp t'} + {~ exists t', t = CtxTyp t'}.
 Proof. sauto lq: on rew: off. Qed.
+
+(** ** Decidability of Typing and Subtyping Inference *)
 
 Lemma dec_ty_sub_ctx_infs' : forall n,
   (forall Γ Σ e, tm_size e + ctx_size Σ < n ->
@@ -832,7 +844,7 @@ Proof.
       * destruct A; try solve [right; intros [Γ' Hc]; dependent destruction Hc; try sfirstorder;
           eapply ty_det in Hty; eauto; sfirstorder].
         sauto lq: on.
-      * right. intros [Γ' Hc]. dependent destruction Hc; try sfirstorder use: NonEmpty_false. 
+      * right. intros [Γ' Hc]. dependent destruction Hc; try sfirstorder use: NonEmpty_false.
     + destruct (dec_CtxEmpty Σ); subst; try sfirstorder.
       assert (Hlt': tm_size e + ctx_size (CtxTyp t) < n). { simpl in *. lia. }
       eapply IHty with (Γ := Γ) in Hlt' as Hty.
@@ -957,7 +969,7 @@ Proof.
               eapply sub_ctx_det in Hsub; eauto. sfirstorder.
         -- right. intros [Δ'' [A'' Hcontra]].
            dependent destruction Hcontra; try sfirstorder.
-           eapply lookupExTy_det in Hlk; eauto. sfirstorder. 
+           eapply lookupExTy_det in Hlk; eauto. sfirstorder.
       * sauto lq: on.
       * assert (Hlt': ctx_size (ty_shift_ctx Σ 0) < n).
         { simpl in *. rewrite ctx_size_ty_shift. lia. }
@@ -968,7 +980,7 @@ Proof.
             destruct (eq_dec_ty t t0); subst. sauto lq: on.
             right. intros [Δ'' [A'' Hcontra]]. dependent destruction Hcontra; try sfirstorder.
             eapply sub_ctx_det in Hsub; eauto. sfirstorder.
-        -- right. intros [Δ'' [A'' Hcontra]]. dependent destruction Hcontra; try sfirstorder. 
+        -- right. intros [Δ'' [A'' Hcontra]]. dependent destruction Hcontra; try sfirstorder.
   - intros Γ Σ Hlt.
     destruct Σ. 1, 4 : sauto lq: on rew: off.
     + destruct (dec_TRegular Γ). 2 : sauto q: on rew: off.
@@ -982,6 +994,8 @@ Proof.
       destruct Hinf as [[A' Hinf] | Hninf]; sauto lq: on rew: off.
 Qed.
 
+(** ** Corollaries *)
+
 Theorem dec_ty : forall Γ Σ e,
   {A | ty Γ Σ e A} + {~ exists A, ty Γ Σ e A}.
 Proof. hauto lq: on use: dec_ty_sub_ctx_infs'. Qed.
@@ -994,4 +1008,4 @@ Theorem dec_infs : forall Γ Σ,
   {A | infs Γ Σ A} + {~ exists A, infs Γ Σ A}.
 Proof. hauto lq: on use: dec_ty_sub_ctx_infs'. Qed.
 
-Recursive Extraction dec_ty.
+(* Recursive Extraction dec_ty. *)
