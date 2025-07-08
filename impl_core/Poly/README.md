@@ -1,9 +1,5 @@
 Beyond the formalization, we extend our system with lists, pairs and ST Monad.
 
-TODO:
-- Replace the Label of the rules (for infer*s*) once the paper is updated
-
-
 ```
 Gamma |- A => e' => A'    Gamma, x : A |- Sigma => e => B
 -----------------------------------------------------------
@@ -49,7 +45,7 @@ Gamma |- [] => \x : A. e => A -> B
 | D1     | `app poly id`                          | `app poly id`                                                                                                | ✅        |
 | D2     | `revapp id poly`                       | `revapp id poly`                                                                                             | ✅        |
 | D3     | `runST argST`                          | `runST argST`                                                                                                | ✅        |
-| D4     | `app runST argST`                      | `app (\x : (forall a. ST a Int). runST (/\a. x @a)) argST`                                                   | Ann       |
+| D4     | `app runST argST`                      | `app (runST @ Int) argST`                                                                                    | Ann       |
 | D5     | `revapp argST runST`                   | `revapp argST (runST @ Int)`                                                                                 | Ann       |
 | E1, E2 | `k h lst`/`k (\x. h x) lst`            | `k (/\a. \x : Int. h x @ a) lst`                                                                             | Ann       |
 | E3     | `r (\x. \y. y)`                        | `r (/\ a. \x : a. /\ b. \y : b. y)`                                                                          | Ann       |

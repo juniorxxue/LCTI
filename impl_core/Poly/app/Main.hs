@@ -499,6 +499,7 @@ main = do
       exD4Ann = infer (ETrm appTyp (ETrm runSTTyp (ETrm argSTTyp EEmpty))) CEmpty $ Var 0 `App` (Abs (Var 2 `App` TAbs (Var 0 `TApp` TVar 0)) `Ann` TArr argSTTyp TInt) `App` Var 2
       -- with AbsAnn: app (\x : forall a. ST a Int. runST (/\a. x @a)) argST
       exD4Ann' = infer (ETrm appTyp (ETrm runSTTyp (ETrm argSTTyp EEmpty))) CEmpty $ Var 0 `App` AbsAnn argSTTyp (Var 2 `App` TAbs (Var 0 `TApp` TVar 0)) `App` Var 2
+      exD4Ann'' = infer (ETrm appTyp (ETrm runSTTyp (ETrm argSTTyp EEmpty))) CEmpty $ Var 0 `App` (Var 1 `TApp` TInt) `App` Var 2
       -- D5: revapp argST runST Ann~> revapp argST (runST @Int) / revapp argST (\x. runST (/\a. x @a) : (forall a. ST a Int) -> Int)
       exD5 = infer (ETrm revappTyp (ETrm argSTTyp (ETrm runSTTyp EEmpty))) CEmpty $ Var 0 `App` Var 1 `App` Var 2
       exD5Ann = infer (ETrm revappTyp (ETrm argSTTyp (ETrm runSTTyp EEmpty))) CEmpty $ Var 0 `App` Var 1 `App` (Var 2 `TApp` TInt)
@@ -588,6 +589,7 @@ main = do
       exD3,
       exD4,
       exD4Ann,
+      exD4Ann',
       exD4Ann',
       exD5,
       exD5Ann,
