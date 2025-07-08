@@ -7,6 +7,23 @@ open import Implicit.Interm.All
 
 open import Implicit.Decl2Interm.Main
 
+complete+' : Γ ⊢d j # A% ≤ B
+          → Γ ≫ A ⇘ A%
+          → Γ ⊢ j # A ⌞ ≤⁺ ⌝ B
+complete+' s grd = complete+ (⊢d→⊢d² s) grd
+
+complete+0' : Γ ⋈ ⊢d j # A ≤ B
+            → Γ ⋈ ⊢r A
+            → Γ ⋈ ⊢r B
+            → Γ ⋈ ⊢ j # A ⌞ ≤⁺ ⌝ B
+complete+0' s regA regB = complete+' s (⊢r-≫-eq regA)
+
+
+complete-' : Γ ⊢d ∞ # A ≤ B%
+          → Γ ≫ B ⇘ B%
+          → Γ ⊢ ∞ # A ⌞ ≤⁻ ⌝ B
+complete-' s grd = complete- (⊢d→⊢d² s) grd
+
 ⊢complete : Γ ⊢d j # e ⦂ A
           → Γ ⊢ j # e ⦂ A
 ⊢complete (⊢lit regΓ) = ⊢lit regΓ

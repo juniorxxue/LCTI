@@ -372,3 +372,28 @@ data [_/_]_∙⟹_ : Type m → Fin m → Env n m → Env n m → Set where
 ∙⟹-∙-eq-false (S∙ inΓ) (∙⟹∙S newΓ up1) (S∙ inΓ') = ∙⟹-∙-eq-false inΓ newΓ inΓ'
 ∙⟹-∙-eq-false (S= inΓ) (∙⟹=S newΓ up1) (S= inΓ') = ∙⟹-∙-eq-false inΓ newΓ inΓ'
 ∙⟹-∙-eq-false (S^ inΓ) (∙⟹^S newΓ up1) (S^ inΓ') = ∙⟹-∙-eq-false inΓ newΓ inΓ'
+
+
+⊢r-◇ : Γ ⊢r A
+     → Γ ◇ k ⇘ Γ'
+     → Γ' ⊢r A
+⊢r-◇ ⊢r-int new = ⊢r-int
+⊢r-◇ (⊢r-var-∙ inΓ) new = ⊢r-var-∙ (◇-∙∈ inΓ new)
+⊢r-◇ (⊢r-arr regA regA₁) new = ⊢r-arr (⊢r-◇ regA new) (⊢r-◇ regA₁ new)
+⊢r-◇ (⊢r-∀ regA) new = ⊢r-∀ (⊢r-◇ regA (◇S∙ new))
+
+◆-sregular : SRegular Γ
+           → Γ ◆ k ⇘ Γ'
+           → SRegular Γ'
+◆-sregular (reg-S∙ regΓ) (◆S∙ new) = reg-S∙ (◆-sregular regΓ new)
+◆-sregular (reg-S^ regΓ) (◆S^ new) = reg-S^ (◆-sregular regΓ new)
+◆-sregular (reg-S= regΓ regA) ◆Z = reg-S∙ regΓ
+◆-sregular (reg-S= regΓ regA) (◆S= new) = reg-S= (◆-sregular regΓ new) (⊢r-◆ regA new)
+
+◇-sregular : SRegular Γ
+           → Γ ◇ k ⇘ Γ'
+           → SRegular Γ'
+◇-sregular (reg-S∙ regΓ) (◇S∙ new) = reg-S∙ (◇-sregular regΓ new)
+◇-sregular (reg-S^ regΓ) ◇Z = reg-S∙ regΓ
+◇-sregular (reg-S^ regΓ) (◇S^ new) = reg-S^ (◇-sregular regΓ new)
+◇-sregular (reg-S= regΓ regA) (◇S= new) = reg-S= (◇-sregular regΓ new) (⊢r-◇ regA new)

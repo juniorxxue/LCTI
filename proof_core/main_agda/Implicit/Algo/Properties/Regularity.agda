@@ -253,17 +253,15 @@ s-⊢c (s-evar-infers infs inst) = ⊢c-var-= (inst-∋= inst)
 --+                           Extension                            +--
 ----------------------------------------------------------------------
 
-{- this lemma is correct and provable
-   but requires several irrevelence lemmas, but is heavy to prove, thus avoid this lemma in its call site
 s-⊆/ : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
      → Γ ⊆ Δ w/t A
 s-⊆/ (s-empty regΓ cloA grd) = ⊆/-refl regΓ cloA
 s-⊆/ (s-type ss) = ss+-⊆/ ss
 s-⊆/ (s-term-c cloA ap ⊢e s) = ext-arr (⊆/-refl (s-env-in s) cloA) (s-⊆/ s)
 s-⊆/ (s-term-o opnA ⊢e ss s) = ext-arr (ss--⊆/ ss) (s-⊆/ s)
-s-⊆/ (s-∀l s upᶜ upᵉ upC upD) = ext-∀ {!s-⊆/ s!}
-s-⊆/ (s-∀l-no s upᶜ upᵉ upC upD) = ext-∀ {!s-⊆/ s!}
-s-⊆/ (s-tapp s upᶜ) = ext-∀ {!s-⊆/ s!}
+s-⊆/ (s-∀l s upᶜ upᵉ upC upD) = ext-∀ (⊆/-◇◆0 (s-⊆/ s))
+s-⊆/ (s-∀l-no s upᶜ upᵉ upC upD) = ext-∀ (⊆/-◇◇0 (s-⊆/ s))
+s-⊆/ (s-tapp s upᶜ) = ext-∀ (⊆/-◆◆0 (s-⊆/ s))
 s-⊆/ (s-svar-term x s) = ⊆/-refl (s-env-in s) (⊢c-var-= (∋:=to∋= x))
 s-⊆/ (s-svar-tapp x s) = ⊆/-refl (s-env-in s) (⊢c-var-= (∋:=to∋= x))
--}
+s-⊆/ (s-evar-infers infs inst) = ext-var (inst-⊆/x inst)

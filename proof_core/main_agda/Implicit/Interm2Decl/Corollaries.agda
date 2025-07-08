@@ -10,6 +10,18 @@ si→sd : Γ ⊢ j # A ⌞ ≤⁺ ⌝ B
       → Γ ⊢d j # A ≤ B
 si→sd s regA = ⊢d²→⊢d (sound-this s (⊢r-≫-eq regA) (⊢r-≫-eq (s+-polarity s)))
 
+sound' : Γ ⊢ j # A ⌞ ≤ ⌝ B
+      → Γ ≫ A ⇘ A%
+      → Γ ≫ B ⇘ B%
+      → Γ ⊢d j # A% ≤ B%
+sound' s grd1 grd2 = ⊢d²→⊢d (sound-this s grd1 grd2)
+
+sound0' : Γ ⋈ ⊢r A
+        → Γ ⋈ ⊢r B
+        → Γ ⋈ ⊢ j # A ⌞ ≤ ⌝ B
+        → Γ ⋈ ⊢d j # A ≤ B
+sound0' regA regB s = sound' s (⊢r-≫-eq regA) (⊢r-≫-eq regB)
+
 ⊢sound : Γ ⊢ j # e ⦂ A
        → Γ ⊢d j # e ⦂ A
 ⊢sound (⊢lit regΓ) = ⊢lit regΓ
