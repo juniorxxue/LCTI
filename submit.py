@@ -149,6 +149,16 @@ def main():
         if script_in_tmp.exists():
             script_in_tmp.unlink()
 
+        # Remove build_agda_html.sh from the archive
+        build_script = tmp_path / "build_agda_html.sh"
+        if build_script.exists():
+            build_script.unlink()
+
+        # Remove html_generator directory from the archive
+        html_generator_dir = tmp_path / "html_generator"
+        if html_generator_dir.exists():
+            shutil.rmtree(html_generator_dir, ignore_errors=True)
+
         # Create zip archive
         archive_path = REPO_DIR / ARCHIVE_NAME
         with zipfile.ZipFile(archive_path, 'w', zipfile.ZIP_DEFLATED) as zipf:

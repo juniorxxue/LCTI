@@ -55,4 +55,6 @@ dist-newstyle/
 _site/
 node_modules/
 
-htmls/
+src_htmls/
+html/
+submission.zip
