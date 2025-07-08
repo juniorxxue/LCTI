@@ -14,6 +14,8 @@ You can run `make` in the `proof_core/main_agda/` directory to compile the Agda 
 
 ### Implementations
 
+* `impl_core/Poly`: the Haskell implementation of the algorithmic system, including all the examples shown in the paper and table in the appendix. The command `cabal run` will print all the derivations of the examples.
+
 ## Right-to-Left Variant
 
 ## Systems with Top and Bottom Types

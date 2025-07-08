@@ -1,5 +1,6 @@
 import os
 import shutil
+import subprocess
 import tempfile
 import zipfile
 from pathlib import Path
@@ -24,12 +25,92 @@ def remove_patterns(base_dir, patterns):
         # Use rglob for recursive matching
         for path in base_dir.rglob(pattern):
             if path.exists():
+                # Skip html directories that we want to preserve
+                if path.name == "html" and path.is_dir():
+                    # Check if this is one of our documentation html directories
+                    if ("proof_core/main_agda" in str(path) or 
+                        "proof_core/decidability_coq" in str(path)):
+                        continue
+                
                 if path.is_dir():
                     shutil.rmtree(path, ignore_errors=True)
                 else:
                     path.unlink(missing_ok=True)
 
+def clean_build_artifacts(base_dir):
+    """Clean build artifacts while preserving HTML documentation."""
+    print("Cleaning build artifacts...")
+    
+    # Define patterns for build artifacts that should be cleaned
+    # (from .gitignore, but we want to keep html folders)
+    build_patterns = [
+        "*.agdai",
+        "*.vo", "*.vos", "*.vok", "*.glob",
+        "dist-newstyle",
+        ".lia.cache",
+        "*.aux", "*.log", "*.toc", "*.xdv", "*.fls",
+        "*.fdb_latexmk", "*.synctex.gz",
+        "*.snm", "*.vrb", "*.nav", "*.out",
+        "*.bbl", "*.blg"
+    ]
+    
+    # Clean build artifacts but preserve html directories
+    for pattern in build_patterns:
+        for path in base_dir.rglob(pattern):
+            if path.exists():
+                # Skip if this is an html directory we want to keep
+                if path.name == "html" and path.is_dir():
+                    continue
+                    
+                if path.is_dir():
+                    shutil.rmtree(path, ignore_errors=True)
+                    print(f"Removed directory: {path.relative_to(base_dir)}")
+                else:
+                    path.unlink(missing_ok=True)
+                    print(f"Removed file: {path.relative_to(base_dir)}")
+
+def run_make_commands():
+    """Run make commands to generate HTML documentation."""
+    print("Generating HTML documentation...")
+    
+    # Run make in proof_core/main_agda/
+    agda_dir = REPO_DIR / "proof_core" / "main_agda"
+    if agda_dir.exists():
+        print(f"Running make in {agda_dir}")
+        try:
+            subprocess.run(["make"], cwd=agda_dir, check=True)
+            print("Agda HTML generation completed")
+        except subprocess.CalledProcessError as e:
+            print(f"Warning: make failed in {agda_dir}: {e}")
+    
+    # Run make in proof_core/decidability_coq/Dec/
+    coq_dec_dir = REPO_DIR / "proof_core" / "decidability_coq" / "Dec"
+    coq_parent_dir = REPO_DIR / "proof_core" / "decidability_coq"
+    if coq_dec_dir.exists():
+        print(f"Running make in {coq_dec_dir}")
+        try:
+            subprocess.run(["make"], cwd=coq_dec_dir, check=True)
+            print("Coq HTML generation completed")
+            
+            # Move html folder from Dec/ to its parent directory
+            html_source = coq_dec_dir / "html"
+            html_dest = coq_parent_dir / "html"
+            
+            if html_source.exists():
+                # Remove existing html folder in parent if it exists
+                if html_dest.exists():
+                    shutil.rmtree(html_dest)
+                # Move the html folder
+                shutil.move(str(html_source), str(html_dest))
+                print(f"Moved HTML from {html_source} to {html_dest}")
+            
+        except subprocess.CalledProcessError as e:
+            print(f"Warning: make failed in {coq_dec_dir}: {e}")
+
 def main():
+    # First, run make commands to generate HTML documentation
+    run_make_commands()
+    
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp_path = Path(tmpdir)
         # Copy all files except .git and .gitmodules
@@ -42,8 +123,13 @@ def main():
             else:
                 shutil.copy2(item, dest)
 
-        # Remove files from .gitignore
+        # Clean build artifacts (but preserve html directories)
+        clean_build_artifacts(tmp_path)
+        
+        # Remove files from .gitignore (but preserve html directories)
         patterns = read_gitignore()
+        # Filter out html pattern if it exists, since we want to keep html dirs
+        patterns = [p for p in patterns if p.strip() != "html/"]
         remove_patterns(tmp_path, patterns)
 
         # Remove git-related files

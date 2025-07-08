@@ -608,7 +608,9 @@ main = do
     ]
     $ \ex -> case runWriterT ex of
       Just (tyA, logs) -> do
-        putStrLn $ "inferred type: " ++ show tyA
+        putStrLn "----------------------------------------"
+        putStrLn $ "Inferred result: " ++ show tyA
+        putStrLn "----------------------------------------"
         mapM_ putStrLn logs
         hFlush stdout
       Nothing -> print "Nothing"
