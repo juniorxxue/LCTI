@@ -25,7 +25,7 @@ import Implicit.Annotatability.Corollaries using (annotatability-real')
 -- Theorem 4.1 (Generalized Soundness of Subtyping)
 import Implicit.Interm2Decl.Corollaries using (sound')
 
--- Theorem 4.2 ((Generalized Completeness of Subtyping)
+-- Theorem 4.2 (Generalized Completeness of Subtyping)
 import Implicit.Decl2Interm.Corollaries using (complete+'; complete-')
 
 -- Corollary 4.3 (Soundness)
@@ -59,7 +59,7 @@ import Implicit.Algo2Interm.Main using (sound)
 -- Corollary 5.8 (Soundness of Typing)
 import Implicit.Algo2Interm.Corollaries using (sound0; sound∞)
 
--- Lemma 5.9 ((Typing implies Subtyping)
+-- Lemma 5.9 (Typing implies Subtyping)
 import Implicit.Algo.Properties.Subsumption using (⊢to≤)
 
 -- Lemma 5.10 (Subsumption of Algo. Typing)
