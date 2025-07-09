@@ -8,6 +8,10 @@ async function getModules(prefix, filename) {
   const visited = new Set();
   const queue = [filename];
   visited.add(filename);
+  allModules.push({
+    href: filename,
+    name: prefix + "${AGDA_PRJ_ROOT}"
+  });
 
   while (queue.length > 0) {
     const currentFile = queue.shift();
@@ -62,7 +66,7 @@ function toTrie(modules) {
   for (const module of modules) {
     let current = trie;
     for (const part of module.name.split(".")) {
-      if (part === "All" || part === "README") {
+      if (part === "All") {
         continue;
       }
       if (!current.has(part)) {
