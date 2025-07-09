@@ -425,13 +425,13 @@ runSpecificExamples showDrv names = do
 -- Run a single example
 runSingleExample :: Example -> Bool -> IO ()
 runSingleExample example showDrv = do
-  putStrLn "-------------------------------------------------------"
+  putStrLn $ replicate 80 '-'
   putStrLn $ exampleName example ++ ": " ++ exampleDescription example
   case runWriterT (infer (exampleEnv example) CEmpty (exampleTerm example)) of
     Just (tyA, logs) -> do
-      putStrLn $ "Typing result: " ++ show tyA
+      putStrLn $ "[✓] Typing result: " ++ show tyA
       when showDrv $ do
         putStrLn ""
         mapM_ putStrLn logs
     Nothing -> do
-      putStrLn "Typing failed"
+      putStrLn "[x] Typing failed"
