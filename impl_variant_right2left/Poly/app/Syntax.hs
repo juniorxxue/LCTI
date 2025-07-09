@@ -7,7 +7,7 @@ import Debug.Trace
 
 type Log = [String]
 data Typ = TInt | TBool | TVar Int | TArr Typ Typ | TForall Typ | TList Typ | TProd Typ Typ | TST Typ Typ deriving (Eq)
-data Trm = LitInt Int | LitBool Bool | Var Int | Abs Trm | App Trm Trm | Ann Trm Typ | TAbs Trm | TApp Trm Typ | Nil | Cons | Pair | ST
+data Trm = LitInt Int | LitBool Bool | Var Int | Abs Trm | AbsAnn Typ Trm | App Trm Trm | Ann Trm Typ | TAbs Trm | TApp Trm Typ | Nil | Cons | Pair | ST
 
 instance Show Typ where
   showsPrec _ TInt = showString "Int"
@@ -24,6 +24,7 @@ instance Show Trm where
   showsPrec _ (LitBool b) = shows b
   showsPrec _ (Var i) = showString "e" . shows i
   showsPrec p (Abs t) = showParen (p > 0) $ showString "λ. " . shows t
+  showsPrec p (AbsAnn ty t) = showParen (p > 0) $ showString "λ" . showString " : " . shows ty . showString ". " . shows t
   showsPrec p (App t1 t2) = showParen (p > 9) $ showsPrec 9 t1 . showString " " . showsPrec 10 t2
   showsPrec p (Ann t ty) = showParen (p > 1) $ showsPrec 1 t . showString " : " . shows ty
   showsPrec p (TAbs t) = showParen (p > 0) $ showString "Λ. " . shows t

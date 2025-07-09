@@ -6,13 +6,14 @@
 {-# HLINT ignore "Use if" #-}
 module Main where
 
-import Control.Monad (forM_)
+import Control.Monad (forM_, when)
 import Control.Monad.Writer
 import DeBruijn
-import Debug.Trace
 import Log
 import Syntax
-import System.IO (hFlush, stdout)
+import System.Environment (getArgs)
+import Examples (examples, Example(..), getExample, getExamplesInGroup)
+import Debug.Trace (trace)
 
 lookupEnv :: Int -> Env -> WriterT Log Maybe Typ
 lookupEnv 0 (ETrm ty _) = do
@@ -25,7 +26,7 @@ lookupEnv k (ESvar _ env) = shiftTyp0 <$> lookupEnv k env
 lookupEnv _ _ = lift Nothing
 
 findSol :: Env -> Int -> WriterT Log Maybe Typ
-findSol a b | trace ("findSol " ++ show a ++ " |- " ++ show b) False = undefined
+-- findSol a b | trace ("findSol " ++ show a ++ " |- " ++ show b) False = undefined
 findSol EEmpty _ = lift Nothing
 findSol (ESvar ty _) 0 = return $ shiftTyp0 ty
 findSol (ESvar _ senv) k | k > 0 = do
@@ -40,7 +41,7 @@ findSol (EEvar senv) k | k > 0 = do
 findSol _ _ = lift Nothing
 
 inst :: Env -> Int -> Typ -> Maybe Env
-inst env k a | trace ("inst " ++ show env ++ " " ++ show k ++ " " ++ show a) False = undefined
+-- inst env k a | trace ("inst " ++ show env ++ " " ++ show k ++ " " ++ show a) False = undefined
 inst (EEvar senv) 0 tyA = Just $ ESvar (unshiftTyp0 tyA) senv
 inst (EEvar senv) k tyA | k > 0 = do
   env' <- inst senv (k - 1) (unshiftTyp0 tyA)
@@ -54,7 +55,7 @@ inst (ESvar ty senv) k tyA | k > 0 = do
 inst _ _ _ = Nothing
 
 ssubP :: (Env, Env) -> Typ -> Typ -> WriterT Log Maybe Env
-ssubP (a1, a2) b c | trace ("ssub " ++ show a1 ++ ";" ++ show a2 ++ " |- " ++ show b ++ " <:+ " ++ show c) False = undefined
+-- ssubP (a1, a2) b c | trace ("ssub " ++ show a1 ++ ";" ++ show a2 ++ " |- " ++ show b ++ " <:+ " ++ show c) False = undefined
 ssubP (env, senv) TInt TInt = do
   tell ["[S-Int] " ++ logSSubFull (env, senv) TInt TInt senv]
   return senv
@@ -112,7 +113,7 @@ ssubP (env, senv) (TST tyA tyB) (TST tyC tyD) = do
 ssubP _ _ _ = lift Nothing
 
 ssubN :: (Env, Env) -> Typ -> Typ -> WriterT Log Maybe Env
-ssubN (a1, a2) b c | trace ("ssub " ++ show a1 ++ ";" ++ show a2 ++ " |- " ++ show b ++ " <:- " ++ show c) False = undefined
+-- ssubN (a1, a2) b c | trace ("ssub " ++ show a1 ++ ";" ++ show a2 ++ " |- " ++ show b ++ " <:- " ++ show c) False = undefined
 ssubN (env, senv) TInt TInt = do
   tell ["[S-Int] " ++ logSSubFull (env, senv) TInt TInt senv]
   return senv
@@ -170,7 +171,7 @@ ssubN (env, senv) (TST tyA tyB) (TST tyC tyD) = do
 ssubN _ _ _ = lift Nothing
 
 ground :: Env -> Typ -> WriterT Log Maybe Typ
-ground a b | trace ("ground " ++ show a ++ " |- " ++ show b) False = undefined
+-- ground a b | trace ("ground " ++ show a ++ " |- " ++ show b) False = undefined
 ground _ TInt = return TInt
 ground _ TBool = return TBool
 ground env (TVar k) | isUvar env k = return (TVar k)
@@ -195,7 +196,7 @@ ground env (TST tyA tyB) = do
   return $ TST tyA' tyB'
 
 sub :: (Env, Env) -> Typ -> Context -> WriterT Log Maybe (Env, Typ)
-sub (a1, a2) b c | trace ("sub " ++ show a1 ++ ";" ++ show a2 ++ " |- " ++ show b ++ " <: " ++ show c) False = undefined
+-- sub (a1, a2) b c | trace ("sub " ++ show a1 ++ ";" ++ show a2 ++ " |- " ++ show b ++ " <: " ++ show c) False = undefined
 sub (env, senv) tyA CEmpty | closed (envConcat env senv) tyA = do
   grdA <- ground (envConcat env senv) tyA
   tell ["[S-Empty] " ++ logSubFull (env, senv) tyA CEmpty senv grdA]
@@ -259,7 +260,6 @@ sub (env, senv) (TVar k) (CTerm e h) | isUvar (envConcat env senv) k = do
     Nothing -> lift Nothing
 sub _ _ _ = lift Nothing
 
--- TODO: change the name of the rules
 infers :: Env -> Context -> WriterT Log Maybe Typ
 infers env (CFullType tyA) = do
   tell ["[CI-Type] " ++ logInfersFull env (CFullType tyA) tyA]
@@ -273,10 +273,8 @@ infers env (CTerm tm h) = do
   return $ TArr tyA tyB
 infers _ _ = lift Nothing
 
--- sub (EEmpty, (ESvar TInt EEmpty)) (TArr (TVar 0) (TVar 0)) (CTerm (Lit 42) CEmpty)
-
 infer :: Env -> Context -> Trm -> WriterT Log Maybe Typ
-infer a b c | trace ("infer " ++ show a ++ " |- " ++ show b ++ " => " ++ show c) False = undefined
+-- infer a b c | trace ("infer " ++ show a ++ " |- " ++ show b ++ " => " ++ show c) False = undefined
 infer env CEmpty (LitInt n) = do
   tell ["[Ty-Int] " ++ logInferFull env CEmpty (LitInt n) TInt]
   return TInt
@@ -309,6 +307,23 @@ infer env (CTerm tm2 h) (Abs tm) = do
   tell ["[Ty-Abs2] " ++ logInferFull env (CTerm tm2 h) (Abs tm) (TArr tyA tyB)]
   tell $ indentAll _log1
   tell $ indentAll _log2
+  return $ TArr tyA tyB
+infer env (CTerm tm2 h) (AbsAnn tyA tm) = do
+  (_, _log1) <- peek $ infer env (CFullType tyA) tm2
+  (tyB, _log2) <- peek $ infer (ETrm tyA env) (shiftContext0 h) tm
+  tell ["[Ty-AbsAnn] " ++ logInferFull env (CTerm tm2 h) (AbsAnn tyA tm) (TArr tyA tyB)]
+  tell $ indentAll _log1
+  tell $ indentAll _log2
+  return $ TArr tyA tyB
+infer env (CFullType (TArr tyA tyB)) (AbsAnn tyA' tm) | tyA == tyA' = do
+  (_, _log) <- peek $ infer (ETrm tyA env) (CFullType tyB) tm
+  tell ["[Ty-AbsAnn-Chk] " ++ logInferFull env (CFullType (TArr tyA tyB)) (AbsAnn tyA' tm) (TArr tyA tyB)]
+  tell $ indentAll _log
+  return $ TArr tyA tyB
+infer env CEmpty (AbsAnn tyA tm) = do
+  (tyB, _log) <- peek $ infer (ETrm tyA env) CEmpty tm
+  tell ["[Ty-AbsAnn] " ++ logInferFull env CEmpty (AbsAnn tyA tm) tyB]
+  tell $ indentAll _log
   return $ TArr tyA tyB
 infer env (CFullType (TForall tyA)) (TAbs tm) = do
   (_, _log) <- peek $ infer (EUvar env) (CFullType tyA) tm
@@ -355,15 +370,61 @@ infer _ _ _ = lift Nothing
 
 main :: IO ()
 main = do
-  let
-    exPair = infer EEmpty CEmpty $ (Pair `App` Abs (Var 0) `App` LitInt 1) `Ann` ((TInt `TArr` TInt) `TProd` TInt)
+  args <- getArgs
+  let showDrv = "--drv" `elem` args
+      showHelp = "--help" `elem` args || "-h" `elem` args
+  
+  if showHelp
+    then do
+      putStrLn "Usage: cabal run Poly -- [OPTIONS] [EXAMPLE_NAME]"
+      putStrLn ""
+      putStrLn "Options:"
+      putStrLn "  --help, -h        Show this help message"
+      putStrLn "  --drv, -d         Show detailed derivation steps"
+      putStrLn ""
+      putStrLn "Examples:"
+      putStrLn "  cabal run Poly                    # Run all examples (default)"
+      putStrLn "  cabal run Poly -- A1              # Run specific example"
+      putStrLn "  cabal run Poly -- A1 A2 A3        # Run multiple examples"
+      putStrLn "  cabal run Poly -- --drv A1        # Run with derivation"
+    else do
+      -- Filter out flags to get example names
+      let requestedExamples = filter (not . isFlag) args
+          isFlag arg = arg `elem` ["--drv", "--help", "-h"]
+      if null requestedExamples
+        then runAllExamples showDrv
+        else runSpecificExamples showDrv requestedExamples
 
-  forM_
-    [ exPair
-    ]
-    $ \ex -> case runWriterT ex of
-      Just (tyA, logs) -> do
-        putStrLn $ "inferred type: " ++ show tyA
+runAllExamples :: Bool -> IO ()
+runAllExamples showDrv = do
+  forM_ examples $ \example -> do
+    runSingleExample example showDrv
+
+runSpecificExamples :: Bool -> [String] -> IO ()
+runSpecificExamples showDrv names = do
+  forM_ names $ \name -> do
+    let groupExamples = getExamplesInGroup name
+    if not (null groupExamples)
+      then do
+        putStrLn $ "Running examples: " ++ name
+        forM_ groupExamples $ \example -> do
+          runSingleExample example showDrv
+      else do
+        case getExample name of
+          Just example -> runSingleExample example showDrv
+          Nothing -> do
+            putStrLn $ "Error: Example or group '" ++ name ++ "' not found."
+            putStrLn "Use --help to see usage information."
+
+runSingleExample :: Example -> Bool -> IO ()
+runSingleExample example showDrv = do
+  putStrLn $ replicate 80 '-'
+  putStrLn $ exampleName example ++ ": " ++ exampleDescription example
+  case runWriterT (infer (exampleEnv example) CEmpty (exampleTerm example)) of
+    Just (tyA, logs) -> do
+      putStrLn $ "[✓] Typing result: " ++ show tyA
+      when showDrv $ do
+        putStrLn ""
         mapM_ putStrLn logs
-        hFlush stdout
-      Nothing -> print "Nothing"
+    Nothing -> do
+      putStrLn "[x] Typing failed"

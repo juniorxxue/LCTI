@@ -49,6 +49,7 @@ shiftTerm _ (LitBool b) = LitBool b
 shiftTerm k (Var x) = if | x < k -> Var x
                          | otherwise -> Var (x + 1)
 shiftTerm k (Abs t) = Abs (shiftTerm (k + 1) t)
+shiftTerm k (AbsAnn ty t) = AbsAnn ty (shiftTerm (k + 1) t)
 shiftTerm k (App t1 t2) = App (shiftTerm k t1) (shiftTerm k t2)
 shiftTerm k (Ann t ty) = Ann (shiftTerm k t) ty
 shiftTerm k (TAbs t) = TAbs (shiftTerm k t)
@@ -78,6 +79,7 @@ shiftTyTerm _ (LitInt i) = LitInt i
 shiftTyTerm _ (LitBool b) = LitBool b
 shiftTyTerm _ (Var x) = (Var x)
 shiftTyTerm k (Abs t) = Abs (shiftTyTerm k t)
+shiftTyTerm k (AbsAnn ty t) = AbsAnn (shiftTyp k ty) (shiftTyTerm k t)
 shiftTyTerm k (App t1 t2) = App (shiftTyTerm k t1) (shiftTyTerm k t2)
 shiftTyTerm k (Ann t ty) = Ann (shiftTyTerm k t) (shiftTyp k ty)
 shiftTyTerm k (TAbs t) = TAbs (shiftTyTerm (1 + k) t)

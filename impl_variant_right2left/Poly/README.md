@@ -1,69 +1,68 @@
-Beyond the formalization, we extend our system with lists, pairs and ST Monad.
+# Right-to-Left Variant Implementation
 
-| ID     | Example Program                   | Translation                                                       | Status |
-| ------ | --------------------------------- | ----------------------------------------------------------------- | ------ |
-| A1     | `\x. \y. y`                       | `/\a. /\b. (\x. \y. y) : a -> b -> b`                             | Ann    |
-| A2     | `choose id`                       | `choose id`                                                       | ✅     |
-| A3     | `choose Nil ids`                  | `choose (Nil : [forall a. a -> a]) ids`                           | Ann    |
-| A4     | `\x. x x`                         | `(\x. x x) : (forall a. a -> a) -> (forall a. a -> a)`            | Ann    |
-| A5     | `id auto`                         | `id auto`                                                         | ✅     |
-| A6     | `id auto'`                        | `id auto'`                                                        | ✅     |
-| A7     | `choose id auto`                  | `choose (id @ (forall a. a -> a)) auto`                           | Ann    |
-| A8     | `choose id auto'`                 | `choose (/\a. \f. id f @a : (forall b. b -> b) -> a -> a) auto'`  | ✅     |
-| A9     | `f (choose id) ids`               | `f (choose id) ids`                                               | ✅     |
-| A10    | `poly id`                         | `poly id`                                                         | ✅     |
-| A11    | `poly (\x. x)`                    | `poly (/\a. \x. x : a -> a)`                                      | Ann    |
-| A12    | `id poly (\x. x)`                 | `id poly (/\a. \x. x : a -> a)`                                   | Ann    |
-| B1     | `\f. (f 1, f True)`               | `\f. (f 1, f True) : (forall a. a -> a) -> Int × Bool`            | Ann    |
-| B2     | `\xs. poly (head xs)`             | `\xs. poly (head xs) : [forall a. a -> a] -> Int × Bool`          | Ann    |
-| C1     | `length ids`                      | `length ids`                                                      | ✅     |
-| C2     | `tail ids`                        | `tail ids`                                                        | ✅     |
-| C3     | `head ids`                        | `head ids`                                                        | ✅     |
-| C4     | `single id`                       | `single id`                                                       | ✅     |
-| C5     | `cons id ids`                     | `cons id ids`                                                     | ✅     |
-| C6     | `cons (\x. x) ids`                | `cons (/\a. \x. x : a -> a) ids`                                  | Ann    |
-| C7     | `append (single inc) (single id)` | `append (single inc) (single (id @ Int))`                         | Ann    |
-| C8     | `append (single id) ids`          | `append (single id) ids`                                          | ✅     |
-| C9     | `map poly (single id)`            | `map poly (single id)`                                            | ✅     |
-| C10    | `map head (single ids)`           | `map (head @ (forall a. a -> a)) (single ids)`                    | Ann    |
-| D1     | `app poly id`                     | `app poly id`                                                     | ✅     |
-| D2     | `revapp id poly`                  | `revapp id poly`                                                  | ✅     |
-| D3     | `runST argST`                     | `runST argST`                                                     | ✅     |
-| D4     | `app runST argST`                 | `app (\x. runST (/\a. x @a) : (forall a. ST a Int) -> Int) argST` | Ann    |
-| D5     | `revapp argST runST`              | `revapp argST (runST @ Int)`                                      | Ann    |
-| E1, E2 | `k h lst`/`k (\x. h x) lst`       | `k (/\a. \x. h x : Int -> a -> a) lst`                            | Ann    |
-| E3     | `r (\x. \y. y)`                   | `r (/\a. (\x. /\b. (\y. y : b -> b)) : a -> forall b. b -> b)`    | Ann    |
-| F5     | `auto id`                         | `auto id`                                                         | ✅     |
-| F6     | `cons (head ids) ids`             | `cons (head ids) ids`                                             | ✅     |
-| F7     | `head ids 3`                      | `head ids 3`                                                      | ✅     |
-| F8     | `choose (head ids)`               | `choose (head ids)`                                               | ✅     |
+This directory contains a Haskell implementation of the right-to-left variant of local contextual type inference.
 
-**Legend:**
-- ✅ Can be typed
-- ❌ Cannot be typed
-- **Ann** indicates examples that require more explicit type annotations to type
+### Building from Source
 
-**Type Definitions:**
-- `id : forall a. a -> a`
-- `choose : forall a. a -> a -> a`
-- `auto : (forall a. a -> a) -> (forall a. a -> a)`
-- `auto' : forall a. (forall b. b -> b) -> a -> a`
-- `poly : (forall a. a -> a) -> Int × Bool`
-- `head : forall a. [a] -> a`
-- `tail : forall a. [a] -> [a]`
-- `length : forall a. [a] -> Int`
-- `single : forall a. a -> [a]`
-- `append : forall a. [a] -> [a] -> [a]`
-- `inc : Int -> Int`
-- `map : forall a b. (a -> b) -> [a] -> [b]`
-- `app : forall a b. (a -> b) -> a -> b`
-- `revapp : forall a b. a -> (a -> b) -> b`
-- `runST : forall a. (forall b. ST b a) -> a`
-- `argST : forall a. ST a Int`
-- `ids : [forall a. a -> a]`
-- `f : forall a. (a -> a) -> [a] -> a`
-- `h : Int -> (forall a. a -> a)`
-- `k : forall a. a -> [a] -> a`
-- `lst : [forall a. Int -> a -> a]`
-- `r : (forall a. a -> forall b. b -> b) -> Int`
- 
+* **Prerequisites**: [GHC](https://www.haskell.org/downloads/) and [Cabal](https://www.haskell.org/cabal/)
+* **Build**: From this directory, run:
+  ```bash
+  cabal build
+  ```
+
+### Usage
+
+* **Run the pair examples**
+
+  To test the `pair` example:
+  ```bash
+  cabal run Poly
+  ```
+
+  Expected Output:
+
+  ```bash
+  --------------------------------------------------------------------------------
+  Pair: (Pair (λx. x) 1) : (Int → Int) × Int
+  [✓] Typing result: (Int → Int) × Int
+  ```
+
+* **Show detailed derivations**
+
+  Add `--drv` argument to print the full derivation tree:
+
+  ```bash
+  cabal run Poly -- --drv
+  ```
+
+  Expected Output: Shows the complete derivation tree.
+
+  ```bash
+  --------------------------------------------------------------------------------
+  Pair: (Pair (λx. x) 1) : (Int → Int) × Int
+  [✓] Typing result: (Int → Int) × Int
+
+  [Ty-Ann] ∅ ⊢ □ ⇒ Pair (λ. e0) 1 : (Int → Int) × Int ⇒ (Int → Int) × Int
+    [Ty-App] ∅ ⊢ (Int → Int) × Int ⇒ Pair (λ. e0) 1 ⇒ (Int → Int) × Int
+      [Ty-App] ∅ ⊢ [1] ↝ (Int → Int) × Int ⇒ Pair (λ. e0) ⇒ Int → (Int → Int) × Int
+        [Ty-Sub] ∅ ⊢ [λ. e0] ↝ [1] ↝ (Int → Int) × Int ⇒ Pair ⇒ (Int → Int) → Int → (Int → Int) × Int
+          [Ty-Pair] ∅ ⊢ □ ⇒ Pair ⇒ ∀. ∀. t1 → t0 → t1 × t0
+          [S-Forall-L] ∅; ∅ ⊢ ∀. ∀. t1 → t0 → t1 × t0 <: [λ. e0] ↝ [1] ↝ (Int → Int) × Int ⊣ ∅ ⇝ (Int → Int) → Int → (Int → Int) × Int
+            [S-Forall-L] ∅; ∅, ^ ⊢ ∀. t1 → t0 → t1 × t0 <: [λ. e0] ↝ [1] ↝ (Int → Int) × Int ⊣ ∅, =Int → Int ⇝ (Int → Int) → Int → (Int → Int) × Int
+              [S-Term-Close] ∅; ∅, ^, ^ ⊢ t1 → t0 → t1 × t0 <: [λ. e0] ↝ [1] ↝ (Int → Int) × Int ⊣ ∅, =Int → Int, =Int ⇝ (Int → Int) → Int → (Int → Int) × Int
+                [S-Term-Close] ∅; ∅, ^, ^ ⊢ t0 → t1 × t0 <: [1] ↝ (Int → Int) × Int ⊣ ∅, =Int → Int, =Int ⇝ Int → (Int → Int) × Int
+                  [S-Type] ∅; ∅, ^, ^ ⊢ t1 × t0 <: (Int → Int) × Int ⊣ ∅, =Int → Int, =Int ⇝ (Int → Int) × Int
+                    [S-Prod] ∅; ∅, ^, ^ ⊢ t1 × t0 <: (Int → Int) × Int ⊣ ∅, =Int → Int, =Int
+                      [S-Ex-L] ∅; ∅, ^, ^ ⊢ t1 <: Int → Int ⊣ ∅, =Int → Int, ^
+                      [S-Ex-L] ∅; ∅, =Int → Int, ^ ⊢ t0 <: Int ⊣ ∅, =Int → Int, =Int
+                  [Ty-Sub] ∅, =Int → Int, =Int ⊢ Int ⇒ 1 ⇒ Int
+                    [Ty-Int] ∅, =Int → Int, =Int ⊢ □ ⇒ 1 ⇒ Int
+                    [S-Type] ∅, =Int → Int, =Int; ∅ ⊢ Int <: Int ⊣ ∅ ⇝ Int
+                      [S-Int] ∅, =Int → Int, =Int; ∅ ⊢ Int <: Int ⊣ ∅
+                [Ty-Abs1] ∅, =Int → Int, =Int ⊢ Int → Int ⇒ λ. e0 ⇒ Int → Int
+                  [Ty-Sub] ∅, =Int → Int, =Int, :Int ⊢ Int ⇒ e0 ⇒ Int
+                    [Ty-Var] ∅, =Int → Int, =Int, :Int ⊢ □ ⇒ e0 ⇒ Int
+                      [Lookup] Int in Γ
+                    [S-Type] ∅, =Int → Int, =Int, :Int; ∅ ⊢ Int <: Int ⊣ ∅ ⇝ Int
+                      [S-Int] ∅, =Int → Int, =Int, :Int; ∅ ⊢ Int <: Int ⊣ ∅
+  ```
