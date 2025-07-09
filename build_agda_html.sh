@@ -18,6 +18,7 @@ build_agda_html() {
     
     # Build and cleanup
     cd $ROOT_DIR/html_generator && npm install && npm run build
+    rm $ROOT_DIR/html_generator/src/_data/agdaModules.js
     rm -rf $ROOT_DIR/html_generator/src/agda
     
     # Remove existing html directory if it exists to avoid moving source inside it
@@ -32,5 +33,5 @@ rm -rf $ROOT_DIR/src_htmls && mkdir -p $ROOT_DIR/src_htmls
 
 # Build HTML for all proof directories
 build_agda_html "proof_core"
-# build_agda_html "proof_core_top_bot"
+build_agda_html "proof_core_top_bot"
 build_agda_html "proof_variant_right2left"
