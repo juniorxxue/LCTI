@@ -22,6 +22,7 @@ import Implicit.Annotatability.Corollaries using (annotatability-real')
 ----------------------------------------------------------------------
 --+                           Section 4                            +--
 ----------------------------------------------------------------------
+
 -- Theorem 4.1 (Generalized Soundness of Subtyping)
 import Implicit.Interm2Decl.Corollaries using (sound')
 
