@@ -9,7 +9,7 @@ module Main where
 import Control.Monad (forM_)
 import Control.Monad.Writer
 import DeBruijn
-import Debug.Trace
+-- import Debug.Trace
 import Log
 import Syntax
 import System.IO (hFlush, stdout)
@@ -25,7 +25,7 @@ lookupEnv k (ESvar _ env) = shiftTyp0 <$> lookupEnv k env
 lookupEnv _ _ = lift Nothing
 
 findSol :: Env -> Int -> WriterT Log Maybe Typ
-findSol a b | trace ("findSol " ++ show a ++ " |- " ++ show b) False = undefined
+-- findSol a b | trace ("findSol " ++ show a ++ " |- " ++ show b) False = undefined
 findSol EEmpty _ = lift Nothing
 findSol (ESvar ty _) 0 = return $ shiftTyp0 ty
 findSol (ESvar _ senv) k | k > 0 = do
@@ -40,7 +40,7 @@ findSol (EEvar senv) k | k > 0 = do
 findSol _ _ = lift Nothing
 
 inst :: Env -> Int -> Typ -> Maybe Env
-inst env k a | trace ("inst " ++ show env ++ " " ++ show k ++ " " ++ show a) False = undefined
+-- inst env k a | trace ("inst " ++ show env ++ " " ++ show k ++ " " ++ show a) False = undefined
 inst (EEvar senv) 0 tyA = Just $ ESvar (unshiftTyp0 tyA) senv
 inst (EEvar senv) k tyA | k > 0 = do
   env' <- inst senv (k - 1) (unshiftTyp0 tyA)
@@ -54,7 +54,7 @@ inst (ESvar ty senv) k tyA | k > 0 = do
 inst _ _ _ = Nothing
 
 ssubP :: (Env, Env) -> Typ -> Typ -> WriterT Log Maybe Env
-ssubP (a1, a2) b c | trace ("ssub " ++ show a1 ++ ";" ++ show a2 ++ " |- " ++ show b ++ " <:+ " ++ show c) False = undefined
+-- ssubP (a1, a2) b c | trace ("ssub " ++ show a1 ++ ";" ++ show a2 ++ " |- " ++ show b ++ " <:+ " ++ show c) False = undefined
 ssubP (env, senv) TInt TInt = do
   tell ["[S-Int] " ++ logSSubFull (env, senv) TInt TInt senv]
   return senv
@@ -112,7 +112,7 @@ ssubP (env, senv) (TST tyA tyB) (TST tyC tyD) = do
 ssubP _ _ _ = lift Nothing
 
 ssubN :: (Env, Env) -> Typ -> Typ -> WriterT Log Maybe Env
-ssubN (a1, a2) b c | trace ("ssub " ++ show a1 ++ ";" ++ show a2 ++ " |- " ++ show b ++ " <:- " ++ show c) False = undefined
+-- ssubN (a1, a2) b c | trace ("ssub " ++ show a1 ++ ";" ++ show a2 ++ " |- " ++ show b ++ " <:- " ++ show c) False = undefined
 ssubN (env, senv) TInt TInt = do
   tell ["[S-Int] " ++ logSSubFull (env, senv) TInt TInt senv]
   return senv
@@ -170,7 +170,7 @@ ssubN (env, senv) (TST tyA tyB) (TST tyC tyD) = do
 ssubN _ _ _ = lift Nothing
 
 ground :: Env -> Typ -> WriterT Log Maybe Typ
-ground a b | trace ("ground " ++ show a ++ " |- " ++ show b) False = undefined
+-- ground a b | trace ("ground " ++ show a ++ " |- " ++ show b) False = undefined
 ground _ TInt = return TInt
 ground _ TBool = return TBool
 ground env (TVar k) | isUvar env k = return (TVar k)
@@ -195,7 +195,7 @@ ground env (TST tyA tyB) = do
   return $ TST tyA' tyB'
 
 sub :: (Env, Env) -> Typ -> Context -> WriterT Log Maybe (Env, Typ)
-sub (a1, a2) b c | trace ("sub " ++ show a1 ++ ";" ++ show a2 ++ " |- " ++ show b ++ " <: " ++ show c) False = undefined
+-- sub (a1, a2) b c | trace ("sub " ++ show a1 ++ ";" ++ show a2 ++ " |- " ++ show b ++ " <: " ++ show c) False = undefined
 sub (env, senv) tyA CEmpty | closed (envConcat env senv) tyA = do
   grdA <- ground (envConcat env senv) tyA
   tell ["[S-Empty] " ++ logSubFull (env, senv) tyA CEmpty senv grdA]
@@ -275,7 +275,7 @@ infers _ _ = lift Nothing
 -- sub (EEmpty, (ESvar TInt EEmpty)) (TArr (TVar 0) (TVar 0)) (CTerm (Lit 42) CEmpty)
 
 infer :: Env -> Context -> Trm -> WriterT Log Maybe Typ
-infer a b c | trace ("infer " ++ show a ++ " |- " ++ show b ++ " => " ++ show c) False = undefined
+-- infer a b c | trace ("infer " ++ show a ++ " |- " ++ show b ++ " => " ++ show c) False = undefined
 infer env CEmpty (LitInt n) = do
   tell ["[Ty-Int] " ++ logInferFull env CEmpty (LitInt n) TInt]
   return TInt
@@ -372,8 +372,7 @@ infer _ _ _ = lift Nothing
 main :: IO ()
 main = do
   -- print idTyp
-  let
-      -- id : forall a. a -> a
+  let -- id : forall a. a -> a
       idTyp = TForall (TArr (TVar 0) (TVar 0))
       -- id = /\a. \x. x : a -> a
       idTrm = TAbs (Ann (Abs (Var 0)) (TArr (TVar 0) (TVar 0)))
@@ -525,7 +524,7 @@ main = do
       exE3Ann = infer (ETrm rTyp EEmpty) CEmpty $ Var 0 `App` TAbs (Abs (TAbs (Abs (Var 0))) `Ann` TArr (TVar 0) idTyp)
       -- with AbsAnn: r (/\a. \x : a. /\b. \y : b. y)
       exE3Ann' = infer (ETrm rTyp EEmpty) CEmpty $ Var 0 `App` TAbs (AbsAnn (TVar 0) (TAbs (AbsAnn (TVar 0) (Var 0))))
-      
+
       -- FreezeML paper additions
       -- F5: auto id
       exF5 = infer (ETrm autoTyp (ETrm idTyp EEmpty)) CEmpty $ Var 0 `App` Var 1
@@ -590,7 +589,7 @@ main = do
       exD4,
       exD4Ann,
       exD4Ann',
-      exD4Ann',
+      exD4Ann'',
       exD5,
       exD5Ann,
       exD5Ann',
