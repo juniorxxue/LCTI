@@ -13,7 +13,7 @@ import DeBruijn
 import Log
 import Syntax
 import System.Environment (getArgs)
-import Examples (examples, Example(..), getExample)
+import Examples (examples, Example(..), getExample, getExamplesInGroup)
 
 lookupEnv :: Int -> Env -> WriterT Log Maybe Typ
 lookupEnv 0 (ETrm ty _) = do
@@ -407,11 +407,20 @@ runAllExamples showDrv = do
 runSpecificExamples :: Bool -> [String] -> IO ()
 runSpecificExamples showDrv names = do
   forM_ names $ \name -> do
-    case getExample name of
-      Just example -> runSingleExample example showDrv
-      Nothing -> do
-        putStrLn $ "Error: Example '" ++ name ++ "' not found."
-        putStrLn "Use --help to see usage information."
+    -- First check if it's a group name
+    let groupExamples = getExamplesInGroup name
+    if not (null groupExamples)
+      then do
+        putStrLn $ "Running examples: " ++ name
+        forM_ groupExamples $ \example -> do
+          runSingleExample example showDrv
+      else do
+        -- If not a group, try as individual example
+        case getExample name of
+          Just example -> runSingleExample example showDrv
+          Nothing -> do
+            putStrLn $ "Error: Example or group '" ++ name ++ "' not found."
+            putStrLn "Use --help to see usage information."
 
 -- Run a single example
 runSingleExample :: Example -> Bool -> IO ()
@@ -421,6 +430,8 @@ runSingleExample example showDrv = do
   case runWriterT (infer (exampleEnv example) CEmpty (exampleTerm example)) of
     Just (tyA, logs) -> do
       putStrLn $ "Typing result: " ++ show tyA
-      when showDrv $ mapM_ putStrLn logs  
+      when showDrv $ do
+        putStrLn ""
+        mapM_ putStrLn logs
     Nothing -> do
       putStrLn "Typing failed"
