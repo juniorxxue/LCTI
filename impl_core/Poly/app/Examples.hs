@@ -2,6 +2,8 @@
 module Examples where
 
 import Syntax
+import Data.Map (Map)
+import qualified Data.Map as Map
 -- We'll import the infer function from Main
 
 -- Data structure for examples
@@ -64,8 +66,25 @@ runSTTyp = TForall $ TArr (TForall $ TST (TVar 0) (TVar 1)) (TVar 0)
 argSTTyp :: Typ
 argSTTyp = TForall $ TST (TVar 0) TInt
 
+-- Convert list to map for easy lookup
+examplesMap :: Map String Example
+examplesMap = Map.fromList [(exampleName ex, ex) | ex <- examplesList]
+
+-- Get all example names
+exampleNames :: [String]
+exampleNames = Map.keys examplesMap
+
+-- Get a specific example by name
+getExample :: String -> Maybe Example
+getExample name = Map.lookup name examplesMap
+
+-- List of all examples (for backward compatibility)
 examples :: [Example]
-examples = 
+examples = Map.elems examplesMap
+
+-- Internal list of examples (used to build the map)
+examplesList :: [Example]
+examplesList = 
   [ Example "A1" EEmpty (Abs (Abs (Var 0))) 
       "λx. λy. y"
     
