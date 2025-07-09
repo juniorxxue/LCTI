@@ -8,7 +8,6 @@ open import Implicit.Language.OpenClose.Base
 open import Implicit.Language.Ground.Base
 open import Implicit.Language.EnvOps.Base
 
-
 -- replace entry ^a with a solution ^a=A in an environment
 infix 3 [_/_]_⟹_
 data [_/_]_⟹_ : Type m → Fin m → Env n m → Env n m → Set where

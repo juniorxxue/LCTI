@@ -11,11 +11,8 @@ open import Implicit.Language.Lookup.Base
 --+                         Entry Removal                          +--
 ----------------------------------------------------------------------
 
-
-
-
 -- remove an entry a=A, we should be careful about this
--- removing an entry a=A requires us to do substittuiion on the remaining env
+-- removing an entry a=A requires us to do substitt]uiion on the remaining env
 
 -- in algo, we need to first lookup the type A
 -- then use type A to manipuate remaining envs to produce a new env
@@ -40,11 +37,6 @@ data _◀_:=_⇘_ : Env n (1 + m) → Fin (1 + m) → Type m → Env n m → Set
 ----------------------------------------------------------------------
 --+                       Entry Replacement                        +--
 ----------------------------------------------------------------------
-
--- could be a combination of weaken and strengthen
-
-
-
 
 -- replace entry a=A with a solution a=B in an environment
 infix 3 [_/_]_=⟹_
@@ -79,7 +71,6 @@ data [_/_]_=⟹_ : Type m → Fin m → Env n m → Env n m → Set where
 ----------------------------------------------------------------------
 --+                          replacement                           +--
 ----------------------------------------------------------------------
-
 
 -- in k position, we replace a ,= B with ,^
 infix 3 _◎_⇘_

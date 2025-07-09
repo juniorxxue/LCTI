@@ -9,8 +9,6 @@ open import Implicit.Language.EnvOps.Base
 --+                     replacement properties                     +--
 ----------------------------------------------------------------------
 
-
-
 inst-affect-one : [ A / X ] Γ ⟹ Δ
                 → Γ ∋^ k
                 → Δ ∋= k

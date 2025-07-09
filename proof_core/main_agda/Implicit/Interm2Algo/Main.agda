@@ -53,31 +53,6 @@ wf1-⊆' (evar-sol ext1 regA) (wf1-sol wfΔ) = wf1-ex (wf1-⊆' ext1 wfΔ)
 wf1-⊆' (svar ext1 regA) (wf1-sol wfΔ) = wf1-sol (wf1-⊆' ext1 wfΔ)
 wf1-⊆' (mark regΓ) wfΔ = wfΔ
 
-⊢r-^∈-¬ε : Γ ⊢r A
-         → Γ ∋^ k
-         → k ¬ε A
-⊢r-^∈-¬ε ⊢r-int inΓ = ¬ε-int
-⊢r-^∈-¬ε (⊢r-var-∙ inΓ₁) inΓ = ¬ε-var (∋∙-∋^-≢ inΓ₁ inΓ)
-⊢r-^∈-¬ε (⊢r-arr regA regA₁) inΓ = ¬ε-arr (⊢r-^∈-¬ε regA inΓ) (⊢r-^∈-¬ε regA₁ inΓ)
-⊢r-^∈-¬ε (⊢r-∀ regA) inΓ = ¬ε-∀ (⊢r-^∈-¬ε regA (S∙ inΓ))
-
-∋∙-∋=-≢ : Γ ∋∙ k₁
-        → Γ ∋= k₂
-        → k₁ ≢ k₂
-∋∙-∋=-≢ Z (S∙ in2) = λ ()
-∋∙-∋=-≢ (S, in1) (S, in2) = ∋∙-∋=-≢ in1 in2
-∋∙-∋=-≢ (S∙ in1) (S∙ in2) = ≢-suc (∋∙-∋=-≢ in1 in2)
-∋∙-∋=-≢ (S= in1) Z = λ ()
-∋∙-∋=-≢ (S= in1) (S= in2) = ≢-suc (∋∙-∋=-≢ in1 in2)
-∋∙-∋=-≢ (S^ in1) (S^ in2) = ≢-suc (∋∙-∋=-≢ in1 in2)
-
-⊢r-=∈-¬ε : Γ ⊢r A
-         → Γ ∋= k
-         → k ¬ε A
-⊢r-=∈-¬ε ⊢r-int inΓ = ¬ε-int
-⊢r-=∈-¬ε (⊢r-var-∙ inΓ₁) inΓ = ¬ε-var (∋∙-∋=-≢ inΓ₁ inΓ)
-⊢r-=∈-¬ε (⊢r-arr regA regA₁) inΓ = ¬ε-arr (⊢r-=∈-¬ε regA inΓ) (⊢r-=∈-¬ε regA₁ inΓ)
-⊢r-=∈-¬ε (⊢r-∀ regA) inΓ = ¬ε-∀ (⊢r-=∈-¬ε regA (S∙ inΓ))
 
 inst-∃-A : Γ ⊢r A
          → WF1 Γ

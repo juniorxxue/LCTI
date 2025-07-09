@@ -110,3 +110,14 @@ open import Implicit.Language.Lookup.Base
 ∋=-∋^-≢ (S^ inΓ1) Z = λ ()
 ∋=-∋^-≢ (S^ inΓ1) (S^ inΓ2) = ≢-suc (∋=-∋^-≢ inΓ1 inΓ2)
 ∋=-∋^-≢ (S, inΓ1) (S, inΓ2) = ∋=-∋^-≢ inΓ1 inΓ2
+
+∋∙-∋=-≢ : Γ ∋∙ k₁
+        → Γ ∋= k₂
+        → k₁ ≢ k₂
+∋∙-∋=-≢ Z (S∙ in2) = λ ()
+∋∙-∋=-≢ (S, in1) (S, in2) = ∋∙-∋=-≢ in1 in2
+∋∙-∋=-≢ (S∙ in1) (S∙ in2) = ≢-suc (∋∙-∋=-≢ in1 in2)
+∋∙-∋=-≢ (S= in1) Z = λ ()
+∋∙-∋=-≢ (S= in1) (S= in2) = ≢-suc (∋∙-∋=-≢ in1 in2)
+∋∙-∋=-≢ (S^ in1) (S^ in2) = ≢-suc (∋∙-∋=-≢ in1 in2)
+

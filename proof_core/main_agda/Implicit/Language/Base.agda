@@ -118,9 +118,3 @@ data GenericConsumer : Term n m → Set where
   gc-var : ∀ {x} → GenericConsumer (Term n m ∋⦂ ` x)
   gc-ann : ∀ {e : Term n m} {A} → GenericConsumer (e ⦂ A)
   gc-tlam : ∀ {e : Term n (1 + m)} → GenericConsumer (Λ e)
-
-
-data AGenericConsumer : Term n m → Set where
-  gc-i : ∀ {i} → AGenericConsumer (Term n m ∋⦂ lit i)
-  gc-var : ∀ {x} → AGenericConsumer (Term n m ∋⦂ ` x)
-  gc-ann : ∀ {e : Term n m} {A} → AGenericConsumer (e ⦂ A)

@@ -5,6 +5,7 @@ open import Implicit.Language.Shift.All
 open import Implicit.Language.Lookup.All
 open import Implicit.Language.Occur.Base
 open import Implicit.Language.OpenClose.Base
+open import Implicit.Language.Regular.Base
 
 ↑ty-ε-≤ : #S X ε A'
         → A ↑ty k ⇘ A'
@@ -119,3 +120,21 @@ open import Implicit.Language.OpenClose.Base
 ⊢c-^∈-false (ε-arr-l inA) inΓ (⊢c-arr cloA cloA₁) = ⊢c-^∈-false inA inΓ cloA
 ⊢c-^∈-false (ε-arr-r ¬inA inA) inΓ (⊢c-arr cloA cloA₁) = ⊢c-^∈-false inA inΓ cloA₁
 ⊢c-^∈-false (ε-∀ inA) inΓ (⊢c-∀ cloA) = ⊢c-^∈-false inA (S∙ inΓ) cloA
+
+
+⊢r-^∈-¬ε : Γ ⊢r A
+         → Γ ∋^ k
+         → k ¬ε A
+⊢r-^∈-¬ε ⊢r-int inΓ = ¬ε-int
+⊢r-^∈-¬ε (⊢r-var-∙ inΓ₁) inΓ = ¬ε-var (∋∙-∋^-≢ inΓ₁ inΓ)
+⊢r-^∈-¬ε (⊢r-arr regA regA₁) inΓ = ¬ε-arr (⊢r-^∈-¬ε regA inΓ) (⊢r-^∈-¬ε regA₁ inΓ)
+⊢r-^∈-¬ε (⊢r-∀ regA) inΓ = ¬ε-∀ (⊢r-^∈-¬ε regA (S∙ inΓ))
+
+
+⊢r-=∈-¬ε : Γ ⊢r A
+         → Γ ∋= k
+         → k ¬ε A
+⊢r-=∈-¬ε ⊢r-int inΓ = ¬ε-int
+⊢r-=∈-¬ε (⊢r-var-∙ inΓ₁) inΓ = ¬ε-var (∋∙-∋=-≢ inΓ₁ inΓ)
+⊢r-=∈-¬ε (⊢r-arr regA regA₁) inΓ = ¬ε-arr (⊢r-=∈-¬ε regA inΓ) (⊢r-=∈-¬ε regA₁ inΓ)
+⊢r-=∈-¬ε (⊢r-∀ regA) inΓ = ¬ε-∀ (⊢r-=∈-¬ε regA (S∙ inΓ))

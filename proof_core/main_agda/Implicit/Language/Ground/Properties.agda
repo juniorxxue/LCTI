@@ -108,8 +108,6 @@ open import Implicit.Language.Find.All
   with ⟨ T' , upT ⟩ ← ↑ty0-total T
   = grd-∀ (≫-trans (reg-S∙ regΓ) grd1 (∙⟹∙S new upT) (S∙ nin) grd2)
 
-
-
 ≫-trans' : SRegular Γ
         → Γ ≫ A ⇘ B
         → Γ ◈ k ⇘ Γ'
@@ -209,8 +207,6 @@ find-≫-∙0 {Γ = Γ} fd grd = find-≫-∙ {Γ = Γ ,∙} fd Z∙ Z grd
   with refl ← ≫-same grd1 new grd2 ninA
   with refl ← ≫-same grd3 new grd4 ninA₁ = refl
 ≫-same (grd-∀ grd1) new (grd-∀ grd2) (¬ε-∀ ninA) = cong `∀_ (≫-same grd1 (◈S∙ new) grd2 ninA)
-
-
 
 
 ≫-unique : Γ ≫ A ⇘ A₁

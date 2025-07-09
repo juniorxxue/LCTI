@@ -262,48 +262,38 @@ data _ⅆ_≋_ⅆ_ : Env n m → Env n m → Env n m → Env n m → Set where
 ⅆk-total (ⅆ⋈ {Γ = Γ} regΓ) (mark regΓ₁) (mark regΓ₂) = ⟨ Γ ⋈ , ⟨ ⅆ⋈ regΓ , ⅆ⋈ regΓ₂ ⟩ ⟩
 ⅆk-total (ⅆS∙∙-hit dd) (uvar ext1) (uvar ext2) = ⟨ ⅆk-total dd ext1 ext2 .proj₁ ,∙ ,
                                                  ⟨ ⅆS∙∙-hit (ⅆk-total dd ext1 ext2 .proj₂ .proj₁) ,
-                                                 ⅆS∙∙-hit (ⅆk-total dd ext1 ext2 .proj₂ .proj₂) ⟩
-                                                 ⟩
+                                                 ⅆS∙∙-hit (ⅆk-total dd ext1 ext2 .proj₂ .proj₂) ⟩ ⟩
 ⅆk-total (ⅆS∙∙-mis dd) (uvar ext1) (uvar ext2) = ⟨ ⅆk-total dd ext1 ext2 .proj₁ ,∙ ,
                                                  ⟨ ⅆS∙∙-mis (ⅆk-total dd ext1 ext2 .proj₂ .proj₁) ,
-                                                 ⅆS∙∙-mis (ⅆk-total dd ext1 ext2 .proj₂ .proj₂) ⟩
-                                                 ⟩
+                                                 ⅆS∙∙-mis (ⅆk-total dd ext1 ext2 .proj₂ .proj₂) ⟩ ⟩
 ⅆk-total (ⅆS^=-hit dd) (evar ext1) (evar-sol ext2 regA) = ⟨ ⅆk-total dd ext1 ext2 .proj₁ ,^ ,
                                                           ⟨ ⅆS^^-hit (ⅆk-total dd ext1 ext2 .proj₂ .proj₁) ,
-                                                          ⅆS^=-hit (ⅆk-total dd ext1 ext2 .proj₂ .proj₂) ⟩
-                                                          ⟩
+                                                          ⅆS^=-hit (ⅆk-total dd ext1 ext2 .proj₂ .proj₂) ⟩ ⟩
 ⅆk-total (ⅆS^=-hit dd) (evar-sol {A = A} ext1 regA) (svar ext2 regA₁) = ⟨ ⅆk-total dd ext1 ext2 .proj₁ ,= A ,
                                                                 ⟨ ⅆS^=-hit (ⅆk-total dd ext1 ext2 .proj₂ .proj₁) ,
-                                                                ⅆS==-hit (ⅆk-total dd ext1 ext2 .proj₂ .proj₂) regA ⟩
-                                                                ⟩
+                                                                ⅆS==-hit (ⅆk-total dd ext1 ext2 .proj₂ .proj₂) regA ⟩ ⟩
 ⅆk-total (ⅆS^=-mis dd) (evar ext1) (evar-sol ext2 regA) = ⟨ ⅆk-total dd ext1 ext2 .proj₁ ,^ ,
                                                           ⟨ ⅆS^^-mis (ⅆk-total dd ext1 ext2 .proj₂ .proj₁) ,
-                                                          ⅆS^=-mis (ⅆk-total dd ext1 ext2 .proj₂ .proj₂) ⟩
-                                                          ⟩
+                                                          ⅆS^=-mis (ⅆk-total dd ext1 ext2 .proj₂ .proj₂) ⟩ ⟩
 ⅆk-total (ⅆS^=-mis {A = A} dd) (evar-sol ext1 regA) (svar ext2 regA₁) = ⟨ ⅆk-total dd ext1 ext2 .proj₁ ,= A ,
                                                                 ⟨ ⅆS^=-mis (ⅆk-total dd ext1 ext2 .proj₂ .proj₁) ,
-                                                                ⅆS==-mis-1 (ⅆk-total dd ext1 ext2 .proj₂ .proj₂) regA ⟩
-                                                                ⟩
+                                                                ⅆS==-mis-1 (ⅆk-total dd ext1 ext2 .proj₂ .proj₂) regA ⟩ ⟩
 ⅆk-total (ⅆS^^-hit dd) (evar ext1) (evar ext2) = ⟨ ⅆk-total dd ext1 ext2 .proj₁ ,^ ,
                                                  ⟨ ⅆS^^-hit (ⅆk-total dd ext1 ext2 .proj₂ .proj₁) ,
                                                  ⅆS^^-hit (ⅆk-total dd ext1 ext2 .proj₂ .proj₂) ⟩
                                                  ⟩
 ⅆk-total (ⅆS^^-mis dd) (evar ext1) (evar ext2) = ⟨ ⅆk-total dd ext1 ext2 .proj₁ ,^ ,
                                                    ⟨ ⅆS^^-mis (ⅆk-total dd ext1 ext2 .proj₂ .proj₁) ,
-                                                   ⅆS^^-mis (ⅆk-total dd ext1 ext2 .proj₂ .proj₂) ⟩
-                                                   ⟩
+                                                   ⅆS^^-mis (ⅆk-total dd ext1 ext2 .proj₂ .proj₂) ⟩ ⟩
 ⅆk-total (ⅆS==-hit {A = A} dd regA) (svar ext1 regA') (svar ext2 regA₁) = ⟨ ⅆk-total dd ext1 ext2 .proj₁ ,= A ,
                                                             ⟨ ⅆS==-hit (ⅆk-total dd ext1 ext2 .proj₂ .proj₁) regA ,
-                                                            ⅆS==-hit (ⅆk-total dd ext1 ext2 .proj₂ .proj₂) regA₁ ⟩
-                                                            ⟩
+                                                            ⅆS==-hit (ⅆk-total dd ext1 ext2 .proj₂ .proj₂) regA₁ ⟩ ⟩
 ⅆk-total (ⅆS==-mis-1 {A = A} dd regA) (svar ext1 regA') (svar ext2 regA₁) = ⟨ ⅆk-total dd ext1 ext2 .proj₁ ,= A ,
                                                               ⟨ ⅆS==-mis-1 (ⅆk-total dd ext1 ext2 .proj₂ .proj₁) regA ,
-                                                              ⅆS==-mis-1 (ⅆk-total dd ext1 ext2 .proj₂ .proj₂) regA₁ ⟩
-                                                              ⟩
+                                                              ⅆS==-mis-1 (ⅆk-total dd ext1 ext2 .proj₂ .proj₂) regA₁ ⟩ ⟩
 ⅆk-total (ⅆS==-mis-2 dd regA) (svar ext1 regA') (svar ext2 regA₁) = ⟨ ⅆk-total dd ext1 ext2 .proj₁ ,^ ,
                                                               ⟨ ⅆS==-mis-2 (ⅆk-total dd ext1 ext2 .proj₂ .proj₁) regA ,
-                                                              ⅆS==-mis-2 (ⅆk-total dd ext1 ext2 .proj₂ .proj₂) regA₁ ⟩
-                                                              ⟩
+                                                              ⅆS==-mis-2 (ⅆk-total dd ext1 ext2 .proj₂ .proj₂) regA₁ ⟩ ⟩
 
 
 
