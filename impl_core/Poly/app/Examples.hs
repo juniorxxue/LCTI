@@ -119,6 +119,21 @@ runSTTyp = TForall $ TArr (TForall $ TST (TVar 0) (TVar 1)) (TVar 0)
 argSTTyp :: Typ
 argSTTyp = TForall $ TST (TVar 0) TInt
 
+fTyp :: Typ
+fTyp = TForall $ TArr (TArr (TVar 0) (TVar 0)) $ TArr (TList (TVar 0)) (TVar 0)
+
+hTyp :: Typ
+hTyp = TArr TInt idTyp
+
+kTyp :: Typ
+kTyp = TForall $ TArr (TVar 0) $ TArr (TList (TVar 0)) (TVar 0)
+
+lstTyp :: Typ
+lstTyp = TList $ TForall $ TArr TInt $ TArr (TVar 0) (TVar 0)
+
+rTyp :: Typ
+rTyp = TArr (TForall (TArr (TVar 0) idTyp)) TInt
+
 -- Convert list to map for easy lookup
 examplesMap :: Map String Example
 examplesMap = Map.fromList [(exampleName ex, ex) | ex <- examplesList]
@@ -301,25 +316,25 @@ examplesList =
       "revapp argST (λx. runST (Λa. x @a) : (∀a. ST a Int) → Int)"
     
   -- E series: Complex examples
-  , Example "E1" (ETrm (TForall $ TArr (TVar 0) $ TArr (TList (TVar 0)) (TVar 0)) (ETrm (TArr TInt idTyp) (ETrm (TList $ TForall $ TArr TInt $ TArr (TVar 0) (TVar 0)) EEmpty))) (Var 0 `App` Var 1 `App` Var 2)
-      "k h lst where h : Int → (∀a. a → a), k : ∀a. a → [a] → a, lst : [∀a. Int → a → a]"
+  , Example "E1" (ETrm kTyp (ETrm hTyp (ETrm lstTyp EEmpty))) (Var 0 `App` Var 1 `App` Var 2)
+      "k h lst"
     
-  , Example "E2" (ETrm (TForall $ TArr (TVar 0) $ TArr (TList (TVar 0)) (TVar 0)) (ETrm (TArr TInt idTyp) (ETrm (TList $ TForall $ TArr TInt $ TArr (TVar 0) (TVar 0)) EEmpty))) (Var 0 `App` Abs (Var 2 `App` Var 0) `App` Var 2)
+  , Example "E2" (ETrm kTyp (ETrm hTyp (ETrm lstTyp EEmpty))) (Var 0 `App` Abs (Var 2 `App` Var 0) `App` Var 2)
       "k (λx. h x) lst"
     
-  , Example "E2 (Fc translation 1)" (ETrm (TForall $ TArr (TVar 0) $ TArr (TList (TVar 0)) (TVar 0)) (ETrm (TArr TInt idTyp) (ETrm (TList $ TForall $ TArr TInt $ TArr (TVar 0) (TVar 0)) EEmpty))) (Var 0 `App` TAbs (Abs ((Var 2 `App` Var 0)) `Ann` TArr TInt (TArr (TVar 0) (TVar 0))) `App` Var 2)
+  , Example "E2 (Fc translation 1)" (ETrm kTyp (ETrm hTyp (ETrm lstTyp EEmpty))) (Var 0 `App` TAbs (Abs (Var 2 `App` Var 0 `TApp` TVar 0) `Ann` TArr TInt (TArr (TVar 0) (TVar 0))) `App` Var 2)
       "k (Λa. λx. h x @ a : Int → a → a) lst"
     
-  , Example "E2 (Fc translation 2)" (ETrm (TForall $ TArr (TVar 0) $ TArr (TList (TVar 0)) (TVar 0)) (ETrm (TArr TInt idTyp) (ETrm (TList $ TForall $ TArr TInt $ TArr (TVar 0) (TVar 0)) EEmpty))) (Var 0 `App` TAbs (AbsAnn TInt (Var 2 `App` Var 0 `TApp` TVar 0)) `App` Var 2)
+  , Example "E2 (Fc translation 2)" (ETrm kTyp (ETrm hTyp (ETrm lstTyp EEmpty))) (Var 0 `App` TAbs (AbsAnn TInt (Var 2 `App` Var 0 `TApp` TVar 0)) `App` Var 2)
       "k (Λa. λx : Int. h x @ a) lst"
     
-  , Example "E3" (ETrm (TArr (TForall (TArr (TVar 0) idTyp)) TInt) EEmpty) (Var 0 `App` Abs (Abs (Var 0)))
-      "r (λx. λy. y) where r : (∀a. a → ∀b. b → b) → Int"
+  , Example "E3" (ETrm rTyp EEmpty) (Var 0 `App` Abs (Abs (Var 0)))
+      "r (λx. λy. y)"
     
-  , Example "E3 (Fc translation 1)" (ETrm (TArr (TForall (TArr (TVar 0) idTyp)) TInt) EEmpty) (Var 0 `App` TAbs (Abs (TAbs (Abs (Var 0))) `Ann` TArr (TVar 0) idTyp))
+  , Example "E3 (Fc translation 1)" (ETrm rTyp EEmpty) (Var 0 `App` TAbs (Abs (TAbs (Abs (Var 0))) `Ann` TArr (TVar 0) idTyp))
       "r (Λ a. (λx. Λ b. λy. y) : a → ∀b. b → b)"
     
-  , Example "E3 (Fc translation 2)" (ETrm (TArr (TForall (TArr (TVar 0) idTyp)) TInt) EEmpty) (Var 0 `App` TAbs (AbsAnn (TVar 0) (TAbs (AbsAnn (TVar 0) (Var 0)))))
+  , Example "E3 (Fc translation 2)" (ETrm rTyp EEmpty) (Var 0 `App` TAbs (AbsAnn (TVar 0) (TAbs (AbsAnn (TVar 0) (Var 0)))))
       "r (Λa. λx : a. Λb. λy : b. y)"
     
   -- F series: FreezeML paper additions
