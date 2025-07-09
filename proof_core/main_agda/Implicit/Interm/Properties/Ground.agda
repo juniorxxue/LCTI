@@ -1,4 +1,4 @@
-module Implicit.Interm.Ground where
+module Implicit.Interm.Properties.Ground where
 
 open import Implicit.Language.All
 open import Implicit.Interm.Base

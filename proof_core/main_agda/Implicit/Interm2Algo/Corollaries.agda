@@ -2,10 +2,8 @@ module Implicit.Interm2Algo.Corollaries where
 
 open import Implicit.Language.All
 open import Implicit.Algo.All
-open import Implicit.Interm.Base
-open import Implicit.Interm.Properties.Regularity
-open import Implicit.Interm.Properties.Polarity
-open import Implicit.Interm.Ground
+open import Implicit.Interm.All
+
 open import Implicit.Interm2Algo.Counter2Context
 open import Implicit.Interm2Algo.ExtIrrev
 open import Implicit.Interm2Algo.EnvDiff
