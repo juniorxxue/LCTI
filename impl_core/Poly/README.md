@@ -9,7 +9,7 @@ This directory contains a Haskell implementation of local contextual type infere
   ```bash
   cabal build
   ```
-`
+
 ### Usage
 
 * **Run all examples**
