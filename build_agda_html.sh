@@ -13,6 +13,7 @@ build_agda_html() {
     # Remove existing agda directory if it exists to avoid moving source inside it
     rm -rf $ROOT_DIR/html_generator/src/agda
     mv $ROOT_DIR/src_htmls/$proof_dir $ROOT_DIR/html_generator/src/agda
+    mkdir -p $ROOT_DIR/html_generator/src/_data
     AGDA_PRJ_NAME=Implicit AGDA_PRJ_ROOT=README envsubst < $ROOT_DIR/html_generator/templates/src/_data/agdaModules.js > $ROOT_DIR/html_generator/src/_data/agdaModules.js
     cp $ROOT_DIR/html_generator/templates/src/agda/agda.11tydata.js $ROOT_DIR/html_generator/src/agda/
     
