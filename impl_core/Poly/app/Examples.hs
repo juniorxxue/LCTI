@@ -54,7 +54,7 @@ exampleGroups = Map.fromList
   , ("F6", ["F6"])
   , ("F7", ["F7"])
   , ("F8", ["F8"])
-  , ("Pair", ["Pair", "Pair (Fc translation)"])
+  , ("Pair", ["Pair", "Pair (Fc translation 1)", "Pair (Fc translation 2)"])
   ]
 
 -- Get all examples in a group
@@ -354,6 +354,9 @@ examplesList =
   , Example "Pair" EEmpty ((Pair `App` Abs (Var 0) `App` LitInt 1) `Ann` ((TInt `TArr` TInt) `TProd` TInt))
       "(Pair (λx. x) 1) : (Int → Int) × Int"
     
-  , Example "Pair (Fc translation)" EEmpty ((Pair `App` (Abs (Var 0) `Ann` TArr TInt TInt) `App` LitInt 1) `Ann` ((TInt `TArr` TInt) `TProd` TInt))
+  , Example "Pair (Fc translation 1)" EEmpty ((Pair `App` (Abs (Var 0) `Ann` TArr TInt TInt) `App` LitInt 1) `Ann` ((TInt `TArr` TInt) `TProd` TInt))
       "(Pair (λx. x : Int → Int) 1) : (Int → Int) × Int"
+    
+  , Example "Pair (Fc translation 2)" EEmpty ((Pair `App` (AbsAnn TInt (Var 0)) `App` LitInt 1) `Ann` ((TInt `TArr` TInt) `TProd` TInt))
+      "(Pair (λx : Int. x) 1) : (Int → Int) × Int"
   ]
