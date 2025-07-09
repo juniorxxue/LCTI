@@ -5,9 +5,7 @@ import Syntax
 import Data.Map (Map)
 import qualified Data.Map as Map
 import Data.Maybe (mapMaybe)
--- We'll import the infer function from Main
 
--- Data structure for examples
 data Example = Example 
   { exampleName :: String
   , exampleEnv :: Env
@@ -15,7 +13,6 @@ data Example = Example
   , exampleDescription :: String
   }
 
--- Group examples by their base name (e.g., "A1" for A1, A1Ann, A1Ann')
 exampleGroups :: Map String [String]
 exampleGroups = Map.fromList
   [ ("A1", ["A1", "A1 (Fc translation 1)", "A1 (Fc translation 2)"])
@@ -57,17 +54,14 @@ exampleGroups = Map.fromList
   , ("Pair", ["Pair", "Pair (Fc translation 1)", "Pair (Fc translation 2)"])
   ]
 
--- Get all examples in a group
 getExamplesInGroup :: String -> [Example]
 getExamplesInGroup groupName = case Map.lookup groupName exampleGroups of
   Just names -> mapMaybe getExample names
   Nothing -> []
 
--- Get all group names
 groupNames :: [String]
 groupNames = Map.keys exampleGroups
 
--- Common type definitions
 idTyp :: Typ
 idTyp = TForall (TArr (TVar 0) (TVar 0))
 
@@ -134,23 +128,18 @@ lstTyp = TList $ TForall $ TArr TInt $ TArr (TVar 0) (TVar 0)
 rTyp :: Typ
 rTyp = TArr (TForall (TArr (TVar 0) idTyp)) TInt
 
--- Convert list to map for easy lookup
 examplesMap :: Map String Example
 examplesMap = Map.fromList [(exampleName ex, ex) | ex <- examplesList]
 
--- Get all example names
 exampleNames :: [String]
 exampleNames = Map.keys examplesMap
 
--- Get a specific example by name
 getExample :: String -> Maybe Example
 getExample name = Map.lookup name examplesMap
 
--- List of all examples (for backward compatibility)
 examples :: [Example]
 examples = examplesList
 
--- Internal list of examples (used to build the map)
 examplesList :: [Example]
 examplesList = 
   [ Example "A1" EEmpty (Abs (Abs (Var 0))) 
@@ -222,7 +211,6 @@ examplesList =
   , Example "A12 (Fc translation)" (ETrm idTyp (ETrm polyTyp EEmpty)) (Var 0 `App` Var 1 `App` TAbs (Abs (Var 0)))
       "id poly (Λa. λx. x)"
     
-  -- B series: Polymorphic contexts
   , Example "B1" EEmpty (Abs (Pair `App` (Var 0 `App` LitInt 1) `App` (Var 0 `App` LitBool True)))
       "λf. (f 1, f True)"
     
@@ -241,7 +229,6 @@ examplesList =
   , Example "B2 (Fc translation 2)" (ETrm polyTyp (ETrm headTyp EEmpty)) (AbsAnn (TList idTyp) (Var 1 `App` (Var 2 `App` Var 0)))
       "λxs : [∀a. a → a]. poly (head xs)"
     
-  -- C series: List operations
   , Example "C1" (ETrm lengthTyp (ETrm (TList idTyp) EEmpty)) (Var 0 `App` Var 1)
       "length ids"
     
@@ -284,7 +271,6 @@ examplesList =
   , Example "C10 (Fc translation)" (ETrm mapTyp (ETrm headTyp (ETrm singleTyp (ETrm (TList idTyp) EEmpty)))) (Var 0 `App` (Var 1 `TApp` idTyp) `App` (Var 2 `App` Var 3))
       "map (head @ (∀a. a → a)) (single ids)"
     
-  -- D series: Higher-order functions
   , Example "D1" (ETrm appTyp (ETrm polyTyp (ETrm idTyp EEmpty))) (Var 0 `App` Var 1 `App` Var 2)
       "app poly id"
     
@@ -315,7 +301,6 @@ examplesList =
   , Example "D5 (Fc translation 2)" (ETrm revappTyp (ETrm argSTTyp (ETrm runSTTyp EEmpty))) (Var 0 `App` Var 1 `App` (Abs (Var 3 `App` TAbs (Var 0 `TApp` TVar 0)) `Ann` TArr argSTTyp TInt))
       "revapp argST (λx. runST (Λa. x @a) : (∀a. ST a Int) → Int)"
     
-  -- E series: Complex examples
   , Example "E1" (ETrm kTyp (ETrm hTyp (ETrm lstTyp EEmpty))) (Var 0 `App` Var 1 `App` Var 2)
       "k h lst"
     
@@ -337,7 +322,7 @@ examplesList =
   , Example "E3 (Fc translation 2)" (ETrm rTyp EEmpty) (Var 0 `App` TAbs (AbsAnn (TVar 0) (TAbs (AbsAnn (TVar 0) (Var 0)))))
       "r (Λa. λx : a. Λb. λy : b. y)"
     
-  -- F series: FreezeML paper additions
+  -- FreezeML paper additions
   , Example "F5" (ETrm autoTyp (ETrm idTyp EEmpty)) (Var 0 `App` Var 1)
       "auto id"
     

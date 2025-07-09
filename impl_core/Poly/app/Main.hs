@@ -9,7 +9,6 @@ module Main where
 import Control.Monad (forM_, when)
 import Control.Monad.Writer
 import DeBruijn
--- import Debug.Trace
 import Log
 import Syntax
 import System.Environment (getArgs)
@@ -259,7 +258,6 @@ sub (env, senv) (TVar k) (CTerm e h) | isUvar (envConcat env senv) k = do
     Nothing -> lift Nothing
 sub _ _ _ = lift Nothing
 
--- TODO: change the name of the rules
 infers :: Env -> Context -> WriterT Log Maybe Typ
 infers env (CFullType tyA) = do
   tell ["[CI-Type] " ++ logInfersFull env (CFullType tyA) tyA]
@@ -397,17 +395,14 @@ main = do
         then runAllExamples showDrv
         else runSpecificExamples showDrv requestedExamples
 
--- Run all examples
 runAllExamples :: Bool -> IO ()
 runAllExamples showDrv = do
   forM_ examples $ \example -> do
     runSingleExample example showDrv
 
--- Run specific examples by name
 runSpecificExamples :: Bool -> [String] -> IO ()
 runSpecificExamples showDrv names = do
   forM_ names $ \name -> do
-    -- First check if it's a group name
     let groupExamples = getExamplesInGroup name
     if not (null groupExamples)
       then do
@@ -415,14 +410,12 @@ runSpecificExamples showDrv names = do
         forM_ groupExamples $ \example -> do
           runSingleExample example showDrv
       else do
-        -- If not a group, try as individual example
         case getExample name of
           Just example -> runSingleExample example showDrv
           Nothing -> do
             putStrLn $ "Error: Example or group '" ++ name ++ "' not found."
             putStrLn "Use --help to see usage information."
 
--- Run a single example
 runSingleExample :: Example -> Bool -> IO ()
 runSingleExample example showDrv = do
   putStrLn $ replicate 80 '-'
