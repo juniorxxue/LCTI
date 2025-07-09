@@ -112,13 +112,3 @@ abstract
                              → Σ ≊ Σ'
                              → ⊥
                 ≊-infs-false (infs-s x infs) (≊S newΣ) = ≊-infs-false infs newΣ
-
-{-
-  with reg-S= regΓ regB ← s-env-out s1
-  with ⟨ Σ″ , upΣ′ ⟩ ← ↑tyᶜ0-total Σ'
-  with ⟨ B' , upB' ⟩ ← ↑ty0-total B
-  with ⟨ C' , upC' ⟩ ← ↑ty0-total C
-  with ih ← s-trans s1 (s-weaken=0 s2 upC {!!} {!!} regB) (≊-↑ty0 newΣ upᶜ upΣ′)
-  = s-tapp ih {!!} {!!}
--- we cannot copy forall-L solution, since tapp with eliminate the context, while forall-L doesn't
--}

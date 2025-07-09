@@ -287,17 +287,6 @@ private variable
          → k ¬ε⋆ A
 ¬ε⋆-↑ty'0 ninA' upA = ¬ε⋆-↑ty' ninA' upA z≤n
 
-{-
-
-↑ty0ₙ-¬ε⋆ : ∀ {m} {A : Type m} {n} {B : Type (n + m)}
-          → A ↑ty0ₙ n ⇘ B
-          → (lt : m < n + m)
-          → (fromℕ< lt) ¬ε⋆ B
-↑ty0ₙ-¬ε⋆ {zero} {A} {n = 1} {B} (↑ty0ₙ-0 x) lt = {!!}
-↑ty0ₙ-¬ε⋆ {suc m} {A} {n = 1} {B} (↑ty0ₙ-0 x) lt = {!!}
-↑ty0ₙ-¬ε⋆ {m} {A} {n} {B} (↑ty0ₙ-S upA x) lt = {!!}
--}
-
 ¬ε-↑ty : k₁ ¬ε T
        → T ↑ty k₂ ⇘ T'
        → k₂ #≤ k₁

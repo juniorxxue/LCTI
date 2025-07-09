@@ -118,12 +118,6 @@ find-ε : find A k ∞
        → k ε A
 find-ε (f-∞ inA) = inA
 
-{-
-find-arr-r : find B k ∞
-         → find (A `→ B) k ∞
-find-arr-r fd = f-∞ (ε-arr-r {!!} (find-ε fd))
--}
-
 find-arr-l : find A k ∞
            → find (A `→ B) k ∞
 find-arr-l (f-∞ inA) = f-∞ (ε-arr-l inA)

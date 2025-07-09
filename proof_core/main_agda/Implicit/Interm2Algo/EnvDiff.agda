@@ -197,15 +197,6 @@ data _ⅆ_≋_ⅆ_ : Env n m → Env n m → Env n m → Env n m → Set where
 ⅆ-r-⊆ (ⅆS=^ dd regA) = evar-sol (ⅆ-r-⊆ dd) (⊆-⊢r' regA (ⅆ-⊆ dd))
 ⅆ-r-⊆ (ⅆS==1 dd regA) = svar (ⅆ-r-⊆ dd) (⊆-⊢r' regA (⊆-trans (ⅆ-r-⊆ dd) (ⅆ-⊆ dd)))
 ⅆ-r-⊆ (ⅆS==2 dd regA) = evar (ⅆ-r-⊆ dd)
-{-
-ⅆ-unique : Ψ ⅆ Ω ≋ Ψ ⅆ Γ
-         → Ω ≡ Γ
-ⅆ-unique (ⅆ⋈ x) = refl
-ⅆ-unique (ⅆS∙ dd) = cong _,∙ (ⅆ-unique dd)
-ⅆ-unique (ⅆS^ dd) = cong _,^ (ⅆ-unique dd)
-ⅆ-unique (ⅆS=^ dd regA) = cong _,^ (ⅆ-unique dd)
-ⅆ-unique (ⅆS==1 dd regA) = cong₂ _,=_ (ⅆ-unique dd) refl
--}
 
 ⅆ-out-eq : Δ ⅆ Ω ≋ Ψ ⅆ Ω
          → Δ ≡ Ψ
@@ -214,19 +205,6 @@ data _ⅆ_≋_ⅆ_ : Env n m → Env n m → Env n m → Env n m → Set where
 ⅆ-out-eq (ⅆS^ dd) rewrite ⅆ-out-eq dd = refl
 ⅆ-out-eq (ⅆS=^ dd regA) rewrite ⅆ-out-eq dd = refl
 ⅆ-out-eq (ⅆS==1 dd regA) rewrite ⅆ-out-eq dd = refl
-
-
-{-
-ⅆ-inst : Δ ⅆ Ω ≋ Ψ ⅆ Γ
-       → [ B / X ] Ψ ⟹ Δ
-       → [ B / X ] Γ ⟹ Ω
-ⅆ-inst (ⅆS∙ dd) (⟹∙S inst up1) = ⟹∙S (ⅆ-inst dd inst) up1
-ⅆ-inst (ⅆS^ dd) (⟹^S inst up1) = ⟹^S (ⅆ-inst dd inst) up1
-ⅆ-inst (ⅆS=^ dd regA) (⟹=S inst up1 regB) = ⟹^S (ⅆ-inst dd inst) up1
-ⅆ-inst (ⅆS==1 dd regA) (⟹=S inst up1 regB) = ⟹=S (ⅆ-inst dd inst) up1 (⊆-⊢r' regB (ⅆ-r-⊆ dd))
-ⅆ-inst (ⅆS==2 dd regA) (⟹^0 up regA₁ env) with refl ← ⅆ-unique dd = ⟹^0 up (⊆-⊢r' regA (ⅆ-l-⊆ dd)) (⊆-regular' env (ⅆ-r-⊆ dd))
--}
-
 
 ⅆ-total-mid : Δ ⅆ Δ' ≋ Γ ⅆ Γ'
             → Γ' ⊆ Ω'

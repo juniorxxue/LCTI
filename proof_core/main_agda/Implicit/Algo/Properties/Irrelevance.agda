@@ -43,10 +43,6 @@ data _&_⇌s_&_ : Env n m → Env n m → Env n m → Env n m → Set where
   svar :
       Γ & Δ ⇌s Γ' & Δ'
     → Γ ,= A & Δ ,= A ⇌s Γ' ,= A & Δ' ,= A
-{-
-  esvar : Γ & Δ ⇌s Γ' & Δ'
-        → Γ ,^ & Δ ,^ ⇌s Γ' ,= A & Δ' ,= A
--}
   mark : Γ ⇌ Δ
        → Γ ⋈ & Γ ⋈ ⇌s Δ ⋈ & Δ ⋈
 

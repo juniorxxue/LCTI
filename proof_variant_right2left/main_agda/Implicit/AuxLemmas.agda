@@ -113,10 +113,6 @@ data _ⅆ_⊆_ⅆ_kp_ : Env n m → Env n m → Env n m → Env n m → HitMis m
              → Γ ,^ ⅆ Γ' ,^ ⊆ Δ ,^ ⅆ Δ' ,^ kp (hit H)
   ⅆS^^-mis : Γ ⅆ Γ' ⊆ Δ ⅆ Δ' kp H
              → Γ ,^ ⅆ Γ' ,^ ⊆ Δ ,^ ⅆ Δ' ,^ kp (mis H)
-{-
-  ⅆS^^-mis-2 : Γ ⅆ Γ' ⊆ Δ ⅆ Δ' kp H
-             → Γ ,^ ⅆ Γ' ,= A ⊆ Δ ,^ ⅆ Δ' ,= A kp (mis H)
--}
   ⅆS==-hit : Γ ⅆ Γ' ⊆ Δ ⅆ Δ' kp H
            → (regA : Γ ⊢r A)
            → Γ ,= A ⅆ Γ' ,= A ⊆ Δ ,= A ⅆ Δ' ,= A kp (hit H)
