@@ -19,7 +19,7 @@ This directory contains a Haskell implementation of local contextual type infere
   cabal run Poly
   ```
 
-  Expected Output: The output will show the type-checking results of all examples. `[✓]` denotes success; `[x]` denotes a type error. For example:
+  Expected Output: The output will show the type-checking results of all examples. `[✓]` denotes success; `[x]` denotes failure. For example:
 
   ```bash
   --------------------------------------------------------------------------------
@@ -55,7 +55,7 @@ This directory contains a Haskell implementation of local contextual type infere
   cabal run Poly -- --drv A2        # Show derivation for A2
   ```
 
-  Expected Output: Shows the complete derivation tree with subtyping and typing rules applied.
+  Expected Output: Shows the complete derivation tree.
 
   ```bash
   Running examples: A2
