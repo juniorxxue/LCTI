@@ -80,13 +80,6 @@ wf1-⊆' (mark regΓ) wfΔ = wfΔ
 ⊢r-=∈-¬ε (⊢r-var-∙ inΓ₁) inΓ = ¬ε-var (∋∙-∋=-≢ inΓ₁ inΓ)
 ⊢r-=∈-¬ε (⊢r-arr regA regA₁) inΓ = ¬ε-arr (⊢r-=∈-¬ε regA inΓ) (⊢r-=∈-¬ε regA₁ inΓ)
 ⊢r-=∈-¬ε (⊢r-∀ regA) inΓ = ¬ε-∀ (⊢r-=∈-¬ε regA (S∙ inΓ))
-{-
-⊢c-^∈-¬ε ⊢c-int inΓ = ¬ε-int
-⊢c-^∈-¬ε (⊢c-var-∙ inΓ₁) inΓ = ¬ε-var (∋∙-∋^-≢ inΓ₁ inΓ)
-⊢c-^∈-¬ε (⊢c-var-= inΓ₁) inΓ = ¬ε-var (∋=-∋^-≢ inΓ₁ inΓ)
-⊢c-^∈-¬ε (⊢c-arr cloA cloA₁) inΓ = ¬ε-arr (⊢c-^∈-¬ε cloA inΓ) (⊢c-^∈-¬ε cloA₁ inΓ)
-⊢c-^∈-¬ε (⊢c-∀ cloA) inΓ = ¬ε-∀ (⊢c-^∈-¬ε cloA (S∙ inΓ))
--}
 
 inst-∃-A : Γ ⊢r A
          → WF1 Γ

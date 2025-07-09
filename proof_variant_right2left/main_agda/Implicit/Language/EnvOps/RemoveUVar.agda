@@ -76,26 +76,6 @@ data _◀_∙⇘_ : Env n (1 + m) → Fin (1 + m) → Env n m → Set where
 ∋=-strengthen∙ {k = #S k} {#S X} (S∙ inΓ) (◀S∙ newΓ) = S∙ (∋=-strengthen∙ inΓ newΓ)
 ∋=-strengthen∙ {k = #S k} {#S X} (S= inΓ) (◀S= newΓ x) = S= (∋=-strengthen∙ inΓ newΓ)
 ∋=-strengthen∙ {k = #S k} {#S X} (S^ inΓ) (◀S^ newΓ) = S^ (∋=-strengthen∙ inΓ newΓ)
-{-
-◀∙-∋:=' : Γ ∋ punchIn k X := A'
-        → Γ ◀ k ∙⇘ Γ'
-        → Γ' ∋ X := A
-        → A ↑ty k ⇘ A'
-◀∙-∋:=' {k = #0} {#0} (S, inΓ) (◀S, newΓ x) (S, inΓ') = ◀∙-∋:=' inΓ newΓ inΓ'
-◀∙-∋:=' {k = #0} {#0} (S∙ (Z up₂) up) ◀Z (Z up₁) with ↑ty-unique up₁ up₂
-... | refl = up
-◀∙-∋:=' {k = #0} {#0} (S∙ (S, inΓ) up) ◀Z (S, inΓ') with ∋:=-unique inΓ inΓ'
-... | refl = up
-◀∙-∋:=' {k = #0} {#S X} (S, inΓ) (◀S, newΓ x) (S, inΓ') = ◀∙-∋:=' inΓ newΓ inΓ'
-◀∙-∋:=' {k = #0} {#S X} (S∙ inΓ up) ◀Z inΓ' with ∋:=-unique inΓ inΓ'
-... | refl = up
-◀∙-∋:=' {k = #S k} {#0} (Z up) (◀S= newΓ x) (Z up₁) = ↑ty-comm' z≤n x up up₁
-◀∙-∋:=' {k = #S k} {#0} (S, inΓ) (◀S, newΓ x) (S, inΓ') = ◀∙-∋:=' inΓ newΓ inΓ'
-◀∙-∋:=' {k = #S k} {#S X} (S, inΓ) (◀S, newΓ x) (S, inΓ') = ◀∙-∋:=' inΓ newΓ inΓ'
-◀∙-∋:=' {k = #S k} {#S X} (S∙ inΓ up) (◀S∙ newΓ) (S∙ inΓ' up₁) = ↑ty-comm' z≤n (◀∙-∋:=' inΓ newΓ inΓ') up up₁
-◀∙-∋:=' {k = #S k} {#S X} (S^ inΓ up) (◀S^ newΓ) (S^ inΓ' up₁) = ↑ty-comm' z≤n (◀∙-∋:=' inΓ newΓ inΓ') up up₁
-◀∙-∋:=' {k = #S k} {#S X} (S= inΓ up) (◀S= newΓ x) (S= inΓ' up₁) = ↑ty-comm' z≤n (◀∙-∋:=' inΓ newΓ inΓ') up up₁
--}
 
 ⊢r-strengthen∙ : Γ ⊢r A'
                → Γ ◀ k ∙⇘ Γ'

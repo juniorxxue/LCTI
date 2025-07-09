@@ -67,16 +67,6 @@ st0-unique st1 st2 = st-unique st1 st2
 ↑ty-st {A = A} {k} {A'} {T = T} up with st-total T k A'
 ... | ⟨ A* , st ⟩ rewrite ↑ty-st-eq up st = st
 
-{-
--- this is a wrong lemma, say T is Int, k is 0, A' is 0
-st-↑ty : ⟦ k / T ⟧ A' ⇘ A
-       → A ↑ty k ⇘ A'
-st-↑ty st-int = ↑ty-int
-st-↑ty {k = k} {T = T} (st-var {X = X}) = {!!}
-st-↑ty (st-arr st st₁) = ↑ty-arr (st-↑ty st) (st-↑ty st₁)
-st-↑ty (st-∀ up st) = ↑ty-∀ (st-↑ty st)
--}
-
 ↑tyᵉ-st-eq :
     e ↑tyᵉ k ⇘ e'
   → ⟦ k / T ⟧ᵉ e' ⇘ e*
@@ -105,20 +95,6 @@ st-total-rev k B = let ⟨ B* , up ⟩ = ↑ty-total B k in ⟨ B* , ↑ty-st up
 
 st0-total-rev : ∀ B → ∃[ A ](⟦ T ⟧ A ⇘ B)
 st0-total-rev = st-total-rev #0
-
-
-
-
--- a corollary of ↑ty-comm and ↑ty-st
-{-
-↑ty-st-comm : k₂ #≤ k₁
-            → A ↑ty (inject₁ k₁) ⇘ A'
-            → T ↑ty k₁ ⇘ T'
-            → ⟦ #S k₂ / T' ⟧ A' ⇘ A*'
-            ---------------
-            → A* ↑ty k₁ ⇘ A*'
-            → ⟦ k₂ / T ⟧ A ⇘ A*
--}
 
 punchIn-punchOut' : ∀ {k₂ : Fin (1 + m)}
   → (¬p : k₁ ≢ X)
