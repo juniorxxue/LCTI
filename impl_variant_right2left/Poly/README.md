@@ -12,14 +12,14 @@ This directory contains a Haskell implementation of the right-to-left variant of
 
 ### Usage
 
-* **Run the pair examples**
+* **Run the pair example**
 
   To test the `pair` example:
   ```bash
   cabal run Poly
   ```
 
-  Expected Output:
+  Expected output:
 
   ```bash
   --------------------------------------------------------------------------------
@@ -29,13 +29,13 @@ This directory contains a Haskell implementation of the right-to-left variant of
 
 * **Show detailed derivations**
 
-  Add `--drv` argument to print the full derivation tree:
+  Add the `--drv` argument to print the full derivation tree:
 
   ```bash
   cabal run Poly -- --drv
   ```
 
-  Expected Output: Shows the complete derivation tree.
+  Expected output: Shows the complete derivation tree.
 
   ```bash
   --------------------------------------------------------------------------------

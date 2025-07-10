@@ -1,6 +1,6 @@
 # Implementation
 
-This directory contains a Haskell implementation of local contextual type inference. All the algorithmic rules are implmented. In addition, we have also added several types, including lists, product types and ST Monad. All the examples provided in the paper run in this implementation.
+This directory contains a Haskell implementation of local contextual type inference. All the algorithmic rules are implemented. In addition, we have also added several types, including lists, product types, and the ST Monad. All the examples provided in the paper run in this implementation.
 
 ### Building from Source
 
@@ -49,7 +49,7 @@ This directory contains a Haskell implementation of local contextual type infere
 
 * **Show detailed derivations**
 
-  Add `--drv` argument to print the full derivation tree:
+  Add the `--drv` argument to print the full derivation tree:
 
   ```bash
   cabal run Poly -- --drv A2        # Show derivation for A2
@@ -77,7 +77,7 @@ This directory contains a Haskell implementation of local contextual type infere
 
 ### Examples
 
-The table below summarises every example used in the paper.
+The table below summarizes every example used in the paper.
 
 | ID     | Example Program                        | Translation                                          | Fc  |
 | ------ | -------------------------------------- | ---------------------------------------------------- | --- |
