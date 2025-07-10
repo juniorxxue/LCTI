@@ -8,6 +8,7 @@ grd-reg-input : Γ ≫ A ⇘ B
               → Γ ⊢r A
               → A ≡ B
 grd-reg-input grd-top ⊢r-top = refl
+grd-reg-input grd-bot ⊢r-bot = refl
 grd-reg-input grd-int ⊢r-int = refl
 grd-reg-input (grd-var= x) (⊢r-var-∙ inΓ) = ⊥-elim (∋∙-∋:=-false inΓ x)
 grd-reg-input (grd-var∙ x) regA = refl

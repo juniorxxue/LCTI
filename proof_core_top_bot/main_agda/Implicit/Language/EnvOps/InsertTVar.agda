@@ -6,6 +6,7 @@ open import Implicit.Language.Lookup.All
 open import Implicit.Language.Regular.All
 open import Implicit.Language.OpenClose.Base
 open import Implicit.Language.Ground.Base
+open import Implicit.Language.Find.Base
 open import Implicit.Language.EnvOps.Base
 open import Implicit.Language.EnvOps.Inst
 
@@ -367,3 +368,12 @@ inst-weaken,s (⟹^0 up regA env) (▶sS^= new x)
 inst-weaken,s (⟹^S inst up1) (▶sS^ new x) = ⟹^S (inst-weaken,s inst new) up1
 inst-weaken,s (⟹∙S inst up1) (▶sS∙ new x) = ⟹∙S (inst-weaken,s inst new) up1
 inst-weaken,s (⟹=S inst up1 regB) (▶sS= new x) = ⟹=S (inst-weaken,s inst new) up1 (⊢r-weaken,s regB (▶s⨟,-▶s,-l new))
+
+⊢rʲ-weaken, : Γ ⊢rʲ j
+            → Γ ▶s k , T ⇘ Γ'
+            → Γ' ⊢rʲ j
+⊢rʲ-weaken, rj-Z new = rj-Z
+⊢rʲ-weaken, rj-∞ new = rj-∞
+⊢rʲ-weaken, (rj-𝕚 regj) new = rj-𝕚 (⊢rʲ-weaken, regj new)
+⊢rʲ-weaken, (rj-𝕔 regj) new = rj-𝕔 (⊢rʲ-weaken, regj new)
+⊢rʲ-weaken, (rj-𝕥 regj regA) new = rj-𝕥 (⊢rʲ-weaken, regj new) (⊢r-weaken,s regA new)

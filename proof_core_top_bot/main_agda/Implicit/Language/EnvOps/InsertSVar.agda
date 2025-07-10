@@ -5,6 +5,7 @@ open import Implicit.Language.Shift.All
 open import Implicit.Language.Lookup.All
 open import Implicit.Language.Regular.All
 open import Implicit.Language.OpenClose.Base
+open import Implicit.Language.Find.Base
 open import Implicit.Language.Ground.Base
 open import Implicit.Language.EnvOps.Base
 open import Implicit.Language.EnvOps.Inst
@@ -268,3 +269,14 @@ inst-weaken= {k = #S k} (⟹∙S {A = A} inst up1) (▶S∙ new x) upA
 inst-weaken= (⟹=S inst up1 regB) (▶Z regA) upA = ⟹=S (⟹=S inst up1 regB) upA regA
 inst-weaken= {k = #S k} (⟹=S {A = A} inst up1 regB) (▶S= new x x₁) upA
   with ⟨ A' , upA' ⟩ ← ↑ty-total A k = ⟹=S (inst-weaken= inst new upA') (↑ty-comm0 up1 upA upA') (⊢r-weaken= regB (▶⨟=-▶=-l new) x₁)
+
+
+⊢rʲ-weaken= : Γ ⊢rʲ j
+            → Γ ▶ k ,= T ⇘ Γ'
+            → j ↑tyʲ k ⇘ j'
+            → Γ' ⊢rʲ j'
+⊢rʲ-weaken= rj-Z new ↑tyʲ-Z = rj-Z
+⊢rʲ-weaken= rj-∞ new ↑tyʲ-∞ = rj-∞
+⊢rʲ-weaken= (rj-𝕚 regj) new (↑tyʲ-𝕚 upj) = rj-𝕚 (⊢rʲ-weaken= regj new upj)
+⊢rʲ-weaken= (rj-𝕔 regj) new (↑tyʲ-𝕔 upj) = rj-𝕔 (⊢rʲ-weaken= regj new upj)
+⊢rʲ-weaken= (rj-𝕥 regj regA) new (↑tyʲ-𝕥 upj upA) = rj-𝕥 (⊢rʲ-weaken= regj new upj) (⊢r-weaken= regA new upA)

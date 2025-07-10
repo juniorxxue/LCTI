@@ -172,7 +172,7 @@ sound : Γ ⊢¹ j # A ≤ B
 sound (s-refl regΔ cloA) = s-refl regΔ cloA
 sound (s-int regΔ) = s-int regΔ
 sound (s-top regΔ regA) = s-top regΔ regA
-sound (s-bot regΔ regA) = s-bot regΔ regA
+sound (s-bot regΔ regA regj) = s-bot regΔ regA regj
 sound (s-var-∙ regΔ inΔ) = s-var-∙ regΔ inΔ
 sound (s-arr₁ s s₁) = s-arr₁ (sound s) (sound s₁)
 sound (s-arr₂ s s₁) = s-arr₂ (sound s) (sound s₁)
@@ -203,7 +203,7 @@ complete : Γ ⊢² j # A ≤ B
 complete (s-refl regΔ cloA) = s-refl regΔ cloA
 complete (s-int regΔ) = s-int regΔ
 complete (s-top regΔ regA) = s-top regΔ regA
-complete (s-bot regΔ regA) = s-bot regΔ regA
+complete (s-bot regΔ regA regj) = s-bot regΔ regA regj
 complete (s-var-∙ regΔ inΔ) = s-var-∙ regΔ inΔ
 complete (s-arr₁ s s₁) = s-arr₁ (complete s) (complete s₁)
 complete (s-arr₂ s s₁) = s-arr₂ (complete s) (complete s₁)

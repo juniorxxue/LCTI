@@ -27,7 +27,8 @@ data _⊢_#_⌞_⌝_ : Env n m → Counter m → Type m → Polar → Type m →
   s-bot+ :
       (regΔ : SRegular Δ)
     → (regA : Δ ⊢r A)
-    → Δ ⊢ ∞ # Bot ⌞ ≤⁺ ⌝ A
+    → (regj : Δ ⊢rʲ j)
+    → Δ ⊢ j # Bot ⌞ ≤⁺ ⌝ A
   s-bot- :
       (regΔ : SRegular Δ)
     → (regA : Δ ⊢c A)
@@ -75,12 +76,13 @@ data _⊢_#_⌞_⌝_ : Env n m → Counter m → Type m → Polar → Type m →
   -- two atomic rules
   s-svar-l : ∀ {X A}
     → (inΔ : Δ ∋ X := A)
-    → Δ ⊢ ∞ # A ⌞ ≤⁺ ⌝ B
-    → Δ ⊢ ∞ # ‶ X ⌞ ≤⁺ ⌝ B
+    → Δ ⊢ j # A ⌞ ≤⁺ ⌝ B
+    → Δ ⊢ j # ‶ X ⌞ ≤⁺ ⌝ B
   s-svar-r : ∀ {X A}
     → (inΔ : Δ ∋ X := A)
     → Δ ⊢ ∞ # B ⌞ ≤⁻ ⌝ A
     → Δ ⊢ ∞ # B ⌞ ≤⁻ ⌝ ‶ X
+{-
   s-svar-𝕚 :
       Δ ∋ X := C
     → Δ ⊢ (𝕚 j) # C ⌞ ≤⁺ ⌝ A `→ B
@@ -93,6 +95,7 @@ data _⊢_#_⌞_⌝_ : Env n m → Counter m → Type m → Polar → Type m →
       Δ ∋ X := B
     → Δ ⊢ (𝕥₍ A ₎ j) # B ⌞ ≤⁺ ⌝ `∀ C
     → Δ ⊢ (𝕥₍ A ₎ j) # ‶ X ⌞ ≤⁺ ⌝ `∀ C
+    -}
 
 s-refl-∞ : SRegular Γ
          → Γ ⊢r A
@@ -103,7 +106,7 @@ s-refl-∞ {≤ = ≤⁻} x ⊢r-top = s-top- x ⊢r-top
 s-refl-∞ regΓ (⊢r-var-∙ inΓ) = s-var-∙ regΓ inΓ
 s-refl-∞ regΓ (⊢r-arr regA regA₁) = s-arr₁ (s-refl-∞ regΓ regA) (s-refl-∞ regΓ regA₁)
 s-refl-∞ regΓ (⊢r-∀ regA) = s-∀ (s-refl-∞ (reg-S∙ regΓ) regA)
-s-refl-∞ {≤ = ≤⁺} regΓ ⊢r-bot = s-bot+ regΓ ⊢r-bot
+s-refl-∞ {≤ = ≤⁺} regΓ ⊢r-bot = s-bot+ regΓ ⊢r-bot rj-∞
 s-refl-∞ {≤ = ≤⁻} regΓ ⊢r-bot = s-bot- regΓ ⊢c-bot
 
 ----------------------------------------------------------------------

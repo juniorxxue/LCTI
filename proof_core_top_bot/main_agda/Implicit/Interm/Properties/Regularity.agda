@@ -1,6 +1,6 @@
 module Implicit.Interm.Properties.Regularity where
 
-open import Implicit.Language.All hiding (_⊢rʲ_)
+open import Implicit.Language.All
 open import Implicit.Interm.Base
 
 s-sregular : Γ ⊢ j # A ⌞ ≤ ⌝ B
@@ -21,12 +21,9 @@ s-sregular (s-svar-l x inΔ) = s-sregular inΔ
 s-sregular (s-svar-r x inΔ) = s-sregular inΔ
 s-sregular (s-tapp s upj) with s-sregular s
 ... | reg-S= r regA = r
-s-sregular (s-svar-𝕚 _ x) = s-sregular x
-s-sregular (s-svar-𝕔 _ x) = s-sregular x
-s-sregular (s-svar-𝕥 x x₁) = s-sregular x₁
 s-sregular (s-top+ regΔ cloA) = regΔ
 s-sregular (s-top- regΔ regA) = regΔ
-s-sregular (s-bot+ regΔ regA) = regΔ
+s-sregular (s-bot+ regΔ regA upj) = regΔ
 s-sregular (s-bot- regΔ regA) = regΔ
 
 t-tregular : Γ ⊢ j # e ⦂ A
@@ -46,89 +43,73 @@ t-tregular (⊢tabs ⊢e) with t-tregular ⊢e
 t-tregular {e = e ⓪ A} (⊢tapp ⊢e st) = t-tregular ⊢e
 
 
-
-infix 3 _⊢rʲ_
-data _⊢rʲ_ : Env n m → Counter m → Set where
-  j-Z : Γ ⊢rʲ Z
-  j-∞ : Γ ⊢rʲ ∞
-  j-𝕚 : Γ ⊢rʲ j
-      → Γ ⊢rʲ (𝕚 j)
-  j-𝕔 : Γ ⊢rʲ j
-      → Γ ⊢rʲ (𝕔 j)
-  j-𝕥 : Γ ⊢rʲ j
-      → Γ ⊢r A
-      → Γ ⊢rʲ 𝕥₍ A ₎ j
-
 ⊢rʲ-strengthen=0 : Γ ,= T ⊢rʲ j'
                  → ↑tyʲ0 j ⇘ j'
                  → Γ ⊢rʲ j
-⊢rʲ-strengthen=0 j-Z ↑tyʲ-Z = j-Z
-⊢rʲ-strengthen=0 j-∞ ↑tyʲ-∞ = j-∞
-⊢rʲ-strengthen=0 (j-𝕚 regj) (↑tyʲ-𝕚 upj) = j-𝕚 (⊢rʲ-strengthen=0 regj upj)
-⊢rʲ-strengthen=0 (j-𝕔 regj) (↑tyʲ-𝕔 upj) = j-𝕔 (⊢rʲ-strengthen=0 regj upj)
-⊢rʲ-strengthen=0 (j-𝕥 regj x) (↑tyʲ-𝕥 upj upA) = j-𝕥 (⊢rʲ-strengthen=0 regj upj) (⊢r-strengthen=0 x upA)
+⊢rʲ-strengthen=0 rj-Z ↑tyʲ-Z = rj-Z
+⊢rʲ-strengthen=0 rj-∞ ↑tyʲ-∞ = rj-∞
+⊢rʲ-strengthen=0 (rj-𝕚 regj) (↑tyʲ-𝕚 upj) = rj-𝕚 (⊢rʲ-strengthen=0 regj upj)
+⊢rʲ-strengthen=0 (rj-𝕔 regj) (↑tyʲ-𝕔 upj) = rj-𝕔 (⊢rʲ-strengthen=0 regj upj)
+⊢rʲ-strengthen=0 (rj-𝕥 regj x) (↑tyʲ-𝕥 upj upA) = rj-𝕥 (⊢rʲ-strengthen=0 regj upj) (⊢r-strengthen=0 x upA)
 
 ⊢rʲ-strengthen^0 : Γ ,^ ⊢rʲ j'
                  → ↑tyʲ0 j ⇘ j'
                  → Γ ⊢rʲ j
-⊢rʲ-strengthen^0 j-Z ↑tyʲ-Z = j-Z
-⊢rʲ-strengthen^0 j-∞ ↑tyʲ-∞ = j-∞
-⊢rʲ-strengthen^0 (j-𝕚 regj) (↑tyʲ-𝕚 upj) = j-𝕚 (⊢rʲ-strengthen^0 regj upj)
-⊢rʲ-strengthen^0 (j-𝕔 regj) (↑tyʲ-𝕔 upj) = j-𝕔 (⊢rʲ-strengthen^0 regj upj)
-⊢rʲ-strengthen^0 (j-𝕥 regj x) (↑tyʲ-𝕥 upj upA) = j-𝕥 (⊢rʲ-strengthen^0 regj upj) (⊢r-strengthen^0 x upA)
+⊢rʲ-strengthen^0 rj-Z ↑tyʲ-Z = rj-Z
+⊢rʲ-strengthen^0 rj-∞ ↑tyʲ-∞ = rj-∞
+⊢rʲ-strengthen^0 (rj-𝕚 regj) (↑tyʲ-𝕚 upj) = rj-𝕚 (⊢rʲ-strengthen^0 regj upj)
+⊢rʲ-strengthen^0 (rj-𝕔 regj) (↑tyʲ-𝕔 upj) = rj-𝕔 (⊢rʲ-strengthen^0 regj upj)
+⊢rʲ-strengthen^0 (rj-𝕥 regj x) (↑tyʲ-𝕥 upj upA) = rj-𝕥 (⊢rʲ-strengthen^0 regj upj) (⊢r-strengthen^0 x upA)
 
 ⊢rʲ-strengthen,0 : Γ , T ⊢rʲ j
                  → Γ ⊢rʲ j
-⊢rʲ-strengthen,0 j-Z = j-Z
-⊢rʲ-strengthen,0 j-∞ = j-∞
-⊢rʲ-strengthen,0 (j-𝕚 regj) = j-𝕚 (⊢rʲ-strengthen,0 regj)
-⊢rʲ-strengthen,0 (j-𝕔 regj) = j-𝕔 (⊢rʲ-strengthen,0 regj)
-⊢rʲ-strengthen,0 (j-𝕥 regj x) = j-𝕥 (⊢rʲ-strengthen,0 regj) (⊢r-strengthen,0 x)
+⊢rʲ-strengthen,0 rj-Z = rj-Z
+⊢rʲ-strengthen,0 rj-∞ = rj-∞
+⊢rʲ-strengthen,0 (rj-𝕚 regj) = rj-𝕚 (⊢rʲ-strengthen,0 regj)
+⊢rʲ-strengthen,0 (rj-𝕔 regj) = rj-𝕔 (⊢rʲ-strengthen,0 regj)
+⊢rʲ-strengthen,0 (rj-𝕥 regj x) = rj-𝕥 (⊢rʲ-strengthen,0 regj) (⊢r-strengthen,0 x)
 
 s-⊢rʲ : Γ ⊢ j # A ⌞ ≤ ⌝ B
       → Γ ⊢rʲ j
-s-⊢rʲ (s-refl regΔ cloA grd) = j-Z
-s-⊢rʲ (s-int regΔ) = j-∞
-s-⊢rʲ (s-var-∙ regΔ inΔ) = j-∞
+s-⊢rʲ (s-refl regΔ cloA grd) = rj-Z
+s-⊢rʲ (s-int regΔ) = rj-∞
+s-⊢rʲ (s-var-∙ regΔ inΔ) = rj-∞
 s-⊢rʲ (s-arr₁ s s₁) = s-⊢rʲ s
-s-⊢rʲ (s-arr₂ s s₁) = j-𝕚 (s-⊢rʲ s₁)
-s-⊢rʲ (s-arr₃ cloA grd s) = j-𝕔 (s-⊢rʲ s)
-s-⊢rʲ (s-∀ s) = j-∞
+s-⊢rʲ (s-arr₂ s s₁) = rj-𝕚 (s-⊢rʲ s₁)
+s-⊢rʲ (s-arr₃ cloA grd s) = rj-𝕔 (s-⊢rʲ s)
+s-⊢rʲ (s-∀ s) = rj-∞
 s-⊢rʲ (s-∀l s ic fd upC upD upj) = ⊢rʲ-strengthen=0 (s-⊢rʲ s) upj
 s-⊢rʲ (s-∀l-no-appear s ic fd upC upD upj) = ⊢rʲ-strengthen^0 (s-⊢rʲ s) upj
 s-⊢rʲ (s-tapp s upj) with s-sregular s
-... | reg-S= r regA = j-𝕥 (⊢rʲ-strengthen=0 (s-⊢rʲ s) upj) regA
-s-⊢rʲ (s-svar-l x inΔ) = j-∞
-s-⊢rʲ (s-svar-r x inΔ) = j-∞
-s-⊢rʲ (s-svar-𝕚 _ x) = s-⊢rʲ x
-s-⊢rʲ (s-svar-𝕔 _ x) = s-⊢rʲ x
-s-⊢rʲ (s-svar-𝕥 x x₁) = s-⊢rʲ x₁
-s-⊢rʲ (s-top+ regΔ cloA) = j-∞
-s-⊢rʲ (s-top- regΔ regA) = j-∞
-s-⊢rʲ (s-bot+ regΔ regA) = j-∞
-s-⊢rʲ (s-bot- regΔ regA) = j-∞
+... | reg-S= r regA = rj-𝕥 (⊢rʲ-strengthen=0 (s-⊢rʲ s) upj) regA
+s-⊢rʲ (s-svar-l x inΔ) = s-⊢rʲ inΔ
+s-⊢rʲ (s-svar-r x inΔ) = rj-∞
+s-⊢rʲ (s-top+ regΔ cloA) = rj-∞
+s-⊢rʲ (s-top- regΔ regA) = rj-∞
+s-⊢rʲ (s-bot+ regΔ regA regj) = regj
+s-⊢rʲ (s-bot- regΔ regA) = rj-∞
 
 ⊢r-⋈ : Γ ⊢rʲ j
      → 𝕣 Γ ⊢rʲ j
-⊢r-⋈ j-Z = j-Z
-⊢r-⋈ j-∞ = j-∞
-⊢r-⋈ (j-𝕚 regj) = j-𝕚 (⊢r-⋈ regj)
-⊢r-⋈ (j-𝕔 regj) = j-𝕔 (⊢r-⋈ regj)
-⊢r-⋈ (j-𝕥 regj x) = j-𝕥 (⊢r-⋈ regj) (⊢r-𝕣' x)
+⊢r-⋈ rj-Z = rj-Z
+⊢r-⋈ rj-∞ = rj-∞
+⊢r-⋈ (rj-𝕚 regj) = rj-𝕚 (⊢r-⋈ regj)
+⊢r-⋈ (rj-𝕔 regj) = rj-𝕔 (⊢r-⋈ regj)
+⊢r-⋈ (rj-𝕥 regj x) = rj-𝕥 (⊢r-⋈ regj) (⊢r-𝕣' x)
 
 
 t-⊢rʲ : Γ ⊢ j # e ⦂ A
       → Γ ⊢rʲ j
-t-⊢rʲ (⊢lit regΓ) = j-Z
-t-⊢rʲ (⊢var regΓ x∈Γ) = j-Z
-t-⊢rʲ (⊢ann ⊢e) = j-Z
-t-⊢rʲ (⊢lam₁ ⊢e) = j-∞
-t-⊢rʲ (⊢lam₂ ⊢e) = j-𝕚 (⊢rʲ-strengthen,0 (t-⊢rʲ ⊢e))
+t-⊢rʲ (⊢lit regΓ) = rj-Z
+t-⊢rʲ (⊢var regΓ x∈Γ) = rj-Z
+t-⊢rʲ (⊢ann ⊢e) = rj-Z
+t-⊢rʲ (⊢lam₁ ⊢e) = rj-∞
+t-⊢rʲ (⊢lam₂ ⊢e) = rj-𝕚 (⊢rʲ-strengthen,0 (t-⊢rʲ ⊢e))
 t-⊢rʲ (⊢app₁ ⊢e ⊢e₁) with t-⊢rʲ ⊢e
-... | j-𝕔 r = r
+... | rj-𝕔 r = r
 t-⊢rʲ (⊢app₂ ⊢e ⊢e₁) with t-⊢rʲ ⊢e
-... | j-𝕚 r = r
+... | rj-𝕚 r = r
 t-⊢rʲ (⊢sub ⊢e B≤A gc j≢Z) = ⊢r-⋈ (s-⊢rʲ B≤A)
-t-⊢rʲ (⊢tabs ⊢e) = j-Z
+t-⊢rʲ (⊢tabs ⊢e) = rj-Z
 t-⊢rʲ (⊢tapp ⊢e st) with t-⊢rʲ ⊢e
-... | j-𝕥 r x = r
+... | rj-𝕥 r x = r

@@ -6,6 +6,7 @@ open import Implicit.Language.Lookup.All
 open import Implicit.Language.Regular.All
 open import Implicit.Language.OpenClose.Base
 open import Implicit.Language.Ground.Base
+open import Implicit.Language.Find.Base
 open import Implicit.Language.Occur.All
 
 open import Implicit.Language.EnvOps.Regular
@@ -236,3 +237,13 @@ sregular-strengthen^ (reg-S= regΓ regA) (◀S= new x) = reg-S= (sregular-streng
 ≫-strengthen^ (grd-arr grd grd₁) regΓ newΓ (↑ty-arr upA upA₁) (↑ty-arr upB upB₁) = grd-arr (≫-strengthen^ grd regΓ newΓ upA upB)
                                                                                            (≫-strengthen^ grd₁ regΓ newΓ upA₁ upB₁)
 ≫-strengthen^ (grd-∀ grd) regΓ newΓ (↑ty-∀ upA) (↑ty-∀ upB) = grd-∀ (≫-strengthen^ grd (reg-S∙ regΓ) (◀S∙ newΓ) upA upB)
+
+⊢rʲ-strengthen^ : Γ ⊢rʲ j'
+               → Γ ◀ k ^⇘ Γ'
+               → j ↑tyʲ k ⇘ j'
+               → Γ' ⊢rʲ j
+⊢rʲ-strengthen^ rj-Z new ↑tyʲ-Z = rj-Z
+⊢rʲ-strengthen^ rj-∞ new ↑tyʲ-∞ = rj-∞
+⊢rʲ-strengthen^ (rj-𝕚 regj) new (↑tyʲ-𝕚 upj) = rj-𝕚 (⊢rʲ-strengthen^ regj new upj)
+⊢rʲ-strengthen^ (rj-𝕔 regj) new (↑tyʲ-𝕔 upj) = rj-𝕔 (⊢rʲ-strengthen^ regj new upj)
+⊢rʲ-strengthen^ (rj-𝕥 regj regA) new (↑tyʲ-𝕥 upj upA) = rj-𝕥 (⊢rʲ-strengthen^ regj new upj) (⊢r-strengthen^ regA new upA)

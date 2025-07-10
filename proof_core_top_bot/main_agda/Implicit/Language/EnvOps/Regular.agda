@@ -7,6 +7,7 @@ open import Implicit.Language.Shift.All
 open import Implicit.Language.Subst.All
 open import Implicit.Language.Lookup.All
 open import Implicit.Language.Regular.All
+open import Implicit.Language.Find.Base
 
 open import Implicit.Language.EnvOps.Base
 open import Implicit.Language.EnvOps.Inst
@@ -133,3 +134,5 @@ st0-⊢r' : Γ ⊢r B*
        → ⟦ A ⟧ B ⇘ B*
        → Γ ⊢r `∀ B
 st0-⊢r' regB* regA stB = ⊢r-∀ (st-⊢r' regB* ◀Z regA stB)
+
+

@@ -72,7 +72,7 @@ sd-strengthen= (s-tapp grd regA' s upj₁) new (↑ty-∀ upA) (↑ty-∀ upB) (
            (sd-strengthen= s (◀S= new upA₁) upA% upB (↑tyʲ-comm0' upj upj₁ upj'))
            upj'
 sd-strengthen= (s-top regΔ regA) x upA ↑ty-top ↑tyʲ-∞ = s-top (sregular-strengthen= regΔ x) (⊢r-strengthen= regA x upA)
-sd-strengthen= (s-bot regΔ regA) x ↑ty-bot upB ↑tyʲ-∞ = s-bot (sregular-strengthen= regΔ x) (⊢r-strengthen= regA x upB)
+sd-strengthen= (s-bot regΔ regA regj) x ↑ty-bot upB upj = s-bot (sregular-strengthen= regΔ x) (⊢r-strengthen= regA x upB) (⊢rʲ-strengthen= regj x upj)
 
 sd-strengthen=0 : Γ ,= T ⊢d j' # A' ≤ B'
                   → ↑ty0 A ⇘ A'
@@ -87,7 +87,7 @@ sd-refl-∞ : SRegular Γ
           → Γ ⊢d ∞ # A ≤ A
 sd-refl-∞ regΓ ⊢r-int = s-int regΓ
 sd-refl-∞ regΓ ⊢r-top = s-top regΓ ⊢r-top
-sd-refl-∞ regΓ ⊢r-bot = s-bot regΓ ⊢r-bot
+sd-refl-∞ regΓ ⊢r-bot = s-bot regΓ ⊢r-bot rj-∞
 sd-refl-∞ regΓ (⊢r-var-∙ inΓ) = s-var-∙ regΓ inΓ
 sd-refl-∞ regΓ (⊢r-arr regA regA₁) = s-arr₁ (sd-refl-∞ regΓ regA) (sd-refl-∞ regΓ regA₁)
 sd-refl-∞ regΓ (⊢r-∀ regA) = s-∀ (sd-refl-∞ (reg-S∙ regΓ) regA)
@@ -190,8 +190,8 @@ sound (s-refl regΔ cloA grd) grd1 grd2
 sound (s-int regΔ) grd-int grd-int = s-int regΔ
 sound (s-top+ regΔ regA) grd1 grd-top = s-top regΔ (⊢c-≫-⊢r regΔ regA grd1)
 sound (s-top- regΔ regA) grd1 grd-top = s-top regΔ (⊢c-≫-⊢r regΔ (⊢r-⊢c regA) grd1)
-sound (s-bot+ regΔ regB) grd-bot grd2 = s-bot regΔ (⊢c-≫-⊢r regΔ (⊢r-⊢c regB) grd2)
-sound (s-bot- regΔ regB) grd-bot grd2 = s-bot regΔ (⊢c-≫-⊢r regΔ regB grd2)
+sound (s-bot+ regΔ regB regj) grd-bot grd2 = s-bot regΔ (⊢c-≫-⊢r regΔ (⊢r-⊢c regB) grd2) regj
+sound (s-bot- regΔ regB) grd-bot grd2 = s-bot regΔ (⊢c-≫-⊢r regΔ regB grd2) rj-∞
 sound (s-var-∙ regΔ inΔ) (grd-var= x) (grd-var= x₁) = ⊥-elim (∋∙-∋:=-false inΔ x₁)
 sound (s-var-∙ regΔ inΔ) (grd-var= x) (grd-var∙ x₁) = ⊥-elim (∋∙-∋:=-false inΔ x)
 sound (s-var-∙ regΔ inΔ) (grd-var∙ x) (grd-var= x₁) = ⊥-elim (∋∙-∋:=-false inΔ x₁)
@@ -254,13 +254,3 @@ sound (s-svar-r inΔ s) grd1 (grd-var= x₁)
   with regB% ← ∋:=-⊢r (s-sregular s) inΔ
   = sound s grd1 (⊢r-≫-eq regB%)
 sound (s-svar-r x inΔ) grd1 (grd-var∙ x₁) = ⊥-elim (∋∙-∋:=-false x₁ x)
--- ⊥-elim (∋∙-∋:=-false x₁ inΔ)
-sound (s-svar-𝕚 inΓ s) (grd-var= x) (grd-arr grd2 grd3)
-  with refl ← ∋:=-unique inΓ x = sound s (⊢r-≫-eq (∋:=-⊢r (s-sregular s) inΓ)) (grd-arr grd2 grd3)
-sound (s-svar-𝕚 inΓ s) (grd-var∙ x) (grd-arr grd2 grd3) = ⊥-elim (∋∙-∋:=-false x inΓ)
-sound (s-svar-𝕔 inΓ s) (grd-var= x) (grd-arr grd2 grd3)
-  with refl ← ∋:=-unique inΓ x = sound s (⊢r-≫-eq (∋:=-⊢r (s-sregular s) inΓ)) (grd-arr grd2 grd3)
-sound (s-svar-𝕔 inΓ s) (grd-var∙ x) grd2 = ⊥-elim (∋∙-∋:=-false x inΓ)
-sound (s-svar-𝕥 inΓ s) (grd-var= x) (grd-∀ grd2)
-  with refl ← ∋:=-unique inΓ x = sound s (⊢r-≫-eq (∋:=-⊢r (s-sregular s) inΓ)) (grd-∀ grd2)
-sound (s-svar-𝕥 inΓ s) (grd-var∙ x) grd2 = ⊥-elim (∋∙-∋:=-false x inΓ)

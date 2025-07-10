@@ -4,6 +4,7 @@ open import Implicit.Language.Base
 open import Implicit.Language.Shift.All
 open import Implicit.Language.Lookup.All
 open import Implicit.Language.Regular.Base
+open import Implicit.Language.Find.Base
 open import Implicit.Language.OpenClose.Base
 open import Implicit.Language.Ground.Base
 
@@ -166,3 +167,13 @@ sregular-strengthen, (reg-S= regΓ regA) (◀S= newΓ) = reg-S= (sregular-streng
 ≫-strengthen, (grd-var∙ x) newΓ = grd-var∙ (∋∙-strengthen, x newΓ)
 ≫-strengthen, (grd-arr grdA grdA₁) newΓ = grd-arr (≫-strengthen, grdA newΓ) (≫-strengthen, grdA₁ newΓ)
 ≫-strengthen, (grd-∀ grdA) newΓ = grd-∀ (≫-strengthen, grdA (◀S∙ newΓ))
+
+
+⊢rʲ-strengthen, : Γ ⊢rʲ j
+                → Γ ◀ k ,⇘ Γ'
+                → Γ' ⊢rʲ j
+⊢rʲ-strengthen, rj-Z new = rj-Z
+⊢rʲ-strengthen, rj-∞ new = rj-∞
+⊢rʲ-strengthen, (rj-𝕚 upj) new = rj-𝕚 (⊢rʲ-strengthen, upj new)
+⊢rʲ-strengthen, (rj-𝕔 upj) new = rj-𝕔 (⊢rʲ-strengthen, upj new)
+⊢rʲ-strengthen, (rj-𝕥 upj regA) new = rj-𝕥 (⊢rʲ-strengthen, upj new) (⊢r-strengthen, regA new)

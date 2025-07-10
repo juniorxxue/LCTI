@@ -22,10 +22,7 @@ s+-polarity (s-∀l s ic fd upC upD upj) = ⊢r-strengthen=0 (s+-polarity s) (�
 s+-polarity (s-∀l-no-appear s ic fd upC upD upj) = ⊢r-strengthen^0 (s+-polarity s) (↑ty-arr upC upD)
 s+-polarity (s-svar-l x inΔ) = s+-polarity inΔ -- ∋:=-⊢r x inΔ
 s+-polarity (s-tapp s upj) = ⊢r-∀ (⊢r-◆0 (s+-polarity s))
-s+-polarity (s-svar-𝕚 _ x) = s+-polarity x
-s+-polarity (s-svar-𝕔 inΓ s) = s+-polarity s
-s+-polarity (s-svar-𝕥 inΓ s) = s+-polarity s
-s+-polarity (s-bot+ regΔ regA) = regA
+s+-polarity (s-bot+ regΔ regA regj) = regA
 
 s--polarity (s-int regΔ) = ⊢r-int
 s--polarity (s-top- regΔ regA) = regA
@@ -34,7 +31,6 @@ s--polarity (s-arr₁ s s₁) = ⊢r-arr (s+-polarity s) (s--polarity s₁)
 s--polarity (s-∀ s) = ⊢r-∀ (s--polarity s)
 s--polarity (s-svar-r x inΔ) = s--polarity inΔ
 s--polarity (s-bot- regΔ regA) = ⊢r-bot
--- ∋:=-⊢r x inΔ
 
 
 t-⊢r : Γ ⊢ j # e ⦂ A
@@ -53,7 +49,7 @@ t-⊢r (⊢app₂ ⊢e ⊢e₁) with t-⊢r ⊢e
 t-⊢r (⊢sub ⊢e B≤A gc j≢Z) = ⊢r-𝕣' (s+-polarity B≤A)
 t-⊢r (⊢tabs ⊢e) = ⊢r-∀ (t-⊢r ⊢e)
 t-⊢r (⊢tapp ⊢e st) with t-⊢rʲ ⊢e
-... | j-𝕥 r x = st0-⊢r (t-⊢r ⊢e) x st
+... | rj-𝕥 r x = st0-⊢r (t-⊢r ⊢e) x st
 
 
 s-⊢c-l : Γ ⊢ j # A ⌞ ≤ ⌝ B
@@ -75,10 +71,7 @@ s-⊢c-l {≤ = ≤⁺} (s-∀l-no-appear s ic fd upC upD upj) = ⊢c-∀ (⊢c-
 s-⊢c-l {≤ = ≤⁺} (s-tapp s upj) = ⊢c-∀ (⊢c-◆0 (s-⊢c-l s))
 s-⊢c-l {≤ = ≤⁺} (s-svar-l x inΔ) = ⊢c-var-= (∋:=to∋= x)
 s-⊢c-l {≤ = ≤⁻} s = ⊢r-⊢c (s--polarity s)
-s-⊢c-l {≤ = ≤⁺} (s-svar-𝕚 inΓ s) = ⊢c-var-= (∋:=to∋= inΓ)
-s-⊢c-l {≤ = ≤⁺} (s-svar-𝕔 inΓ s) = ⊢c-var-= (∋:=to∋= inΓ)
-s-⊢c-l {≤ = ≤⁺} (s-svar-𝕥 inΓ s) = ⊢c-var-= (∋:=to∋= inΓ)
-s-⊢c-l {≤ = ≤⁺} (s-bot+ regΔ regA) = ⊢c-bot
+s-⊢c-l {≤ = ≤⁺} (s-bot+ regΔ regA rej) = ⊢c-bot
 
 s-⊢c-r {≤ = ≤⁺} s = ⊢r-⊢c (s+-polarity s)
 s-⊢c-r {≤ = ≤⁻} (s-int regΔ) = ⊢c-int
@@ -88,4 +81,3 @@ s-⊢c-r {≤ = ≤⁻} (s-arr₁ s s₁) = ⊢c-arr (s-⊢c-l s) (s-⊢c-r s₁
 s-⊢c-r {≤ = ≤⁻} (s-∀ s) = ⊢c-∀ (s-⊢c-r s)
 s-⊢c-r {≤ = ≤⁻} (s-svar-r x inΔ) = ⊢c-var-= (∋:=to∋= x)
 s-⊢c-r {≤ = ≤⁻} (s-bot- regΔ regA) = regA
--- ⊢c-var-= (∋:=to∋= inΔ)
