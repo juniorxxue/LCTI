@@ -23,12 +23,6 @@ sound-ss (s-∀ s) = s-∀ (sound-ss s)
 --+                           main logic                           +--
 ----------------------------------------------------------------------
 
-agc-gc : AGenericConsumer e
-       → GenericConsumer e
-agc-gc gc-i = gc-i
-agc-gc gc-var = gc-var
-agc-gc gc-ann = gc-ann
-
 s-nonempty-case1 : Γ ⋈ ⊢ A₁ ≤⁺ [ e₁ ]↝ Σ ⊣ Γ ⋈ ↪ A ↡ j
                  → NonZ j
 s-nonempty-case1 (s-term-c cloA ap ⊢e s) = nz-C
