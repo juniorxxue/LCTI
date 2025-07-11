@@ -1,4 +1,4 @@
 .PHONY: all
 
 all:
-	agda --html Implicit/Paper.agda
+	agda --html Implicit/README.agda
