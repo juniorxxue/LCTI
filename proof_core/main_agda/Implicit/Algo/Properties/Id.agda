@@ -67,8 +67,7 @@ s-id' (s-∀l-no s upᶜ upᵉ upC upD) with s-id' s
 ... | id-e r = id-e (id-st' {T = Int} r (↑tyᶜ-st upᶜ) (↑ty-st upD))
 s-id' (s-tapp {B = B} {C = C} s upᶜ)
   with ⟨ B* , stB ⟩ ← st0-total B C = id-⓪ (id-st' (s-id' s) (↑tyᶜ-st upᶜ) stB) stB
-s-id' (s-svar-term inΓ s) = s-id' s
-s-id' (s-svar-tapp inΓ s) = s-id' s
+s-id' (s-svar inΓ s) = s-id' s
 s-id' (s-evar-infers infs inst) = infs-id' infs
 
 infs-id' (infs-z regΓ regA) = id-τ
@@ -83,3 +82,4 @@ infs-id' (infs-s x infs) = id-e (infs-id' infs)
 s-id0 : Γ ⊢ A ≤⁺ τ B ⊣ Γ' ↪ C
       → B ≡ C
 s-id0 (s-type ss) = refl
+s-id0 (s-svar inΓ s) = s-id0 s

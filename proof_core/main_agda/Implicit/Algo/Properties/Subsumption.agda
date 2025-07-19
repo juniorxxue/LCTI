@@ -13,134 +13,107 @@ open import Implicit.Algo.Properties.StrengthenSVar
 open import Implicit.Algo.Properties.StrengthenEVar
 open import Implicit.Algo.Properties.Weaken
 open import Implicit.Algo.Properties.Irrelevance
-open import Implicit.Algo.Properties.Trans
-open import Implicit.Algo.Properties.SubIrrelevance
 
-open import Implicit.Algo.Properties.Swap
+ss-grd+ : SRegular Γ
+       → Γ ⊢c A
+         → Γ ≫ A ⇘ B
+         → Γ ⊢ A ⌞ ≤⁺ ⌝ B ⊣ Γ
+ss-grd- : SRegular Γ
+       → Γ ⊢c A
+         → Γ ≫ A ⇘ B
+         → Γ ⊢ B ⌞ ≤⁻ ⌝ A ⊣ Γ
 
-≊-weaken : Σ₁ ≊ Σ₂
-         → ↑tmᶜ0 Σ₁ ⇘ Σ₁'
-         → ↑tmᶜ0 Σ₂ ⇘ Σ₂'
-         → Σ₁' ≊ Σ₂'
-≊-weaken ≊Z ↑tmᶜ-□ ↑tmᶜ-τ = ≊Z
-≊-weaken (≊S new) (↑tmᶜ-e up-e up1) (↑tmᶜ-e up-e₁ up2) with refl ← ↑tm-unique up-e up-e₁ = ≊S (≊-weaken new up1 up2)
-≊-weaken (≊⓪ new) (↑tmᶜ-⓪ up1) (↑tmᶜ-⓪ up2) = ≊⓪ (≊-weaken new up1 up2)
+ss-grd+ regΓ cloA grd-int = s-int regΓ
+ss-grd+ regΓ cloA (grd-var= x) = s-ex-l= regΓ x
+ss-grd+ regΓ cloA (grd-var∙ x) = s-var-∙ regΓ x
+ss-grd+ regΓ (⊢c-arr cloA cloA₁) (grd-arr grd grd₁) = s-arr (ss-grd- regΓ cloA grd) (ss-grd+ regΓ cloA₁ grd₁)
+ss-grd+ regΓ (⊢c-∀ cloA) (grd-∀ grd) = s-∀ (ss-grd+ (reg-S∙ regΓ) cloA grd)
 
--- aux lemmas
-t-inf-open-false : Γ ⊢ □ ⇒ e ⇒ A
-                 → Γ ⋈ ⊢o A
-                 → ⊥
-t-inf-open-false ⊢e opnA = ⊢r-⊢o-false (⊢r-𝕣 (t-⊢r ⊢e)) opnA
+ss-grd- regΓ cloA grd-int = s-int regΓ
+ss-grd- regΓ cloA (grd-var= x) = s-ex-r= regΓ x
+ss-grd- regΓ cloA (grd-var∙ x) = s-var-∙ regΓ x
+ss-grd- regΓ (⊢c-arr cloA cloA₁) (grd-arr grd grd₁) = s-arr (ss-grd+ regΓ cloA grd) (ss-grd- regΓ cloA₁ grd₁)
+ss-grd- regΓ (⊢c-∀ cloA) (grd-∀ grd) = s-∀ (ss-grd- (reg-S∙ regΓ) cloA grd)
 
-⊢to≤ : Γ ⊢ Σ ⇒ e ⇒ A
-     → Γ ⋈ ⊢ A ≤⁺ Σ ⊣ Γ ⋈ ↪ A
 
-subsumption :  Γ ⊢ Σ ⇒ e ⇒ A
-             → Σ ≊ Σ'
-             → Γ ⋈ ⊢ A ≤⁺ Σ' ⊣ Γ ⋈ ↪ A'
-             → Γ ⊢ Σ' ⇒ e ⇒ A'
+private variable
+  σ σ' : Context n m
 
-infs-sub' : 𝕣 Γ ⊨ Σ ⟹ A
-          → SRegular Γ
-          → Γ ⊢ A ≤⁺ Σ ⊣ Γ ↪ A
+infix 3 _≊_by_
+data _≊_by_ : Context n m → Context n m → Type m → Set where
+  ≋□ : (Context n m ∋⦂ □) ≊ (τ A) by A
+  ≊S : Σ ≊ σ by B
+     → [ e ]↝ Σ ≊ [ e ]↝ σ by A `→ B
+  ≊⓪ : Σ ≊ σ by B*
+     → ⟦ A ⟧ B ⇘ B*
+     → A ⓪↝ Σ ≊ A ⓪↝ σ by `∀ B
+
+≊-↑ty : Σ ≊ σ by A
+      → ↑tyᶜ0 Σ ⇘ Σ'
+      → ↑tyᶜ0 σ ⇘ σ'
+      → ↑ty0 A ⇘ A'
+      → Σ' ≊ σ' by A'
+≊-↑ty ≋□ ↑tyᶜ-□ (↑tyᶜ-τ up-t) upA with refl ← ↑ty-unique up-t upA = ≋□
+≊-↑ty (≊S new) (↑tyᶜ-e up-e upΣ) (↑tyᶜ-e up-e₁ upσ) (↑ty-arr upA upA₁)
+  with refl ← ↑tyᵉ-unique up-e up-e₁ = ≊S (≊-↑ty new upΣ upσ upA₁)
+≊-↑ty (≊⓪ {B* = B*} new x) (↑tyᶜ-⓪ upA₁ upΣ) (↑tyᶜ-⓪ upA₂ upσ) (↑ty-∀ upA)
+  with refl ← ↑ty-unique upA₁ upA₂
+  with ⟨ B*' , upB* ⟩ ← ↑ty0-total B* = ≊⓪ (≊-↑ty new upΣ upσ upB*) (↑ty-st-comm z≤n x upA upA₁ upB*)
+
+≊-↑tm : Σ ≊ σ by A
+      → ↑tmᶜ0 Σ ⇘ Σ'
+      → ↑tmᶜ0 σ ⇘ σ'
+      → Σ' ≊ σ' by A
+≊-↑tm ≋□ ↑tmᶜ-□ ↑tmᶜ-τ = ≋□
+≊-↑tm (≊S new) (↑tmᶜ-e up-e upΣ) (↑tmᶜ-e up-e₁ upσ)
+  with refl ← ↑tm-unique up-e up-e₁ = ≊S (≊-↑tm new upΣ upσ)
+≊-↑tm (≊⓪ new x) (↑tmᶜ-⓪ upΣ) (↑tmᶜ-⓪ upσ) = ≊⓪ (≊-↑tm new upΣ upσ) x
+
+≊-nonempty : NonEmpty Σ
+           → Σ ≊ Σ' by A
+           → NonEmpty Σ'
+≊-nonempty ne-app (≊S new) = ne-app
+≊-nonempty ne-tapp (≊⓪ new x) = ne-tapp
+
+infs-subsumption : 𝕣 Γ ⊨ Σ ⟹ A
+                 → Σ ≊ σ by A
+                 → 𝕣 Γ ⊨ σ ⟹ A
+
+s-subsumtion : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
+             → Σ ≊ Σ' by B
+             → Γ ⊢ A ≤⁺ Σ' ⊣ Δ ↪ B
+
+s-subsumtion (s-empty regΓ cloA grd) ≋□ = s-type (ss-grd+ regΓ cloA grd)
+s-subsumtion (s-term-c cloA ap ⊢e s) (≊S new) = s-term-c cloA ap ⊢e (s-subsumtion s new)
+s-subsumtion (s-term-o opnA ⊢e ss s) (≊S new) = s-term-o opnA ⊢e ss (s-subsumtion s new)
+s-subsumtion (s-∀l s upᶜ upᵉ upC upD) (≊S {σ = σ} new)
+  with ⟨ σ' , upσ ⟩ ←  ↑tyᶜ0-total σ = s-∀l (s-subsumtion s (≊S (≊-↑ty new upᶜ upσ upD))) upσ upᵉ upC upD
+s-subsumtion (s-∀l-no s upᶜ upᵉ upC upD) (≊S {σ = σ} new)
+  with ⟨ σ' , upσ ⟩ ←  ↑tyᶜ0-total σ = s-∀l-no (s-subsumtion s (≊S (≊-↑ty new upᶜ upσ upD))) upσ upᵉ upC upD
+s-subsumtion (s-tapp s upᶜ) (≊⓪ {σ = σ} new x)
+  with ⟨ σ' , upσ ⟩ ←  ↑tyᶜ0-total σ
+  with ninC ← ⊢r-¬ε (s-⊢r s) Z
+  with ⟨ up , upp ⟩ ← ↑ty-surjective ninC
+  with refl ← ↑ty-st-eq upp x = s-tapp (s-subsumtion s (≊-↑ty new upᶜ upσ upp)) upσ
+s-subsumtion (s-svar x s) new = s-svar x (s-subsumtion s new)
+s-subsumtion (s-evar-infers {Δ = Δ} infs inst) (≊S new) = s-evar-infers (infs-subsumption {Γ = Δ} infs (≊S new)) inst
+
+infs-subsumption {Γ = Γ} (infs-s ⊢e infs) (≊S new) = infs-s ⊢e (infs-subsumption {Γ = Γ} infs new)
+
+subsumption : Γ ⊢ Σ ⇒ e ⇒ A
+             → Σ ≊ Σ' by A
+             → Γ ⊢ Σ' ⇒ e ⇒ A
+subsumption (⊢lit regΓ) ≋□ = ⊢sub (⊢lit regΓ) ne-τ gc-i (s-type (s-int (reg-Z regΓ)))
+subsumption (⊢var regΓ x∈Γ) ≋□ = ⊢sub (⊢var regΓ x∈Γ) ne-τ gc-var (s-type (s-refl (reg-Z regΓ) (⊢r-𝕣 (∋⦂-⊢r regΓ x∈Γ))))
+subsumption (⊢ann ⊢e) ≋□ with t-⊢rᶜ ⊢e
+... | ⊢rᶜ-τ regA = ⊢sub (⊢ann ⊢e) ne-τ gc-ann (s-type (s-refl (reg-Z (t-env ⊢e)) (⊢r-𝕣 regA)))
+subsumption (⊢app ⊢e) new = ⊢app (subsumption ⊢e (≊S new))
+subsumption (⊢lam₂ ⊢e up-c ⊢e₁) (≊S {σ = σ} new)
+  with ⟨ σ' , upσ ⟩ ← ↑tmᶜ0-total σ = ⊢lam₂ ⊢e upσ (subsumption ⊢e₁ (≊-↑tm new up-c upσ))
+subsumption (⊢sub ⊢e ne gc s) new = ⊢sub ⊢e (≊-nonempty ne new) gc (s-subsumtion s new)
+subsumption (⊢tabs ⊢e) ≋□ = ⊢sub (⊢tabs ⊢e) ne-τ gc-tlam (s-type (s-refl (reg-Z (t-env (⊢tabs ⊢e))) (⊢r-𝕣 (⊢r-∀ (t-⊢r ⊢e)))))
+subsumption (⊢tapp ⊢e st) new = ⊢tapp (subsumption ⊢e (≊⓪ new st)) st
 
 subsumption0 : Γ ⊢ □ ⇒ e ⇒ A
              → Γ ⊢ τ A ⇒ e ⇒ A
-subsumption0 ⊢e = subsumption ⊢e ≊Z (s-type (s-refl (reg-Z (t-env ⊢e)) (⊢r-weaken⋈0 (t-⊢r ⊢e))))
-
-
-s-refined-p : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
-            → Δ ⊢ B ≤⁺ Σ ⊣ Δ ↪ B
-s-refined-p (s-empty cloΓ cloA x) = let regB = (⊢c-≫-⊢r cloΓ cloA x) in s-empty cloΓ (⊢r-⊢c regB ) (⊢r-≫-eq regB)
-s-refined-p (s-type ss) = s-type (s-refl (ss-env-out ss) (ss-polarity+-out ss))
-s-refined-p (s-term-c cloA ap ⊢e s) with ⊢id0 ⊢e
-... | refl = let regA = ⊆-⊢r (⊢c-≫-⊢r (s-env-in s) cloA ap) (s-⊆ s)
-             in s-term-c (⊢r-⊢c regA) (⊢r-≫-eq regA) (t-irrev-⊆ ⊢e (s-⊆ s)) (s-refined-p s)
-s-refined-p s'@(s-term-o opnA ⊢e ss s) with subsumption0 ⊢e
-... | ih = let regA = ⊆-⊢r (ss-polarity- ss) (s-⊆ s')
-         in s-term-c (⊢r-⊢c regA) (⊢r-≫-eq regA) (t-irrev-⊆ ih (s-⊆ s')) (s-refined-p s)
-s-refined-p (s-∀l s upᶜ upᵉ upC upD) = s-strengthen=0 (s-refined-p s) (↑ty-arr upC upD) (↑ty-arr upC upD) (↑tyᶜ-e upᵉ upᶜ)
-s-refined-p (s-∀l-no s upᶜ upᵉ upC upD) = s-strengthen^0 (s-refined-p s) (↑ty-arr upC upD) (↑ty-arr upC upD) (↑tyᶜ-e upᵉ upᶜ)
--- s-strengthen=0 (s-refined-p s) (↑ty-arr upC upD) (↑ty-arr upC upD) (↑tyᶜ-e upᵉ upᶜ)
-s-refined-p (s-tapp s upᶜ) = s-tapp (s-refined-p s) upᶜ
-s-refined-p (s-svar-term inΓ s) = s-refined-p s
-s-refined-p (s-svar-tapp inΓ s) = s-refined-p s
-s-refined-p (s-evar-infers (infs-s ⊢e infs) inst)
-  with regA ← (⊆-⊢r (⊢r-𝕣 (t-⊢r ⊢e)) (inst-⊆ inst))
-  with ih ← infs-sub' infs (inst-env-in inst)
-  = s-term-c (⊢r-⊢c regA) (⊢r-≫-eq regA) (t-irrev-⊆ (subsumption0 ⊢e) (inst-⊆ inst)) (s-irrev-⊆ ih (inst-⊆ inst))
-
-infs-sub' (infs-z regΓ regA) regΓ' = s-type (s-refl regΓ' (⊢r-𝕣 regA))
-infs-sub' (infs-s ⊢e infs) regΓ'
-  with regA ← (⊢r-𝕣 (t-⊢r ⊢e))
-  = s-term-c (⊢r-⊢c regA) (⊢r-≫-eq regA) (subsumption0 ⊢e) (infs-sub' infs regΓ')
-
-
-
-⊢to≤ (⊢lit regΓ) = s-empty (reg-Z regΓ) ⊢c-int grd-int
-⊢to≤ (⊢var cloΓ x∈Γ) = let regA = ⊢r-𝕣 (∋⦂-⊢r cloΓ x∈Γ)
-                       in s-empty (reg-Z cloΓ) (⊢r-⊢c regA) (⊢r-≫-eq regA)
-⊢to≤ (⊢ann ⊢e) with refl ← ⊢id0 ⊢e = let regA = ⊢r-𝕣 (t-⊢r ⊢e)
-                                     in s-empty (reg-Z (t-env ⊢e)) (⊢r-⊢c regA) (⊢r-≫-eq regA)
-⊢to≤ (⊢app ⊢e) with ⊢to≤ ⊢e
-... | s-term-c cloA ap ⊢e₁ r = r
-... | s-term-o opnA ⊢e₁ x r = ⊥-elim (⊢r-⊢o-false (⊢r-𝕣 (t-⊢r ⊢e₁)) opnA)
-⊢to≤ (⊢lam₁ ⊢e)
-  with refl ← ⊢id0 ⊢e
-  with reg-S, r regA ← t-env ⊢e
-  with regB ← t-⊢r ⊢e = s-type (s-refl (reg-Z r) (⊢r-arr (⊢r-𝕣 regA) (⊢r-𝕣 (⊢r-strengthen,0 regB))))
-⊢to≤ (⊢lam₂ ⊢e up-c ⊢e₁) with ⊢to≤ ⊢e₁
-... | ih = let regA = ⊢r-𝕣 (t-⊢r ⊢e) in s-term-c (⊢r-⊢c regA) (⊢r-≫-eq regA) (subsumption0 ⊢e) (s-strengthen,0 ih up-c)
-⊢to≤ (⊢sub ⊢e ne gc s) = s-refined-p s
-⊢to≤ (⊢tabs ⊢e) with t-env ⊢e
-... | reg-S∙ r = let regA = ⊢r-𝕣 (t-⊢r ⊢e) in s-empty (reg-Z r) (⊢c-∀ (⊢r-⊢c regA)) (grd-∀ (⊢r-≫-eq regA))
-⊢to≤ {e = Λ e} (⊢tabs-τ x) with ⊢id0 x
-... | refl = s-type (s-refl (reg-Z (t-env (⊢tabs-τ x))) (⊢r-𝕣 (⊢r-∀ (t-⊢r x))))
-⊢to≤ (⊢tapp ⊢e st) with ⊢to≤ ⊢e
-... | s-tapp r upᶜ = let upA = (st-↑ty (⊢r-¬ε (s-⊢r r) Z) st)
-                     in s-strengthen=0 r upA upA upᶜ
-
-subsumption {Σ' = τ A} (⊢lit regΓ) ≊Z s = ⊢sub (⊢lit regΓ) ne-τ gc-i s
-subsumption {Σ' = τ A} (⊢var cloΓ x∈Γ) ≊Z s = ⊢sub (⊢var cloΓ x∈Γ) ne-τ gc-var s
-subsumption {Σ' = τ A} (⊢ann ⊢e) ≊Z s = ⊢sub (⊢ann ⊢e) ne-τ gc-ann s
-subsumption {Σ' = τ A} (⊢app ⊢e) ≊Z s with ⊢to≤ ⊢e
-... | s-term-c cloA ap ⊢e₁ s₁ = ⊢app (subsumption ⊢e (≊S ≊Z) (s-term-c cloA ap ⊢e₁ s))
-... | s-term-o opnA ⊢e₁ x s₁ = ⊥-elim (t-inf-open-false ⊢e₁ opnA)
-subsumption {Σ' = τ (`∀ B)} (⊢tabs ⊢e) ≊Z (s-type (s-∀ ss)) =
-  ⊢tabs-τ (subsumption ⊢e ≊Z (s-type (ss-swap ss swap-Z swap-Z)))
-subsumption {Σ' = τ A} {A' = A′} (⊢tapp ⊢e st) ≊Z s
-  with ⟨ A' , upA ⟩ ← ↑ty0-total A
-  with refl ← s-id0 s
-  with s-tapp (s-empty regΓ'@(reg-S= regΓ regA) cloA grd) ↑tyᶜ-□ ← ⊢to≤ ⊢e =
-    let upA₁ = (st-↑ty (⊢r-¬ε (⊢c-≫-⊢r regΓ' cloA grd) Z) st)
-    in ⊢tapp (subsumption ⊢e (≊⓪ ≊Z) (s-tapp (s-weaken=0 s upA₁ (↑tyᶜ-τ upA) upA regA) (↑tyᶜ-τ upA))) (↑ty-st upA)
-
-subsumption {Σ' = [ e ]↝ Σ'} (⊢app ⊢e) (≊S newΣ) s with ⊢to≤ ⊢e
-... | s-term-c cloA ap ⊢e₁ r = ⊢app (subsumption ⊢e (≊S (≊S newΣ)) (s-term-c cloA ap ⊢e₁ s))
-... | s-term-o opnA ⊢e₁ x r = ⊥-elim (t-inf-open-false ⊢e₁ opnA)
-subsumption {Σ' = [ e ]↝ Σ'} (⊢lam₂ ⊢e up-c ⊢e₁) (≊S newΣ) (s-term-c cloA ap ⊢e₂ s)
-  with relf ← ⊢id0 ⊢e₂
-  with reg-S, regΓ regA ← t-env ⊢e₁
-  with refl ← ⊢r-≫-eq' (⊢r-𝕣 regA) ap
-  with ⟨ nΣ' , upΣ ⟩ ← ↑tmᶜ0-total Σ' = ⊢lam₂ ⊢e upΣ (subsumption ⊢e₁ (≊-weaken newΣ up-c upΣ) (s-weaken,0 s upΣ regA))
-subsumption {Σ' = [ e ]↝ Σ'} (⊢lam₂ ⊢e up-c ⊢e₁) (≊S newΣ) (s-term-o opnA ⊢e₂ x s) = ⊥-elim (t-inf-open-false ⊢e opnA)
-subsumption {Σ' = [ e ]↝ Σ'} (⊢sub ⊢e ne gc s₁) (≊S newΣ) s = ⊢sub ⊢e ne-app gc (s-trans s₁ s (≊S newΣ))
-subsumption {Σ' = [ e ]↝ Σ'} {A' = A′} (⊢tapp ⊢e st) (≊S newΣ) s
-  with s-tapp s' (↑tyᶜ-e up-e upᶜ) ← ⊢to≤ ⊢e
-  with ⟨ Σ″ , upΣ' ⟩ ← ↑tyᶜ0-total Σ'
-  with ⟨ A″ , upA′ ⟩ ← ↑ty0-total A′
-  with reg-S= regΓ regA ← s-env-in s'
-  = let upA' = (st-↑ty (⊢r-¬ε (s-⊢r s') Z) st)
-    in ⊢tapp (subsumption ⊢e (≊⓪ (≊S newΣ)) (s-tapp (s-weaken=0 s upA' (↑tyᶜ-e up-e upΣ') upA′ regA) (↑tyᶜ-e up-e upΣ'))) (↑ty-st upA′)
-
-subsumption {Σ' = A ⓪↝ Σ'} (⊢app ⊢e) (≊⓪ newΣ) s with ⊢to≤ ⊢e
-... | s-term-c cloA ap ⊢e₁ r = ⊢app (subsumption ⊢e (≊S (≊⓪ newΣ)) (s-term-c cloA ap ⊢e₁ s))
-... | s-term-o opnA ⊢e₁ ss r = ⊥-elim (t-inf-open-false ⊢e₁ opnA)
-subsumption {Σ' = A ⓪↝ Σ'} (⊢sub ⊢e ne gc s₁) newΣ s = ⊢sub ⊢e ne-tapp gc (s-trans s₁ s newΣ)
-subsumption {Σ' = A ⓪↝ Σ'} {A' = A′} (⊢tapp ⊢e st) (≊⓪ newΣ) s
-  with s-tapp s' (↑tyᶜ-⓪ up-e upᶜ) ← ⊢to≤ ⊢e
-  with ⟨ Σ″ , upΣ' ⟩ ← ↑tyᶜ0-total Σ'
-  with ⟨ A″ , upA′ ⟩ ← ↑ty0-total A′
-  with reg-S= regΓ regA ← s-env-in s'
-  = let upA' = (st-↑ty (⊢r-¬ε (s-⊢r s') Z) st)
-    in ⊢tapp (subsumption ⊢e (≊⓪ (≊⓪ newΣ)) (s-tapp (s-weaken=0 s upA' (↑tyᶜ-⓪ up-e upΣ') upA′ regA) (↑tyᶜ-⓪ up-e upΣ'))) (↑ty-st upA′)
+subsumption0 ⊢e = subsumption ⊢e ≋□

@@ -117,12 +117,10 @@ s-weaken^ {k = k} (s-∀l-no s upᶜ upᵉ upC upD) new (↑ty-∀ upA) (↑ty�
          upΣ″ upe″ upC″ upD″
 s-weaken^ (s-tapp s upᶜ) new (↑ty-∀ upA) (↑tyᶜ-⓪ {Σ' = Σ'} upA' upΣ) (↑ty-∀ upB)
   with ⟨ Σ″ , upΣ″ ⟩ ← ↑tyᶜ0-total Σ' = s-tapp (s-weaken^ s (▶S= new upA') upA (↑tyᶜ-comm0' upΣ upΣ″ upᶜ) upB) upΣ″
-s-weaken^ {k = k} (s-svar-term {A = A} inΓ s) new ↑ty-var (↑tyᶜ-e up-e upΣ) (↑ty-arr upB upB₁)
+s-weaken^ {k = k} (s-svar {A = A} inΓ s) new ↑ty-var upΣ upB
   with ⟨ A' , upA ⟩ ← ↑ty-total A k
-  with refl ← ▶⨟^-unique new = s-svar-term (∋:=-weaken^ inΓ upA (▶⨟^-▶^-l new)) (s-weaken^ s new upA (↑tyᶜ-e up-e upΣ) (↑ty-arr upB upB₁))
-s-weaken^ {k = k} (s-svar-tapp {A = A} inΓ s) new ↑ty-var (↑tyᶜ-⓪ upA upΣ) (↑ty-∀ upB)
-  with ⟨ A' , upA' ⟩ ← ↑ty-total A k
-  with refl ← ▶⨟^-unique new = s-svar-tapp (∋:=-weaken^ inΓ upA' (▶⨟^-▶^-l new)) (s-weaken^ s new upA' (↑tyᶜ-⓪ upA upΣ) (↑ty-∀ upB))
+  with refl ← ▶⨟^-unique new
+  = s-svar (∋:=-weaken^ inΓ upA (▶⨟^-▶^-l new)) (s-weaken^ s new upA upΣ upB)
 s-weaken^ (s-evar-infers infs inst) new ↑ty-var (↑tyᶜ-e up-e upΣ) upB
   = s-evar-infers (infs-weaken^ infs (▶^-𝕣 (▶⨟^-▶^-l new)) (↑tyᶜ-e up-e upΣ) upB) (inst-weaken^ inst new upB)
 

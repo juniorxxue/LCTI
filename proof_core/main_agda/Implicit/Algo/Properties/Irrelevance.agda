@@ -264,8 +264,7 @@ s-irrev (s-term-o opnA ⊢e ss s) tf with ⇌s-Ω (ss-⊆ ss) tf
 s-irrev (s-∀l s upᶜ upᵉ upC upD) tf = s-∀l (s-irrev s (evar-sol tf)) upᶜ upᵉ upC upD
 s-irrev (s-∀l-no s upᶜ upᵉ upC upD) tf = s-∀l-no (s-irrev s (evar tf)) upᶜ upᵉ upC upD
 s-irrev (s-tapp s upᶜ) tf = s-tapp (s-irrev s (svar tf)) upᶜ
-s-irrev (s-svar-term inΓ s) tf with refl ← ⇌s-eq tf = s-svar-term (⇌s-∋:=-l inΓ tf) (s-irrev s tf)
-s-irrev (s-svar-tapp inΓ s) tf with refl ← ⇌s-eq tf = s-svar-tapp (⇌s-∋:=-l inΓ tf) (s-irrev s tf)
+s-irrev (s-svar inΓ s) tf with refl ← ⇌s-eq tf = s-svar (⇌s-∋:=-l inΓ tf) (s-irrev s tf)
 s-irrev (s-evar-infers infs inst) tf = s-evar-infers (infs-irrev infs (⇌s-⇌-l tf)) (⇌s-inst tf inst)
 
 infs-irrev (infs-z regΓ regA) tf = infs-z (⇌-tregular regΓ tf) (⇌-⊢r regA tf)

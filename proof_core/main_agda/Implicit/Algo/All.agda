@@ -2,7 +2,6 @@ module Implicit.Algo.All where
 
 open import Implicit.Algo.Base public
 open import Implicit.Algo.Properties.Shift public
-
 open import Implicit.Algo.Properties.Weaken public
 
 open import Implicit.Algo.Properties.Id public
@@ -14,5 +13,3 @@ open import Implicit.Algo.Properties.Regularity public
 
 open import Implicit.Algo.Properties.Irrelevance public
 open import Implicit.Algo.Properties.Subsumption public
-open import Implicit.Algo.Properties.OpenK public
-open import Implicit.Algo.Properties.SubIrrelevance public

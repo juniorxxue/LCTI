@@ -93,10 +93,8 @@ abstract
   s-strengthen, (s-tapp s upᶜ) newΓ newΔ (↑tmᶜ-⓪ {Σ = Σ} upΣ)
     with ⟨ Σ' , upΣ' ⟩ ← ↑tyᶜ0-total Σ
     = s-tapp (s-strengthen, s (◀S= newΓ) (◀S= newΔ) (↑tmᶜ-↑tyᶜ-comm upΣ upᶜ upΣ')) upΣ'
-  s-strengthen, (s-svar-term inΓ s) newΓ newΔ (↑tmᶜ-e up-e upΣ)
-    with refl ← ◀,-unique newΓ newΔ = s-svar-term (∋:=-strengthen, inΓ newΓ) (s-strengthen, s newΓ newΓ (↑tmᶜ-e up-e upΣ))
-  s-strengthen, (s-svar-tapp inΓ s) newΓ newΔ (↑tmᶜ-⓪ upΣ)
-    with refl ← ◀,-unique newΓ newΔ = s-svar-tapp (∋:=-strengthen, inΓ newΓ) (s-strengthen, s newΓ newΓ (↑tmᶜ-⓪ upΣ))
+  s-strengthen, (s-svar inΓ s) newΓ newΔ upΣ
+    with refl ← ◀,-unique newΓ newΔ = s-svar (∋:=-strengthen, inΓ newΓ) (s-strengthen, s newΓ newΓ upΣ)
   s-strengthen, (s-evar-infers infs inst) newΓ newΔ (↑tmᶜ-e up-e upΣ)
     = s-evar-infers (infs-strengthen, infs (◀,-𝕣 newΓ) (↑tmᶜ-e up-e upΣ)) (inst-strengthen, inst newΓ newΔ)
 

@@ -188,16 +188,11 @@ abstract
   s-strengthen^ (s-tapp s upᶜ) newΓ newΔ (↑ty-∀ upA) (↑ty-∀ upB) (↑tyᶜ-⓪ {Σ = Σ} upA₁ upΣ)
     with ⟨ Σ' , upΣ' ⟩ ← ↑tyᶜ0-total Σ
     = s-tapp (s-strengthen^ s (◀S= newΓ upA₁) (◀S= newΔ upA₁) upA upB (↑tyᶜ-comm0' upΣ upᶜ upΣ')) upΣ'
-  s-strengthen^ (s-svar-term inΓ s) newΓ newΔ ↑ty-var (↑ty-arr upB upB₁) (↑tyᶜ-e up-e upΣ)
+  s-strengthen^ (s-svar inΓ s) newΓ newΔ ↑ty-var upA upΣ
     with refl ← ◀^-unique newΓ newΔ
     with regA ← ∋:=-⊢r (s-env-in s) inΓ
     with ⟨ pA , uppA ⟩ ← ⊢r-◀^-↑ty-surjective regA newΔ
-    = s-svar-term (∋:=-strengthen^-reg (s-env-in s) inΓ newΓ uppA) (s-strengthen^ s newΓ newΓ uppA (↑ty-arr upB upB₁) (↑tyᶜ-e up-e upΣ))
-  s-strengthen^ (s-svar-tapp inΓ s) newΓ newΔ ↑ty-var (↑ty-∀ upB) (↑tyᶜ-⓪ upA upΣ)
-    with refl ← ◀^-unique newΓ newΔ
-    with regA ← ∋:=-⊢r (s-env-in s) inΓ
-    with ⟨ pA , uppA ⟩ ← ⊢r-◀^-↑ty-surjective regA newΔ
-    = s-svar-tapp (∋:=-strengthen^-reg (s-env-in s) inΓ newΔ uppA) (s-strengthen^ s newΔ newΔ uppA (↑ty-∀ upB) (↑tyᶜ-⓪ upA upΣ))
+    = s-svar (∋:=-strengthen^-reg (s-env-in s) inΓ newΓ uppA) (s-strengthen^ s newΓ newΓ uppA upA upΣ)
   s-strengthen^ (s-evar-infers infs inst) newΓ newΔ ↑ty-var upB (↑tyᶜ-e up-e upΣ)
     = s-evar-infers (infs-strengthen^ infs (◀^-𝕣 newΓ) upB (↑tyᶜ-e up-e upΣ)) (inst-strengthen^ inst newΓ newΔ upB)
 

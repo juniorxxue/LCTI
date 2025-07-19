@@ -61,8 +61,7 @@ s-env-in (s-∀l-no s upᶜ upᵉ upC upD) with s-env-in s
 ... | reg-S^ r = r
 s-env-in (s-tapp s upᶜ) with s-env-in s
 ... | reg-S= r regA = r
-s-env-in (s-svar-term inΓ s) = s-env-in s
-s-env-in (s-svar-tapp inΓ s) = s-env-in s
+s-env-in (s-svar inΓ s) = s-env-in s
 s-env-in (s-evar-infers x inst) = inst-env-in inst
 
 s-env-out : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
@@ -156,8 +155,7 @@ s-⊢rᶜ (s-∀l-no s upᶜ upᵉ upC upD) with s-⊢rᶜ s
 ... | ⊢rᶜ-term r = ⊢rᶜ-term (⊢rᶜ-strengthen^0 r upᶜ)
 s-⊢rᶜ (s-tapp s upᶜ) with s-env-in s
 ... | reg-S= r regA = ⊢rᶜ-tapp regA (⊢rᶜ-strengthen=0 (s-⊢rᶜ s) upᶜ)
-s-⊢rᶜ (s-svar-term inΓ s) = s-⊢rᶜ s
-s-⊢rᶜ (s-svar-tapp inΓ s) = s-⊢rᶜ s
+s-⊢rᶜ (s-svar inΓ s) = s-⊢rᶜ s
 s-⊢rᶜ (s-evar-infers tfs inst) with infs-⊢rᶜ tfs
 ... | ⊢rᶜ-term r = ⊢rᶜ-term (⊢rᶜ-𝕣 r)
 
@@ -194,8 +192,7 @@ s-⊢r (s-term-o opnA ⊢e ss s) = ⊢r-arr (⊢r-𝕣 (t-⊢r ⊢e)) (⊆-⊢r'
 s-⊢r (s-∀l s upᶜ upᵉ upC upD) = ⊢r-strengthen^0 (s-⊢r s) (↑ty-arr upC upD)
 s-⊢r (s-∀l-no s upᶜ upᵉ upC upD) = ⊢r-strengthen^0 (s-⊢r s) (↑ty-arr upC upD)
 s-⊢r (s-tapp s upᶜ) = ⊢r-∀ (⊢r-◆0 (s-⊢r s))
-s-⊢r (s-svar-term inΓ s) = s-⊢r s
-s-⊢r (s-svar-tapp inΓ s) = s-⊢r s
+s-⊢r (s-svar inΓ s) = s-⊢r s
 s-⊢r (s-evar-infers tfs inst) = ⊢r-𝕣 (infs-⊢r tfs)
 
 t-⊢r (⊢lit regΓ) = ⊢r-int
@@ -244,8 +241,7 @@ s-⊢c (s-term-o opnA ⊢e ss s) = ⊢c-arr (⊆-⊢c (ss--⊢c ss) (s-⊆ s)) (
 s-⊢c (s-∀l s upᶜ upᵉ upC upD) = ⊢c-∀ (⊢c-◆0 (s-⊢c s))
 s-⊢c (s-∀l-no s upᶜ upᵉ upC upD) = ⊢c-∀ (⊢c-◇0 (s-⊢c s))
 s-⊢c (s-tapp s upᶜ) = ⊢c-∀ (⊢c-◆0 (s-⊢c s))
-s-⊢c (s-svar-term x s) = ⊢c-var-= (∋:=to∋= x)
-s-⊢c (s-svar-tapp x s) = ⊢c-var-= (∋:=to∋= x)
+s-⊢c (s-svar x s) = ⊢c-var-= (∋:=to∋= x)
 s-⊢c (s-evar-infers infs inst) = ⊢c-var-= (inst-∋= inst)
 
 
@@ -262,6 +258,5 @@ s-⊆/ (s-term-o opnA ⊢e ss s) = ext-arr (ss--⊆/ ss) (s-⊆/ s)
 s-⊆/ (s-∀l s upᶜ upᵉ upC upD) = ext-∀ (⊆/-◇◆0 (s-⊆/ s))
 s-⊆/ (s-∀l-no s upᶜ upᵉ upC upD) = ext-∀ (⊆/-◇◇0 (s-⊆/ s))
 s-⊆/ (s-tapp s upᶜ) = ext-∀ (⊆/-◆◆0 (s-⊆/ s))
-s-⊆/ (s-svar-term x s) = ⊆/-refl (s-env-in s) (⊢c-var-= (∋:=to∋= x))
-s-⊆/ (s-svar-tapp x s) = ⊆/-refl (s-env-in s) (⊢c-var-= (∋:=to∋= x))
+s-⊆/ (s-svar x s) = ⊆/-refl (s-env-in s) (⊢c-var-= (∋:=to∋= x))
 s-⊆/ (s-evar-infers infs inst) = ext-var (inst-⊆/x inst)
