@@ -1,3 +1,5 @@
+{-# OPTIONS --allow-unsolved-metas #-}
+{-# OPTIONS --allow-incomplete-matches #-}
 module Implicit.Interm.Properties.Strengthen where
 
 open import Implicit.Language.All
@@ -17,12 +19,9 @@ s-strengthen, (s-arr₃ cloA grd s) newΓ = s-arr₃ (⊢c-strengthen, cloA new�
 s-strengthen, (s-∀ s) newΓ = s-∀ (s-strengthen, s (◀S∙ newΓ))
 s-strengthen, (s-∀l s ic fd upC upD upj) newΓ = s-∀l (s-strengthen, s (◀S= newΓ)) ic fd upC upD upj
 s-strengthen, (s-∀l-no-appear s ic fd upC upD upj) newΓ = s-∀l-no-appear (s-strengthen, s (◀S^ newΓ)) ic fd upC upD upj
-s-strengthen, (s-svar-l x inΔ) newΓ = s-svar-l (sregular-strengthen, x newΓ) (∋:=-strengthen, inΔ newΓ)
+s-strengthen, (s-svar-l x inΔ) newΓ = s-svar-l (∋:=-strengthen, x newΓ) (s-strengthen, inΔ newΓ)
 s-strengthen, (s-svar-r x inΔ) newΓ = s-svar-r (sregular-strengthen, x newΓ) (∋:=-strengthen, inΔ newΓ)
 s-strengthen, (s-tapp s upj) newΓ = s-tapp (s-strengthen, s (◀S= newΓ)) upj
-s-strengthen, (s-svar-𝕚 inΓ s) newΓ = s-svar-𝕚 (∋:=-strengthen, inΓ newΓ) (s-strengthen, s newΓ)
-s-strengthen, (s-svar-𝕔 inΓ s) newΓ = s-svar-𝕔 (∋:=-strengthen, inΓ newΓ) (s-strengthen, s newΓ)
-s-strengthen, (s-svar-𝕥 inΓ s) newΓ = s-svar-𝕥 (∋:=-strengthen, inΓ newΓ) (s-strengthen, s newΓ)
 
 
 t-strengthen, : Γ ⊢ j # e' ⦂ A
@@ -85,24 +84,8 @@ s-strengthen= {j = j} (s-∀l-no-appear s ic fd upC upD upj₁) newΓ (↑ty-∀
 s-strengthen= (s-tapp s upj₁) newΓ (↑ty-∀ upA) (↑ty-∀ upB) (↑tyʲ-𝕥 {j = j} upj upA₁)
   with ⟨ j' , upj' ⟩ ← ↑tyʲ0-total j
   = s-tapp (s-strengthen= s (◀S= newΓ upA₁) upA upB (↑tyʲ-comm0' upj upj₁ upj')) upj'
-s-strengthen= (s-svar-l x inΔ) newΓ ↑ty-var upB ↑tyʲ-∞ = s-svar-l (sregular-strengthen= x newΓ) (∋:=-strengthen=-reg x inΔ newΓ upB)
+s-strengthen= (s-svar-l x inΔ) newΓ ↑ty-var upB upj = ?
 s-strengthen= (s-svar-r x inΔ) newΓ upA ↑ty-var ↑tyʲ-∞ = s-svar-r (sregular-strengthen= x newΓ) (∋:=-strengthen=-reg x inΔ newΓ upA)
-s-strengthen= (s-svar-𝕚 inΓ s) newΓ ↑ty-var (↑ty-arr upB upB₁) (↑tyʲ-𝕚 upj)
-  with regC ← ∋:=-⊢r (s-sregular s) inΓ
-  with k¬εC ← ⊢r-¬ε regC (◀=-∋=' newΓ)
-  with ⟨ preC , upC' ⟩ ← ↑ty-surjective k¬εC
-  = s-svar-𝕚 (∋:=-strengthen=-reg (s-sregular s) inΓ newΓ upC') (s-strengthen= s newΓ upC' (↑ty-arr upB upB₁) (↑tyʲ-𝕚 upj))
-s-strengthen= (s-svar-𝕔 inΓ s) newΓ ↑ty-var (↑ty-arr upB upB₁) (↑tyʲ-𝕔 upj)
-  with regC ← ∋:=-⊢r (s-sregular s) inΓ
-  with k¬εC ← ⊢r-¬ε regC (◀=-∋=' newΓ)
-  with ⟨ preC , upC' ⟩ ← ↑ty-surjective k¬εC
-  = s-svar-𝕔 (∋:=-strengthen=-reg (s-sregular s) inΓ newΓ upC') (s-strengthen= s newΓ upC' (↑ty-arr upB upB₁) (↑tyʲ-𝕔 upj))
-s-strengthen= (s-svar-𝕥 inΓ s) newΓ ↑ty-var (↑ty-∀ upB) (↑tyʲ-𝕥 upj upA₁)
-  with regC ← ∋:=-⊢r (s-sregular s) inΓ
-  with k¬εC ← ⊢r-¬ε regC (◀=-∋=' newΓ)
-  with ⟨ preC , upC' ⟩ ← ↑ty-surjective k¬εC
-  = s-svar-𝕥 (∋:=-strengthen=-reg (s-sregular s) inΓ newΓ upC') (s-strengthen= s newΓ upC' (↑ty-∀ upB) (↑tyʲ-𝕥 upj upA₁))
-
 t-strengthen= : Γ ⊢ j' # e' ⦂ A'
                 → Γ ◀ k =⇘ Γ'
                 → e ↑tyᵉ k ⇘ e'
@@ -173,23 +156,9 @@ s-strengthen^ {j = j} (s-∀l-no-appear s ic fd upC upD upj₁) newΓ (↑ty-∀
 s-strengthen^ (s-tapp s upj₁) newΓ (↑ty-∀ upA) (↑ty-∀ upB) (↑tyʲ-𝕥 {j = j} upj upA₁)
   with ⟨ j' , upj' ⟩ ← ↑tyʲ0-total j
   = s-tapp (s-strengthen^ s (◀S= newΓ upA₁) upA upB (↑tyʲ-comm0' upj upj₁ upj')) upj'
-s-strengthen^ (s-svar-l x inΔ) newΓ ↑ty-var upB ↑tyʲ-∞ = s-svar-l (sregular-strengthen^ x newΓ) (∋:=-strengthen^-reg x inΔ newΓ upB)
+s-strengthen^ (s-svar-l x inΔ) newΓ ↑ty-var upB upj = {!!}
+-- s-svar-l (sregular-strengthen^ x newΓ) (∋:=-strengthen^-reg x inΔ newΓ upB)
 s-strengthen^ (s-svar-r x inΔ) newΓ upA ↑ty-var ↑tyʲ-∞ = s-svar-r (sregular-strengthen^ x newΓ) (∋:=-strengthen^-reg x inΔ newΓ upA)
-s-strengthen^ (s-svar-𝕚 inΓ s) newΓ ↑ty-var (↑ty-arr upB upB₁) (↑tyʲ-𝕚 upj)
-  with regC ← ∋:=-⊢r (s-sregular s) inΓ
-  with k¬εC ← ⊢r-¬ε-^ regC (◀^-∋^' newΓ)
-  with ⟨ preC , upC' ⟩ ← ↑ty-surjective k¬εC
-  = s-svar-𝕚 (∋:=-strengthen^-reg (s-sregular s) inΓ newΓ upC') (s-strengthen^ s newΓ upC' (↑ty-arr upB upB₁) (↑tyʲ-𝕚 upj))
-s-strengthen^ (s-svar-𝕔 inΓ s) newΓ ↑ty-var (↑ty-arr upB upB₁) (↑tyʲ-𝕔 upj)
-  with regC ← ∋:=-⊢r (s-sregular s) inΓ
-  with k¬εC ← ⊢r-¬ε-^ regC (◀^-∋^' newΓ)
-  with ⟨ preC , upC' ⟩ ← ↑ty-surjective k¬εC
-  = s-svar-𝕔 (∋:=-strengthen^-reg (s-sregular s) inΓ newΓ upC') (s-strengthen^ s newΓ upC' (↑ty-arr upB upB₁) (↑tyʲ-𝕔 upj))
-s-strengthen^ (s-svar-𝕥 inΓ s) newΓ ↑ty-var (↑ty-∀ upB) (↑tyʲ-𝕥 upj upA₁)
-  with regC ← ∋:=-⊢r (s-sregular s) inΓ
-  with k¬εC ← ⊢r-¬ε-^ regC (◀^-∋^' newΓ)
-  with ⟨ preC , upC' ⟩ ← ↑ty-surjective k¬εC
-  = s-svar-𝕥 (∋:=-strengthen^-reg (s-sregular s) inΓ newΓ upC') (s-strengthen^ s newΓ upC' (↑ty-∀ upB) (↑tyʲ-𝕥 upj upA₁))
 
 
 t-strengthen^ : Γ ⊢ j' # e' ⦂ A'

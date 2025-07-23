@@ -69,13 +69,17 @@ variable
   Γ Γ' Γ'' Γ₁ Γ₂ Γ₃ Γ* Γ% : Env n m -- typing env
   Δ Δ' Δ₁ Δ₂ Ψ Ω Ψ' Ω' : Env n m -- subtyping env
 
-𝕣 : Env n m → Env n m
-𝕣 ∅ = ∅
-𝕣 (Γ , A) = 𝕣 Γ , A
-𝕣 (Γ ,^) = 𝕣 Γ ,^
-𝕣 (Γ ,∙) = 𝕣 Γ ,∙
-𝕣 (Γ ,= A) = 𝕣 Γ ,= A
-𝕣 (Γ ⋈) = Γ
+infix 3 _↳_
+data _↳_ : Env n m → Env n m → Set where
+  ↳S, : Δ ↳ Γ
+      → Δ , A ↳ Γ , A
+  ↳S^ : Δ ↳ Γ
+      → Δ ,^ ↳ Γ ,^
+  ↳S∙ : Δ ↳ Γ
+      → Δ ,∙ ↳ Γ ,∙
+  ↳S= : Δ ↳ Γ
+      → Δ ,= A ↳ Γ ,= A
+  ↳⋈ : Γ ⋈ ↳ Γ
 
 ‶-injective : ‶ X ≡ ‶ Y
             → X ≡ Y

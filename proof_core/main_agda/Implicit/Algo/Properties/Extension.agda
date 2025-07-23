@@ -26,8 +26,8 @@ s-⊆ : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
     → Γ ⊆ Δ
 s-⊆ (s-empty regΓ cloA x) = ⊆-refl regΓ
 s-⊆ (s-type ss) = ss-⊆ ss
-s-⊆ (s-term-c cloA ap ⊢e s) = s-⊆ s
-s-⊆ (s-term-o opnA ⊢e x s) = ⊆-trans (ss-⊆ x) (s-⊆ s)
+s-⊆ (s-term-c cloA ap era ⊢e s) = s-⊆ s
+s-⊆ (s-term-o opnA era ⊢e x s) = ⊆-trans (ss-⊆ x) (s-⊆ s)
 s-⊆ (s-∀l s upᶜ upᵉ upC upD) with s-⊆ s
 ... | evar-sol r regA = r
 s-⊆ (s-∀l-no s upᶜ upᵉ upC upD) with s-⊆ s
@@ -35,7 +35,7 @@ s-⊆ (s-∀l-no s upᶜ upᵉ upC upD) with s-⊆ s
 s-⊆ (s-tapp s upᶜ) with s-⊆ s
 ... | svar r regA = r
 s-⊆ (s-svar inΓ s) = s-⊆ s
-s-⊆ (s-evar-infers infs inst) = inst-⊆ inst
+s-⊆ (s-evar-infers era infs inst) = inst-⊆ inst
 
 inst-⊆/x : [ A / X ] Γ ⟹ Δ
          → Γ ⊆ Δ w/v X

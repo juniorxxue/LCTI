@@ -136,15 +136,10 @@ data _⊢_≤⁺_⊣_↪_↡_ where
     → (upj : ↑tyʲ0 j ⇘ j')
     → Δ ⊢ `∀ A ≤⁺ (B ⓪↝ Σ) ⊣ Ψ ↪ `∀ C ↡ (𝕥₍ B ₎ j)
 
-  s-svar-term :
+  s-svar :
       Δ ∋ X := A
-    → Δ ⊢ A ≤⁺ ([ e ]↝ Σ) ⊣ Δ ↪ B `→ C ↡ j
-    → Δ ⊢ ‶ X ≤⁺ ([ e ]↝ Σ) ⊣ Δ ↪ B `→ C ↡ j
-
-  s-svar-tapp :
-      Δ ∋ X := A
-    → Δ ⊢ A ≤⁺ (B ⓪↝ Σ) ⊣ Δ ↪ `∀ C ↡ (𝕥₍ B ₎ j)
-    → Δ ⊢ ‶ X ≤⁺ (B ⓪↝ Σ) ⊣ Δ ↪ `∀ C ↡ (𝕥₍ B ₎ j)
+    → Δ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B ↡ j
+    → Δ ⊢ ‶ X ≤⁺ Σ ⊣ Δ ↪ B ↡ j
 
   s-evar-infers :
       (infs : 𝕣 Δ ⊨ [ e ]↝ Σ ⟹ A ↡ (𝕚 j))

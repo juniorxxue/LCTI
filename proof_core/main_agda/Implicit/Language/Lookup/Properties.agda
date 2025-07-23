@@ -12,6 +12,7 @@ open import Implicit.Language.Lookup.Base
 ∋⦂-unique (S∙ in1 x) (S∙ in2 x₁) rewrite ∋⦂-unique in1 in2 = ↑ty-unique x x₁
 ∋⦂-unique (S^ in1 x) (S^ in2 up) rewrite ∋⦂-unique in1 in2 = ↑ty-unique x up
 ∋⦂-unique (S= in1 x) (S= in2 x₁) rewrite ∋⦂-unique in1 in2 = ↑ty-unique x x₁
+∋⦂-unique (S⋈ in1) (S⋈ in2) rewrite ∋⦂-unique in1 in2 = refl
 
 ∋:=-unique : Γ ∋ k := A
            → Γ ∋ k := B
@@ -25,6 +26,7 @@ open import Implicit.Language.Lookup.Base
 ... | refl = ↑ty-unique up up₁
 ∋:=-unique (S, in1 ) (S, in2)  with ∋:=-unique in1 in2
 ... | refl = refl
+∋:=-unique (S⋈ in1) (S⋈ in2) rewrite ∋:=-unique in1 in2 = refl
 
 ∋:=-total : Γ ∋= X
           → ∃[ A ](Γ ∋ X := A)
@@ -38,6 +40,9 @@ open import Implicit.Language.Lookup.Base
 ... | ⟨ A , AinΓ ⟩ = let ⟨ A' , upA ⟩ = ↑ty0-total A in ⟨ A' , S= AinΓ upA ⟩
 ∋:=-total (S, inΓ) with ∋:=-total inΓ
 ... | ⟨ A , inΓ ⟩ = ⟨ A , S, inΓ ⟩
+∋:=-total (S⋈ inΓ) with ∋:=-total inΓ
+... | ⟨ A , inΓ ⟩ = ⟨ A , S⋈ inΓ ⟩
+
 
 ∋:=to∋= : Γ ∋ k := A
       → Γ ∋= k
@@ -46,6 +51,7 @@ open import Implicit.Language.Lookup.Base
 ∋:=to∋= (S∙ inΓ up) = S∙ (∋:=to∋= inΓ)
 ∋:=to∋= (S= inΓ up) = S= (∋:=to∋= inΓ)
 ∋:=to∋= (S, inΓ) = S, (∋:=to∋= inΓ)
+∋:=to∋= (S⋈ inΓ) = S⋈ (∋:=to∋= inΓ)
 
 ∋∙-⋈-pred : Γ ⋈ ∋∙ X
           → Γ ∋∙ X
@@ -63,6 +69,7 @@ open import Implicit.Language.Lookup.Base
 ∋^-∋∙-false (S∙ ^in) (S∙ ∙in) = ∋^-∋∙-false ^in ∙in
 ∋^-∋∙-false (S= ^in) (S= ∙in) = ∋^-∋∙-false ^in ∙in
 ∋^-∋∙-false (S, ^in) (S, ∙in) = ∋^-∋∙-false ^in ∙in
+∋^-∋∙-false (S⋈ ^in) (S⋈ ∙in) = ∋^-∋∙-false ^in ∙in
 
 ∋^-∋=-false :
     Γ ∋^ k
@@ -72,6 +79,7 @@ open import Implicit.Language.Lookup.Base
 ∋^-∋=-false (S∙ in1) (S∙ in2) = ∋^-∋=-false in1 in2
 ∋^-∋=-false (S= in1) (S= in2) = ∋^-∋=-false in1 in2
 ∋^-∋=-false (S, in1) (S, in2) = ∋^-∋=-false in1 in2
+∋^-∋=-false (S⋈ in1) (S⋈ in2) = ∋^-∋=-false in1 in2
 
 ∋∙-∋=-false :
     Γ ∋∙ X
@@ -81,6 +89,7 @@ open import Implicit.Language.Lookup.Base
 ∋∙-∋=-false (S= in1) (S= in2) = ∋∙-∋=-false in1 in2
 ∋∙-∋=-false (S^ in1) (S^ in2) = ∋∙-∋=-false in1 in2
 ∋∙-∋=-false (S, in1) (S, in2) = ∋∙-∋=-false in1 in2
+∋∙-∋=-false (S⋈ in1) (S⋈ in2) = ∋∙-∋=-false in1 in2
 
 ∋∙-∋:=-false :
     Γ ∋∙ X
@@ -90,6 +99,7 @@ open import Implicit.Language.Lookup.Base
 ∋∙-∋:=-false (S= inΓ) (S= inΓ' up) = ∋∙-∋:=-false inΓ inΓ'
 ∋∙-∋:=-false (S^ inΓ) (S^ inΓ' up) = ∋∙-∋:=-false inΓ inΓ'
 ∋∙-∋:=-false (S, in1) (S, in2) = ∋∙-∋:=-false in1 in2
+∋∙-∋:=-false (S⋈ in1) (S⋈ in2) = ∋∙-∋:=-false in1 in2
 
 ∋∙-∋^-≢ : Γ ∋∙ k₁
         → Γ ∋^ k₂
@@ -100,6 +110,7 @@ open import Implicit.Language.Lookup.Base
 ∋∙-∋^-≢ (S^ inΓ1) Z = λ ()
 ∋∙-∋^-≢ (S^ inΓ1) (S^ inΓ2) = ≢-suc (∋∙-∋^-≢ inΓ1 inΓ2)
 ∋∙-∋^-≢ (S, inΓ1) (S, inΓ2) = ∋∙-∋^-≢ inΓ1 inΓ2
+∋∙-∋^-≢ (S⋈ inΓ1) (S⋈ inΓ2) = ∋∙-∋^-≢ inΓ1 inΓ2
 
 ∋=-∋^-≢ : Γ ∋= k₁
         → Γ ∋^ k₂
@@ -110,6 +121,7 @@ open import Implicit.Language.Lookup.Base
 ∋=-∋^-≢ (S^ inΓ1) Z = λ ()
 ∋=-∋^-≢ (S^ inΓ1) (S^ inΓ2) = ≢-suc (∋=-∋^-≢ inΓ1 inΓ2)
 ∋=-∋^-≢ (S, inΓ1) (S, inΓ2) = ∋=-∋^-≢ inΓ1 inΓ2
+∋=-∋^-≢ (S⋈ inΓ1) (S⋈ inΓ2) = ∋=-∋^-≢ inΓ1 inΓ2
 
 ∋∙-∋=-≢ : Γ ∋∙ k₁
         → Γ ∋= k₂
@@ -120,4 +132,4 @@ open import Implicit.Language.Lookup.Base
 ∋∙-∋=-≢ (S= in1) Z = λ ()
 ∋∙-∋=-≢ (S= in1) (S= in2) = ≢-suc (∋∙-∋=-≢ in1 in2)
 ∋∙-∋=-≢ (S^ in1) (S^ in2) = ≢-suc (∋∙-∋=-≢ in1 in2)
-
+∋∙-∋=-≢ (S⋈ in1) (S⋈ in2) = ∋∙-∋=-≢ in1 in2

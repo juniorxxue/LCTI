@@ -27,28 +27,14 @@ data _◀_=⇘_ : Env n (1 + m) → Fin (1 + m) → Env n m → Set where
   ◀S⋈ : Γ ◀ k =⇘ Γ'
       → Γ ⋈ ◀ k =⇘ Γ' ⋈
 
-infix 3 _∋='_
-data _∋='_ : Env n m → Fin m → Set where
-  Z  : Δ ,= A ∋=' #0
-  S∙ : Δ ∋=' k
-     → Δ ,∙ ∋=' #S k
-  S^ : Δ ∋=' k
-     → Δ ,^ ∋=' #S k
-  S= : Δ ∋=' k
-     → Δ ,= B ∋=' #S k
-  S, : Δ ∋=' k
-     → Δ , A ∋=' k
-  S⋈ : Δ ∋=' k
-     → Δ ⋈ ∋=' k
-
-◀=-∋=' : Γ ◀ k =⇘ Γ'
-      → Γ ∋=' k
-◀=-∋=' ◀Z = Z
-◀=-∋=' (◀S, newΓ x) = S, (◀=-∋=' newΓ)
-◀=-∋=' (◀S^ newΓ) = S^ (◀=-∋=' newΓ)
-◀=-∋=' (◀S∙ newΓ) = S∙ (◀=-∋=' newΓ)
-◀=-∋=' (◀S= newΓ x) = S= (◀=-∋=' newΓ)
-◀=-∋=' (◀S⋈ newΓ) = S⋈ (◀=-∋=' newΓ)
+◀=-∋= : Γ ◀ k =⇘ Γ'
+      → Γ ∋= k
+◀=-∋= ◀Z = Z
+◀=-∋= (◀S, newΓ x) = S, (◀=-∋= newΓ)
+◀=-∋= (◀S^ newΓ) = S^ (◀=-∋= newΓ)
+◀=-∋= (◀S∙ newΓ) = S∙ (◀=-∋= newΓ)
+◀=-∋= (◀S= newΓ x) = S= (◀=-∋= newΓ)
+◀=-∋= (◀S⋈ newΓ) = S⋈ (◀=-∋= newΓ)
 
 ∋∙-strengthen= : Γ ∋∙ punchIn k X
       → Γ ◀ k =⇘ Γ'
@@ -104,17 +90,6 @@ data _∋='_ : Env n m → Fin m → Set where
 ∋:=-strengthen=' {k = #S k} {#S X} (S= inΓ up) (◀S= newΓ x) (S= inΓ' up₁) = ↑ty-comm' z≤n (∋:=-strengthen=' inΓ newΓ inΓ') up up₁
 ∋:=-strengthen=' {k = #0} {#0} (S= (S, x₁) up) ◀Z (S, inΓ') with refl ← ∋:=-unique x₁ inΓ' = up
 ∋:=-strengthen=' (S, inΓ) (◀S, new up) (S, inΓ') = ∋:=-strengthen=' inΓ new inΓ'
-
-∋∙-∋='-≢ : Γ ∋=' k
-         → Γ ∋∙ X
-         → X ≢ k
-∋∙-∋='-≢ Z (S= inΓ2) = λ ()
-∋∙-∋='-≢ (S∙ inΓ1) Z = λ ()
-∋∙-∋='-≢ (S∙ inΓ1) (S∙ inΓ2) = ≢-suc (∋∙-∋='-≢ inΓ1 inΓ2)
-∋∙-∋='-≢ (S^ inΓ1) (S^ inΓ2) = ≢-suc (∋∙-∋='-≢ inΓ1 inΓ2)
-∋∙-∋='-≢ (S= inΓ1) (S= inΓ2) = ≢-suc (∋∙-∋='-≢ inΓ1 inΓ2)
-∋∙-∋='-≢ (S, inΓ1) (S, inΓ2) = ∋∙-∋='-≢ inΓ1 inΓ2
-∋∙-∋='-≢ (S⋈ inΓ1) (S⋈ inΓ2) = ∋∙-∋='-≢ inΓ1 inΓ2
 
 ⊢r-¬ε : Γ ⊢r A
         → Γ ∋=' k

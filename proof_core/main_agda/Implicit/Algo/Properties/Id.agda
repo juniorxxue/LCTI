@@ -59,8 +59,8 @@ infs-id' : Γ ⊨ Σ ⟹ A
 
 s-id' (s-empty regΓ cloA grd) = id-□
 s-id' (s-type ss) = id-τ
-s-id' (s-term-c cloA ap ⊢e s) = id-e (s-id' s)
-s-id' (s-term-o opnA ⊢e ss s) = id-e (s-id' s)
+s-id' (s-term-c cloA ap era ⊢e s) = id-e (s-id' s)
+s-id' (s-term-o opnA era ⊢e ss s) = id-e (s-id' s)
 s-id' (s-∀l s upᶜ upᵉ upC upD) with s-id' s
 ... | id-e r = id-e (id-st' {T = Int} r (↑tyᶜ-st upᶜ) (↑ty-st upD))
 s-id' (s-∀l-no s upᶜ upᵉ upC upD) with s-id' s
@@ -68,7 +68,7 @@ s-id' (s-∀l-no s upᶜ upᵉ upC upD) with s-id' s
 s-id' (s-tapp {B = B} {C = C} s upᶜ)
   with ⟨ B* , stB ⟩ ← st0-total B C = id-⓪ (id-st' (s-id' s) (↑tyᶜ-st upᶜ) stB) stB
 s-id' (s-svar inΓ s) = s-id' s
-s-id' (s-evar-infers infs inst) = infs-id' infs
+s-id' (s-evar-infers era infs inst) = infs-id' infs
 
 infs-id' (infs-z regΓ regA) = id-τ
 infs-id' (infs-s x infs) = id-e (infs-id' infs)

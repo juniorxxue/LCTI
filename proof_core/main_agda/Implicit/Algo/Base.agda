@@ -121,13 +121,15 @@ data _⊢_≤⁺_⊣_↪_ where
   s-term-c :
       (cloA : Δ ⊢c A)
     → (ap : Δ ≫ A ⇘ A%)
-    → (⊢e : 𝕣 Δ ⊢ τ A% ⇒ e ⇒ A')
+    → (era : Δ ↳ Γ)
+    → (⊢e : Γ ⊢ τ A% ⇒ e ⇒ A')
     → Δ ⊢ B ≤⁺ Σ ⊣ Ψ ↪ D
     → Δ ⊢ (A `→ B) ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ A% `→ D
 
   s-term-o :
       (opnA : Δ ⊢o A)
-    → (⊢e : 𝕣 Δ ⊢ □ ⇒ e ⇒ C)
+    → (era : Δ ↳ Γ)
+    → (⊢e : Γ ⊢ □ ⇒ e ⇒ C)
     → (ss : Δ ⊢ C ⌞ ≤⁻ ⌝ A ⊣ Ω)
     → Ω ⊢ B ≤⁺ Σ ⊣ Ψ ↪ D
     → Δ ⊢ A `→ B ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ C `→ D
@@ -159,7 +161,8 @@ data _⊢_≤⁺_⊣_↪_ where
     → Δ ⊢ ‶ X ≤⁺ Σ ⊣ Δ ↪ B
 
   s-evar-infers :
-      (infs : 𝕣 Δ ⊨ [ e ]↝ Σ ⟹ A)
+      (era : Δ ↳ Γ)
+    → (infs : Γ ⊨ [ e ]↝ Σ ⟹ A)
     → (inst : [ A / X ] Δ ⟹ Ψ) -- implies Γ ∋^k
     → Δ ⊢ ‶ X ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ A
 
@@ -170,5 +173,3 @@ data _⊨_⟹_ where
   infs-s : (⊢e : Γ ⊢ □ ⇒ e ⇒ A)
          → Γ ⊨ Σ ⟹ B
          → Γ ⊨ [ e ]↝ Σ ⟹ A `→ B
-
--- _ : ∅ , (Int `→ Int) , `∀ (‶ #0 `→ ‶ #0) ⊢ □ ⇒ (` #0 · ` #1) · (lit 1) ⇒ Int

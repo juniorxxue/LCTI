@@ -1,3 +1,5 @@
+{-# OPTIONS --allow-unsolved-metas #-}
+{-# OPTIONS --allow-incomplete-matches #-}
 module Implicit.Interm.Properties.Ground where
 
 open import Implicit.Language.All
@@ -13,7 +15,7 @@ s+-≫ (s-int cloΓ) = grd-int
 s+-≫ (s-var-∙ cloΓ inΓ) = grd-var∙ inΓ
 s+-≫ (s-arr₁ s s₁) = grd-arr (s--≫ s) (s+-≫ s₁)
 s+-≫ (s-∀ s) = grd-∀ (s+-≫ s)
-s+-≫ (s-svar-l cloA inΓ) = grd-var= inΓ
+s+-≫ (s-svar-l cloA inΓ) = {!!}
 
 s--≫ (s-int cloΓ) = grd-int
 s--≫ (s-var-∙ cloΓ inΓ) = grd-var∙ inΓ

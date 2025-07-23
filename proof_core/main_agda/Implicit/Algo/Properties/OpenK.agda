@@ -2,10 +2,6 @@ module Implicit.Algo.Properties.OpenK where
 
 open import Implicit.Language.All
 open import Implicit.Algo.Base
-open import Implicit.Algo.Properties.Extension
-open import Implicit.Algo.Properties.Regularity
-open import Implicit.Algo.Properties.Irrelevance
-
 
 infix 3 _∤_⊢oˣ_
 data _∤_⊢oˣ_ : Env n m → Fin (1 + m) → Fin m → Set where

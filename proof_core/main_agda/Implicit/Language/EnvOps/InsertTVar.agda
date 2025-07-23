@@ -125,23 +125,6 @@ data _⨟_▶s_,_⇘_⨟_ : Env n m → Env n m → Fin (1 + n) → Type m → E
 ▶,-▶⨟, (▶S∙ new x) = ▶S∙ (▶,-▶⨟, new) x
 ▶,-▶⨟, (▶S= new x) = ▶S= (▶,-▶⨟, new) x
 
-▶,-𝕣 : Γ ▶ k , T ⇘ Γ'
-     → 𝕣 Γ ▶ k , T ⇘ 𝕣 Γ'
-▶,-𝕣 (▶Z regA) = ▶Z (⊢r-𝕣' regA)
-▶,-𝕣 (▶S, new) = ▶S, (▶,-𝕣 new)
-▶,-𝕣 (▶S^ new x) = ▶S^ (▶,-𝕣 new) x
-▶,-𝕣 (▶S∙ new x) = ▶S∙ (▶,-𝕣 new) x
-▶,-𝕣 (▶S= new x) = ▶S= (▶,-𝕣 new) x
-
-▶,-▶s,-𝕣 : Γ ▶s k , T ⇘ Γ'
-         → 𝕣 Γ ▶ k , T ⇘ 𝕣 Γ'
-▶,-▶s,-𝕣 (▶sS⋈ x) = x
-▶,-▶s,-𝕣 (▶sS, new) = ▶S, (▶,-▶s,-𝕣 new)
-▶,-▶s,-𝕣 (▶sS^ new x) = ▶S^ (▶,-▶s,-𝕣 new) x
-▶,-▶s,-𝕣 (▶sS∙ new x) = ▶S∙ (▶,-▶s,-𝕣 new) x
-▶,-▶s,-𝕣 (▶sS= new x) = ▶S= (▶,-▶s,-𝕣 new) x
-
-
 ∋∙-weaken, : Γ ∋∙ X
            → Γ ▶ k , T ⇘ Γ'
            → Γ' ∋∙ X

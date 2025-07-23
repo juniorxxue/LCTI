@@ -1,3 +1,5 @@
+{-# OPTIONS --allow-unsolved-metas #-}
+{-# OPTIONS --allow-incomplete-matches #-}
 module Implicit.Algo.Properties.Regularity where
 
 open import Implicit.Language.All
@@ -53,8 +55,8 @@ s-env-in : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
          → SRegular Γ
 s-env-in (s-empty cloΓ cloA x) = cloΓ
 s-env-in (s-type ss) = ss-env-in ss
-s-env-in (s-term-c cloA ap ⊢e s) = s-env-in s
-s-env-in (s-term-o opnA ⊢e x s) = ss-env-in x
+s-env-in (s-term-c cloA ap era ⊢e s) = s-env-in s
+s-env-in (s-term-o opnA era ⊢e x s) = ss-env-in x
 s-env-in (s-∀l s upᶜ upᵉ upC upD) with s-env-in s
 ... | reg-S^ r = r
 s-env-in (s-∀l-no s upᶜ upᵉ upC upD) with s-env-in s
@@ -62,7 +64,7 @@ s-env-in (s-∀l-no s upᶜ upᵉ upC upD) with s-env-in s
 s-env-in (s-tapp s upᶜ) with s-env-in s
 ... | reg-S= r regA = r
 s-env-in (s-svar inΓ s) = s-env-in s
-s-env-in (s-evar-infers x inst) = inst-env-in inst
+s-env-in (s-evar-infers era infs inst) = inst-env-in inst
 
 s-env-out : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
           → SRegular Δ
@@ -127,16 +129,9 @@ data _⊢rᶜ_ : Env n m → Context n m → Set where
 ⊢rᶜ-⋈ : Γ ⋈ ⊢rᶜ Σ
       → Γ ⊢rᶜ Σ
 ⊢rᶜ-⋈ ⊢rᶜ-empty = ⊢rᶜ-empty
-⊢rᶜ-⋈ (⊢rᶜ-τ regA) = ⊢rᶜ-τ (⊢r-𝕣' regA)
+⊢rᶜ-⋈ (⊢rᶜ-τ regA) = ⊢rᶜ-τ {!!}
 ⊢rᶜ-⋈ (⊢rᶜ-term reg) = ⊢rᶜ-term (⊢rᶜ-⋈ reg)
-⊢rᶜ-⋈ (⊢rᶜ-tapp regA regΓ) = ⊢rᶜ-tapp (⊢r-𝕣' regA) (⊢rᶜ-⋈ regΓ)
-
-⊢rᶜ-𝕣 : 𝕣 Γ ⊢rᶜ Σ
-      → Γ ⊢rᶜ Σ
-⊢rᶜ-𝕣 ⊢rᶜ-empty = ⊢rᶜ-empty
-⊢rᶜ-𝕣 (⊢rᶜ-τ regA) = ⊢rᶜ-τ (⊢r-𝕣 regA)
-⊢rᶜ-𝕣 (⊢rᶜ-term regΣ) = ⊢rᶜ-term (⊢rᶜ-𝕣 regΣ)
-⊢rᶜ-𝕣 (⊢rᶜ-tapp regA regΣ) = ⊢rᶜ-tapp (⊢r-𝕣 regA) (⊢rᶜ-𝕣 regΣ)
+⊢rᶜ-⋈ (⊢rᶜ-tapp regA regΓ) = ⊢rᶜ-tapp {!!} (⊢rᶜ-⋈ regΓ)
 
 infs-⊢rᶜ : Γ ⊨ Σ ⟹ A
          → Γ ⊢rᶜ Σ
@@ -147,8 +142,8 @@ s-⊢rᶜ : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
       → Γ ⊢rᶜ Σ
 s-⊢rᶜ (s-empty regΓ cloA grd) = ⊢rᶜ-empty
 s-⊢rᶜ (s-type ss) = ⊢rᶜ-τ (ss-polarity+ ss)
-s-⊢rᶜ (s-term-c cloA ap ⊢e s) = ⊢rᶜ-term (s-⊢rᶜ s)
-s-⊢rᶜ (s-term-o opnA ⊢e ss s) = ⊢rᶜ-term (⊆-⊢rᶜ' (s-⊢rᶜ s) (ss-⊆ ss))
+s-⊢rᶜ (s-term-c cloA ap era ⊢e s) = ⊢rᶜ-term (s-⊢rᶜ s)
+s-⊢rᶜ (s-term-o opnA era ⊢e ss s) = ⊢rᶜ-term (⊆-⊢rᶜ' (s-⊢rᶜ s) (ss-⊆ ss))
 s-⊢rᶜ (s-∀l s upᶜ upᵉ upC upD) with s-⊢rᶜ s
 ... | ⊢rᶜ-term r = ⊢rᶜ-term (⊢rᶜ-strengthen^0 r upᶜ)
 s-⊢rᶜ (s-∀l-no s upᶜ upᵉ upC upD) with s-⊢rᶜ s
@@ -156,8 +151,8 @@ s-⊢rᶜ (s-∀l-no s upᶜ upᵉ upC upD) with s-⊢rᶜ s
 s-⊢rᶜ (s-tapp s upᶜ) with s-env-in s
 ... | reg-S= r regA = ⊢rᶜ-tapp regA (⊢rᶜ-strengthen=0 (s-⊢rᶜ s) upᶜ)
 s-⊢rᶜ (s-svar inΓ s) = s-⊢rᶜ s
-s-⊢rᶜ (s-evar-infers tfs inst) with infs-⊢rᶜ tfs
-... | ⊢rᶜ-term r = ⊢rᶜ-term (⊢rᶜ-𝕣 r)
+s-⊢rᶜ (s-evar-infers era tfs inst) with infs-⊢rᶜ tfs
+... | ⊢rᶜ-term r = {!!}
 
 t-⊢rᶜ : Γ ⊢ Σ ⇒ e ⇒ A
       → Γ ⊢rᶜ Σ
@@ -187,13 +182,13 @@ infs-⊢r : Γ ⊨ Σ ⟹ A
 
 s-⊢r (s-empty regΓ cloA x) = ⊢c-≫-⊢r regΓ cloA x
 s-⊢r (s-type ss) = ss-polarity+ ss
-s-⊢r (s-term-c cloA ap ⊢e s) = ⊢r-arr (⊢c-≫-⊢r (s-env-in s) cloA ap) (s-⊢r s)
-s-⊢r (s-term-o opnA ⊢e ss s) = ⊢r-arr (⊢r-𝕣 (t-⊢r ⊢e)) (⊆-⊢r' (s-⊢r s) (ss-⊆ ss))
+s-⊢r (s-term-c cloA ap era ⊢e s) = ⊢r-arr (⊢c-≫-⊢r (s-env-in s) cloA ap) (s-⊢r s)
+s-⊢r (s-term-o opnA era ⊢e ss s) = ⊢r-arr {!!} (⊆-⊢r' (s-⊢r s) (ss-⊆ ss))
 s-⊢r (s-∀l s upᶜ upᵉ upC upD) = ⊢r-strengthen^0 (s-⊢r s) (↑ty-arr upC upD)
 s-⊢r (s-∀l-no s upᶜ upᵉ upC upD) = ⊢r-strengthen^0 (s-⊢r s) (↑ty-arr upC upD)
 s-⊢r (s-tapp s upᶜ) = ⊢r-∀ (⊢r-◆0 (s-⊢r s))
 s-⊢r (s-svar inΓ s) = s-⊢r s
-s-⊢r (s-evar-infers tfs inst) = ⊢r-𝕣 (infs-⊢r tfs)
+s-⊢r (s-evar-infers era tfs inst) = {!!}
 
 t-⊢r (⊢lit regΓ) = ⊢r-int
 t-⊢r (⊢var regΓ x∈Γ) = ∋⦂-⊢r regΓ x∈Γ
@@ -203,7 +198,7 @@ t-⊢r (⊢app ⊢e) with t-⊢r ⊢e
 t-⊢r (⊢lam₁ ⊢e) with t-env ⊢e
 ... | reg-S, r regA = ⊢r-arr regA (⊢r-strengthen,0 (t-⊢r ⊢e))
 t-⊢r (⊢lam₂ ⊢e up-c ⊢e₁) = ⊢r-arr (t-⊢r ⊢e) (⊢r-strengthen,0 (t-⊢r ⊢e₁))
-t-⊢r (⊢sub ⊢e ne gc s) = ⊢r-𝕣' (s-⊢r s)
+t-⊢r (⊢sub ⊢e ne gc s) = {!!}
 t-⊢r (⊢tabs ⊢e) = ⊢r-∀ (t-⊢r ⊢e)
 t-⊢r (⊢tapp ⊢e st) with t-⊢rᶜ ⊢e
 ... | ⊢rᶜ-tapp regA regΓ = st0-⊢r (t-⊢r ⊢e) regA st
@@ -236,13 +231,13 @@ s-⊢c : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
      → Δ ⊢c A
 s-⊢c (s-empty regΓ cloA grd) = cloA
 s-⊢c (s-type ss) = ss+-⊢c ss
-s-⊢c (s-term-c cloA ap ⊢e s) = ⊢c-arr (⊆-⊢c cloA (s-⊆ s)) (s-⊢c s)
-s-⊢c (s-term-o opnA ⊢e ss s) = ⊢c-arr (⊆-⊢c (ss--⊢c ss) (s-⊆ s)) (s-⊢c s)
+s-⊢c (s-term-c cloA ap era ⊢e s) = ⊢c-arr (⊆-⊢c cloA (s-⊆ s)) (s-⊢c s)
+s-⊢c (s-term-o opnA era ⊢e ss s) = ⊢c-arr (⊆-⊢c (ss--⊢c ss) (s-⊆ s)) (s-⊢c s)
 s-⊢c (s-∀l s upᶜ upᵉ upC upD) = ⊢c-∀ (⊢c-◆0 (s-⊢c s))
 s-⊢c (s-∀l-no s upᶜ upᵉ upC upD) = ⊢c-∀ (⊢c-◇0 (s-⊢c s))
 s-⊢c (s-tapp s upᶜ) = ⊢c-∀ (⊢c-◆0 (s-⊢c s))
 s-⊢c (s-svar x s) = ⊢c-var-= (∋:=to∋= x)
-s-⊢c (s-evar-infers infs inst) = ⊢c-var-= (inst-∋= inst)
+s-⊢c (s-evar-infers era infs inst) = ⊢c-var-= (inst-∋= inst)
 
 
 ----------------------------------------------------------------------
@@ -253,10 +248,10 @@ s-⊆/ : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
      → Γ ⊆ Δ w/t A
 s-⊆/ (s-empty regΓ cloA grd) = ⊆/-refl regΓ cloA
 s-⊆/ (s-type ss) = ss+-⊆/ ss
-s-⊆/ (s-term-c cloA ap ⊢e s) = ext-arr (⊆/-refl (s-env-in s) cloA) (s-⊆/ s)
-s-⊆/ (s-term-o opnA ⊢e ss s) = ext-arr (ss--⊆/ ss) (s-⊆/ s)
+s-⊆/ (s-term-c cloA ap era ⊢e s) = ext-arr (⊆/-refl (s-env-in s) cloA) (s-⊆/ s)
+s-⊆/ (s-term-o opnA era ⊢e ss s) = ext-arr (ss--⊆/ ss) (s-⊆/ s)
 s-⊆/ (s-∀l s upᶜ upᵉ upC upD) = ext-∀ (⊆/-◇◆0 (s-⊆/ s))
 s-⊆/ (s-∀l-no s upᶜ upᵉ upC upD) = ext-∀ (⊆/-◇◇0 (s-⊆/ s))
 s-⊆/ (s-tapp s upᶜ) = ext-∀ (⊆/-◆◆0 (s-⊆/ s))
 s-⊆/ (s-svar x s) = ⊆/-refl (s-env-in s) (⊢c-var-= (∋:=to∋= x))
-s-⊆/ (s-evar-infers infs inst) = ext-var (inst-⊆/x inst)
+s-⊆/ (s-evar-infers era infs inst) = ext-var (inst-⊆/x inst)

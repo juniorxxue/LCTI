@@ -36,7 +36,7 @@ open import Implicit.Language.EnvOps.RemoveUVar
 
 ⊢r-weaken⋈0 : Γ ⊢r A
             → Γ ⋈ ⊢r A
-⊢r-weaken⋈0 regA = ⊢r-𝕣 regA
+⊢r-weaken⋈0 regA = ⊢r-𝕣 regA ↳⋈
 
 ⊢r-weaken,0 : Γ ⊢r A
              → Γ ⊢r T

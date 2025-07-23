@@ -37,8 +37,7 @@ s-find {k = k} (s-term-o {A = A} opnA ⊢e ss s) inΓ inΔ with ε-dec {k = k} {
 s-find (s-∀l-𝕚 s upᶜ upj upᵉ upC upD) inΓ inΔ = f-∀-𝕚 (s-find s (S^ inΓ) (S= inΔ)) upj
 s-find (s-∀l-𝕔 s upᶜ upj upᵉ upC upD) inΓ inΔ = f-∀-𝕔 (s-find s (S^ inΓ) (S= inΔ)) upj
 s-find (s-tapp s upᶜ upj) inΓ inΔ = f-𝕥 (s-find s (S= inΓ) (S= inΔ)) upj
-s-find (s-svar-term in' s) inΓ inΔ = ⊥-elim (∋^-∋=-false inΓ inΔ)
-s-find (s-svar-tapp in' s) inΓ inΔ = ⊥-elim (∋^-∋=-false inΓ inΔ)
+s-find (s-svar in' s) inΓ inΔ = ⊥-elim (∋^-∋=-false inΓ inΔ)
 s-find (s-∀l-no-𝕚 s upᶜ upj upᵉ upC upD) inΓ inΔ = f-∀-𝕚 (s-find s (S^ inΓ) (S^ inΔ)) upj
 s-find (s-∀l-no-𝕔 s upᶜ upj upᵉ upC upD) inΓ inΔ = f-∀-𝕔 (s-find s (S^ inΓ) (S^ inΔ)) upj
 s-find (s-evar-infers infs inst) inΓ inΔ
@@ -88,6 +87,5 @@ s-¬ε (s-term-o opnA ⊢e ss s) inΓ inΔ = let inΩ = ⊆-∋^-middle inΓ in�
 s-¬ε (s-∀l s upᶜ upᵉ upC upD) inΓ inΔ = ¬ε-∀ (s-¬ε s (S^ inΓ) (S= inΔ))
 s-¬ε (s-∀l-no s upᶜ upᵉ upC upD) inΓ inΔ = ¬ε-∀ (s-¬ε s (S^ inΓ) (S^ inΔ))
 s-¬ε (s-tapp s upᶜ) inΓ inΔ = ¬ε-∀ (s-¬ε s (S= inΓ) (S= inΔ))
-s-¬ε (s-svar-term x s) inΓ inΔ = ¬ε-var (∋=-∋^-≢ (∋:=to∋= x) inΓ)
-s-¬ε (s-svar-tapp x s) inΓ inΔ = ¬ε-var (∋=-∋^-≢ (∋:=to∋= x) inΓ)
+s-¬ε (s-svar x s) inΓ inΔ = ¬ε-var (∋=-∋^-≢ (∋:=to∋= x) inΓ)
 s-¬ε (s-evar-infers infs inst) inΓ inΔ = ¬ε-var (∋=-∋^-≢ (inst-∋= inst) inΔ)

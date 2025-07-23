@@ -24,6 +24,9 @@ s-⊆-exsol (evar-sol ext cloA) (S^ inΓ) with s-⊆-exsol ext inΓ
 s-⊆-exsol (svar ext _) (S= inΓ) with s-⊆-exsol ext inΓ
 ... | is-ex x = is-ex (S= x)
 ... | is-sol x = is-sol (S= x)
+s-⊆-exsol (tvar ext regA) (S, inΓ) with s-⊆-exsol ext inΓ
+... | is-ex inΓ₁ = is-ex (S, inΓ₁)
+... | is-sol inΓ₁ = is-sol (S, inΓ₁)
 
 ⊆/x-exsol : Γ ⊆ Δ w/v X
           → Γ ∋^ k

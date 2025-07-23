@@ -6,6 +6,10 @@ open import Implicit.Language.Lookup.Base
 
 infix 3 _⊆_
 data _⊆_ : Env n m → Env n m → Set where
+  empty : ∅ ⊆ ∅
+  tvar : Γ ⊆ Δ
+       → (regA : Γ ⊢r A)
+       → Γ , A ⊆ Δ , A
   uvar :
       Γ ⊆ Δ
     → Γ ,∙ ⊆ Δ ,∙
@@ -20,8 +24,8 @@ data _⊆_ : Env n m → Env n m → Set where
       Γ ⊆ Δ
     → (regA : Γ ⊢r A)
     → Γ ,= A ⊆ Δ ,= A
-  mark : (regΓ : TRegular Γ)
-    → Γ ⋈ ⊆ Γ ⋈
+  mark : Γ ⊆ Δ
+       → Γ ⋈ ⊆ Δ ⋈
 
 data ExSol (Γ : Env n m) (k : Fin m) : Set where
   is-ex  : (inΓ : Γ ∋^ k) → ExSol Γ k

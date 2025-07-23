@@ -127,16 +127,6 @@ data _⨟_▶_,=_⇘_⨟_ : Env n m → Env n m → Fin (1 + m) → Type m → E
 ⊢r-weaken= {T = T} (⊢r-∀ regA) new (↑ty-∀ upA)
   with ⟨ T' , upT ⟩ ← ↑ty0-total T = ⊢r-∀ (⊢r-weaken= regA (▶S∙ new upT) upA)
 
-
-▶=-𝕣 : Γ ▶ k ,= T ⇘ Γ'
-     → 𝕣 Γ ▶ k ,= T ⇘ 𝕣 Γ'
-▶=-𝕣 (▶Z regA) = ▶Z (⊢r-𝕣' regA)
-▶=-𝕣 (▶S, new up) = ▶S, (▶=-𝕣 new) up
-▶=-𝕣 (▶S^ new x) = ▶S^ (▶=-𝕣 new) x
-▶=-𝕣 (▶S∙ new x) = ▶S∙ (▶=-𝕣 new) x
-▶=-𝕣 (▶S= new x x₁) = ▶S= (▶=-𝕣 new) x x₁
-▶=-𝕣 (▶S⋈ new) = new
-
 ▶⨟=-unique : Γ ⨟ Γ ▶ k ,= T ⇘ Γ' ⨟ Δ'
            → Γ' ≡ Δ'
 ▶⨟=-unique (▶Z regA) = refl

@@ -19,6 +19,8 @@ data _∋_⦂_ : Env n m → Fin n → Type m → Set where
   S= : Γ ∋ x ⦂ A
      → (up : ↑ty0 A ⇘ A')
      → Γ ,= B ∋ x ⦂ A'
+  S⋈ : Γ ∋ x ⦂ A
+     → Γ ⋈ ∋ x ⦂ A
 
 -- lookup an entry in subtyping env : solution
 infix 3 _∋_:=_
@@ -36,6 +38,8 @@ data _∋_:=_ : Env n m → Fin m → Type m → Set where
      → Δ ,= B ∋ #S k := A'
   S, : Δ ∋ k := A
      → Δ , B ∋ k := A
+  S⋈ : Δ ∋ k := A
+     → Δ ⋈ ∋ k := A
 
 -- lookup an entry in subtyping env: solution (simpler ver.)
 infix 3 _∋=_
@@ -49,6 +53,8 @@ data _∋=_ : Env n m → Fin m → Set where
      → Δ ,= B ∋= #S k
   S, : Δ ∋= k
      → Δ , A ∋= k
+  S⋈ : Δ ∋= k
+     → Δ ⋈ ∋= k
 
 -- lookup an entry in subtyping env: (unsolved) existential variable
 infix 3 _∋^_
@@ -62,6 +68,8 @@ data _∋^_ : Env n m → Fin m → Set where
      → Δ ,^ ∋^ #S k
   S, : Δ ∋^ k  -- this entry is used for proving weakening of term variables in subtyping
      → Δ , A ∋^ k
+  S⋈ : Δ ∋^ k -- needed for metatheory, but not happen in practice
+     → Δ ⋈ ∋^ k
 
 -- lookup an entry: universal variable
 -- works on either typing or subtyping env
