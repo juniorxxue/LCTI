@@ -6,3 +6,4 @@ open import Implicit.Language.Extension.ExSol public
 open import Implicit.Language.Extension.Occur public
 open import Implicit.Language.Extension.EnvReplace public
 open import Implicit.Language.Extension.Properties public
+open import Implicit.Language.Extension.Preservation public

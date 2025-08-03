@@ -27,6 +27,9 @@ s-⊆-exsol (svar ext _) (S= inΓ) with s-⊆-exsol ext inΓ
 s-⊆-exsol (tvar ext regA) (S, inΓ) with s-⊆-exsol ext inΓ
 ... | is-ex inΓ₁ = is-ex (S, inΓ₁)
 ... | is-sol inΓ₁ = is-sol (S, inΓ₁)
+s-⊆-exsol (mark ext) (S⋈ inΓ) with s-⊆-exsol ext inΓ
+... | is-ex inΓ₁ = is-ex (S⋈ inΓ₁)
+... | is-sol inΓ₁ = is-sol (S⋈ inΓ₁)
 
 ⊆/x-exsol : Γ ⊆ Δ w/v X
           → Γ ∋^ k
@@ -45,6 +48,7 @@ s-⊆-exsol (tvar ext regA) (S, inΓ) with s-⊆-exsol ext inΓ
 ⊆/x-exsol (ext-S= ext _) (S= inΓ) with ⊆/x-exsol ext inΓ
 ... | is-ex inΓ₁ = is-ex (S= inΓ₁)
 ... | is-sol inΓ₁ = is-sol (S= inΓ₁)
+⊆/x-exsol (ext-mark regΓ inΓ') (S⋈ inΓ) = is-ex (S⋈ inΓ)
 
 ⊆/-exsol : Γ ⊆ Δ w/t A
          → Γ ∋^ k

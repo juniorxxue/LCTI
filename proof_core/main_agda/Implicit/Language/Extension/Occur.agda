@@ -9,31 +9,17 @@ open import Implicit.Language.Extension.InputOutput
 open import Implicit.Language.Extension.ExSol
 open import Implicit.Language.Extension.Properties
 
-⊆/x-≢ : Γ ⊆ Δ w/v X
-        → Γ ∋^ k
-        → Δ ∋^ k
-        → X ≢ k
-⊆/x-≢ (ext-S^ ext) (S^ inΓ) (S^ inΔ) refl = ⊆/x-≢ ext inΓ inΔ refl
-⊆/x-≢ (ext-S∙ ext) (S∙ inΓ) (S∙ inΔ) refl = ⊆/x-≢ ext inΓ inΔ refl
-⊆/x-≢ (ext-S= ext regA) (S= inΓ) (S= inΔ) refl = ⊆/x-≢ ext inΓ inΔ refl
+postulate
+  ⊆/x-≢ : Γ ⊆ Δ w/v X
+      → Γ ∋^ k
+      → Δ ∋^ k
+      → X ≢ k
 
-⊆-∋^-middle : Γ ∋^ k
+  ⊆-∋^-middle : Γ ∋^ k
             → Δ ∋^ k
             → Γ ⊆ Ω
             → Ω ⊆ Δ
             → Ω ∋^ k
-⊆-∋^-middle Z Z (evar ext1) (evar ext2) = Z
-⊆-∋^-middle (S∙ inΓ) (S∙ inΔ) (uvar ext1) (uvar ext2) = S∙ (⊆-∋^-middle inΓ inΔ ext1 ext2)
-⊆-∋^-middle (S∙ inΓ) (S= inΔ) (uvar ext1) ()
-⊆-∋^-middle (S∙ inΓ) (S^ inΔ) (uvar ext1) ()
-⊆-∋^-middle (S= inΓ) (S∙ inΔ) (svar ext1 regA) ()
-⊆-∋^-middle (S= inΓ) (S= inΔ) (svar ext1 regA) (svar ext2 regA₁) = S= (⊆-∋^-middle inΓ inΔ ext1 ext2)
-⊆-∋^-middle (S= inΓ) (S^ inΔ) (svar ext1 regA) ()
-⊆-∋^-middle (S^ inΓ) (S∙ inΔ) (evar ext1) ()
-⊆-∋^-middle (S^ inΓ) (S∙ inΔ) (evar-sol ext1 regA) ()
-⊆-∋^-middle (S^ inΓ) (S= inΔ) (evar ext1) (evar-sol ext2 regA) = S^ (⊆-∋^-middle inΓ inΔ ext1 ext2)
-⊆-∋^-middle (S^ inΓ) (S= inΔ) (evar-sol ext1 regA) (svar ext2 regA₁) = S= (⊆-∋^-middle inΓ inΔ ext1 ext2)
-⊆-∋^-middle (S^ inΓ) (S^ inΔ) (evar ext1) (evar ext2) = S^ (⊆-∋^-middle inΓ inΔ ext1 ext2)
 
 
 ^in-^out-¬ε : Γ ⊆ Δ w/t A

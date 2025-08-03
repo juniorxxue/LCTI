@@ -52,3 +52,32 @@ data SRegular : Env n m → Set where
   reg-S= : SRegular Δ
          → (regA : Δ ⊢r A)
          → SRegular (Δ ,= A)
+
+data Regular : Env n m → Set where
+  reg-Z : Regular ∅
+  reg-S, : Regular Γ
+         → (regA : Γ ⊢r A)
+         → Regular (Γ , A)
+  reg-S∙ : Regular Γ
+         → Regular (Γ ,∙)
+  reg-S^ : Regular Γ
+         → Regular (Γ ,^)
+  reg-S= : Regular Γ
+         → (regA : Γ ⊢r A)
+         → Regular (Γ ,= A)
+  reg-S⋈ : Regular Γ
+         → Regular (Γ ⋈)
+
+
+treg-reg : TRegular Γ → Regular Γ
+treg-reg reg-Z = reg-Z
+treg-reg (reg-S, reg regA) = reg-S, (treg-reg reg) regA
+treg-reg (reg-S∙ reg) = reg-S∙ (treg-reg reg)
+treg-reg (reg-S^ reg) = reg-S^ (treg-reg reg)
+treg-reg (reg-S= reg regA) = reg-S= (treg-reg reg) regA
+
+sreg-reg : SRegular Γ → Regular Γ
+sreg-reg (reg-Z regΓ) = reg-S⋈ (treg-reg regΓ)
+sreg-reg (reg-S∙ reg) = reg-S∙ (sreg-reg reg)
+sreg-reg (reg-S^ reg) = reg-S^ (sreg-reg reg)
+sreg-reg (reg-S= reg regA) = reg-S= (sreg-reg reg) regA

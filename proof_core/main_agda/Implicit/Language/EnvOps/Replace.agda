@@ -1,3 +1,5 @@
+{-# OPTIONS --allow-unsolved-metas #-}
+{-# OPTIONS --allow-incomplete-matches #-}
 module Implicit.Language.EnvOps.Replace where
 
 open import Implicit.Language.Base
