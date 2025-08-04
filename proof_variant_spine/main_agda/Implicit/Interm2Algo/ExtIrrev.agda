@@ -1,6 +1,32 @@
+{-# OPTIONS --allow-unsolved-metas #-}
+{-# OPTIONS --allow-incomplete-matches #-}
 module Implicit.Interm2Algo.ExtIrrev where
 
 open import Implicit.Language.All
+
+infix 3 _⊆_w/t_w/p_
+data _⊆_w/t_w/p_ : Env n m → Env n m → Type m → Counter m → Set where
+  ⊆p-∞ : (ext : Γ ⊆ Δ w/t A)
+       → Γ ⊆ Δ w/t A w/p ∞
+  ⊆p-I : Γ ⊆ Δ w/t B w/p j
+       → Γ ⊆ Δ w/t A `→ B w/p 𝕚 j
+  ⊆p-C : Γ ⊆ Δ w/t B w/p j
+       → Γ ⊆ Δ w/t A `→ B w/p 𝕔 j
+  ⊆∀p-I : Γ ,^ ⊆ Δ ,= B w/t A w/p (𝕚 j')
+       → (upj : ↑tyʲ0 j ⇘ j')
+       → Γ ⊆ Δ w/t `∀ A w/p (𝕚 j)
+  ⊆∀p-I-no : Γ ,^ ⊆ Δ ,^ w/t A w/p (𝕚 j')
+       → (upj : ↑tyʲ0 j ⇘ j')
+       → Γ ⊆ Δ w/t `∀ A w/p (𝕚 j)
+  ⊆∀p-C : Γ ,^ ⊆ Δ ,= B w/t A w/p (𝕔 j')
+       → (upj : ↑tyʲ0 j ⇘ j')
+       → Γ ⊆ Δ w/t `∀ A w/p (𝕔 j)
+  ⊆∀p-C-no : Γ ,^ ⊆ Δ ,^ w/t A w/p (𝕔 j')
+       → (upj : ↑tyʲ0 j ⇘ j')
+       → Γ ⊆ Δ w/t `∀ A w/p (𝕔 j)
+  ⊆∀p-T : Γ ,= B ⊆ Δ ,= B w/t A w/p j'
+       → (upj : ↑tyʲ0 j ⇘ j')
+       → Γ ⊆ Δ w/t `∀ A w/p 𝕥₍ B ₎ j
 
 infix 3 _⊆_w/t_w/c_
 data _⊆_w/t_w/c_ : Env n m → Env n m → Type m → Counter m → Set where
@@ -41,6 +67,8 @@ data _⊆_w/t_w/c_ : Env n m → Env n m → Type m → Counter m → Set where
   ⊆Inf-X : (extx : Γ ⊆ Δ w/v X)
          → (iso : IsoInf (𝕚 j))
          → Γ ⊆ Δ w/t ‶ X w/c 𝕚 j
+  ⊆jump : (extp : Γ ⊆ Δ w/t A w/p j)
+        → Γ ⊆ Δ w/t A w/c j
 
 ⊆/c-⊆ : Γ ⊆ Δ w/t A w/c j
       → Γ ⊆ Δ
