@@ -89,6 +89,18 @@ open import Implicit.Language.Regular.Base
 --+                        not occur in env                        +--
 ----------------------------------------------------------------------
 
+εᵍ-⦂-¬ε : k ¬εᵍ Γ
+         → Γ ∋ X ⦂ A
+         → k ¬ε A
+εᵍ-⦂-¬ε Z^ (S^ inA up) = ↑ty-¬ε up
+εᵍ-⦂-¬ε Z∙ (S∙ inA up) = ↑ty-¬ε up
+εᵍ-⦂-¬ε (Z= upA ¬inA) (S= inA up) = ↑ty-¬ε up
+εᵍ-⦂-¬ε (S, ¬inA ninΓ) Z = ¬inA
+εᵍ-⦂-¬ε (S, ¬inA ninΓ) (S, inA) = εᵍ-⦂-¬ε ninΓ inA
+εᵍ-⦂-¬ε (S∙ ninΓ) (S∙ inA up) = ¬ε-↑ty0 (εᵍ-⦂-¬ε ninΓ inA) up
+εᵍ-⦂-¬ε (S^ ninΓ) (S^ inA up) = ¬ε-↑ty0 (εᵍ-⦂-¬ε ninΓ inA) up
+εᵍ-⦂-¬ε (S= ninΓ upA ¬inA) (S= inA up) = ¬ε-↑ty0 (εᵍ-⦂-¬ε ninΓ inA) up
+
 εᵍ-:=-¬ε : k ¬εᵍ Γ
          → Γ ∋ X := A
          → k ¬ε A

@@ -11,7 +11,7 @@ open import Implicit.Language.Extension.All
 open import Implicit.Language.EnvOps.All
 open import Implicit.Language.Find.All
 
-⊢c-≫-⊢r : SRegular Γ
+⊢c-≫-⊢r : Regular Γ
           → Γ ⊢c A
           → Γ ≫ A ⇘ A%
           → Γ ⊢r A%
@@ -49,7 +49,7 @@ open import Implicit.Language.Find.All
 ⊢r-≫-eq' (⊢r-arr regA regA₁) (grd-arr grd grd₁) = cong₂ _`→_ (⊢r-≫-eq' regA grd) (⊢r-≫-eq' regA₁ grd₁)
 ⊢r-≫-eq' (⊢r-∀ regA) (grd-∀ grd) = cong `∀_ (⊢r-≫-eq' regA grd)
 
-⊢c-≫-⊢c : SRegular Γ
+⊢c-≫-⊢c : Regular Γ
           → Γ ⊢c A
           → Γ ≫ A ⇘ A%
           → Γ ⊢c A%
@@ -68,6 +68,8 @@ open import Implicit.Language.Find.All
                → Γ ⊆ Δ
                → Γ ∋= X
                → Γ ∋ X := A%
+        helper (S, inΔ) (tvar ext regA) (S, in1) = S, (helper inΔ ext in1)
+        helper (S⋈ inΔ) (mark ext) (S⋈ in1) = S⋈ (helper inΔ ext in1)
         helper (Z up) (svar ext regA) Z = Z up
         helper (S∙ inΔ up) (uvar ext) (S∙ inΓ) = S∙ (helper inΔ ext inΓ) up
         helper (S^ inΔ up) (evar ext) (S^ inΓ) = S^ (helper inΔ ext inΓ) up
@@ -91,7 +93,7 @@ open import Implicit.Language.Find.All
 ⊆-⊢c-≫' ext (⊢c-∀ cloA) (grd-∀ grd) = grd-∀ (⊆-⊢c-≫' (uvar ext) cloA grd)
 
 
-≫-trans : SRegular Γ
+≫-trans : Regular Γ
         → Γ ≫ A ⇘ B
          → [ T / k ] Γ ∙⟹ Γ'
          → k ¬εᵍ Γ
@@ -108,7 +110,7 @@ open import Implicit.Language.Find.All
   with ⟨ T' , upT ⟩ ← ↑ty0-total T
   = grd-∀ (≫-trans (reg-S∙ regΓ) grd1 (∙⟹∙S new upT) (S∙ nin) grd2)
 
-≫-trans' : SRegular Γ
+≫-trans' : Regular Γ
         → Γ ≫ A ⇘ B
         → Γ ◈ k ⇘ Γ'
         → k ¬εᵍ Γ
@@ -121,13 +123,13 @@ open import Implicit.Language.Find.All
                                                                  (≫-trans' regΓ grd₁ new ninΓ ninB₁)
 ≫-trans' regΓ (grd-∀ grd) new ninΓ (¬ε-∀ ninB) = grd-∀ (≫-trans' (reg-S∙ regΓ) grd (◈S∙ new) (S∙ ninΓ) ninB)
 
-≫-trans'0 : SRegular Γ
+≫-trans'0 : Regular Γ
           → Γ ,∙ ≫ A ⇘ B
           → #0 ¬ε B
           → Γ ,^ ≫ A ⇘ B
 ≫-trans'0 regΓ grd1 ninA = ≫-trans' (reg-S∙ regΓ) grd1 ◈Z Z∙ ninA
 
-≫-trans0 : SRegular Γ
+≫-trans0 : Regular Γ
           → Γ ⊢r B
           → Γ ,= B ≫ A₁ ⇘ A%
           → Γ ,∙ ≫ A ⇘ A₁
@@ -220,7 +222,7 @@ find-≫-∙0 {Γ = Γ} fd grd = find-≫-∙ {Γ = Γ ,∙} fd Z∙ Z grd
 ≫-unique (grd-arr grd1 grd3) (grd-arr grd2 grd4) = cong₂ _`→_ (≫-unique grd1 grd2) (≫-unique grd3 grd4)
 ≫-unique (grd-∀ grd1) (grd-∀ grd2) = cong `∀_ (≫-unique grd1 grd2)
 
-≫-trans'' : SRegular Γ
+≫-trans'' : Regular Γ
         → Γ ≫ A ⇘ B
          → [ T / k ] Γ ∙⟹ Γ'
          → k ¬εᵍ Γ
@@ -237,7 +239,7 @@ find-≫-∙0 {Γ = Γ} fd grd = find-≫-∙ {Γ = Γ ,∙} fd Z∙ Z grd
 ≫-trans'' {T = T} regΓ (grd-∀ grd1) new ninΓ (grd-∀ grd2) = grd-∀ (≫-trans'' (reg-S∙ regΓ) grd1 (∙⟹∙S new (proj₂ (↑ty0-total T))) (S∙ ninΓ) grd2)
 
 
-≫-total : SRegular Γ
+≫-total : Regular Γ
         → Γ ⊢c A
         → ∃[ A% ](Γ ≫ A ⇘ A%)
 ≫-total regΓ ⊢c-int = ⟨ Int , grd-int ⟩

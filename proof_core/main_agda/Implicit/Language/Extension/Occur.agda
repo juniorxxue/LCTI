@@ -27,7 +27,7 @@ postulate
             → Δ ∋^ k
             → k ¬ε A
 ^in-^out-¬ε (ext-int x) inΓ inΔ = ¬ε-int
-^in-^out-¬ε (ext-var x) inΓ inΔ = ¬ε-var (⊆/x-≢ x inΓ inΔ)
+^in-^out-¬ε (ext-var x reg1 reg2) inΓ inΔ = ¬ε-var (⊆/x-≢ x inΓ inΔ)
 ^in-^out-¬ε (ext-arr ext ext₁) inΓ inΔ = let inΩ = ⊆-∋^-middle inΓ inΔ (⊆/-⊆ ext) (⊆/-⊆ ext₁)
                                          in ¬ε-arr (^in-^out-¬ε ext inΓ inΩ) (^in-^out-¬ε ext₁ inΩ inΔ)
 ^in-^out-¬ε (ext-∀ ext) inΓ inΔ = ¬ε-∀ (^in-^out-¬ε ext (S∙ inΓ) (S∙ inΔ))
@@ -38,7 +38,7 @@ postulate
            → Δ ∋= k
            → k ε A
 ^in-=out-ε (ext-int regΓ) inΓ inΔ = ⊥-elim (∋^-∋=-false inΓ inΔ)
-^in-=out-ε (ext-var x) inΓ inΔ with ⊆/x-^in-=out-eq x inΓ inΔ
+^in-=out-ε (ext-var x reg1 reg2) inΓ inΔ with ⊆/x-^in-=out-eq x inΓ inΔ
 ... | refl = ε-var
 ^in-=out-ε (ext-arr ext ext₁) inΓ inΔ with ⊆/-exsol ext inΓ
 ... | is-ex inΓ₁ = ε-arr-r (^in-^out-¬ε ext inΓ inΓ₁) (^in-=out-ε ext₁ inΓ₁ inΔ)

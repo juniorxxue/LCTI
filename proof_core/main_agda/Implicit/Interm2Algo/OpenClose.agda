@@ -19,7 +19,7 @@ open import Implicit.Language.All
 ... | inj₁ (⊢o-var-^ x) = inj₁ (⊢o-var-^ (S= x))
 ... | inj₂ (⊢c-var-∙ inΔ) = inj₂ (⊢c-var-∙ (S= inΔ))
 ... | inj₂ (⊢c-var-= inΔ) = inj₂ (⊢c-var-= (S= inΔ))
-⊆/x-openclose (ext-mark x x₁) = inj₂ (⊢c-var-∙ (S⋈ x₁))
+⊆/x-openclose (ext-S⋈ x x₁) = inj₂ (⊢c-var-∙ (S⋈ x₁))
 
 ⊆/-openclose : Γ ⊆ Δ w/t A
               → Γ ⊢o A ⊎ Γ ⊢c A

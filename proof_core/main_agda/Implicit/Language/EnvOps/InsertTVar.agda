@@ -202,3 +202,8 @@ tregular-weaken, (reg-S^ regΓ) (▶Z regA) = reg-S, (reg-S^ regΓ) regA
 tregular-weaken, (reg-S^ regΓ) (▶S^ new x) = reg-S^ (tregular-weaken, regΓ new)
 tregular-weaken, (reg-S= regΓ regA) (▶Z regA₁) = reg-S, (reg-S= regΓ regA) regA₁
 tregular-weaken, (reg-S= regΓ regA) (▶S= new x) = reg-S= (tregular-weaken, regΓ new) (⊢r-weaken, regA new)
+
+⊢r-weaken,0 : Γ ⊢r A
+               → Γ ⊢r T
+               → Γ , T ⊢r A
+⊢r-weaken,0 regA regT = ⊢r-weaken, regA (▶Z regT)

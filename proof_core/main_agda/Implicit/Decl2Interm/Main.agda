@@ -15,7 +15,6 @@ complete+ : Γ ⊢d² j # A% ≤ B
           → Γ ≫ A ⇘ A%
           → Γ ⊢ j # A ⌞ ≤⁺ ⌝ B
 
-
 complete- : Γ ⊢d² ∞ # A ≤ B%
           → Γ ≫ B ⇘ B%
           → Γ ⊢ ∞ # A ⌞ ≤⁻ ⌝ B

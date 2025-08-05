@@ -168,51 +168,6 @@ s2-weaken=0 : Γ ⊢d² j # A ≤ B
             → Γ ,= T ⊢d² j' # A' ≤ B'
 s2-weaken=0 s upA upB upj regT = s2-weaken= s (▶Z regT) upA upB upj
 
-
-s2-weaken^ : Γ ⊢d² j # A ≤ B
-           → Γ ▶ k ,^⇘ Γ'
-            → A ↑ty k ⇘ A'
-            → B ↑ty k ⇘ B'
-            → j ↑tyʲ k ⇘ j'
-            → Γ' ⊢d² j' # A' ≤ B'
-s2-weaken^ (s-refl regΔ cloA) new upA upB ↑tyʲ-Z
-  with refl ← ↑ty-unique upA upB = s-refl (sregular-weaken^ regΔ new) (⊢r-weaken^ cloA new upB)
-s2-weaken^ (s-int regΔ) new ↑ty-int ↑ty-int ↑tyʲ-∞ = s-int (sregular-weaken^ regΔ new)
-s2-weaken^ (s-var-∙ regΔ inΔ) new ↑ty-var ↑ty-var ↑tyʲ-∞ = s-var-∙ (sregular-weaken^ regΔ new) (∋∙-weaken^ inΔ new)
-s2-weaken^ (s-arr₁ s s₁) new (↑ty-arr upA upA₁) (↑ty-arr upB upB₁) ↑tyʲ-∞ = s-arr₁ (s2-weaken^ s new upB upA ↑tyʲ-∞) (s2-weaken^ s₁ new upA₁ upB₁ ↑tyʲ-∞)
-s2-weaken^ (s-arr₂ s s₁) new (↑ty-arr upA upA₁) (↑ty-arr upB upB₁) (↑tyʲ-𝕚 upj)
-  = s-arr₂ (s2-weaken^ s new upB upA ↑tyʲ-∞) (s2-weaken^ s₁ new upA₁ upB₁ upj)
-s2-weaken^ (s-arr₃ regA s) new (↑ty-arr upA upA₁) (↑ty-arr upB upB₁) (↑tyʲ-𝕔 upj)
-  with refl ← ↑ty-unique upA upB = s-arr₃ (⊢r-weaken^ regA new upB) (s2-weaken^ s new upA₁ upB₁ upj)
-s2-weaken^ (s-∀ s) new (↑ty-∀ upA) (↑ty-∀ upB) ↑tyʲ-∞ = s-∀ (s2-weaken^ s (▶S∙ new) upA upB ↑tyʲ-∞)
-s2-weaken^ {k = k} {j' = j'} (s-∀l {B = B} {A% = A%} grd regA s ic fd upC upD upj₁) new (↑ty-∀ upA) (↑ty-arr {A' = C'} {B' = D'} upB upB₁) upj
-  with ⟨ B' , upB₂ ⟩ ← ↑ty-total B k
-  with ⟨ C₁ , upC₁ ⟩ ← ↑ty0-total C'
-  with ⟨ D₁ , upD₁ ⟩ ← ↑ty0-total D'
-  with ⟨ j₁ , upj₂ ⟩ ← ↑tyʲ0-total j'
-  with ⟨ A%' , upA% ⟩ ← ↑ty-total A% (#S k)
-  = s-∀l (≫-weaken^ grd (▶S= new upB₂) upA upA%)
-         (⊢r-weaken^ regA (▶S∙ new) upA)
-         (s2-weaken^ s (▶S= new upB₂) upA% (↑ty-arr (↑ty-comm0' upB upC₁ upC) (↑ty-comm0' upB₁ upD₁ upD)) (↑tyʲ-comm0' upj upj₂ upj₁))
-         (𝕚𝕔-↑tyʲ ic upj) (↑ty-find0 fd upA (↑tyʲ-comm0' upj upj₂ upj₁)) upC₁ upD₁ upj₂
-s2-weaken^ {k = k} {j' = j'} (s-∀l-no-appear {A% = A%} grd regA s ic fd upC upD upj₁) new (↑ty-∀ upA) (↑ty-arr {A' = C'} {B' = D'} upB upB₁) upj
---  with ⟨ B' , upB₂ ⟩ ← ↑ty-total B k
-  with ⟨ C₁ , upC₁ ⟩ ← ↑ty0-total C'
-  with ⟨ D₁ , upD₁ ⟩ ← ↑ty0-total D'
-  with ⟨ j₁ , upj₂ ⟩ ← ↑tyʲ0-total j'
-  with ⟨ A%' , upA% ⟩ ← ↑ty-total A% (#S k)
-  = s-∀l-no-appear (≫-weaken^ grd (▶S^ new) upA upA%)
-         (⊢r-weaken^ regA (▶S∙ new) upA)
-         (s2-weaken^ s (▶S^ new) upA% (↑ty-arr (↑ty-comm0' upB upC₁ upC) (↑ty-comm0' upB₁ upD₁ upD)) (↑tyʲ-comm0' upj upj₂ upj₁))
-         (𝕚𝕔-↑tyʲ ic upj) (¬ε-↑ty0' fd upA) upC₁ upD₁ upj₂
-s2-weaken^ {k = k} {j' = 𝕥₍  _ ₎ j'} (s-tapp {B = B} {A% = A%} x regA s upj₁) new (↑ty-∀ upA) (↑ty-∀ upB) (↑tyʲ-𝕥 upj upA₁)
-  with ⟨ j₁ , upj₂ ⟩ ← ↑tyʲ0-total j'
-  with ⟨ B' , upB₂ ⟩ ← ↑ty-total B k
-  with ⟨ A%' , upA% ⟩ ← ↑ty-total A% (#S k)
-  = s-tapp (≫-weaken^ x (▶S= new upA₁) upA upA%)
-           (⊢r-weaken^ regA (▶S∙ new) upA)
-           (s2-weaken^ s (▶S= new upA₁) upA% upB (↑tyʲ-comm0' upj upj₂ upj₁)) upj₂
-
 s2-weaken^0 : Γ ⊢d² j # A ≤ B
             → ↑ty0 A ⇘ A'
             → ↑ty0 B ⇘ B'

@@ -43,24 +43,24 @@ data _▶_⇘_w/_ : Env n m → Fin (1 + m) → Env n (1 + m) → MType m → Se
   ▶S⋈ : Γ ▶ k ⇘ Γ' w/ mA
       → Γ ⋈ ▶ k ⇘ Γ' ⋈ w/ mA
 
-{-
-
-infix 3 _⨟_▶_⇘_⨟_
-data _⨟_▶_⇘_⨟_ : Env n m → Env n m → Fin (1 + m) → Env n (1 + m) → Env n (1 + m) → Set where
-  ▶Z : Γ ⨟ Δ ▶ #0 ⇘ Γ ,^ ⨟ Δ ,^
-  ▶S, : Γ ⨟ Δ ▶ k ⇘ Γ' ⨟ Δ'
-      → (upA : A ↑ty k ⇘ A')
-      → Γ , A ⨟ Δ , A ▶ k ⇘ Γ' , A' ⨟ Δ' , A'
-  ▶S^ : Γ ⨟ Δ ▶ k ⇘ Γ' ⨟ Δ'
-      → Γ ,^ ⨟ Δ ,^ ▶ #S k ⇘ Γ' ,^ ⨟ Δ' ,^
-  ▶S^= : Γ ⨟ Δ ▶ k ⇘ Γ' ⨟ Δ'
-       → (upA : A ↑ty k ⇘ A')
-      → Γ ,^ ⨟ Δ ,= A ▶ #S k ⇘ Γ' ,^ ⨟ Δ' ,= A'
-  ▶S∙ : Γ ⨟ Δ ▶ k ⇘ Γ' ⨟ Δ'
-      → Γ ,∙ ⨟ Δ ,∙ ▶ #S k ⇘ Γ' ,∙ ⨟ Δ' ,∙
-  ▶S= : Γ ⨟ Δ ▶ k ⇘ Γ' ⨟ Δ'
-      → (upA : A ↑ty k ⇘ A')
-      → Γ ,= A ⨟ Δ ,= A ▶ #S k ⇘ Γ' ,= A' ⨟ Δ' ,= A'
-  ▶S⋈ : Γ ⨟ Δ ▶ k ⇘ Γ' ⨟ Δ'
-      → Γ ⋈ ⨟ Δ ⋈ ▶ k ⇘ Γ' ⋈ ⨟ Δ' ⋈
--}
+infix 3 _⨟_▶_⇘_⨟_w/_
+data _⨟_▶_⇘_⨟_w/_ : Env n m → Env n m → Fin (1 + m) → Env n (1 + m) → Env n (1 + m) → MType m → Set where
+  ▶Z^ : Γ ⨟ Δ ▶ #0 ⇘ (Γ ,^) ⨟ (Δ ,^) w/ nothing
+  ▶Z∙ : Γ ⨟ Δ ▶ #0 ⇘ Γ ,∙ ⨟ Δ ,∙ w/ nothing
+  ▶Z= : (regA : Γ ⊢r A)
+      → Γ ⨟ Δ ▶ #0 ⇘ Γ ,= A ⨟ Δ ,= A w/ (just A)
+  ▶S, : Γ ⨟ Δ ▶ k ⇘ Γ' ⨟ Δ' w/ mA
+      → (up : B ↑ty k ⇘ B')
+      → Γ , B ⨟ Δ , B ▶ k ⇘ Γ' , B' ⨟ Δ' , B' w/ mA
+  ▶S^ : Γ ⨟ Δ ▶ k ⇘ Γ' ⨟ Δ' w/ mA
+      → (upmA : ↑tyᵐ0 mA ⇘ mA')
+      → Γ ,^ ⨟ Δ ,^ ▶ #S k ⇘ Γ' ,^ ⨟ Δ' ,^ w/ mA'
+  ▶S∙ : Γ ⨟ Δ ▶ k ⇘ Γ' ⨟ Δ'  w/ mA
+      → (upmA : ↑tyᵐ0 mA ⇘ mA')
+      → Γ ,∙ ⨟ Δ ,∙ ▶ #S k ⇘ Γ' ,∙ ⨟ Δ' ,∙  w/ mA'
+  ▶S= : Γ ⨟ Δ ▶ k ⇘ Γ' ⨟ Δ' w/ mA
+      → (upmA : ↑tyᵐ0 mA ⇘ mA')
+      → (upB : B ↑ty k ⇘ B')
+      → Γ ,= B ⨟ Δ ,= B ▶ #S k ⇘ Γ' ,= B' ⨟ Δ' ,= B' w/ mA'
+  ▶S⋈ : Γ ⨟ Δ ▶ k ⇘ Γ' ⨟ Δ' w/ mA
+      → Γ ⋈ ⨟ Δ ⋈ ▶ k ⇘ Γ' ⋈ ⨟ Δ' ⋈ w/ mA

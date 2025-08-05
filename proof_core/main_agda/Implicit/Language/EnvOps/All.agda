@@ -9,6 +9,10 @@ open import Implicit.Language.EnvOps.Weaken.Base public
 open import Implicit.Language.EnvOps.Weaken.Lookup public
 open import Implicit.Language.EnvOps.Weaken.Misc public
 
+open import Implicit.Language.EnvOps.Strengthen.Base public
+open import Implicit.Language.EnvOps.Strengthen.Lookup public
+open import Implicit.Language.EnvOps.Strengthen.Misc public
+
 open import Implicit.Language.EnvOps.Regular public
 
 open import Implicit.Language.EnvOps.Replace public

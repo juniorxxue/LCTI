@@ -41,20 +41,21 @@ open import Implicit.Language.Extension.Preservation
 ⊆-antisymm (tvar ext1 regA) (tvar ext2 regB) with refl ← ⊆-antisymm ext1 ext2 = refl
 ⊆-antisymm (mark x) (mark x₁) with refl ← ⊆-antisymm x x₁ = refl
 
-reg-⊆/x∙ : SRegular Δ
-        → Δ ∋∙ X
-        → Δ ⊆ Δ w/v X
-reg-⊆/x∙ (reg-Z regΓ) (S⋈ inΔ) = ext-mark regΓ (⊢c-var-∙ inΔ)
-reg-⊆/x∙ (reg-S∙ regΔ) Z = ext-Z∙ regΔ
-reg-⊆/x∙ (reg-S∙ regΔ) (S∙ inΔ) = ext-S∙ (reg-⊆/x∙ regΔ inΔ)
-reg-⊆/x∙ (reg-S^ regΔ) (S^ inΔ) = ext-S^ (reg-⊆/x∙ regΔ inΔ)
-reg-⊆/x∙ (reg-S= regΔ regA) (S= inΔ) = ext-S= (reg-⊆/x∙ regΔ inΔ) regA
+reg-⊆/x∙ : Δ ∋∙ X
+         → Δ ⊆ Δ w/v X
+reg-⊆/x∙ Z = ext-Z∙
+reg-⊆/x∙ (S, inΔ) = ext-S, (reg-⊆/x∙ inΔ)
+reg-⊆/x∙ (S∙ inΔ) = ext-S∙ (reg-⊆/x∙ inΔ)
+reg-⊆/x∙ (S= inΔ) = ext-S= (reg-⊆/x∙ inΔ)
+reg-⊆/x∙ (S^ inΔ) = ext-S^ (reg-⊆/x∙ inΔ)
+reg-⊆/x∙ (S⋈ inΔ) = ext-S⋈ (reg-⊆/x∙ inΔ)
+
 
 reg-⊆/ : SRegular Δ
        → Δ ⊢r A
        → Δ ⊆ Δ w/t A
 reg-⊆/ senv ⊢r-int = ext-int senv
-reg-⊆/ senv (⊢r-var-∙ inΓ) = ext-var (reg-⊆/x∙ senv inΓ)
+reg-⊆/ senv (⊢r-var-∙ inΓ) = ext-var (reg-⊆/x∙ inΓ) senv senv
 reg-⊆/ senv (⊢r-arr regA regA₁) = ext-arr (reg-⊆/ senv regA) (reg-⊆/ senv regA₁)
 reg-⊆/ senv (⊢r-∀ regA) = ext-∀ (reg-⊆/ (reg-S∙ senv) regA)
 
@@ -62,27 +63,29 @@ reg-⊆/ senv (⊢r-∀ regA) = ext-∀ (reg-⊆/ (reg-S∙ senv) regA)
 ⊆/x-∋∙-eq : Γ ⊆ Δ w/v X
           → Γ ∋∙ X
           → Γ ≡ Δ
-⊆/x-∋∙-eq (ext-Z∙ regΓ) Z = refl
+⊆/x-∋∙-eq (ext-Z∙) Z = refl
 ⊆/x-∋∙-eq (ext-S^ ext) (S^ inΓ) = cong _,^ (⊆/x-∋∙-eq ext inΓ)
 ⊆/x-∋∙-eq (ext-S∙ ext) (S∙ inΓ) = cong _,∙ (⊆/x-∋∙-eq ext inΓ)
-⊆/x-∋∙-eq (ext-S= ext regA) (S= inΓ) = cong₂ _,=_ (⊆/x-∋∙-eq ext inΓ) refl
-⊆/x-∋∙-eq (ext-mark x _) inΓ = refl
+⊆/x-∋∙-eq (ext-S= ext) (S= inΓ) = cong₂ _,=_ (⊆/x-∋∙-eq ext inΓ) refl
+⊆/x-∋∙-eq (ext-S⋈ ext) (S⋈ inΓ) = cong _⋈ (⊆/x-∋∙-eq ext inΓ)
+⊆/x-∋∙-eq (ext-S, ext) (S, inΓ) = cong₂ _,_ (⊆/x-∋∙-eq ext inΓ) refl
 
 ⊆/x-∋=-eq : Γ ⊆ Δ w/v X
           → Γ ∋= X
           → Γ ≡ Δ
-⊆/x-∋=-eq (ext-Z= regA regΓ) Z = refl
+⊆/x-∋=-eq (ext-Z=) Z = refl
 ⊆/x-∋=-eq (ext-S^ ext) (S^ inΓ) = cong _,^ (⊆/x-∋=-eq ext inΓ)
 ⊆/x-∋=-eq (ext-S∙ ext) (S∙ inΓ) = cong _,∙ (⊆/x-∋=-eq ext inΓ)
-⊆/x-∋=-eq (ext-S= ext _) (S= inΓ) = cong₂ _,=_ (⊆/x-∋=-eq ext inΓ) refl
-⊆/x-∋=-eq (ext-mark regΓ _) (S⋈ inΓ') = refl
+⊆/x-∋=-eq (ext-S= ext) (S= inΓ) = cong₂ _,=_ (⊆/x-∋=-eq ext inΓ) refl
+⊆/x-∋=-eq (ext-S⋈ ext) (S⋈ inΓ') = cong _⋈ (⊆/x-∋=-eq ext inΓ')
+⊆/x-∋=-eq (ext-S, ext) (S, inΓ) = cong₂ _,_ (⊆/x-∋=-eq ext inΓ) refl
 
 ⊆/-⊢c-eq : Γ ⊆ Δ w/t A
          → Γ ⊢c A
          → Γ ≡ Δ
 ⊆/-⊢c-eq (ext-int regΓ) cloA = refl
-⊆/-⊢c-eq (ext-var x) (⊢c-var-∙ inΔ) = ⊆/x-∋∙-eq x inΔ
-⊆/-⊢c-eq (ext-var x) (⊢c-var-= inΔ) = ⊆/x-∋=-eq x inΔ
+⊆/-⊢c-eq (ext-var x reg1 reg2) (⊢c-var-∙ inΔ) = ⊆/x-∋∙-eq x inΔ
+⊆/-⊢c-eq (ext-var x reg1 reg2) (⊢c-var-= inΔ) = ⊆/x-∋=-eq x inΔ
 ⊆/-⊢c-eq (ext-arr ext ext₁) (⊢c-arr cloA cloA₁)
   with refl ← ⊆/-⊢c-eq ext cloA
   with refl ← ⊆/-⊢c-eq ext₁ cloA₁ = refl
@@ -92,82 +95,94 @@ reg-⊆/ senv (⊢r-∀ regA) = ext-∀ (reg-⊆/ (reg-S∙ senv) regA)
 ⊆/-∙out-∙in : Δ ∋∙ X
             → Γ ⊆ Δ w/v X
             → Γ ∋∙ X
-⊆/-∙out-∙in Z (ext-Z∙ _) = Z
+⊆/-∙out-∙in Z (ext-Z∙) = Z
 ⊆/-∙out-∙in (S∙ inΓ) (ext-S∙ ext) = S∙ (⊆/-∙out-∙in inΓ ext)
-⊆/-∙out-∙in (S= inΓ) (ext-S= ext _) = S= (⊆/-∙out-∙in inΓ ext)
+⊆/-∙out-∙in (S= inΓ) (ext-S= ext) = S= (⊆/-∙out-∙in inΓ ext)
 ⊆/-∙out-∙in (S^ inΓ) (ext-S^ ext) = S^ (⊆/-∙out-∙in inΓ ext)
-⊆/-∙out-∙in (S⋈ inΓ) (ext-mark x _) = S⋈ inΓ
+⊆/-∙out-∙in (S⋈ inΓ) (ext-S⋈ ext) = S⋈ (⊆/-∙out-∙in inΓ ext)
+⊆/-∙out-∙in (S, inΓ) (ext-S, ext) = S, (⊆/-∙out-∙in inΓ ext)
 
 ----------------------------------------------------------------------
 --+             restricted extension implies extension             +--
 ----------------------------------------------------------------------
 
-⊆/x-⊆ : Γ ⊆ Δ w/v X
+⊆/x-⊆ : Regular Γ
+      → Regular Δ
+      → Γ ⊆ Δ w/v X
       → Γ ⊆ Δ
-⊆/x-⊆ (ext-Z^ regΓ regA) = evar-sol (⊆-refl (sreg-reg regΓ)) regA
-⊆/x-⊆ (ext-Z∙ regΓ) = ⊆-refl (reg-S∙ (sreg-reg regΓ))
-⊆/x-⊆ (ext-Z= regΓ regA) = ⊆-refl (reg-S= (sreg-reg regΓ) regA)
-⊆/x-⊆ (ext-S^ ext) = evar (⊆/x-⊆ ext)
-⊆/x-⊆ (ext-S∙ ext) = uvar (⊆/x-⊆ ext)
-⊆/x-⊆ (ext-S= ext regA) = svar (⊆/x-⊆ ext) regA
-⊆/x-⊆ (ext-mark x cloX) = mark (⊆-refl (treg-reg x))
+⊆/x-⊆ (reg-S, reg1 regA) (reg-S, reg2 regA₁) (ext-S, ext) = tvar (⊆/x-⊆ reg1 reg2 ext) regA
+⊆/x-⊆ (reg-S∙ reg1) (reg-S∙ reg2) ext-Z∙ = ⊆-refl (reg-S∙ reg1)
+⊆/x-⊆ (reg-S∙ reg1) (reg-S∙ reg2) (ext-S∙ ext) = uvar (⊆/x-⊆ reg1 reg2 ext)
+⊆/x-⊆ (reg-S^ reg1) (reg-S= reg2 regA) ext-Z^ = evar-sol (⊆-refl reg1) regA
+⊆/x-⊆ (reg-S^ reg1) (reg-S^ reg2) (ext-S^ ext) = evar (⊆/x-⊆ reg1 reg2 ext)
+⊆/x-⊆ (reg-S= reg1 regA) (reg-S= reg2 regA₁) ext-Z= = ⊆-refl (reg-S= reg1 regA₁)
+⊆/x-⊆ (reg-S= reg1 regA) (reg-S= reg2 regA₁) (ext-S= ext) = svar (⊆/x-⊆ reg1 reg2 ext) regA
+⊆/x-⊆ (reg-S⋈ reg1) (reg-S⋈ reg2) (ext-S⋈ ext) = mark (⊆/x-⊆ reg1 reg2 ext)
+
 
 ⊆/-⊆ : Γ ⊆ Δ w/t A
      → Γ ⊆ Δ
 ⊆/-⊆ (ext-int regΓ) = ⊆-refl (sreg-reg regΓ)
-⊆/-⊆ (ext-var x) = ⊆/x-⊆ x
+⊆/-⊆ (ext-var ext reg1 reg2) = ⊆/x-⊆ (sreg-reg reg1) (sreg-reg reg2) ext
 ⊆/-⊆ (ext-arr ext ext₁) = ⊆-trans (⊆/-⊆ ext) (⊆/-⊆ ext₁)
 ⊆/-⊆ (ext-∀ ext) with ⊆/-⊆ ext
 ... | uvar r = r
 
 
-
-
-⊆/x-refl : SRegular Γ
-       → Γ ⊢c ‶ X
+⊆/x-∋∙-refl : Γ ∋∙ X
        → Γ ⊆ Γ w/v X
-⊆/x-refl (reg-Z regΓ) (⊢c-var-= (S⋈ inΔ)) = ext-mark regΓ (⊢c-var-= inΔ)
-⊆/x-refl (reg-Z regΓ) (⊢c-var-∙ (S⋈ inΔ)) = ext-mark regΓ (⊢c-var-∙ inΔ)
-⊆/x-refl (reg-S∙ regΓ) (⊢c-var-∙ Z) = ext-Z∙ regΓ
-⊆/x-refl (reg-S∙ regΓ) (⊢c-var-∙ (S∙ inΔ)) = ext-S∙ (⊆/x-refl regΓ (⊢c-var-∙ inΔ))
-⊆/x-refl (reg-S^ regΓ) (⊢c-var-∙ (S^ inΔ)) = ext-S^ (⊆/x-refl regΓ (⊢c-var-∙ inΔ))
-⊆/x-refl (reg-S= regΓ regA) (⊢c-var-∙ (S= inΔ)) = ext-S= (⊆/x-refl regΓ (⊢c-var-∙ inΔ)) regA
-⊆/x-refl (reg-S∙ regΓ) (⊢c-var-= (S∙ inΔ)) = ext-S∙ (⊆/x-refl regΓ (⊢c-var-= inΔ))
-⊆/x-refl (reg-S^ regΓ) (⊢c-var-= (S^ inΔ)) = ext-S^ (⊆/x-refl regΓ (⊢c-var-= inΔ))
-⊆/x-refl (reg-S= regΓ regA) (⊢c-var-= Z) = ext-Z= regΓ regA
-⊆/x-refl (reg-S= regΓ regA) (⊢c-var-= (S= inΔ)) = ext-S= (⊆/x-refl regΓ (⊢c-var-= inΔ)) regA
+⊆/x-∋∙-refl Z = ext-Z∙
+⊆/x-∋∙-refl (S, in1) = ext-S, (⊆/x-∋∙-refl in1)
+⊆/x-∋∙-refl (S∙ in1) = ext-S∙ (⊆/x-∋∙-refl in1)
+⊆/x-∋∙-refl (S= in1) = ext-S= (⊆/x-∋∙-refl in1)
+⊆/x-∋∙-refl (S^ in1) = ext-S^ (⊆/x-∋∙-refl in1)
+⊆/x-∋∙-refl (S⋈ in1) = ext-S⋈ (⊆/x-∋∙-refl in1)
+
+
+⊆/x-∋=-refl : Γ ∋= X
+       → Γ ⊆ Γ w/v X
+⊆/x-∋=-refl Z = ext-Z=
+⊆/x-∋=-refl (S∙ in1) = ext-S∙ (⊆/x-∋=-refl in1)
+⊆/x-∋=-refl (S^ in1) = ext-S^ (⊆/x-∋=-refl in1)
+⊆/x-∋=-refl (S= in1) = ext-S= (⊆/x-∋=-refl in1)
+⊆/x-∋=-refl (S, in1) = ext-S, (⊆/x-∋=-refl in1)
+⊆/x-∋=-refl (S⋈ in1) = ext-S⋈ (⊆/x-∋=-refl in1)
+
 
 ⊆/-refl : SRegular Γ
        → Γ ⊢c A
        → Γ ⊆ Γ w/t A
 ⊆/-refl regΓ ⊢c-int = ext-int regΓ
-⊆/-refl regΓ (⊢c-var-∙ inΔ) = ext-var (⊆/x-refl regΓ (⊢c-var-∙ inΔ))
-⊆/-refl regΓ (⊢c-var-= inΔ) = ext-var (⊆/x-refl regΓ (⊢c-var-= inΔ))
--- ext-var (⊆/x-refl regΓ (⊢c-var-= inΔ))
+⊆/-refl regΓ (⊢c-var-∙ inΔ) = ext-var (⊆/x-∋∙-refl inΔ) regΓ regΓ
+⊆/-refl regΓ (⊢c-var-= inΔ) = ext-var (⊆/x-∋=-refl inΔ) regΓ regΓ
 ⊆/-refl regΓ (⊢c-arr cloA cloA₁) = ext-arr (⊆/-refl regΓ cloA) (⊆/-refl regΓ cloA₁)
 ⊆/-refl regΓ (⊢c-∀ cloA) = ext-∀ (⊆/-refl (reg-S∙ regΓ) cloA)
 
 ⊆/x-⊢c : Γ ⊆ Δ w/v X
        → Δ ⊢c ‶ X
-⊆/x-⊢c (ext-Z^ regΓ regA) = ⊢c-var-= Z
-⊆/x-⊢c (ext-Z∙ regΓ) = ⊢c-var-∙ Z
-⊆/x-⊢c (ext-Z= regΓ regA) = ⊢c-var-= Z
+⊆/x-⊢c ext-Z^ = ⊢c-var-= Z
+⊆/x-⊢c ext-Z∙ = ⊢c-var-∙ Z
+⊆/x-⊢c ext-Z= = ⊢c-var-= Z
 ⊆/x-⊢c (ext-S^ ext) with ⊆/x-⊢c ext
 ... | ⊢c-var-∙ inΔ = ⊢c-var-∙ (S^ inΔ)
 ... | ⊢c-var-= inΔ = ⊢c-var-= (S^ inΔ)
 ⊆/x-⊢c (ext-S∙ ext) with ⊆/x-⊢c ext
 ... | ⊢c-var-∙ inΔ = ⊢c-var-∙ (S∙ inΔ)
 ... | ⊢c-var-= inΔ = ⊢c-var-= (S∙ inΔ)
-⊆/x-⊢c (ext-S= ext regA) with ⊆/x-⊢c ext
+⊆/x-⊢c (ext-S= ext) with ⊆/x-⊢c ext
 ... | ⊢c-var-∙ inΔ = ⊢c-var-∙ (S= inΔ)
 ... | ⊢c-var-= inΔ = ⊢c-var-= (S= inΔ)
-⊆/x-⊢c (ext-mark x (⊢c-var-∙ inΔ)) = ⊢c-var-∙ (S⋈ inΔ)
-⊆/x-⊢c (ext-mark x (⊢c-var-= inΔ)) = ⊢c-var-= (S⋈ inΔ)
+⊆/x-⊢c (ext-S⋈ ext) with ⊆/x-⊢c ext
+... | ⊢c-var-∙ inΔ = ⊢c-var-∙ (S⋈ inΔ)
+... | ⊢c-var-= inΔ = ⊢c-var-= (S⋈ inΔ)
+⊆/x-⊢c (ext-S, ext) with ⊆/x-⊢c ext
+... | ⊢c-var-∙ inΔ = ⊢c-var-∙ (S, inΔ)
+... | ⊢c-var-= inΔ = ⊢c-var-= (S, inΔ)
 
 ⊆/-⊢c : Γ ⊆ Δ w/t A
       → Δ ⊢c A
 ⊆/-⊢c (ext-int x) = ⊢c-int
-⊆/-⊢c (ext-var x) = ⊆/x-⊢c x
+⊆/-⊢c (ext-var ext reg1 reg2) = ⊆/x-⊢c ext
 ⊆/-⊢c (ext-arr ext ext₁) = ⊢c-arr (⊆-⊢c (⊆/-⊢c ext) (⊆/-⊆ ext₁)) (⊆/-⊢c ext₁)
 ⊆/-⊢c (ext-∀ ext) = ⊢c-∀ (⊆/-⊢c ext)
 

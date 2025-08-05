@@ -27,7 +27,7 @@ data _¬εᵍ_ : Fin m → Env n m → Set where
   Z= : (upA : ↑ty0 A ⇘ A')
      → (¬inA : #0 ¬ε A')
      → #0 ¬εᵍ Γ ,= A
-  S, : (k ¬ε A)
+  S, : (¬inA : k ¬ε A)
        → k ¬εᵍ Γ
        → k ¬εᵍ Γ , A
   S∙ : k ¬εᵍ Γ

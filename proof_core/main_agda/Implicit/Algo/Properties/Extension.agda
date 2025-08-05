@@ -5,26 +5,26 @@ open import Implicit.Algo.Base
 
 inst-⊆ : [ A / X ] Γ ⟹ Δ
        → Γ ⊆ Δ
-inst-⊆ (⟹^0 up regA env) = evar-sol (⊆-refl env) regA
+inst-⊆ (⟹^0 up regA env) = evar-sol (⊆-refl (sreg-reg env)) regA
 inst-⊆ (⟹^S inst up1) = evar (inst-⊆ inst)
 inst-⊆ (⟹∙S inst up1) = uvar (inst-⊆ inst)
 inst-⊆ (⟹=S inst up1 regB) = svar (inst-⊆ inst) regB
 
 ss-⊆ : Γ ⊢ A ⌞ ≤ ⌝ B ⊣ Δ
      → Γ ⊆ Δ
-ss-⊆ (s-int regΓ) = ⊆-refl regΓ
-ss-⊆ (s-var-∙ regΓ x) = ⊆-refl regΓ
+ss-⊆ (s-int regΓ) = ⊆-refl (sreg-reg regΓ)
+ss-⊆ (s-var-∙ regΓ x) = ⊆-refl (sreg-reg regΓ)
 ss-⊆ (s-ex-l^ inst) = inst-⊆ inst
 ss-⊆ (s-ex-r^ inst) = inst-⊆ inst
-ss-⊆ (s-ex-l= regΓ x-in) = ⊆-refl regΓ
-ss-⊆ (s-ex-r= regΓ x-in) = ⊆-refl regΓ
+ss-⊆ (s-ex-l= regΓ x-in) = ⊆-refl (sreg-reg regΓ)
+ss-⊆ (s-ex-r= regΓ x-in) = ⊆-refl (sreg-reg regΓ)
 ss-⊆ (s-arr s s₁) = ⊆-trans (ss-⊆ s) (ss-⊆ s₁)
 ss-⊆ (s-∀ s) with ss-⊆ s
 ... | uvar r = r
 
 s-⊆ : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
     → Γ ⊆ Δ
-s-⊆ (s-empty regΓ cloA x) = ⊆-refl regΓ
+s-⊆ (s-empty regΓ cloA x) = ⊆-refl (sreg-reg regΓ)
 s-⊆ (s-type ss) = ss-⊆ ss
 s-⊆ (s-term-c cloA ap era ⊢e s) = s-⊆ s
 s-⊆ (s-term-o opnA era ⊢e x s) = ⊆-trans (ss-⊆ x) (s-⊆ s)

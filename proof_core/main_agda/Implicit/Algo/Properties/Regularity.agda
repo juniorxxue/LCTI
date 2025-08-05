@@ -49,7 +49,7 @@ ss-env-in (s-∀ s) with ss-env-in s
 
 ss-env-out : Γ ⊢ A ⌞ ≤ ⌝ B ⊣ Δ
            → SRegular Δ
-ss-env-out s = ⊆-regular (ss-env-in s) (ss-⊆ s)
+ss-env-out s = {!!}
 
 s-env-in : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
          → SRegular Γ
@@ -68,7 +68,7 @@ s-env-in (s-evar-infers era infs inst) = inst-env-in inst
 
 s-env-out : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
           → SRegular Δ
-s-env-out s = ⊆-regular (s-env-in s) (s-⊆ s)
+s-env-out s = {!!}
 
 inst-env-out : [ A / X ] Γ ⟹ Δ
              → SRegular Δ
@@ -101,22 +101,11 @@ data _⊢rᶜ_ : Env n m → Context n m → Set where
 ⊆-⊢rᶜ' (⊢rᶜ-term regΣ) ext = ⊢rᶜ-term (⊆-⊢rᶜ' regΣ ext)
 ⊆-⊢rᶜ' (⊢rᶜ-tapp regA regΓ) ext = ⊢rᶜ-tapp (⊆-⊢r' regA ext) (⊆-⊢rᶜ' regΓ ext)
 
-⊢rᶜ-strengthen^0 : Γ ,^ ⊢rᶜ Σ'
-                 → ↑tyᶜ0 Σ ⇘ Σ'
-                 → Γ ⊢rᶜ Σ
-⊢rᶜ-strengthen^0 ⊢rᶜ-empty ↑tyᶜ-□ = ⊢rᶜ-empty
-⊢rᶜ-strengthen^0 (⊢rᶜ-τ regA) (↑tyᶜ-τ up-t) = ⊢rᶜ-τ (⊢r-strengthen^0 regA up-t)
-⊢rᶜ-strengthen^0 (⊢rᶜ-term regΣ) (↑tyᶜ-e up-e upΣ) = ⊢rᶜ-term (⊢rᶜ-strengthen^0 regΣ upΣ)
-⊢rᶜ-strengthen^0 (⊢rᶜ-tapp regA regΣ) (↑tyᶜ-⓪ upA upΣ) = ⊢rᶜ-tapp (⊢r-strengthen^0 regA upA) (⊢rᶜ-strengthen^0 regΣ upΣ)
-
-
-⊢rᶜ-strengthen=0 : Γ ,= T ⊢rᶜ Σ'
-                 → ↑tyᶜ0 Σ ⇘ Σ'
-                 → Γ ⊢rᶜ Σ
-⊢rᶜ-strengthen=0 ⊢rᶜ-empty ↑tyᶜ-□ = ⊢rᶜ-empty
-⊢rᶜ-strengthen=0 (⊢rᶜ-τ regA) (↑tyᶜ-τ up-t) = ⊢rᶜ-τ (⊢r-strengthen=0 regA up-t)
-⊢rᶜ-strengthen=0 (⊢rᶜ-term regΣ) (↑tyᶜ-e up-e upΣ) = ⊢rᶜ-term (⊢rᶜ-strengthen=0 regΣ upΣ)
-⊢rᶜ-strengthen=0 (⊢rᶜ-tapp regA regΣ) (↑tyᶜ-⓪ upA upΣ) = ⊢rᶜ-tapp (⊢r-strengthen=0 regA upA) (⊢rᶜ-strengthen=0 regΣ upΣ)
+⊢rᶜ-strengthen : Γ ⊢rᶜ Σ'
+               → Γ ◀ k ⇘ Γ'
+               → Σ ↑tyᶜ k ⇘ Σ'
+               → Γ' ⊢rᶜ Σ
+⊢rᶜ-strengthen = {!!}
 
 ⊢rᶜ-strengthen,0 : Γ , A ⊢rᶜ Σ'
                  → ↑tmᶜ0 Σ ⇘ Σ'
@@ -145,11 +134,13 @@ s-⊢rᶜ (s-type ss) = ⊢rᶜ-τ (ss-polarity+ ss)
 s-⊢rᶜ (s-term-c cloA ap era ⊢e s) = ⊢rᶜ-term (s-⊢rᶜ s)
 s-⊢rᶜ (s-term-o opnA era ⊢e ss s) = ⊢rᶜ-term (⊆-⊢rᶜ' (s-⊢rᶜ s) (ss-⊆ ss))
 s-⊢rᶜ (s-∀l s upᶜ upᵉ upC upD) with s-⊢rᶜ s
-... | ⊢rᶜ-term r = ⊢rᶜ-term (⊢rᶜ-strengthen^0 r upᶜ)
+... | ⊢rᶜ-term r = ⊢rᶜ-term (⊢rᶜ-strengthen r ◀Z^ upᶜ)
 s-⊢rᶜ (s-∀l-no s upᶜ upᵉ upC upD) with s-⊢rᶜ s
-... | ⊢rᶜ-term r = ⊢rᶜ-term (⊢rᶜ-strengthen^0 r upᶜ)
+... | ⊢rᶜ-term r = ⊢rᶜ-term (⊢rᶜ-strengthen r ◀Z^ upᶜ)
+-- (⊢rᶜ-strengthen^0 r upᶜ)
 s-⊢rᶜ (s-tapp s upᶜ) with s-env-in s
-... | reg-S= r regA = ⊢rᶜ-tapp regA (⊢rᶜ-strengthen=0 (s-⊢rᶜ s) upᶜ)
+... | reg-S= r regA = ⊢rᶜ-tapp regA {!⊢rᶜ-strengthen!}
+-- (⊢rᶜ-strengthen=0 (s-⊢rᶜ s) upᶜ)
 s-⊢rᶜ (s-svar inΓ s) = s-⊢rᶜ s
 s-⊢rᶜ (s-evar-infers era tfs inst) with infs-⊢rᶜ tfs
 ... | ⊢rᶜ-term r = {!!}
@@ -180,18 +171,20 @@ t-⊢r : Γ ⊢ Σ ⇒ e ⇒ A
 infs-⊢r : Γ ⊨ Σ ⟹ A
         → Γ ⊢r A
 
-s-⊢r (s-empty regΓ cloA x) = ⊢c-≫-⊢r regΓ cloA x
+s-⊢r (s-empty regΓ cloA x) = ⊢c-≫-⊢r {!!} cloA x
 s-⊢r (s-type ss) = ss-polarity+ ss
-s-⊢r (s-term-c cloA ap era ⊢e s) = ⊢r-arr (⊢c-≫-⊢r (s-env-in s) cloA ap) (s-⊢r s)
+s-⊢r (s-term-c cloA ap era ⊢e s) = ⊢r-arr (⊢c-≫-⊢r {!!} cloA ap) (s-⊢r s)
 s-⊢r (s-term-o opnA era ⊢e ss s) = ⊢r-arr {!!} (⊆-⊢r' (s-⊢r s) (ss-⊆ ss))
-s-⊢r (s-∀l s upᶜ upᵉ upC upD) = ⊢r-strengthen^0 (s-⊢r s) (↑ty-arr upC upD)
-s-⊢r (s-∀l-no s upᶜ upᵉ upC upD) = ⊢r-strengthen^0 (s-⊢r s) (↑ty-arr upC upD)
+s-⊢r (s-∀l s upᶜ upᵉ upC upD) = {!!}
+-- ⊢r-strengthen^0 (s-⊢r s) (↑ty-arr upC upD)
+s-⊢r (s-∀l-no s upᶜ upᵉ upC upD) = {!!}
+-- ⊢r-strengthen^0 (s-⊢r s) (↑ty-arr upC upD)
 s-⊢r (s-tapp s upᶜ) = ⊢r-∀ (⊢r-◆0 (s-⊢r s))
 s-⊢r (s-svar inΓ s) = s-⊢r s
 s-⊢r (s-evar-infers era tfs inst) = {!!}
 
 t-⊢r (⊢lit regΓ) = ⊢r-int
-t-⊢r (⊢var regΓ x∈Γ) = ∋⦂-⊢r regΓ x∈Γ
+t-⊢r (⊢var regΓ x∈Γ) = ∋⦂-⊢r {!!} x∈Γ
 t-⊢r (⊢ann ⊢e) rewrite ⊢id0 ⊢e = t-⊢r ⊢e
 t-⊢r (⊢app ⊢e) with t-⊢r ⊢e
 ... | ⊢r-arr r r₁ = r₁
@@ -201,7 +194,8 @@ t-⊢r (⊢lam₂ ⊢e up-c ⊢e₁) = ⊢r-arr (t-⊢r ⊢e) (⊢r-strengthen,0
 t-⊢r (⊢sub ⊢e ne gc s) = {!!}
 t-⊢r (⊢tabs ⊢e) = ⊢r-∀ (t-⊢r ⊢e)
 t-⊢r (⊢tapp ⊢e st) with t-⊢rᶜ ⊢e
-... | ⊢rᶜ-tapp regA regΓ = st0-⊢r (t-⊢r ⊢e) regA st
+... | ⊢rᶜ-tapp regA regΓ = {!!}
+-- st0-⊢r (t-⊢r ⊢e) regA st
 t-⊢r (⊢tabs-τ ⊢e) = ⊢r-∀ (t-⊢r ⊢e)
 
 infs-⊢r (infs-z regΓ regA) = regA

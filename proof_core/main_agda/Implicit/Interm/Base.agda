@@ -6,6 +6,11 @@ open import Implicit.Language.All
 --+                           Subtyping                            +--
 ----------------------------------------------------------------------
 
+data Instantiable (A : Type m) (k : Fin m) (j : Counter m) : Set where
+  inst-find : find A k j → Instantiable A k j
+  inst-noappar : k ¬ε A → Instantiable A k j
+
+
 infix 3 _⊢_#_⌞_⌝_
 data _⊢_#_⌞_⌝_ : Env n m → Counter m → Type m → Polar → Type m → Set where
   s-refl :

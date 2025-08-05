@@ -16,12 +16,6 @@ open import Implicit.Language.EnvOps.Weaken.Misc
 
 abstract
 
-  ⊢r-weaken,0 : Γ ⊢r A
-               → Γ ⊢r T
-               → Γ , T ⊢r A
-  ⊢r-weaken,0 regA regT = ⊢r-weaken, regA (▶Z regT)
-
-
   ∋:=-⊢r : Regular Γ
           → Γ ∋ X := A
           → Γ ⊢r A

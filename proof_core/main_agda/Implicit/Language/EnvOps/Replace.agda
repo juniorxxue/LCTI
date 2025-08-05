@@ -21,6 +21,8 @@ data _◆_⇘_ : Env n m → Fin m → Env n m → Set where
       → Γ ,= A ◆ #S k ⇘ Γ' ,= A
   ◆S^ : Γ ◆ k ⇘ Γ'
       → Γ ,^ ◆ #S k ⇘ Γ' ,^
+  ◆S⋈ : Γ ◆ k ⇘ Γ'
+      → Γ ⋈ ◆ k ⇘ Γ' ⋈
 
 
 ◆-unique : Γ ◆ k ⇘ Γ₁
@@ -88,7 +90,6 @@ data _◆_⇘_ : Env n m → Fin m → Env n m → Set where
 ◇-=∈ (S^ inΓ) ◇Z = S∙ inΓ
 ◇-=∈ (S^ inΓ) (◇S^ newΓ) = S^ (◇-=∈ inΓ newΓ)
 
--- should this A exposed to the outside?
 ◆-=∈-≢ : Γ ∋= X
      → Γ ◆ k ⇘ Γ'
      → k ≢ X
