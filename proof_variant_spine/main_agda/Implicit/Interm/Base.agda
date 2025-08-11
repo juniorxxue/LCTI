@@ -44,6 +44,15 @@ data _⊢_#_⌞_⌝_ : Env n m → Counter m → Type m → Polar → Type m →
     → (upD : ↑ty0 D ⇘ D')
     → (upj : ↑tyʲ0 j ⇘ j')
     → Δ ⊢ j # `∀ A ⌞ ≤⁺ ⌝ C `→ D
+  s-∀l-new :
+      Δ ,= B ⊢ j' # A ⌞ ≤⁺ ⌝ C' `→ D'
+    → (ic : (𝕚𝕔 j))
+    → (¬pk : ¬peek A #0 j') -- prioritize peek over find
+    → (fd : find A #0 j')
+    → (upC : ↑ty0 C ⇘ C')
+    → (upD : ↑ty0 D ⇘ D')
+    → (upj : ↑tyʲ0 j ⇘ j')
+    → Δ ⊢ j # `∀ A ⌞ ≤⁺ ⌝ C `→ D
   s-∀l-peek :
       Δ ,= B ⊢ j' # A ⌞ ≤⁺ ⌝ C' `→ D'
     → (ic : (𝕚𝕔 j))

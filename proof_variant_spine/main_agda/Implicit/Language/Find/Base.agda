@@ -131,6 +131,23 @@ data peek : Type m → Fin m → Counter m → Set where
             → (upj : ↑tyʲ0 j ⇘ j')
             → peek (`∀ A) k (𝕥₍ B ₎ j)
 
+data ¬peek : Type m → Fin m → Counter m → Set where
+  ¬peek-base1 : ¬peek A k Z
+  ¬peek-base2 : (¬inA : k ¬ε A)
+             → ¬peek A k ∞
+  ¬peek-arr-i : ¬peek B k j
+              → ¬peek (A `→ B) k (𝕚 j)
+  ¬peek-arr-c : ¬peek B k j
+              → ¬peek (A `→ B) k (𝕔 j)
+  ¬peek-∀-i : ¬peek A (#S k) (𝕚 j')
+              → (upj : ↑tyʲ0 j ⇘ j')
+            → ¬peek (`∀ A) k (𝕚 j)
+  ¬peek-∀-c : ¬peek A (#S k) (𝕔 j')
+            → (upj : ↑tyʲ0 j ⇘ j')
+            → ¬peek (`∀ A) k (𝕔 j)
+  ¬peek-∀-t : ¬peek A (#S k) j'
+            → (upj : ↑tyʲ0 j ⇘ j')
+            → ¬peek (`∀ A) k (𝕥₍ B ₎ j)
 
 find-ε : find A k ∞
        → k ε A
