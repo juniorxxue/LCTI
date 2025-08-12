@@ -1,3 +1,5 @@
+{-# OPTIONS --allow-unsolved-metas #-}
+{-# OPTIONS --allow-incomplete-matches #-}
 module Implicit.Language.Ground.Properties where
 
 open import Implicit.Language.Base

@@ -49,6 +49,24 @@ data _⊢_⌞_⌝_⊣_ : Env n m → Type m → Polar → Type m → Env n m →
       Δ ,∙ ⊢ A ⌞ ≤ ⌝ B ⊣ Ψ ,∙
     → Δ ⊢ `∀ A ⌞ ≤ ⌝ (`∀ B) ⊣ Ψ
 
+
+infix 3 _⊢_↷_⊣_
+data _⊢_↷_⊣_ : Env n m → Type m → Context n m → Env n m → Set where
+  jump-base1 : Δ ⊢ A ⌞ ≤⁺ ⌝ B ⊣ Ψ
+             → Δ ⊢ A ↷ (τ B) ⊣ Ψ
+  jump-base2 : Δ ⊢ A ↷ □ ⊣ Δ
+  jump-arr : Δ ⊢ B ↷ Σ ⊣ Ψ
+           → Δ ⊢ A `→ B ↷ ([ e ]↝ Σ) ⊣ Ψ
+  jump-∀ : Δ ,∙ ⊢ A ↷ ([ e' ]↝ Σ') ⊣ Ψ ,∙
+         → (upΣ : ↑tyᶜ0 Σ ⇘ Σ')
+         → (upe : ↑tyᵉ0 e ⇘ e')
+         → Δ ⊢ `∀ A ↷ ([ e ]↝ Σ) ⊣ Ψ
+  jump-∀-𝕥 : Δ ,∙ ⊢ A ↷ Σ' ⊣ Ψ ,∙
+         → (upΣ : ↑tyᶜ0 Σ ⇘ Σ')
+         → (upe : ↑tyᵉ0 e ⇘ e')
+         → Δ ⊢ `∀ A ↷ (B ⓪↝ Σ) ⊣ Ψ
+
+
 infix 3 _⊢_⇒_⇒_
 infix 3 _⊢_≤⁺_⊣_↪_
 infix 3 _⊨_⟹_

@@ -89,6 +89,24 @@ data IsoInf : Counter m → Set where
   i∞-i : IsoInf j
        → IsoInf (𝕚 j)
 
+
+data peek : Type m → Fin m → Counter m → Set where
+  peek-base : (inA : k ε A)
+            → peek A k ∞
+  peek-arr-i : peek B k j
+             → peek (A `→ B) k (𝕚 j)
+  peek-arr-c : peek B k j
+             → peek (A `→ B) k (𝕔 j)
+  peek-∀-i : peek A (#S k) (𝕚 j')
+             → (upj : ↑tyʲ0 j ⇘ j')
+             → peek (`∀ A) k (𝕚 j)
+  peek-∀-c : peek A (#S k) (𝕔 j')
+             → (upj : ↑tyʲ0 j ⇘ j')
+             → peek (`∀ A) k (𝕔 j)
+  peek-∀-t : peek A (#S k) j'
+            → (upj : ↑tyʲ0 j ⇘ j')
+            → peek (`∀ A) k (𝕥₍ B ₎ j)
+
 -- find A k j
 -- at j-th position of A type, should have a bound variable, example: |-1 forall a. a -> a <: Int
 data find : Type m → Fin m → Counter m → Set where
@@ -102,6 +120,9 @@ data find : Type m → Fin m → Counter m → Set where
             → find B k j
             → find (A `→ B) k (𝕚 j)
   f-arr-𝕔   : (¬inA : k ¬ε A)
+            → find B k j
+            → find (A `→ B) k (𝕔 j)
+  f-arr-pk   : (peek : peek B k j)
             → find B k j
             → find (A `→ B) k (𝕔 j)
   f-∀-𝕚     : find A (#S k) (𝕚 j')
