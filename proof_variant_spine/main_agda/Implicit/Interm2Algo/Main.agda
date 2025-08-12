@@ -70,6 +70,41 @@ inst-∃-A {A = T} regA (wf1-ex wfΓ) (reg-S^ regΓ) (S^ inΓ)
   with ⟨ Δ' , inst' ⟩ ← inst-∃-A (⊢r-strengthen^0 regA pupA) wfΓ regΓ inΓ
   = ⟨ Δ' ,^ , ⟹^S inst' pupA ⟩
 
+complete-¬peek : ¬peek A k j
+              → Γ ∋^ k
+              → Γ ⊢ ⟨ j , B ⟩ ~s Σ
+              → Γ ⊢ A ↷ Σ ⊣ Γ
+complete-¬peek ¬peek-base1 ninΓ ~Z = jump-base2
+complete-¬peek (¬peek-base2 ¬inA) ninΓ ~∞ = jump-base1 {!!}
+complete-¬peek (¬peek-arr-i npk) ninΓ ~j = {!!}
+complete-¬peek (¬peek-arr-c npk) ninΓ ~j = {!!}
+complete-¬peek (¬peek-∀-i npk upj) ninΓ ~j = {!!}
+complete-¬peek (¬peek-∀-c npk upj) ninΓ ~j = {!!}
+complete-¬peek (¬peek-∀-t npk upj) ninΓ ~j = {!!}
+
+complete-¬pk-v2 : Δ ⊢ j # A ⌞ ≤⁺ ⌝ B
+                → Γ ⊢ ⟨ j , B ⟩ ~s Σ
+                → ¬peek A k j
+                → Δ ⊢ A ↷ Σ ⊣ Δ
+complete-¬pk-v2 (s-refl regΔ cloA grd) ~Z npk = jump-base2
+complete-¬pk-v2 (s-int regΔ) ~∞ (¬peek-base2 ¬inA) = jump-base1 (s-int regΔ)
+complete-¬pk-v2 (s-var-∙ regΔ inΔ) ~j npk = {!!}
+complete-¬pk-v2 (s-arr₁ s s₁) ~j npk = {!!}
+complete-¬pk-v2 (s-arr₂ s s₁) ~j npk = {!!}
+complete-¬pk-v2 (s-arr₃ cloA grd s) ~j npk = {!!}
+complete-¬pk-v2 (s-∀ s) ~j npk = {!!}
+complete-¬pk-v2 (s-∀l s ic fd upC upD upj) ~j npk = {!!}
+complete-¬pk-v2 (s-∀l-new s ic ¬pk fd upC upD upj) ~j npk = {!!}
+complete-¬pk-v2 (s-∀l-peek s ic pk upC upD upj) ~j npk = {!!}
+complete-¬pk-v2 (s-∀l-no-appear s ic fd upC upD upj) ~j npk = {!!}
+complete-¬pk-v2 (s-tapp s upj) ~j npk = {!!}
+complete-¬pk-v2 (s-svar-l x inΔ) ~∞ (¬peek-base2 (¬ε-var x₁)) = jump-base1 (s-ex-l= x inΔ)
+
+complete-¬pk-v3 : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
+                → Γ ⊢ ⟨ j , B ⟩ ~s Σ
+                → ¬peek A k j
+                → Γ ⊢ A ↷ Σ ⊣ Δ
+
 
 complete-s :  Δ ⊢ j # A ⌞ ≤⁺ ⌝ B
             → WFC Δ j

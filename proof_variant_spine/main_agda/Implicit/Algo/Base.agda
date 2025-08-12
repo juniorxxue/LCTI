@@ -52,8 +52,9 @@ data _⊢_⌞_⌝_⊣_ : Env n m → Type m → Polar → Type m → Env n m →
 
 infix 3 _⊢_↷_⊣_
 data _⊢_↷_⊣_ : Env n m → Type m → Context n m → Env n m → Set where
-  jump-base : Δ ⊢ A ⌞ ≤⁺ ⌝ B ⊣ Ψ
-            → Δ ⊢ A ↷ (τ B) ⊣ Ψ
+  jump-base1 : Δ ⊢ A ⌞ ≤⁺ ⌝ B ⊣ Ψ
+             → Δ ⊢ A ↷ (τ B) ⊣ Ψ
+  jump-base2 : Δ ⊢ A ↷ □ ⊣ Δ
   jump-arr : Δ ⊢ B ↷ Σ ⊣ Ψ
            → Δ ⊢ A `→ B ↷ ([ e ]↝ Σ) ⊣ Ψ
   jump-∀ : Δ ,∙ ⊢ A ↷ ([ e' ]↝ Σ') ⊣ Ψ ,∙
@@ -149,8 +150,8 @@ data _⊢_≤⁺_⊣_↪_ where
     → Δ ⊢ A `→ B ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ C `→ D
 
   s-∀l-y :
-      (jump : Δ ,^ ⊢ A ↷ ([ e' ]↝ Σ') ⊣ Δ ,= B)
-    → Δ ,= B ⊢ A ≤⁺ ([ e' ]↝ Σ') ⊣ Ψ ,= B ↪ C' `→ D'
+      (jump : Δ ,^ ⊢ A ↷ ([ e' ]↝ Σ') ⊣ Δ₁ ,= B)
+    → Δ₁ ,= B ⊢ A ≤⁺ ([ e' ]↝ Σ') ⊣ Ψ ,= B ↪ C' `→ D'
     → (upᶜ : ↑tyᶜ0 Σ ⇘ Σ')
     → (upᵉ : ↑tyᵉ0 e ⇘ e')
     → (upC : ↑ty0 C ⇘ C')
@@ -158,8 +159,8 @@ data _⊢_≤⁺_⊣_↪_ where
     → Δ ⊢ `∀ A ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ C `→ D
 
   s-∀l-n-y :
-      (jump : Δ ,^ ⊢ A ↷ ([ e' ]↝ Σ') ⊣ Δ ,^)
-    → Δ ,^ ⊢ A ≤⁺ ([ e' ]↝ Σ') ⊣ Ψ ,= B ↪ C' `→ D'
+      (jump : Δ ,^ ⊢ A ↷ ([ e' ]↝ Σ') ⊣ Δ₁ ,^)
+    → Δ₁ ,^ ⊢ A ≤⁺ ([ e' ]↝ Σ') ⊣ Ψ ,= B ↪ C' `→ D'
     → (upᶜ : ↑tyᶜ0 Σ ⇘ Σ')
     → (upᵉ : ↑tyᵉ0 e ⇘ e')
     → (upC : ↑ty0 C ⇘ C')
@@ -167,8 +168,8 @@ data _⊢_≤⁺_⊣_↪_ where
     → Δ ⊢ `∀ A ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ C `→ D
 
   s-∀l-n-n :
-      (jump : Δ ,^ ⊢ A ↷ ([ e' ]↝ Σ') ⊣ Δ ,^)
-    → Δ ,^ ⊢ A ≤⁺ ([ e' ]↝ Σ') ⊣ Ψ ,^ ↪ C' `→ D'
+      (jump : Δ ,^ ⊢ A ↷ ([ e' ]↝ Σ') ⊣ Δ₁ ,^)
+    → Δ₁ ,^ ⊢ A ≤⁺ ([ e' ]↝ Σ') ⊣ Ψ ,^ ↪ C' `→ D'
     → (upᶜ : ↑tyᶜ0 Σ ⇘ Σ')
     → (upᵉ : ↑tyᵉ0 e ⇘ e')
     → (upC : ↑ty0 C ⇘ C')
