@@ -55,6 +55,7 @@ data _⊢_↷_⊣_ : Env n m → Type m → Context n m → Env n m → Set wher
   jump-base1 : Δ ⊢ A ⌞ ≤⁺ ⌝ B ⊣ Ψ
              → Δ ⊢ A ↷ (τ B) ⊣ Ψ
   jump-base2 : Δ ⊢ A ↷ □ ⊣ Δ
+  jump-base3 : Δ ⊢ ‶ X ↷ [ e ]↝ Σ ⊣ Δ
   jump-arr : Δ ⊢ B ↷ Σ ⊣ Ψ
            → Δ ⊢ A `→ B ↷ ([ e ]↝ Σ) ⊣ Ψ
   jump-∀ : Δ ,∙ ⊢ A ↷ ([ e' ]↝ Σ') ⊣ Ψ ,∙
