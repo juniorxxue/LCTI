@@ -103,6 +103,7 @@ s-refl-∞ regΓ (⊢r-var-∙ inΓ) = s-var-∙ regΓ inΓ
 s-refl-∞ regΓ (⊢r-arr regA regA₁) = s-arr₁ (s-refl-∞ regΓ regA) (s-refl-∞ regΓ regA₁)
 s-refl-∞ regΓ (⊢r-∀ regA) = s-∀ (s-refl-∞ (reg-S∙ regΓ) regA)
 
+{-
 
 infix 3 _⊢_#_↷_
 data _⊢_#_↷_ : Env n m → Counter m → Type m → Type m → Set where
@@ -181,6 +182,7 @@ data _⊢_#_↷_ : Env n m → Counter m → Type m → Type m → Set where
       Δ ∋ X := B
     → Δ ⊢ (𝕥₍ A ₎ j) # B  ↷  `∀ C
     → Δ ⊢ (𝕥₍ A ₎ j) # ‶ X  ↷  `∀ C
+-}
 
 ----------------------------------------------------------------------
 --+                             Typing                             +--

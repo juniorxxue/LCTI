@@ -29,7 +29,7 @@ s-find : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B ↡ j
        → Δ ∋= k
        → find A k j
 s-find (s-empty regΓ cloA x) inΓ inΔ = ⊥-elim (∋^-∋=-false inΓ inΔ)
-s-find (s-type ss) inΓ inΔ = f-∞ (ss-find-l ss inΓ inΔ)
+s-find (s-type ss) inΓ inΔ = {!!}
 s-find (s-term-c cloA ap ⊢e s) inΓ inΔ = f-arr-𝕔 (⊢c-^∈-¬ε cloA inΓ) (s-find s inΓ inΔ)
 s-find {k = k} (s-term-o {A = A} opnA ⊢e ss s) inΓ inΔ with ε-dec {k = k} {A = A}
 ... | inj₁ inA  = f-arr-𝕚-l inA
@@ -43,31 +43,16 @@ s-find (s-svar-tapp in' s) inΓ inΔ = ⊥-elim (∋^-∋=-false inΓ inΔ)
 -- s-find (s-∀l-no-𝕔 s upᶜ upj upᵉ upC upD) inΓ inΔ = f-∀-𝕔 (s-find s (S^ inΓ) (S^ inΔ)) upj
 s-find (s-evar-infers infs inst) inΓ inΔ
   with ε-var ← ^in-=out-ε (ext-var (inst-⊆/x inst)) inΓ inΔ = f-iso (infs-isoinf infs)
-s-find (s-∀l-y-𝕚 jump x₂ upᶜ upᵉ upC upD upj) inΓ x₁ = f-∀-𝕚 (s-find x₂ (S= inΓ) (S= x₁)) upj
-s-find (s-∀l-y-𝕔 jump x₂ upᶜ upᵉ upC upD upj) inΓ x₁ = f-∀-𝕔 (s-find x₂ (S= inΓ) (S= x₁)) upj
-s-find (s-∀l-n-y-𝕚 jump x₂ upᶜ upᵉ upC upD upj) inΓ x₁ = f-∀-𝕚 (s-find x₂ (S^ inΓ) (S= x₁)) upj
-s-find (s-∀l-n-y-𝕔 jump x₂ upᶜ upᵉ upC upD upj) inΓ x₁ = f-∀-𝕔 (s-find x₂ (S^ inΓ) (S= x₁)) upj
-s-find (s-∀l-n-n-𝕚 jump x₂ upᶜ upᵉ upC upD upj) inΓ x₁ = f-∀-𝕚 (s-find x₂ (S^ inΓ) (S^ x₁)) upj
-s-find (s-∀l-n-n-𝕔 jump x₂ upᶜ upᵉ upC upD upj) inΓ x₁ = f-∀-𝕔 (s-find x₂ (S^ inΓ) (S^ x₁)) upj
+s-find (s-∀l-y-𝕚 pk s upᶜ upj upᵉ upC upD) inΓ inΔ = f-∀-𝕚 (s-find s (S= inΓ) (S= inΔ)) upj
+s-find (s-∀l-n-y-𝕚 ¬pk s upᶜ upj upᵉ upC upD) inΓ inΔ = f-∀-𝕚 (s-find s (S^ inΓ) (S= inΔ)) upj
+s-find (s-∀l-n-n-𝕚 ¬pk s upᶜ upj upᵉ upC upD) inΓ inΔ = f-∀-𝕚 (s-find s (S^ inΓ) (S^ inΔ)) upj
+s-find (s-∀l-y-𝕔 pk s upᶜ upj upᵉ upC upD) inΓ inΔ = f-∀-𝕔 (s-find s (S= inΓ) (S= inΔ)) upj
+s-find (s-∀l-n-y-𝕔 ¬pk s upᶜ upj upᵉ upC upD) inΓ inΔ = f-∀-𝕔 (s-find s (S^ inΓ) (S= inΔ)) upj
+s-find (s-∀l-n-n-𝕔 ¬pk s upᶜ upj upᵉ upC upD) inΓ inΔ = f-∀-𝕔 (s-find s (S^ inΓ) (S^ inΔ)) upj
 
 s-find0 : Γ ,^ ⊢ A ≤⁺ [ e' ]↝ Σ' ⊣ Δ ,= B ↪ C `→ D ↡ j
               → find A #0 j
 s-find0 s = s-find s Z Z
-
-s-peek : Γ ⊢ A ↷ Σ ⊣ Δ ↡ j
-       → Γ ∋^ k
-       → Δ ∋= k
-       → peek A k j
-s-peek (jump-base x) in1 in2 = peek-base (ss-find-l x in1 in2)
-s-peek (jump-arr-i jp) in1 in2 = peek-arr-i (s-peek jp in1 in2)
-s-peek (jump-arr-c jp) in1 in2 = peek-arr-c (s-peek jp in1 in2)
-s-peek (jump-∀-𝕚 jp upΣ upe upj) in1 in2 = peek-∀-i (s-peek jp (S∙ in1) (S∙ in2)) upj
-s-peek (jump-∀-𝕔 jp upΣ upe upj) in1 in2 = peek-∀-c (s-peek jp (S∙ in1) (S∙ in2)) upj
-s-peek (jump-∀-𝕥 jp upΣ upe upj) in1 in2 = peek-∀-t (s-peek jp (S∙ in1) (S∙ in2)) upj
-
-s-peek0 : Γ ,^ ⊢ A ↷ [ e ]↝ Σ ⊣ Γ ,= B ↡ j
-          → peek A #0 j
-s-peek0 s = s-peek s Z Z
 
 
 ss-¬ε+ : Γ ⊢ A ⌞ ≤⁺ ⌝ B ⊣ Δ

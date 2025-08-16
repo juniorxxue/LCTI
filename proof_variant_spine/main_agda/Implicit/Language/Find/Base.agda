@@ -92,8 +92,10 @@ data IsoInf : Counter m → Set where
 -- find A k j
 -- at j-th position of A type, should have a bound variable, example: |-1 forall a. a -> a <: Int
 data find : Type m → Fin m → Counter m → Set where
+{-
   f-∞       : (inA : k ε A)
             → find A k ∞
+-}
   f-iso     : (iso : IsoInf j)
             → find (‶ k) k j
   f-arr-𝕚-l : (inA : k ε A)
@@ -148,14 +150,6 @@ data ¬peek : Type m → Fin m → Counter m → Set where
   ¬peek-∀-t : ¬peek A (#S k) j'
             → (upj : ↑tyʲ0 j ⇘ j')
             → ¬peek (`∀ A) k (𝕥₍ B ₎ j)
-
-find-ε : find A k ∞
-       → k ε A
-find-ε (f-∞ inA) = inA
-
-find-arr-l : find A k ∞
-           → find (A `→ B) k ∞
-find-arr-l (f-∞ inA) = f-∞ (ε-arr-l inA)
 
 find-Z-false : find A k Z
              → ⊥

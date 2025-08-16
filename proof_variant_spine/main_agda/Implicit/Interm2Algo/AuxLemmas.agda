@@ -1,5 +1,3 @@
-{-# OPTIONS --allow-unsolved-metas #-}
-{-# OPTIONS --allow-incomplete-matches #-}
 module Implicit.Interm2Algo.AuxLemmas where
 
 open import Implicit.Language.All
@@ -12,41 +10,41 @@ open import Implicit.Interm2Algo.EnvDiff
 open import Implicit.Interm2Algo.OpenClose
 open import Implicit.Interm2Algo.Find
 
-s+-⊆/ : Δ ⊢ j # A ⌞ ≤⁺ ⌝ B
-      → Δ ⊆ Δ w/t A w/c j
 
 s--⊆/ : Δ ⊢ ∞ # A ⌞ ≤⁻ ⌝ B
       → Δ ⊆ Δ w/t B
-s--⊆/ (s-int regΔ) = ext-int regΔ
-s--⊆/ (s-var-∙ regΔ inΔ) = ext-var (reg-⊆/x∙ regΔ inΔ)
-s--⊆/ (s-arr₁ s s₁) with s+-⊆/ s
-... | ⊆∞ ext = ext-arr ext (s--⊆/ s₁)
-s--⊆/ (s-∀ s) = ext-∀ (s--⊆/ s)
-s--⊆/ (s-svar-r x inΔ) = ext-var (⊆/x-refl x (⊢c-var-= (∋:=to∋= inΔ)))
+s--⊆/ s = ⊆/-refl (s-sregular s) (s-⊢c-r s)
+
+s+-⊆/ : Δ ⊢ j # A ⌞ ≤⁺ ⌝ B
+      → Δ ⊆ Δ w/t A w/c j
 
 s+-⊆/ (s-refl regΔ cloA grd) = (⊆Z regΔ)
-s+-⊆/ (s-int regΔ) = ⊆∞ (ext-int regΔ)
-s+-⊆/ (s-var-∙ regΔ inΔ) = ⊆∞ (ext-var (reg-⊆/x∙ regΔ inΔ))
+s+-⊆/ (s-int regΔ) = ⊆∞ regΔ
+s+-⊆/ (s-var-∙ regΔ inΔ) = ⊆∞ regΔ
 s+-⊆/ (s-arr₁ s s₁) with s+-⊆/ s₁
-... | ⊆∞ x = ⊆∞ (ext-arr (s--⊆/ s) x)
+... | ⊆∞ regΓ = ⊆∞ regΓ
 s+-⊆/ (s-arr₂ s s₁) = ⊆I (s--⊆/ s) (s+-⊆/ s₁)
 s+-⊆/ (s-arr₃ cloA grd s) = ⊆C cloA (s+-⊆/ s)
 s+-⊆/ (s-∀ s) with s+-⊆/ s
-... | ⊆∞ x = ⊆∞ (ext-∀ x)
+... | ⊆∞ (reg-S∙ regΓ) = ⊆∞ regΓ
 s+-⊆/ (s-∀l s ic fd upC upD upj) with s+-⊆/ s
 s+-⊆/ (s-∀l s case-𝕚 fd upC upD (↑tyʲ-𝕚 upj)) | r = ⊆∀-I (⊆/c-irrev-^0 r fd) upj
 s+-⊆/ (s-∀l s case-𝕔 fd upC upD (↑tyʲ-𝕔 upj)) | r = ⊆∀-C (⊆/c-irrev-^0 r fd) upj
 s+-⊆/ (s-∀l-no-appear s ic fd upC upD upj) with s+-⊆/ s
 s+-⊆/ (s-∀l-no-appear s case-𝕚 fd upC upD (↑tyʲ-𝕚 upj)) | r = ⊆∀-I-no r upj
 s+-⊆/ (s-∀l-no-appear s case-𝕔 fd upC upD (↑tyʲ-𝕔 upj)) | r = ⊆∀-C-no r upj
-s+-⊆/ (s-svar-l x inΔ) = ⊆∞ (ext-var (⊆/x-refl x (⊢c-var-= (∋:=to∋= inΔ))))
+s+-⊆/ (s-svar-l x inΔ) = ⊆∞ x
 s+-⊆/ (s-tapp s upj) = ⊆∀-T (s+-⊆/ s) upj
 s+-⊆/ (s-svar-𝕚 inΓ s) = ⊆I-X (s-sregular s) (⊢c-var-= (∋:=to∋= inΓ))
 s+-⊆/ (s-svar-𝕔 inΓ s) = ⊆C-X (s-sregular s) (⊢c-var-= (∋:=to∋= inΓ))
 s+-⊆/ (s-svar-𝕥 inΓ s) = ⊆T-X (s-sregular s) (⊢c-var-= (∋:=to∋= inΓ))
 s+-⊆/ (s-∀l-peek x ic pk upC upD upj) with s+-⊆/ x
 s+-⊆/ (s-∀l-peek x case-𝕚 pk upC upD (↑tyʲ-𝕚 upj)) | r = ⊆∀-I-new r upj
-s+-⊆/ (s-∀l-peek x case-𝕔 pk upC upD (↑tyʲ-𝕔 upj)) | r = {!!}
+s+-⊆/ (s-∀l-peek x case-𝕔 pk upC upD (↑tyʲ-𝕔 upj)) | r = ⊆∀-C-new r upj
+s+-⊆/ (s-∀l-new x case-𝕚 ¬pk fd upC upD (↑tyʲ-𝕚 upj)) with s+-⊆/ x
+... | r = ⊆∀-I-new r upj
+s+-⊆/ (s-∀l-new x case-𝕔 ¬pk fd upC upD (↑tyʲ-𝕔 upj)) with s+-⊆/ x
+... | r = ⊆∀-C-new r upj
 
 
 infix 3 _≤_⟹_

@@ -170,7 +170,6 @@ find-≫-∙ : find A% k j
          → Γ ∋∙ k
          → Γ ≫ A ⇘ A%
          → find A k j
-find-≫-∙ (f-∞ x) ninΓ inΓ grd = f-∞ (ε-≫-∙ x inΓ ninΓ grd)
 find-≫-∙ (f-arr-𝕚-l x) ninΓ inΓ (grd-var= x₁) = ⊥-elim (εᵍ-:=-false x₁ (ε-arr-l x) ninΓ)
 find-≫-∙ (f-arr-𝕚-l x) ninΓ inΓ (grd-arr grd grd₁) = f-arr-𝕚-l (ε-≫-∙ x inΓ ninΓ grd)
 find-≫-∙ (f-arr-𝕚-r ¬inA fd) ninΓ inΓ (grd-var= x) = ⊥-elim (εᵍ-:=-false x (ε-arr-r ¬inA (find-ε-gen fd)) ninΓ)
@@ -277,7 +276,6 @@ find-≫-∙' : find A k j
          → Γ ∋∙ k
          → Γ ≫ A ⇘ A%
          → find A% k j
-find-≫-∙' (f-∞ x) ninΓ inΓ grd = f-∞ (ε-≫-∙' x inΓ ninΓ grd)
 find-≫-∙' (f-arr-𝕚-l x) ninΓ inΓ (grd-arr grd grd₁) = f-arr-𝕚-l (ε-≫-∙' x inΓ ninΓ grd)
 find-≫-∙' (f-arr-𝕚-r ¬inA fd) ninΓ inΓ (grd-arr grd grd₁) = f-arr-𝕚-r (¬ε-≫-∙' ¬inA inΓ ninΓ grd) (find-≫-∙' fd ninΓ inΓ grd₁)
 find-≫-∙' (f-arr-𝕔 ¬inA fd) ninΓ inΓ (grd-arr grd grd₁) = f-arr-𝕔 (¬ε-≫-∙' ¬inA inΓ ninΓ grd) (find-≫-∙' fd ninΓ inΓ grd₁)

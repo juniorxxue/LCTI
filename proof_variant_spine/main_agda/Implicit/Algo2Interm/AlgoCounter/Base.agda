@@ -10,29 +10,62 @@ open import Implicit.Algo.Base
 ✫ (𝕔 j) = j
 ✫ (𝕥₍ A ₎ j) = j
 
-infix 3 _⊢_↷_⊣_↡_
-data _⊢_↷_⊣_↡_ : Env n m → Type m → Context n m → Env n m → Counter m → Set where
-  jump-base : Δ ⊢ A ⌞ ≤⁺ ⌝ B ⊣ Ψ
-            → Δ ⊢ A ↷ (τ B) ⊣ Ψ ↡ ∞
-  jump-arr-i : Δ ⊢ B ↷ Σ ⊣ Ψ ↡ j
-           → Δ ⊢ A `→ B ↷ ([ e ]↝ Σ) ⊣ Ψ ↡ 𝕚 j
-  jump-arr-c : Δ ⊢ B ↷ Σ ⊣ Ψ ↡ j
-           → Δ ⊢ A `→ B ↷ ([ e ]↝ Σ) ⊣ Ψ ↡ 𝕔 j
-  jump-∀-𝕚 : Δ ,∙ ⊢ A ↷ ([ e' ]↝ Σ') ⊣ Ψ ,∙ ↡ 𝕚 j'
-         → (upΣ : ↑tyᶜ0 Σ ⇘ Σ')
-         → (upe : ↑tyᵉ0 e ⇘ e')
-         → (upj : ↑tyʲ0 j ⇘ j')
-         → Δ ⊢ `∀ A ↷ ([ e ]↝ Σ) ⊣ Ψ  ↡ 𝕚 j
-  jump-∀-𝕔 : Δ ,∙ ⊢ A ↷ ([ e' ]↝ Σ') ⊣ Ψ ,∙ ↡ 𝕔 j'
-         → (upΣ : ↑tyᶜ0 Σ ⇘ Σ')
-         → (upe : ↑tyᵉ0 e ⇘ e')
-         → (upj : ↑tyʲ0 j ⇘ j')
-         → Δ ⊢ `∀ A ↷ ([ e ]↝ Σ) ⊣ Ψ  ↡ 𝕔 j
-  jump-∀-𝕥 : Δ ,∙ ⊢ A ↷ Σ' ⊣ Ψ ,∙ ↡ j'
-         → (upΣ : ↑tyᶜ0 Σ ⇘ Σ')
-         → (upe : ↑tyᵉ0 e ⇘ e')
-         → (upj : ↑tyʲ0 j ⇘ j')
-         → Δ ⊢ `∀ A ↷ (B ⓪↝ Σ) ⊣ Ψ  ↡  (𝕥₍ B ₎ j)
+
+infix 3 _~pk'~_w/_↬_↡_
+
+data _~pk'~_w/_↬_↡_ : Type (1 + m) → Context n (1 + m) → Fin (1 + m) → Type m → Counter (1 + m) → Set where
+  pk-type : A ~~pk~~ B w/ k ↪ C
+          → A ~pk'~ (Context n (1 + m) ∋⦂ τ B) w/ k ↬ C ↡ ∞
+  pk-term-𝕚 : B ~pk'~ Σ w/ k ↬ C ↡ j
+          → A `→ B ~pk'~ [ e ]↝ Σ w/ k ↬ C ↡ 𝕚 j
+  pk-term-𝕔 : B ~pk'~ Σ w/ k ↬ C ↡ j
+          → A `→ B ~pk'~ [ e ]↝ Σ w/ k ↬ C ↡ 𝕔 j
+  pk-∀l-𝕚   : A ~pk'~ [ e' ]↝ Σ' w/ (#S k) ↬ C' ↡ 𝕚 j'
+          → (upΣ : ↑tyᶜ0 Σ ⇘ Σ')
+          → (upj : ↑tyʲ0 j ⇘ j')
+          → (upe : ↑tyᵉ0 e ⇘ e')
+          → (upC : ↑ty0 C ⇘ C')
+          → `∀ A ~pk'~ [ e ]↝ Σ w/ k ↬ C ↡ 𝕚 j
+  pk-∀l-𝕔   : A ~pk'~ [ e' ]↝ Σ' w/ (#S k) ↬ C' ↡ 𝕔 j'
+          → (upΣ : ↑tyᶜ0 Σ ⇘ Σ')
+          → (upj : ↑tyʲ0 j ⇘ j')
+          → (upe : ↑tyᵉ0 e ⇘ e')
+          → (upC : ↑ty0 C ⇘ C')
+          → `∀ A ~pk'~ [ e ]↝ Σ w/ k ↬ C ↡ 𝕔 j
+  pk-tapp : A ~pk'~ Σ' w/ (#S k) ↬ C' ↡ j'
+          → (upC : ↑ty0 C ⇘ C')
+          → (upΣ : ↑tyᶜ0 Σ ⇘ Σ')
+          → (upj : ↑tyʲ0 j ⇘ j')
+          → `∀ A ~pk'~ (B ⓪↝ Σ) w/ k ↬ C ↡ (𝕥₍ B ₎ j)
+
+
+-- degenerate version for negation
+{-
+infix 3 _~pk'~_w/_↡_
+
+data _~pk'~_w/_↡_ : Type m → Context n m → Fin m → Counter m → Set where
+  pk-type : (inA : k ε A)
+          → A ~pk'~ (Context n m ∋⦂ τ B) w/ k ↡ ∞
+  pk-term-𝕚 : B ~pk'~ Σ w/ k  ↡  j
+          → A `→ B ~pk'~ [ e ]↝ Σ w/ k  ↡ 𝕚 j
+  pk-term-𝕔 : B ~pk'~ Σ w/ k  ↡  j
+          → A `→ B ~pk'~ [ e ]↝ Σ w/ k  ↡ 𝕔 j
+  pk-∀l-𝕚   : A ~pk'~ [ e' ]↝ Σ' w/ (#S k) ↡ 𝕚 j'
+          → (upΣ : ↑tyᶜ0 Σ ⇘ Σ')
+          → (upj : ↑tyʲ0 j ⇘ j')
+          → (upe : ↑tyᵉ0 e ⇘ e')
+          → `∀ A ~pk'~ [ e ]↝ Σ w/ k ↡ 𝕚 j
+  pk-∀l-𝕔   : A ~pk'~ [ e' ]↝ Σ' w/ (#S k) ↡ 𝕔 j'
+          → (upΣ : ↑tyᶜ0 Σ ⇘ Σ')
+          → (upj : ↑tyʲ0 j ⇘ j')
+          → (upe : ↑tyᵉ0 e ⇘ e')
+          → `∀ A ~pk'~ [ e ]↝ Σ w/ k ↡ 𝕔 j
+  pk-tapp : A ~pk'~ Σ' w/ (#S k) ↡ j'
+          → (upΣ : ↑tyᶜ0 Σ ⇘ Σ')
+          → (upj : ↑tyʲ0 j ⇘ j')
+          → `∀ A ~pk'~ (B ⓪↝ Σ) w/ k ↡ (𝕥₍ B ₎ j)
+
+-}
 
 infix 3 _⊢_⇒_⇒_↡_
 infix 3 _⊢_≤⁺_⊣_↪_↡_
@@ -119,64 +152,64 @@ data _⊢_≤⁺_⊣_↪_↡_ where
     → Δ ⊢ A `→ B ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ C `→ D ↡ 𝕚 j
 
   s-∀l-y-𝕚 :
-      (jump : Δ ,^ ⊢ A ↷ ([ e' ]↝ Σ') ⊣ Δ ,= B ↡ (𝕚 j'))
+      (pk : A ~pk'~ ([ e' ]↝ Σ') w/ #0 ↬ B ↡ (𝕚 j'))
     → Δ ,= B ⊢ A ≤⁺ ([ e' ]↝ Σ') ⊣ Ψ ,= B ↪ C' `→ D' ↡ (𝕚 j')
     → (upᶜ : ↑tyᶜ0 Σ ⇘ Σ')
+    → (upj : ↑tyʲ0 j ⇘ j')
     → (upᵉ : ↑tyᵉ0 e ⇘ e')
     → (upC : ↑ty0 C ⇘ C')
     → (upD : ↑ty0 D ⇘ D')
-        → (upj : ↑tyʲ0 j ⇘ j')
-    → Δ ⊢ `∀ A ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ C `→ D ↡ (𝕚 j)
-
-  s-∀l-y-𝕔 :
-      (jump : Δ ,^ ⊢ A ↷ ([ e' ]↝ Σ') ⊣ Δ ,= B ↡ (𝕔 j'))
-    → Δ ,= B ⊢ A ≤⁺ ([ e' ]↝ Σ') ⊣ Ψ ,= B ↪ C' `→ D' ↡ (𝕔 j')
-    → (upᶜ : ↑tyᶜ0 Σ ⇘ Σ')
-    → (upᵉ : ↑tyᵉ0 e ⇘ e')
-    → (upC : ↑ty0 C ⇘ C')
-    → (upD : ↑ty0 D ⇘ D')
-            → (upj : ↑tyʲ0 j ⇘ j')
-    → Δ ⊢ `∀ A ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ C `→ D ↡ (𝕔 j)
+    → Δ ⊢ `∀ A ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ C `→ D ↡ 𝕚 j
 
   s-∀l-n-y-𝕚 :
-      (jump : Δ ,^ ⊢ A ↷ ([ e' ]↝ Σ') ⊣ Δ ,^ ↡ (𝕚 j'))
-    → Δ ,^ ⊢ A ≤⁺ ([ e' ]↝ Σ') ⊣ Ψ ,= B ↪ C' `→ D' ↡ (𝕚 j')
+      (¬pk : ¬ (A ~pk~ ([ e' ]↝ Σ') w/ #0))
+    → Δ ,^ ⊢ A ≤⁺ ([ e' ]↝ Σ') ⊣ Ψ ,= B ↪ C' `→ D' ↡ 𝕚 j'
     → (upᶜ : ↑tyᶜ0 Σ ⇘ Σ')
+    → (upj : ↑tyʲ0 j ⇘ j')
     → (upᵉ : ↑tyᵉ0 e ⇘ e')
     → (upC : ↑ty0 C ⇘ C')
     → (upD : ↑ty0 D ⇘ D')
-        → (upj : ↑tyʲ0 j ⇘ j')
-    → Δ ⊢ `∀ A ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ C `→ D ↡ (𝕚 j)
-
-  s-∀l-n-y-𝕔 :
-      (jump : Δ ,^ ⊢ A ↷ ([ e' ]↝ Σ') ⊣ Δ ,^ ↡ (𝕔 j'))
-    → Δ ,^ ⊢ A ≤⁺ ([ e' ]↝ Σ') ⊣ Ψ ,= B ↪ C' `→ D' ↡ (𝕔 j')
-    → (upᶜ : ↑tyᶜ0 Σ ⇘ Σ')
-    → (upᵉ : ↑tyᵉ0 e ⇘ e')
-    → (upC : ↑ty0 C ⇘ C')
-    → (upD : ↑ty0 D ⇘ D')
-        → (upj : ↑tyʲ0 j ⇘ j')
-    → Δ ⊢ `∀ A ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ C `→ D ↡ (𝕔 j)
+    → Δ ⊢ `∀ A ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ C `→ D ↡ 𝕚 j
 
   s-∀l-n-n-𝕚 :
-      (jump : Δ ,^ ⊢ A ↷ ([ e' ]↝ Σ') ⊣ Δ ,^ ↡ (𝕚 j'))
-    → Δ ,^ ⊢ A ≤⁺ ([ e' ]↝ Σ') ⊣ Ψ ,^ ↪ C' `→ D' ↡ (𝕚 j')
+      (¬pk : ¬ (A ~pk~ ([ e' ]↝ Σ') w/ #0))
+    → Δ ,^ ⊢ A ≤⁺ ([ e' ]↝ Σ') ⊣ Ψ ,^ ↪ C' `→ D' ↡ 𝕚 j'
     → (upᶜ : ↑tyᶜ0 Σ ⇘ Σ')
+    → (upj : ↑tyʲ0 j ⇘ j')
     → (upᵉ : ↑tyᵉ0 e ⇘ e')
     → (upC : ↑ty0 C ⇘ C')
     → (upD : ↑ty0 D ⇘ D')
-        → (upj : ↑tyʲ0 j ⇘ j')
-    → Δ ⊢ `∀ A ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ C `→ D ↡ (𝕚 j)
+    → Δ ⊢ `∀ A ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ C `→ D ↡ 𝕚 j
+
+  s-∀l-y-𝕔 :
+      (pk : A ~pk'~ ([ e' ]↝ Σ') w/ #0 ↬ B ↡ (𝕔 j'))
+    → Δ ,= B ⊢ A ≤⁺ ([ e' ]↝ Σ') ⊣ Ψ ,= B ↪ C' `→ D' ↡ (𝕔 j')
+    → (upᶜ : ↑tyᶜ0 Σ ⇘ Σ')
+    → (upj : ↑tyʲ0 j ⇘ j')
+    → (upᵉ : ↑tyᵉ0 e ⇘ e')
+    → (upC : ↑ty0 C ⇘ C')
+    → (upD : ↑ty0 D ⇘ D')
+    → Δ ⊢ `∀ A ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ C `→ D ↡ 𝕔 j
+
+  s-∀l-n-y-𝕔 :
+      (¬pk : ¬ (A ~pk~ ([ e' ]↝ Σ') w/ #0))
+    → Δ ,^ ⊢ A ≤⁺ ([ e' ]↝ Σ') ⊣ Ψ ,= B ↪ C' `→ D' ↡ 𝕔 j'
+    → (upᶜ : ↑tyᶜ0 Σ ⇘ Σ')
+    → (upj : ↑tyʲ0 j ⇘ j')
+    → (upᵉ : ↑tyᵉ0 e ⇘ e')
+    → (upC : ↑ty0 C ⇘ C')
+    → (upD : ↑ty0 D ⇘ D')
+    → Δ ⊢ `∀ A ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ C `→ D ↡ 𝕔 j
 
   s-∀l-n-n-𝕔 :
-      (jump : Δ ,^ ⊢ A ↷ ([ e' ]↝ Σ') ⊣ Δ ,^ ↡ (𝕔 j'))
-    → Δ ,^ ⊢ A ≤⁺ ([ e' ]↝ Σ') ⊣ Ψ ,^ ↪ C' `→ D' ↡ (𝕔 j')
+      (¬pk : ¬ (A ~pk~ ([ e' ]↝ Σ') w/ #0))
+    → Δ ,^ ⊢ A ≤⁺ ([ e' ]↝ Σ') ⊣ Ψ ,^ ↪ C' `→ D' ↡ 𝕔 j'
     → (upᶜ : ↑tyᶜ0 Σ ⇘ Σ')
+    → (upj : ↑tyʲ0 j ⇘ j')
     → (upᵉ : ↑tyᵉ0 e ⇘ e')
     → (upC : ↑ty0 C ⇘ C')
     → (upD : ↑ty0 D ⇘ D')
-      → (upj : ↑tyʲ0 j ⇘ j')
-    → Δ ⊢ `∀ A ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ C `→ D ↡ (𝕔 j)
+    → Δ ⊢ `∀ A ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ C `→ D ↡ 𝕔 j
 
   s-tapp :
       Δ ,= B ⊢ A ≤⁺ Σ' ⊣ Ψ ,= B ↪ C ↡ j'
