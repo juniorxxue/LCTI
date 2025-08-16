@@ -43,6 +43,9 @@ data _⊆_w/t_w/c_ : Env n m → Env n m → Type m → Counter m → Set where
   ⊆∀-I : Γ ,^ ⊆ Δ ,= B w/t A w/c (𝕚 j')
        → (upj : ↑tyʲ0 j ⇘ j')
        → Γ ⊆ Δ w/t `∀ A w/c (𝕚 j)
+  ⊆∀-I-new : Γ ,= B ⊆ Δ ,= B w/t A w/c (𝕚 j')
+       → (upj : ↑tyʲ0 j ⇘ j')
+       → Γ ⊆ Δ w/t `∀ A w/c (𝕚 j)
   ⊆∀-I-no : Γ ,^ ⊆ Δ ,^ w/t A w/c (𝕚 j')
        → (upj : ↑tyʲ0 j ⇘ j')
        → Γ ⊆ Δ w/t `∀ A w/c (𝕚 j)
@@ -67,8 +70,10 @@ data _⊆_w/t_w/c_ : Env n m → Env n m → Type m → Counter m → Set where
   ⊆Inf-X : (extx : Γ ⊆ Δ w/v X)
          → (iso : IsoInf (𝕚 j))
          → Γ ⊆ Δ w/t ‶ X w/c 𝕚 j
+{-
   ⊆jump : (extp : Γ ⊆ Δ w/t A w/p j)
         → Γ ⊆ Δ w/t A w/c j
+-}        
 
 ⊆/c-⊆ : Γ ⊆ Δ w/t A w/c j
       → Γ ⊆ Δ

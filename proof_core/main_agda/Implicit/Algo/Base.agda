@@ -177,3 +177,12 @@ data _⊨_⟹_ where
          → Γ ⊨ [ e ]↝ Σ ⟹ A `→ B
 
 -- _ : ∅ , (Int `→ Int) , `∀ (‶ #0 `→ ‶ #0) ⊢ □ ⇒ (` #0 · ` #1) · (lit 1) ⇒ Int
+
+-- rejected cases
+{-
+_ : ∅ ⋈ ⊢ `∀ Int `→ `∀ (‶ #1 `→ ‶ #0) ≤⁺ [ lit 1 ]↝ (τ (`∀ (‶ #0 `→ ‶ #0))) ⊣ ∅ ⋈ ↪ Int `→ `∀ (‶ #0 `→ ‶ #0)
+_ = s-∀l (s-term-c ⊢c-int grd-int (⊢sub (⊢lit (reg-S^ reg-Z)) ne-τ gc-i
+                                    (s-type (s-int (reg-Z (reg-S^ reg-Z)))))
+                                    (s-type (s-∀ (s-arr (s-ex-r^ (⟹∙S {!!} {!!})) {!!}))))
+         (↑tyᶜ-τ (↑ty-∀ (↑ty-arr ↑ty-var ↑ty-var))) ↑tyᵉ-lit ↑ty-int (↑ty-∀ (↑ty-arr ↑ty-var ↑ty-var))
+-}

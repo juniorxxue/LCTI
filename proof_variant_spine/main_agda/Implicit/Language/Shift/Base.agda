@@ -121,3 +121,36 @@ data _↑ty0ₙ_⇘_ : Type m → (k : ℕ) → Type (k + m) → Set where
   ↑ty0ₙ-S : A ↑ty0ₙ n ⇘ B
           → ↑ty0 B ⇘ B'
           → A ↑ty0ₙ (suc n) ⇘ B'
+
+
+{-
+infixl 4 _,ᶜ_
+
+data CEnv : ℕ → ℕ → Set where
+  ∅ᶜ     : CEnv 0 m
+  _,ᶜ_   : CEnv n m → (A : Type m) → CEnv (1 + n) m
+
+variable
+  Γᶜ Γᶜ' Γᶜ'' Γᶜ₁ Γᶜ₂ Γᶜ₃ Γᶜ* Γᶜ% : CEnv n m
+
+infixr 7 sτ_
+infix 4 ⟨ƛ_,_⟩
+data Stuck : ℕ → ℕ → Set where
+  sτ_ : (A : Type m) → Stuck n m                                          -- type
+  ⟨ƛ_,_⟩ : (e : Term (1 + n' + n) m) → (Γ : CEnv n' m) → Stuck n m            -- closure
+
+variable
+  S   S'  S''     : Stuck n m
+  S%  S%' S%''    : Stuck n m
+  S*  S*' S*''    : Stuck n m
+  S₁  S₂  S₃  S₄  : Stuck n m
+  S₁' S₂' S₃' S₄' : Stuck n m
+
+infix 3 _↑tmˢ_⇘_
+data _↑tmˢ_⇘_ : Stuck n m → Fin (1 + n) → Stuck (1 + n) m → Set where
+  ↑tmˢ-τ :
+      (sτ A) ↑tmˢ k ⇘ (Stuck (1 + n) m ∋⦂ sτ A)
+  ↑tmˢ-clos :
+      (Term (1 + n' + n) m ∋⦂ e) ↑tm (1 + n' + k) ⇘ (Term (1 + n' + (1 + n)) m ∋⦂ e')
+    → (Stuck n m ∋⦂ ⟨ƛ e , CEnv n' m ∋⦂ Γᶜ ⟩) ↑tmˢ k ⇘ (Stuck (1 + n) m ∋⦂ ⟨ƛ e' , CEnv n' m ∋⦂ Γᶜ ⟩)
+-}

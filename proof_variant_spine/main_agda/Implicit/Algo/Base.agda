@@ -50,22 +50,55 @@ data _⊢_⌞_⌝_⊣_ : Env n m → Type m → Polar → Type m → Env n m →
     → Δ ⊢ `∀ A ⌞ ≤ ⌝ (`∀ B) ⊣ Ψ
 
 
-infix 3 _⊢_↷_⊣_
-data _⊢_↷_⊣_ : Env n m → Type m → Context n m → Env n m → Set where
-  jump-base1 : Δ ⊢ A ⌞ ≤⁺ ⌝ B ⊣ Ψ
-             → Δ ⊢ A ↷ (τ B) ⊣ Ψ
-  jump-base2 : Δ ⊢ A ↷ □ ⊣ Δ
-  jump-base3 : Δ ⊢ ‶ X ↷ [ e ]↝ Σ ⊣ Δ
-  jump-arr : Δ ⊢ B ↷ Σ ⊣ Ψ
-           → Δ ⊢ A `→ B ↷ ([ e ]↝ Σ) ⊣ Ψ
-  jump-∀ : Δ ,∙ ⊢ A ↷ ([ e' ]↝ Σ') ⊣ Ψ ,∙
-         → (upΣ : ↑tyᶜ0 Σ ⇘ Σ')
-         → (upe : ↑tyᵉ0 e ⇘ e')
-         → Δ ⊢ `∀ A ↷ ([ e ]↝ Σ) ⊣ Ψ
-  jump-∀-𝕥 : Δ ,∙ ⊢ A ↷ Σ' ⊣ Ψ ,∙
-         → (upΣ : ↑tyᶜ0 Σ ⇘ Σ')
-         → (upe : ↑tyᵉ0 e ⇘ e')
-         → Δ ⊢ `∀ A ↷ (B ⓪↝ Σ) ⊣ Ψ
+infix 3 _~~pk~~_w/_↪_
+infix 3 _~pk~_w/_↪_
+
+data _~~pk~~_w/_↪_ : Type (1 + m) → Type (1 + m) → Fin (1 + m) → Type m → Set where
+  pk-var-l : (upA : ↑ty0 A ⇘ A')
+           → ‶ k ~~pk~~ A' w/ k ↪ A
+  pk-var-r : (upA : ↑ty0 A ⇘ A')
+           → A' ~~pk~~ ‶ k w/ k ↪ A
+  pk-arr-l : A ~~pk~~ B w/ k ↪ E
+           → A `→ B ~~pk~~ C `→ D w/ k ↪ E
+  pk-arr-r : C ~~pk~~ D w/ k ↪ E
+           → A `→ B ~~pk~~ C `→ D w/ k ↪ E
+  pk-∀     : A ~~pk~~ B w/ (#S k) ↪ C'
+           → (upC : ↑ty0 C ⇘ C')
+           → `∀ A ~~pk~~ `∀ B w/ k ↪ C
+
+data _~pk~_w/_↪_ : Type (1 + m) → Context n (1 + m) → Fin (1 + m) → Type m → Set where
+  pk-type : A ~~pk~~ B w/ k ↪ C
+          → A ~pk~ (Context n (1 + m) ∋⦂ τ B) w/ k ↪ C
+  pk-term : B ~pk~ Σ w/ k ↪ C
+          → A `→ B ~pk~ [ e ]↝ Σ w/ k ↪ C
+  pk-∀l   : A ~pk~ [ e' ]↝ Σ' w/ (#S k) ↪ C'
+          → (upΣ : ↑tyᶜ0 Σ ⇘ Σ')
+          → (upe : ↑tyᵉ0 e ⇘ e')
+          → (upC : ↑ty0 C ⇘ C')
+          → `∀ A ~pk~ [ e ]↝ Σ w/ k ↪ C
+  pk-tapp : A ~pk~ Σ' w/ (#S k) ↪ C'
+          → (upC : ↑ty0 C ⇘ C')
+          → (upΣ : ↑tyᶜ0 Σ ⇘ Σ')
+          → `∀ A ~pk~ (B ⓪↝ Σ) w/ k ↪ C
+
+
+-- degenerate version for negation
+
+infix 3 _~pk~_w/_
+
+data _~pk~_w/_ : Type m → Context n m → Fin m → Set where
+  pk-type : (inA : k ε A)
+          → A ~pk~ (Context n m ∋⦂ τ B) w/ k
+  pk-term : B ~pk~ Σ w/ k
+          → A `→ B ~pk~ [ e ]↝ Σ w/ k
+  pk-∀l   : A ~pk~ [ e' ]↝ Σ' w/ (#S k)
+          → (upΣ : ↑tyᶜ0 Σ ⇘ Σ')
+          → (upe : ↑tyᵉ0 e ⇘ e')
+          → `∀ A ~pk~ [ e ]↝ Σ w/ k
+  pk-tapp : A ~pk~ Σ' w/ (#S k)
+          → (upΣ : ↑tyᶜ0 Σ ⇘ Σ')
+          → `∀ A ~pk~ (B ⓪↝ Σ) w/ k
+
 
 infix 3 _⊢_⇒_⇒_
 infix 3 _⊢_≤⁺_⊣_↪_
@@ -151,8 +184,8 @@ data _⊢_≤⁺_⊣_↪_ where
     → Δ ⊢ A `→ B ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ C `→ D
 
   s-∀l-y :
-      (jump : Δ ,^ ⊢ A ↷ ([ e' ]↝ Σ') ⊣ Δ₁ ,= B)
-    → Δ₁ ,= B ⊢ A ≤⁺ ([ e' ]↝ Σ') ⊣ Ψ ,= B ↪ C' `→ D'
+      (pk : A ~pk~ ([ e' ]↝ Σ') w/ #0 ↪ B)
+    → Δ ,= B ⊢ A ≤⁺ ([ e' ]↝ Σ') ⊣ Ψ ,= B ↪ C' `→ D'
     → (upᶜ : ↑tyᶜ0 Σ ⇘ Σ')
     → (upᵉ : ↑tyᵉ0 e ⇘ e')
     → (upC : ↑ty0 C ⇘ C')
@@ -160,8 +193,8 @@ data _⊢_≤⁺_⊣_↪_ where
     → Δ ⊢ `∀ A ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ C `→ D
 
   s-∀l-n-y :
-      (jump : Δ ,^ ⊢ A ↷ ([ e' ]↝ Σ') ⊣ Δ₁ ,^)
-    → Δ₁ ,^ ⊢ A ≤⁺ ([ e' ]↝ Σ') ⊣ Ψ ,= B ↪ C' `→ D'
+      (¬pk : ¬ (A ~pk~ ([ e' ]↝ Σ') w/ #0))
+    → Δ ,^ ⊢ A ≤⁺ ([ e' ]↝ Σ') ⊣ Ψ ,= B ↪ C' `→ D'
     → (upᶜ : ↑tyᶜ0 Σ ⇘ Σ')
     → (upᵉ : ↑tyᵉ0 e ⇘ e')
     → (upC : ↑ty0 C ⇘ C')
@@ -169,8 +202,8 @@ data _⊢_≤⁺_⊣_↪_ where
     → Δ ⊢ `∀ A ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ C `→ D
 
   s-∀l-n-n :
-      (jump : Δ ,^ ⊢ A ↷ ([ e' ]↝ Σ') ⊣ Δ₁ ,^)
-    → Δ₁ ,^ ⊢ A ≤⁺ ([ e' ]↝ Σ') ⊣ Ψ ,^ ↪ C' `→ D'
+      (¬pk : ¬ (A ~pk~ ([ e' ]↝ Σ') w/ #0))
+    → Δ ,^ ⊢ A ≤⁺ ([ e' ]↝ Σ') ⊣ Ψ ,^ ↪ C' `→ D'
     → (upᶜ : ↑tyᶜ0 Σ ⇘ Σ')
     → (upᵉ : ↑tyᵉ0 e ⇘ e')
     → (upC : ↑ty0 C ⇘ C')
@@ -204,5 +237,3 @@ data _⊨_⟹_ where
   infs-s : (⊢e : Γ ⊢ □ ⇒ e ⇒ A)
          → Γ ⊨ Σ ⟹ B
          → Γ ⊨ [ e ]↝ Σ ⟹ A `→ B
-
--- _ : ∅ , (Int `→ Int) , `∀ (‶ #0 `→ ‶ #0) ⊢ □ ⇒ (` #0 · ` #1) · (lit 1) ⇒ Int
