@@ -30,8 +30,8 @@ infix 3 _⊆_w/t_w/c_
 data _⊆_w/t_w/c_ : Env n m → Env n m → Type m → Counter m → Set where
   ⊆Z : (regΓ : SRegular Γ)
      → Γ ⊆ Γ w/t A w/c Z
-  ⊆∞ : (regΓ : SRegular Γ)
-     → Γ ⊆ Γ w/t A w/c ∞
+  ⊆∞ : (ext : Γ ⊆ Δ w/t A)
+     → Γ ⊆ Δ w/t A w/c ∞
   ⊆I : (ext : Γ ⊆ Ω w/t A)
      → Ω ⊆ Δ w/t B w/c j
      → Γ ⊆ Δ w/t (A `→ B) w/c (𝕚 j)
@@ -95,7 +95,7 @@ data _⊆_w/t_w/c_ : Env n m → Env n m → Type m → Counter m → Set where
 ⊆/c-⊆ (⊆C-X regΓ cloA) = ⊆-refl regΓ
 ⊆/c-⊆ (⊆T-X regΓ cloA) = ⊆-refl regΓ
 ⊆/c-⊆ (⊆Inf-X extx iso) = ⊆/x-⊆ extx
-⊆/c-⊆ (⊆∞ regΓ) = ⊆-refl regΓ
+⊆/c-⊆ (⊆∞ ext) = {!!}
 ⊆/c-⊆ (⊆∀-I-new ext upj) with ⊆/c-⊆ ext
 ... | svar r regA = r
 ⊆/c-⊆ (⊆∀-C-new ext upj) with ⊆/c-⊆ ext
@@ -121,7 +121,7 @@ data _⊆_w/t_w/c_ : Env n m → Env n m → Type m → Counter m → Set where
 ⊆/c-find (⊆T-X regΓ cloA) in1 in2 = ⊥-elim (∋^-∋=-false in1 in2)
 ⊆/c-find (⊆Inf-X extx iso) in1 in2
   with ε-var ← ^in-=out-ε (ext-var extx) in1 in2 = f-iso iso
-⊆/c-find (⊆∞ regΓ) x x₁ = ⊥-elim (∋^-∋=-false x x₁)
+⊆/c-find (⊆∞ ext) x x₁ = {!!}
 ⊆/c-find (⊆∀-I-new x₂ upj) x x₁ = f-∀-𝕚 (⊆/c-find x₂ (S= x) (S= x₁)) upj
 ⊆/c-find (⊆∀-C-new x₂ upj) x x₁ = f-∀-𝕔 (⊆/c-find x₂ (S= x) (S= x₁)) upj
 
@@ -134,6 +134,7 @@ data _⊆_w/t_w/c_ : Env n m → Env n m → Type m → Counter m → Set where
               → Γ ∋^ k
               → find A k j
               → Δ ∋= k
+⊆/c-find-∋= (⊆∞ ext) inΓ fd = {!!}
 ⊆/c-find-∋= (⊆I ext ext₁) inΓ (f-arr-𝕚-l x) = ⊆-∋= (⊆/-^in-=out ext x inΓ) (⊆/c-⊆ ext₁)
 ⊆/c-find-∋= (⊆I ext ext₁) inΓ (f-arr-𝕚-r ¬inA fd) = ⊆/c-find-∋= ext₁ (⊆/-^in-^out ext ¬inA inΓ) fd
 ⊆/c-find-∋= (⊆C cloA ext) inΓ (f-arr-𝕔 ¬inA fd) = ⊆/c-find-∋= ext inΓ fd
@@ -162,6 +163,9 @@ data _⊆_w/t_w/c_ : Env n m → Env n m → Type m → Counter m → Set where
   with refl ← ↑tyʲ-unique upj upj₁
   with S= r ← ⊆/c-find-∋= ext (S= inΓ) fd
   = r
+⊆/c-find-∋= (⊆Z regΓ) inΓ (f-iso ())
+⊆/c-find-∋= (⊆C-X regΓ cloA) inΓ (f-iso ())
+⊆/c-find-∋= (⊆T-X regΓ cloA) inΓ (f-iso ())
 
 ----------------------------------------------------------------------
 --+                              inst                              +--
@@ -291,9 +295,7 @@ data _⊆_w/t_w/c_ : Env n m → Env n m → Type m → Counter m → Set where
 ⊆/c-irrev-== {B = B} (⊆∀-C-no ext upj) new1 new2
   with ⟨ B' , upB ⟩ ← ↑ty0-total B  = ⊆∀-C-no (⊆/c-irrev-== ext (=⟹^S new1 upB) (=⟹^S new2 upB)) upj
 ⊆/c-irrev-== (⊆Inf-X extx iso) new1 new2 = ⊆Inf-X (⊆/x-irrev-== extx new1 new2) iso
-⊆/c-irrev-== (⊆∞ regΓ) new1 new2
-  with refl ← =⟹-unique new1 new2
-  = ⊆∞ (=⟹-sregular new1)
+⊆/c-irrev-== (⊆∞ ext) new1 new2 = {!!}
 ⊆/c-irrev-== {B = B} (⊆∀-I-new ext upj) new1 new2
   with svar r regA ← ⊆/c-⊆ ext
   with ⟨ B' , upB ⟩ ← ↑ty0-total B

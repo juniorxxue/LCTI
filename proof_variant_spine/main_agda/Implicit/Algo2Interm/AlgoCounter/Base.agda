@@ -40,7 +40,7 @@ data _~pk'~_w/_↬_↡_ : Type (1 + m) → Context n (1 + m) → Fin (1 + m) →
 
 
 -- degenerate version for negation
-{-
+
 infix 3 _~pk'~_w/_↡_
 
 data _~pk'~_w/_↡_ : Type m → Context n m → Fin m → Counter m → Set where
@@ -65,7 +65,6 @@ data _~pk'~_w/_↡_ : Type m → Context n m → Fin m → Counter m → Set whe
           → (upj : ↑tyʲ0 j ⇘ j')
           → `∀ A ~pk'~ (B ⓪↝ Σ) w/ k ↡ (𝕥₍ B ₎ j)
 
--}
 
 infix 3 _⊢_⇒_⇒_↡_
 infix 3 _⊢_≤⁺_⊣_↪_↡_

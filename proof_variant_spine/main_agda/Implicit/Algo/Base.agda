@@ -49,6 +49,24 @@ data _⊢_⌞_⌝_⊣_ : Env n m → Type m → Polar → Type m → Env n m →
       Δ ,∙ ⊢ A ⌞ ≤ ⌝ B ⊣ Ψ ,∙
     → Δ ⊢ `∀ A ⌞ ≤ ⌝ (`∀ B) ⊣ Ψ
 
+-- degenerate version for negation
+
+infix 3 _~pk~_w/_
+
+data _~pk~_w/_ : Type m → Context n m → Fin m → Set where
+  pk-type : (inA : k ε A)
+          → A ~pk~ (Context n m ∋⦂ τ B) w/ k
+  pk-term : B ~pk~ Σ w/ k
+          → A `→ B ~pk~ [ e ]↝ Σ w/ k
+  pk-∀l   : A ~pk~ [ e' ]↝ Σ' w/ (#S k)
+          → (upΣ : ↑tyᶜ0 Σ ⇘ Σ')
+          → (upe : ↑tyᵉ0 e ⇘ e')
+          → `∀ A ~pk~ [ e ]↝ Σ w/ k
+  pk-tapp : A ~pk~ Σ' w/ (#S k)
+          → (upΣ : ↑tyᶜ0 Σ ⇘ Σ')
+          → `∀ A ~pk~ (B ⓪↝ Σ) w/ k
+
+
 
 infix 3 _~~pk~~_w/_↪_
 infix 3 _~pk~_w/_↪_
@@ -56,11 +74,13 @@ infix 3 _~pk~_w/_↪_
 data _~~pk~~_w/_↪_ : Type (1 + m) → Type (1 + m) → Fin (1 + m) → Type m → Set where
   pk-var-l : (upA : ↑ty0 A ⇘ A')
            → ‶ k ~~pk~~ A' w/ k ↪ A
+{-
   pk-var-r : (upA : ↑ty0 A ⇘ A')
            → A' ~~pk~~ ‶ k w/ k ↪ A
+-}
   pk-arr-l : A ~~pk~~ B w/ k ↪ E
            → A `→ B ~~pk~~ C `→ D w/ k ↪ E
-  pk-arr-r : C ~~pk~~ D w/ k ↪ E
+  pk-arr-r : B ~~pk~~ D w/ k ↪ E
            → A `→ B ~~pk~~ C `→ D w/ k ↪ E
   pk-∀     : A ~~pk~~ B w/ (#S k) ↪ C'
            → (upC : ↑ty0 C ⇘ C')
@@ -82,22 +102,6 @@ data _~pk~_w/_↪_ : Type (1 + m) → Context n (1 + m) → Fin (1 + m) → Type
           → `∀ A ~pk~ (B ⓪↝ Σ) w/ k ↪ C
 
 
--- degenerate version for negation
-
-infix 3 _~pk~_w/_
-
-data _~pk~_w/_ : Type m → Context n m → Fin m → Set where
-  pk-type : (inA : k ε A)
-          → A ~pk~ (Context n m ∋⦂ τ B) w/ k
-  pk-term : B ~pk~ Σ w/ k
-          → A `→ B ~pk~ [ e ]↝ Σ w/ k
-  pk-∀l   : A ~pk~ [ e' ]↝ Σ' w/ (#S k)
-          → (upΣ : ↑tyᶜ0 Σ ⇘ Σ')
-          → (upe : ↑tyᵉ0 e ⇘ e')
-          → `∀ A ~pk~ [ e ]↝ Σ w/ k
-  pk-tapp : A ~pk~ Σ' w/ (#S k)
-          → (upΣ : ↑tyᶜ0 Σ ⇘ Σ')
-          → `∀ A ~pk~ (B ⓪↝ Σ) w/ k
 
 
 infix 3 _⊢_⇒_⇒_

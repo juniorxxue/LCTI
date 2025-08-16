@@ -29,7 +29,7 @@ s-find : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B ↡ j
        → Δ ∋= k
        → find A k j
 s-find (s-empty regΓ cloA x) inΓ inΔ = ⊥-elim (∋^-∋=-false inΓ inΔ)
-s-find (s-type ss) inΓ inΔ = {!!}
+s-find (s-type ss) inΓ inΔ = f-∞ (ss-find-l ss inΓ inΔ)
 s-find (s-term-c cloA ap ⊢e s) inΓ inΔ = f-arr-𝕔 (⊢c-^∈-¬ε cloA inΓ) (s-find s inΓ inΔ)
 s-find {k = k} (s-term-o {A = A} opnA ⊢e ss s) inΓ inΔ with ε-dec {k = k} {A = A}
 ... | inj₁ inA  = f-arr-𝕚-l inA

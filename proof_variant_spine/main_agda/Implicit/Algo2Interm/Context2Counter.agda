@@ -117,6 +117,22 @@ NonEmpty-NonZ ne-tapp (~tT ~J st) = nz-T
   with ⟨ C* , stC ⟩ ← st0-total A C = ~sT (~s-strengthen^0 ~s (↑ty-st-comm0' stC upA₁ upA st) upΣ upj) stC
 
 
+postulate
+  ~s-weaken^0 : Γ ⊢ ⟨ j , A ⟩ ~s Σ
+                 → ↑ty0 A ⇘ A'
+                 → ↑tyᶜ0 Σ ⇘ Σ'
+                 → ↑tyʲ0 j ⇘ j'
+            → Γ ,^ ⊢ ⟨ j' , A' ⟩ ~s Σ'
+{-
+~s-weaken^0 ~sZ upA ↑tyᶜ-□ ↑tyʲ-Z = ~sZ
+~s-weaken^0 ~s∞ upA (↑tyᶜ-τ up-t) ↑tyʲ-∞ with refl ← ↑ty-unique upA up-t = ~s∞
+~s-weaken^0 (~sI ⊢e ~j) (↑ty-arr upA upA₁) (↑tyᶜ-e up-e upΣ) (↑tyʲ-𝕚 upj) = ~sI {!!} {!!}
+~s-weaken^0 (~sC ⊢e ~j) upA upΣ upj = {!!}
+~s-weaken^0 (~sT ~j st) upA upΣ upj = {!!}
+-}
+
+
+
 ~s-strengthen=0 : Γ ,= T ⊢ ⟨ j' , A' ⟩ ~s Σ'
                  → ↑ty0 A ⇘ A'
                  → ↑tyᶜ0 Σ ⇘ Σ'

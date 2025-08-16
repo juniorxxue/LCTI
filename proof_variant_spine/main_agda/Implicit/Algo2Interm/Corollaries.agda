@@ -76,17 +76,17 @@ sc-complete (s-term-c cloA ap ⊢e s) with sc-complete s | tc-complete ⊢e
 ... | subs j~Σ s₁ | typs ~t∞ ⊢e₁ = subs (~sC (t-⊆-prv (sound ⊢e₁) (sc-⊆ s₁)) j~Σ)
                                         (s-term-c cloA ap ⊢e₁ s₁)
 sc-complete s'@(s-term-o opnA ⊢e ss s) with sc-complete s | tc-complete ⊢e
-... | subs j~Σ s₁ | typs ~tZ ⊢e₁ = subs (~sI (t-⊆-prv (sound ⊢e₁) (s-⊆ s')) j~Σ)
+... | subs j~Σ s₁ | typs ~tZ ⊢e₁
+  = subs (~sI (t-⊆-prv (sound ⊢e₁) (s-⊆ s')) j~Σ)
                                         (s-term-o opnA ⊢e₁ ss s₁)
-sc-complete (s-∀l s upᶜ upᵉ upC upD) with sc-complete s
-sc-complete (s-∀l s upᶜ upᵉ upC upD) | subs {𝕚 j} j~Σ s₁
-  with ⟨ j' , ↑tyʲ-𝕚 upj' ⟩ ← ↑tyʲ0-exist j~Σ (↑tyᶜ-e upᵉ upᶜ)
-  = subs (~s-strengthen=0 j~Σ (↑ty-arr upC upD) (↑tyᶜ-e upᵉ upᶜ) (↑tyʲ-𝕚 upj'))
-                          (s-∀l-𝕚 s₁ upᶜ upj' upᵉ upC upD)
-sc-complete (s-∀l s upᶜ upᵉ upC upD) | subs {𝕔 j} j~Σ s₁
-  with ⟨ j' , ↑tyʲ-𝕔 upj' ⟩ ← ↑tyʲ0-exist j~Σ (↑tyᶜ-e upᵉ upᶜ)
-  = subs (~s-strengthen=0 j~Σ (↑ty-arr upC upD) (↑tyᶜ-e upᵉ upᶜ) (↑tyʲ-𝕔 upj'))
-                    (s-∀l-𝕔 s₁ upᶜ upj' upᵉ upC upD)
+-- sc-complete (s-∀l s upᶜ upᵉ upC upD) with sc-complete s
+-- sc-complete (s-∀l s upᶜ upᵉ upC upD) | subs {𝕚 j} j~Σ s₁
+--   with ⟨ j' , ↑tyʲ-𝕚 upj' ⟩ ← ↑tyʲ0-exist j~Σ (↑tyᶜ-e upᵉ upᶜ)
+--   = subs (~s-strengthen=0 j~Σ (↑ty-arr upC upD) (↑tyᶜ-e upᵉ upᶜ) (↑tyʲ-𝕚 upj'))
+--                           ?
+-- sc-complete (s-∀l s upᶜ upᵉ upC upD) | subs {𝕔 j} j~Σ s₁
+--   with ⟨ j' , ↑tyʲ-𝕔 upj' ⟩ ← ↑tyʲ0-exist j~Σ (↑tyᶜ-e upᵉ upᶜ)
+--   = subs (~s-strengthen=0 j~Σ (↑ty-arr upC upD) (↑tyᶜ-e upᵉ upᶜ) (↑tyʲ-𝕔 upj'))
 sc-complete (s-tapp {B = B} {C = C} s upᶜ) with sc-complete s
 ... | subs j~Σ s₁
   with ⟨ B* , stB ⟩ ← st0-total B C
@@ -96,15 +96,21 @@ sc-complete (s-svar-term inΓ s) with sc-complete s
 ... | subs j~Σ s₁ = subs j~Σ (s-svar-term inΓ s₁)
 sc-complete (s-svar-tapp inΓ s) with sc-complete s
 ... | subs (~sT j~Σ st) s₁ = subs (~sT j~Σ st) (s-svar-tapp inΓ s₁)
-sc-complete (s-∀l-no s upᶜ upᵉ upC upD) with sc-complete s
-... | subs {𝕚 j} j~Σ s₁
-  with ⟨ j' , ↑tyʲ-𝕚 upj' ⟩ ← ↑tyʲ0-exist j~Σ (↑tyᶜ-e upᵉ upᶜ)
-  = subs (~s-strengthen^0 j~Σ (↑ty-arr upC upD) (↑tyᶜ-e upᵉ upᶜ) (↑tyʲ-𝕚 upj')) (s-∀l-no-𝕚 s₁ upᶜ upj' upᵉ upC upD)
-... | subs {𝕔 j} j~Σ s₁
-  with ⟨ j' , ↑tyʲ-𝕔 upj' ⟩ ← ↑tyʲ0-exist j~Σ (↑tyᶜ-e upᵉ upᶜ)
-  = subs (~s-strengthen^0 j~Σ (↑ty-arr upC upD) (↑tyᶜ-e upᵉ upᶜ) (↑tyʲ-𝕔 upj')) (s-∀l-no-𝕔 s₁ upᶜ upj' upᵉ upC upD)
+
+-- sc-complete (s-∀l-no s upᶜ upᵉ upC upD) with sc-complete s
+-- ... | subs {𝕚 j} j~Σ s₁
+--   with ⟨ j' , ↑tyʲ-𝕚 upj' ⟩ ← ↑tyʲ0-exist j~Σ (↑tyᶜ-e upᵉ upᶜ)
+--   = subs (~s-strengthen^0 j~Σ (↑ty-arr upC upD) (↑tyᶜ-e upᵉ upᶜ) (↑tyʲ-𝕚 upj')) (s-∀l-no-𝕚 s₁ upᶜ upj' upᵉ upC upD)
+-- ... | subs {𝕔 j} j~Σ s₁
+--   with ⟨ j' , ↑tyʲ-𝕔 upj' ⟩ ← ↑tyʲ0-exist j~Σ (↑tyᶜ-e upᵉ upᶜ)
+--   = subs (~s-strengthen^0 j~Σ (↑ty-arr upC upD) (↑tyᶜ-e upᵉ upᶜ) (↑tyʲ-𝕔 upj')) (s-∀l-no-𝕔 s₁ upᶜ upj' upᵉ upC upD)
+
 sc-complete (s-evar-infers infs inst) with infs-complete infs
 ... | infss ~j'@(~iI ⊢e j~Σ) infs₁ = subs (~s-irrev-⊆ (~t-~s (~infs-~t ~j')) (inst-⊆ inst)) (s-evar-infers infs₁ inst)
+
+sc-complete (s-∀l-y pk s upᶜ upᵉ upC upD) = {!!}
+sc-complete (s-∀l-n-y ¬pk s upᶜ upᵉ upC upD) = {!!}
+sc-complete (s-∀l-n-n ¬pk s upᶜ upᵉ upC upD) = {!!}
 
 infs-complete (infs-z regΓ regA) = infss ~i∞ (infs-z regΓ regA)
 infs-complete (infs-s ⊢e infs)
