@@ -20,6 +20,29 @@ open import Implicit.Algo2Interm.Main
 ↑tyʲ0-exist (~sT ~s st) (↑tyᶜ-⓪ {A = A} x upΣ) = ⟨ 𝕥₍ A ₎ ↑tyʲ0-exist ~s upΣ .proj₁ ,
                                           ↑tyʲ-𝕥 (↑tyʲ0-exist ~s upΣ .proj₂) x ⟩
 
+
+peek-complete : A ~pk~ Σ w/ k ↪ B
+             → Γ ⊢ ⟨ j , C ⟩ ~s Σ
+             → A ~pk'~ Σ w/ k ↬ B ↡ j
+peek-complete (pk-type x) ~s∞ = pk-type x
+peek-complete (pk-term pk) (~sI ⊢e ~j) = pk-term-𝕚 (peek-complete pk ~j)
+peek-complete (pk-term pk) (~sC ⊢e ~j) = pk-term-𝕔 (peek-complete pk ~j)
+peek-complete (pk-∀l pk upΣ upe upC) (~sI {j = j} {A = A} {B = B} ⊢e ~j)
+  with ⟨ j' , upj ⟩ ← ↑tyʲ0-total j
+  with ⟨ A , upA ⟩ ← ↑ty0-total A
+  with ⟨ B , upB ⟩ ← ↑ty0-total B
+  = pk-∀l-𝕚 (peek-complete pk (~s-weaken^0 (~sI ⊢e ~j) (↑ty-arr upA upB) (↑tyᶜ-e upe upΣ) (↑tyʲ-𝕚 upj))) upΣ upj upe upC
+peek-complete (pk-∀l pk upΣ upe upC) (~sC {j = j} {A = A} {B = B} ⊢e ~j)
+  with ⟨ j' , upj ⟩ ← ↑tyʲ0-total j
+  with ⟨ A , upA ⟩ ← ↑ty0-total A
+  with ⟨ B , upB ⟩ ← ↑ty0-total B
+  = pk-∀l-𝕔 (peek-complete pk (~s-weaken^0 (~sC ⊢e ~j) (↑ty-arr upA upB) (↑tyᶜ-e upe upΣ) (↑tyʲ-𝕔 upj))) upΣ upj upe upC
+peek-complete (pk-tapp pk upC upΣ) (~sT {j = j} {B* = B} ~j st)
+  with ⟨ j' , upj ⟩ ← ↑tyʲ0-total j
+  with ⟨ B , upB ⟩ ← ↑ty0-total B
+  = pk-tapp (peek-complete pk (~s-weaken^0 ~j upB upΣ upj)) upC upΣ upj
+
+
 -- corollaries are bridged via completeness of AlgoCounter
 
 data JustType (Γ : Env n m) (Σ : Context n m) (e : Term n m) (A : Type m) : Set where
@@ -108,8 +131,18 @@ sc-complete (s-svar-tapp inΓ s) with sc-complete s
 sc-complete (s-evar-infers infs inst) with infs-complete infs
 ... | infss ~j'@(~iI ⊢e j~Σ) infs₁ = subs (~s-irrev-⊆ (~t-~s (~infs-~t ~j')) (inst-⊆ inst)) (s-evar-infers infs₁ inst)
 
-sc-complete (s-∀l-y pk s upᶜ upᵉ upC upD) = {!!}
-sc-complete (s-∀l-n-y ¬pk s upᶜ upᵉ upC upD) = {!!}
+sc-complete (s-∀l-y pk s upᶜ upᵉ upC upD) with sc-complete s
+... | subs {𝕚 j} j~Σ s₁
+  with ⟨ j' , ↑tyʲ-𝕚 upj' ⟩ ← ↑tyʲ0-exist j~Σ (↑tyᶜ-e upᵉ upᶜ)
+  with ~jweaken ← (~s-strengthen=0 j~Σ (↑ty-arr upC upD) (↑tyᶜ-e upᵉ upᶜ) (↑tyʲ-𝕚 upj'))
+  = subs ~jweaken (s-∀l-y-𝕚 (peek-complete pk j~Σ) s₁ upᶜ upj' upᵉ upC upD)
+... | subs {𝕔 j} j~Σ s₁
+  with ⟨ j' , ↑tyʲ-𝕔 upj' ⟩ ← ↑tyʲ0-exist j~Σ (↑tyᶜ-e upᵉ upᶜ)
+  with ~jweaken ← (~s-strengthen=0 j~Σ (↑ty-arr upC upD) (↑tyᶜ-e upᵉ upᶜ) (↑tyʲ-𝕔 upj'))
+  = subs ~jweaken (s-∀l-y-𝕔 (peek-complete pk j~Σ) s₁ upᶜ upj' upᵉ upC upD)
+sc-complete (s-∀l-n-y ¬pk s upᶜ upᵉ upC upD) with sc-complete s
+... | subs {𝕚 j} j~Σ s₁ = {!!}
+... | subs {𝕔 j} j~Σ s₁ = {!!}
 sc-complete (s-∀l-n-n ¬pk s upᶜ upᵉ upC upD) = {!!}
 
 infs-complete (infs-z regΓ regA) = infss ~i∞ (infs-z regΓ regA)
