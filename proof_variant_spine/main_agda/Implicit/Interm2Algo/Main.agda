@@ -5,11 +5,14 @@ open import Implicit.Algo.All
 open import Implicit.Interm.All
 
 open import Implicit.Interm2Algo.Counter2Context
+open import Implicit.Interm2Algo.ReExtension
 open import Implicit.Interm2Algo.ExtIrrev
 open import Implicit.Interm2Algo.EnvDiff
 open import Implicit.Interm2Algo.OpenClose
 open import Implicit.Interm2Algo.Find
 open import Implicit.Interm2Algo.AuxLemmas
+open import Implicit.Interm2Algo.NewSpine
+
 
 data WF1 : Env n m → Set where
   wf1-base : WF1 (Γ ⋈)
@@ -107,8 +110,7 @@ complete-s :  Δ ⊢ j # A ⌞ ≤⁺ ⌝ B
             → Γ ⊢ ⟨ j , B ⟩ ~s Σ
             → Complete A j Σ Γ Δ B
 complete-s {j = Z} (s-refl regΔ cloA grd) wfc (⊆Z regΓ) ~Z = normal (⊢c-¬ε' cloA) (s-empty regΔ cloA grd)
-complete-s {j = ∞} s wfc (⊆∞ ext) ~∞ = ss-complete (complete-ss+ s {!!})
--- ss-complete (complete-ss+ s ext)
+complete-s {j = ∞} s wfc (⊆∞ ext) ~∞ = ss-complete (complete-ss+ s ext)
 complete-s {j = 𝕚 j} (s-arr₂ s s₁) (wfc-𝕚 x) (⊆I ext ext₁) (~I ⊢e j~Σ) with ⊆/-openclose ext
 -- A is open
 complete-s {j = 𝕚 j} (s-arr₂ {A = A} s s₁) (wfc-𝕚 x) (⊆I ext ext₁) (~I ⊢e ~j) | inj₁ opnA

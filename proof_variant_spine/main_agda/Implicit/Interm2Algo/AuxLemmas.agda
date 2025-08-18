@@ -5,6 +5,7 @@ open import Implicit.Algo.All
 open import Implicit.Interm.All
 
 open import Implicit.Interm2Algo.Counter2Context
+open import Implicit.Interm2Algo.ReExtension
 open import Implicit.Interm2Algo.ExtIrrev
 open import Implicit.Interm2Algo.EnvDiff
 open import Implicit.Interm2Algo.OpenClose
@@ -19,21 +20,21 @@ s+-⊆/ : Δ ⊢ j # A ⌞ ≤⁺ ⌝ B
       → Δ ⊆ Δ w/t A w/c j
 
 s+-⊆/ (s-refl regΔ cloA grd) = (⊆Z regΔ)
-s+-⊆/ (s-int regΔ) = ⊆∞ regΔ
-s+-⊆/ (s-var-∙ regΔ inΔ) = ⊆∞ regΔ
+s+-⊆/ (s-int regΔ) = ⊆∞ (ext-int regΔ)
+s+-⊆/ (s-var-∙ regΔ inΔ) = ⊆∞ (ext-var ((reg-⊆/x∙ regΔ inΔ)))
 s+-⊆/ (s-arr₁ s s₁) with s+-⊆/ s₁
-... | ⊆∞ regΓ = ⊆∞ regΓ
+... | ⊆∞ regΓ = ⊆∞ (ext-arr (s--⊆/ s) regΓ)
 s+-⊆/ (s-arr₂ s s₁) = ⊆I (s--⊆/ s) (s+-⊆/ s₁)
 s+-⊆/ (s-arr₃ cloA grd s) = ⊆C cloA (s+-⊆/ s)
 s+-⊆/ (s-∀ s) with s+-⊆/ s
-... | ⊆∞ (reg-S∙ regΓ) = ⊆∞ regΓ
+... | ⊆∞ ext = ⊆∞ (ext-∀ ext)
 s+-⊆/ (s-∀l s ic fd upC upD upj) with s+-⊆/ s
 s+-⊆/ (s-∀l s case-𝕚 fd upC upD (↑tyʲ-𝕚 upj)) | r = ⊆∀-I (⊆/c-irrev-^0 r fd) upj
 s+-⊆/ (s-∀l s case-𝕔 fd upC upD (↑tyʲ-𝕔 upj)) | r = ⊆∀-C (⊆/c-irrev-^0 r fd) upj
 s+-⊆/ (s-∀l-no-appear s ic fd upC upD upj) with s+-⊆/ s
 s+-⊆/ (s-∀l-no-appear s case-𝕚 fd upC upD (↑tyʲ-𝕚 upj)) | r = ⊆∀-I-no r upj
 s+-⊆/ (s-∀l-no-appear s case-𝕔 fd upC upD (↑tyʲ-𝕔 upj)) | r = ⊆∀-C-no r upj
-s+-⊆/ (s-svar-l x inΔ) = ⊆∞ x
+s+-⊆/ (s-svar-l x inΔ) = ⊆∞ ((ext-var (⊆/x-refl x (⊢c-var-= (∋:=to∋= inΔ)))))
 s+-⊆/ (s-tapp s upj) = ⊆∀-T (s+-⊆/ s) upj
 s+-⊆/ (s-svar-𝕚 inΓ s) = ⊆I-X (s-sregular s) (⊢c-var-= (∋:=to∋= inΓ))
 s+-⊆/ (s-svar-𝕔 inΓ s) = ⊆C-X (s-sregular s) (⊢c-var-= (∋:=to∋= inΓ))

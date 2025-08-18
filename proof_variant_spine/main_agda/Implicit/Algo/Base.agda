@@ -78,7 +78,7 @@ data _~~pk~~_w/_↪_ : Type (1 + m) → Type (1 + m) → Fin (1 + m) → Type m 
   pk-var-r : (upA : ↑ty0 A ⇘ A')
            → A' ~~pk~~ ‶ k w/ k ↪ A
 -}
-  pk-arr-l : A ~~pk~~ B w/ k ↪ E
+  pk-arr-l : A ~~pk~~ C w/ k ↪ E -- note, no contra-variant here for simplicity
            → A `→ B ~~pk~~ C `→ D w/ k ↪ E
   pk-arr-r : B ~~pk~~ D w/ k ↪ E
            → A `→ B ~~pk~~ C `→ D w/ k ↪ E
