@@ -32,9 +32,8 @@ data _~pk~_w/_↪_ : Type (1 + m) → Context n (1 + m) → Fin (1 + m) → Type
 -}
 
 
-data peek-a : Type (1 + m) → Type (1 + m) → Fin (1 + m) → Counter (1 + m) → Type m → Set where
+data peek-a : Type m → Type m → Fin m → Counter m → Type m → Set where
   pka-∞ : A ~~pk~~ B w/ k ↪ C
---        → ↑ty0 C ⇘ C'
         → peek-a A B k ∞ C
   pka-arr-𝕚 : peek-a B D k j E
             → peek-a (A `→ B) (C `→ D) k (𝕚 j) E
@@ -61,19 +60,17 @@ data peek-a : Type (1 + m) → Type (1 + m) → Fin (1 + m) → Counter (1 + m) 
 peek→peek-t : Γ ⊢ ∞ # A ⌞ ≤⁺ ⌝ B
             → Γ ∋ k := T
             → k ε A
-            → ∃[ pT ]((A ~~pk~~ B w/ k ↪ pT) × (↑ty0 pT ⇘ T))
+            → A ~~pk~~ B w/ k ↪ T
 -- peek→peek-t (s-var-∙ regΔ inΔ) inΓ ε-var = ⟨ {!!} , ⟨ (pk-var-l {!!}) , {!!} ⟩ ⟩
 -- peek→peek-t (s-arr₁ s s₁) inΓ (ε-arr-l inA) = {!!}
 -- peek→peek-t (s-arr₁ s s₁) inΓ (ε-arr-r ¬inA inA) = {!!}
 -- peek→peek-t (s-∀ s) inΓ inA = {!!}
 -- peek→peek-t (s-svar-l x inΔ) inΓ inA = {!!}
 
-peek→peek-a : ∀ {pT}
-            → Γ ⊢ j # A ⌞ ≤⁺ ⌝ B
+peek→peek-a : Γ ⊢ j # A ⌞ ≤⁺ ⌝ B
             → peek A k j
             → Γ ∋ k := T
-            → ↑ty0 pT ⇘ T
-            → peek-a A B k j pT
+            → peek-a A B k j T
 -- peek→peek-a s (peek-base inA) inΓ = pka-∞ {!!} {!!}
 -- peek→peek-a (s-arr₂ s s₁) (peek-arr-i pk) inΓ = pka-arr-𝕚 (peek→peek-a s₁ pk inΓ)
 -- peek→peek-a (s-arr₃ cloA grd s) (peek-arr-c pk) inΓ = pka-arr-𝕔 (peek→peek-a s pk inΓ)
@@ -104,4 +101,4 @@ peek-a-~pk~ (pka-∀-𝕔 pka upC upD upE upj) ~j'@(~C {Σ = Σ} {e = e} ⊢e ~j
   = pk-∀l (peek-a-~pk~ pka (~weaken^0 ~j' (↑ty-arr upC upD) (↑tyᶜ-e up-e upΣ) (↑tyʲ-𝕔 upj))) upΣ up-e upE
 peek-a-~pk~ (pka-∀-𝕥 pka upB upj) (~T {Σ = Σ} ~j st)
   with ⟨ Σ' , upΣ ⟩ ← ↑tyᶜ0-total Σ
-  = pk-tapp (peek-a-~pk~ pka {!~j!}) upB upΣ
+  = pk-tapp (peek-a-~pk~ pka {!!}) upB upΣ

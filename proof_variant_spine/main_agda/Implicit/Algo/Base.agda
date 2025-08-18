@@ -71,13 +71,8 @@ data _~pk~_w/_ : Type m → Context n m → Fin m → Set where
 infix 3 _~~pk~~_w/_↪_
 infix 3 _~pk~_w/_↪_
 
-data _~~pk~~_w/_↪_ : Type (1 + m) → Type (1 + m) → Fin (1 + m) → Type m → Set where
-  pk-var-l : (upA : ↑ty0 A ⇘ A')
-           → ‶ k ~~pk~~ A' w/ k ↪ A
-{-
-  pk-var-r : (upA : ↑ty0 A ⇘ A')
-           → A' ~~pk~~ ‶ k w/ k ↪ A
--}
+data _~~pk~~_w/_↪_ : Type m → Type m → Fin m → Type m → Set where
+  pk-var-l : ‶ k ~~pk~~ A w/ k ↪ A
   pk-arr-l : A ~~pk~~ C w/ k ↪ E -- note, no contra-variant here for simplicity
            → A `→ B ~~pk~~ C `→ D w/ k ↪ E
   pk-arr-r : B ~~pk~~ D w/ k ↪ E
@@ -86,9 +81,9 @@ data _~~pk~~_w/_↪_ : Type (1 + m) → Type (1 + m) → Fin (1 + m) → Type m 
            → (upC : ↑ty0 C ⇘ C')
            → `∀ A ~~pk~~ `∀ B w/ k ↪ C
 
-data _~pk~_w/_↪_ : Type (1 + m) → Context n (1 + m) → Fin (1 + m) → Type m → Set where
+data _~pk~_w/_↪_ : Type m → Context n m → Fin m → Type m → Set where
   pk-type : A ~~pk~~ B w/ k ↪ C
-          → A ~pk~ (Context n (1 + m) ∋⦂ τ B) w/ k ↪ C
+          → A ~pk~ (Context n m ∋⦂ τ B) w/ k ↪ C
   pk-term : B ~pk~ Σ w/ k ↪ C
           → A `→ B ~pk~ [ e ]↝ Σ w/ k ↪ C
   pk-∀l   : A ~pk~ [ e' ]↝ Σ' w/ (#S k) ↪ C'
@@ -100,8 +95,6 @@ data _~pk~_w/_↪_ : Type (1 + m) → Context n (1 + m) → Fin (1 + m) → Type
           → (upC : ↑ty0 C ⇘ C')
           → (upΣ : ↑tyᶜ0 Σ ⇘ Σ')
           → `∀ A ~pk~ (B ⓪↝ Σ) w/ k ↪ C
-
-
 
 
 infix 3 _⊢_⇒_⇒_
@@ -188,7 +181,8 @@ data _⊢_≤⁺_⊣_↪_ where
     → Δ ⊢ A `→ B ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ C `→ D
 
   s-∀l-y :
-      (pk : A ~pk~ ([ e' ]↝ Σ') w/ #0 ↪ B)
+      (pk : A ~pk~ ([ e' ]↝ Σ') w/ #0 ↪ B')
+    → (upB : ↑ty0 B ⇘ B')
     → Δ ,= B ⊢ A ≤⁺ ([ e' ]↝ Σ') ⊣ Ψ ,= B ↪ C' `→ D'
     → (upᶜ : ↑tyᶜ0 Σ ⇘ Σ')
     → (upᵉ : ↑tyᵉ0 e ⇘ e')
