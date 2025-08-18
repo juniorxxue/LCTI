@@ -153,7 +153,7 @@ complete-s  {j = 𝕚 j} (s-∀l-peek s case-𝕚 pk upC upD (↑tyʲ-𝕚 upj))
   with refl ← ↑tyʲ-unique upj upj₁
   with weaken-j~ ← (~weaken^0 (~I ⊢e ~j) (↑ty-arr upC upD) (↑tyᶜ-e upe upΣ)) (↑tyʲ-𝕚 upj)
   with complete-s s (wfc-𝕚 (wf1-sol x)) (⊆/c-irrev-^=0' ext regA) weaken-j~
-... | normal cond s₁ = normal (λ cond' → cond (case₄ (case₂ cond'))) (s-∀l-y {!!} (s-unsol-sol0 s₁) upΣ upe upC upD)
+... | normal cond s₁ = normal (λ cond' → cond (case₄ (case₂ cond'))) (s-∀l-y {!peek→peek-a s pk ?!} (s-unsol-sol0 s₁) upΣ upe upC upD)
 ... | special inA inΓ^ tail newΔ s₁ = {!!}
 
 complete-s {j = 𝕔 j} (s-∀l-new s ic ¬pk fd upC upD (↑tyʲ-𝕔 upj)) (wfc-𝕔 x) (⊆∀-C ext upj₁) ~j'@(~C {Σ = Σ} {e = e} ⊢e ~j)
