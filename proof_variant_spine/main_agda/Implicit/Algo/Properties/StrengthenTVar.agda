@@ -74,7 +74,7 @@ abstract
   t-strengthen, (⊢sub ⊢e ne gc s) newΓ upΣ upe = ⊢sub (t-strengthen, ⊢e newΓ ↑tmᶜ-□ upe) (nonempty-↑tmᶜ' ne upΣ) (↑tm-gc' gc upe) (s-strengthen, s (◀S⋈ newΓ) (◀S⋈ newΓ) upΣ)
   t-strengthen, (⊢tabs ⊢e) newΓ ↑tmᶜ-□ (↑tm-Λ upe) = ⊢tabs (t-strengthen, ⊢e (◀S∙ newΓ) ↑tmᶜ-□ upe)
   t-strengthen, (⊢tabs-τ ⊢e) newΓ ↑tmᶜ-τ (↑tm-Λ upe) = ⊢tabs-τ (t-strengthen, ⊢e (◀S∙ newΓ) ↑tmᶜ-τ upe)
-  t-strengthen, (⊢tapp ⊢e st) newΓ newΣ (↑tm-⓪ upe) = ⊢tapp (t-strengthen, ⊢e newΓ (↑tmᶜ-⓪ newΣ) upe) st
+  -- t-strengthen, (⊢tapp ⊢e st) newΓ newΣ (↑tm-⓪ upe) = ⊢tapp (t-strengthen, ⊢e newΓ (↑tmᶜ-⓪ newΣ) upe) st
 
   s-strengthen, (s-empty regΓ cloA x) newΓ newΔ ↑tmᶜ-□ with refl ← ◀,-unique newΓ newΔ = s-empty (sregular-strengthen, regΓ newΓ)
                                                                                                  (⊢c-strengthen, cloA newΓ)

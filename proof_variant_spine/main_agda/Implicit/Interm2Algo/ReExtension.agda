@@ -6,6 +6,7 @@ open import Implicit.Language.All
 infix 3 _⊆_w/t_w/c_
 data _⊆_w/t_w/c_ : Env n m → Env n m → Type m → Counter m → Set where
   ⊆Z : (regΓ : SRegular Γ)
+     → (cloA : Γ ⊢c A)
      → Γ ⊆ Γ w/t A w/c Z
   ⊆∞ : (ext : Γ ⊆ Δ w/t A)
      → Γ ⊆ Δ w/t A w/c ∞
@@ -53,7 +54,7 @@ data _⊆_w/t_w/c_ : Env n m → Env n m → Type m → Counter m → Set where
 
 ⊆/c-⊆ : Γ ⊆ Δ w/t A w/c j
       → Γ ⊆ Δ
-⊆/c-⊆ (⊆Z regΓ) = ⊆-refl regΓ
+⊆/c-⊆ (⊆Z regΓ cloA) = ⊆-refl regΓ
 ⊆/c-⊆ (⊆I ext ext₁) = ⊆-trans (⊆/-⊆ ext) (⊆/c-⊆ ext₁)
 ⊆/c-⊆ (⊆C x ext) = ⊆/c-⊆ ext
 ⊆/c-⊆ (⊆∀-I ext upj) with ⊆/c-⊆ ext
@@ -81,7 +82,7 @@ data _⊆_w/t_w/c_ : Env n m → Env n m → Type m → Counter m → Set where
          → Γ ∋^ k
          → Δ ∋= k
          → find A k j
-⊆/c-find (⊆Z regΓ) in1 in2 = ⊥-elim (∋^-∋=-false in1 in2)
+⊆/c-find (⊆Z regΓ cloA) in1 in2 = ⊥-elim (∋^-∋=-false in1 in2)
 ⊆/c-find {A = A `→ B} {k = k} (⊆I ext ext₁) in1 in2 with ε-dec {k = k} {A}
 ... | inj₁ p = f-arr-𝕚-l p
 ... | inj₂ ¬p = f-arr-𝕚-r ¬p (⊆/c-find ext₁ (⊆/-^in-^out ext ¬p in1) in2)
@@ -138,7 +139,7 @@ data _⊆_w/t_w/c_ : Env n m → Env n m → Type m → Counter m → Set where
   with refl ← ↑tyʲ-unique upj upj₁
   with S= r ← ⊆/c-find-∋= ext (S= inΓ) fd
   = r
-⊆/c-find-∋= (⊆Z regΓ) inΓ (f-iso ())
+⊆/c-find-∋= (⊆Z regΓ cloA) inΓ (f-iso ())
 ⊆/c-find-∋= (⊆C-X regΓ cloA) inΓ (f-iso ())
 ⊆/c-find-∋= (⊆T-X regΓ cloA) inΓ (f-iso ())
 

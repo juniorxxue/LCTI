@@ -114,7 +114,7 @@ subsumption (⊢lam₂ ⊢e up-c ⊢e₁) (≊S {σ = σ} new)
   with ⟨ σ' , upσ ⟩ ← ↑tmᶜ0-total σ = ⊢lam₂ ⊢e upσ (subsumption ⊢e₁ (≊-↑tm new up-c upσ))
 subsumption (⊢sub ⊢e ne gc s) new = ⊢sub ⊢e (≊-nonempty ne new) gc (s-subsumtion s new)
 subsumption (⊢tabs ⊢e) ≋□ = ⊢sub (⊢tabs ⊢e) ne-τ gc-tlam (s-type (s-refl (reg-Z (t-env (⊢tabs ⊢e))) (⊢r-𝕣 (⊢r-∀ (t-⊢r ⊢e)))))
-subsumption (⊢tapp ⊢e st) new = ⊢tapp (subsumption ⊢e (≊⓪ new st)) st
+-- subsumption (⊢tapp ⊢e st) new = ⊢tapp (subsumption ⊢e (≊⓪ new st)) st
 
 subsumption0 : Γ ⊢ □ ⇒ e ⇒ A
              → Γ ⊢ τ A ⇒ e ⇒ A

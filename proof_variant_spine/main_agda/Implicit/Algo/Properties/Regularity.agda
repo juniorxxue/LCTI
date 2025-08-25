@@ -4,7 +4,6 @@ module Implicit.Algo.Properties.Regularity where
 
 open import Implicit.Language.All
 open import Implicit.Algo.Base
-open import Implicit.Algo.Properties.Id
 open import Implicit.Algo.Properties.Extension
 open import Implicit.Algo.Properties.Polarity
 
@@ -66,6 +65,9 @@ s-env-in (s-tapp s upᶜ) with s-env-in s
 s-env-in (s-svar-term inΓ s) = s-env-in s
 s-env-in (s-svar-tapp inΓ s) = s-env-in s
 s-env-in (s-evar-infers x inst) = inst-env-in inst
+s-env-in (s-∀l-y pk upB x upᶜ upᵉ upC upD) = {!!}
+s-env-in (s-∀l-n-y ¬pk x upᶜ upᵉ upC upD) = {!!}
+s-env-in (s-∀l-n-n ¬pk x upᶜ upᵉ upC upD) = {!!}
 
 s-env-out : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
           → SRegular Δ
@@ -162,6 +164,9 @@ s-⊢rᶜ (s-svar-term inΓ s) = s-⊢rᶜ s
 s-⊢rᶜ (s-svar-tapp inΓ s) = s-⊢rᶜ s
 s-⊢rᶜ (s-evar-infers tfs inst) with infs-⊢rᶜ tfs
 ... | ⊢rᶜ-term r = ⊢rᶜ-term (⊢rᶜ-𝕣 r)
+s-⊢rᶜ (s-∀l-y pk upB x upᶜ upᵉ upC upD) = {!!}
+s-⊢rᶜ (s-∀l-n-y ¬pk x upᶜ upᵉ upC upD) = {!!}
+s-⊢rᶜ (s-∀l-n-n ¬pk x upᶜ upᵉ upC upD) = {!!}
 
 t-⊢rᶜ : Γ ⊢ Σ ⇒ e ⇒ A
       → Γ ⊢rᶜ Σ
@@ -202,7 +207,9 @@ s-⊢r (s-evar-infers tfs inst) = ⊢r-𝕣 (infs-⊢r tfs)
 
 t-⊢r (⊢lit regΓ) = ⊢r-int
 t-⊢r (⊢var regΓ x∈Γ) = ∋⦂-⊢r regΓ x∈Γ
-t-⊢r (⊢ann ⊢e) rewrite ⊢id0 ⊢e = t-⊢r ⊢e
+t-⊢r (⊢ann ⊢e) with t-⊢rᶜ ⊢e
+... | ⊢rᶜ-τ regA = regA
+-- rewrite ⊢id0 ⊢e = t-⊢r ⊢e
 t-⊢r (⊢app ⊢e) with t-⊢r ⊢e
 ... | ⊢r-arr r r₁ = r₁
 t-⊢r (⊢lam₁ ⊢e) with t-env ⊢e
@@ -210,8 +217,8 @@ t-⊢r (⊢lam₁ ⊢e) with t-env ⊢e
 t-⊢r (⊢lam₂ ⊢e up-c ⊢e₁) = ⊢r-arr (t-⊢r ⊢e) (⊢r-strengthen,0 (t-⊢r ⊢e₁))
 t-⊢r (⊢sub ⊢e ne gc s) = ⊢r-𝕣' (s-⊢r s)
 t-⊢r (⊢tabs ⊢e) = ⊢r-∀ (t-⊢r ⊢e)
-t-⊢r (⊢tapp ⊢e st) with t-⊢rᶜ ⊢e
-... | ⊢rᶜ-tapp regA regΓ = st0-⊢r (t-⊢r ⊢e) regA st
+-- t-⊢r (⊢tapp ⊢e st) with t-⊢rᶜ ⊢e
+-- ... | ⊢rᶜ-tapp regA regΓ = st0-⊢r (t-⊢r ⊢e) regA st
 t-⊢r (⊢tabs-τ ⊢e) = ⊢r-∀ (t-⊢r ⊢e)
 
 infs-⊢r (infs-z regΓ regA) = regA

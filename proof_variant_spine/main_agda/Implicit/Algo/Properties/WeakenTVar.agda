@@ -82,7 +82,7 @@ t-weaken, {T = T} (⊢tabs ⊢e) new ↑tmᶜ-□ (↑tm-Λ upe)
   with ⟨ T' , upT ⟩ ← ↑ty0-total T = ⊢tabs (t-weaken, ⊢e (▶S∙ new upT) ↑tmᶜ-□ upe)
 t-weaken, {T = T} (⊢tabs-τ ⊢e) new ↑tmᶜ-τ (↑tm-Λ upe)
   with ⟨ T' , upT ⟩ ← ↑ty0-total T = ⊢tabs-τ (t-weaken, ⊢e (▶S∙ new upT) ↑tmᶜ-τ upe)
-t-weaken, (⊢tapp ⊢e st) new upΣ (↑tm-⓪ upe) = ⊢tapp (t-weaken, ⊢e new (↑tmᶜ-⓪ upΣ) upe) st
+-- t-weaken, (⊢tapp ⊢e st) new upΣ (↑tm-⓪ upe) = ⊢tapp (t-weaken, ⊢e new (↑tmᶜ-⓪ upΣ) upe) st
 
 s-weaken, (s-empty regΓ cloA grd) ↑tmᶜ-□ new
    with refl ← ▶s⨟,-unique new = s-empty (sregular-weaken,s regΓ (▶s⨟,-▶s,-l new)) (⊢c-weaken,s cloA (▶s⨟,-▶s,-l new)) (≫-weaken,s grd (▶s⨟,-▶s,-l new))

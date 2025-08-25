@@ -145,10 +145,10 @@ abstract
   t-strengthen= (⊢tabs ⊢e) newΓ (↑ty-∀ upA) (↑tyᵉ-Λ upe) ↑tyᶜ-□ = ⊢tabs (t-strengthen= ⊢e (◀S∙ newΓ) upA upe ↑tyᶜ-□)
   t-strengthen= (⊢tabs-τ ⊢e) newΓ (↑ty-∀ upA) (↑tyᵉ-Λ upe) (↑tyᶜ-τ (↑ty-∀ upA'))
     = ⊢tabs-τ (t-strengthen= ⊢e (◀S∙ newΓ) upA upe (↑tyᶜ-τ upA'))
-  t-strengthen= (⊢tapp ⊢e st) newΓ upA (↑tyᵉ-⓪ upe upA₁) upΣ
-    with regA ← t-⊢r ⊢e
-    with ⟨ pA , ↑ty-∀ uppA ⟩ ← ⊢r-◀=-↑ty-surjective regA newΓ
-    = ⊢tapp (t-strengthen= ⊢e newΓ (↑ty-∀ uppA) upe (↑tyᶜ-⓪ upA₁ upΣ)) (↑ty-st-comm0'' st upA₁ uppA upA)
+  -- t-strengthen= (⊢tapp ⊢e st) newΓ upA (↑tyᵉ-⓪ upe upA₁) upΣ
+  --   with regA ← t-⊢r ⊢e
+  --   with ⟨ pA , ↑ty-∀ uppA ⟩ ← ⊢r-◀=-↑ty-surjective regA newΓ
+  --   = ⊢tapp (t-strengthen= ⊢e newΓ (↑ty-∀ uppA) upe (↑tyᶜ-⓪ upA₁ upΣ)) (↑ty-st-comm0'' st upA₁ uppA upA)
 
 
   s-strengthen= (s-empty regΓ cloA x) newΓ newΔ upA upB ↑tyᶜ-□

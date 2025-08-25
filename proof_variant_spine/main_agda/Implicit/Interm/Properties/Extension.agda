@@ -16,8 +16,6 @@ s-⊆-prv (s-arr₁ s s₁) ext = s-arr₁ (s-⊆-prv s ext) (s-⊆-prv s₁ ext
 s-⊆-prv (s-arr₂ s s₁) ext = s-arr₂ (s-⊆-prv s ext) (s-⊆-prv s₁ ext)
 s-⊆-prv (s-arr₃ cloA grd s) ext = s-arr₃ (⊆-⊢c cloA ext) (⊆-⊢c-≫' ext cloA grd) (s-⊆-prv s ext)
 s-⊆-prv (s-∀ s) ext = s-∀ (s-⊆-prv s (uvar ext))
-s-⊆-prv (s-∀l s ic fd upC upD upj) ext with s-sregular s
-... | reg-S= r regA = s-∀l (s-⊆-prv s (svar ext regA)) ic fd upC upD upj
 s-⊆-prv (s-∀l-no-appear s ic fd upC upD upj) ext with s-sregular s
 ... | reg-S^ r = s-∀l-no-appear (s-⊆-prv s (evar ext)) ic fd upC upD upj
 s-⊆-prv (s-svar-l x inΔ) ext = s-svar-l (⊆-sregular' ext) (⊆-∋:= inΔ ext)
@@ -151,8 +149,6 @@ s-⊆-prv-gen (s-arr₁ s s₁) ext = s-arr₁ (s-⊆-prv-gen s ext) (s-⊆-prv-
 s-⊆-prv-gen (s-arr₂ s s₁) ext = s-arr₂ (s-⊆-prv-gen s ext) (s-⊆-prv-gen s₁ ext)
 s-⊆-prv-gen (s-arr₃ cloA grd s) ext = s-arr₃ (⊆t-⊢c cloA ext) (⊆t-⊢c-≫ grd ext cloA) (s-⊆-prv-gen s ext)
 s-⊆-prv-gen (s-∀ s) ext = s-∀ (s-⊆-prv-gen s (uvar ext))
-s-⊆-prv-gen (s-∀l s ic fd upC upD upj) ext with s-sregular s
-... | reg-S= r regA = s-∀l (s-⊆-prv-gen s (svar ext regA)) ic fd upC upD upj
 s-⊆-prv-gen (s-∀l-no-appear s ic fd upC upD upj) ext with s-sregular s
 ... | reg-S^ r = s-∀l-no-appear (s-⊆-prv-gen s (evar ext)) ic fd upC upD upj
 s-⊆-prv-gen (s-svar-l x inΔ) ext = s-svar-l (⊆t-sregular x ext) (⊆t-∋:= inΔ ext)

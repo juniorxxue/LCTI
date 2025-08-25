@@ -96,8 +96,8 @@ t-weaken= {T = T} (⊢tabs ⊢e) new ↑tyᶜ-□ (↑tyᵉ-Λ upe) (↑ty-∀ u
 t-weaken= {T = T} (⊢tabs-τ ⊢e) new (↑tyᶜ-τ (↑ty-∀ upA')) (↑tyᵉ-Λ upe) (↑ty-∀ upA)
   with ⟨ T' , upT ⟩ ← ↑ty0-total T
   = ⊢tabs-τ (t-weaken= ⊢e (▶S∙ new upT) (↑tyᶜ-τ upA') upe upA)
-t-weaken= {k = k} (⊢tapp {B = B} ⊢e st) newΓ upΣ (↑tyᵉ-⓪ upe upA₁) upA
-  with ⟨ B' , upB ⟩ ← ↑ty-total B (#S k) = ⊢tapp (t-weaken= ⊢e newΓ (↑tyᶜ-⓪ upA₁ upΣ) upe (↑ty-∀ upB)) (↑ty-st-comm0 st upA₁ upB upA)
+-- t-weaken= {k = k} (⊢tapp {B = B} ⊢e st) newΓ upΣ (↑tyᵉ-⓪ upe upA₁) upA
+  -- with ⟨ B' , upB ⟩ ← ↑ty-total B (#S k) = ⊢tapp (t-weaken= ⊢e newΓ (↑tyᶜ-⓪ upA₁ upΣ) upe (↑ty-∀ upB)) (↑ty-st-comm0 st upA₁ upB upA)
 
 s-weaken= (s-empty regΓ cloA grd) new upA ↑tyᶜ-□ upB
   with refl ← ▶⨟=-unique new = s-empty (sregular-weaken= regΓ (▶⨟=-▶=-l new)) (⊢c-weaken= cloA (▶⨟=-▶=-l new) upA) (≫-weaken= grd (▶⨟=-▶=-l new) upA upB)

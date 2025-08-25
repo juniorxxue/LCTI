@@ -149,10 +149,10 @@ data _⊢_⇒_⇒_ where
       Γ ,∙ ⊢ τ B ⇒ e ⇒ A
     → Γ ⊢ τ (`∀ B) ⇒ Λ e ⇒ `∀ A
 
-  ⊢tapp :
-      Γ ⊢ A ⓪↝ Σ ⇒ e ⇒ `∀ B
-    → (st : ⟦ A ⟧ B ⇘ B*)
-    → Γ ⊢ Σ ⇒ e ⓪ A ⇒ B*
+  ⊢tapp : ∀ {pB}
+    → Γ ⊢ A ⓪↝ Σ ⇒ e ⇒ `∀ B
+    → (upB : ↑ty0 pB ⇘ B)
+    → Γ ⊢ Σ ⇒ e ⓪ A ⇒ pB
 
 data _⊢_≤⁺_⊣_↪_ where
 

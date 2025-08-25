@@ -36,14 +36,6 @@ data _⊢_#_⌞_⌝_ : Env n m → Counter m → Type m → Polar → Type m →
   s-∀ :
       Δ ,∙ ⊢ ∞ # A ⌞ ≤ ⌝ B
     → Δ ⊢ ∞ # `∀ A ⌞ ≤ ⌝ `∀ B
-  s-∀l :
-      Δ ,= B ⊢ j' # A ⌞ ≤⁺ ⌝ C' `→ D'
-    → (ic : (𝕚𝕔 j))
-    → (fd : find A #0 j')
-    → (upC : ↑ty0 C ⇘ C')
-    → (upD : ↑ty0 D ⇘ D')
-    → (upj : ↑tyʲ0 j ⇘ j')
-    → Δ ⊢ j # `∀ A ⌞ ≤⁺ ⌝ C `→ D
   s-∀l-new :
       Δ ,= B ⊢ j' # A ⌞ ≤⁺ ⌝ C' `→ D'
     → (ic : (𝕚𝕔 j))
@@ -226,9 +218,10 @@ data _⊢_#_⦂_ : Env n m → Counter m → Term n m → Type m → Set where
   ⊢tabs-∞ :
       Γ ,∙ ⊢ ∞ # e ⦂ A
     → Γ ⊢ ∞ # Λ e ⦂ `∀ A
-  ⊢tapp : Γ ⊢ 𝕥₍ A ₎ j # e ⦂ `∀ B
-        → (st : ⟦ A ⟧ B ⇘ B*)
-        → Γ ⊢ j # e ⓪ A ⦂ B*
+  ⊢tapp : ∀ {pB}
+        → Γ ⊢ 𝕥₍ A ₎ j # e ⦂ `∀ B
+        → (upB : ↑ty0 pB ⇘ B)
+        → Γ ⊢ j # e ⓪ A ⦂ pB
 
 
 _ : ∅ , `∀ `∀ (‶ #0 `→ ‶ #1 `→ (‶ #0 `→ ‶ #1)) ⊢ ∞ # (` #0) · (lit 1) · (ƛ ` #0) ⦂ Int `→ (Int `→ Int)
