@@ -31,6 +31,8 @@ data _⊆_w/t_w/p_ : Env n m → Env n m → Type m → Counter m → Set where
 -}
 
 
+
+
 ----------------------------------------------------------------------
 --+          extension is irrelevant to solution                   +--
 ----------------------------------------------------------------------
@@ -105,6 +107,14 @@ data _⊆_w/t_w/p_ : Env n m → Env n m → Type m → Counter m → Set where
   with svar r regA ← ⊆/c-⊆ ext
   with ⟨ B' , upB ⟩ ← ↑ty0-total B
   = ⊆∀-C-new (⊆/c-irrev-== ext (=⟹=S new1 upB regA) (=⟹=S new2 upB (⊆-⊢r regA r))) upj
+
+⊆/c-irrev-==0 : Γ ,= B ⊆ Δ ,= B w/t A w/c j
+              → Γ ⊢r C
+              → Γ ,= C ⊆ Δ ,= C w/t A w/c j
+⊆/c-irrev-==0 {C = C} ext regC
+  with ⟨ C' , upC ⟩ ← ↑ty0-total C
+  with svar ext' regA ← ⊆/c-⊆ ext
+  = ⊆/c-irrev-== ext (=⟹=0 upC regC (⊆-sregular ext')) (=⟹=0 upC (⊆-⊢r regC ext') (⊆-sregular' ext'))
 
 ⊆/v-irrev-^= : Γ ⊆ Δ w/v k
              → Γ ∋^ k
@@ -292,6 +302,39 @@ data _⊆_w/t_w/p_ : Env n m → Env n m → Type m → Counter m → Set where
              → #0 ¬ε A
              → Γ ,^ ⊆ Δ ,^ w/t A
 ⊆/-irrev-^^0 ext nin = ⊆/-irrev-^^ ext nin ◎Z ◎Z
+
+⊆/c-irrev-^^ : Γ ⊆ Δ w/t A w/c j
+            → k ¬ε A
+            → Γ ◎ k ⇘ Γ'
+            → Δ ◎ k ⇘ Δ'
+            → Γ' ⊆ Δ' w/t A w/c j
+⊆/c-irrev-^^ (⊆Z regΓ cloA) ninA newΓ newΔ
+  with refl ← ◎-unique newΓ newΔ = ⊆Z (◎-sregular regΓ newΓ) (◎-⊢c cloA newΓ ninA)
+⊆/c-irrev-^^ (⊆∞ ext) ninA newΓ newΔ = ⊆∞ (⊆/-irrev-^^ ext ninA newΓ newΔ)
+⊆/c-irrev-^^ (⊆I ext ext₁) (¬ε-arr ninA ninA₁) newΓ newΔ
+  with ⟨ Ω' , ◎Ω ⟩ ← ◎-total (⊆/-=in-=out ext (◎-∋= newΓ))
+  = ⊆I (⊆/-irrev-^^ ext ninA newΓ ◎Ω) (⊆/c-irrev-^^ ext₁ ninA₁ ◎Ω newΔ)
+⊆/c-irrev-^^ (⊆C cloA ext) (¬ε-arr ninA ninA₁) newΓ newΔ = ⊆C (◎-⊢c cloA newΓ ninA) (⊆/c-irrev-^^ ext ninA₁ newΓ newΔ)
+⊆/c-irrev-^^ (⊆∀-I ext upj) (¬ε-∀ ninA) newΓ newΔ = ⊆∀-I (⊆/c-irrev-^^ ext ninA (◎S^ newΓ) (◎S= newΔ)) upj
+⊆/c-irrev-^^ (⊆∀-I-new ext upj) (¬ε-∀ ninA) newΓ newΔ = ⊆∀-I-new (⊆/c-irrev-^^ ext ninA (◎S= newΓ) (◎S= newΔ)) upj
+⊆/c-irrev-^^ (⊆∀-C-new ext upj) (¬ε-∀ ninA) newΓ newΔ = ⊆∀-C-new (⊆/c-irrev-^^ ext ninA (◎S= newΓ) (◎S= newΔ)) upj
+⊆/c-irrev-^^ (⊆∀-I-no ext upj) (¬ε-∀ ninA) newΓ newΔ = ⊆∀-I-no (⊆/c-irrev-^^ ext ninA (◎S^ newΓ) (◎S^ newΔ)) upj
+⊆/c-irrev-^^ (⊆∀-C ext upj) (¬ε-∀ ninA) newΓ newΔ = ⊆∀-C (⊆/c-irrev-^^ ext ninA (◎S^ newΓ) (◎S= newΔ)) upj
+⊆/c-irrev-^^ (⊆∀-C-no ext upj) (¬ε-∀ ninA) newΓ newΔ = ⊆∀-C-no (⊆/c-irrev-^^ ext ninA (◎S^ newΓ) (◎S^ newΔ)) upj
+⊆/c-irrev-^^ (⊆∀-T ext upj) (¬ε-∀ ninA) newΓ newΔ = ⊆∀-T (⊆/c-irrev-^^ ext ninA (◎S= newΓ) (◎S= newΔ)) upj
+⊆/c-irrev-^^ (⊆I-X regΓ cloA) (¬ε-var x) newΓ newΔ
+  with refl ← ◎-unique newΓ newΔ = ⊆I-X (◎-sregular regΓ newΓ) (◎-⊢c cloA newΓ (¬ε-var x))
+⊆/c-irrev-^^ (⊆C-X regΓ cloA) (¬ε-var x) newΓ newΔ
+  with refl ← ◎-unique newΓ newΔ = ⊆C-X (◎-sregular regΓ newΓ) (◎-⊢c cloA newΓ (¬ε-var x))
+⊆/c-irrev-^^ (⊆T-X regΓ cloA) (¬ε-var x) newΓ newΔ
+  with refl ← ◎-unique newΓ newΔ = ⊆T-X (◎-sregular regΓ newΓ) (◎-⊢c cloA newΓ (¬ε-var x))
+⊆/c-irrev-^^ (⊆Inf-X extx iso) (¬ε-var x) newΓ newΔ = ⊆Inf-X (⊆/v-irrev-^^ extx newΓ newΔ x) iso
+
+⊆/c-irrev-^^0 : Γ ,= B ⊆ Δ ,= B w/t A w/c j
+             → #0 ¬ε A
+             → Γ ,^ ⊆ Δ ,^ w/t A w/c j
+⊆/c-irrev-^^0 ext ninA = ⊆/c-irrev-^^ ext ninA ◎Z ◎Z
+
 
 ⊆/v-irrev-^ : Γ ⊆ Δ w/v k
             → Γ ◎ k ⇘ Γ'

@@ -155,7 +155,6 @@ complete-s  {j = 𝕚 j} (s-∀l-peek {B = B} s case-𝕚 pk upC upD (↑tyʲ-�
   with com-pk ← (peek-a-~pk~ (peek→peek-a s pk (Z upB)) weaken-j~)
   with complete-s s (wfc-𝕚 (wf1-sol x)) (⊆/c-irrev-^=0' ext regA) weaken-j~
 ... | normal cond s₁ = normal (λ cond' → cond (case₄ (case₂ cond'))) (s-∀l-y com-pk upB (s-unsol-sol0 s₁) upΣ upe upC upD)
--- (s-∀l-y {!peek→peek-a s pk ?!} (s-unsol-sol0 s₁) upΣ upe upC upD)
 ... | special {k = #0} inA Z tail (=⟹=0 up regA₁ env) s₁
   with refl ← pk-tail-eq com-pk tail inA (s-id' s₁)
   = normal (case₅ inA) (s-∀l-y com-pk up (s-unsol-sol0 s₁) upΣ upe upC upD) -- some uniqueness needed
@@ -163,7 +162,17 @@ complete-s  {j = 𝕚 j} (s-∀l-peek {B = B} s case-𝕚 pk upC upD (↑tyʲ-�
   = special (ε-∀ inA) inΓ^ (ett-∀-𝕚 tail upC upD up1) newΔ (s-∀l-y com-pk upB (s-unsol-sol0 s₁) upΣ upe upC upD)
 
 complete-s {j = 𝕔 j} (s-∀l-new s ic ¬pk fd upC upD (↑tyʲ-𝕔 upj)) (wfc-𝕔 x) (⊆∀-C ext upj₁) ~j'@(~C {Σ = Σ} {e = e} ⊢e ~j)
-  = _
+  with ⟨ Σ' , upΣ ⟩ ← ↑tyᶜ0-total Σ
+  with ⟨ e' , upe ⟩ ← ↑tyᵉ0-total e
+  with reg-S= r regA ← s-sregular s
+  with refl ← ↑tyʲ-unique upj upj₁
+  with weaken-j~ ← (~weaken^0 (~C ⊢e ~j) (↑ty-arr upC upD) (↑tyᶜ-e upe upΣ)) (↑tyʲ-𝕔 upj)
+  with com-¬pk ← (complete-¬peek ¬pk weaken-j~)
+  with complete-s s (wfc-𝕔 (wf1-sol x)) (⊆/c-irrev-^=0 ext fd regA) weaken-j~
+... | normal cond s₁ = normal (λ cond' → cond (case₄ (case₂ cond'))) (s-∀l-n-y com-¬pk s₁ upΣ upe upC upD)
+... | special {k = #0} inA Z tail (=⟹=0 up regA₁ env) s₁ = normal (case₅ inA) (s-∀l-n-y com-¬pk s₁ upΣ upe upC upD)
+... | special {k = #S k} inA (S^ inΓ^) tail (=⟹=S newΔ up1 regB) s₁ = special (ε-∀ inA) inΓ^ (ett-∀-𝕚 tail upC upD up1) newΔ
+              (s-∀l-n-y com-¬pk s₁ upΣ upe upC upD)
 complete-s {j = 𝕚 j} (s-∀l-new x ic ¬pk fd upC upD (↑tyʲ-𝕚 upj))
   (wfc-𝕚 x₁)
   (⊆∀-I-no ext upj₁)
@@ -234,54 +243,98 @@ complete-s {j = 𝕥₍ T ₎ j} (s-svar-𝕥 x s) (wfc-𝕥 wf) (⊆T-X regΓ c
 ... | normal cond s₁ = normal (⊢c-¬ε' cloA) (s-svar-tapp x s₁)
 ... | special inA inΓ^ tail newΔ s₁ = ⊥-elim (complete-false₃ (∋:=-⊢r regΓ x) inA inΓ^)
 
-complete-s (s-∀l-peek s ic pk upC upD upj) wf (⊆∀-I-no ext upj₁) ~j = ⊥-elim (ε-¬ε-false {!!} (⊆/c-no-appear ext Z Z))
-complete-s (s-∀l-peek s ic pk upC upD upj) wf (⊆∀-C ext upj₁) ~j = {!!}
-complete-s (s-∀l-peek s ic pk upC upD upj) wf (⊆∀-C-no ext upj₁) ~j = {!!}
-{-
-complete-s {j = 𝕚 j} (s-∀l-new s ic ¬pk fd upC upD (↑tyʲ-𝕚 upj)) (wfc-𝕚 x) (⊆∀-I ext upj₁) ~j'@(~I {Σ = Σ} {e = e} ⊢e ~j)
+complete-s (s-∀l-peek s ic pk upC upD upj) wf (⊆∀-I-no ext upj₁) ~j = ⊥-elim (ε-¬ε-false (peek-ε-gen pk) (⊆/c-no-appear ext Z Z))
+complete-s  {j = 𝕔 j} (s-∀l-peek {B = B} s case-𝕔 pk upC upD (↑tyʲ-𝕔 upj)) (wfc-𝕔 x) (⊆∀-C ext upj₁) ~j'@(~C {Σ = Σ} {e = e} ⊢e ~j)
   with ⟨ Σ' , upΣ ⟩ ← ↑tyᶜ0-total Σ
   with ⟨ e' , upe ⟩ ← ↑tyᵉ0-total e
+  with ⟨ B' , upB ⟩ ← ↑ty0-total B
   with reg-S= r regA ← s-sregular s
   with refl ← ↑tyʲ-unique upj upj₁
-  with weaken-j~ ← (~weaken^0 (~I ⊢e ~j) (↑ty-arr upC upD) (↑tyᶜ-e upe upΣ)) (↑tyʲ-𝕚 upj)
-  with complete-s s (wfc-𝕚 (wf1-sol x)) (⊆/c-irrev-^=0 ext fd regA) weaken-j~
-... | normal cond s₁ = normal (λ cond' → cond (case₄ (case₂ cond'))) (s-∀l-n-y (complete-¬peek ¬pk weaken-j~) s₁ upΣ upe upC upD)
-... | special {k = #0} inA Z tail (=⟹=0 up regA₁ env) s₁ = normal (case₅ inA) (s-∀l-n-y (complete-¬peek ¬pk weaken-j~) s₁ upΣ upe upC upD)
-... | special {k = #S k} inA (S^ inΓ^) tail (=⟹=S newΔ up1 regB) s₁ = special (ε-∀ inA) inΓ^ (ett-∀-𝕚 tail upC upD up1) newΔ
-              (s-∀l-n-y (complete-¬peek ¬pk weaken-j~) s₁ upΣ upe upC upD)
--}
+  with weaken-j~ ← (~weaken^0 (~C ⊢e ~j) (↑ty-arr upC upD) (↑tyᶜ-e upe upΣ)) (↑tyʲ-𝕔 upj)
+  with com-pk ← (peek-a-~pk~ (peek→peek-a s pk (Z upB)) weaken-j~)
+  with complete-s s (wfc-𝕔 (wf1-sol x)) (⊆/c-irrev-^=0' ext regA) weaken-j~
+... | normal cond s₁ = normal (λ cond' → cond (case₄ (case₂ cond'))) (s-∀l-y com-pk upB (s-unsol-sol0 s₁) upΣ upe upC upD)
+... | special {k = #0} inA Z tail (=⟹=0 up regA₁ env) s₁
+  with refl ← pk-tail-eq com-pk tail inA (s-id' s₁)
+  = normal (case₅ inA) (s-∀l-y com-pk up (s-unsol-sol0 s₁) upΣ upe upC upD)
+... | special {k = #S k} inA (S^ inΓ^) tail (=⟹=S newΔ up1 regB) s₁
+  = special (ε-∀ inA) inΓ^ (ett-∀-𝕚 tail upC upD up1) newΔ (s-∀l-y com-pk upB (s-unsol-sol0 s₁) upΣ upe upC upD)
+complete-s (s-∀l-peek s ic pk upC upD upj) wf (⊆∀-C-no ext upj₁) ~j = ⊥-elim (ε-¬ε-false (peek-ε-gen pk) (⊆/c-no-appear ext Z Z))
 complete-s {j = 𝕚 j} (s-∀l-new s ic ¬pk fd upC upD (↑tyʲ-𝕚 upj)) (wfc-𝕚 x) (⊆∀-I-new ext upj₁) ~j'@(~I {Σ = Σ} {e = e} ⊢e ~j)
   with ⟨ Σ' , upΣ ⟩ ← ↑tyᶜ0-total Σ
   with ⟨ e' , upe ⟩ ← ↑tyᵉ0-total e
   with reg-S= r regA ← s-sregular s
   with refl ← ↑tyʲ-unique upj upj₁
   with weaken-j~ ← (~weaken^0 (~I ⊢e ~j) (↑ty-arr upC upD) (↑tyᶜ-e upe upΣ)) (↑tyʲ-𝕚 upj)
+  with com-¬pk ← (complete-¬peek ¬pk weaken-j~)
   with complete-s s (wfc-𝕚 (wf1-sol x)) (⊆/c-irrev-^=0 (⊆/c-irrev-^0 ext fd) fd regA) weaken-j~
-... | r
-  = {!!}
-complete-s (s-∀l-peek s case-𝕚 pk upC upD (↑tyʲ-𝕚 upj)) (wfc-𝕚 x₁)
-  (⊆∀-I-new x₂ upj₁)
-  (~I ⊢e x₃)
-  = {!!}
-complete-s {j = 𝕚 j} (s-∀l-no-appear x ic fd upC upD (↑tyʲ-𝕚 upj))
-  (wfc-𝕚 x₁)
-  (⊆∀-I-new x₂ upj₁)
-  (~I ⊢e x₃)
-  = {!!}
+... | normal cond s₁ = normal (λ cond' → cond (case₄ (case₂ cond'))) (s-∀l-n-y com-¬pk s₁ upΣ upe upC upD)
+... | special {k = #0} inA Z tail (=⟹=0 up regA₁ env) s₁ = normal (case₅ inA) ((s-∀l-n-y com-¬pk s₁ upΣ upe upC upD))
+... | special {k = #S k} inA (S^ inΓ^) tail (=⟹=S newΔ up1 regB) s₁ = special (ε-∀ inA) inΓ^ (ett-∀-𝕚 tail upC upD up1) newΔ
+  (s-∀l-n-y com-¬pk s₁ upΣ upe upC upD)
+complete-s (s-∀l-peek {B = B} s case-𝕚 pk upC upD (↑tyʲ-𝕚 upj)) (wfc-𝕚 x) (⊆∀-I-new ext upj₁) ~j'@(~I {Σ = Σ} {e = e} ⊢e ~j)
+  with ⟨ Σ' , upΣ ⟩ ← ↑tyᶜ0-total Σ
+  with ⟨ B' , upB ⟩ ← ↑ty0-total B
+  with ⟨ e' , upe ⟩ ← ↑tyᵉ0-total e
+  with reg-S= r regA ← s-sregular s
+  with svar ext' _ ← ⊆/c-⊆ ext
+  with regA' ← ⊆-⊢r' regA ext'
+  with refl ← ↑tyʲ-unique upj upj₁
+  with weaken-j~ ← (~weaken=0 (~I ⊢e ~j) (↑ty-arr upC upD) (↑tyᶜ-e upe upΣ)) (↑tyʲ-𝕚 upj) regA'
+  with com-pk ← (peek-a-~pk~ (peek→peek-a s pk (Z upB)) weaken-j~)
+  with complete-s s (wfc-𝕚 (wf1-sol x)) (⊆/c-irrev-==0 ext regA') weaken-j~
+... | normal cond s₁ = normal (λ cond' → cond (case₃ cond')) (s-∀l-y com-pk upB s₁ upΣ upe upC upD)
+... | special {k = #0} inA () tail newΔ s₁
+... | special {k = #S k} inA (S= inΓ^) tail (=⟹=S newΔ up1 regB) s₁ = special (ε-∀ inA) inΓ^ (ett-∀-𝕚 tail upC upD up1) newΔ ((s-∀l-y com-pk upB s₁ upΣ upe upC upD))
+complete-s {j = 𝕚 j} (s-∀l-no-appear s ic fd upC upD (↑tyʲ-𝕚 upj)) (wfc-𝕚 x) (⊆∀-I-new ext upj₁) ~j'@(~I {Σ = Σ} {e = e} ⊢e ~j)
+  with ⟨ Σ' , upΣ ⟩ ← ↑tyᶜ0-total Σ
+  with ⟨ e' , upe ⟩ ← ↑tyᵉ0-total e
+  with reg-S^ r ← s-sregular s
+  with refl ← ↑tyʲ-unique upj upj₁
+  with weaken-j~ ← (~weaken^0 (~I ⊢e ~j) (↑ty-arr upC upD) (↑tyᶜ-e upe upΣ)) (↑tyʲ-𝕚 upj)
+  with complete-s s (wfc-𝕚 (wf1-ex x)) (⊆/c-irrev-^^0 ext fd) weaken-j~
+... | normal cond s₁ = normal ((λ cond' → cond (case₄ (case₂ cond')))) (s-∀l-n-n (¬ε-¬pk fd) s₁ upΣ upe upC upD)
+... | special {k = #0} inA Z tail () s₁
+... | special {k = #S k} inA (S^ inΓ^) tail (=⟹^S newΔ up1) s₁
+  = special (ε-∀ inA) inΓ^ (ett-∀-𝕚 tail upC upD up1) newΔ (s-∀l-n-n (¬ε-¬pk fd) s₁ upΣ upe upC upD)
 -- no worry, logic below duplicated
-complete-s {j = 𝕔 j} (s-∀l-new x ic ¬pk fd upC upD (↑tyʲ-𝕔 upj))
-  (wfc-𝕔 x₁)
-  (⊆∀-C-new x₂ upj₁)
-  (~C ⊢e x₃)
-  = {!!}
-complete-s (s-∀l-peek x₁ ic pk upC upD upj) x (⊆∀-C-new x₂ upj₁)
-  (~C ⊢e x₃)
-  = {!!}
-complete-s {j = 𝕔 j} (s-∀l-no-appear x ic fd upC upD (↑tyʲ-𝕔 upj))
-  (wfc-𝕔 x₁)
-  (⊆∀-C-new x₂ upj₁)
-  (~C ⊢e x₃)
-  = {!!}
+complete-s {j = 𝕔 j} (s-∀l-new s ic ¬pk fd upC upD (↑tyʲ-𝕔 upj)) (wfc-𝕔 x) (⊆∀-C-new ext upj₁) ~j'@(~C {Σ = Σ} {e = e} ⊢e ~j)
+  with ⟨ Σ' , upΣ ⟩ ← ↑tyᶜ0-total Σ
+  with ⟨ e' , upe ⟩ ← ↑tyᵉ0-total e
+  with reg-S= r regA ← s-sregular s
+  with refl ← ↑tyʲ-unique upj upj₁
+  with weaken-j~ ← (~weaken^0 (~C ⊢e ~j) (↑ty-arr upC upD) (↑tyᶜ-e upe upΣ)) (↑tyʲ-𝕔 upj)
+  with com-¬pk ← (complete-¬peek ¬pk weaken-j~)
+  with complete-s s (wfc-𝕔 (wf1-sol x)) (⊆/c-irrev-^=0 (⊆/c-irrev-^0 ext fd) fd regA) weaken-j~
+... | normal cond s₁ = normal (λ cond' → cond (case₄ (case₂ cond'))) (s-∀l-n-y com-¬pk s₁ upΣ upe upC upD)
+... | special {k = #0} inA Z tail (=⟹=0 up regA₁ env) s₁ = normal (case₅ inA) ((s-∀l-n-y com-¬pk s₁ upΣ upe upC upD))
+... | special {k = #S k} inA (S^ inΓ^) tail (=⟹=S newΔ up1 regB) s₁ = special (ε-∀ inA) inΓ^ (ett-∀-𝕚 tail upC upD up1) newΔ
+  (s-∀l-n-y com-¬pk s₁ upΣ upe upC upD)
+complete-s (s-∀l-peek {B = B} s case-𝕔 pk upC upD (↑tyʲ-𝕔 upj)) (wfc-𝕔 x) (⊆∀-C-new ext upj₁) ~j'@(~C {Σ = Σ} {e = e} ⊢e ~j)
+  with ⟨ Σ' , upΣ ⟩ ← ↑tyᶜ0-total Σ
+  with ⟨ B' , upB ⟩ ← ↑ty0-total B
+  with ⟨ e' , upe ⟩ ← ↑tyᵉ0-total e
+  with reg-S= r regA ← s-sregular s
+  with svar ext' _ ← ⊆/c-⊆ ext
+  with regA' ← ⊆-⊢r' regA ext'
+  with refl ← ↑tyʲ-unique upj upj₁
+  with weaken-j~ ← (~weaken=0 (~C ⊢e ~j) (↑ty-arr upC upD) (↑tyᶜ-e upe upΣ)) (↑tyʲ-𝕔 upj) regA'
+  with com-pk ← (peek-a-~pk~ (peek→peek-a s pk (Z upB)) weaken-j~)
+  with complete-s s (wfc-𝕔 (wf1-sol x)) (⊆/c-irrev-==0 ext regA') weaken-j~
+... | normal cond s₁ = normal (λ cond' → cond (case₃ cond')) (s-∀l-y com-pk upB s₁ upΣ upe upC upD)
+... | special {k = #0} inA () tail newΔ s₁
+... | special {k = #S k} inA (S= inΓ^) tail (=⟹=S newΔ up1 regB) s₁ = special (ε-∀ inA) inΓ^ (ett-∀-𝕚 tail upC upD up1) newΔ ((s-∀l-y com-pk upB s₁ upΣ upe upC upD))
+complete-s {j = 𝕔 j} (s-∀l-no-appear s ic fd upC upD (↑tyʲ-𝕔 upj)) (wfc-𝕔 x) (⊆∀-C-new ext upj₁) ~j'@(~C {Σ = Σ} {e = e} ⊢e ~j)
+  with ⟨ Σ' , upΣ ⟩ ← ↑tyᶜ0-total Σ
+  with ⟨ e' , upe ⟩ ← ↑tyᵉ0-total e
+  with reg-S^ r ← s-sregular s
+  with refl ← ↑tyʲ-unique upj upj₁
+  with weaken-j~ ← (~weaken^0 (~C ⊢e ~j) (↑ty-arr upC upD) (↑tyᶜ-e upe upΣ)) (↑tyʲ-𝕔 upj)
+  with complete-s s (wfc-𝕔 (wf1-ex x)) (⊆/c-irrev-^^0 ext fd) weaken-j~
+... | normal cond s₁ = normal ((λ cond' → cond (case₄ (case₂ cond')))) (s-∀l-n-n (¬ε-¬pk fd) s₁ upΣ upe upC upD)
+... | special {k = #0} inA Z tail () s₁
+... | special {k = #S k} inA (S^ inΓ^) tail (=⟹^S newΔ up1) s₁
+  = special (ε-∀ inA) inΓ^ (ett-∀-𝕚 tail upC upD up1) newΔ (s-∀l-n-n (¬ε-¬pk fd) s₁ upΣ upe upC upD)
 
 ----------------------------------------------------------------------
 --+                          Corollaries                           +--

@@ -76,3 +76,17 @@ find-ε-gen (f-arr-𝕔 ¬inA fd) = ε-arr-r ¬inA (find-ε-gen fd)
 find-ε-gen (f-∀-𝕚 fd upj) = ε-∀ (find-ε-gen fd)
 find-ε-gen (f-∀-𝕔 fd upj) = ε-∀ (find-ε-gen fd)
 find-ε-gen (f-𝕥 fd upj) = ε-∀ (find-ε-gen fd)
+
+
+peek-ε-gen : peek A k j
+           → k ε A
+peek-ε-gen (peek-base inA) = inA
+peek-ε-gen {k = k} (peek-arr-i {A = A} pk) with ε-dec {k = k} {A = A}
+... | inj₁ x = ε-arr-l x
+... | inj₂ y = ε-arr-r y (peek-ε-gen pk)
+peek-ε-gen {k = k} (peek-arr-c {A = A} pk) with ε-dec {k = k} {A = A}
+... | inj₁ x = ε-arr-l x
+... | inj₂ y = ε-arr-r y (peek-ε-gen pk)
+peek-ε-gen (peek-∀-i pk upj) = ε-∀ (peek-ε-gen pk)
+peek-ε-gen (peek-∀-c pk upj) = ε-∀ (peek-ε-gen pk)
+peek-ε-gen (peek-∀-t pk upj) = ε-∀ (peek-ε-gen pk)
