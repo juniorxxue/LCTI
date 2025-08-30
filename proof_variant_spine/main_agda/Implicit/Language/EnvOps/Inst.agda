@@ -49,3 +49,22 @@ inst-∋:= (⟹^0 up regA env) = Z up
 inst-∋:= (⟹^S inst up1) = S^ (inst-∋:= inst) up1
 inst-∋:= (⟹∙S inst up1) = S∙ (inst-∋:= inst) up1
 inst-∋:= (⟹=S inst up1 regB) = S= (inst-∋:= inst) up1
+
+inst-unique : [ A / k ] Γ ⟹ Δ₁
+            → [ A / k ] Γ ⟹ Δ₂
+            → Δ₁ ≡ Δ₂
+inst-unique (⟹^0 up regA env) (⟹^0 up₁ regA₁ env₁)
+  with refl ← ↑ty-unique-inver up up₁
+  = refl
+inst-unique (⟹^S inst1 up1) (⟹^S inst2 up2)
+  with refl ← ↑ty-unique-inver up1 up2
+  with refl ← inst-unique inst1 inst2
+  = refl
+inst-unique (⟹∙S inst1 up1) (⟹∙S inst2 up2)
+  with refl ← ↑ty-unique-inver up1 up2
+  with refl ← inst-unique inst1 inst2
+  = refl
+inst-unique (⟹=S inst1 up1 regB) (⟹=S inst2 up2 regB₁)
+  with refl ← ↑ty-unique-inver up1 up2
+  with refl ← inst-unique inst1 inst2
+  = refl
