@@ -19,6 +19,18 @@ open import Implicit.Algo.Properties.Polarity
 ≊-↑ty0 (≊⓪ newΣ) (↑tyᶜ-⓪ x up1) (↑tyᶜ-⓪ x₁ up2)
   with refl ← ↑ty-unique x₁ x = ≊⓪ (≊-↑ty0 newΣ up1 up2)
 
+~pk~-≊-false : ∀ {σ}
+             → A ~pk~ Σ w/ k ↪ B
+             → Σ ≊ σ
+             → ⊥
+~pk~-≊-false (pk-term pk) (≊S newΣ) = ~pk~-≊-false pk newΣ
+~pk~-≊-false {σ = σ} (pk-∀l pk upΣ upe upC) (≊S newΣ)
+  with ⟨ σ' , upσ ⟩ ← ↑tyᶜ0-total σ
+  = ~pk~-≊-false pk (≊-↑ty0 (≊S newΣ) (↑tyᶜ-e upe upΣ) upσ)
+~pk~-≊-false (pk-tapp pk upC upΣ) (≊⓪ {Σ' = σ} newΣ)
+  with ⟨ σ' , upσ ⟩ ← ↑tyᶜ0-total σ
+  = ~pk~-≊-false pk (≊-↑ty0 newΣ upΣ upσ)
+
 
 ss-grd+ : SRegular Γ
        → Γ ⊢c A
@@ -85,6 +97,12 @@ abstract
     with refl ← ⊢r-≫-eq' (⊆-⊢r (ss-polarity- x) (s-⊆ s')) ap = s-term-o opnA ⊢e x (s-trans s1 s2 newΣ)
   s-trans s'@(s-term-o opnA ⊢e x s1) (s-term-o opnA₁ ⊢e₁ x₁ s2) (≊S newΣ) = let regA = ⊆-⊢r (⊢r-𝕣 (t-⊢r ⊢e)) (s-⊆ s')
                                                                             in ⊥-elim (⊢r-⊢o-false regA opnA₁)
+  s-trans {Σ' = σ} (s-∀l-y pk upB s up-c up-e upC upD) s2 newΣ
+    with ⟨ σ' , upσ ⟩ ← ↑tyᶜ0-total σ
+    = ⊥-elim (~pk~-≊-false pk (≊-↑ty0 newΣ (↑tyᶜ-e up-e up-c) upσ))
+  s-trans (s-∀l-n-y ¬pk s up-c up-e upC upD) s2 newΣ = {!!}
+  s-trans (s-∀l-n-n ¬pk s up-c up-e upC upD) s2 newΣ = {!!}
+{-
   s-trans (s-∀l s1 upᶜ upᵉ upC upD) s'@(s-term-c {A% = A%} {Σ = Σ′} {D = D} cloA ap ⊢e s2) (≊S newΣ)
     with reg-S= regΓ regB ← s-env-out s1
     = let ⟨ Σ″ , upΣ′ ⟩ = ↑tyᶜ0-total Σ′
@@ -102,6 +120,7 @@ abstract
                                          (↑tyᶜ-e upᵉ upΣ′) (↑ty-arr upA%' upD')) (≊S (≊-↑ty0 newΣ upᶜ upΣ′))) upΣ′ upᵉ upA%' upD'
   s-trans s'@(s-∀l-no s1 upᶜ upᵉ upC upD) (s-term-o opnA ⊢e x s2) (≊S newΣ)
     with (⊢r-arr regC regD) ← s-⊢r s' = let regA = ⊆-⊢r regC (s-⊆ s') in ⊥-elim (⊢r-⊢o-false regA opnA)
+-}
   s-trans {C = C} (s-tapp {B = B} s1 upᶜ) (s-tapp s2 upᶜ₁) (≊⓪ {Σ' = Σ'} newΣ) = s-tapp (s-trans s1 s2 (≊-↑ty0 newΣ upᶜ upᶜ₁)) upᶜ₁
   s-trans (s-svar-term inΓ s) (s-term-c cloA ap ⊢e s2) (≊S newΣ) = s-svar-term inΓ (s-trans s (s-term-c cloA ap ⊢e s2) (≊S newΣ))
   s-trans (s-svar-term inΓ s) (s-term-o opnA ⊢e ss s2) (≊S newΣ)
