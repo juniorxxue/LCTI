@@ -3,11 +3,40 @@ module Implicit.Interm2Algo.Inst where
 open import Implicit.Language.All
 open import Implicit.Algo.All
 open import Implicit.Interm2Algo.EnvDiff
+open import Implicit.Interm2Algo.OpenClose
 
 postulate
   infs-sub' : 𝕣 Γ ⊨ Σ ⟹ A
           → SRegular Γ
           → Γ ⊢ A ≤⁺ Σ ⊣ Γ ↪ A
+
+
+inst-false-1 : Γ ∋^ X
+             → [ T / k ] Γ ⟹ Γ'
+             → Γ' ∋∙ X
+             → ⊥
+inst-false-1 in1 inst in2 = {!!}
+
+inst-
+
+s-unsol-sol-helper-eq : Γ ⊢o A
+                      → Γ' ⊢c A
+                      → [ T / k ] Γ ⟹ Γ'
+                      → Γ ⊆ Ω w/t A
+                      → Ω ≡ Γ'
+s-unsol-sol-helper-eq (⊢o-var-^ x) (⊢c-var-∙ inΔ) inst (ext-var x₁) = ⊥-elim (inst-false-1 x inst inΔ)
+s-unsol-sol-helper-eq (⊢o-var-^ x) (⊢c-var-= inΔ) inst (ext-var x₁) = {!inst-affect-one!}
+s-unsol-sol-helper-eq (⊢o-arr-l opnA) (⊢c-arr cloA cloA₁) inst (ext-arr extA extA₁)
+  with refl ← s-unsol-sol-helper-eq opnA cloA inst extA = sym (⊆/-⊢c-eq extA₁ cloA₁)
+s-unsol-sol-helper-eq (⊢o-arr-r opnA) (⊢c-arr cloA cloA₁) inst (ext-arr extA extA₁) with ⊆/-openclose extA
+... | inj₁ opnA
+  with refl ← s-unsol-sol-helper-eq opnA cloA inst extA = sym (⊆/-⊢c-eq extA₁ cloA₁)
+... | inj₂ cloA'
+  with refl ← ⊆/-⊢c-eq extA cloA'
+  = s-unsol-sol-helper-eq opnA cloA₁ inst extA₁
+s-unsol-sol-helper-eq {T = T} (⊢o-∀ opnA) (⊢c-∀ cloA) inst (ext-∀ extA)
+  with ⟨ T' , upT ⟩ ← ↑ty0-total T
+  with refl ← s-unsol-sol-helper-eq opnA cloA (⟹∙S inst upT) extA = refl
 
 
 ⊆/x-neq-∋^ : Γ ∋^ k
@@ -132,6 +161,130 @@ ss-unsol-sol {T = T} (s-∀ s) inΔ inst
   = s-∀ (ss-unsol-sol s (S∙ inΔ upT) (⟹∙S inst upT))
 
 
+infix 3 _⊢wf_
+data _⊢wf_ : Env n m → Type m → Set where
+  ⊢wf-int :
+      Δ ⊢wf Int
+  ⊢wf-var-∙ :
+      (inΔ : Δ ∋∙ X)
+    → Δ ⊢wf ‶ X
+  ⊢wf-var-= :
+      (inΔ : Δ ∋= X)
+    → Δ ⊢wf ‶ X
+  ⊢wf-var-^ :
+      Δ ∋^ X
+    → Δ ⊢wf ‶ X
+  ⊢wf-arr :
+      Δ ⊢wf A
+    → Δ ⊢wf B
+    → Δ ⊢wf (A `→ B)
+  ⊢wf-∀ :
+      Δ ,∙ ⊢wf A
+    → Δ ⊢wf `∀ A
+
+
+⊆-∋=-⊢wf : Γ ⊆ Δ
+         → Δ ∋= X
+         → Γ ⊢wf ‶ X
+⊆-∋=-⊢wf (uvar ext) (S∙ inΔ) with ⊆-∋=-⊢wf ext inΔ
+... | ⊢wf-var-∙ inΔ₁ = ⊢wf-var-∙ (S∙ inΔ₁)
+... | ⊢wf-var-= inΔ₁ = ⊢wf-var-= (S∙ inΔ₁)
+... | ⊢wf-var-^ x = ⊢wf-var-^ (S∙ x)
+⊆-∋=-⊢wf (evar ext) (S^ inΔ) with ⊆-∋=-⊢wf ext inΔ
+... | ⊢wf-var-∙ inΔ₁ = ⊢wf-var-∙ (S^ inΔ₁)
+... | ⊢wf-var-= inΔ₁ = ⊢wf-var-= (S^ inΔ₁)
+... | ⊢wf-var-^ x = ⊢wf-var-^ (S^ x)
+⊆-∋=-⊢wf (evar-sol ext regA) Z = ⊢wf-var-^ Z
+⊆-∋=-⊢wf (evar-sol ext regA) (S= inΔ) with ⊆-∋=-⊢wf ext inΔ
+... | ⊢wf-var-∙ inΔ₁ = ⊢wf-var-∙ (S^ inΔ₁)
+... | ⊢wf-var-= inΔ₁ = ⊢wf-var-= (S^ inΔ₁)
+... | ⊢wf-var-^ x = ⊢wf-var-^ (S^ x)
+⊆-∋=-⊢wf (svar ext regA) Z = ⊢wf-var-= Z
+⊆-∋=-⊢wf (svar ext regA) (S= inΔ) with ⊆-∋=-⊢wf ext inΔ
+... | ⊢wf-var-∙ inΔ₁ = ⊢wf-var-∙ (S= inΔ₁)
+... | ⊢wf-var-= inΔ₁ = ⊢wf-var-= (S= inΔ₁)
+... | ⊢wf-var-^ x = ⊢wf-var-^ (S= x)
+
+⊆-∋^-⊢wf : Γ ⊆ Δ
+         → Δ ∋^ X
+         → Γ ⊢wf ‶ X
+⊆-∋^-⊢wf (uvar ext) (S∙ inΔ) with ⊆-∋^-⊢wf ext inΔ
+... | ⊢wf-var-∙ inΔ₁ = ⊢wf-var-∙ (S∙ inΔ₁)
+... | ⊢wf-var-= inΔ₁ = ⊢wf-var-= (S∙ inΔ₁)
+... | ⊢wf-var-^ x = ⊢wf-var-^ (S∙ x)
+⊆-∋^-⊢wf (evar ext) Z = ⊢wf-var-^ Z
+⊆-∋^-⊢wf (evar ext) (S^ inΔ) with ⊆-∋^-⊢wf ext inΔ
+... | ⊢wf-var-∙ inΔ₁ = ⊢wf-var-∙ (S^ inΔ₁)
+... | ⊢wf-var-= inΔ₁ = ⊢wf-var-= (S^ inΔ₁)
+... | ⊢wf-var-^ x = ⊢wf-var-^ (S^ x)
+⊆-∋^-⊢wf (evar-sol ext regA) (S= inΔ) with ⊆-∋^-⊢wf ext inΔ
+... | ⊢wf-var-∙ inΔ₁ = ⊢wf-var-∙ (S^ inΔ₁)
+... | ⊢wf-var-= inΔ₁ = ⊢wf-var-= (S^ inΔ₁)
+... | ⊢wf-var-^ x = ⊢wf-var-^ (S^ x)
+⊆-∋^-⊢wf (svar ext regA) (S= inΔ) with ⊆-∋^-⊢wf ext inΔ
+... | ⊢wf-var-∙ inΔ₁ = ⊢wf-var-∙ (S= inΔ₁)
+... | ⊢wf-var-= inΔ₁ = ⊢wf-var-= (S= inΔ₁)
+... | ⊢wf-var-^ x = ⊢wf-var-^ (S= x)
+
+⊢wf-⊆ : Δ ⊢wf A
+      → Γ ⊆ Δ
+      → Γ ⊢wf A
+⊢wf-⊆ ⊢wf-int ext = ⊢wf-int
+⊢wf-⊆ (⊢wf-var-∙ inΔ) ext = ⊢wf-var-∙ (⊆-∋∙' inΔ ext)
+⊢wf-⊆ (⊢wf-var-= inΔ) ext = ⊆-∋=-⊢wf ext inΔ
+⊢wf-⊆ (⊢wf-var-^ x) ext = ⊆-∋^-⊢wf ext x
+⊢wf-⊆ (⊢wf-arr wfA wfA₁) ext = ⊢wf-arr (⊢wf-⊆ wfA ext) (⊢wf-⊆ wfA₁ ext)
+⊢wf-⊆ (⊢wf-∀ wfA) ext = ⊢wf-∀ (⊢wf-⊆ wfA (uvar ext))
+
+
+⊆/x-⊢wf : Γ ⊆ Δ w/v X
+        → Γ ⊢wf ‶ X
+⊆/x-⊢wf (ext-Z^ regΓ regA) = ⊢wf-var-^ Z
+⊆/x-⊢wf (ext-Z∙ regΓ) = ⊢wf-var-∙ Z
+⊆/x-⊢wf (ext-Z= regΓ regA) = ⊢wf-var-= Z
+⊆/x-⊢wf (ext-S^ ext) with ⊆/x-⊢wf ext
+... | ⊢wf-var-∙ inΔ = ⊢wf-var-∙ (S^ inΔ)
+... | ⊢wf-var-= inΔ = ⊢wf-var-= (S^ inΔ)
+... | ⊢wf-var-^ x = ⊢wf-var-^ (S^ x)
+⊆/x-⊢wf (ext-S∙ ext) with ⊆/x-⊢wf ext
+... | ⊢wf-var-∙ inΔ = ⊢wf-var-∙ (S∙ inΔ)
+... | ⊢wf-var-= inΔ = ⊢wf-var-= (S∙ inΔ)
+... | ⊢wf-var-^ x = ⊢wf-var-^ (S∙ x)
+⊆/x-⊢wf (ext-S= ext regA) with ⊆/x-⊢wf ext
+... | ⊢wf-var-∙ inΔ = ⊢wf-var-∙ (S= inΔ)
+... | ⊢wf-var-= inΔ = ⊢wf-var-= (S= inΔ)
+... | ⊢wf-var-^ x = ⊢wf-var-^ (S= x)
+⊆/x-⊢wf (ext-mark x x₁) = ⊢wf-var-∙ (S⋈ x₁)
+
+⊆/-⊢wf : Γ ⊆ Δ w/t A
+       → Γ ⊢wf A
+⊆/-⊢wf (ext-int x) = ⊢wf-int
+⊆/-⊢wf (ext-var x) = ⊆/x-⊢wf x
+⊆/-⊢wf (ext-arr ext ext₁) = ⊢wf-arr (⊆/-⊢wf ext) (⊢wf-⊆ (⊆/-⊢wf ext₁) (⊆/-⊆ ext))
+⊆/-⊢wf (ext-∀ ext) = ⊢wf-∀ (⊆/-⊢wf ext)
+
+inst-openclose : Γ ⊢wf A
+               → [ T / k ] Γ ⟹ Γ'
+               → Γ' ⊢o A ⊎ Γ' ⊢c A
+inst-openclose ⊢wf-int inst = inj₂ ⊢c-int
+inst-openclose (⊢wf-var-∙ inΔ) inst = inj₂ (⊢c-var-∙ (⊆-∋∙ inΔ (inst-⊆ inst)))
+inst-openclose (⊢wf-var-= inΔ) inst = inj₂ (⊢c-var-= (⊆-∋= inΔ (inst-⊆ inst)))
+inst-openclose {k = k} (⊢wf-var-^ {X = X} x) inst with X #≟ k
+... | yes refl = inj₂ (⊢c-var-= (inst-∋= inst))
+... | no ¬p = inj₁ (⊢o-var-^ (⊆/x-neq-∋^ x (inst-⊆/x inst) ¬p))
+inst-openclose (⊢wf-arr wfA wfA₁) inst with inst-openclose wfA inst | inst-openclose wfA₁ inst
+... | inj₁ x | inj₁ x₁ = inj₁ (⊢o-arr-l x)
+... | inj₁ x | inj₂ y = inj₁ (⊢o-arr-l x)
+... | inj₂ y | inj₁ x = inj₁ (⊢o-arr-r x)
+... | inj₂ y | inj₂ y₁ = inj₂ (⊢c-arr y y₁)
+inst-openclose {T = T} (⊢wf-∀ wfA) inst
+  with ⟨ T' , upT ⟩ ← ↑ty0-total T
+  with inst-openclose wfA (⟹∙S inst upT)
+... | inj₁ x = inj₁ (⊢o-∀ x)
+... | inj₂ y = inj₂ (⊢c-∀ y)
+
+
+
 s-unsol-sol : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
             → Δ ∋ k := T
             → [ T / k ] Γ ⟹ Γ'
@@ -142,7 +295,19 @@ s-unsol-sol (s-term-c cloA ap ⊢e s) inΔ inst
   with extΓ ← inst-⊆ inst
   = s-term-c (⊆-⊢c cloA extΓ) (⊆-⊢c-≫' extΓ cloA ap) (t-irrev-⊆ ⊢e extΓ) (s-unsol-sol s inΔ inst)
 s-unsol-sol (s-term-o opnA ⊢e ss s) inΔ inst
-  = s-term-c {!!} {!!} {!subsumption0 ⊢e!} {!!}
+  with wfA ← ⊆/-⊢wf (ss--⊆/ ss)
+  with extΓ ← inst-⊆ inst
+  with inst-openclose wfA inst
+... | inj₁ opnA
+  with s-⊆-exsol (ss-⊆ ss) (inst-∋^ inst)
+... | is-ex inΓ
+  with ⟨ Ω' , instΩ ⟩ ← inst-∃ inΓ inΔ (s-⊆ s)
+  = s-term-o opnA (t-irrev-⊆ ⊢e extΓ) (ss-irrev-inst ss inst instΩ) (s-unsol-sol s inΔ instΩ)
+... | is-sol inΔ'
+  = s-term-o opnA (t-irrev-⊆ ⊢e extΓ) (ss-unsol-sol ss (∋=-∋:=-⊆ inΔ' inΔ (s-⊆ s)) inst) s
+s-unsol-sol (s-term-o opnA ⊢e ss s) inΔ inst | inj₂ cloA
+  with refl ← s-unsol-sol-helper-eq opnA cloA inst (ss--⊆/ ss)
+  = s-term-c cloA {!!} (subsumption0 (t-irrev-⊆ ⊢e extΓ)) s
 s-unsol-sol {T = T} (s-∀l-y pk upB s upᶜ upᵉ upC upD) inΔ inst
   with ⟨ T' , upT ⟩ ← ↑ty0-total T
   with reg-S= r regA ← s-env-in s
@@ -178,4 +343,5 @@ s-unsol-sol0 : Γ ,^ ⊢ A ≤⁺ Σ ⊣ Δ ,= B ↪ C
 s-unsol-sol0 {B = B} s
   with ⟨ B' , upB ⟩ ← ↑ty0-total B
   with reg-S= regA regA₁ ← s-env-out s
-  = s-unsol-sol s (Z upB) (⟹^0 upB {!!} {!!})
+  with evar-sol ext regA₂ ← s-⊆ s
+  = s-unsol-sol s (Z upB) (⟹^0 upB (⊆-⊢r' regA₂ ext) (⊆-sregular ext))
