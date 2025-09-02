@@ -100,7 +100,15 @@ abstract
   s-trans {Σ' = σ} (s-∀l-y pk upB s up-c up-e upC upD) s2 newΣ
     with ⟨ σ' , upσ ⟩ ← ↑tyᶜ0-total σ
     = ⊥-elim (~pk~-≊-false pk (≊-↑ty0 newΣ (↑tyᶜ-e up-e up-c) upσ))
-  s-trans (s-∀l-n-y ¬pk s up-c up-e upC upD) s2 newΣ = {!!}
+  s-trans (s-∀l-n-y ¬pk s1 up-c up-e upC upD) s'@(s-term-c {A% = A%} {Σ = Σ′} {D = D} cloA ap ⊢e s2) (≊S newΣ)
+    with reg-S= regΓ regB ← s-env-out s1
+    = let ⟨ Σ″ , upΣ′ ⟩ = ↑tyᶜ0-total Σ′
+          ⟨ A%' , upA%' ⟩ = ↑ty0-total A%
+          ⟨ D' , upD' ⟩ = ↑ty0-total D
+      in s-∀l-n-y {!!} (s-trans s1 (s-weaken=0 s' (↑ty-arr upC upD) (↑tyᶜ-e up-e upΣ′) (↑ty-arr upA%' upD') regB) (≊S (≊-↑ty0 newΣ up-c upΣ′))) upΣ′ up-e upA%' upD'
+  s-trans s'@(s-∀l-n-y ¬pk s1 up-c up-e upC upD) (s-term-o opnA ⊢e x s2) (≊S newΣ)
+    with (⊢r-arr regC regD) ← s-⊢r s' = {!!}
+
   s-trans (s-∀l-n-n ¬pk s up-c up-e upC upD) s2 newΣ = {!!}
 {-
   s-trans (s-∀l s1 upᶜ upᵉ upC upD) s'@(s-term-c {A% = A%} {Σ = Σ′} {D = D} cloA ap ⊢e s2) (≊S newΣ)

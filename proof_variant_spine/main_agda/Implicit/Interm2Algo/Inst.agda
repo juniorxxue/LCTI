@@ -434,7 +434,7 @@ s-unsol-sol {k = k} (s-evar-infers {X = X} (infs-s ⊢e infs) inst₁) inΔ inst
   with ⊢r-arr regA regB ← ∋:=-⊢r (⊆-sregular' extΓ) inΔ
   = s-svar-term inΔ (s-term-c (⊢r-⊢c regA) (⊢r-≫-eq regA)
                 (subsumption0 (t-irrev-⊆ ⊢e extΓ))
-                (infs-sub' (infs-irrev-⊆ infs extΓ) (⊆-sregular' extΓ)))
+                {!!})
 ... | no ¬p
   with inΔ' ← ⊆/x-neq-∋^ (inst-∋^ inst) (inst-⊆/x inst₁) ¬p
   = ⊥-elim (∋^-∋=-false inΔ' (∋:=to∋= inΔ))

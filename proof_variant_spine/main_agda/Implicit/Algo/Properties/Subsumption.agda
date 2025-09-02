@@ -1,5 +1,3 @@
-{-# OPTIONS --allow-unsolved-metas #-}
-{-# OPTIONS --allow-incomplete-matches #-}
 module Implicit.Algo.Properties.Subsumption where
 
 open import Implicit.Language.All
@@ -77,6 +75,11 @@ data _≊_by_ : Context n m → Context n m → Type m → Set where
 ≊-nonempty ne-app (≊S new) = ne-app
 ≊-nonempty ne-tapp (≊⓪ new x) = ne-tapp
 
+
+~pk~-dec : (A ~pk~ Σ w/ k) ⊎ (¬ (A ~pk~ Σ w/ k))
+~pk~-dec = {!!}
+
+
 infs-subsumption : 𝕣 Γ ⊨ Σ ⟹ A
                  → Σ ≊ σ by A
                  → 𝕣 Γ ⊨ σ ⟹ A
@@ -99,6 +102,12 @@ s-subsumtion (s-tapp s upᶜ) (≊⓪ {σ = σ} new x)
   with refl ← ↑ty-st-eq upp x = s-tapp (s-subsumtion s (≊-↑ty new upᶜ upσ upp)) upσ
 -- s-subsumtion (s-svar x s) new = s-svar x (s-subsumtion s new)
 s-subsumtion (s-evar-infers {Δ = Δ} infs inst) (≊S new) = s-evar-infers (infs-subsumption {Γ = Δ} infs (≊S new)) inst
+s-subsumtion (s-svar-term inΔ s) (≊S new) = s-svar-term inΔ (s-subsumtion s (≊S new))
+s-subsumtion (s-svar-tapp inΔ s) (≊⓪ new x) = s-svar-tapp inΔ (s-subsumtion s (≊⓪ new x))
+s-subsumtion (s-∀l-y pk upB s up-c up-e upC upD) (≊S new) = ⊥-elim {!!}
+s-subsumtion (s-∀l-n-y ¬pk s1 up-c up-e upC upD) (≊S new) = {!!}
+s-subsumtion (s-∀l-n-n ¬pk s up-c up-e upC upD) new = {!!}
+
 
 infs-subsumption {Γ = Γ} (infs-s ⊢e infs) (≊S new) = infs-s ⊢e (infs-subsumption {Γ = Γ} infs new)
 
@@ -114,7 +123,8 @@ subsumption (⊢lam₂ ⊢e up-c ⊢e₁) (≊S {σ = σ} new)
   with ⟨ σ' , upσ ⟩ ← ↑tmᶜ0-total σ = ⊢lam₂ ⊢e upσ (subsumption ⊢e₁ (≊-↑tm new up-c upσ))
 subsumption (⊢sub ⊢e ne gc s) new = ⊢sub ⊢e (≊-nonempty ne new) gc (s-subsumtion s new)
 subsumption (⊢tabs ⊢e) ≋□ = ⊢sub (⊢tabs ⊢e) ne-τ gc-tlam (s-type (s-refl (reg-Z (t-env (⊢tabs ⊢e))) (⊢r-𝕣 (⊢r-∀ (t-⊢r ⊢e)))))
--- subsumption (⊢tapp ⊢e st) new = ⊢tapp (subsumption ⊢e (≊⓪ new st)) st
+subsumption (⊢tapp ⊢e up) new = ⊢tapp (subsumption ⊢e (≊⓪ new (↑ty-st up))) up
+-- ⊢tapp (subsumption ⊢e (≊⓪ new st)) st
 
 subsumption0 : Γ ⊢ □ ⇒ e ⇒ A
              → Γ ⊢ τ A ⇒ e ⇒ A
