@@ -1,5 +1,3 @@
-{-# OPTIONS --allow-unsolved-metas #-}
-{-# OPTIONS --allow-incomplete-matches #-}
 module Implicit.Language.Ground.Properties where
 
 open import Implicit.Language.Base
@@ -172,6 +170,7 @@ find-≫-∙ : find A% k j
          → Γ ∋∙ k
          → Γ ≫ A ⇘ A%
          → find A k j
+find-≫-∙ (f-∞ x) ninΓ inΓ grd = f-∞ (ε-≫-∙ x inΓ ninΓ grd)
 find-≫-∙ (f-arr-𝕚-l x) ninΓ inΓ (grd-var= x₁) = ⊥-elim (εᵍ-:=-false x₁ (ε-arr-l x) ninΓ)
 find-≫-∙ (f-arr-𝕚-l x) ninΓ inΓ (grd-arr grd grd₁) = f-arr-𝕚-l (ε-≫-∙ x inΓ ninΓ grd)
 find-≫-∙ (f-arr-𝕚-r ¬inA fd) ninΓ inΓ (grd-var= x) = ⊥-elim (εᵍ-:=-false x (ε-arr-r ¬inA (find-ε-gen fd)) ninΓ)
@@ -185,7 +184,9 @@ find-≫-∙ (f-∀-𝕔 fd upj) ninΓ inΓ (grd-∀ grd) = f-∀-𝕔 (find-≫
 find-≫-∙ (f-𝕥 fd upj) ninΓ inΓ (grd-var= x) = ⊥-elim (εᵍ-:=-false x (ε-∀ (find-ε-gen fd)) ninΓ)
 find-≫-∙ (f-𝕥 fd upj) ninΓ inΓ (grd-∀ grd) = f-𝕥 (find-≫-∙ fd (S∙ ninΓ) (S∙ inΓ) grd) upj
 find-≫-∙ (f-iso iso) ninΓ inΓ (grd-var= x) = ⊥-elim (εᵍ-:=-false x ε-var ninΓ)
+
 find-≫-∙ (f-iso iso) ninΓ inΓ (grd-var∙ x) = f-iso iso
+
 
 find-≫-∙0 : find A% #0 j
           → Γ ,∙ ≫ A ⇘ A%
@@ -278,6 +279,7 @@ find-≫-∙' : find A k j
          → Γ ∋∙ k
          → Γ ≫ A ⇘ A%
          → find A% k j
+find-≫-∙' (f-∞ x) ninΓ inΓ grd = f-∞ (ε-≫-∙' x inΓ ninΓ grd)
 find-≫-∙' (f-arr-𝕚-l x) ninΓ inΓ (grd-arr grd grd₁) = f-arr-𝕚-l (ε-≫-∙' x inΓ ninΓ grd)
 find-≫-∙' (f-arr-𝕚-r ¬inA fd) ninΓ inΓ (grd-arr grd grd₁) = f-arr-𝕚-r (¬ε-≫-∙' ¬inA inΓ ninΓ grd) (find-≫-∙' fd ninΓ inΓ grd₁)
 find-≫-∙' (f-arr-𝕔 ¬inA fd) ninΓ inΓ (grd-arr grd grd₁) = f-arr-𝕔 (¬ε-≫-∙' ¬inA inΓ ninΓ grd) (find-≫-∙' fd ninΓ inΓ grd₁)

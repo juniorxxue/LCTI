@@ -1,5 +1,3 @@
-{-# OPTIONS --allow-unsolved-metas #-}
-{-# OPTIONS --allow-incomplete-matches #-}
 module Implicit.Algo.Properties.Irrelevance where
 
 -- the irrelevance in altering (solutions and ex-vars in) typing environments
@@ -263,8 +261,9 @@ s-irrev (s-type ss) tf = s-type (ss-irrev ss tf)
 s-irrev (s-term-c cloA ap ⊢e s) tf = s-term-c (⇌s-⊢c-l cloA tf) (⇌s-≫-l ap tf) (t-irrev ⊢e (⇌s-⇌-l tf)) (s-irrev s tf)
 s-irrev (s-term-o opnA ⊢e ss s) tf with ⇌s-Ω (ss-⊆ ss) tf
 ... | ⟨ Ω' , tf' ⟩ = s-term-o (⇌s-⊢o-l opnA tf) (t-irrev ⊢e (⇌s-⇌-l tf)) (ss-irrev ss tf') (s-irrev s (⇌s-arr tf tf' (s-⊆ s)))
--- s-irrev (s-∀l s upᶜ upᵉ upC upD) tf = s-∀l (s-irrev s (evar-sol tf)) upᶜ upᵉ upC upD
--- s-irrev (s-∀l-no s upᶜ upᵉ upC upD) tf = s-∀l-no (s-irrev s (evar tf)) upᶜ upᵉ upC upD
+s-irrev (s-∀l-y pk upB s upᶜ upᵉ upC upD) tf = s-∀l-y pk upB (s-irrev s (svar tf)) upᶜ upᵉ upC upD
+s-irrev (s-∀l-n-y s upᶜ upᵉ upC upD) tf = s-∀l-n-y (s-irrev s (evar-sol tf)) upᶜ upᵉ upC upD
+s-irrev (s-∀l-n-n s upᶜ upᵉ upC upD) tf = s-∀l-n-n (s-irrev s (evar tf)) upᶜ upᵉ upC upD
 s-irrev (s-tapp s upᶜ) tf = s-tapp (s-irrev s (svar tf)) upᶜ
 s-irrev (s-svar-term inΓ s) tf with refl ← ⇌s-eq tf = s-svar-term (⇌s-∋:=-l inΓ tf) (s-irrev s tf)
 s-irrev (s-svar-tapp inΓ s) tf with refl ← ⇌s-eq tf = s-svar-tapp (⇌s-∋:=-l inΓ tf) (s-irrev s tf)

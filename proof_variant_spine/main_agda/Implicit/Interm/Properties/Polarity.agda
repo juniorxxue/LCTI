@@ -1,5 +1,3 @@
-{-# OPTIONS --allow-unsolved-metas #-}
-{-# OPTIONS --allow-incomplete-matches #-}
 module Implicit.Interm.Properties.Polarity where
 
 open import Implicit.Language.All
@@ -25,6 +23,8 @@ s+-polarity (s-tapp s upj) = ⊢r-∀ (⊢r-◆0 (s+-polarity s))
 s+-polarity (s-svar-𝕚 _ x) = s+-polarity x
 s+-polarity (s-svar-𝕔 inΓ s) = s+-polarity s
 s+-polarity (s-svar-𝕥 inΓ s) = s+-polarity s
+s+-polarity (s-∀l-new s ic fd upC upD upj) = ⊢r-strengthen=0 (s+-polarity s) (↑ty-arr upC upD)
+s+-polarity (s-∀l-peek s ic pk upC upD upj) = ⊢r-strengthen=0 (s+-polarity s) (↑ty-arr upC upD)
 
 s--polarity (s-int regΔ) = ⊢r-int
 s--polarity (s-var-∙ regΔ inΔ) = ⊢r-var-∙ inΔ
@@ -73,6 +73,8 @@ s-⊢c-l {≤ = ≤⁻} s = ⊢r-⊢c (s--polarity s)
 s-⊢c-l {≤ = ≤⁺} (s-svar-𝕚 inΓ s) = ⊢c-var-= (∋:=to∋= inΓ)
 s-⊢c-l {≤ = ≤⁺} (s-svar-𝕔 inΓ s) = ⊢c-var-= (∋:=to∋= inΓ)
 s-⊢c-l {≤ = ≤⁺} (s-svar-𝕥 inΓ s) = ⊢c-var-= (∋:=to∋= inΓ)
+s-⊢c-l {≤ = ≤⁺} (s-∀l-new s ic fd upC upD upj) = ⊢c-∀ (⊢c-◆0 (s-⊢c-l s))
+s-⊢c-l {≤ = ≤⁺} (s-∀l-peek s ic pk upC upD upj) = ⊢c-∀ (⊢c-◆0 (s-⊢c-l s))
 
 s-⊢c-r {≤ = ≤⁺} s = ⊢r-⊢c (s+-polarity s)
 s-⊢c-r {≤ = ≤⁻} (s-int regΔ) = ⊢c-int

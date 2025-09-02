@@ -197,3 +197,16 @@ pk-tail-eq (pk-∀l pk upΣ upe upC) (ett-∀-𝕚 tl upB upC₁ upT) (ε-∀ in
   with refl ← pk-tail-eq pk tl inA (id-e (id-↑ty' id₁ upΣ upC₁)) = ↑ty-unique-inver upC upT
 pk-tail-eq (pk-tapp pk upC upΣ) (ett-∀-𝕥 tl upT) (ε-∀ inA) (id-⓪ id₁ up)
   with refl ← pk-tail-eq pk tl inA (id-↑ty' id₁ upΣ up) = ↑ty-unique-inver upC upT
+
+peek-ε-gen : peek A k j
+           → k ε A
+peek-ε-gen (peek-base inA) = inA
+peek-ε-gen {k = k} (peek-arr-i {A = A} pk) with ε-dec {k = k} {A = A}
+... | inj₁ x = ε-arr-l x
+... | inj₂ y = ε-arr-r y (peek-ε-gen pk)
+peek-ε-gen {k = k} (peek-arr-c {A = A} pk) with ε-dec {k = k} {A = A}
+... | inj₁ x = ε-arr-l x
+... | inj₂ y = ε-arr-r y (peek-ε-gen pk)
+peek-ε-gen (peek-∀-i pk upj) = ε-∀ (peek-ε-gen pk)
+peek-ε-gen (peek-∀-c pk upj) = ε-∀ (peek-ε-gen pk)
+peek-ε-gen (peek-∀-t pk upj) = ε-∀ (peek-ε-gen pk)

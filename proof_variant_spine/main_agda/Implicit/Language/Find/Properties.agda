@@ -1,5 +1,3 @@
-{-# OPTIONS --allow-unsolved-metas #-}
-{-# OPTIONS --allow-incomplete-matches #-}
 module Implicit.Language.Find.Properties where
 
 
@@ -25,6 +23,7 @@ open import Implicit.Language.Find.Base
          → j ↑tyʲ k ⇘ j'
          → X #< k
          → find A' (inject₁ X) j'
+↑ty-find (f-∞ x) upA ↑tyʲ-∞ lt = f-∞ (↑ty-ε x upA lt)
 ↑ty-find (f-iso x) ↑ty-var upj lt rewrite punchIn-inject lt = f-iso (↑tyʲ-iso x upj)
 ↑ty-find (f-arr-𝕚-l x) (↑ty-arr upA upA₁) (↑tyʲ-𝕚 upj) lt = f-arr-𝕚-l (↑ty-ε x upA lt)
 ↑ty-find (f-arr-𝕚-r ¬inA fd) (↑ty-arr upA upA₁) (↑tyʲ-𝕚 upj) lt = f-arr-𝕚-r (↑ty-¬ε-prv ¬inA upA lt) (↑ty-find fd upA₁ upj lt)
@@ -48,17 +47,18 @@ open import Implicit.Language.Find.Base
           → j ↑tyʲ k ⇘ j'
           → X #< k
           → find A X j
+↑ty-find' (f-∞ x) upA ↑tyʲ-∞ lt = f-∞ (↑ty-ε' x lt upA)
 ↑ty-find' (f-iso x) upA upj lt rewrite punchIn-inject lt with ↑ty-var-inv-helper upA refl
 ... | refl = f-iso (↑tyʲ-iso' x upj)
 ↑ty-find' (f-arr-𝕚-l x) (↑ty-arr upA upA₁) (↑tyʲ-𝕚 upj) lt = f-arr-𝕚-l (↑ty-ε' x lt upA)
 ↑ty-find' (f-arr-𝕚-r ¬inA fd) (↑ty-arr upA upA₁) (↑tyʲ-𝕚 upj) lt = f-arr-𝕚-r (¬ε-↑ty'-inv ¬inA upA lt) (↑ty-find' fd upA₁ upj lt)
 ↑ty-find' (f-arr-𝕔 ¬inA fd) (↑ty-arr upA upA₁) (↑tyʲ-𝕔 upj) lt = f-arr-𝕔 (¬ε-↑ty'-inv ¬inA upA lt) (↑ty-find' fd upA₁ upj lt)
 ↑ty-find' (f-∀-𝕚 fd upj₁) (↑ty-∀ upA) (↑tyʲ-𝕚 {j = j} upj) lt
-  with ⟨ j' , upj' ⟩ ← ↑tyʲ0-total j = f-∀-𝕚 (↑ty-find' fd upA (↑tyʲ-𝕚 (↑tyʲ-comm0' upj upj₁ upj')) (s≤s lt)) upj'
+  with ⟨ j' , upj' ⟩ ← ↑tyʲ0-total j = f-∀-𝕚 (↑ty-find' fd upA (↑tyʲ-𝕚 (↑tyʲ-comm0' upj upj₁ upj')) (s≤s lt)) upj'
 ↑ty-find' (f-∀-𝕔 fd upj₁) (↑ty-∀ upA) (↑tyʲ-𝕔 {j = j} upj) lt
-  with ⟨ j' , upj' ⟩ ← ↑tyʲ0-total j = f-∀-𝕔 (↑ty-find' fd upA (↑tyʲ-𝕔 (↑tyʲ-comm0' upj upj₁ upj')) (s≤s lt)) upj'
+  with ⟨ j' , upj' ⟩ ← ↑tyʲ0-total j = f-∀-𝕔 (↑ty-find' fd upA (↑tyʲ-𝕔 (↑tyʲ-comm0' upj upj₁ upj')) (s≤s lt)) upj'
 ↑ty-find' (f-𝕥 fd upj₁) (↑ty-∀ upA) (↑tyʲ-𝕥 {j = j} upj upA₁) lt
-  with ⟨ j' , upj' ⟩ ← ↑tyʲ0-total j = f-𝕥 (↑ty-find' fd upA (↑tyʲ-comm0' upj upj₁ upj') (s≤s lt)) upj'
+  with ⟨ j' , upj' ⟩ ← ↑tyʲ0-total j = f-𝕥 (↑ty-find' fd upA (↑tyʲ-comm0' upj upj₁ upj') (s≤s lt)) upj'
 
 ↑ty-find0' : find A' #0 j'
             → A ↑ty (#S k) ⇘ A'
@@ -69,6 +69,7 @@ open import Implicit.Language.Find.Base
 
 find-ε-gen : find A k j
            → k ε A
+find-ε-gen (f-∞ x) = x
 find-ε-gen (f-iso iso) = ε-var
 find-ε-gen (f-arr-𝕚-l x) = ε-arr-l x
 find-ε-gen (f-arr-𝕚-r ¬inA fd) = ε-arr-r ¬inA (find-ε-gen fd)
@@ -76,17 +77,3 @@ find-ε-gen (f-arr-𝕔 ¬inA fd) = ε-arr-r ¬inA (find-ε-gen fd)
 find-ε-gen (f-∀-𝕚 fd upj) = ε-∀ (find-ε-gen fd)
 find-ε-gen (f-∀-𝕔 fd upj) = ε-∀ (find-ε-gen fd)
 find-ε-gen (f-𝕥 fd upj) = ε-∀ (find-ε-gen fd)
-
-
-peek-ε-gen : peek A k j
-           → k ε A
-peek-ε-gen (peek-base inA) = inA
-peek-ε-gen {k = k} (peek-arr-i {A = A} pk) with ε-dec {k = k} {A = A}
-... | inj₁ x = ε-arr-l x
-... | inj₂ y = ε-arr-r y (peek-ε-gen pk)
-peek-ε-gen {k = k} (peek-arr-c {A = A} pk) with ε-dec {k = k} {A = A}
-... | inj₁ x = ε-arr-l x
-... | inj₂ y = ε-arr-r y (peek-ε-gen pk)
-peek-ε-gen (peek-∀-i pk upj) = ε-∀ (peek-ε-gen pk)
-peek-ε-gen (peek-∀-c pk upj) = ε-∀ (peek-ε-gen pk)
-peek-ε-gen (peek-∀-t pk upj) = ε-∀ (peek-ε-gen pk)

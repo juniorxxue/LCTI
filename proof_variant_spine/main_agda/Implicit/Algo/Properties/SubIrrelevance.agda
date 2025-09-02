@@ -1,5 +1,3 @@
-{-# OPTIONS --allow-unsolved-metas #-}
-{-# OPTIONS --allow-incomplete-matches #-}
 module Implicit.Algo.Properties.SubIrrelevance where
 
 -- the irrelevance in altering (unsolving unrelated solutions in) subtyping environments
@@ -184,7 +182,9 @@ s-⊆-prv-gen {k = k} (s-∀l-n-y s upᶜ upᵉ upC upD) (opn-∀ opnA) exts
   = s-∀l-n-y (s-⊆-prv-gen {k = #S k} s (⊢ok-◈0 opnA) (⊆-S^= exts (⊆-⊢r' regA ext))) upᶜ upᵉ upC upD
 s-⊆-prv-gen (s-∀l-n-n s upᶜ upᵉ upC upD) (opn-∀ opnA) exts = s-∀l-n-n (s-⊆-prv-gen s (⊢ok-◈0 opnA) (⊆-S^^ exts)) upᶜ upᵉ upC upD
 s-⊆-prv-gen {k = k} (s-∀l-y pk upB s upᶜ upᵉ upC upD) (opn-∀ opnA) exts
-  = s-∀l-y pk upB (s-⊆-prv-gen {k = #S k} s {!!} (⊆-S== exts {!!})) upᶜ upᵉ upC upD
+  with reg-S= r regA ← s-env-out s
+  with ext ← ⊆⊆-⊆-ll exts
+  = s-∀l-y pk upB (s-⊆-prv-gen {k = #S k} s (⊢ok-∙⟹0 opnA (⊆-⊢r' regA ext)) (⊆-S== exts (⊆-⊢r' regA ext))) upᶜ upᵉ upC upD
 s-⊆-prv-gen (s-tapp s upᶜ) (opn-∀ opnA) exts
   with reg-S= r regA ← s-env-in s = s-tapp (s-⊆-prv-gen s (⊢ok-∙⟹0 opnA regA) (⊆-S== exts regA)) upᶜ
 s-⊆-prv-gen (s-svar-term x s) (opn-var x₁) exts

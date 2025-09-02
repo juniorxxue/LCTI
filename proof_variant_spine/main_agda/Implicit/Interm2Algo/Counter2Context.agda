@@ -1,5 +1,3 @@
-{-# OPTIONS --allow-unsolved-metas #-}
-{-# OPTIONS --allow-incomplete-matches #-}
 module Implicit.Interm2Algo.Counter2Context where
 
 open import Implicit.Language.All
@@ -81,10 +79,9 @@ data _⊢_~t_ : Env n m → Counter m × Type m → Context n m → Set where
   ~I (t-weaken= ⊢e (▶Z (⊢r-𝕣' regT)) ↑tyᶜ-□ up-e upA) (~weaken=0 ~s upA₁ upΣ upj regT)
 ~weaken=0 (~C ⊢e ~s) (↑ty-arr upA upA₁) (↑tyᶜ-e up-e upΣ) (↑tyʲ-𝕔 upj) regT =
   ~C (t-weaken= ⊢e (▶Z (⊢r-𝕣' regT)) (↑tyᶜ-τ upA) up-e upA) (~weaken=0 ~s upA₁ upΣ upj regT)
--- ~weaken=0 (~T {B* = B*} ~s st) (↑ty-∀ upA) (↑tyᶜ-⓪ x upΣ) (↑tyʲ-𝕥 upj upA₁) regT
---   with refl ← ↑ty-unique upA₁ x
---   with ⟨ B*' , upB* ⟩ ← ↑ty0-total B* = ~T (~weaken=0 ~s upB* upΣ upj regT) (↑ty-st-comm z≤n st upA x upB*)
-~weaken=0 x x₁ x₂ (↑tyʲ-𝕥 x₄ upA) x₃ = {!!}
+~weaken=0 (~T ~s upB) (↑ty-∀ upA) (↑tyᶜ-⓪ x upΣ) (↑tyʲ-𝕥 upj upA₁) regT
+  with refl ← ↑ty-unique x upA₁
+  = ~T (~weaken=0 ~s upB upΣ upj regT) (↑ty-comm0 upB upA upB)
 
 
 ~weaken^0 : Γ ⊢ ⟨ j , A ⟩ ~s Σ
@@ -100,7 +97,9 @@ data _⊢_~t_ : Env n m → Counter m × Type m → Context n m → Set where
 -- ~weaken^0 (~T {B* = B*} ~j st) (↑ty-∀ upA) (↑tyᶜ-⓪ x upΣ) (↑tyʲ-𝕥 upj upA₁)
 --   with refl ← ↑ty-unique upA₁ x
 --   with ⟨ B*' , upB* ⟩ ← ↑ty0-total B* = ~T (~weaken^0 ~j upB* upΣ upj) (↑ty-st-comm z≤n st upA x upB*)
-~weaken^0 x x₁ x₂ (↑tyʲ-𝕥 x₃ upA) = {!!}
+~weaken^0 (~T ~s upB) (↑ty-∀ upA) (↑tyᶜ-⓪ x upΣ) (↑tyʲ-𝕥 upj upA₁)
+  with refl ← ↑ty-unique x upA₁
+  = ~T (~weaken^0 ~s upB upΣ upj) (↑ty-comm0 upB upA upB)
 
 ~t-~s : Γ ⊢ ⟨ j , B ⟩ ~t Σ
       → Γ ⋈ ⊢ ⟨ j , B ⟩ ~s Σ
@@ -109,14 +108,6 @@ data _⊢_~t_ : Env n m → Counter m × Type m → Context n m → Set where
 ~t-~s (~I ⊢e j~Σ) = ~I ⊢e (~t-~s j~Σ)
 ~t-~s (~C ⊢e j~Σ) = ~C ⊢e (~t-~s j~Σ)
 ~t-~s (~T j~Σ upB) = ~T (~t-~s j~Σ) upB
-
--- ~s-~~s : Γ ⊢ ⟨ j , B ⟩ ~s Σ
---       → ⟨ j , B ⟩ ~~s Σ
--- ~s-~~s ~Z = ~Z
--- ~s-~~s ~∞ = ~∞
--- ~s-~~s (~I ⊢e ~j) = ~I (~s-~~s ~j)
--- ~s-~~s (~C ⊢e ~j) = ~C (~s-~~s ~j)
--- ~s-~~s (~T ~j st) = ~T (~s-~~s ~j) {!!}
 
 ----------------------------------------------------------------------
 --+                             Irrev                              +--
