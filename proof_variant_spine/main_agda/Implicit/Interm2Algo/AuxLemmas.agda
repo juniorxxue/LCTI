@@ -39,9 +39,9 @@ s+-⊆/ (s-svar-𝕥 inΓ s) = ⊆T-X (s-sregular s) (⊢c-var-= (∋:=to∋= in
 s+-⊆/ (s-∀l-peek x ic pk upC upD upj) with s+-⊆/ x
 s+-⊆/ (s-∀l-peek x case-𝕚 pk upC upD (↑tyʲ-𝕚 upj)) | r = ⊆∀-I-new r upj
 s+-⊆/ (s-∀l-peek x case-𝕔 pk upC upD (↑tyʲ-𝕔 upj)) | r = ⊆∀-C-new r upj
-s+-⊆/ (s-∀l-new x case-𝕚 ¬pk fd upC upD (↑tyʲ-𝕚 upj)) with s+-⊆/ x
+s+-⊆/ (s-∀l-new x case-𝕚 fd upC upD (↑tyʲ-𝕚 upj)) with s+-⊆/ x
 ... | r = ⊆∀-I-new r upj
-s+-⊆/ (s-∀l-new x case-𝕔 ¬pk fd upC upD (↑tyʲ-𝕔 upj)) with s+-⊆/ x
+s+-⊆/ (s-∀l-new x case-𝕔 fd upC upD (↑tyʲ-𝕔 upj)) with s+-⊆/ x
 ... | r = ⊆∀-C-new r upj
 
 

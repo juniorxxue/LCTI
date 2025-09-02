@@ -178,11 +178,13 @@ s-⊆-prv-gen (s-term-o opnA₁ ⊢e ss s) (opn-arr opnA opnA₂) exts
   with ext ← ⊆⊆-⊆-l exts
   with ⟨ Ω' , ⟨ exts1 , exts2 ⟩ ⟩ ← ⊆⊆-Ω-exist exts (ss-⊆ ss) (s-⊆ s)
   = s-term-o (exts-open-prv exts opnA₁ opnA) (t-irrev-⊆ ⊢e ext) (ss--⊆-prv-gen ss opnA exts1) (s-⊆-prv-gen s (⊢ok-⊆ opnA₂ (ss-⊆ ss)) exts2)
--- s-⊆-prv-gen {k = k} (s-∀l s upᶜ upᵉ upC upD) (opn-∀ opnA) exts
---   with reg-S= r regA ← s-env-out s
---   with ext ← ⊆⊆-⊆-ll exts
---   = s-∀l (s-⊆-prv-gen {k = #S k} s (⊢ok-◈0 opnA) (⊆-S^= exts (⊆-⊢r' regA ext))) upᶜ upᵉ upC upD
--- s-⊆-prv-gen (s-∀l-no s upᶜ upᵉ upC upD) (opn-∀ opnA) exts = s-∀l-no (s-⊆-prv-gen s (⊢ok-◈0 opnA) (⊆-S^^ exts)) upᶜ upᵉ upC upD
+s-⊆-prv-gen {k = k} (s-∀l-n-y s upᶜ upᵉ upC upD) (opn-∀ opnA) exts
+  with reg-S= r regA ← s-env-out s
+  with ext ← ⊆⊆-⊆-ll exts
+  = s-∀l-n-y (s-⊆-prv-gen {k = #S k} s (⊢ok-◈0 opnA) (⊆-S^= exts (⊆-⊢r' regA ext))) upᶜ upᵉ upC upD
+s-⊆-prv-gen (s-∀l-n-n s upᶜ upᵉ upC upD) (opn-∀ opnA) exts = s-∀l-n-n (s-⊆-prv-gen s (⊢ok-◈0 opnA) (⊆-S^^ exts)) upᶜ upᵉ upC upD
+s-⊆-prv-gen {k = k} (s-∀l-y pk upB s upᶜ upᵉ upC upD) (opn-∀ opnA) exts
+  = s-∀l-y pk upB (s-⊆-prv-gen {k = #S k} s {!!} (⊆-S== exts {!!})) upᶜ upᵉ upC upD
 s-⊆-prv-gen (s-tapp s upᶜ) (opn-∀ opnA) exts
   with reg-S= r regA ← s-env-in s = s-tapp (s-⊆-prv-gen s (⊢ok-∙⟹0 opnA regA) (⊆-S== exts regA)) upᶜ
 s-⊆-prv-gen (s-svar-term x s) (opn-var x₁) exts

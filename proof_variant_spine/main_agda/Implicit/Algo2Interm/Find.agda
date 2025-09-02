@@ -43,12 +43,12 @@ s-find (s-svar-tapp in' s) inΓ inΔ = ⊥-elim (∋^-∋=-false inΓ inΔ)
 -- s-find (s-∀l-no-𝕔 s upᶜ upj upᵉ upC upD) inΓ inΔ = f-∀-𝕔 (s-find s (S^ inΓ) (S^ inΔ)) upj
 s-find (s-evar-infers infs inst) inΓ inΔ
   with ε-var ← ^in-=out-ε (ext-var (inst-⊆/x inst)) inΓ inΔ = f-iso (infs-isoinf infs)
-s-find (s-∀l-y-𝕚 pk s upᶜ upj upᵉ upC upD) inΓ inΔ = f-∀-𝕚 (s-find s (S= inΓ) (S= inΔ)) upj
-s-find (s-∀l-n-y-𝕚 ¬pk s upᶜ upj upᵉ upC upD) inΓ inΔ = f-∀-𝕚 (s-find s (S^ inΓ) (S= inΔ)) upj
-s-find (s-∀l-n-n-𝕚 ¬pk s upᶜ upj upᵉ upC upD) inΓ inΔ = f-∀-𝕚 (s-find s (S^ inΓ) (S^ inΔ)) upj
-s-find (s-∀l-y-𝕔 pk s upᶜ upj upᵉ upC upD) inΓ inΔ = f-∀-𝕔 (s-find s (S= inΓ) (S= inΔ)) upj
-s-find (s-∀l-n-y-𝕔 ¬pk s upᶜ upj upᵉ upC upD) inΓ inΔ = f-∀-𝕔 (s-find s (S^ inΓ) (S= inΔ)) upj
-s-find (s-∀l-n-n-𝕔 ¬pk s upᶜ upj upᵉ upC upD) inΓ inΔ = f-∀-𝕔 (s-find s (S^ inΓ) (S^ inΔ)) upj
+s-find (s-∀l-y-𝕚 pk upB s upᶜ upj upᵉ upC upD) inΓ inΔ = f-∀-𝕚 (s-find s (S= inΓ) (S= inΔ)) upj
+s-find (s-∀l-n-y-𝕚 s upᶜ upj upᵉ upC upD) inΓ inΔ = f-∀-𝕚 (s-find s (S^ inΓ) (S= inΔ)) upj
+s-find (s-∀l-n-n-𝕚 s upᶜ upj upᵉ upC upD) inΓ inΔ = f-∀-𝕚 (s-find s (S^ inΓ) (S^ inΔ)) upj
+s-find (s-∀l-y-𝕔 pk upB s upᶜ upj upᵉ upC upD) inΓ inΔ = f-∀-𝕔 (s-find s (S= inΓ) (S= inΔ)) upj
+s-find (s-∀l-n-y-𝕔 s upᶜ upj upᵉ upC upD) inΓ inΔ = f-∀-𝕔 (s-find s (S^ inΓ) (S= inΔ)) upj
+s-find (s-∀l-n-n-𝕔 s upᶜ upj upᵉ upC upD) inΓ inΔ = f-∀-𝕔 (s-find s (S^ inΓ) (S^ inΔ)) upj
 
 s-find0 : Γ ,^ ⊢ A ≤⁺ [ e' ]↝ Σ' ⊣ Δ ,= B ↪ C `→ D ↡ j
               → find A #0 j
@@ -95,6 +95,6 @@ s-¬ε (s-tapp s upᶜ) inΓ inΔ = ¬ε-∀ (s-¬ε s (S= inΓ) (S= inΔ))
 s-¬ε (s-svar-term x s) inΓ inΔ = ¬ε-var (∋=-∋^-≢ (∋:=to∋= x) inΓ)
 s-¬ε (s-svar-tapp x s) inΓ inΔ = ¬ε-var (∋=-∋^-≢ (∋:=to∋= x) inΓ)
 s-¬ε (s-evar-infers infs inst) inΓ inΔ = ¬ε-var (∋=-∋^-≢ (inst-∋= inst) inΔ)
-s-¬ε (s-∀l-y jump x₂ upᶜ upᵉ upC upD) x x₁ = ¬ε-∀ (s-¬ε x₂ (S= x) (S= x₁))
-s-¬ε (s-∀l-n-y jump x₂ upᶜ upᵉ upC upD) x x₁ = ¬ε-∀ (s-¬ε x₂ (S^ x) (S= x₁))
-s-¬ε (s-∀l-n-n jump x₂ upᶜ upᵉ upC upD) x x₁ = ¬ε-∀ (s-¬ε x₂ (S^ x) (S^ x₁))
+s-¬ε (s-∀l-y jump upB x₂ upᶜ upᵉ upC upD) x x₁ = ¬ε-∀ (s-¬ε x₂ (S= x) (S= x₁))
+s-¬ε (s-∀l-n-y x₂ upᶜ upᵉ upC upD) x x₁ = ¬ε-∀ (s-¬ε x₂ (S^ x) (S= x₁))
+s-¬ε (s-∀l-n-n x₂ upᶜ upᵉ upC upD) x x₁ = ¬ε-∀ (s-¬ε x₂ (S^ x) (S^ x₁))

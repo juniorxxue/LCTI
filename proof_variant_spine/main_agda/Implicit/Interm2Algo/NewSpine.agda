@@ -100,7 +100,7 @@ peek→peek-a s (peek-base inA) inΓ = pka-∞ (peek→peek-t s inΓ inA)
 peek→peek-a (s-arr₂ s s₁) (peek-arr-i pk) inΓ = pka-arr-𝕚 (peek→peek-a s₁ pk inΓ)
 peek→peek-a (s-arr₃ cloA grd s) (peek-arr-c pk) inΓ = pka-arr-𝕔 (peek→peek-a s pk inΓ)
 -- case peek-∀-i
-peek→peek-a {T = T} (s-∀l-new s ic ¬pk fd upC upD (↑tyʲ-𝕚 upj₁)) (peek-∀-i pk upj) inΓ
+peek→peek-a {T = T} (s-∀l-new s ic fd upC upD (↑tyʲ-𝕚 upj₁)) (peek-∀-i pk upj) inΓ
   with refl ← ↑tyʲ-unique upj upj₁
   with ⟨ T' , upT ⟩ ← ↑ty0-total T
   = pka-∀-𝕚 (peek→peek-a s pk (S= inΓ upT)) upC upD upT upj₁
@@ -113,7 +113,7 @@ peek→peek-a {T = T} (s-∀l-no-appear s ic fd upC upD (↑tyʲ-𝕚 upj₁)) (
   with ⟨ T' , upT ⟩ ← ↑ty0-total T
   = pka-∀-𝕚 (peek→peek-a s pk (S^ inΓ upT)) upC upD upT upj₁
 -- case peek-∀-c
-peek→peek-a {T = T} (s-∀l-new s ic ¬pk fd upC upD (↑tyʲ-𝕔 upj₁)) (peek-∀-c pk upj) inΓ
+peek→peek-a {T = T} (s-∀l-new s ic fd upC upD (↑tyʲ-𝕔 upj₁)) (peek-∀-c pk upj) inΓ
   with refl ← ↑tyʲ-unique upj upj₁
   with ⟨ T' , upT ⟩ ← ↑ty0-total T
   = pka-∀-𝕔 (peek→peek-a s pk (S= inΓ upT)) upC upD upT upj₁
@@ -175,14 +175,6 @@ id-↑ty' {k = k} (id-⓪ {B = B} id₁ up) (↑tyᶜ-⓪ upA₁ upΣ) (↑ty-�
   with ⟨ B' , upB ⟩ ← ↑ty-total B k
   = id-⓪ (id-↑ty' id₁ upΣ upB) (↑ty-comm0 up upA upB)
 
-pk-ε : A ~~pk~~ B w/ k ↪ T
-     → k ε A
-pk-ε pk-var-l = ε-var
-pk-ε (pk-arr-l pk) = ε-arr-l (pk-ε pk)
-pk-ε {k = k} (pk-arr-r {A = A} pk) with ε-dec {k = k} {A = A}
-... | inj₁ inA = ε-arr-l inA
-... | inj₂ ¬inA = ε-arr-r ¬inA (pk-ε pk)
-pk-ε (pk-∀ pk upC) = ε-∀ (pk-ε pk)
 
 pk'~-tail-eq : A ~~pk~~ B w/ k ↪ T₁
              → A ≤ B ⟹ T₂

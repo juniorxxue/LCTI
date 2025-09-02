@@ -5,11 +5,6 @@ open import Implicit.Algo.All
 open import Implicit.Interm2Algo.EnvDiff
 open import Implicit.Interm2Algo.OpenClose
 
-postulate
-  infs-sub' : 𝕣 Γ ⊨ Σ ⟹ A
-          → SRegular Γ
-          → Γ ⊢ A ≤⁺ Σ ⊣ Γ ↪ A
-
 ss-≫-- : Γ ⊢ B ⌞ ≤⁻ ⌝ A ⊣ Δ
        → Δ ≫ A ⇘ B
 
@@ -413,12 +408,12 @@ s-unsol-sol {T = T} (s-∀l-y pk upB s upᶜ upᵉ upC upD) inΔ inst
   with ⟨ T' , upT ⟩ ← ↑ty0-total T
   with reg-S= r regA ← s-env-in s
   = s-∀l-y pk upB (s-unsol-sol s (S= inΔ upT) (⟹=S inst upT regA)) upᶜ upᵉ upC upD
-s-unsol-sol {T = T} (s-∀l-n-y ¬pk s upᶜ upᵉ upC upD) inΔ inst
+s-unsol-sol {T = T} (s-∀l-n-y s upᶜ upᵉ upC upD) inΔ inst
   with ⟨ T' , upT ⟩ ← ↑ty0-total T
-  = s-∀l-n-y ¬pk (s-unsol-sol s (S= inΔ upT) (⟹^S inst upT)) upᶜ upᵉ upC upD
-s-unsol-sol {T = T} (s-∀l-n-n ¬pk s upᶜ upᵉ upC upD) inΔ inst
+  = s-∀l-n-y (s-unsol-sol s (S= inΔ upT) (⟹^S inst upT)) upᶜ upᵉ upC upD
+s-unsol-sol {T = T} (s-∀l-n-n s upᶜ upᵉ upC upD) inΔ inst
   with ⟨ T' , upT ⟩ ← ↑ty0-total T
-  = s-∀l-n-n ¬pk (s-unsol-sol s (S^ inΔ upT) (⟹^S inst upT)) upᶜ upᵉ upC upD
+  = s-∀l-n-n (s-unsol-sol s (S^ inΔ upT) (⟹^S inst upT)) upᶜ upᵉ upC upD
 s-unsol-sol {T = T} (s-tapp s upᶜ) inΔ inst
   with ⟨ T' , upT ⟩ ← ↑ty0-total T
   with reg-S= r regA ← s-env-in s
@@ -434,7 +429,7 @@ s-unsol-sol {k = k} (s-evar-infers {X = X} (infs-s ⊢e infs) inst₁) inΔ inst
   with ⊢r-arr regA regB ← ∋:=-⊢r (⊆-sregular' extΓ) inΔ
   = s-svar-term inΔ (s-term-c (⊢r-⊢c regA) (⊢r-≫-eq regA)
                 (subsumption0 (t-irrev-⊆ ⊢e extΓ))
-                {!!})
+                (infs-sub' (infs-irrev-⊆ infs extΓ) (⊆-sregular' extΓ)))
 ... | no ¬p
   with inΔ' ← ⊆/x-neq-∋^ (inst-∋^ inst) (inst-⊆/x inst₁) ¬p
   = ⊥-elim (∋^-∋=-false inΔ' (∋:=to∋= inΔ))

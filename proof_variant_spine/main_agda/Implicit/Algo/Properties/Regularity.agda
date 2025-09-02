@@ -66,8 +66,8 @@ s-env-in (s-svar-term inΓ s) = s-env-in s
 s-env-in (s-svar-tapp inΓ s) = s-env-in s
 s-env-in (s-evar-infers x inst) = inst-env-in inst
 s-env-in (s-∀l-y pk upB x upᶜ upᵉ upC upD) = {!!}
-s-env-in (s-∀l-n-y ¬pk x upᶜ upᵉ upC upD) = {!!}
-s-env-in (s-∀l-n-n ¬pk x upᶜ upᵉ upC upD) = {!!}
+s-env-in (s-∀l-n-y x upᶜ upᵉ upC upD) = {!!}
+s-env-in (s-∀l-n-n x upᶜ upᵉ upC upD) = {!!}
 
 s-env-out : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
           → SRegular Δ
@@ -165,8 +165,8 @@ s-⊢rᶜ (s-svar-tapp inΓ s) = s-⊢rᶜ s
 s-⊢rᶜ (s-evar-infers tfs inst) with infs-⊢rᶜ tfs
 ... | ⊢rᶜ-term r = ⊢rᶜ-term (⊢rᶜ-𝕣 r)
 s-⊢rᶜ (s-∀l-y pk upB x upᶜ upᵉ upC upD) = {!!}
-s-⊢rᶜ (s-∀l-n-y ¬pk x upᶜ upᵉ upC upD) = {!!}
-s-⊢rᶜ (s-∀l-n-n ¬pk x upᶜ upᵉ upC upD) = {!!}
+s-⊢rᶜ (s-∀l-n-y x upᶜ upᵉ upC upD) = {!!}
+s-⊢rᶜ (s-∀l-n-n x upᶜ upᵉ upC upD) = {!!}
 
 t-⊢rᶜ : Γ ⊢ Σ ⇒ e ⇒ A
       → Γ ⊢rᶜ Σ

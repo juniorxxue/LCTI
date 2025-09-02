@@ -13,9 +13,9 @@ open import Implicit.Algo.Base
 
 infix 3 _~pk'~_w/_↬_↡_
 
-data _~pk'~_w/_↬_↡_ : Type (1 + m) → Context n (1 + m) → Fin (1 + m) → Type m → Counter (1 + m) → Set where
+data _~pk'~_w/_↬_↡_ : Type m → Context n m → Fin m → Type m → Counter m → Set where
   pk-type : A ~~pk~~ B w/ k ↪ C
-          → A ~pk'~ (Context n (1 + m) ∋⦂ τ B) w/ k ↬ C ↡ ∞
+          → A ~pk'~ (Context n m ∋⦂ τ B) w/ k ↬ C ↡ ∞
   pk-term-𝕚 : B ~pk'~ Σ w/ k ↬ C ↡ j
           → A `→ B ~pk'~ [ e ]↝ Σ w/ k ↬ C ↡ 𝕚 j
   pk-term-𝕔 : B ~pk'~ Σ w/ k ↬ C ↡ j
@@ -119,9 +119,9 @@ data _⊢_⇒_⇒_↡_ where
     → Γ ⊢ τ (`∀ B) ⇒ Λ e ⇒ `∀ A ↡ ∞
 
   ⊢tapp :
-      Γ ⊢ A ⓪↝ Σ ⇒ e ⇒ `∀ B ↡ 𝕥₍ A ₎ j
-    → (st : ⟦ A ⟧ B ⇘ B*)
-    → Γ ⊢ Σ ⇒ e ⓪ A ⇒ B* ↡ j
+      Γ ⊢ A ⓪↝ Σ ⇒ e ⇒ `∀ B' ↡ 𝕥₍ A ₎ j
+    → (upB : ↑ty0 B ⇘ B')
+    → Γ ⊢ Σ ⇒ e ⓪ A ⇒ B ↡ j
 
 
 data _⊢_≤⁺_⊣_↪_↡_ where
@@ -151,7 +151,8 @@ data _⊢_≤⁺_⊣_↪_↡_ where
     → Δ ⊢ A `→ B ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ C `→ D ↡ 𝕚 j
 
   s-∀l-y-𝕚 :
-      (pk : A ~pk'~ ([ e' ]↝ Σ') w/ #0 ↬ B ↡ (𝕚 j'))
+      (pk : A ~pk'~ ([ e' ]↝ Σ') w/ #0 ↬ B' ↡ (𝕚 j'))
+    → (upB : ↑ty0 B ⇘ B')
     → Δ ,= B ⊢ A ≤⁺ ([ e' ]↝ Σ') ⊣ Ψ ,= B ↪ C' `→ D' ↡ (𝕚 j')
     → (upᶜ : ↑tyᶜ0 Σ ⇘ Σ')
     → (upj : ↑tyʲ0 j ⇘ j')
@@ -161,8 +162,7 @@ data _⊢_≤⁺_⊣_↪_↡_ where
     → Δ ⊢ `∀ A ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ C `→ D ↡ 𝕚 j
 
   s-∀l-n-y-𝕚 :
-      (¬pk : ¬ (A ~pk~ ([ e' ]↝ Σ') w/ #0))
-    → Δ ,^ ⊢ A ≤⁺ ([ e' ]↝ Σ') ⊣ Ψ ,= B ↪ C' `→ D' ↡ 𝕚 j'
+      Δ ,^ ⊢ A ≤⁺ ([ e' ]↝ Σ') ⊣ Ψ ,= B ↪ C' `→ D' ↡ 𝕚 j'
     → (upᶜ : ↑tyᶜ0 Σ ⇘ Σ')
     → (upj : ↑tyʲ0 j ⇘ j')
     → (upᵉ : ↑tyᵉ0 e ⇘ e')
@@ -171,8 +171,7 @@ data _⊢_≤⁺_⊣_↪_↡_ where
     → Δ ⊢ `∀ A ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ C `→ D ↡ 𝕚 j
 
   s-∀l-n-n-𝕚 :
-      (¬pk : ¬ (A ~pk~ ([ e' ]↝ Σ') w/ #0))
-    → Δ ,^ ⊢ A ≤⁺ ([ e' ]↝ Σ') ⊣ Ψ ,^ ↪ C' `→ D' ↡ 𝕚 j'
+      Δ ,^ ⊢ A ≤⁺ ([ e' ]↝ Σ') ⊣ Ψ ,^ ↪ C' `→ D' ↡ 𝕚 j'
     → (upᶜ : ↑tyᶜ0 Σ ⇘ Σ')
     → (upj : ↑tyʲ0 j ⇘ j')
     → (upᵉ : ↑tyᵉ0 e ⇘ e')
@@ -181,7 +180,8 @@ data _⊢_≤⁺_⊣_↪_↡_ where
     → Δ ⊢ `∀ A ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ C `→ D ↡ 𝕚 j
 
   s-∀l-y-𝕔 :
-      (pk : A ~pk'~ ([ e' ]↝ Σ') w/ #0 ↬ B ↡ (𝕔 j'))
+      (pk : A ~pk'~ ([ e' ]↝ Σ') w/ #0 ↬ B' ↡ (𝕔 j'))
+    → (upB : ↑ty0 B ⇘ B')
     → Δ ,= B ⊢ A ≤⁺ ([ e' ]↝ Σ') ⊣ Ψ ,= B ↪ C' `→ D' ↡ (𝕔 j')
     → (upᶜ : ↑tyᶜ0 Σ ⇘ Σ')
     → (upj : ↑tyʲ0 j ⇘ j')
@@ -191,8 +191,7 @@ data _⊢_≤⁺_⊣_↪_↡_ where
     → Δ ⊢ `∀ A ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ C `→ D ↡ 𝕔 j
 
   s-∀l-n-y-𝕔 :
-      (¬pk : ¬ (A ~pk~ ([ e' ]↝ Σ') w/ #0))
-    → Δ ,^ ⊢ A ≤⁺ ([ e' ]↝ Σ') ⊣ Ψ ,= B ↪ C' `→ D' ↡ 𝕔 j'
+      Δ ,^ ⊢ A ≤⁺ ([ e' ]↝ Σ') ⊣ Ψ ,= B ↪ C' `→ D' ↡ 𝕔 j'
     → (upᶜ : ↑tyᶜ0 Σ ⇘ Σ')
     → (upj : ↑tyʲ0 j ⇘ j')
     → (upᵉ : ↑tyᵉ0 e ⇘ e')
@@ -201,8 +200,7 @@ data _⊢_≤⁺_⊣_↪_↡_ where
     → Δ ⊢ `∀ A ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ C `→ D ↡ 𝕔 j
 
   s-∀l-n-n-𝕔 :
-      (¬pk : ¬ (A ~pk~ ([ e' ]↝ Σ') w/ #0))
-    → Δ ,^ ⊢ A ≤⁺ ([ e' ]↝ Σ') ⊣ Ψ ,^ ↪ C' `→ D' ↡ 𝕔 j'
+      Δ ,^ ⊢ A ≤⁺ ([ e' ]↝ Σ') ⊣ Ψ ,^ ↪ C' `→ D' ↡ 𝕔 j'
     → (upᶜ : ↑tyᶜ0 Σ ⇘ Σ')
     → (upj : ↑tyʲ0 j ⇘ j')
     → (upᵉ : ↑tyᵉ0 e ⇘ e')

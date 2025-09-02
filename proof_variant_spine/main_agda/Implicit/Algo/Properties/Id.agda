@@ -77,8 +77,8 @@ s-id' (s-svar-term inΓ s) = s-id' s
 s-id' (s-svar-tapp inΓ s) = s-id' s
 s-id' (s-evar-infers infs inst) = infs-id' infs
 s-id' s'@(s-∀l-y pk upB x upᶜ upᵉ upC upD) = id-↑ty (s-id' x) (↑tyᶜ-e upᵉ upᶜ) (↑ty-arr upC upD)
-s-id' (s-∀l-n-y ¬pk x upᶜ upᵉ upC upD) = id-↑ty (s-id' x) (↑tyᶜ-e upᵉ upᶜ) (↑ty-arr upC upD)
-s-id' (s-∀l-n-n ¬pk x upᶜ upᵉ upC upD) = id-↑ty (s-id' x) (↑tyᶜ-e upᵉ upᶜ) (↑ty-arr upC upD)
+s-id' (s-∀l-n-y x upᶜ upᵉ upC upD) = id-↑ty (s-id' x) (↑tyᶜ-e upᵉ upᶜ) (↑ty-arr upC upD)
+s-id' (s-∀l-n-n x upᶜ upᵉ upC upD) = id-↑ty (s-id' x) (↑tyᶜ-e upᵉ upᶜ) (↑ty-arr upC upD)
 s-id' (s-tapp x upᶜ)
   with regC ← s-⊢r x
   with ¬inC ← ⊢r-=∈-¬ε regC Z

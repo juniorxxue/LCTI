@@ -19,18 +19,9 @@ sound-ss (s-ex-r= regΓ x-in) = s-svar-r regΓ x-in
 sound-ss (s-arr s s₁) = s-arr₁ (s-⊆-prv (sound-ss s) (ss-⊆ s₁)) (sound-ss s₁)
 sound-ss (s-∀ s) = s-∀ (sound-ss s)
 
-peek-ε : A ~~pk~~ B w/ k ↪ C
-       → k ε A
-peek-ε (pk-var-l upA) = ε-var
-peek-ε (pk-arr-l pk) = ε-arr-l (peek-ε pk)
-peek-ε {k = k} (pk-arr-r {A = A} pk) with ε-dec {k = k} {A = A}
-... | inj₁ x = ε-arr-l x
-... | inj₂ y = ε-arr-r y (peek-ε pk)
-peek-ε (pk-∀ pk upC) = ε-∀ (peek-ε pk)
-
 sound-peek' : A ~pk'~ Σ w/ k ↬ B ↡ j
             → peek A k j
-sound-peek' (pk-type x) = peek-base (peek-ε x)
+sound-peek' (pk-type x) = peek-base (pk-ε x)
 sound-peek' (pk-term-𝕚 pk) = peek-arr-i (sound-peek' pk)
 sound-peek' (pk-term-𝕔 pk) = peek-arr-c (sound-peek' pk)
 sound-peek' (pk-∀l-𝕚 pk upΣ upj upe upC) = peek-∀-i (sound-peek' pk) upj
@@ -68,12 +59,12 @@ s-nonempty-case1 : Γ ⋈ ⊢ A₁ ≤⁺ [ e₁ ]↝ Σ ⊣ Γ ⋈ ↪ A ↡ j
                  → NonZ j
 s-nonempty-case1 (s-term-c cloA ap ⊢e s) = nz-C
 s-nonempty-case1 (s-term-o opnA ⊢e ss s) = nz-I
-s-nonempty-case1 (s-∀l-y-𝕚 jump s upᶜ upᵉ upC upD upj) = nz-I
-s-nonempty-case1 (s-∀l-y-𝕔 jump s upᶜ upᵉ upC upD upj) = nz-C
-s-nonempty-case1 (s-∀l-n-y-𝕚 jump s upᶜ upᵉ upC upD upj) = nz-I
-s-nonempty-case1 (s-∀l-n-y-𝕔 jump s upᶜ upᵉ upC upD upj) = nz-C
-s-nonempty-case1 (s-∀l-n-n-𝕚 jump s upᶜ upᵉ upC upD upj) = nz-I
-s-nonempty-case1 (s-∀l-n-n-𝕔 jump s upᶜ upᵉ upC upD upj) = nz-C
+s-nonempty-case1 (s-∀l-y-𝕚 jump upB s upᶜ upᵉ upC upD upj) = nz-I
+s-nonempty-case1 (s-∀l-y-𝕔 jump upB s upᶜ upᵉ upC upD upj) = nz-C
+s-nonempty-case1 (s-∀l-n-y-𝕚  s upᶜ upᵉ upC upD upj) = nz-I
+s-nonempty-case1 (s-∀l-n-y-𝕔  s upᶜ upᵉ upC upD upj) = nz-C
+s-nonempty-case1 (s-∀l-n-n-𝕚  s upᶜ upᵉ upC upD upj) = nz-I
+s-nonempty-case1 (s-∀l-n-n-𝕔  s upᶜ upᵉ upC upD upj) = nz-C
 
 s-nonempty-case2 : Γ ⋈ ⊢ A₁ ≤⁺ A₁ ⓪↝ Σ ⊣ Γ ⋈ ↪ A ↡ j
                  → NonZ j
@@ -113,7 +104,8 @@ tc-~ (⊢tabs ⊢e) = ~tZ
 tc-~ {e = Λ e} (⊢tabs-τ x) with tc-id0 x
 ... | refl = ~t∞
 tc-~ (⊢tapp ⊢e st) with tc-~ ⊢e
-... | ~tT r st₁ with refl ← st-unique st st₁ = r
+... | ~tT r st₁
+  with refl ← ↑ty-st-eq st st₁ = r
 
 sc-~ (s-empty regΓ cloA x) = ~sZ
 sc-~ (s-type ss) = ~s∞
@@ -144,16 +136,16 @@ sc-~ (s-∀l-n-n-𝕚 jump x upᶜ upᵉ upC upD upj) = ~s-strengthen^0 (sc-~ x)
 sc-~ (s-∀l-n-n-𝕔 jump x upᶜ upᵉ upC upD upj) = ~s-strengthen^0 (sc-~ x) (↑ty-arr upC upD) (↑tyᶜ-e upᵉ upᶜ)
                                                 (↑tyʲ-𝕔 upj)
 -}
-sc-~ (s-∀l-y-𝕚 pk x upᶜ upj upᵉ upC upD) = ~s-strengthen=0 (sc-~ x) (↑ty-arr upC upD) (↑tyᶜ-e upᵉ upᶜ)
+sc-~ (s-∀l-y-𝕚 pk upB x upᶜ upj upᵉ upC upD) = ~s-strengthen=0 (sc-~ x) (↑ty-arr upC upD) (↑tyᶜ-e upᵉ upᶜ)
                                             (↑tyʲ-𝕚 upj)
-sc-~ (s-∀l-n-y-𝕚 ¬pk x upᶜ upj upᵉ upC upD) = ~s-strengthen=0 (sc-~ x) (↑ty-arr upC upD) (↑tyᶜ-e upᵉ upᶜ)
+sc-~ (s-∀l-n-y-𝕚 x upᶜ upj upᵉ upC upD) = ~s-strengthen=0 (sc-~ x) (↑ty-arr upC upD) (↑tyᶜ-e upᵉ upᶜ)
                                                (↑tyʲ-𝕚 upj)
-sc-~ (s-∀l-n-n-𝕚 ¬pk x upᶜ upj upᵉ upC upD) = ~s-strengthen^0 (sc-~ x) (↑ty-arr upC upD) (↑tyᶜ-e upᵉ upᶜ) (↑tyʲ-𝕚 upj)
-sc-~ (s-∀l-y-𝕔 pk x upᶜ upj upᵉ upC upD) = ~s-strengthen=0 (sc-~ x) (↑ty-arr upC upD) (↑tyᶜ-e upᵉ upᶜ)
+sc-~ (s-∀l-n-n-𝕚 x upᶜ upj upᵉ upC upD) = ~s-strengthen^0 (sc-~ x) (↑ty-arr upC upD) (↑tyᶜ-e upᵉ upᶜ) (↑tyʲ-𝕚 upj)
+sc-~ (s-∀l-y-𝕔 pk upB x upᶜ upj upᵉ upC upD) = ~s-strengthen=0 (sc-~ x) (↑ty-arr upC upD) (↑tyᶜ-e upᵉ upᶜ)
                                             (↑tyʲ-𝕔 upj)
-sc-~ (s-∀l-n-y-𝕔 ¬pk x upᶜ upj upᵉ upC upD) = ~s-strengthen=0 (sc-~ x) (↑ty-arr upC upD) (↑tyᶜ-e upᵉ upᶜ)
+sc-~ (s-∀l-n-y-𝕔 x upᶜ upj upᵉ upC upD) = ~s-strengthen=0 (sc-~ x) (↑ty-arr upC upD) (↑tyᶜ-e upᵉ upᶜ)
                                                (↑tyʲ-𝕔 upj)
-sc-~ (s-∀l-n-n-𝕔 ¬pk x upᶜ upj upᵉ upC upD) = ~s-strengthen^0 (sc-~ x) (↑ty-arr upC upD) (↑tyᶜ-e upᵉ upᶜ)
+sc-~ (s-∀l-n-n-𝕔 x upᶜ upj upᵉ upC upD) = ~s-strengthen^0 (sc-~ x) (↑ty-arr upC upD) (↑tyᶜ-e upᵉ upᶜ)
                                                (↑tyʲ-𝕔 upj)
 
 infs-~ (infs-z regΓ regA) = ~t∞
@@ -188,12 +180,12 @@ sound-s (s-svar-tapp inΓ s) = s-svar-𝕥 inΓ (sound-s s)
 -- sound-s (s-∀l-no-𝕚 s upᶜ upj upᵉ upC upD) = s-∀l-no-appear (sound-s s) case-𝕚 (s-¬ε (sc-sound s) Z Z) upC upD (↑tyʲ-𝕚 upj)
 -- sound-s (s-∀l-no-𝕔 s upᶜ upj upᵉ upC upD) = s-∀l-no-appear (sound-s s) case-𝕔 (s-¬ε (sc-sound s) Z Z) upC upD (↑tyʲ-𝕔 upj)
 sound-s (s-evar-infers (infs-s ⊢e infs) inst) = s-svar-𝕚 (inst-∋:= inst) (sound-infs (infs-s ⊢e infs) (inst-⊆ inst))
-sound-s (s-∀l-y-𝕚 jump x upᶜ upᵉ upC upD upj) = s-∀l-peek (sound-s x) case-𝕚 (sound-peek' jump) upD upj (↑tyʲ-𝕚 upᵉ)
-sound-s (s-∀l-y-𝕔 jump x upᶜ upᵉ upC upD upj) = s-∀l-peek (sound-s x) case-𝕔 (sound-peek' jump) upD upj (↑tyʲ-𝕔 upᵉ)
-sound-s (s-∀l-n-y-𝕚 ¬pk x upᶜ upj upᵉ upC upD) = s-∀l-new (sound-s x) case-𝕚 (λ x₁ → ¬pk (complete-peek x₁ (sc-~ x))) (s-find0 x) upC upD (↑tyʲ-𝕚 upj)
-sound-s (s-∀l-n-n-𝕚 ¬pk x upᶜ upj upᵉ upC upD) = s-∀l-no-appear (sound-s x) case-𝕚 (s-¬ε (sc-sound x) Z Z) upC upD (↑tyʲ-𝕚 upj)
-sound-s (s-∀l-n-y-𝕔 ¬pk x upᶜ upj upᵉ upC upD) = s-∀l-new (sound-s x) case-𝕔 (λ x₁ → ¬pk (complete-peek x₁ (sc-~ x))) (s-find0 x) upC upD (↑tyʲ-𝕔 upj)
-sound-s (s-∀l-n-n-𝕔 ¬pk x upᶜ upj upᵉ upC upD) = s-∀l-no-appear (sound-s x) case-𝕔 (s-¬ε (sc-sound x) Z Z) upC upD (↑tyʲ-𝕔 upj)
+sound-s (s-∀l-y-𝕚 jump upB x upᶜ upᵉ upC upD upj) = s-∀l-peek (sound-s x) case-𝕚 (sound-peek' jump) upD upj (↑tyʲ-𝕚 upᵉ)
+sound-s (s-∀l-y-𝕔 jump upB x upᶜ upᵉ upC upD upj) = s-∀l-peek (sound-s x) case-𝕔 (sound-peek' jump) upD upj (↑tyʲ-𝕔 upᵉ)
+sound-s (s-∀l-n-y-𝕚 x upᶜ upj upᵉ upC upD) = s-∀l-new (sound-s x) case-𝕚 (s-find0 x) upC upD (↑tyʲ-𝕚 upj)
+sound-s (s-∀l-n-n-𝕚 x upᶜ upj upᵉ upC upD) = s-∀l-no-appear (sound-s x) case-𝕚 (s-¬ε (sc-sound x) Z Z) upC upD (↑tyʲ-𝕚 upj)
+sound-s (s-∀l-n-y-𝕔 x upᶜ upj upᵉ upC upD) = s-∀l-new (sound-s x) case-𝕔 (s-find0 x) upC upD (↑tyʲ-𝕔 upj)
+sound-s (s-∀l-n-n-𝕔 x upᶜ upj upᵉ upC upD) = s-∀l-no-appear (sound-s x) case-𝕔 (s-¬ε (sc-sound x) Z Z) upC upD (↑tyʲ-𝕔 upj)
 
 -- sound-s (s-∀l-n-y-𝕚 jump x upᶜ upᵉ upC upD upj) = s-∀l (sound-s x) case-𝕚 (s-find0 x) upC upD (↑tyʲ-𝕚 upj)
 -- sound-s (s-∀l-n-y-𝕔 jump x upᶜ upᵉ upC upD upj) = s-∀l (sound-s x) case-𝕔 (s-find0 x) upC upD (↑tyʲ-𝕔 upj)

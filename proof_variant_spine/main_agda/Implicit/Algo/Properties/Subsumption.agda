@@ -76,8 +76,18 @@ data _≊_by_ : Context n m → Context n m → Type m → Set where
 ≊-nonempty ne-tapp (≊⓪ new x) = ne-tapp
 
 
-~pk~-dec : (A ~pk~ Σ w/ k) ⊎ (¬ (A ~pk~ Σ w/ k))
-~pk~-dec = {!!}
+~pk~-≊by-false : A ~pk~ Σ w/ k ↪ B
+               → Σ ≊ σ by C
+               → ⊥
+~pk~-≊by-false (pk-term pk) (≊S new) = ~pk~-≊by-false pk new
+~pk~-≊by-false {σ = σ} {C = C} (pk-∀l pk upΣ upe upC) new
+  with ⟨ σ' , upσ ⟩ ← ↑tyᶜ0-total σ
+  with ⟨ C' , upC ⟩ ← ↑ty0-total C
+  = ~pk~-≊by-false pk (≊-↑ty new (↑tyᶜ-e upe upΣ) upσ upC)
+~pk~-≊by-false (pk-tapp pk upC upΣ) (≊⓪ {σ = σ} {B* = C} new x)
+  with ⟨ σ' , upσ ⟩ ← ↑tyᶜ0-total σ
+  with ⟨ C' , upC ⟩ ← ↑ty0-total C
+  = ~pk~-≊by-false pk (≊-↑ty new upΣ upσ upC)
 
 
 infs-subsumption : 𝕣 Γ ⊨ Σ ⟹ A
@@ -91,22 +101,21 @@ s-subsumtion : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
 s-subsumtion (s-empty regΓ cloA grd) ≋□ = s-type (ss-grd+ regΓ cloA grd)
 s-subsumtion (s-term-c cloA ap ⊢e s) (≊S new) = s-term-c cloA ap ⊢e (s-subsumtion s new)
 s-subsumtion (s-term-o opnA ⊢e ss s) (≊S new) = s-term-o opnA ⊢e ss (s-subsumtion s new)
--- s-subsumtion (s-∀l s upᶜ upᵉ upC upD) (≊S {σ = σ} new)
---   with ⟨ σ' , upσ ⟩ ←  ↑tyᶜ0-total σ = s-∀l (s-subsumtion s (≊S (≊-↑ty new upᶜ upσ upD))) upσ upᵉ upC upD
--- s-subsumtion (s-∀l-no s upᶜ upᵉ upC upD) (≊S {σ = σ} new)
---   with ⟨ σ' , upσ ⟩ ←  ↑tyᶜ0-total σ = s-∀l-no (s-subsumtion s (≊S (≊-↑ty new upᶜ upσ upD))) upσ upᵉ upC upD
 s-subsumtion (s-tapp s upᶜ) (≊⓪ {σ = σ} new x)
   with ⟨ σ' , upσ ⟩ ←  ↑tyᶜ0-total σ
   with ninC ← ⊢r-¬ε (s-⊢r s) Z
   with ⟨ up , upp ⟩ ← ↑ty-surjective ninC
   with refl ← ↑ty-st-eq upp x = s-tapp (s-subsumtion s (≊-↑ty new upᶜ upσ upp)) upσ
--- s-subsumtion (s-svar x s) new = s-svar x (s-subsumtion s new)
 s-subsumtion (s-evar-infers {Δ = Δ} infs inst) (≊S new) = s-evar-infers (infs-subsumption {Γ = Δ} infs (≊S new)) inst
 s-subsumtion (s-svar-term inΔ s) (≊S new) = s-svar-term inΔ (s-subsumtion s (≊S new))
 s-subsumtion (s-svar-tapp inΔ s) (≊⓪ new x) = s-svar-tapp inΔ (s-subsumtion s (≊⓪ new x))
-s-subsumtion (s-∀l-y pk upB s up-c up-e upC upD) (≊S new) = ⊥-elim {!!}
-s-subsumtion (s-∀l-n-y ¬pk s1 up-c up-e upC upD) (≊S new) = {!!}
-s-subsumtion (s-∀l-n-n ¬pk s up-c up-e upC upD) new = {!!}
+s-subsumtion {Σ' = σ} (s-∀l-y pk upB s up-c up-e upC upD) new
+  with ⟨ σ' , upσ ⟩ ←  ↑tyᶜ0-total σ
+  = ⊥-elim (~pk~-≊by-false pk (≊-↑ty new (↑tyᶜ-e up-e up-c) upσ (↑ty-arr upC upD)))
+s-subsumtion (s-∀l-n-y s1 up-c up-e upC upD) (≊S {σ = σ} new)
+  with ⟨ σ' , upσ ⟩ ←  ↑tyᶜ0-total σ = s-∀l-n-y (s-subsumtion s1 (≊S (≊-↑ty new up-c upσ upD))) upσ up-e upC upD
+s-subsumtion (s-∀l-n-n s up-c up-e upC upD) (≊S {σ = σ} new)
+  with ⟨ σ' , upσ ⟩ ←  ↑tyᶜ0-total σ = s-∀l-n-n (s-subsumtion s (≊S (≊-↑ty new up-c upσ upD))) upσ up-e upC upD
 
 
 infs-subsumption {Γ = Γ} (infs-s ⊢e infs) (≊S new) = infs-s ⊢e (infs-subsumption {Γ = Γ} infs new)
