@@ -22,7 +22,7 @@ s-sregular (s-tapp s upj) with s-sregular s
 s-sregular (s-svar-𝕚 _ x) = s-sregular x
 s-sregular (s-svar-𝕔 _ x) = s-sregular x
 s-sregular (s-svar-𝕥 x x₁) = s-sregular x₁
-s-sregular (s-∀l-new s ic fd upC upD upj) with s-sregular s
+s-sregular (s-∀l s ic fd upC upD upj) with s-sregular s
 ... | reg-S= r regA = r
 s-sregular (s-∀l-peek s ic pk upC upD upj)  with s-sregular s
 ... | reg-S= r regA = r
@@ -102,7 +102,7 @@ s-⊢rʲ (s-svar-r x inΔ) = j-∞
 s-⊢rʲ (s-svar-𝕚 _ x) = s-⊢rʲ x
 s-⊢rʲ (s-svar-𝕔 _ x) = s-⊢rʲ x
 s-⊢rʲ (s-svar-𝕥 x x₁) = s-⊢rʲ x₁
-s-⊢rʲ (s-∀l-new s ic fd upC upD upj) = ⊢rʲ-strengthen=0 (s-⊢rʲ s) upj
+s-⊢rʲ (s-∀l s ic fd upC upD upj) = ⊢rʲ-strengthen=0 (s-⊢rʲ s) upj
 s-⊢rʲ (s-∀l-peek s ic pk upC upD upj) = ⊢rʲ-strengthen=0 (s-⊢rʲ s) upj
 
 ⊢r-⋈ : Γ ⊢rʲ j

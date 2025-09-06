@@ -10,6 +10,8 @@ import Implicit.Decl.Typing using (s-refl-∞)
 -- Theorem 3.2 (Transitivity of subtyping)
 import Implicit.Decl.Trans using (s-trans')
 
+{- compared with IF is not considered in this extension
+
 -- Theorem 3.3 (Soundness to Implicit System F)
 import Implicit.Annotatability.Soundness using (sound)
 
@@ -18,6 +20,8 @@ import Implicit.Annotatability.Corollaries using (annotatability-real)
 
 -- Corollary 3.5 (Annotatability to F𝑖)
 import Implicit.Annotatability.Corollaries using (annotatability-real')
+
+-}
 
 ----------------------------------------------------------------------
 --+                           Section 4                            +--
@@ -61,7 +65,7 @@ import Implicit.Algo2Interm.Main using (sound)
 import Implicit.Algo2Interm.Corollaries using (sound0; sound∞)
 
 -- Lemma 5.9 (Typing implies Subtyping)
-import Implicit.Algo.Properties.Subsumption using (⊢to≤)
+import Implicit.Algo.Properties.Typing2Sub using (⊢to≤)
 
 -- Lemma 5.10 (Subsumption of Algo. Typing)
 import Implicit.Algo.Properties.Subsumption using (subsumption0)

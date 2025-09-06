@@ -22,6 +22,13 @@ open import Implicit.Decl.AuxLemmas
   with regA* ← s1-⊢r-l s
   with regA ← st-⊢r'' regA* ▶Z regB st
   = s-∀l {B = B} {A% = A*'} (st-↑ty-≫0 st regA* upA* regB) regA (s2-weaken=0 (⊢d→⊢d² s) upA* (↑ty-arr upC upD) upj regB) ic fd upC upD upj
+⊢d→⊢d² (s-∀l-peek {B = B} {A* = A*} {C = C} {D = D} regB st s ic fd upj)
+  with ⟨ C' , upC ⟩ ← ↑ty0-total C
+  with ⟨ D' , upD ⟩ ← ↑ty0-total D
+  with ⟨ A*' , upA* ⟩ ← ↑ty0-total A*
+  with regA* ← s1-⊢r-l s
+  with regA ← st-⊢r'' regA* ▶Z regB st
+  = s-∀l-peek {B = B} {A% = A*'} (st-↑ty-≫0 st regA* upA* regB) regA (s2-weaken=0 (⊢d→⊢d² s) upA* (↑ty-arr upC upD) upj regB) ic fd upC upD upj
 ⊢d→⊢d² (s-∀l-no-appear {B = B} {A* = A*} {j = j} {C = C} {D = D} regB st s ic fd)
   with ⟨ C' , upC ⟩ ← ↑ty0-total C
   with ⟨ D' , upD ⟩ ← ↑ty0-total D
@@ -48,6 +55,10 @@ open import Implicit.Decl.AuxLemmas
   with reg-S= r regA₁ ← s2-sregular s
   with ⟨ preA% , upp ⟩ ← ↑ty-surjective (⊢r-¬ε (s2-⊢r-l s) Z)
   = s-∀l regA₁ (≫-↑ty-st'0 regA regA₁ grd upp) (s1-strengthen=0 (⊢d²→⊢d s) upp (↑ty-arr upC upD) upj) ic fd upj
+⊢d²→⊢d (s-∀l-peek {B = B} grd regA s ic fd upC upD upj)
+  with reg-S= r regA₁ ← s2-sregular s
+  with ⟨ preA% , upp ⟩ ← ↑ty-surjective (⊢r-¬ε (s2-⊢r-l s) Z)
+  = s-∀l-peek regA₁ (≫-↑ty-st'0 regA regA₁ grd upp) (s1-strengthen=0 (⊢d²→⊢d s) upp (↑ty-arr upC upD) upj) ic fd upj
 ⊢d²→⊢d (s-∀l-no-appear grd regA s ic fd upC upD upj)
   with reg-S^ r ← s2-sregular s
   with ⟨ preA% , upp ⟩ ← ↑ty-surjective (⊢r-¬ε-^ (s2-⊢r-l s) Z)

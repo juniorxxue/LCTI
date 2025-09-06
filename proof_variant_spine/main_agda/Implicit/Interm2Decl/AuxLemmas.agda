@@ -42,6 +42,22 @@ sd-strengthen= {j = j} (s-∀l {B = B} grd regA' s ic fd upC upD upj₁) new (�
          (sd-strengthen= s (◀S= new upB') upA% (↑ty-arr (↑ty-comm0' upB upC upA′) (↑ty-comm0' upB₁ upD upB′)) (↑tyʲ-comm0' upj upj₁ upj'))
          (𝕚𝕔-↑tyʲ' ic upj)
          (↑ty-find0' fd upA (↑tyʲ-comm0' upj upj₁ upj')) upA′ upB′ upj'
+sd-strengthen= {j = j} (s-∀l-peek {B = B} grd regA' s ic fd upC upD upj₁) new (↑ty-∀ upA) (↑ty-arr {A = A′} {B = B′} upB upB₁) upj
+  with ⟨ A″ , upA′ ⟩ ← ↑ty0-total A′
+  with ⟨ B″ , upB′ ⟩ ← ↑ty0-total B′
+  with ⟨ j' , upj' ⟩ ← ↑tyʲ0-total j
+  with reg-S= regΓ regA ← s2-sregular s
+  with k¬εB ← ⊢r-¬ε regA (◀=-∋=' new)
+  with ⟨ preB , upB' ⟩ ← ↑ty-surjective k¬εB
+  -- A%
+  with regA% ← s2-⊢r-l s
+  with k1¬εB ← ⊢r-¬ε regA% (S= (◀=-∋=' new))
+  with ⟨ preA% , upA% ⟩ ← ↑ty-surjective k1¬εB
+  = s-∀l-peek (≫-strengthen= grd (reg-S= regΓ regA) (◀S= new upB') upA upA%)
+         (⊢r-strengthen= regA' (◀S∙ new) upA)
+         (sd-strengthen= s (◀S= new upB') upA% (↑ty-arr (↑ty-comm0' upB upC upA′) (↑ty-comm0' upB₁ upD upB′)) (↑tyʲ-comm0' upj upj₁ upj'))
+         (𝕚𝕔-↑tyʲ' ic upj)
+         (↑ty-peek0' fd upA (↑tyʲ-comm0' upj upj₁ upj')) upA′ upB′ upj'
 sd-strengthen= {j = j} (s-∀l-no-appear grd regA' s ic fd upC upD upj₁) new (↑ty-∀ upA) (↑ty-arr {A = A′} {B = B′} upB upB₁) upj
   with ⟨ A″ , upA′ ⟩ ← ↑ty0-total A′
   with ⟨ B″ , upB′ ⟩ ← ↑ty0-total B′

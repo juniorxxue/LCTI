@@ -36,7 +36,7 @@ data _⊢_#_⌞_⌝_ : Env n m → Counter m → Type m → Polar → Type m →
   s-∀ :
       Δ ,∙ ⊢ ∞ # A ⌞ ≤ ⌝ B
     → Δ ⊢ ∞ # `∀ A ⌞ ≤ ⌝ `∀ B
-  s-∀l-new :
+  s-∀l :
       Δ ,= B ⊢ j' # A ⌞ ≤⁺ ⌝ C' `→ D'
     → (ic : (𝕚𝕔 j))
 --    → (¬pk : ¬ (peek A #0 j')) -- prioritize peek over find
@@ -124,7 +124,7 @@ data _⊢_#_↷_ : Env n m → Counter m → Type m → Type m → Set where
   s-∀ :
       Δ ,∙ ⊢ ∞ # A  ↷  B
     → Δ ⊢ ∞ # `∀ A  ↷  `∀ B
-  s-∀l-new :
+  s-∀l :
       Δ ,= B ⊢ j' # A  ↷  C' `→ D'
     → (ic : (𝕚𝕔 j))
     → (¬pk : ¬ (peek A #0 j')) -- prioritize peek over find

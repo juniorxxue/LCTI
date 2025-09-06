@@ -41,6 +41,20 @@ sound s'@(s-∀l {B = B} s ic fd upC upD upj) (grd-∀ grd1) grdCD@(grd-arr grd2
          upC
          upD
          upj
+sound s'@(s-∀l-peek {B = B} s ic fd upC upD upj) (grd-∀ grd1) grdCD@(grd-arr grd2 grd3)
+  with cloA ← s-⊢c-l s
+  with ⟨ A% , grdA ⟩ ← ≫-total (I.s-sregular s) cloA
+  with reg-S= regΓ regA ← I.s-sregular s
+  with regCD ← s+-polarity s'
+  with refl ← ⊢r-≫-eq' regCD grdCD
+  = s-∀l-peek (≫-trans'' (reg-S∙ regΓ) grd1 (∙⟹^0 (proj₂ (↑ty0-total B)) regA) Z∙ grdA)
+         (⊢c-≫-⊢r (reg-S∙ regΓ) (⊢c-◆0 (s-⊢c-l s)) grd1)
+         (sound s grdA (⊢r-≫-eq (s+-polarity s)))
+         ic
+         (peek-≫-∙' fd Z∙ Z grd1)
+         upC
+         upD
+         upj
 sound s'@(s-∀l-no-appear s ic fd upC upD upj) (grd-∀ grd1) grdCD@(grd-arr grd2 grd3)
   with cloA ← s-⊢c-l s
   with ⟨ A% , grdA ⟩ ← ≫-total (I.s-sregular s) cloA

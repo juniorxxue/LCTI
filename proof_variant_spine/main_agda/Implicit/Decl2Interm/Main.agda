@@ -40,6 +40,10 @@ complete+ (s-∀l grd₁ regA s case-𝕚 fd upC upD upj) (grd-var= x)
   = s-svar-𝕚 x (s-∀l (complete+ s grd₁) case-𝕚 fd upC upD upj)
 complete+ (s-∀l grd₁ regA s case-𝕔 fd upC upD upj) (grd-var= x)
   = s-svar-𝕔 x (s-∀l (complete+ s grd₁) case-𝕔 fd upC upD upj)
+complete+ (s-∀l-peek grd₁ regA s case-𝕚 fd upC upD upj) (grd-var= x)
+  = s-svar-𝕚 x (s-∀l-peek (complete+ s grd₁) case-𝕚 fd upC upD upj)
+complete+ (s-∀l-peek grd₁ regA s case-𝕔 fd upC upD upj) (grd-var= x)
+  = s-svar-𝕔 x (s-∀l-peek (complete+ s grd₁) case-𝕔 fd upC upD upj)
 complete+ (s-∀l-no-appear grd₁ regA s case-𝕚 fd upC upD upj) (grd-var= x)
   = s-svar-𝕚 x (s-∀l-no-appear (complete+ s grd₁) case-𝕚 fd upC upD upj)
 complete+ (s-∀l-no-appear grd₁ regA s case-𝕔 fd upC upD upj) (grd-var= x)
@@ -50,6 +54,12 @@ complete+ (s-∀l grd₁ regA s case-𝕚 fd upC upD upj) (grd-∀ grd)
 complete+ (s-∀l grd₁ regA s case-𝕔 fd upC upD upj) (grd-∀ grd)
   with reg-S= regΓ regA ← s2-sregular s
   = s-∀l (complete+ s (≫-trans0 regΓ regA grd₁ grd)) case-𝕔 (find-≫-∙0 fd grd) upC upD upj
+complete+ (s-∀l-peek grd₁ regA s case-𝕚 fd upC upD upj) (grd-∀ grd)
+  with reg-S= regΓ regA ← s2-sregular s
+  = s-∀l-peek (complete+ s (≫-trans0 regΓ regA grd₁ grd)) case-𝕚 (peek-≫-∙0 fd grd) upC upD upj
+complete+ (s-∀l-peek grd₁ regA s case-𝕔 fd upC upD upj) (grd-∀ grd)
+  with reg-S= regΓ regA ← s2-sregular s
+  = s-∀l-peek (complete+ s (≫-trans0 regΓ regA grd₁ grd)) case-𝕔 (peek-≫-∙0 fd grd) upC upD upj
 complete+ (s-∀l-no-appear grd₁ regA s case-𝕚 fd upC upD upj) (grd-∀ grd)
   with reg-S^ regΓ ← s2-sregular s
   with ⟨ A' , upA ⟩ ← ↑ty-surjective fd

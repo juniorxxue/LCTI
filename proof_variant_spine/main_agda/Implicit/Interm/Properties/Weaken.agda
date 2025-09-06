@@ -19,12 +19,12 @@ s-weaken^ (s-arr₁ s s₁) newΓ (↑ty-arr upA upA₁) (↑ty-arr upB upB₁) 
 s-weaken^ (s-arr₂ s s₁) newΓ (↑ty-arr upA upA₁) (↑ty-arr upB upB₁) (↑tyʲ-𝕚 upj) = s-arr₂ (s-weaken^ s newΓ upB upA ↑tyʲ-∞) (s-weaken^ s₁ newΓ upA₁ upB₁ upj)
 s-weaken^ (s-arr₃ cloA grd s) newΓ (↑ty-arr upA upA₁) (↑ty-arr upB upB₁) (↑tyʲ-𝕔 upj) = s-arr₃ (⊢c-weaken^ cloA newΓ upA) (≫-weaken^ grd newΓ upA upB) (s-weaken^ s newΓ upA₁ upB₁ upj)
 s-weaken^ (s-∀ s) newΓ (↑ty-∀ upA) (↑ty-∀ upB) ↑tyʲ-∞ = s-∀ (s-weaken^ s (▶S∙ newΓ) upA upB ↑tyʲ-∞)
-s-weaken^ {k = k} {j' = j₁} (s-∀l-new {B = B} s ic fd upC upD upj₁) newΓ (↑ty-∀ upA) (↑ty-arr {A' = A₁} {B' = B₁} upB upB₁) upj
+s-weaken^ {k = k} {j' = j₁} (s-∀l {B = B} s ic fd upC upD upj₁) newΓ (↑ty-∀ upA) (↑ty-arr {A' = A₁} {B' = B₁} upB upB₁) upj
   with ⟨ A₁' , upA₂ ⟩ ← ↑ty0-total A₁
   with ⟨ B₁' , upB₂ ⟩ ← ↑ty0-total B₁
   with ⟨ j₁' , upj₂ ⟩ ← ↑tyʲ0-total j₁
   with ⟨ B' , upB₃ ⟩ ← ↑ty-total B k
-  = s-∀l-new (s-weaken^ s (▶S= newΓ upB₃) upA
+  = s-∀l (s-weaken^ s (▶S= newΓ upB₃) upA
          (↑ty-arr (↑ty-comm0' upB upA₂ upC) (↑ty-comm0' upB₁ upB₂ upD)) (↑tyʲ-comm0' upj upj₂ upj₁)) (𝕚𝕔-↑tyʲ ic upj)
                               (↑ty-find0 fd upA (↑tyʲ-comm0' upj upj₂ upj₁)) upA₂ upB₂ upj₂
 s-weaken^ {k = k} {j' = j₁} (s-∀l-peek {B = B} s ic pk upC upD upj₁) newΓ (↑ty-∀ upA) (↑ty-arr {A' = A₁} {B' = B₁} upB upB₁) upj

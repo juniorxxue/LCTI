@@ -129,7 +129,7 @@ complete-s {j = 𝕚 j} (s-arr₂ {A = A} s s₁) (wfc-𝕚 x) (⊆I ext ext₁)
 ... | special {k = k} inA inΓ^ tail newΔ s₂ with ε-dec {k = k} {A = A}
 ... | inj₁ inA' = ⊥-elim (⊢c-^∈-false inA' inΓ^ cloA)
 ... | inj₂ ¬inA = special (ε-arr ¬inA inA) inΓ^ (ett-arr tail) newΔ (s-term-c cloA grd (subsumption0 ⊢e) s₂)
-complete-s {j = 𝕚 j} (s-∀l-new s ic fd upC upD (↑tyʲ-𝕚 upj)) (wfc-𝕚 x) (⊆∀-I ext upj₁) ~j'@(~I {Σ = Σ} {e = e} ⊢e ~j)
+complete-s {j = 𝕚 j} (s-∀l s ic fd upC upD (↑tyʲ-𝕚 upj)) (wfc-𝕚 x) (⊆∀-I ext upj₁) ~j'@(~I {Σ = Σ} {e = e} ⊢e ~j)
   with ⟨ Σ' , upΣ ⟩ ← ↑tyᶜ0-total Σ
   with ⟨ e' , upe ⟩ ← ↑tyᵉ0-total e
   with reg-S= r regA ← s-sregular s
@@ -156,7 +156,7 @@ complete-s  {j = 𝕚 j} (s-∀l-peek {B = B} s case-𝕚 pk upC upD (↑tyʲ-�
 ... | special {k = #S k} inA (S^ inΓ^) tail (=⟹=S newΔ up1 regB) s₁
   = special (ε-∀ inA) inΓ^ (ett-∀-𝕚 tail upC upD up1) newΔ (s-∀l-y com-pk upB (s-unsol-sol0 s₁) upΣ upe upC upD)
 
-complete-s {j = 𝕔 j} (s-∀l-new s ic fd upC upD (↑tyʲ-𝕔 upj)) (wfc-𝕔 x) (⊆∀-C ext upj₁) ~j'@(~C {Σ = Σ} {e = e} ⊢e ~j)
+complete-s {j = 𝕔 j} (s-∀l s ic fd upC upD (↑tyʲ-𝕔 upj)) (wfc-𝕔 x) (⊆∀-C ext upj₁) ~j'@(~C {Σ = Σ} {e = e} ⊢e ~j)
   with ⟨ Σ' , upΣ ⟩ ← ↑tyᶜ0-total Σ
   with ⟨ e' , upe ⟩ ← ↑tyᵉ0-total e
   with reg-S= r regA ← s-sregular s
@@ -167,13 +167,13 @@ complete-s {j = 𝕔 j} (s-∀l-new s ic fd upC upD (↑tyʲ-𝕔 upj)) (wfc-�
 ... | special {k = #0} inA Z tail (=⟹=0 up regA₁ env) s₁ = normal (case₅ inA) (s-∀l-n-y s₁ upΣ upe upC upD)
 ... | special {k = #S k} inA (S^ inΓ^) tail (=⟹=S newΔ up1 regB) s₁ = special (ε-∀ inA) inΓ^ (ett-∀-𝕚 tail upC upD up1) newΔ
               (s-∀l-n-y s₁ upΣ upe upC upD)
-complete-s {j = 𝕚 j} (s-∀l-new x ic fd upC upD (↑tyʲ-𝕚 upj))
+complete-s {j = 𝕚 j} (s-∀l x ic fd upC upD (↑tyʲ-𝕚 upj))
   (wfc-𝕚 x₁)
   (⊆∀-I-no ext upj₁)
   (~I ⊢e x₃)
   with refl ← ↑tyʲ-unique upj upj₁
   with () ← ⊆/c-find-∋= ext Z fd
-complete-s {j = 𝕔 j} (s-∀l-new x ic fd upC upD (↑tyʲ-𝕔 upj))
+complete-s {j = 𝕔 j} (s-∀l x ic fd upC upD (↑tyʲ-𝕔 upj))
   (wfc-𝕔 x₁)
   (⊆∀-C-no ext upj₁)
   (~C ⊢e x₃)
@@ -255,7 +255,7 @@ complete-s  {j = 𝕔 j} (s-∀l-peek {B = B} s case-𝕔 pk upC upD (↑tyʲ-�
 ... | special {k = #S k} inA (S^ inΓ^) tail (=⟹=S newΔ up1 regB) s₁
   = special (ε-∀ inA) inΓ^ (ett-∀-𝕚 tail upC upD up1) newΔ (s-∀l-y com-pk upB (s-unsol-sol0 s₁) upΣ upe upC upD)
 complete-s (s-∀l-peek s ic pk upC upD upj) wf (⊆∀-C-no ext upj₁) ~j = ⊥-elim (ε-¬ε-false (peek-ε-gen pk) (⊆/c-no-appear ext Z Z))
-complete-s {j = 𝕚 j} (s-∀l-new s ic fd upC upD (↑tyʲ-𝕚 upj)) (wfc-𝕚 x) (⊆∀-I-new ext upj₁) ~j'@(~I {Σ = Σ} {e = e} ⊢e ~j)
+complete-s {j = 𝕚 j} (s-∀l s ic fd upC upD (↑tyʲ-𝕚 upj)) (wfc-𝕚 x) (⊆∀-I-new ext upj₁) ~j'@(~I {Σ = Σ} {e = e} ⊢e ~j)
   with ⟨ Σ' , upΣ ⟩ ← ↑tyᶜ0-total Σ
   with ⟨ e' , upe ⟩ ← ↑tyᵉ0-total e
   with reg-S= r regA ← s-sregular s
@@ -292,7 +292,7 @@ complete-s {j = 𝕚 j} (s-∀l-no-appear s ic fd upC upD (↑tyʲ-𝕚 upj)) (w
 ... | special {k = #S k} inA (S^ inΓ^) tail (=⟹^S newΔ up1) s₁
   = special (ε-∀ inA) inΓ^ (ett-∀-𝕚 tail upC upD up1) newΔ (s-∀l-n-n s₁ upΣ upe upC upD)
 -- no worry, logic below duplicated
-complete-s {j = 𝕔 j} (s-∀l-new s ic fd upC upD (↑tyʲ-𝕔 upj)) (wfc-𝕔 x) (⊆∀-C-new ext upj₁) ~j'@(~C {Σ = Σ} {e = e} ⊢e ~j)
+complete-s {j = 𝕔 j} (s-∀l s ic fd upC upD (↑tyʲ-𝕔 upj)) (wfc-𝕔 x) (⊆∀-C-new ext upj₁) ~j'@(~C {Σ = Σ} {e = e} ⊢e ~j)
   with ⟨ Σ' , upΣ ⟩ ← ↑tyᶜ0-total Σ
   with ⟨ e' , upe ⟩ ← ↑tyᵉ0-total e
   with reg-S= r regA ← s-sregular s

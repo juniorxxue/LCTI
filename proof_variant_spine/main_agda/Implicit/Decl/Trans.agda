@@ -16,6 +16,8 @@ s-trans' (s-arr₃ regA s1) (s-arr₃ regA₁ s2) = s-arr₃ regA (s-trans' s1 s
 s-trans' (s-∀ s1) (s-∀ s2) = s-∀ (s-trans' s1 s2)
 s-trans' (s-∀l regB st s1 ic fd upj) (s-arr₂ s2 s3) = s-∀l regB st (s-trans' s1 (s-arr₂ s2 s3)) ic fd upj
 s-trans' (s-∀l regB st s1 ic fd upj) (s-arr₃ regA s2) = s-∀l regB st (s-trans' s1 (s-arr₃ regA s2)) ic fd upj
+s-trans' (s-∀l-peek regB st s1 ic fd upj) (s-arr₂ s2 s3) = s-∀l-peek regB st (s-trans' s1 (s-arr₂ s2 s3)) ic fd upj
+s-trans' (s-∀l-peek regB st s1 ic fd upj) (s-arr₃ regA s2) = s-∀l-peek regB st (s-trans' s1 (s-arr₃ regA s2)) ic fd upj
 s-trans' (s-∀l-no-appear regB st s1 ic fd) (s-arr₂ s2 s3) = s-∀l-no-appear regB st (s-trans' s1 (s-arr₂ s2 s3)) ic fd
 s-trans' (s-∀l-no-appear regB st s1 ic fd) (s-arr₃ regA s2) = s-∀l-no-appear regB st (s-trans' s1 (s-arr₃ regA s2)) ic fd
 s-trans' (s-tapp regB st s1 upC) (s-tapp regB₁ st₁ s2 upC₁)
@@ -80,6 +82,23 @@ find-≋ (f-iso iso) (𝕚≋ ~j) = f-iso (≋-isoinf (𝕚≋ ~j) iso)
 find-≋ (f-iso iso) refl≋ = f-iso iso
 find-≋ fd refl≋ = fd
 
+peek-≋ : ∀ {nj}
+       → peek A k j
+       → j ≋ nj
+       → peek A k nj
+peek-≋ pk refl≋ = pk
+peek-≋ (peek-arr-i pk) (𝕚≋ ~j) = peek-arr-i (peek-≋ pk ~j)
+peek-≋ (peek-arr-c pk) (𝕔≋ ~j) = peek-arr-c (peek-≋ pk ~j)
+peek-≋ (peek-∀-i pk upj) (𝕚≋ {nj = nj} ~j)
+  with ⟨ nj' , upnj ⟩ ← ↑tyʲ0-total nj
+  = peek-∀-i (peek-≋ pk (𝕚≋ (↑ty-≋ ~j upj upnj))) upnj
+peek-≋ (peek-∀-c pk upj) (𝕔≋ {nj = nj} ~j)
+  with ⟨ nj' , upnj ⟩ ← ↑tyʲ0-total nj
+  = peek-∀-c (peek-≋ pk (𝕔≋ (↑ty-≋ ~j upj upnj))) upnj
+peek-≋ (peek-∀-t pk upj) (𝕥≋ {nj = nj} ~j)
+  with ⟨ nj' , upnj ⟩ ← ↑tyʲ0-total nj
+  = peek-∀-t (peek-≋ pk (↑ty-≋ ~j upj upnj)) upnj
+
 s-trans-∞ : Γ ⊢d ∞ # A ≤ B
           → Γ ⊢d ∞ # B ≤ C
           → Γ ⊢d ∞ # A ≤ C
@@ -119,6 +138,13 @@ s-trans (s-∀l regB st s1 ic fd (↑tyʲ-𝕚 upj)) (𝕚≋ {nj = nj} ~j) (s-a
 s-trans (s-∀l regB st s1 ic fd (↑tyʲ-𝕔 upj)) (𝕔≋ {nj = nj} ~j) (s-arr₃ regA s2)
   with ⟨ nj' , upnj ⟩ ← ↑tyʲ0-total nj
   = s-∀l regB st (s-trans s1 (𝕔≋ ~j) (s-arr₃ regA s2)) case-𝕔 (find-≋ fd (𝕔≋ (↑ty-≋ ~j upj upnj))) (↑tyʲ-𝕔 upnj)
+s-trans (s-∀l-peek regB st s1 () fd upj) Z≋ (s-arr₁ s2 s3)
+s-trans (s-∀l-peek regB st s1 ic fd (↑tyʲ-𝕚 upj)) (𝕚≋ {nj = nj} ~j) (s-arr₂ s2 s3)
+  with ⟨ nj' , upnj ⟩ ← ↑tyʲ0-total nj
+  = s-∀l-peek regB st (s-trans s1 (𝕚≋ ~j) (s-arr₂ s2 s3)) case-𝕚 (peek-≋ fd (𝕚≋ (↑ty-≋ ~j upj upnj))) (↑tyʲ-𝕚 upnj)
+s-trans (s-∀l-peek regB st s1 ic fd (↑tyʲ-𝕔 upj)) (𝕔≋ {nj = nj} ~j) (s-arr₃ regA s2)
+  with ⟨ nj' , upnj ⟩ ← ↑tyʲ0-total nj
+  = s-∀l-peek regB st (s-trans s1 (𝕔≋ ~j) (s-arr₃ regA s2)) case-𝕔 (peek-≋ fd (𝕔≋ (↑ty-≋ ~j upj upnj))) (↑tyʲ-𝕔 upnj)
 s-trans (s-∀l-no-appear regB st s1 ic fd) (𝕚≋ ~j) (s-arr₂ s2 s3)
   = s-∀l-no-appear regB st (s-trans s1 (𝕚≋ ~j) (s-arr₂ s2 s3)) case-𝕚 fd
 s-trans (s-∀l-no-appear regB st s1 ic fd) (𝕔≋ ~j) (s-arr₃ regA s3)

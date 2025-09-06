@@ -22,7 +22,7 @@ s-strengthen, (s-tapp s upj) newΓ = s-tapp (s-strengthen, s (◀S= newΓ)) upj
 s-strengthen, (s-svar-𝕚 inΓ s) newΓ = s-svar-𝕚 (∋:=-strengthen, inΓ newΓ) (s-strengthen, s newΓ)
 s-strengthen, (s-svar-𝕔 inΓ s) newΓ = s-svar-𝕔 (∋:=-strengthen, inΓ newΓ) (s-strengthen, s newΓ)
 s-strengthen, (s-svar-𝕥 inΓ s) newΓ = s-svar-𝕥 (∋:=-strengthen, inΓ newΓ) (s-strengthen, s newΓ)
-s-strengthen, (s-∀l-new s ic fd upC upD upj) newΓ = s-∀l-new (s-strengthen, s (◀S= newΓ)) ic fd upC upD upj
+s-strengthen, (s-∀l s ic fd upC upD upj) newΓ = s-∀l (s-strengthen, s (◀S= newΓ)) ic fd upC upD upj
 s-strengthen, (s-∀l-peek s ic pk upC upD upj) newΓ = s-∀l-peek (s-strengthen, s (◀S= newΓ)) ic pk upC upD upj
 
 
@@ -94,14 +94,14 @@ s-strengthen= (s-svar-𝕥 inΓ s) newΓ ↑ty-var (↑ty-∀ upB) (↑tyʲ-𝕥
   with k¬εC ← ⊢r-¬ε regC (◀=-∋=' newΓ)
   with ⟨ preC , upC' ⟩ ← ↑ty-surjective k¬εC
   = s-svar-𝕥 (∋:=-strengthen=-reg (s-sregular s) inΓ newΓ upC') (s-strengthen= s newΓ upC' (↑ty-∀ upB) (↑tyʲ-𝕥 upj upA₁))
-s-strengthen= {j = j} (s-∀l-new {B = B} s ic fd upC upD upj₁) newΓ (↑ty-∀ upA) (↑ty-arr {A = A′} {B = B′} upB upB₁) upj
+s-strengthen= {j = j} (s-∀l {B = B} s ic fd upC upD upj₁) newΓ (↑ty-∀ upA) (↑ty-arr {A = A′} {B = B′} upB upB₁) upj
   with ⟨ A″ , upA′ ⟩ ← ↑ty0-total A′
   with ⟨ B″ , upB′ ⟩ ← ↑ty0-total B′
   with ⟨ j' , upj' ⟩ ← ↑tyʲ0-total j
   with reg-S= regΓ regA ← s-sregular s
   with k¬εB ← ⊢r-¬ε regA (◀=-∋=' newΓ)
   with ⟨ preB , upB' ⟩ ← ↑ty-surjective k¬εB
-  = s-∀l-new (s-strengthen= s (◀S= newΓ upB') upA (↑ty-arr (↑ty-comm0' upB upC upA′) (↑ty-comm0' upB₁ upD upB′)) (↑tyʲ-comm0' upj upj₁ upj'))
+  = s-∀l (s-strengthen= s (◀S= newΓ upB') upA (↑ty-arr (↑ty-comm0' upB upC upA′) (↑ty-comm0' upB₁ upD upB′)) (↑tyʲ-comm0' upj upj₁ upj'))
              (𝕚𝕔-↑tyʲ' ic upj) (↑ty-find0' fd upA (↑tyʲ-comm0' upj upj₁ upj')) upA′ upB′ upj'
 s-strengthen= {j = j} (s-∀l-peek {B = B} s ic pk upC upD upj₁) newΓ (↑ty-∀ upA) (↑ty-arr {A = A′} {B = B′} upB upB₁) upj
   with ⟨ A″ , upA′ ⟩ ← ↑ty0-total A′
@@ -190,14 +190,14 @@ s-strengthen^ (s-svar-𝕥 inΓ s) newΓ ↑ty-var (↑ty-∀ upB) (↑tyʲ-𝕥
   with k¬εC ← ⊢r-¬ε-^ regC (◀^-∋^' newΓ)
   with ⟨ preC , upC' ⟩ ← ↑ty-surjective k¬εC
   = s-svar-𝕥 (∋:=-strengthen^-reg (s-sregular s) inΓ newΓ upC') (s-strengthen^ s newΓ upC' (↑ty-∀ upB) (↑tyʲ-𝕥 upj upA₁))
-s-strengthen^ {j = j} (s-∀l-new {B = B} s ic fd upC upD upj₁) newΓ (↑ty-∀ upA) (↑ty-arr {A = A′} {B = B′} upB upB₁) upj
+s-strengthen^ {j = j} (s-∀l {B = B} s ic fd upC upD upj₁) newΓ (↑ty-∀ upA) (↑ty-arr {A = A′} {B = B′} upB upB₁) upj
   with ⟨ A″ , upA′ ⟩ ← ↑ty0-total A′
   with ⟨ B″ , upB′ ⟩ ← ↑ty0-total B′
   with ⟨ j' , upj' ⟩ ← ↑tyʲ0-total j
   with reg-S= regΓ regA ← s-sregular s
   with k¬εB ← ⊢r-¬ε-^ regA (◀^-∋^' newΓ)
   with ⟨ preB , upB' ⟩ ← ↑ty-surjective k¬εB
-    = s-∀l-new (s-strengthen^ s (◀S= newΓ upB') upA (↑ty-arr (↑ty-comm0' upB upC upA′) (↑ty-comm0' upB₁ upD upB′)) (↑tyʲ-comm0' upj upj₁ upj'))
+    = s-∀l (s-strengthen^ s (◀S= newΓ upB') upA (↑ty-arr (↑ty-comm0' upB upC upA′) (↑ty-comm0' upB₁ upD upB′)) (↑tyʲ-comm0' upj upj₁ upj'))
            (𝕚𝕔-↑tyʲ' ic upj) (↑ty-find0' fd upA (↑tyʲ-comm0' upj upj₁ upj')) upA′ upB′ upj'
 s-strengthen^ {j = j} (s-∀l-peek {B = B} s ic fd upC upD upj₁) newΓ (↑ty-∀ upA) (↑ty-arr {A = A′} {B = B′} upB upB₁) upj
   with ⟨ A″ , upA′ ⟩ ← ↑ty0-total A′

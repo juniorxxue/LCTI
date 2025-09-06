@@ -194,6 +194,31 @@ find-≫-∙0 : find A% #0 j
 find-≫-∙0 {Γ = Γ} fd grd = find-≫-∙ {Γ = Γ ,∙} fd Z∙ Z grd
 
 
+peek-≫-∙ : peek A% k j
+         → k ¬εᵍ Γ
+         → Γ ∋∙ k
+         → Γ ≫ A ⇘ A%
+         → peek A k j
+peek-≫-∙ (peek-base inA) ninΓ inΓ grd = peek-base (ε-≫-∙ inA inΓ ninΓ grd)
+peek-≫-∙ (peek-arr-i pk) ninΓ inΓ (grd-var= x) = ⊥-elim (εᵍ-:=-false x (peek-ε-gen (peek-arr-c pk)) ninΓ)
+peek-≫-∙ (peek-arr-i pk) ninΓ inΓ (grd-arr grd grd₁) = peek-arr-i (peek-≫-∙ pk ninΓ inΓ grd₁)
+peek-≫-∙ (peek-arr-c pk) ninΓ inΓ (grd-var= x) = ⊥-elim (εᵍ-:=-false x (peek-ε-gen (peek-arr-c pk)) ninΓ)
+peek-≫-∙ (peek-arr-c pk) ninΓ inΓ (grd-arr grd grd₁) = peek-arr-c (peek-≫-∙ pk ninΓ inΓ grd₁)
+peek-≫-∙ (peek-∀-i fd upj) ninΓ inΓ (grd-var= x) = ⊥-elim (εᵍ-:=-false x (ε-∀ (peek-ε-gen fd)) ninΓ)
+peek-≫-∙ (peek-∀-i fd upj) ninΓ inΓ (grd-∀ grd) = peek-∀-i (peek-≫-∙ fd (S∙ ninΓ) (S∙ inΓ) grd) upj
+peek-≫-∙ (peek-∀-c fd upj) ninΓ inΓ (grd-var= x) = ⊥-elim (εᵍ-:=-false x (ε-∀ (peek-ε-gen fd)) ninΓ)
+peek-≫-∙ (peek-∀-c fd upj) ninΓ inΓ (grd-∀ grd) = peek-∀-c (peek-≫-∙ fd (S∙ ninΓ) (S∙ inΓ) grd) upj
+peek-≫-∙ (peek-∀-t fd upj) ninΓ inΓ (grd-var= x) = ⊥-elim (εᵍ-:=-false x (ε-∀ (peek-ε-gen fd)) ninΓ)
+peek-≫-∙ (peek-∀-t fd upj) ninΓ inΓ (grd-∀ grd) = peek-∀-t (peek-≫-∙ fd (S∙ ninΓ) (S∙ inΓ) grd) upj
+
+
+peek-≫-∙0 : peek A% #0 j
+          → Γ ,∙ ≫ A ⇘ A%
+          → peek A #0 j
+peek-≫-∙0 {Γ = Γ} fd grd = peek-≫-∙ {Γ = Γ ,∙} fd Z∙ Z grd
+
+
+
 ≫-same : Γ ≫ A ⇘ A₁
        → Γ ◈ k ⇘ Γ'
        → Γ' ≫ A ⇘ A₂
@@ -288,6 +313,18 @@ find-≫-∙' (f-∀-𝕔 fd upj) ninΓ inΓ (grd-∀ grd) = f-∀-𝕔 (find-�
 find-≫-∙' (f-𝕥 fd upj) ninΓ inΓ (grd-∀ grd) = f-𝕥 (find-≫-∙' fd (S∙ ninΓ) (S∙ inΓ) grd) upj
 find-≫-∙' (f-iso iso) ninΓ inΓ (grd-var= x) = ⊥-elim (∋∙-∋:=-false inΓ x)
 find-≫-∙' (f-iso iso) ninΓ inΓ (grd-var∙ x) = f-iso iso
+
+peek-≫-∙' : peek A k j
+         → k ¬εᵍ Γ
+         → Γ ∋∙ k
+         → Γ ≫ A ⇘ A%
+         → peek A% k j
+peek-≫-∙' (peek-base inA) ninΓ inΓ grd = peek-base (ε-≫-∙' inA inΓ ninΓ grd)
+peek-≫-∙' (peek-arr-i pk) ninΓ inΓ (grd-arr grd grd₁) = peek-arr-i (peek-≫-∙' pk ninΓ inΓ grd₁)
+peek-≫-∙' (peek-arr-c pk) ninΓ inΓ (grd-arr grd grd₁) = peek-arr-c (peek-≫-∙' pk ninΓ inΓ grd₁)
+peek-≫-∙' (peek-∀-i pk upj) ninΓ inΓ (grd-∀ grd) = peek-∀-i (peek-≫-∙' pk (S∙ ninΓ) (S∙ inΓ) grd) upj
+peek-≫-∙' (peek-∀-c pk upj) ninΓ inΓ (grd-∀ grd) = peek-∀-c (peek-≫-∙' pk (S∙ ninΓ) (S∙ inΓ) grd) upj
+peek-≫-∙' (peek-∀-t pk upj) ninΓ inΓ (grd-∀ grd) = peek-∀-t (peek-≫-∙' pk (S∙ ninΓ) (S∙ inΓ) grd) upj
 
 ≫-same' : Γ ≫ A ⇘ A₁
        → Γ ◈ k ⇘ Γ'
