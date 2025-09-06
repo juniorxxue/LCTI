@@ -428,3 +428,12 @@ private variable
                → re ≡ punchIn k Y
                → X ≡ Y
 ↑ty-var-inv {X = X} {Y = Y} {k = k} ↑ty-var eq = punchIn-injective k X Y eq
+
+
+gc-↑tyᵉ : GenericConsumer e
+        → e ↑tyᵉ k ⇘ e'
+        → GenericConsumer e'
+gc-↑tyᵉ gc-i ↑tyᵉ-lit = gc-i
+gc-↑tyᵉ gc-var ↑tyᵉ-var = gc-var
+gc-↑tyᵉ gc-ann (↑tyᵉ-⦂ upe up) = gc-ann
+gc-↑tyᵉ gc-tlam (↑tyᵉ-Λ upe) = gc-tlam

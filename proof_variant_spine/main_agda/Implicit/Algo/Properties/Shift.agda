@@ -138,10 +138,3 @@ nonempty-↑tyᶜ' ne-τ (↑tyᶜ-τ up-t) = ne-τ
 nonempty-↑tyᶜ' ne-app (↑tyᶜ-e up-e upΣ) = ne-app
 nonempty-↑tyᶜ' ne-tapp (↑tyᶜ-⓪ x up) = ne-tapp
 
-gc-↑tyᵉ : GenericConsumer e
-        → e ↑tyᵉ k ⇘ e'
-        → GenericConsumer e'
-gc-↑tyᵉ gc-i ↑tyᵉ-lit = gc-i
-gc-↑tyᵉ gc-var ↑tyᵉ-var = gc-var
-gc-↑tyᵉ gc-ann (↑tyᵉ-⦂ upe up) = gc-ann
-gc-↑tyᵉ gc-tlam (↑tyᵉ-Λ upe) = gc-tlam

@@ -2,7 +2,7 @@ module Implicit.Algo2Interm.Context2Counter where
 
 open import Implicit.Language.All
 open import Implicit.Interm.All
-open import Implicit.Algo.All
+open import Implicit.Algo.All hiding (t-weaken^)
 open import Implicit.Algo2Interm.AlgoCounter.All
 
 infix 3 _⊢_~t_
@@ -101,6 +101,22 @@ NonEmpty-NonZ ne-app (~tI ⊢e j~Σ) = nz-I
 NonEmpty-NonZ ne-app (~tC ⊢e j~Σ) = nz-C
 NonEmpty-NonZ ne-tapp (~tT ~J st) = nz-T
 
+~s-weaken^0 : Γ ⊢ ⟨ j , A ⟩ ~s Σ
+                 → ↑ty0 A ⇘ A'
+                 → ↑tyᶜ0 Σ ⇘ Σ'
+                 → ↑tyʲ0 j ⇘ j'
+            → Γ ,^ ⊢ ⟨ j' , A' ⟩ ~s Σ'
+~s-weaken^0 ~sZ upA ↑tyᶜ-□ ↑tyʲ-Z = ~sZ
+~s-weaken^0 ~s∞ upA (↑tyᶜ-τ up-t) ↑tyʲ-∞
+  with refl ← ↑ty-unique upA up-t
+  = ~s∞
+~s-weaken^0 (~sI ⊢e ~s) (↑ty-arr upA upA₁) (↑tyᶜ-e up-e upΣ) (↑tyʲ-𝕚 upj) = ~sI (t-weaken^ ⊢e ▶Z up-e upA ↑tyʲ-Z) (~s-weaken^0 ~s upA₁ upΣ upj)
+~s-weaken^0 (~sC ⊢e ~s) (↑ty-arr upA upA₁) (↑tyᶜ-e up-e upΣ) (↑tyʲ-𝕔 upj) = ~sC (t-weaken^ ⊢e ▶Z up-e upA ↑tyʲ-∞) (~s-weaken^0 ~s upA₁ upΣ upj)
+~s-weaken^0 (~sT ~s st) (↑ty-∀ {A' = C} upA) (↑tyᶜ-⓪ upA₂ upΣ) (↑tyʲ-𝕥 {A = A} {A' = B} upj upA₁)
+  with refl ← ↑ty-unique upA₂ upA₁
+  with ⟨ C* , st-C ⟩ ← st0-total B C
+  = ~sT (~s-weaken^0 ~s (↑ty-st-comm0' st upA₂ upA st-C) upΣ upj) st-C
+
 
 
 ~s-strengthen^0 : Γ ,^ ⊢ ⟨ j' , A' ⟩ ~s Σ'
@@ -115,23 +131,6 @@ NonEmpty-NonZ ne-tapp (~tT ~J st) = nz-T
 ~s-strengthen^0 (~sT ~s st) (↑ty-∀ {A = C} upA) (↑tyᶜ-⓪ upA₁ upΣ) (↑tyʲ-𝕥 {A = A} upj upA₂)
   with refl ← ↑ty-unique-inver upA₁ upA₂
   with ⟨ C* , stC ⟩ ← st0-total A C = ~sT (~s-strengthen^0 ~s (↑ty-st-comm0' stC upA₁ upA st) upΣ upj) stC
-
-
-postulate
-  ~s-weaken^0 : Γ ⊢ ⟨ j , A ⟩ ~s Σ
-                 → ↑ty0 A ⇘ A'
-                 → ↑tyᶜ0 Σ ⇘ Σ'
-                 → ↑tyʲ0 j ⇘ j'
-            → Γ ,^ ⊢ ⟨ j' , A' ⟩ ~s Σ'
-{-
-~s-weaken^0 ~sZ upA ↑tyᶜ-□ ↑tyʲ-Z = ~sZ
-~s-weaken^0 ~s∞ upA (↑tyᶜ-τ up-t) ↑tyʲ-∞ with refl ← ↑ty-unique upA up-t = ~s∞
-~s-weaken^0 (~sI ⊢e ~j) (↑ty-arr upA upA₁) (↑tyᶜ-e up-e upΣ) (↑tyʲ-𝕚 upj) = ~sI {!!} {!!}
-~s-weaken^0 (~sC ⊢e ~j) upA upΣ upj = {!!}
-~s-weaken^0 (~sT ~j st) upA upΣ upj = {!!}
--}
-
-
 
 ~s-strengthen=0 : Γ ,= T ⊢ ⟨ j' , A' ⟩ ~s Σ'
                  → ↑ty0 A ⇘ A'

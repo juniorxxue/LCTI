@@ -1,5 +1,3 @@
-{-# OPTIONS --allow-unsolved-metas #-}
-{-# OPTIONS --allow-incomplete-matches #-}
 module Implicit.Algo.Properties.StrengthenTVar where
 
 open import Implicit.Language.All
@@ -8,6 +6,20 @@ open import Implicit.Algo.Properties.Extension
 open import Implicit.Algo.Properties.Shift
 open import Implicit.Algo.Properties.Id
 open import Implicit.Algo.Properties.Regularity
+
+peek-↑tmᶜ : A ~pk~ Σ' w/ X ↪ B
+          → Σ ↑tmᶜ k ⇘ Σ'
+          → A ~pk~ Σ w/ X ↪ B
+peek-↑tmᶜ (pk-type x) ↑tmᶜ-τ = pk-type x
+peek-↑tmᶜ (pk-term pk) (↑tmᶜ-e up-e up) = pk-term (peek-↑tmᶜ pk up)
+peek-↑tmᶜ (pk-∀l pk upΣ upe upC) (↑tmᶜ-e {e = e} {Σ = Σ} up-e up)
+  with ⟨ e' , up-e' ⟩ ← ↑tyᵉ0-total e
+  with ⟨ Σ' , up-Σ ⟩ ← ↑tyᶜ0-total Σ
+  = pk-∀l (peek-↑tmᶜ pk (↑tmᶜ-e (↑tm-↑tyᵉ-comm up-e upe up-e') (↑tmᶜ-↑tyᶜ-comm up upΣ up-Σ))) up-Σ up-e' upC
+peek-↑tmᶜ (pk-tapp pk upC upΣ) (↑tmᶜ-⓪ {Σ = Σ} up)
+  with ⟨ Σ' , up-Σ ⟩ ← ↑tyᶜ0-total Σ
+  = pk-tapp (peek-↑tmᶜ pk (↑tmᶜ-↑tyᶜ-comm up upΣ up-Σ)) upC up-Σ
+
 
 abstract
   ◀,-⊆-total : Γ ⊆ Δ
@@ -74,7 +86,7 @@ abstract
   t-strengthen, (⊢sub ⊢e ne gc s) newΓ upΣ upe = ⊢sub (t-strengthen, ⊢e newΓ ↑tmᶜ-□ upe) (nonempty-↑tmᶜ' ne upΣ) (↑tm-gc' gc upe) (s-strengthen, s (◀S⋈ newΓ) (◀S⋈ newΓ) upΣ)
   t-strengthen, (⊢tabs ⊢e) newΓ ↑tmᶜ-□ (↑tm-Λ upe) = ⊢tabs (t-strengthen, ⊢e (◀S∙ newΓ) ↑tmᶜ-□ upe)
   t-strengthen, (⊢tabs-τ ⊢e) newΓ ↑tmᶜ-τ (↑tm-Λ upe) = ⊢tabs-τ (t-strengthen, ⊢e (◀S∙ newΓ) ↑tmᶜ-τ upe)
-  -- t-strengthen, (⊢tapp ⊢e st) newΓ newΣ (↑tm-⓪ upe) = ⊢tapp (t-strengthen, ⊢e newΓ (↑tmᶜ-⓪ newΣ) upe) st
+  t-strengthen, (⊢tapp ⊢e st) newΓ newΣ (↑tm-⓪ upe) = ⊢tapp (t-strengthen, ⊢e newΓ (↑tmᶜ-⓪ newΣ) upe) st
 
   s-strengthen, (s-empty regΓ cloA x) newΓ newΔ ↑tmᶜ-□ with refl ← ◀,-unique newΓ newΔ = s-empty (sregular-strengthen, regΓ newΓ)
                                                                                                  (⊢c-strengthen, cloA newΓ)
@@ -84,14 +96,20 @@ abstract
                                                                                (t-strengthen, ⊢e (◀,-𝕣 newΓ) ↑tmᶜ-τ up-e) (s-strengthen, s newΓ newΔ upΣ)
   s-strengthen, (s-term-o opnA ⊢e ss s) newΓ newΔ (↑tmᶜ-e up-e upΣ) with ◀,-⊆-total (ss-⊆ ss) newΓ
   ... | ⟨ Ω' , newΩ ⟩ = s-term-o (⊢o-strengthen, opnA newΓ) (t-strengthen, ⊢e (◀,-𝕣 newΓ) ↑tmᶜ-□ up-e) (ss-strengthen, ss newΓ newΩ) (s-strengthen, s newΩ newΔ upΣ)
-  -- s-strengthen, (s-∀l s upᶜ upᵉ upC upD) newΓ newΔ (↑tmᶜ-e {e = e} {Σ = Σ} up-e upΣ)
-  --   with ⟨ Σ' , upΣ' ⟩ ← ↑tyᶜ0-total Σ
-  --   with ⟨ e' , upe ⟩ ← ↑tyᵉ0-total e
-  --   = s-∀l (s-strengthen, s (◀S^ newΓ) (◀S= newΔ) (↑tmᶜ-e (↑tm-↑tyᵉ-comm up-e upᵉ upe) (↑tmᶜ-↑tyᶜ-comm upΣ upᶜ upΣ'))) upΣ' upe upC upD
-  -- s-strengthen, (s-∀l-no s upᶜ upᵉ upC upD) newΓ newΔ (↑tmᶜ-e {e = e} {Σ = Σ} up-e upΣ)
-  --   with ⟨ Σ' , upΣ' ⟩ ← ↑tyᶜ0-total Σ
-  --   with ⟨ e' , upe ⟩ ← ↑tyᵉ0-total e
-  --   = s-∀l-no (s-strengthen, s (◀S^ newΓ) (◀S^ newΔ) (↑tmᶜ-e (↑tm-↑tyᵉ-comm up-e upᵉ upe) (↑tmᶜ-↑tyᶜ-comm upΣ upᶜ upΣ'))) upΣ' upe upC upD
+  s-strengthen, (s-∀l-n-y s upᶜ upᵉ upC upD) newΓ newΔ (↑tmᶜ-e {e = e} {Σ = Σ} up-e upΣ)
+    with ⟨ Σ' , upΣ' ⟩ ← ↑tyᶜ0-total Σ
+    with ⟨ e' , upe ⟩ ← ↑tyᵉ0-total e
+    = s-∀l-n-y (s-strengthen, s (◀S^ newΓ) (◀S= newΔ) (↑tmᶜ-e (↑tm-↑tyᵉ-comm up-e upᵉ upe) (↑tmᶜ-↑tyᶜ-comm upΣ upᶜ upΣ'))) upΣ' upe upC upD
+  s-strengthen, (s-∀l-n-n s upᶜ upᵉ upC upD) newΓ newΔ (↑tmᶜ-e {e = e} {Σ = Σ} up-e upΣ)
+    with ⟨ Σ' , upΣ' ⟩ ← ↑tyᶜ0-total Σ
+    with ⟨ e' , upe ⟩ ← ↑tyᵉ0-total e
+    = s-∀l-n-n (s-strengthen, s (◀S^ newΓ) (◀S^ newΔ) (↑tmᶜ-e (↑tm-↑tyᵉ-comm up-e upᵉ upe) (↑tmᶜ-↑tyᶜ-comm upΣ upᶜ upΣ'))) upΣ' upe upC upD
+  s-strengthen, (s-∀l-y pk upB s upᶜ upᵉ upC upD) newΓ newΔ (↑tmᶜ-e {e = e} {Σ = Σ} up-e upΣ)
+    with ⟨ Σ' , upΣ' ⟩ ← ↑tyᶜ0-total Σ
+    with ⟨ e' , upe ⟩ ← ↑tyᵉ0-total e
+--    with up-Σ ← ↑tmᶜ-↑tyᶜ-comm upΣ upᶜ upΣ'
+    = s-∀l-y (peek-↑tmᶜ pk (↑tmᶜ-↑tyᶜ-comm (↑tmᶜ-e up-e upΣ) (↑tyᶜ-e upᵉ upᶜ)
+                             (↑tyᶜ-e upe upΣ'))) upB (s-strengthen, s (◀S= newΓ) (◀S= newΔ) (↑tmᶜ-e (↑tm-↑tyᵉ-comm up-e upᵉ upe) (↑tmᶜ-↑tyᶜ-comm upΣ upᶜ upΣ'))) upΣ' upe upC upD
   s-strengthen, (s-tapp s upᶜ) newΓ newΔ (↑tmᶜ-⓪ {Σ = Σ} upΣ)
     with ⟨ Σ' , upΣ' ⟩ ← ↑tyᶜ0-total Σ
     = s-tapp (s-strengthen, s (◀S= newΓ) (◀S= newΔ) (↑tmᶜ-↑tyᶜ-comm upΣ upᶜ upΣ')) upΣ'

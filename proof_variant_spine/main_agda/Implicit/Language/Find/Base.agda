@@ -78,7 +78,7 @@ nonz-↑tyʲ' nz-T (↑tyʲ-𝕥 upj upA) = nz-T
 
 nonz-↑tyʲ : NonZ j
           → j ↑tyʲ k ⇘ j'
-          → NonZ j
+          → NonZ j'
 nonz-↑tyʲ nz-∞ ↑tyʲ-∞ = nz-∞
 nonz-↑tyʲ nz-I (↑tyʲ-𝕚 upj) = nz-I
 nonz-↑tyʲ nz-C (↑tyʲ-𝕔 upj) = nz-C

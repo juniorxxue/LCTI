@@ -1,5 +1,3 @@
-{-# OPTIONS --allow-unsolved-metas #-}
-{-# OPTIONS --allow-incomplete-matches #-}
 module Implicit.Algo.Properties.WeakenTVar where
 
 open import Implicit.Language.All
@@ -32,6 +30,22 @@ open import Implicit.Algo.Properties.Id
                                                                    ▶sS= (▶s⨟,-Ω-exist new ext1 ext2 .proj₂ .proj₂) x ⟩ ⟩
 ▶s⨟,-Ω-exist (▶sS⋈ {Γ' = Γ'} new) (mark regΓ) (mark regΓ₁)
   with refl ← ▶⨟,-unique new = ⟨ Γ' ⋈ , ⟨ ▶sS⋈ new , ▶sS⋈ new ⟩ ⟩
+
+
+peek-weaken,-lemma : A ~pk~ Σ w/ X ↪ B'
+                   → Σ ↑tmᶜ k ⇘ Σ'
+                   → A ~pk~ Σ' w/ X ↪ B'
+peek-weaken,-lemma (pk-type x) ↑tmᶜ-τ = pk-type x
+peek-weaken,-lemma (pk-term pk) (↑tmᶜ-e up-e up) = pk-term (peek-weaken,-lemma pk up)
+peek-weaken,-lemma (pk-∀l pk upΣ upe upC) (↑tmᶜ-e {e' = e'} {Σ' = Σ'}  up-e up)
+  with ⟨ Σ'' , upΣ' ⟩ ← ↑tyᶜ0-total Σ'
+  with ⟨ e'' , up-e' ⟩ ← ↑tyᵉ0-total e'
+  = pk-∀l (peek-weaken,-lemma pk (↑tmᶜ-↑tyᶜ-comm (↑tmᶜ-e up-e up) (↑tyᶜ-e up-e' upΣ') (↑tyᶜ-e upe upΣ))) upΣ' up-e' upC
+peek-weaken,-lemma (pk-tapp  pk upC upΣ) (↑tmᶜ-⓪ {Σ' = Σ} up)
+  with ⟨ Σ' , upΣ' ⟩ ← ↑tyᶜ0-total Σ
+  = pk-tapp (peek-weaken,-lemma pk (↑tmᶜ-↑tyᶜ-comm up upΣ' upΣ)) upC upΣ'
+
+
 
 
 ss-weaken, : Γ ⊢ A ⌞ ≤ ⌝ B ⊣ Δ
@@ -82,7 +96,7 @@ t-weaken, {T = T} (⊢tabs ⊢e) new ↑tmᶜ-□ (↑tm-Λ upe)
   with ⟨ T' , upT ⟩ ← ↑ty0-total T = ⊢tabs (t-weaken, ⊢e (▶S∙ new upT) ↑tmᶜ-□ upe)
 t-weaken, {T = T} (⊢tabs-τ ⊢e) new ↑tmᶜ-τ (↑tm-Λ upe)
   with ⟨ T' , upT ⟩ ← ↑ty0-total T = ⊢tabs-τ (t-weaken, ⊢e (▶S∙ new upT) ↑tmᶜ-τ upe)
--- t-weaken, (⊢tapp ⊢e st) new upΣ (↑tm-⓪ upe) = ⊢tapp (t-weaken, ⊢e new (↑tmᶜ-⓪ upΣ) upe) st
+t-weaken, (⊢tapp ⊢e st) new upΣ (↑tm-⓪ upe) = ⊢tapp (t-weaken, ⊢e new (↑tmᶜ-⓪ upΣ) upe) st
 
 s-weaken, (s-empty regΓ cloA grd) ↑tmᶜ-□ new
    with refl ← ▶s⨟,-unique new = s-empty (sregular-weaken,s regΓ (▶s⨟,-▶s,-l new)) (⊢c-weaken,s cloA (▶s⨟,-▶s,-l new)) (≫-weaken,s grd (▶s⨟,-▶s,-l new))
@@ -97,16 +111,22 @@ s-weaken, (s-term-o opnA ⊢e ss s) (↑tmᶜ-e up-e upΣ) new
              (t-weaken, ⊢e (▶,-▶s,-𝕣 (▶s⨟,-▶s,-l new)) ↑tmᶜ-□ up-e)
              (ss-weaken, ss new1)
              (s-weaken, s upΣ new2)
--- s-weaken, {T = T} (s-∀l s upᶜ upᵉ upC upD) (↑tmᶜ-e {e' = e'} {Σ' = Σ'} up-e upΣ) new
---   with ⟨ T' , upT ⟩ ← ↑ty0-total T
---   with ⟨ Σ″ , upΣ' ⟩ ← ↑tyᶜ0-total Σ'
---   with ⟨ e″ , upe' ⟩ ← ↑tyᵉ0-total e'
---   = s-∀l (s-weaken, s (↑tmᶜ-e (↑tm-↑tyᵉ-comm up-e upe' upᵉ) (↑tmᶜ-↑tyᶜ-comm upΣ upΣ' upᶜ)) (▶sS^= new upT)) upΣ' upe' upC upD
--- s-weaken, {T = T} (s-∀l-no s upᶜ upᵉ upC upD) (↑tmᶜ-e {e' = e'} {Σ' = Σ'} up-e upΣ) new
---   with ⟨ T' , upT ⟩ ← ↑ty0-total T
---   with ⟨ Σ″ , upΣ' ⟩ ← ↑tyᶜ0-total Σ'
---   with ⟨ e″ , upe' ⟩ ← ↑tyᵉ0-total e'
---   = s-∀l-no (s-weaken, s (↑tmᶜ-e (↑tm-↑tyᵉ-comm up-e upe' upᵉ) (↑tmᶜ-↑tyᶜ-comm upΣ upΣ' upᶜ)) (▶sS^ new upT)) upΣ' upe' upC upD
+s-weaken, {T = T} (s-∀l-n-y s upᶜ upᵉ upC upD) (↑tmᶜ-e {e' = e'} {Σ' = Σ'} up-e upΣ) new
+  with ⟨ T' , upT ⟩ ← ↑ty0-total T
+  with ⟨ Σ″ , upΣ' ⟩ ← ↑tyᶜ0-total Σ'
+  with ⟨ e″ , upe' ⟩ ← ↑tyᵉ0-total e'
+  = s-∀l-n-y (s-weaken, s (↑tmᶜ-e (↑tm-↑tyᵉ-comm up-e upe' upᵉ) (↑tmᶜ-↑tyᶜ-comm upΣ upΣ' upᶜ)) (▶sS^= new upT)) upΣ' upe' upC upD
+s-weaken, {T = T} (s-∀l-n-n s upᶜ upᵉ upC upD) (↑tmᶜ-e {e' = e'} {Σ' = Σ'} up-e upΣ) new
+  with ⟨ T' , upT ⟩ ← ↑ty0-total T
+  with ⟨ Σ″ , upΣ' ⟩ ← ↑tyᶜ0-total Σ'
+  with ⟨ e″ , upe' ⟩ ← ↑tyᵉ0-total e'
+  = s-∀l-n-n (s-weaken, s (↑tmᶜ-e (↑tm-↑tyᵉ-comm up-e upe' upᵉ) (↑tmᶜ-↑tyᶜ-comm upΣ upΣ' upᶜ)) (▶sS^ new upT)) upΣ' upe' upC upD
+s-weaken, {T = T} (s-∀l-y pk upB s upᶜ upᵉ upC upD) (↑tmᶜ-e {e' = e'} {Σ' = Σ'} up-e upΣ) new
+  with ⟨ T' , upT ⟩ ← ↑ty0-total T
+  with ⟨ Σ″ , upΣ' ⟩ ← ↑tyᶜ0-total Σ'
+  with ⟨ e″ , upe' ⟩ ← ↑tyᵉ0-total e'
+  = s-∀l-y (peek-weaken,-lemma pk (↑tmᶜ-↑tyᶜ-comm (↑tmᶜ-e up-e upΣ) (↑tyᶜ-e upe' upΣ') (↑tyᶜ-e upᵉ upᶜ))) upB
+           (s-weaken, s (↑tmᶜ-e (↑tm-↑tyᵉ-comm up-e upe' upᵉ) (↑tmᶜ-↑tyᶜ-comm upΣ upΣ' upᶜ)) (▶sS= new upT)) upΣ' upe' upC upD
 s-weaken, {T = T} (s-tapp s upᶜ) (↑tmᶜ-⓪ {Σ' = Σ'} upΣ) new
   with ⟨ Σ″ , upΣ″ ⟩ ← ↑tyᶜ0-total Σ'
   with ⟨ T' , upT ⟩ ← ↑ty0-total T = s-tapp (s-weaken, s (↑tmᶜ-↑tyᶜ-comm upΣ upΣ″ upᶜ) (▶sS= new upT)) upΣ″

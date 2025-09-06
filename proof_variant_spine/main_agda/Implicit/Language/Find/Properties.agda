@@ -41,6 +41,29 @@ open import Implicit.Language.Find.Base
           → find A' #0 j'
 ↑ty-find0 fd upA upj = ↑ty-find fd upA upj (s≤s z≤n)
 
+↑ty-peek : peek A X j
+         → A ↑ty k ⇘ A'
+         → j ↑tyʲ k ⇘ j'
+         → X #< k
+         → peek A' (inject₁ X) j'
+↑ty-peek (peek-base inA) upA ↑tyʲ-∞ lt = peek-base (↑ty-ε inA upA lt)
+↑ty-peek (peek-arr-i pk) (↑ty-arr upA upA₁) (↑tyʲ-𝕚 upj) lt = peek-arr-i (↑ty-peek pk upA₁ upj lt)
+↑ty-peek (peek-arr-c pk) (↑ty-arr upA upA₁) (↑tyʲ-𝕔 upj) lt = peek-arr-c (↑ty-peek pk upA₁ upj lt)
+↑ty-peek (peek-∀-i pk upj₁) (↑ty-∀ upA) (↑tyʲ-𝕚 {j' = j'} upj) lt
+  with ⟨ j″ , upj' ⟩ ← ↑tyʲ0-total j'
+  = peek-∀-i (↑ty-peek pk upA (↑tyʲ-𝕚 (↑tyʲ-comm0' upj upj' upj₁)) (s≤s lt)) upj'
+↑ty-peek (peek-∀-c pk upj₁) (↑ty-∀ upA) (↑tyʲ-𝕔 {j' = j'} upj) lt
+  with ⟨ j″ , upj' ⟩ ← ↑tyʲ0-total j'
+  = peek-∀-c (↑ty-peek pk upA (↑tyʲ-𝕔 (↑tyʲ-comm0' upj upj' upj₁)) (s≤s lt)) upj'
+↑ty-peek (peek-∀-t pk upj₁) (↑ty-∀ upA) (↑tyʲ-𝕥 {j' = j'} upj upA₁) lt
+  with ⟨ j″ , upj' ⟩ ← ↑tyʲ0-total j'
+  = peek-∀-t (↑ty-peek pk upA (↑tyʲ-comm0' upj upj' upj₁) (s≤s lt)) upj'
+
+↑ty-peek0 : peek A #0 j
+          → A ↑ty (#S k) ⇘ A'
+          → j ↑tyʲ (#S k) ⇘ j'
+          → peek A' #0 j'
+↑ty-peek0 pk upA upj = ↑ty-peek pk upA upj (s≤s z≤n)
 
 ↑ty-find' : find A' (inject₁ X) j'
           → A ↑ty k ⇘ A'
@@ -60,11 +83,35 @@ open import Implicit.Language.Find.Base
 ↑ty-find' (f-𝕥 fd upj₁) (↑ty-∀ upA) (↑tyʲ-𝕥 {j = j} upj upA₁) lt
   with ⟨ j' , upj' ⟩ ← ↑tyʲ0-total j = f-𝕥 (↑ty-find' fd upA (↑tyʲ-comm0' upj upj₁ upj') (s≤s lt)) upj'
 
+↑ty-peek' : peek A' (inject₁ X) j'
+          → A ↑ty k ⇘ A'
+          → j ↑tyʲ k ⇘ j'
+          → X #< k
+          → peek A X j
+↑ty-peek' (peek-base inA) upA ↑tyʲ-∞ lt = peek-base (↑ty-ε' inA lt upA)
+↑ty-peek' (peek-arr-i pk) (↑ty-arr upA upA₁) (↑tyʲ-𝕚 upj) lt = peek-arr-i (↑ty-peek' pk upA₁ upj lt)
+↑ty-peek' (peek-arr-c pk) (↑ty-arr upA upA₁) (↑tyʲ-𝕔 upj) lt = peek-arr-c (↑ty-peek' pk upA₁ upj lt)
+↑ty-peek' (peek-∀-i pk upj₁) (↑ty-∀ upA) (↑tyʲ-𝕚 {j = j} upj) lt
+  with ⟨ j' , upj' ⟩ ← ↑tyʲ0-total j
+  = peek-∀-i (↑ty-peek' pk upA (↑tyʲ-𝕚 (↑tyʲ-comm0' upj upj₁ upj')) (s≤s lt)) upj'
+↑ty-peek' (peek-∀-c pk upj₁) (↑ty-∀ upA) (↑tyʲ-𝕔 {j = j} upj) lt
+  with ⟨ j' , upj' ⟩ ← ↑tyʲ0-total j
+  = peek-∀-c (↑ty-peek' pk upA (↑tyʲ-𝕔 (↑tyʲ-comm0' upj upj₁ upj')) (s≤s lt)) upj'
+↑ty-peek' (peek-∀-t pk upj₁) (↑ty-∀ upA) (↑tyʲ-𝕥 {j = j} upj upA₁) lt
+  with ⟨ j' , upj' ⟩ ← ↑tyʲ0-total j
+  = peek-∀-t (↑ty-peek' pk upA (↑tyʲ-comm0' upj upj₁ upj') (s≤s lt)) upj'
+
 ↑ty-find0' : find A' #0 j'
             → A ↑ty (#S k) ⇘ A'
             → j ↑tyʲ (#S k) ⇘ j'
             → find A #0 j
 ↑ty-find0' fd upA upj = ↑ty-find' fd upA upj (s≤s z≤n)
+
+↑ty-peek0' : peek A' #0 j'
+            → A ↑ty (#S k) ⇘ A'
+            → j ↑tyʲ (#S k) ⇘ j'
+            → peek A #0 j
+↑ty-peek0' fd upA upj = ↑ty-peek' fd upA upj (s≤s z≤n)
 
 
 find-ε-gen : find A k j

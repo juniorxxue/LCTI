@@ -1,5 +1,3 @@
-{-# OPTIONS --allow-unsolved-metas #-}
-{-# OPTIONS --allow-incomplete-matches #-}
 module Implicit.Algo.Properties.StrengthenEVar where
 
 open import Implicit.Language.All
@@ -8,6 +6,7 @@ open import Implicit.Algo.Properties.Extension
 open import Implicit.Algo.Properties.Shift
 open import Implicit.Algo.Properties.Id
 open import Implicit.Algo.Properties.Regularity
+open import Implicit.Algo.Properties.Peek
 
 abstract
   ◀^-unique : Γ ◀ k ^⇘ Γ'
@@ -144,10 +143,10 @@ abstract
   t-strengthen^ (⊢tabs ⊢e) new (↑ty-∀ upA) (↑tyᵉ-Λ upe) ↑tyᶜ-□ = ⊢tabs (t-strengthen^ ⊢e (◀S∙ new) upA upe ↑tyᶜ-□)
   t-strengthen^ (⊢tabs-τ ⊢e) new (↑ty-∀ upA) (↑tyᵉ-Λ upe) (↑tyᶜ-τ (↑ty-∀ upA'))
     = ⊢tabs-τ (t-strengthen^ ⊢e (◀S∙ new) upA upe (↑tyᶜ-τ upA'))
-  -- t-strengthen^ (⊢tapp ⊢e st) new upA (↑tyᵉ-⓪ upe upA₁) upΣ
-  --   with regA ← t-⊢r ⊢e
-  --   with ⟨ pA , ↑ty-∀ uppA ⟩ ← ⊢r-◀^-↑ty-surjective regA new
-  --   = ⊢tapp (t-strengthen^ ⊢e new (↑ty-∀ uppA) upe (↑tyᶜ-⓪ upA₁ upΣ)) (↑ty-st-comm0'' st upA₁ uppA upA)
+  t-strengthen^ (⊢tapp ⊢e st) new upA (↑tyᵉ-⓪ upe upA₁) upΣ
+    with regA ← t-⊢r ⊢e
+    with ⟨ pA , ↑ty-∀ uppA ⟩ ← ⊢r-◀^-↑ty-surjective regA new
+    = ⊢tapp (t-strengthen^ ⊢e new (↑ty-∀ uppA) upe (↑tyᶜ-⓪ upA₁ upΣ)) (↑ty-comm1 uppA st upA)
 
 
   s-strengthen^ (s-empty regΓ cloA grd) newΓ newΔ upA upB ↑tyᶜ-□
@@ -166,27 +165,38 @@ abstract
                (t-strengthen^ ⊢e (◀^-𝕣 newΓ) upB up-e ↑tyᶜ-□)
                (ss-strengthen^ ss newΓ newΩ upB upA)
                (s-strengthen^ s newΩ newΔ upA₁ upB₁ upΣ)
-  -- s-strengthen^ (s-∀l s upᶜ upᵉ upC upD) newΓ newΔ (↑ty-∀ upA) (↑ty-arr {A = A} {B = B} upB upB₁) (↑tyᶜ-e {e = e} {Σ = Σ} up-e upΣ)
-  --   with reg-S= regΔ regB ← s-env-out s
-  --   with ⟨ e' , upe ⟩ ← ↑tyᵉ0-total e
-  --   with ⟨ Σ' , upΣ' ⟩ ← ↑tyᶜ0-total Σ
-  --   with ⟨ A' , upA' ⟩ ← ↑ty0-total A
-  --   with ⟨ B' , upB' ⟩ ← ↑ty0-total B
-  --   with ⟨ pB , uppB ⟩ ← ⊢r-◀^-↑ty-surjective regB newΔ
-  --   = s-∀l (s-strengthen^ s (◀S^ newΓ) (◀S= newΔ uppB) upA
-  --                         (↑ty-arr (↑ty-comm0' upB upC upA') (↑ty-comm0' upB₁ upD upB'))
-  --                         (↑tyᶜ-e (↑tyᵉ-comm0' up-e upᵉ upe) (↑tyᶜ-comm0' upΣ upᶜ upΣ')))
-  --          upΣ' upe upA' upB'
-  -- s-strengthen^ (s-∀l-no s upᶜ upᵉ upC upD) newΓ newΔ (↑ty-∀ upA) (↑ty-arr {A = A} {B = B} upB upB₁) (↑tyᶜ-e {e = e} {Σ = Σ} up-e upΣ)
-  --   with reg-S^ regΓ ← s-env-out s
-  --   with ⟨ e' , upe ⟩ ← ↑tyᵉ0-total e
-  --   with ⟨ Σ' , upΣ' ⟩ ← ↑tyᶜ0-total Σ
-  --   with ⟨ A' , upA' ⟩ ← ↑ty0-total A
-  --   with ⟨ B' , upB' ⟩ ← ↑ty0-total B
-  --   = s-∀l-no (s-strengthen^ s (◀S^ newΓ) (◀S^ newΔ) upA
-  --                         (↑ty-arr (↑ty-comm0' upB upC upA') (↑ty-comm0' upB₁ upD upB'))
-  --                         (↑tyᶜ-e (↑tyᵉ-comm0' up-e upᵉ upe) (↑tyᶜ-comm0' upΣ upᶜ upΣ')))
-  --          upΣ' upe upA' upB'
+  s-strengthen^ (s-∀l-n-y s upᶜ upᵉ upC upD) newΓ newΔ (↑ty-∀ upA) (↑ty-arr {A = A} {B = B} upB upB₁) (↑tyᶜ-e {e = e} {Σ = Σ} up-e upΣ)
+    with reg-S= regΔ regB ← s-env-out s
+    with ⟨ e' , upe ⟩ ← ↑tyᵉ0-total e
+    with ⟨ Σ' , upΣ' ⟩ ← ↑tyᶜ0-total Σ
+    with ⟨ A' , upA' ⟩ ← ↑ty0-total A
+    with ⟨ B' , upB' ⟩ ← ↑ty0-total B
+    with ⟨ pB , uppB ⟩ ← ⊢r-◀^-↑ty-surjective regB newΔ
+    = s-∀l-n-y (s-strengthen^ s (◀S^ newΓ) (◀S= newΔ uppB) upA
+                          (↑ty-arr (↑ty-comm0' upB upC upA') (↑ty-comm0' upB₁ upD upB'))
+                          (↑tyᶜ-e (↑tyᵉ-comm0' up-e upᵉ upe) (↑tyᶜ-comm0' upΣ upᶜ upΣ')))
+           upΣ' upe upA' upB'
+  s-strengthen^ (s-∀l-n-n s upᶜ upᵉ upC upD) newΓ newΔ (↑ty-∀ upA) (↑ty-arr {A = A} {B = B} upB upB₁) (↑tyᶜ-e {e = e} {Σ = Σ} up-e upΣ)
+    with reg-S^ regΓ ← s-env-out s
+    with ⟨ e' , upe ⟩ ← ↑tyᵉ0-total e
+    with ⟨ Σ' , upΣ' ⟩ ← ↑tyᶜ0-total Σ
+    with ⟨ A' , upA' ⟩ ← ↑ty0-total A
+    with ⟨ B' , upB' ⟩ ← ↑ty0-total B
+    = s-∀l-n-n (s-strengthen^ s (◀S^ newΓ) (◀S^ newΔ) upA
+                          (↑ty-arr (↑ty-comm0' upB upC upA') (↑ty-comm0' upB₁ upD upB'))
+                          (↑tyᶜ-e (↑tyᵉ-comm0' up-e upᵉ upe) (↑tyᶜ-comm0' upΣ upᶜ upΣ')))
+           upΣ' upe upA' upB'
+  s-strengthen^ (s-∀l-y pk upB₂ s upᶜ upᵉ upC upD) newΓ newΔ (↑ty-∀ upA) (↑ty-arr {A = A} {B = B} upB upB₁) (↑tyᶜ-e {e = e} {Σ = Σ} up-e upΣ)
+    with reg-S= regΔ regB ← s-env-out s
+    with ⟨ e' , upe ⟩ ← ↑tyᵉ0-total e
+    with ⟨ Σ' , upΣ' ⟩ ← ↑tyᶜ0-total Σ
+    with ⟨ A' , upA' ⟩ ← ↑ty0-total A
+    with ⟨ B' , upB' ⟩ ← ↑ty0-total B
+    with ⟨ pB , uppB ⟩ ← ⊢r-◀^-↑ty-surjective regB newΔ
+    with ⟨ pB' , uppB' ⟩ ← ↑ty0-total pB
+    = s-∀l-y (peek-strengthen=-lemma pk (↑tyᶜ-e (↑tyᵉ-comm0' up-e upᵉ upe) (↑tyᶜ-comm0' upΣ upᶜ upΣ')) upA (↑ty-comm0' uppB upB₂ uppB') (s≤s z≤n)) uppB' (s-strengthen^ s (◀S= newΓ uppB) (◀S= newΔ uppB) upA
+                       (↑ty-arr (↑ty-comm0' upB upC upA') (↑ty-comm0' upB₁ upD upB')) (↑tyᶜ-e (↑tyᵉ-comm0' up-e upᵉ upe) (↑tyᶜ-comm0' upΣ upᶜ upΣ')))
+                         upΣ' upe upA' upB'
   s-strengthen^ (s-tapp s upᶜ) newΓ newΔ (↑ty-∀ upA) (↑ty-∀ upB) (↑tyᶜ-⓪ {Σ = Σ} upA₁ upΣ)
     with ⟨ Σ' , upΣ' ⟩ ← ↑tyᶜ0-total Σ
     = s-tapp (s-strengthen^ s (◀S= newΓ upA₁) (◀S= newΔ upA₁) upA upB (↑tyᶜ-comm0' upΣ upᶜ upΣ')) upΣ'

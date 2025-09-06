@@ -1,5 +1,3 @@
-{-# OPTIONS --allow-unsolved-metas #-}
-{-# OPTIONS --allow-incomplete-matches #-}
 module Implicit.Algo.Properties.WeakenEVar where
 
 open import Implicit.Language.All
@@ -7,6 +5,7 @@ open import Implicit.Algo.Base
 open import Implicit.Algo.Properties.Extension
 open import Implicit.Algo.Properties.Shift
 open import Implicit.Algo.Properties.Id
+open import Implicit.Algo.Properties.Peek
 
 ▶⨟^-Ω-exist : Γ ⨟ Δ ▶ k ,^⇘ Γ' ⨟ Δ'
             → Γ ⊆ Ω
@@ -98,25 +97,35 @@ s-weaken^ (s-term-o opnA ⊢e ss s) new (↑ty-arr upA upA₁) (↑tyᶜ-e up-e 
              (t-weaken^ ⊢e (▶^-𝕣 (▶⨟^-▶^-l new)) ↑tyᶜ-□ up-e upB)
              (ss-weaken^ ss new1 upB upA)
              (s-weaken^ s new2 upA₁ upΣ upB₁)
--- s-weaken^ {k = k} (s-∀l {B = B} s upᶜ upᵉ upC upD) new (↑ty-∀ upA) (↑tyᶜ-e {e' = e'} {Σ' = Σ'} up-e upΣ) (↑ty-arr {A' = C'} {B' = D'} upC' upD')
---   with ⟨ B' , upB' ⟩ ← ↑ty-total B k
---   with ⟨ C″ , upC″ ⟩ ← ↑ty0-total C'
---   with ⟨ D″ , upD″ ⟩ ← ↑ty0-total D'
---   with ⟨ e″ , upe″ ⟩ ← ↑tyᵉ0-total e'
---   with ⟨ Σ″ , upΣ″ ⟩ ← ↑tyᶜ0-total Σ'
---   = s-∀l (s-weaken^ s (▶S^= new upB') upA
---          (↑tyᶜ-comm0' (↑tyᶜ-e up-e upΣ) (↑tyᶜ-e upe″ upΣ″) (↑tyᶜ-e upᵉ upᶜ))
---          (↑ty-arr (↑ty-comm0' upC' upC″ upC) (↑ty-comm0' upD' upD″ upD)))
---          upΣ″ upe″ upC″ upD″
--- s-weaken^ {k = k} (s-∀l-no s upᶜ upᵉ upC upD) new (↑ty-∀ upA) (↑tyᶜ-e {e' = e'} {Σ' = Σ'} up-e upΣ) (↑ty-arr {A' = C'} {B' = D'} upC' upD')
---   with ⟨ C″ , upC″ ⟩ ← ↑ty0-total C'
---   with ⟨ D″ , upD″ ⟩ ← ↑ty0-total D'
---   with ⟨ e″ , upe″ ⟩ ← ↑tyᵉ0-total e'
---   with ⟨ Σ″ , upΣ″ ⟩ ← ↑tyᶜ0-total Σ'
---   = s-∀l-no (s-weaken^ s (▶S^ new) upA
---          (↑tyᶜ-comm0' (↑tyᶜ-e up-e upΣ) (↑tyᶜ-e upe″ upΣ″) (↑tyᶜ-e upᵉ upᶜ))
---          (↑ty-arr (↑ty-comm0' upC' upC″ upC) (↑ty-comm0' upD' upD″ upD)))
---          upΣ″ upe″ upC″ upD″
+s-weaken^ {k = k} (s-∀l-n-y {B = B} s upᶜ upᵉ upC upD) new (↑ty-∀ upA) (↑tyᶜ-e {e' = e'} {Σ' = Σ'} up-e upΣ) (↑ty-arr {A' = C'} {B' = D'} upC' upD')
+  with ⟨ B' , upB' ⟩ ← ↑ty-total B k
+  with ⟨ C″ , upC″ ⟩ ← ↑ty0-total C'
+  with ⟨ D″ , upD″ ⟩ ← ↑ty0-total D'
+  with ⟨ e″ , upe″ ⟩ ← ↑tyᵉ0-total e'
+  with ⟨ Σ″ , upΣ″ ⟩ ← ↑tyᶜ0-total Σ'
+  = s-∀l-n-y (s-weaken^ s (▶S^= new upB') upA
+         (↑tyᶜ-comm0' (↑tyᶜ-e up-e upΣ) (↑tyᶜ-e upe″ upΣ″) (↑tyᶜ-e upᵉ upᶜ))
+         (↑ty-arr (↑ty-comm0' upC' upC″ upC) (↑ty-comm0' upD' upD″ upD)))
+         upΣ″ upe″ upC″ upD″
+s-weaken^ {k = k} (s-∀l-n-n s upᶜ upᵉ upC upD) new (↑ty-∀ upA) (↑tyᶜ-e {e' = e'} {Σ' = Σ'} up-e upΣ) (↑ty-arr {A' = C'} {B' = D'} upC' upD')
+  with ⟨ C″ , upC″ ⟩ ← ↑ty0-total C'
+  with ⟨ D″ , upD″ ⟩ ← ↑ty0-total D'
+  with ⟨ e″ , upe″ ⟩ ← ↑tyᵉ0-total e'
+  with ⟨ Σ″ , upΣ″ ⟩ ← ↑tyᶜ0-total Σ'
+  = s-∀l-n-n (s-weaken^ s (▶S^ new) upA
+         (↑tyᶜ-comm0' (↑tyᶜ-e up-e upΣ) (↑tyᶜ-e upe″ upΣ″) (↑tyᶜ-e upᵉ upᶜ))
+         (↑ty-arr (↑ty-comm0' upC' upC″ upC) (↑ty-comm0' upD' upD″ upD)))
+         upΣ″ upe″ upC″ upD″
+s-weaken^ {k = k} (s-∀l-y {B = B} pk upB s upᶜ upᵉ upC upD) new (↑ty-∀ upA) (↑tyᶜ-e {e' = e'} {Σ' = Σ'} up-e upΣ) (↑ty-arr {A' = C'} {B' = D'} upC' upD')
+  with ⟨ C″ , upC″ ⟩ ← ↑ty0-total C'
+  with ⟨ D″ , upD″ ⟩ ← ↑ty0-total D'
+  with ⟨ e″ , upe″ ⟩ ← ↑tyᵉ0-total e'
+  with ⟨ Σ″ , upΣ″ ⟩ ← ↑tyᶜ0-total Σ'
+  with ⟨ B' , upB' ⟩ ← ↑ty-total B k
+  with ⟨ B′ , upB′ ⟩ ← ↑ty0-total B'
+  = s-∀l-y (peek-weaken=-lemma pk (↑tyᶜ-comm0' (↑tyᶜ-e up-e upΣ) (↑tyᶜ-e upe″ upΣ″) (↑tyᶜ-e upᵉ upᶜ)) upA (↑ty-comm0' upB' upB′ upB) (s≤s z≤n)) upB′ (s-weaken^ s (▶S= new upB') upA
+           (↑tyᶜ-comm0' (↑tyᶜ-e up-e upΣ) (↑tyᶜ-e upe″ upΣ″) (↑tyᶜ-e upᵉ upᶜ))
+           (↑ty-arr (↑ty-comm0' upC' upC″ upC) (↑ty-comm0' upD' upD″ upD))) upΣ″ upe″ upC″ upD″
 s-weaken^ (s-tapp s upᶜ) new (↑ty-∀ upA) (↑tyᶜ-⓪ {Σ' = Σ'} upA' upΣ) (↑ty-∀ upB)
   with ⟨ Σ″ , upΣ″ ⟩ ← ↑tyᶜ0-total Σ' = s-tapp (s-weaken^ s (▶S= new upA') upA (↑tyᶜ-comm0' upΣ upΣ″ upᶜ) upB) upΣ″
 s-weaken^ {k = k} (s-svar-term {A = A} inΓ s) new ↑ty-var (↑tyᶜ-e up-e upΣ) (↑ty-arr upB upB₁)
@@ -148,8 +157,8 @@ t-weaken^ {k = k} (⊢sub {A = A} ⊢e ne gc s) newΓ upΣ upe upA
          (nonempty-↑tyᶜ' ne upΣ) (gc-↑tyᵉ gc upe) (s-weaken^ s (▶S⋈ (▶^-▶⨟^ newΓ)) upA' upΣ upA)
 t-weaken^ (⊢tabs ⊢e) newΓ ↑tyᶜ-□ (↑tyᵉ-Λ upe) (↑ty-∀ upA) = ⊢tabs (t-weaken^ ⊢e (▶S∙ newΓ) ↑tyᶜ-□ upe upA)
 t-weaken^ (⊢tabs-τ ⊢e) newΓ (↑tyᶜ-τ (↑ty-∀ upA')) (↑tyᵉ-Λ upe) (↑ty-∀ upA) = ⊢tabs-τ (t-weaken^ ⊢e (▶S∙ newΓ) (↑tyᶜ-τ upA') upe upA)
--- t-weaken^ {k = k} (⊢tapp {B = B} ⊢e st) newΓ upΣ (↑tyᵉ-⓪ upe upA₁) upA
-  -- with ⟨ B' , upB ⟩ ← ↑ty-total B (#S k) = ⊢tapp (t-weaken^ ⊢e newΓ (↑tyᶜ-⓪ upA₁ upΣ) upe (↑ty-∀ upB)) (↑ty-st-comm0 st upA₁ upB upA)
+t-weaken^ {k = k} (⊢tapp {B = B} ⊢e st) newΓ upΣ (↑tyᵉ-⓪ upe upA₁) upA
+  with ⟨ B' , upB ⟩ ← ↑ty-total B (#S k) = ⊢tapp (t-weaken^ ⊢e newΓ (↑tyᶜ-⓪ upA₁ upΣ) upe (↑ty-∀ upB)) (↑ty-comm z≤n st upB upA)
 
 t-weaken^0 : Γ ⊢ Σ ⇒ e ⇒ A
            → ↑tyᶜ0 Σ ⇘ Σ'
