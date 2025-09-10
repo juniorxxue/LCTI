@@ -4,10 +4,11 @@
 module Syntax where
 
 import Debug.Trace
+import Data.List (intercalate)
 
 type Log = [String]
-data Typ = TInt | TBool | TVar Int | TArr Typ Typ | TForall Typ | TList Typ | TProd Typ Typ | TST Typ Typ deriving (Eq)
-data Trm = LitInt Int | LitBool Bool | Var Int | Abs Trm | AbsAnn Typ Trm | App Trm Trm | Ann Trm Typ | TAbs Trm | TApp Trm Typ | Nil | Cons | Pair | ST
+data Typ = TInt | TBool | TVar Int | TArr Typ Typ | TForall Typ | TUncurry [Typ] Typ | TList Typ | TProd Typ Typ | TST Typ Typ deriving (Eq)
+data Trm = LitInt Int | LitBool Bool | Var Int | Abs Trm | AbsAnn Typ Trm | AbsUncurry Int Trm | App Trm Trm | AppUncurry Trm [Trm] | Ann Trm Typ | TAbs Trm | TApp Trm Typ | Nil | Cons | Pair | ST
 
 instance Show Typ where
   showsPrec _ TInt = showString "Int"
@@ -15,6 +16,8 @@ instance Show Typ where
   showsPrec _ (TVar i) = showString "t" . shows i
   showsPrec p (TArr t1 t2) = showParen (p > 0) $ showsPrec 1 t1 . showString " → " . shows t2
   showsPrec p (TForall t) = showParen (p > 0) $ showString "∀. " . shows t
+  showsPrec p (TUncurry ts t) = showParen (p > 0) $
+    showString "(" . showString (intercalate ", " $ map show ts) . showString ") → " . shows t
   showsPrec _ (TList t) = showString "[" . shows t . showString "]"
   showsPrec p (TProd t1 t2) = showParen (p > 1) $ showsPrec 1 t1 . showString " × " . showsPrec 1 t2
   showsPrec p (TST t1 t2) = showParen (p > 1) $ showString "ST " . showsPrec 1 t1 . showString " " . showsPrec 1 t2
@@ -25,7 +28,9 @@ instance Show Trm where
   showsPrec _ (Var i) = showString "e" . shows i
   showsPrec p (Abs t) = showParen (p > 0) $ showString "λ. " . shows t
   showsPrec p (AbsAnn ty t) = showParen (p > 0) $ showString "λ" . showString " : " . shows ty . showString ". " . shows t
+  showsPrec p (AbsUncurry n t) = showParen (p > 0) $ showString "λ" . shows n . showString ". " . shows t
   showsPrec p (App t1 t2) = showParen (p > 9) $ showsPrec 9 t1 . showString " " . showsPrec 10 t2
+  showsPrec p (AppUncurry t ts) = showParen (p > 9) $ showsPrec 9 t . showString "(" . showString (intercalate ", " $ map show ts) . showString ")"
   showsPrec p (Ann t ty) = showParen (p > 1) $ showsPrec 1 t . showString " : " . shows ty
   showsPrec p (TAbs t) = showParen (p > 0) $ showString "Λ. " . shows t
   showsPrec p (TApp t ty) = showParen (p > 9) $ showsPrec 9 t . showString " @" . showsPrec 10 ty
@@ -50,13 +55,14 @@ instance Show Env where
   show (ESvar ty env) = show env ++ ", =" ++ show ty
   show (EEvar env) = show env ++ ", ^"
 
-data Context = CEmpty | CFullType Typ | CTerm Trm Context | CTApp Typ Context
+data Context = CEmpty | CFullType Typ | CTerm Trm Context | CTApp Typ Context | CUncurry [Trm] Context
 
 instance Show Context where
   show CEmpty = "□"
   show (CFullType ty) = show ty
   show (CTerm trm ctx) = "[" ++ show trm ++ "]" ++ " ↝ " ++ show ctx
   show (CTApp ty ctx) = show ty ++ " @↝ " ++ show ctx
+  show (CUncurry ts ctx) = "(" ++ intercalate ", " (map show ts) ++ ") ↝ " ++ show ctx
 
 genericConsumer :: Trm -> Bool
 genericConsumer (LitInt _) = True
@@ -103,6 +109,7 @@ closed _ TBool = True
 closed senv (TVar x) = not $ isEvar senv x
 closed senv (TArr t1 t2) = closed senv t1 && closed senv t2
 closed senv (TForall t) = closed (EUvar senv) t
+closed senv (TUncurry ts t) = all (closed senv) ts && closed senv t
 closed senv (TList t) = closed senv t
 closed senv (TProd t1 t2) = closed senv t1 && closed senv t2
 closed senv (TST t1 t2) = closed senv t1 && closed senv t2

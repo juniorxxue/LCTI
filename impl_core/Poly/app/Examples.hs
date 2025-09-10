@@ -65,11 +65,17 @@ groupNames = Map.keys exampleGroups
 idTyp :: Typ
 idTyp = TForall (TArr (TVar 0) (TVar 0))
 
+idTypUncurry :: Typ
+idTypUncurry = TForall $ TUncurry [TVar 0] (TVar 0)
+
 idTrm :: Trm
 idTrm = TAbs (Ann (Abs (Var 0)) (TArr (TVar 0) (TVar 0)))
 
 chooseTyp :: Typ
 chooseTyp = TForall $ TArr (TVar 0) $ TArr (TVar 0) (TVar 0)
+
+chooseTypUncurry :: Typ
+chooseTypUncurry = TForall $ TUncurry [TVar 0, TVar 0] (TVar 0)
 
 autoTyp :: Typ
 autoTyp = idTyp `TArr` idTyp
@@ -159,6 +165,9 @@ examplesList =
     
   , Example "A3 (Fc translation)" (ETrm (TList idTyp) (ETrm chooseTyp EEmpty)) (Var 1 `App` (Nil `Ann` TList idTyp) `App` Var 0)
       "choose (Nil : [∀a. a → a]) ids"
+
+  , Example "A3 (uncurried)" (ETrm (TList idTyp) (ETrm chooseTypUncurry EEmpty)) (Var 1 `AppUncurry` [Nil `Ann` TList idTyp, Var 0])
+      "choose(Nil : [∀a. a → a], ids)"
     
   , Example "A4" EEmpty (Abs (App (Var 0) (Var 0)))
       "λx. x x"
@@ -171,15 +180,27 @@ examplesList =
     
   , Example "A5" (ETrm idTyp (ETrm autoTyp EEmpty)) (Var 0 `App` Var 1)
       "id auto"
+
+  , Example "A5 (uncurried)" (ETrm idTypUncurry (ETrm autoTyp EEmpty)) (Var 0 `AppUncurry` [Var 1])
+      "id(auto)"
     
   , Example "A6" (ETrm idTyp (ETrm auto'Typ EEmpty)) (Var 0 `App` Var 1)
       "id auto'"
+
+  , Example "A6 (uncurried)" (ETrm idTypUncurry (ETrm auto'Typ EEmpty)) (Var 0 `AppUncurry` [Var 1])
+      "id(auto')"
     
   , Example "A7" (ETrm chooseTyp (ETrm idTyp (ETrm autoTyp EEmpty))) (Var 0 `App` Var 1 `App` Var 2)
       "choose id auto"
     
   , Example "A7 (Fc translation)" (ETrm chooseTyp (ETrm idTyp (ETrm autoTyp EEmpty))) (Var 0 `App` (Var 1 `TApp` idTyp) `App` Var 2)
       "choose (id @ (∀a. a → a)) auto"
+
+  , Example "A7 (uncurried)" (ETrm chooseTypUncurry (ETrm idTyp (ETrm autoTyp EEmpty))) (Var 0 `AppUncurry` [Var 1, Var 2])
+      "choose(id, auto)"
+    
+  , Example "A7 (Fc translation, uncurried)" (ETrm chooseTypUncurry (ETrm idTyp (ETrm autoTyp EEmpty))) (Var 0 `AppUncurry` [Var 1 `TApp` idTyp, Var 2])
+      "choose(id @ (∀a. a → a), auto)"
     
   , Example "A8" (ETrm chooseTyp (ETrm idTyp (ETrm auto'Typ EEmpty))) (Var 0 `App` Var 1 `App` Var 2)
       "choose id auto'"
@@ -192,7 +213,13 @@ examplesList =
     
   , Example "A8 (Fc translation 3)" (ETrm chooseTyp (ETrm idTyp (ETrm auto'Typ EEmpty))) (Var 0 `App` TAbs (AbsAnn idTyp (Var 2 `App` (Var 0 `TApp` TVar 0)) `Ann` TArr idTyp (TArr (TVar 0) (TVar 0))) `App` Var 2)
       "choose (Λa. λf : ∀b. b → b. id f @a) auto'"
-    
+
+  , Example "A8 (uncurried)" (ETrm chooseTypUncurry (ETrm idTyp (ETrm auto'Typ EEmpty))) (Var 0 `AppUncurry` [Var 1, Var 2])
+      "choose(id, auto')"
+
+  , Example "A8 (Fc translation 1, uncurried)" (ETrm chooseTypUncurry (ETrm idTyp (ETrm auto'Typ EEmpty))) (Var 0 `AppUncurry` [TAbs (Abs (Var 2 `App` (Var 0 `TApp` TVar 0)) `Ann` TArr idTyp (TArr (TVar 0) (TVar 0))), Var 2])
+      "choose(Λa. λf : ∀b. b → b. id f @a, auto')"
+
   , Example "A9" (ETrm (TForall $ TArr (TArr (TVar 0) (TVar 0)) $ TArr (TList (TVar 0)) (TVar 0)) (ETrm chooseTyp (ETrm idTyp (ETrm (TList idTyp) EEmpty)))) (Var 0 `App` (Var 1 `App` Var 2) `App` Var 3)
       "f (choose id) ids where f : ∀a. (a → a) → [a] → a"
     

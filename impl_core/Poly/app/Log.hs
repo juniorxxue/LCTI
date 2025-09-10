@@ -19,6 +19,15 @@ logSub senv ty ctx = show senv ++ " ⊢ " ++ show ty ++ " <: " ++ show ctx ++ " 
 -- logSubFull :: (Env, Env) -> Typ -> Context -> Env -> Typ -> String
 -- logSubFull (env, senv) ty ctx envout ty' = show env ++ "; " ++ show senv ++ " ⊢ " ++ show ty ++ " <: " ++ show ctx ++ " ⊣ " ++ show envout ++ " ⇝ " ++ show ty'
 
+logDispatch :: (Env, Env) -> [Typ] -> [Trm] -> [Typ] -> Env -> String
+logDispatch (env, senv) tyAs tms tyAs' envout =
+  grey ++ show env ++ "; " ++ reset ++
+  blue ++ show senv ++ reset ++ " ⊢ " ++
+  show tyAs ++ " ⇉ " ++
+  show tms ++ " ⇉ " ++
+  bold ++ show tyAs' ++ reset ++ " ⊣ " ++
+  red ++ show envout ++ reset
+
 logSubFull :: (Env, Env) -> Typ -> Context -> Env -> Typ -> String
 logSubFull (env, senv) ty ctx envout ty' =
   grey  ++ show env  ++ "; " ++ reset ++
