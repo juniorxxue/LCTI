@@ -291,24 +291,12 @@ sub (env, senv) (TForall tyA) (CTApp tyB h) = do
   tell ["[S-Forall-TApp] " ++ logSubFull (env, senv) (TForall tyA) (CTApp tyB h) senv'' (TForall tyC)]
   tell $ indentAll _log1
   return (senv'', TForall tyC)
-sub (env, senv) (TVar k) (CTerm e h) | isSvar (envConcat env senv) k = do
+sub (env, senv) (TVar k) h | isSvar (envConcat env senv) k = do
   tyA <- findSol (envConcat env senv) k
-  ((senv', tyBC), _log) <- peek $ sub (env, senv) tyA (CTerm e h)
-  tell ["[S-Svar-Term] " ++ logSubFull (env, senv) (TVar k) (CTerm e h) senv' tyBC]
+  ((senv', tyB), _log) <- peek $ sub (env, senv) tyA h
+  tell ["[S-Svar] " ++ logSubFull (env, senv) (TVar k) h senv' tyB]
   tell $ indentAll _log
-  return (senv', tyBC)
-sub (env, senv) (TVar k) (CTApp tyT h) | isSvar (envConcat env senv) k = do
-  tyA <- findSol (envConcat env senv) k
-  ((senv', tyBC), _log) <- peek $ sub (env, senv) tyA (CTApp tyT h)
-  tell ["[S-Svar-TApp] " ++ logSubFull (env, senv) (TVar k) (CTApp tyT h) senv' tyBC]
-  tell $ indentAll _log
-  return (senv', tyBC)
-sub (env, senv) (TVar k) (CUncurry es h) | isSvar (envConcat env senv) k = do
-  tyA <- findSol (envConcat env senv) k
-  ((senv', tyBC), _log) <- peek $ sub (env, senv) tyA (CUncurry es h)
-  tell ["[S-Svar-UC] " ++ logSubFull (env, senv) (TVar k) (CUncurry es h) senv' tyBC]
-  tell $ indentAll _log
-  return (senv', tyBC)
+  return (senv', tyB)
 sub (env, senv) (TVar k) (CTerm e h) | isUvar (envConcat env senv) k = do
   (tyA, _log) <- peek $ infers (envConcat env senv) (CTerm e h)
   case inst senv k tyA of
