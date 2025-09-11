@@ -8,7 +8,8 @@ import Data.List (intercalate)
 
 type Log = [String]
 data Typ = TInt | TBool | TVar Int | TArr Typ Typ | TForall Typ | TUncurry [Typ] Typ | TList Typ | TProd Typ Typ | TST Typ Typ deriving (Eq)
-data Trm = LitInt Int | LitBool Bool | Var Int | Abs Trm | AbsAnn Typ Trm | AbsUncurry Int Trm | App Trm Trm | AppUncurry Trm [Trm] | Ann Trm Typ | TAbs Trm | TApp Trm Typ | Nil | Cons | Pair | ST
+data Trm = LitInt Int | LitBool Bool | Var Int | Abs Trm | AbsAnn Typ Trm | AbsUncurry Int Trm | App Trm Trm | AppUncurry Trm [Trm] | Ann Trm Typ | TAbs Trm | TApp Trm Typ
+         | Nil | Cons | Pair | ST | NilUncurry | ConsUncurry | PairUncurry | STUncurry
 
 instance Show Typ where
   showsPrec _ TInt = showString "Int"
@@ -38,6 +39,10 @@ instance Show Trm where
   showsPrec _ Cons = showString "Cons"
   showsPrec _ Pair = showString "Pair"
   showsPrec _ ST = showString "ST"
+  showsPrec _ NilUncurry = showString "Nil"
+  showsPrec _ ConsUncurry = showString "Cons"
+  showsPrec _ PairUncurry = showString "Pair"
+  showsPrec _ STUncurry = showString "ST"
 
 data Env = EEmpty | ETrm Typ Env | EUvar Env | EEvar Env | ESvar Typ Env
 
@@ -72,6 +77,10 @@ genericConsumer (Ann _ _) = True
 genericConsumer (TAbs _) = True
 genericConsumer Cons = True
 genericConsumer Pair = True
+genericConsumer NilUncurry = True
+genericConsumer ConsUncurry = True
+genericConsumer PairUncurry = True
+genericConsumer STUncurry = True
 genericConsumer _ = False
 
 

@@ -62,6 +62,10 @@ shiftTerm _ Nil = Nil
 shiftTerm _ Cons = Cons
 shiftTerm _ Pair = Pair
 shiftTerm _ ST = ST
+shiftTerm _ NilUncurry = NilUncurry
+shiftTerm _ ConsUncurry = ConsUncurry
+shiftTerm _ PairUncurry = PairUncurry
+shiftTerm _ STUncurry = STUncurry
 
 shiftTerm0 :: Trm -> Trm
 shiftTerm0 = shiftTerm 0
@@ -95,6 +99,10 @@ shiftTyTerm _ Nil = Nil
 shiftTyTerm _ Cons = Cons
 shiftTyTerm _ Pair = Pair
 shiftTyTerm _ ST = ST
+shiftTyTerm _ NilUncurry = NilUncurry
+shiftTyTerm _ ConsUncurry = ConsUncurry
+shiftTyTerm _ PairUncurry = PairUncurry
+shiftTyTerm _ STUncurry = STUncurry
 
 -- type shift in context
 shiftTyContext :: Int -> Context -> Context

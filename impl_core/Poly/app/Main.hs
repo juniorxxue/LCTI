@@ -6,7 +6,7 @@
 {-# HLINT ignore "Use if" #-}
 module Main where
 
-import Control.Monad (forM_, when)
+import Control.Monad (forM_, when, foldM)
 import Control.Monad.Writer
 import DeBruijn
 import Log
@@ -41,7 +41,7 @@ findSol (EEvar senv) k | k > 0 = do
 findSol _ _ = lift Nothing
 
 inst :: Env -> Int -> Typ -> Maybe Env
--- inst env k a | trace ("inst " ++ show env ++ " " ++ show k ++ " " ++ show a) False = undefined
+inst env k a | trace ("inst " ++ show env ++ " " ++ show k ++ " " ++ show a) False = undefined
 inst (EEvar senv) 0 tyA = Just $ ESvar (unshiftTyp0 tyA) senv
 inst (EEvar senv) k tyA | k > 0 = do
   env' <- inst senv (k - 1) (unshiftTyp0 tyA)
@@ -55,7 +55,7 @@ inst (ESvar ty senv) k tyA | k > 0 = do
 inst _ _ _ = Nothing
 
 ssubP :: (Env, Env) -> Typ -> Typ -> WriterT Log Maybe Env
--- ssubP (a1, a2) b c | trace ("ssub " ++ show a1 ++ ";" ++ show a2 ++ " |- " ++ show b ++ " <:+ " ++ show c) False = undefined
+ssubP (a1, a2) b c | trace ("ssub " ++ show a1 ++ ";" ++ show a2 ++ " |- " ++ show b ++ " <:+ " ++ show c) False = undefined
 ssubP (env, senv) TInt TInt = do
   tell ["[S-Int] " ++ logSSubFull (env, senv) TInt TInt senv]
   return senv
@@ -83,6 +83,17 @@ ssubP (env, senv) (TArr tyA tyB) (TArr tyC tyD) = do
   tell ["[S-Arr] " ++ logSSubFull (env, senv) (TArr tyA tyB) (TArr tyC tyD) senv2]
   tell $ indentAll _log1
   tell $ indentAll _log2
+  return senv2
+ssubP (env, senv) (TUncurry tsA tyA) (TUncurry tsC tyD) | length tsA == length tsC = do
+  let foldFunc (senv', logs) (tyA', tyC') = do
+        (senv'', log') <- peek $ ssubN (env, senv') tyC' tyA'
+        return (senv'', logs ++ log')
+  (result, _) <- peek $ foldM foldFunc (senv, []) (zip tsA tsC)
+  let (senv1, argLogs) = result
+  (senv2, retLog) <- peek $ ssubP (env, senv1) tyA tyD
+  tell ["[S-Uncurry] " ++ logSSubFull (env, senv) (TUncurry tsA tyA) (TUncurry tsC tyD) senv2]
+  tell $ indentAll argLogs
+  tell $ indentAll retLog
   return senv2
 ssubP (env, senv) (TForall tyA) (TForall tyB) = do
   (EUvar senv', _log) <- peek $ ssubP (env, EUvar senv) tyA tyB
@@ -113,7 +124,7 @@ ssubP (env, senv) (TST tyA tyB) (TST tyC tyD) = do
 ssubP _ _ _ = lift Nothing
 
 ssubN :: (Env, Env) -> Typ -> Typ -> WriterT Log Maybe Env
--- ssubN (a1, a2) b c | trace ("ssub " ++ show a1 ++ ";" ++ show a2 ++ " |- " ++ show b ++ " <:- " ++ show c) False = undefined
+ssubN (a1, a2) b c | trace ("ssub " ++ show a1 ++ ";" ++ show a2 ++ " |- " ++ show b ++ " <:- " ++ show c) False = undefined
 ssubN (env, senv) TInt TInt = do
   tell ["[S-Int] " ++ logSSubFull (env, senv) TInt TInt senv]
   return senv
@@ -141,6 +152,17 @@ ssubN (env, senv) (TArr tyA tyB) (TArr tyC tyD) = do
   tell ["[S-Arr] " ++ logSSubFull (env, senv) (TArr tyA tyB) (TArr tyC tyD) senv2]
   tell $ indentAll _log1
   tell $ indentAll _log2
+  return senv2
+ssubN (env, senv) (TUncurry tsA tyB) (TUncurry tsC tyD) | length tsA == length tsC = do
+  let foldFunc (senv', logs) (tyA', tyC') = do
+        (senv'', log') <- peek $ ssubP (env, senv') tyC' tyA'
+        return (senv'', logs ++ log')
+  (result, _) <- peek $ foldM foldFunc (senv, []) (zip tsA tsC)
+  let (senv1, argLogs) = result
+  (senv2, retLog) <- peek $ ssubN (env, senv1) tyB tyD
+  tell ["[S-Uncurry] " ++ logSSubFull (env, senv) (TUncurry tsA tyB) (TUncurry tsC tyD) senv2]
+  tell $ indentAll argLogs
+  tell $ indentAll retLog
   return senv2
 ssubN (env, senv) (TForall tyA) (TForall tyB) = do
   (EUvar senv', _log) <- peek $ ssubN (env, EUvar senv) tyA tyB
@@ -171,7 +193,7 @@ ssubN (env, senv) (TST tyA tyB) (TST tyC tyD) = do
 ssubN _ _ _ = lift Nothing
 
 ground :: Env -> Typ -> WriterT Log Maybe Typ
--- ground a b | trace ("ground " ++ show a ++ " |- " ++ show b) False = undefined
+ground a b | trace ("ground " ++ show a ++ " |- " ++ show b) False = undefined
 ground _ TInt = return TInt
 ground _ TBool = return TBool
 ground env (TVar k) | isUvar env k = return (TVar k)
@@ -200,7 +222,7 @@ ground env (TST tyA tyB) = do
   return $ TST tyA' tyB'
 
 dispatch :: (Env, Env) -> [Typ] -> [Trm] -> WriterT Log Maybe (Env, [Typ])
--- dispatch (a1, a2) b c | trace ("dispatch " ++ show a1 ++ ";" ++ show a2 ++ " |- " ++ show b ++ " ⇉ " ++ show c) False = undefined
+dispatch (a1, a2) b c | trace ("dispatch " ++ show a1 ++ ";" ++ show a2 ++ " |- " ++ show b ++ " ⇉ " ++ show c) False = undefined
 dispatch (env, senv) [tyA] [e] | open (envConcat env senv) tyA = do
   (tyA', _log) <- peek $ infer (envConcat env senv) CEmpty e
   (senv', _log') <- peek $ ssubN (env, senv) tyA' tyA
@@ -234,7 +256,7 @@ dispatch (env, senv) (tyA:tyAs) (e:es) | closed (envConcat env senv) tyA = do
 dispatch _ _ _ = lift Nothing
 
 sub :: (Env, Env) -> Typ -> Context -> WriterT Log Maybe (Env, Typ)
--- sub (a1, a2) b c | trace ("sub " ++ show a1 ++ ";" ++ show a2 ++ " |- " ++ show b ++ " <: " ++ show c) False = undefined
+sub (a1, a2) b c | trace ("sub " ++ show a1 ++ ";" ++ show a2 ++ " |- " ++ show b ++ " <: " ++ show c) False = undefined
 sub (env, senv) tyA CEmpty | closed (envConcat env senv) tyA = do
   grdA <- ground (envConcat env senv) tyA
   tell ["[S-Empty] " ++ logSubFull (env, senv) tyA CEmpty senv grdA]
@@ -299,6 +321,12 @@ sub (env, senv) (TVar k) (CTApp tyT h) | isSvar (envConcat env senv) k = do
   tell ["[S-Svar-TApp] " ++ logSubFull (env, senv) (TVar k) (CTApp tyT h) senv' tyBC]
   tell $ indentAll _log
   return (senv', tyBC)
+sub (env, senv) (TVar k) (CUncurry es h) | isSvar (envConcat env senv) k = do
+  tyA <- findSol (envConcat env senv) k
+  ((senv', tyBC), _log) <- peek $ sub (env, senv) tyA (CUncurry es h)
+  tell ["[S-Svar-UC] " ++ logSubFull (env, senv) (TVar k) (CUncurry es h) senv' tyBC]
+  tell $ indentAll _log
+  return (senv', tyBC)
 sub (env, senv) (TVar k) (CTerm e h) | isUvar (envConcat env senv) k = do
   (tyA, _log) <- peek $ infers (envConcat env senv) (CTerm e h)
   case inst senv k tyA of
@@ -323,10 +351,8 @@ infers env (CTerm tm h) = do
   return $ TArr tyA tyB
 infers _ _ = lift Nothing
 
--- sub (EEmpty, (ESvar TInt EEmpty)) (TArr (TVar 0) (TVar 0)) (CTerm (Lit 42) CEmpty)
-
 infer :: Env -> Context -> Trm -> WriterT Log Maybe Typ
--- infer a b c | trace ("infer " ++ show a ++ " |- " ++ show b ++ " => " ++ show c) False = undefined
+infer a b c | trace ("infer " ++ show a ++ " |- " ++ show b ++ " => " ++ show c) False = undefined
 infer env CEmpty (LitInt n) = do
   tell ["[Ty-Int] " ++ logInferFull env CEmpty (LitInt n) TInt]
   return TInt
