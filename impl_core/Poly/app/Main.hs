@@ -461,6 +461,18 @@ infer env CEmpty ST = do
   let tyST = TForall $ TForall $ TArr (TVar 1) $ TArr (TVar 0) $ TST (TVar 1) (TVar 0)
   tell ["[Ty-ST] " ++ logInferFull env CEmpty ST tyST]
   return tyST
+infer env CEmpty ConsUncurry = do
+  let tyCons = TForall (TUncurry [TVar 0, TList (TVar 0)] (TList (TVar 0)))
+  tell ["[Ty-Cons-UC] " ++ logInferFull env CEmpty ConsUncurry tyCons]
+  return tyCons
+infer env CEmpty PairUncurry = do
+  let tyPair = TForall $ TForall $ TUncurry [TVar 1, TVar 0] $ TProd (TVar 1) (TVar 0)
+  tell ["[Ty-Pair-UC] " ++ logInferFull env CEmpty PairUncurry tyPair]
+  return tyPair
+infer env CEmpty STUncurry = do
+  let tyST = TForall $ TForall $ TUncurry [TVar 1, TVar 0] $ TST (TVar 1) (TVar 0)
+  tell ["[Ty-ST-UC] " ++ logInferFull env CEmpty STUncurry tyST]
+  return tyST
 infer _ _ _ = lift Nothing
 
 main :: IO ()

@@ -167,14 +167,8 @@ fTypUncurry = TForall $ TUncurry [TUncurry [TVar 0] (TVar 0), TList (TVar 0)] (T
 hTyp :: Typ
 hTyp = TArr TInt idTyp
 
-hTypUncurry :: Typ
-hTypUncurry = TUncurry [TInt] idTyp
-
 kTyp :: Typ
 kTyp = TForall $ TArr (TVar 0) $ TArr (TList (TVar 0)) (TVar 0)
-
-kTypUncurry :: Typ
-kTypUncurry = TForall $ TUncurry [TVar 0] $ TArr (TList (TVar 0)) (TVar 0)
 
 lstTyp :: Typ
 lstTyp = TList $ TForall $ TArr TInt $ TArr (TVar 0) (TVar 0)
@@ -184,9 +178,6 @@ lstTypUncurry = TList $ TForall $ TUncurry [TInt, TArr (TVar 0) (TVar 0)] (TVar 
 
 rTyp :: Typ
 rTyp = TArr (TForall (TArr (TVar 0) idTyp)) TInt
-
-rTypUncurry :: Typ
-rTypUncurry = TUncurry [TForall (TArr (TVar 0) idTyp)] TInt
 
 examplesMap :: Map String Example
 examplesMap = Map.fromList [(exampleName ex, ex) | ex <- examplesList]
@@ -457,71 +448,80 @@ examplesList =
   , Example "D4 (Fc translation 2)" (ETrm appTyp (ETrm runSTTyp (ETrm argSTTyp EEmpty))) (Var 0 `App` AbsAnn argSTTyp (Var 2 `App` TAbs (Var 0 `TApp` TVar 0)) `App` Var 2)
       "app (λx : ∀a. ST a Int. runST (Λa. x @a)) argST"
     
---   , Example "D4 (Fc translation 3)" (ETrm appTyp (ETrm runSTTyp (ETrm argSTTyp EEmpty))) (Var 0 `App` (Var 1 `TApp` TInt) `App` Var 2)
---       "app (runST @Int) argST"
+  , Example "D4 (Fc translation 3)" (ETrm appTyp (ETrm runSTTyp (ETrm argSTTyp EEmpty))) (Var 0 `App` (Var 1 `TApp` TInt) `App` Var 2)
+      "app (runST @Int) argST"
     
---   , Example "D4 (uncurried)" (ETrm appTypUncurry (ETrm runSTTypUncurry (ETrm argSTTyp EEmpty))) (Var 0 `AppUncurry` [Var 1, Var 2])
---       "app(runST, argST)"
+  , Example "D4 (uncurried)" (ETrm appTypUncurry (ETrm runSTTypUncurry (ETrm argSTTyp EEmpty))) (Var 0 `AppUncurry` [Var 1, Var 2])
+      "app(runST, argST)"
 
---   , Example "D4 (Fc translation 1, uncurried)" (ETrm appTypUncurry (ETrm runSTTypUncurry (ETrm argSTTyp EEmpty))) (Var 0 `App` (Abs (Var 2 `App` TAbs (Var 0 `TApp` TVar 0)) `Ann` TArr argSTTyp TInt) `App` Var 2)
---       "app(λx. runST(Λa. x @a) : (∀a. ST a Int) → Int, argST)"
+  , Example "D4 (Fc translation 1, uncurried)" (ETrm appTypUncurry (ETrm runSTTypUncurry (ETrm argSTTyp EEmpty))) (Var 0 `AppUncurry` [AbsUncurry 1 (Var 2 `AppUncurry` [TAbs (Var 0 `TApp` TVar 0)]) `Ann` TArr argSTTyp TInt, Var 2])
+      "app(λ(x). runST(Λa. x @a) : (∀a. ST a Int) → Int, argST)"
     
-  , Example "D4 (Fc translation 2, uncurried)" (ETrm appTypUncurry (ETrm runSTTypUncurry (ETrm argSTTyp EEmpty))) (Var 0 `AppUncurry` [AbsAnn argSTTyp (Var 2 `AppUncurry` [TAbs (Var 0 `TApp` TVar 0)]), Var 2])
-      "app(λx : ∀a. ST a Int. runST(Λa. x @a), argST)"
-    
---   , Example "D4 (Fc translation 3, uncurried)" (ETrm appTypUncurry (ETrm runSTTypUncurry (ETrm argSTTyp EEmpty))) (Var 0 `AppUncurry` [Var 1 `TApp` TInt, Var 2])
---       "app(runST @Int, argST)"
+  , Example "D4 (Fc translation 3, uncurried)" (ETrm appTypUncurry (ETrm runSTTypUncurry (ETrm argSTTyp EEmpty))) (Var 0 `AppUncurry` [Var 1 `TApp` TInt, Var 2])
+      "app(runST @Int, argST)"
 
---   , Example "D5" (ETrm revappTyp (ETrm argSTTyp (ETrm runSTTyp EEmpty))) (Var 0 `App` Var 1 `App` Var 2)
---       "revapp argST runST"
+  , Example "D5" (ETrm revappTyp (ETrm argSTTyp (ETrm runSTTyp EEmpty))) (Var 0 `App` Var 1 `App` Var 2)
+      "revapp argST runST"
     
---   , Example "D5 (Fc translation 1)" (ETrm revappTyp (ETrm argSTTyp (ETrm runSTTyp EEmpty))) (Var 0 `App` Var 1 `App` (Var 2 `TApp` TInt))
---       "revapp argST (runST @Int)"
+  , Example "D5 (Fc translation 1)" (ETrm revappTyp (ETrm argSTTyp (ETrm runSTTyp EEmpty))) (Var 0 `App` Var 1 `App` (Var 2 `TApp` TInt))
+      "revapp argST (runST @Int)"
     
---   , Example "D5 (Fc translation 2)" (ETrm revappTyp (ETrm argSTTyp (ETrm runSTTyp EEmpty))) (Var 0 `App` Var 1 `App` (Abs (Var 3 `App` TAbs (Var 0 `TApp` TVar 0)) `Ann` TArr argSTTyp TInt))
---       "revapp argST (λx. runST (Λa. x @a) : (∀a. ST a Int) → Int)"
+  , Example "D5 (Fc translation 2)" (ETrm revappTyp (ETrm argSTTyp (ETrm runSTTyp EEmpty))) (Var 0 `App` Var 1 `App` (Abs (Var 3 `App` TAbs (Var 0 `TApp` TVar 0)) `Ann` TArr argSTTyp TInt))
+      "revapp argST (λx. runST (Λa. x @a) : (∀a. ST a Int) → Int)"
     
---   , Example "E1" (ETrm kTyp (ETrm hTyp (ETrm lstTyp EEmpty))) (Var 0 `App` Var 1 `App` Var 2)
---       "k h lst"
+  , Example "D5 (uncurried)" (ETrm revappTypUncurry (ETrm argSTTyp (ETrm runSTTypUncurry EEmpty))) (Var 0 `AppUncurry` [Var 1, Var 2])
+      "revapp(argST, runST)"
     
---   , Example "E2" (ETrm kTyp (ETrm hTyp (ETrm lstTyp EEmpty))) (Var 0 `App` Abs (Var 2 `App` Var 0) `App` Var 2)
---       "k (λx. h x) lst"
+  , Example "D5 (Fc translation 1, uncurried)" (ETrm revappTypUncurry (ETrm argSTTyp (ETrm runSTTypUncurry EEmpty))) (Var 0 `AppUncurry` [Var 1, Var 2 `TApp` TInt])
+      "revapp(argST, runST @Int)"
     
---   , Example "E2 (Fc translation 1)" (ETrm kTyp (ETrm hTyp (ETrm lstTyp EEmpty))) (Var 0 `App` TAbs (Abs (Var 2 `App` Var 0 `TApp` TVar 0) `Ann` TArr TInt (TArr (TVar 0) (TVar 0))) `App` Var 2)
---       "k (Λa. λx. h x @ a : Int → a → a) lst"
+  , Example "D5 (Fc translation 2, uncurried)" (ETrm revappTypUncurry (ETrm argSTTyp (ETrm runSTTypUncurry EEmpty))) (Var 0 `AppUncurry` [Var 1, AbsUncurry 1 (Var 3 `AppUncurry` [TAbs (Var 0 `TApp` TVar 0)]) `Ann` TUncurry [argSTTyp] TInt])
+      "revapp(argST, λ(x). runST(Λa. x @a) : (∀a. ST a Int) → Int)"
+
+  , Example "E1" (ETrm kTyp (ETrm hTyp (ETrm lstTyp EEmpty))) (Var 0 `App` Var 1 `App` Var 2)
+      "k h lst"
+
+  , Example "E2" (ETrm kTyp (ETrm hTyp (ETrm lstTyp EEmpty))) (Var 0 `App` Abs (Var 2 `App` Var 0) `App` Var 2)
+      "k (λx. h x) lst"
     
---   , Example "E2 (Fc translation 2)" (ETrm kTyp (ETrm hTyp (ETrm lstTyp EEmpty))) (Var 0 `App` TAbs (AbsAnn TInt (Var 2 `App` Var 0 `TApp` TVar 0)) `App` Var 2)
---       "k (Λa. λx : Int. h x @ a) lst"
+  , Example "E2 (Fc translation 1)" (ETrm kTyp (ETrm hTyp (ETrm lstTyp EEmpty))) (Var 0 `App` TAbs (Abs (Var 2 `App` Var 0 `TApp` TVar 0) `Ann` TArr TInt (TArr (TVar 0) (TVar 0))) `App` Var 2)
+      "k (Λa. λx. h x @ a : Int → a → a) lst"
     
---   , Example "E3" (ETrm rTyp EEmpty) (Var 0 `App` Abs (Abs (Var 0)))
---       "r (λx. λy. y)"
+  , Example "E2 (Fc translation 2)" (ETrm kTyp (ETrm hTyp (ETrm lstTyp EEmpty))) (Var 0 `App` TAbs (AbsAnn TInt (Var 2 `App` Var 0 `TApp` TVar 0)) `App` Var 2)
+      "k (Λa. λx : Int. h x @ a) lst"
     
---   , Example "E3 (Fc translation 1)" (ETrm rTyp EEmpty) (Var 0 `App` TAbs (Abs (TAbs (Abs (Var 0))) `Ann` TArr (TVar 0) idTyp))
---       "r (Λ a. (λx. Λ b. λy. y) : a → ∀b. b → b)"
+  , Example "E3" (ETrm rTyp EEmpty) (Var 0 `App` Abs (Abs (Var 0)))
+      "r (λx. λy. y)"
     
---   , Example "E3 (Fc translation 2)" (ETrm rTyp EEmpty) (Var 0 `App` TAbs (AbsAnn (TVar 0) (TAbs (AbsAnn (TVar 0) (Var 0)))))
---       "r (Λa. λx : a. Λb. λy : b. y)"
+  , Example "E3 (Fc translation 1)" (ETrm rTyp EEmpty) (Var 0 `App` TAbs (Abs (TAbs (Abs (Var 0))) `Ann` TArr (TVar 0) idTyp))
+      "r (Λ a. (λx. Λ b. λy. y) : a → ∀b. b → b)"
+    
+  , Example "E3 (Fc translation 2)" (ETrm rTyp EEmpty) (Var 0 `App` TAbs (AbsAnn (TVar 0) (TAbs (AbsAnn (TVar 0) (Var 0)))))
+      "r (Λa. λx : a. Λb. λy : b. y)"
     
   -- FreezeML paper additions
---   , Example "F5" (ETrm autoTyp (ETrm idTyp EEmpty)) (Var 0 `App` Var 1)
---       "auto id"
+  , Example "F5" (ETrm autoTyp (ETrm idTyp EEmpty)) (Var 0 `App` Var 1)
+      "auto id"
 
---   , Example "F5 (uncurried, TODO)" (ETrm autoTypUncurry (ETrm idTypUncurry EEmpty)) (Var 0 `AppUncurry` [Var 1])
---       "auto(id)"
+  , Example "F5 (uncurried)" (ETrm autoTypUncurry (ETrm idTypUncurry EEmpty)) (Var 0 `AppUncurry` [Var 1])
+      "auto(id)"
     
---   , Example "F6" (ETrm headTyp (ETrm (TList idTyp) EEmpty)) (Cons `App` (Var 0 `App` Var 1) `App` Var 1)
---       "cons (head ids) ids"
-    
---   , Example "F7" (ETrm headTyp (ETrm (TList idTyp) EEmpty)) (Var 0 `App` Var 1 `App` LitInt 3)
---       "head ids 3"
+  , Example "F6" (ETrm headTyp (ETrm (TList idTyp) EEmpty)) (Cons `App` (Var 0 `App` Var 1) `App` Var 1)
+      "cons (head ids) ids"
 
---   , Example "F7 (uncurried)" (ETrm headTypUncurry (ETrm (TList idTypUncurry) EEmpty)) (Var 0 `AppUncurry` [Var 1] `AppUncurry` [LitInt 3])
---       "head(ids)(3)"
+  , Example "F6 (uncurried)" (ETrm headTypUncurry (ETrm (TList idTypUncurry) EEmpty)) (ConsUncurry `AppUncurry` [Var 0 `AppUncurry` [Var 1], Var 1])
+      "cons(head(ids), ids)"
+
+  , Example "F7" (ETrm headTyp (ETrm (TList idTyp) EEmpty)) (Var 0 `App` Var 1 `App` LitInt 3)
+      "head ids 3"
+
+  , Example "F7 (uncurried)" (ETrm headTypUncurry (ETrm (TList idTypUncurry) EEmpty)) (Var 0 `AppUncurry` [Var 1] `AppUncurry` [LitInt 3])
+      "head(ids)(3)"
     
---   , Example "F8" (ETrm chooseTyp (ETrm headTyp (ETrm (TList idTyp) EEmpty))) (Var 0 `App` (Var 1 `App` Var 2))
---       "choose (head ids)"
+  , Example "F8" (ETrm chooseTyp (ETrm headTyp (ETrm (TList idTyp) EEmpty))) (Var 0 `App` (Var 1 `App` Var 2))
+      "choose (head ids)"
     
---   -- Spine-local type inference
+  -- Spine-local type inference
 --   , Example "Pair" EEmpty ((Pair `App` Abs (Var 0) `App` LitInt 1) `Ann` ((TInt `TArr` TInt) `TProd` TInt))
 --       "(Pair (λx. x) 1) : (Int → Int) × Int"
     
