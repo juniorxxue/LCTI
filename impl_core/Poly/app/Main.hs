@@ -41,7 +41,7 @@ findSol (EEvar senv) k | k > 0 = do
 findSol _ _ = lift Nothing
 
 inst :: Env -> Int -> Typ -> Maybe Env
-inst env k a | trace ("inst " ++ show env ++ " " ++ show k ++ " " ++ show a) False = undefined
+-- inst env k a | trace ("inst " ++ show env ++ " " ++ show k ++ " " ++ show a) False = undefined
 inst (EEvar senv) 0 tyA = Just $ ESvar (unshiftTyp0 tyA) senv
 inst (EEvar senv) k tyA | k > 0 = do
   env' <- inst senv (k - 1) (unshiftTyp0 tyA)
@@ -55,7 +55,7 @@ inst (ESvar ty senv) k tyA | k > 0 = do
 inst _ _ _ = Nothing
 
 ssubP :: (Env, Env) -> Typ -> Typ -> WriterT Log Maybe Env
-ssubP (a1, a2) b c | trace ("ssub " ++ show a1 ++ ";" ++ show a2 ++ " |- " ++ show b ++ " <:+ " ++ show c) False = undefined
+-- ssubP (a1, a2) b c | trace ("ssub " ++ show a1 ++ ";" ++ show a2 ++ " |- " ++ show b ++ " <:+ " ++ show c) False = undefined
 ssubP (env, senv) TInt TInt = do
   tell ["[S-Int] " ++ logSSubFull (env, senv) TInt TInt senv]
   return senv
@@ -124,7 +124,7 @@ ssubP (env, senv) (TST tyA tyB) (TST tyC tyD) = do
 ssubP _ _ _ = lift Nothing
 
 ssubN :: (Env, Env) -> Typ -> Typ -> WriterT Log Maybe Env
-ssubN (a1, a2) b c | trace ("ssub " ++ show a1 ++ ";" ++ show a2 ++ " |- " ++ show b ++ " <:- " ++ show c) False = undefined
+-- ssubN (a1, a2) b c | trace ("ssub " ++ show a1 ++ ";" ++ show a2 ++ " |- " ++ show b ++ " <:- " ++ show c) False = undefined
 ssubN (env, senv) TInt TInt = do
   tell ["[S-Int] " ++ logSSubFull (env, senv) TInt TInt senv]
   return senv
@@ -193,7 +193,7 @@ ssubN (env, senv) (TST tyA tyB) (TST tyC tyD) = do
 ssubN _ _ _ = lift Nothing
 
 ground :: Env -> Typ -> WriterT Log Maybe Typ
-ground a b | trace ("ground " ++ show a ++ " |- " ++ show b) False = undefined
+-- ground a b | trace ("ground " ++ show a ++ " |- " ++ show b) False = undefined
 ground _ TInt = return TInt
 ground _ TBool = return TBool
 ground env (TVar k) | isUvar env k = return (TVar k)
@@ -222,7 +222,7 @@ ground env (TST tyA tyB) = do
   return $ TST tyA' tyB'
 
 dispatch :: (Env, Env) -> [Typ] -> [Trm] -> WriterT Log Maybe (Env, [Typ])
-dispatch (a1, a2) b c | trace ("dispatch " ++ show a1 ++ ";" ++ show a2 ++ " |- " ++ show b ++ " ⇉ " ++ show c) False = undefined
+-- dispatch (a1, a2) b c | trace ("dispatch " ++ show a1 ++ ";" ++ show a2 ++ " |- " ++ show b ++ " ⇉ " ++ show c) False = undefined
 dispatch (env, senv) [tyA] [e] | open (envConcat env senv) tyA = do
   (tyA', _log) <- peek $ infer (envConcat env senv) CEmpty e
   (senv', _log') <- peek $ ssubN (env, senv) tyA' tyA
@@ -256,7 +256,7 @@ dispatch (env, senv) (tyA:tyAs) (e:es) | closed (envConcat env senv) tyA = do
 dispatch _ _ _ = lift Nothing
 
 sub :: (Env, Env) -> Typ -> Context -> WriterT Log Maybe (Env, Typ)
-sub (a1, a2) b c | trace ("sub " ++ show a1 ++ ";" ++ show a2 ++ " |- " ++ show b ++ " <: " ++ show c) False = undefined
+-- sub (a1, a2) b c | trace ("sub " ++ show a1 ++ ";" ++ show a2 ++ " |- " ++ show b ++ " <: " ++ show c) False = undefined
 sub (env, senv) tyA CEmpty | closed (envConcat env senv) tyA = do
   grdA <- ground (envConcat env senv) tyA
   tell ["[S-Empty] " ++ logSubFull (env, senv) tyA CEmpty senv grdA]
@@ -352,7 +352,7 @@ infers env (CTerm tm h) = do
 infers _ _ = lift Nothing
 
 infer :: Env -> Context -> Trm -> WriterT Log Maybe Typ
-infer a b c | trace ("infer " ++ show a ++ " |- " ++ show b ++ " => " ++ show c) False = undefined
+-- infer a b c | trace ("infer " ++ show a ++ " |- " ++ show b ++ " => " ++ show c) False = undefined
 infer env CEmpty (LitInt n) = do
   tell ["[Ty-Int] " ++ logInferFull env CEmpty (LitInt n) TInt]
   return TInt
