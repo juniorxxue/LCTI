@@ -1,19 +1,16 @@
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE TypeSynonymInstances #-}
-{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 
-{-# HLINT ignore "Redundant multi-way if" #-}
-{-# HLINT ignore "Use if" #-}
 module Main where
 
-import Control.Monad (forM_, when, foldM)
+import Control.Monad (foldM, forM_, when)
 import Control.Monad.Writer
 import DeBruijn
+import Debug.Trace
+import Examples (Example (..), examples, getExample, getExamplesInGroup)
 import Log
 import Syntax
 import System.Environment (getArgs)
-import Examples (examples, Example(..), getExample, getExamplesInGroup)
-import Debug.Trace
 
 lookupEnv :: Int -> Env -> WriterT Log Maybe Typ
 lookupEnv 0 (ETrm ty _) = do
@@ -236,23 +233,23 @@ dispatch (env, senv) [tyA] [e] | closed (envConcat env senv) tyA = do
   tell ["[S-Dispatch-Closed] " ++ logDispatch (env, senv) [tyA] [e] [tyA] senv]
   tell $ indentAll _log
   return (senv, [tyA])
-dispatch (env, senv) (tyA:tyAs) (e:es) | open (envConcat env senv) tyA = do
+dispatch (env, senv) (tyA : tyAs) (e : es) | open (envConcat env senv) tyA = do
   (tyA', _log) <- peek $ infer (envConcat env senv) CEmpty e
   (senv', _log') <- peek $ ssubN (env, senv) tyA' tyA
   ((senv'', tyAs'), _log'') <- peek $ dispatch (env, senv') tyAs es
-  tell ["[S-Dispatch-Cons-Open] " ++ logDispatch (env, senv) (tyA:tyAs) (e:es) (tyA':tyAs') senv'']
+  tell ["[S-Dispatch-Cons-Open] " ++ logDispatch (env, senv) (tyA : tyAs) (e : es) (tyA' : tyAs') senv'']
   tell $ indentAll _log
   tell $ indentAll _log'
   tell $ indentAll _log''
-  return (senv'', tyA':tyAs')
-dispatch (env, senv) (tyA:tyAs) (e:es) | closed (envConcat env senv) tyA = do
+  return (senv'', tyA' : tyAs')
+dispatch (env, senv) (tyA : tyAs) (e : es) | closed (envConcat env senv) tyA = do
   grdA <- ground (envConcat env senv) tyA
   (_, _log) <- peek $ infer (envConcat env senv) (CFullType grdA) e
   ((senv', tyAs'), _log') <- peek $ dispatch (env, senv) tyAs es
-  tell ["[S-Dispatch-Cons-Closed] " ++ logDispatch (env, senv) (tyA:tyAs) (e:es) (tyA:tyAs') senv']
+  tell ["[S-Dispatch-Cons-Closed] " ++ logDispatch (env, senv) (tyA : tyAs) (e : es) (tyA : tyAs') senv']
   tell $ indentAll _log
   tell $ indentAll _log'
-  return (senv', tyA:tyAs')
+  return (senv', tyA : tyAs')
 dispatch _ _ _ = lift Nothing
 
 sub :: (Env, Env) -> Typ -> Context -> WriterT Log Maybe (Env, Typ)
@@ -336,7 +333,6 @@ sub (env, senv) (TVar k) (CTerm e h) | isUvar (envConcat env senv) k = do
       return (newenv, tyA)
     Nothing -> lift Nothing
 sub _ _ _ = lift Nothing
-
 
 infers :: Env -> Context -> WriterT Log Maybe Typ
 infers env (CFullType tyA) = do
@@ -480,7 +476,7 @@ main = do
   args <- getArgs
   let showDrv = "--drv" `elem` args
       showHelp = "--help" `elem` args || "-h" `elem` args
-  
+
   if showHelp
     then do
       putStrLn "Usage: cabal run Poly -- [OPTIONS] [EXAMPLE_NAME]"

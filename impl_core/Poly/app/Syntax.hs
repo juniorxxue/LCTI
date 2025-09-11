@@ -1,15 +1,33 @@
-{-# LANGUAGE RankNTypes, TypeSynonymInstances #-}
-{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
-{-# HLINT ignore "Redundant multi-way if" #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE TypeSynonymInstances #-}
+
 module Syntax where
 
-import Debug.Trace
 import Data.List (intercalate)
 
 type Log = [String]
+
 data Typ = TInt | TBool | TVar Int | TArr Typ Typ | TForall Typ | TUncurry [Typ] Typ | TList Typ | TProd Typ Typ | TST Typ Typ deriving (Eq)
-data Trm = LitInt Int | LitBool Bool | Var Int | Abs Trm | AbsAnn Typ Trm | AbsUncurry Int Trm | App Trm Trm | AppUncurry Trm [Trm] | Ann Trm Typ | TAbs Trm | TApp Trm Typ
-         | Nil | Cons | Pair | ST | ConsUncurry | PairUncurry | STUncurry
+
+data Trm
+  = LitInt Int
+  | LitBool Bool
+  | Var Int
+  | Abs Trm
+  | AbsAnn Typ Trm
+  | AbsUncurry Int Trm
+  | App Trm Trm
+  | AppUncurry Trm [Trm]
+  | Ann Trm Typ
+  | TAbs Trm
+  | TApp Trm Typ
+  | Nil
+  | Cons
+  | Pair
+  | ST
+  | ConsUncurry
+  | PairUncurry
+  | STUncurry
 
 instance Show Typ where
   showsPrec _ TInt = showString "Int"
@@ -17,8 +35,9 @@ instance Show Typ where
   showsPrec _ (TVar i) = showString "t" . shows i
   showsPrec p (TArr t1 t2) = showParen (p > 0) $ showsPrec 1 t1 . showString " → " . shows t2
   showsPrec p (TForall t) = showParen (p > 0) $ showString "∀. " . shows t
-  showsPrec p (TUncurry ts t) = showParen (p > 0) $
-    showString "(" . showString (intercalate ", " $ map show ts) . showString ") → " . shows t
+  showsPrec p (TUncurry ts t) =
+    showParen (p > 0) $
+      showString "(" . showString (intercalate ", " $ map show ts) . showString ") → " . shows t
   showsPrec _ (TList t) = showString "[" . shows t . showString "]"
   showsPrec p (TProd t1 t2) = showParen (p > 1) $ showsPrec 1 t1 . showString " × " . showsPrec 1 t2
   showsPrec p (TST t1 t2) = showParen (p > 1) $ showString "ST " . showsPrec 1 t1 . showString " " . showsPrec 1 t2
@@ -82,11 +101,9 @@ genericConsumer PairUncurry = True
 genericConsumer STUncurry = True
 genericConsumer _ = False
 
-
 nonEmptyContext :: Context -> Bool
 nonEmptyContext CEmpty = False
 nonEmptyContext _ = True
-
 
 isEvar :: Env -> Int -> Bool
 isEvar EEmpty _ = False
