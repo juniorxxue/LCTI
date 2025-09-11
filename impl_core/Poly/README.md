@@ -29,6 +29,9 @@ This directory contains a Haskell implementation of local contextual type infere
   A1 (Fc translation 1): Λa. Λb. (λx. λy. y) : a → b → b
   [✓] Typing result: ∀. ∀. t1 → t0 → t0
   --------------------------------------------------------------------------------
+  A1 (Fc translation 1, uncurried): Λa. Λb. (λ(x, y). y) : (a, b) → b
+  [✓] Typing result: ∀. ∀. (t1, t0) → t0
+  --------------------------------------------------------------------------------
   A1 (Fc translation 2): Λa. Λb. λx : a. λy : b. y
   [✓] Typing result: ∀. ∀. t1 → t0 → t0
   --------------------------------------------------------------------------------
