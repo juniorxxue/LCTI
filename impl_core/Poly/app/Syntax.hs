@@ -76,6 +76,7 @@ genericConsumer (Ann _ _) = True
 genericConsumer (TAbs _) = True
 genericConsumer Cons = True
 genericConsumer Pair = True
+genericConsumer ST = True
 genericConsumer ConsUncurry = True
 genericConsumer PairUncurry = True
 genericConsumer STUncurry = True

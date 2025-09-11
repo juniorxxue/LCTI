@@ -409,13 +409,13 @@ infer env CEmpty (AbsAnn tyA tm) = do
   tell $ indentAll _log
   return $ TArr tyA tyB
 infer env (CFullType (TUncurry ts tyB)) (AbsUncurry n tm) | n == length ts = do
-  (tyC, _log) <- peek $ infer (foldr ETrm env ts) (CFullType tyB) tm
+  (tyC, _log) <- peek $ infer (foldl (flip ETrm) env ts) (CFullType tyB) tm
   tell ["[Ty-Abs-UC1] " ++ logInferFull env (CFullType (TUncurry ts tyB)) (AbsUncurry n tm) (TUncurry ts tyC)]
   tell $ indentAll _log
   return $ TUncurry ts tyC
 infer env (CUncurry tm2s h) (AbsUncurry n tm) | n == length tm2s = do
   (tyAs, _log1) <- peek $ mapM (infer env CEmpty) tm2s
-  (tyB, _log2) <- peek $ infer (foldr ETrm env tyAs) (iterate shiftContext0 h !! n) tm
+  (tyB, _log2) <- peek $ infer (foldl (flip ETrm) env tyAs) (iterate shiftContext0 h !! n) tm
   tell ["[Ty-Abs-UC2] " ++ logInferFull env (CUncurry tm2s h) (AbsUncurry n tm) (TUncurry tyAs tyB)]
   tell $ indentAll _log1
   tell $ indentAll _log2
