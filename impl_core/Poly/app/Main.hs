@@ -218,39 +218,21 @@ ground env (TST tyA tyB) = do
   tyB' <- ground env tyB
   return $ TST tyA' tyB'
 
-dispatch :: (Env, Env) -> [Typ] -> [Trm] -> WriterT Log Maybe (Env, [Typ])
--- dispatch (a1, a2) b c | trace ("dispatch " ++ show a1 ++ ";" ++ show a2 ++ " |- " ++ show b ++ " ⇉ " ++ show c) False = undefined
-dispatch (env, senv) [tyA] [e] | open (envConcat env senv) tyA = do
+inferUncurry :: (Env, Env) -> Typ -> Trm -> WriterT Log Maybe (Env, Typ)
+inferUncurry (env, senv) tyA e | open (envConcat env senv) tyA = do
   (tyA', _log) <- peek $ infer (envConcat env senv) CEmpty e
   (senv', _log') <- peek $ ssubN (env, senv) tyA' tyA
-  tell ["[S-Dispatch-Open] " ++ logDispatch (env, senv) [tyA] [e] [tyA'] senv']
+  tell ["[UC-Infer] " ++ logInferUncurry (env, senv) tyA e tyA' senv']
   tell $ indentAll _log
   tell $ indentAll _log'
-  return (senv', [tyA'])
-dispatch (env, senv) [tyA] [e] | closed (envConcat env senv) tyA = do
+  return (senv', tyA')
+inferUncurry (env, senv) tyA e | closed (envConcat env senv) tyA = do
   grdA <- ground (envConcat env senv) tyA
   (_, _log) <- peek $ infer (envConcat env senv) (CFullType grdA) e
-  tell ["[S-Dispatch-Closed] " ++ logDispatch (env, senv) [tyA] [e] [tyA] senv]
+  tell ["[UC-Check] " ++ logInferUncurry (env, senv) tyA e tyA senv]
   tell $ indentAll _log
-  return (senv, [tyA])
-dispatch (env, senv) (tyA : tyAs) (e : es) | open (envConcat env senv) tyA = do
-  (tyA', _log) <- peek $ infer (envConcat env senv) CEmpty e
-  (senv', _log') <- peek $ ssubN (env, senv) tyA' tyA
-  ((senv'', tyAs'), _log'') <- peek $ dispatch (env, senv') tyAs es
-  tell ["[S-Dispatch-Cons-Open] " ++ logDispatch (env, senv) (tyA : tyAs) (e : es) (tyA' : tyAs') senv'']
-  tell $ indentAll _log
-  tell $ indentAll _log'
-  tell $ indentAll _log''
-  return (senv'', tyA' : tyAs')
-dispatch (env, senv) (tyA : tyAs) (e : es) | closed (envConcat env senv) tyA = do
-  grdA <- ground (envConcat env senv) tyA
-  (_, _log) <- peek $ infer (envConcat env senv) (CFullType grdA) e
-  ((senv', tyAs'), _log') <- peek $ dispatch (env, senv) tyAs es
-  tell ["[S-Dispatch-Cons-Closed] " ++ logDispatch (env, senv) (tyA : tyAs) (e : es) (tyA : tyAs') senv']
-  tell $ indentAll _log
-  tell $ indentAll _log'
-  return (senv', tyA : tyAs')
-dispatch _ _ _ = lift Nothing
+  return (senv, tyA)
+inferUncurry _ _ _ = lift Nothing
 
 sub :: (Env, Env) -> Typ -> Context -> WriterT Log Maybe (Env, Typ)
 -- sub (a1, a2) b c | trace ("sub " ++ show a1 ++ ";" ++ show a2 ++ " |- " ++ show b ++ " <: " ++ show c) False = undefined
@@ -281,7 +263,10 @@ sub (env, senv) (TArr tyA tyB) (CTerm e h) | open (envConcat env senv) tyA = do
   tell $ indentAll _log3
   return (senv2, TArr tyC tyD)
 sub (env, senv) (TUncurry tyAs tyB) (CUncurry es h) = do
-  ((senv', tyAs'), _log1) <- peek $ dispatch (env, senv) tyAs es
+  let foldFunc ((senv', tyAs'), logs) (tyA', e') = do
+        ((senv'', tyA''), log') <- peek $ inferUncurry (env, senv') tyA' e'
+        return ((senv'', tyAs' ++ [tyA'']), logs ++ log')
+  ((senv', tyAs'), _log1) <- foldM foldFunc ((senv, []), []) (zip tyAs es)
   ((senv'', tyB'), _log2) <- peek $ sub (env, senv') tyB h
   tell ["[S-Arr-UC] " ++ logSubFull (env, senv) (TUncurry tyAs tyB) (CUncurry es h) senv'' (TUncurry tyAs' tyB')]
   tell $ indentAll _log1

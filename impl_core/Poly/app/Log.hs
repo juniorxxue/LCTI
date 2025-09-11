@@ -21,8 +21,8 @@ logSub senv ty ctx = show senv ++ " ⊢ " ++ show ty ++ " <: " ++ show ctx ++ " 
 -- logSubFull :: (Env, Env) -> Typ -> Context -> Env -> Typ -> String
 -- logSubFull (env, senv) ty ctx envout ty' = show env ++ "; " ++ show senv ++ " ⊢ " ++ show ty ++ " <: " ++ show ctx ++ " ⊣ " ++ show envout ++ " ⇝ " ++ show ty'
 
-logDispatch :: (Env, Env) -> [Typ] -> [Trm] -> [Typ] -> Env -> String
-logDispatch (env, senv) tyAs tms tyAs' envout =
+logInferUncurry :: (Env, Env) -> Typ -> Trm -> Typ -> Env -> String
+logInferUncurry (env, senv) tyA e tyA' envout =
   grey
     ++ show env
     ++ "; "
@@ -31,12 +31,12 @@ logDispatch (env, senv) tyAs tms tyAs' envout =
     ++ show senv
     ++ reset
     ++ " ⊢ "
-    ++ show tyAs
+    ++ show tyA
     ++ " ⇉ "
-    ++ show tms
+    ++ show e
     ++ " ⇉ "
     ++ bold
-    ++ show tyAs'
+    ++ show tyA'
     ++ reset
     ++ " ⊣ "
     ++ red
