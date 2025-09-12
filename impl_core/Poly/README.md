@@ -2,6 +2,13 @@
 
 This directory contains a Haskell implementation of local contextual type inference. All the algorithmic rules are implemented. In addition, we have also added several types, including lists, product types, and the ST Monad. All the examples provided in the paper run in this implementation.
 
+### Changelog
+
+- Added syntax and typing rules for **uncurried** application;
+- Provided uncurried variants for all examples that do not involve partial application of the curried arguments; the corresponding uncurried type signatures are listed at the end of this README;
+- Verified that each uncurried example yields the same typing result as its curried counterpart (reproduce with `cabal run Poly -- Uncurry`);
+- Included the `const` example from Section 2.2.
+
 ### Building from Source
 
 * **Prerequisites**: [GHC](https://www.haskell.org/downloads/) and [Cabal](https://www.haskell.org/cabal/)
@@ -113,13 +120,14 @@ The table below summarizes every example used in the paper.
 | D3     | `runST argST`                          | `runST argST`                                        | ✅  | ✅             | `runST(argST)`                                                |
 | D4     | `app runST argST`                      | `app (runST @ Int) argST`                            | Ann | Ann            | `app(runST @Int, argST)`                                      |
 | D5     | `revapp argST runST`                   | `revapp argST (runST @ Int)`                         | Ann | Ann            | `revapp(argST, runST @Int)`                                   |
-| E1, E2 | `k h lst`/`k (\x. h x) lst`            | `k (/\a. \x : Int. h x @ a) lst`                     | Ann | -              | -                                                             |
-| E3     | `r (\x. \y. y)`                        | `r (/\ a. \x : a. /\ b. \y : b. y)`                  | Ann | -              | -                                                             |
+| E1, E2 | `k h lst`/`k (\x. h x) lst`            | `k (/\a. \x : Int. h x @ a) lst`                     | Ann | Ann            | `k(Λa. λx : Int. h(x) @ a)(lst)`                              |
+| E3     | `r (\x. \y. y)`                        | `r (/\ a. \x : a. /\ b. \y : b. y)`                  | Ann | Ann            | `r(Λa. λ(x : a). Λb. λ(y : b). y)`                            |
 | F5     | `auto id`                              | `auto id`                                            | ✅  | ✅             | `auto(id)`                                                    |
 | F6     | `cons (head ids) ids`                  | `cons (head ids) ids`                                | ✅  | ✅             | `cons(head(ids), ids)`                                        |
 | F7     | `head ids 3`                           | `head ids 3`                                         | ✅  | ✅             | `head(ids)(3)`                                                |
 | F8     | `choose (head ids)`                    | `choose (head ids)`                                  | ✅  | -              | -                                                             |
 | G1     | `(pair (\x. x) 1) : (Int -> Int, Int)` | `(pair (\x : Int. x) 1) : (Int -> Int, Int)`         | Ann | Ann            | `(pair(λ(x). x : (Int) → Int), 1) : ((Int) → Int) × Int`      |
+| Const  | `(Λa. Λb. λx : a. λy : b. x) 1 True`   | `(Λa. Λb. λx : a. λy : b. x) 1 True`                 | ✅  | ✅             | `(Λa. Λb. λ(x : a). λ(y : b). x)(1)(True)`                    |
 
 **Legend:**
 - ✅: successfully typed
@@ -173,3 +181,8 @@ The table below summarizes every example used in the paper.
 - `revapp : forall a b. (a, a -> b) -> b`
 - `runST : forall a. (forall b. ST b a) -> a`
 - `ids : [forall a. (a) -> a]`
+- `f : forall a. ((a) -> a) -> ([a]) -> a`
+- `h : (Int) -> (forall a. (a) -> a)`
+- `k : forall a. (a) -> ([a]) -> a`
+- `lst : [forall a. (Int) -> (a) -> a]`
+- `r : (forall a. (a) -> forall b. (b) -> b) -> Int`
