@@ -96,8 +96,8 @@ The table below summarizes every example used in the paper.
 | A10    | `poly id`                              | `poly id`                                            | ✅  | ✅             | `poly(id)`                                                    |
 | A11    | `poly (\x. x)`                         | `poly (/\a. \x. x)`                                  | Ann | Ann            | `poly(Λa. λ(x). x)`                                           |
 | A12    | `id poly (\x. x)`                      | `id poly (/\a. \x. x)`                               | Ann | Ann            | `id(poly)(Λa. λ(x). x)`                                       |
-| B1     | `\f. (f 1, f True)`                    | `\f : (forall a. a -> a). (f 1, f True)`             | Ann | Ann            | `λf : ∀a. (a) → a. (f(1), f(True))`                           |
-| B2     | `\xs. poly (head xs)`                  | `\xs : [forall a. a -> a]. poly (head xs)`           | Ann | Ann            | `λxs : [∀a. (a) → a]. poly(head(xs))`                         |
+| B1     | `\f. (f 1, f True)`                    | `\f : (forall a. a -> a). (f 1, f True)`             | Ann | Ann            | `λ(f : ∀a. (a) → a). (f(1), f(True))`                         |
+| B2     | `\xs. poly (head xs)`                  | `\xs : [forall a. a -> a]. poly (head xs)`           | Ann | Ann            | `λ(xs : [∀a. (a) → a]). poly(head(xs))`                       |
 | C1     | `length ids`                           | `length ids`                                         | ✅  | ✅             | `length(ids)`                                                 |
 | C2     | `tail ids`                             | `tail ids`                                           | ✅  | ✅             | `tail(ids)`                                                   |
 | C3     | `head ids`                             | `head ids`                                           | ✅  | ✅             | `head(ids)`                                                   |
