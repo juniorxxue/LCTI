@@ -6,7 +6,7 @@ module Main where
 import Control.Monad (foldM, forM_, when)
 import Control.Monad.Writer
 import DeBruijn
-import Debug.Trace
+-- import Debug.Trace
 import Examples (Example (..), examples, getExample, getExamplesInGroup)
 import Log
 import Syntax
