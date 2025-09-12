@@ -16,6 +16,7 @@ data Trm
   | Abs Trm
   | AbsAnn Typ Trm
   | AbsUncurry Int Trm
+  | AbsUncurryAnn [Typ] Trm
   | App Trm Trm
   | AppUncurry Trm [Trm]
   | Ann Trm Typ
@@ -49,6 +50,7 @@ instance Show Trm where
   showsPrec p (Abs t) = showParen (p > 0) $ showString "λ. " . shows t
   showsPrec p (AbsAnn ty t) = showParen (p > 0) $ showString "λ" . showString " : " . shows ty . showString ". " . shows t
   showsPrec p (AbsUncurry n t) = showParen (p > 0) $ showString "λ" . shows n . showString ". " . shows t
+  showsPrec p (AbsUncurryAnn ts t) = showParen (p > 0) $ showString "λ" . showString " : (" . showString (intercalate ", " $ map show ts) . showString "). " . shows t
   showsPrec p (App t1 t2) = showParen (p > 9) $ showsPrec 9 t1 . showString " " . showsPrec 10 t2
   showsPrec p (AppUncurry t ts) = showParen (p > 9) $ showsPrec 9 t . showString "(" . showString (intercalate ", " $ map show ts) . showString ")"
   showsPrec p (Ann t ty) = showParen (p > 1) $ showsPrec 1 t . showString " : " . shows ty

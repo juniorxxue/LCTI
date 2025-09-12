@@ -56,6 +56,7 @@ exampleGroups =
       ("Pair", ["Pair", "Pair (Fc translation 1)", "Pair (Fc translation 2)"]),
       ( "Uncurry",
         [ "A1 (Fc translation 1, uncurried)",
+          "A1 (Fc translation 2, uncurried)",
           "A2 (uncurried)",
           "A3 (uncurried)",
           "A3 (Fc translation, uncurried)",
@@ -285,6 +286,11 @@ examplesList =
       (TAbs $ TAbs $ AbsAnn (TVar 1) $ AbsAnn (TVar 0) $ Var 0)
       "Λa. Λb. λx : a. λy : b. y",
     Example
+      "A1 (Fc translation 2, uncurried)"
+      EEmpty
+      (TAbs $ TAbs $ AbsUncurryAnn [TVar 1, TVar 0] $ Var 0)
+      "Λa. Λb. λ(x : a, y : b). y",
+    Example
       "A2"
       (ETrm idTyp (ETrm chooseTyp EEmpty))
       (Var 1 `App` Var 0)
@@ -330,10 +336,15 @@ examplesList =
       (AbsUncurry 1 (App (Var 0) (Var 0)))
       "λ(x). x x",
     Example
-      "A4 (Fc translation, uncurried)"
+      "A4 (Fc translation 1, uncurried)"
       EEmpty
       (AbsUncurry 1 (AppUncurry (Var 0) [Var 0]) `Ann` autoTypUncurry)
-      "(λ(x). x(x)) : (∀a. a → a) → (∀a. a → a)",
+      "(λ(x). x(x)) : (∀a. (a) → a) → (∀a. (a) → a)",
+    Example
+      "A4 (Fc translation 2, uncurried)"
+      EEmpty
+      (AbsUncurryAnn [idTypUncurry] (AppUncurry (Var 0) [Var 0]))
+      "λ(x : ∀a. (a) → a). x(x)",
     Example
       "A5"
       (ETrm idTyp (ETrm autoTyp EEmpty))
@@ -409,6 +420,11 @@ examplesList =
       (ETrm chooseTypUncurry (ETrm idTypUncurry (ETrm auto'TypUncurry EEmpty)))
       (Var 0 `AppUncurry` [TAbs (AbsUncurry 1 (AbsUncurry 1 (Var 3 `AppUncurry` [Var 1 `AppUncurry` [Var 0]])) `Ann` TUncurry [idTypUncurry] (TUncurry [TVar 0] (TVar 0))), Var 2])
       "choose(Λa. λ(f). λ(x). id(f)(x) : (∀b. (b) → b) → (a) → a, auto')",
+    Example
+      "A8 (Fc translation 3, uncurried)"
+      (ETrm chooseTypUncurry (ETrm idTypUncurry (ETrm auto'TypUncurry EEmpty)))
+      (Var 0 `AppUncurry` [TAbs (AbsUncurryAnn [idTypUncurry] (Var 2 `AppUncurry` [Var 0 `TApp` TVar 0])), Var 2])
+      "choose(Λa. λ(f : ∀b. (b) → b). id(f @a), auto')",
     Example
       "A9"
       (ETrm (TForall $ TArr (TArr (TVar 0) (TVar 0)) $ TArr (TList (TVar 0)) (TVar 0)) (ETrm chooseTyp (ETrm idTyp (ETrm (TList idTyp) EEmpty))))
@@ -487,13 +503,13 @@ examplesList =
     Example
       "B1 (Fc translation 1, uncurried)"
       EEmpty
-      (AbsUncurry 1 (PairUncurry `AppUncurry` [Var 0 `AppUncurry` [LitInt 1], Var 0 `AppUncurry` [LitBool True]]) `Ann` (TUncurry [idTypUncurry] (TProd TInt TBool)))
+      (AbsUncurry 1 (PairUncurry `AppUncurry` [Var 0 `AppUncurry` [LitInt 1], Var 0 `AppUncurry` [LitBool True]]) `Ann` TUncurry [idTypUncurry] (TProd TInt TBool))
       "(λ(f). (f(1), f(True))) : (∀a. (a) → a) → Int × Bool",
     Example
       "B1 (Fc translation 2, uncurried)"
       EEmpty
-      (AbsAnn idTypUncurry (PairUncurry `AppUncurry` [Var 0 `AppUncurry` [LitInt 1], Var 0 `AppUncurry` [LitBool True]]))
-      "λf : ∀a. (a) → a. (f(1), f(True))",
+      (AbsUncurryAnn [idTypUncurry] (PairUncurry `AppUncurry` [Var 0 `AppUncurry` [LitInt 1], Var 0 `AppUncurry` [LitBool True]]))
+      "λ(f : ∀a. (a) → a). (f(1), f(True))",
     Example
       "B2"
       (ETrm polyTyp (ETrm headTyp EEmpty))
@@ -522,8 +538,8 @@ examplesList =
     Example
       "B2 (Fc translation 2, uncurried)"
       (ETrm polyTypUncurry (ETrm headTypUncurry EEmpty))
-      (AbsAnn (TList idTypUncurry) (Var 1 `AppUncurry` [Var 2 `AppUncurry` [Var 0]]))
-      "λxs : [∀a. (a) → a]. poly(head(xs))",
+      (AbsUncurryAnn [TList idTypUncurry] (Var 1 `AppUncurry` [Var 2 `AppUncurry` [Var 0]]))
+      "λ(xs : [∀a. (a) → a]). poly(head(xs))",
     Example
       "C1"
       (ETrm lengthTyp (ETrm (TList idTyp) EEmpty))
@@ -599,6 +615,11 @@ examplesList =
       (ETrm (TList idTypUncurry) EEmpty)
       (ConsUncurry `AppUncurry` [idTrmUncurry, Var 0])
       "cons(Λa. λ(x). x : (a) → a, ids)",
+    Example
+      "C6 (Fc translation 2, uncurried)"
+      (ETrm (TList idTypUncurry) EEmpty)
+      (ConsUncurry `AppUncurry` [TAbs (AbsUncurryAnn [TVar 0] (Var 0)), Var 0])
+      "cons(Λa. λ(x : a). x, ids)",
     Example
       "C7"
       (ETrm appendTyp (ETrm singleTyp (ETrm incTyp (ETrm idTyp EEmpty))))
@@ -720,6 +741,11 @@ examplesList =
       (Var 0 `AppUncurry` [AbsUncurry 1 (Var 2 `AppUncurry` [TAbs (Var 0 `TApp` TVar 0)]) `Ann` TUncurry [argSTTyp] TInt, Var 2])
       "app(λ(x). runST(Λa. x @a) : (∀a. ST a Int) → Int, argST)",
     Example
+      "D4 (Fc translation 2, uncurried)"
+      (ETrm appTypUncurry (ETrm runSTTypUncurry (ETrm argSTTyp EEmpty)))
+      (Var 0 `AppUncurry` [AbsUncurryAnn [argSTTyp] (Var 2 `AppUncurry` [TAbs (Var 0 `TApp` TVar 0)]), Var 2])
+      "app(λ(x : ∀a. ST a Int). runST(Λa. x @a), argST)",
+    Example
       "D4 (Fc translation 3, uncurried)"
       (ETrm appTypUncurry (ETrm runSTTypUncurry (ETrm argSTTyp EEmpty)))
       (Var 0 `AppUncurry` [Var 1 `TApp` TInt, Var 2])
@@ -839,7 +865,7 @@ examplesList =
     Example
       "Pair (Fc translation 2)"
       EEmpty
-      ((Pair `App` (AbsAnn TInt (Var 0)) `App` LitInt 1) `Ann` ((TInt `TArr` TInt) `TProd` TInt))
+      ((Pair `App` AbsAnn TInt (Var 0) `App` LitInt 1) `Ann` ((TInt `TArr` TInt) `TProd` TInt))
       "(Pair (λx : Int. x) 1) : (Int → Int) × Int",
     Example
       "Pair (uncurried)"
@@ -850,5 +876,20 @@ examplesList =
       "Pair (Fc translation 1, uncurried)"
       EEmpty
       ((PairUncurry `AppUncurry` [AbsUncurry 1 (Var 0) `Ann` TUncurry [TInt] TInt, LitInt 1]) `Ann` (([TInt] `TUncurry` TInt) `TProd` TInt))
-      "(Pair(λ(x). x : (Int) → Int), 1) : ((Int) → Int) × Int"
+      "(Pair(λ(x). x : (Int) → Int), 1) : ((Int) → Int) × Int",
+    Example
+      "Pair (Fc translation 2, uncurried)"
+      EEmpty
+      ((PairUncurry `AppUncurry` [AbsUncurryAnn [TInt] (Var 0), LitInt 1]) `Ann` (([TInt] `TUncurry` TInt) `TProd` TInt))
+      "(Pair(λ(x : Int). x, 1) : ((Int) → Int) × Int",
+    Example
+      "const3"
+      EEmpty
+      (TAbs (TAbs (AbsUncurryAnn [TVar 1] (AbsUncurryAnn [TVar 0] (Var 1)))))
+      "(Λa. Λb. λ(x : a). λ(y : b). x)",
+    Example
+      "const3-app"
+      EEmpty
+      (TAbs (TAbs (AbsUncurryAnn [TVar 1] (AbsUncurryAnn [TVar 0] (Var 1)))) `AppUncurry` [LitInt 1] `AppUncurry` [LitBool True])
+      "(Λa. Λb. λ(x : a). λ(y : b). x)(1)(true)"
   ]

@@ -360,23 +360,40 @@ infer env (CTerm tm2 h) (Abs tm) = do
   tell $ indentAll _log1
   tell $ indentAll _log2
   return $ TArr tyA tyB
+infer env (CFullType (TArr tyA tyB)) (AbsAnn tyA' tm) | tyA == tyA' = do
+  (_, _log) <- peek $ infer (ETrm tyA env) (CFullType tyB) tm
+  tell ["[Ty-AbsAnn1] " ++ logInferFull env (CFullType (TArr tyA tyB)) (AbsAnn tyA' tm) (TArr tyA tyB)]
+  tell $ indentAll _log
+  return $ TArr tyA tyB
 infer env (CTerm tm2 h) (AbsAnn tyA tm) = do
   (_, _log1) <- peek $ infer env (CFullType tyA) tm2
   (tyB, _log2) <- peek $ infer (ETrm tyA env) (shiftContext0 h) tm
-  tell ["[Ty-AbsAnn] " ++ logInferFull env (CTerm tm2 h) (AbsAnn tyA tm) (TArr tyA tyB)]
+  tell ["[Ty-AbsAnn2] " ++ logInferFull env (CTerm tm2 h) (AbsAnn tyA tm) (TArr tyA tyB)]
   tell $ indentAll _log1
   tell $ indentAll _log2
   return $ TArr tyA tyB
-infer env (CFullType (TArr tyA tyB)) (AbsAnn tyA' tm) | tyA == tyA' = do
-  (_, _log) <- peek $ infer (ETrm tyA env) (CFullType tyB) tm
-  tell ["[Ty-AbsAnn-Chk] " ++ logInferFull env (CFullType (TArr tyA tyB)) (AbsAnn tyA' tm) (TArr tyA tyB)]
-  tell $ indentAll _log
-  return $ TArr tyA tyB
 infer env CEmpty (AbsAnn tyA tm) = do
   (tyB, _log) <- peek $ infer (ETrm tyA env) CEmpty tm
-  tell ["[Ty-AbsAnn] " ++ logInferFull env CEmpty (AbsAnn tyA tm) tyB]
+  tell ["[Ty-AbsAnn3] " ++ logInferFull env CEmpty (AbsAnn tyA tm) tyB]
   tell $ indentAll _log
   return $ TArr tyA tyB
+infer env (CFullType (TUncurry tyAs tyB)) (AbsUncurryAnn tyAs' tm) | all (uncurry (==)) (zip tyAs tyAs') = do
+  (_, _log) <- peek $ infer (foldl (flip ETrm) env tyAs) (CFullType tyB) tm
+  tell ["[Ty-AbsAnn-UC1] " ++ logInferFull env (CFullType (TUncurry tyAs tyB)) (AbsUncurryAnn tyAs' tm) (TUncurry tyAs tyB)]
+  tell $ indentAll _log
+  return $ TUncurry tyAs tyB
+infer env (CUncurry tm2s h) (AbsUncurryAnn tyAs tm) | length tyAs == length tm2s = do
+  (_, _log1) <- peek $ mapM (\(tyA, tm2) -> infer env (CFullType tyA) tm2) (zip tyAs tm2s)
+  (tyB, _log2) <- peek $ infer (foldl (flip ETrm) env tyAs) (iterate shiftContext0 h !! length tyAs) tm
+  tell ["[Ty-AbsAnn-UC2] " ++ logInferFull env (CUncurry tm2s h) (AbsUncurryAnn tyAs tm) (TUncurry tyAs tyB)]
+  tell $ indentAll _log1
+  tell $ indentAll _log2
+  return $ TUncurry tyAs tyB
+infer env CEmpty (AbsUncurryAnn tyAs tm) = do
+  (tyB, _log) <- peek $ infer (foldl (flip ETrm) env tyAs) CEmpty tm
+  tell ["[Ty-AbsAnn-UC3] " ++ logInferFull env CEmpty (AbsUncurryAnn tyAs tm) tyB]
+  tell $ indentAll _log
+  return $ TUncurry tyAs tyB
 infer env (CFullType (TUncurry ts tyB)) (AbsUncurry n tm) | n == length ts = do
   (tyC, _log) <- peek $ infer (foldl (flip ETrm) env ts) (CFullType tyB) tm
   tell ["[Ty-Abs-UC1] " ++ logInferFull env (CFullType (TUncurry ts tyB)) (AbsUncurry n tm) (TUncurry ts tyC)]
