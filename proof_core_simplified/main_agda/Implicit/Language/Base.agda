@@ -19,7 +19,6 @@ data Type : ℕ → Set where
   _`→_   : (A : Type m) → (B : Type m) → Type m
   `∀_    : (A : Type (1 + m)) → Type m
 
-
 variable
   A  B  C  D  E  T  : Type m
   A% B% C% D% E% T% : Type m
@@ -81,25 +80,22 @@ variable
             → X ≡ Y
 ‶-injective refl = refl
 
-infixr 9 𝕥₍_₎_
-data Counter : ℕ → Set where
-  Z : Counter m
-  ∞ : Counter m
-  𝕚 : Counter m → Counter m
-  𝕔 : Counter m → Counter m
-  𝕥₍_₎_ : Type m → Counter m → Counter m
+data Counter : Set where
+  Z : Counter
+  ∞ : Counter
+  𝕚 : Counter → Counter
+  𝕔 : Counter → Counter
 
 variable
-  j j′ j″  : Counter m
-  j' j'' : Counter m
+  j j′ j″  : Counter
+  j' j'' : Counter
 
-data NonZ : Counter m → Set where
-  nz-∞ : NonZ (Counter m ∋⦂ ∞)
+data NonZ : Counter → Set where
+  nz-∞ : NonZ ∞
   nz-I : NonZ (𝕚 j)
   nz-C : NonZ (𝕔 j)
-  nz-T : NonZ (𝕥₍ A ₎ j)
 
-data 𝕚𝕔 : Counter m → Set where
+data 𝕚𝕔 : Counter → Set where
   case-𝕚 : 𝕚𝕔 (𝕚 j)
   case-𝕔 : 𝕚𝕔 (𝕔 j)
 
