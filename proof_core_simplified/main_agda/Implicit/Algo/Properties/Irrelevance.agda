@@ -254,7 +254,7 @@ t-irrev (⊢lam₂ ⊢e up-c ⊢e₁) tf = ⊢lam₂ (t-irrev ⊢e tf) up-c (t-i
 t-irrev (⊢sub ⊢e ne gc s) tf = ⊢sub (t-irrev ⊢e tf) ne gc (s-irrev s (mark tf))
 t-irrev (⊢tabs ⊢e) tf = ⊢tabs (t-irrev ⊢e (uvar tf))
 t-irrev {e = Λ e} (⊢tabs-τ x₁) x = ⊢tabs-τ (t-irrev x₁ (uvar x))
-t-irrev (⊢tapp ⊢e st) tf = ⊢tapp (t-irrev ⊢e tf) st
+t-irrev (⊢tapp ⊢e regA st s) tf = ⊢tapp (t-irrev ⊢e tf) regA (⇌-⊢r st tf) (s-irrev s (mark tf))
 
 s-irrev (s-empty regΓ cloA x) tf with refl ← ⇌s-eq tf = s-empty (⇌s-sregular-l regΓ tf) (⇌s-⊢c-l cloA tf) (⇌s-≫-l x tf)
 s-irrev (s-type ss) tf = s-type (ss-irrev ss tf)
@@ -263,9 +263,7 @@ s-irrev (s-term-o opnA ⊢e ss s) tf with ⇌s-Ω (ss-⊆ ss) tf
 ... | ⟨ Ω' , tf' ⟩ = s-term-o (⇌s-⊢o-l opnA tf) (t-irrev ⊢e (⇌s-⇌-l tf)) (ss-irrev ss tf') (s-irrev s (⇌s-arr tf tf' (s-⊆ s)))
 s-irrev (s-∀l s upᶜ upᵉ upC upD) tf = s-∀l (s-irrev s (evar-sol tf)) upᶜ upᵉ upC upD
 s-irrev (s-∀l-no s upᶜ upᵉ upC upD) tf = s-∀l-no (s-irrev s (evar tf)) upᶜ upᵉ upC upD
-s-irrev (s-tapp s upᶜ) tf = s-tapp (s-irrev s (svar tf)) upᶜ
 s-irrev (s-svar-term inΓ s) tf with refl ← ⇌s-eq tf = s-svar-term (⇌s-∋:=-l inΓ tf) (s-irrev s tf)
-s-irrev (s-svar-tapp inΓ s) tf with refl ← ⇌s-eq tf = s-svar-tapp (⇌s-∋:=-l inΓ tf) (s-irrev s tf)
 s-irrev (s-evar-infers infs inst) tf = s-evar-infers (infs-irrev infs (⇌s-⇌-l tf)) (⇌s-inst tf inst)
 
 infs-irrev (infs-z regΓ regA) tf = infs-z (⇌-tregular regΓ tf) (⇌-⊢r regA tf)

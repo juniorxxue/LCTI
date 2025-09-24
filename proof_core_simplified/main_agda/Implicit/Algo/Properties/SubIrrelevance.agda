@@ -181,14 +181,9 @@ s-⊆-prv-gen {k = k} (s-∀l s upᶜ upᵉ upC upD) (opn-∀ opnA) exts
   with ext ← ⊆⊆-⊆-ll exts
   = s-∀l (s-⊆-prv-gen {k = #S k} s (⊢ok-◈0 opnA) (⊆-S^= exts (⊆-⊢r' regA ext))) upᶜ upᵉ upC upD
 s-⊆-prv-gen (s-∀l-no s upᶜ upᵉ upC upD) (opn-∀ opnA) exts = s-∀l-no (s-⊆-prv-gen s (⊢ok-◈0 opnA) (⊆-S^^ exts)) upᶜ upᵉ upC upD
-s-⊆-prv-gen (s-tapp s upᶜ) (opn-∀ opnA) exts
-  with reg-S= r regA ← s-env-in s = s-tapp (s-⊆-prv-gen s (⊢ok-∙⟹0 opnA regA) (⊆-S== exts regA)) upᶜ
 s-⊆-prv-gen (s-svar-term x s) (opn-var x₁) exts
   with ext ← ⊆⊆-⊆-l exts
   with refl ← ⊆⊆-one-input exts = s-svar-term (⊆-∋:= x ext) (s-⊆-prv-gen s (⊢r-⊢ok (∋:=-⊢r (s-env-in s) x)) exts)
-s-⊆-prv-gen (s-svar-tapp x s) (opn-var x₁) exts
-  with ext ← ⊆⊆-⊆-l exts
-  with refl ← ⊆⊆-one-input exts = s-svar-tapp (⊆-∋:= x ext) (s-⊆-prv-gen s (⊢r-⊢ok (∋:=-⊢r (s-env-in s) x)) exts)
 s-⊆-prv-gen (s-evar-infers infs inst) (opn-var x) exts
   with ext ← ⊆⊆-⊆-l exts = s-evar-infers (infs-irrev-⊆ infs ext) (⊆⊆-inst inst exts (⊢oˣ-∋^-#< x (inst-∋^ inst)))
 

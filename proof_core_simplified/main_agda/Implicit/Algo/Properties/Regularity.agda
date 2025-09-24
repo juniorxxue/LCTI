@@ -24,7 +24,7 @@ t-env (⊢tabs ⊢e) with t-env ⊢e
 ... | reg-S∙ r = r
 t-env (⊢tabs-τ ⊢e) with t-env ⊢e
 ... | reg-S∙ r = r
-t-env (⊢tapp ⊢e st) = t-env ⊢e
+t-env (⊢tapp ⊢e regA st s) = t-env ⊢e
 
 inst-env-in : [ A / X ] Γ ⟹ Δ
             → SRegular Γ
@@ -59,10 +59,7 @@ s-env-in (s-∀l s upᶜ upᵉ upC upD) with s-env-in s
 ... | reg-S^ r = r
 s-env-in (s-∀l-no s upᶜ upᵉ upC upD) with s-env-in s
 ... | reg-S^ r = r
-s-env-in (s-tapp s upᶜ) with s-env-in s
-... | reg-S= r regA = r
 s-env-in (s-svar-term inΓ s) = s-env-in s
-s-env-in (s-svar-tapp inΓ s) = s-env-in s
 s-env-in (s-evar-infers x inst) = inst-env-in inst
 
 s-env-out : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
@@ -88,9 +85,6 @@ data _⊢rᶜ_ : Env n m → Context n m → Set where
         → Γ ⊢rᶜ (τ A)
   ⊢rᶜ-term : Γ ⊢rᶜ Σ
            → Γ ⊢rᶜ [ e ]↝ Σ
-  ⊢rᶜ-tapp : (regA : Γ ⊢r A)
-           → Γ ⊢rᶜ Σ
-           → Γ ⊢rᶜ A ⓪↝ Σ
 
 ⊆-⊢rᶜ' : Δ ⊢rᶜ Σ
        → Γ ⊆ Δ
@@ -98,7 +92,6 @@ data _⊢rᶜ_ : Env n m → Context n m → Set where
 ⊆-⊢rᶜ' ⊢rᶜ-empty ext = ⊢rᶜ-empty
 ⊆-⊢rᶜ' (⊢rᶜ-τ regA) ext = ⊢rᶜ-τ (⊆-⊢r' regA ext)
 ⊆-⊢rᶜ' (⊢rᶜ-term regΣ) ext = ⊢rᶜ-term (⊆-⊢rᶜ' regΣ ext)
-⊆-⊢rᶜ' (⊢rᶜ-tapp regA regΓ) ext = ⊢rᶜ-tapp (⊆-⊢r' regA ext) (⊆-⊢rᶜ' regΓ ext)
 
 ⊢rᶜ-strengthen^0 : Γ ,^ ⊢rᶜ Σ'
                  → ↑tyᶜ0 Σ ⇘ Σ'
@@ -106,7 +99,6 @@ data _⊢rᶜ_ : Env n m → Context n m → Set where
 ⊢rᶜ-strengthen^0 ⊢rᶜ-empty ↑tyᶜ-□ = ⊢rᶜ-empty
 ⊢rᶜ-strengthen^0 (⊢rᶜ-τ regA) (↑tyᶜ-τ up-t) = ⊢rᶜ-τ (⊢r-strengthen^0 regA up-t)
 ⊢rᶜ-strengthen^0 (⊢rᶜ-term regΣ) (↑tyᶜ-e up-e upΣ) = ⊢rᶜ-term (⊢rᶜ-strengthen^0 regΣ upΣ)
-⊢rᶜ-strengthen^0 (⊢rᶜ-tapp regA regΣ) (↑tyᶜ-⓪ upA upΣ) = ⊢rᶜ-tapp (⊢r-strengthen^0 regA upA) (⊢rᶜ-strengthen^0 regΣ upΣ)
 
 
 ⊢rᶜ-strengthen=0 : Γ ,= T ⊢rᶜ Σ'
@@ -115,7 +107,6 @@ data _⊢rᶜ_ : Env n m → Context n m → Set where
 ⊢rᶜ-strengthen=0 ⊢rᶜ-empty ↑tyᶜ-□ = ⊢rᶜ-empty
 ⊢rᶜ-strengthen=0 (⊢rᶜ-τ regA) (↑tyᶜ-τ up-t) = ⊢rᶜ-τ (⊢r-strengthen=0 regA up-t)
 ⊢rᶜ-strengthen=0 (⊢rᶜ-term regΣ) (↑tyᶜ-e up-e upΣ) = ⊢rᶜ-term (⊢rᶜ-strengthen=0 regΣ upΣ)
-⊢rᶜ-strengthen=0 (⊢rᶜ-tapp regA regΣ) (↑tyᶜ-⓪ upA upΣ) = ⊢rᶜ-tapp (⊢r-strengthen=0 regA upA) (⊢rᶜ-strengthen=0 regΣ upΣ)
 
 ⊢rᶜ-strengthen,0 : Γ , A ⊢rᶜ Σ'
                  → ↑tmᶜ0 Σ ⇘ Σ'
@@ -123,21 +114,18 @@ data _⊢rᶜ_ : Env n m → Context n m → Set where
 ⊢rᶜ-strengthen,0 ⊢rᶜ-empty ↑tmᶜ-□ = ⊢rᶜ-empty
 ⊢rᶜ-strengthen,0 (⊢rᶜ-τ regA) ↑tmᶜ-τ = ⊢rᶜ-τ (⊢r-strengthen,0 regA)
 ⊢rᶜ-strengthen,0 (⊢rᶜ-term regΣ) (↑tmᶜ-e up-e upΣ) = ⊢rᶜ-term (⊢rᶜ-strengthen,0 regΣ upΣ)
-⊢rᶜ-strengthen,0 (⊢rᶜ-tapp regA regΣ) (↑tmᶜ-⓪ upΣ) = ⊢rᶜ-tapp (⊢r-strengthen,0 regA) (⊢rᶜ-strengthen,0 regΣ upΣ)
 
 ⊢rᶜ-⋈ : Γ ⋈ ⊢rᶜ Σ
       → Γ ⊢rᶜ Σ
 ⊢rᶜ-⋈ ⊢rᶜ-empty = ⊢rᶜ-empty
 ⊢rᶜ-⋈ (⊢rᶜ-τ regA) = ⊢rᶜ-τ (⊢r-𝕣' regA)
 ⊢rᶜ-⋈ (⊢rᶜ-term reg) = ⊢rᶜ-term (⊢rᶜ-⋈ reg)
-⊢rᶜ-⋈ (⊢rᶜ-tapp regA regΓ) = ⊢rᶜ-tapp (⊢r-𝕣' regA) (⊢rᶜ-⋈ regΓ)
 
 ⊢rᶜ-𝕣 : 𝕣 Γ ⊢rᶜ Σ
       → Γ ⊢rᶜ Σ
 ⊢rᶜ-𝕣 ⊢rᶜ-empty = ⊢rᶜ-empty
 ⊢rᶜ-𝕣 (⊢rᶜ-τ regA) = ⊢rᶜ-τ (⊢r-𝕣 regA)
 ⊢rᶜ-𝕣 (⊢rᶜ-term regΣ) = ⊢rᶜ-term (⊢rᶜ-𝕣 regΣ)
-⊢rᶜ-𝕣 (⊢rᶜ-tapp regA regΣ) = ⊢rᶜ-tapp (⊢r-𝕣 regA) (⊢rᶜ-𝕣 regΣ)
 
 infs-⊢rᶜ : Γ ⊨ Σ ⟹ A
          → Γ ⊢rᶜ Σ
@@ -154,10 +142,7 @@ s-⊢rᶜ (s-∀l s upᶜ upᵉ upC upD) with s-⊢rᶜ s
 ... | ⊢rᶜ-term r = ⊢rᶜ-term (⊢rᶜ-strengthen^0 r upᶜ)
 s-⊢rᶜ (s-∀l-no s upᶜ upᵉ upC upD) with s-⊢rᶜ s
 ... | ⊢rᶜ-term r = ⊢rᶜ-term (⊢rᶜ-strengthen^0 r upᶜ)
-s-⊢rᶜ (s-tapp s upᶜ) with s-env-in s
-... | reg-S= r regA = ⊢rᶜ-tapp regA (⊢rᶜ-strengthen=0 (s-⊢rᶜ s) upᶜ)
 s-⊢rᶜ (s-svar-term inΓ s) = s-⊢rᶜ s
-s-⊢rᶜ (s-svar-tapp inΓ s) = s-⊢rᶜ s
 s-⊢rᶜ (s-evar-infers tfs inst) with infs-⊢rᶜ tfs
 ... | ⊢rᶜ-term r = ⊢rᶜ-term (⊢rᶜ-𝕣 r)
 
@@ -175,10 +160,9 @@ t-⊢rᶜ (⊢lam₁ ⊢e)
 t-⊢rᶜ (⊢lam₂ ⊢e up-c ⊢e₁) = ⊢rᶜ-term (⊢rᶜ-strengthen,0 (t-⊢rᶜ ⊢e₁) up-c)
 t-⊢rᶜ (⊢sub ⊢e ne gc s) = ⊢rᶜ-⋈ (s-⊢rᶜ s)
 t-⊢rᶜ (⊢tabs ⊢e) = ⊢rᶜ-empty
-t-⊢rᶜ (⊢tapp ⊢e st) with t-⊢rᶜ ⊢e
-... | ⊢rᶜ-tapp regA regΓ = regΓ
 t-⊢rᶜ (⊢tabs-τ ⊢e) with t-⊢rᶜ ⊢e
 ... | ⊢rᶜ-τ regA = ⊢rᶜ-τ (⊢r-∀ regA)
+t-⊢rᶜ (⊢tapp ⊢e st regA s) = ⊢rᶜ-⋈ (s-⊢rᶜ s)
 
 s-⊢r : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B
      → Γ ⊢r B
@@ -193,9 +177,7 @@ s-⊢r (s-term-c cloA ap ⊢e s) = ⊢r-arr (⊢c-≫-⊢r (s-env-in s) cloA ap)
 s-⊢r (s-term-o opnA ⊢e ss s) = ⊢r-arr (⊢r-𝕣 (t-⊢r ⊢e)) (⊆-⊢r' (s-⊢r s) (ss-⊆ ss))
 s-⊢r (s-∀l s upᶜ upᵉ upC upD) = ⊢r-strengthen^0 (s-⊢r s) (↑ty-arr upC upD)
 s-⊢r (s-∀l-no s upᶜ upᵉ upC upD) = ⊢r-strengthen^0 (s-⊢r s) (↑ty-arr upC upD)
-s-⊢r (s-tapp s upᶜ) = ⊢r-∀ (⊢r-◆0 (s-⊢r s))
 s-⊢r (s-svar-term inΓ s) = s-⊢r s
-s-⊢r (s-svar-tapp inΓ s) = s-⊢r s
 s-⊢r (s-evar-infers tfs inst) = ⊢r-𝕣 (infs-⊢r tfs)
 
 t-⊢r (⊢lit regΓ) = ⊢r-int
@@ -208,9 +190,8 @@ t-⊢r (⊢lam₁ ⊢e) with t-env ⊢e
 t-⊢r (⊢lam₂ ⊢e up-c ⊢e₁) = ⊢r-arr (t-⊢r ⊢e) (⊢r-strengthen,0 (t-⊢r ⊢e₁))
 t-⊢r (⊢sub ⊢e ne gc s) = ⊢r-𝕣' (s-⊢r s)
 t-⊢r (⊢tabs ⊢e) = ⊢r-∀ (t-⊢r ⊢e)
-t-⊢r (⊢tapp ⊢e st) with t-⊢rᶜ ⊢e
-... | ⊢rᶜ-tapp regA regΓ = st0-⊢r (t-⊢r ⊢e) regA st
 t-⊢r (⊢tabs-τ ⊢e) = ⊢r-∀ (t-⊢r ⊢e)
+t-⊢r (⊢tapp ⊢e st regA s) = ⊢r-𝕣' (s-⊢r s)
 
 infs-⊢r (infs-z regΓ regA) = regA
 infs-⊢r (infs-s x infs) = ⊢r-arr (t-⊢r x) (infs-⊢r infs)
@@ -243,9 +224,7 @@ s-⊢c (s-term-c cloA ap ⊢e s) = ⊢c-arr (⊆-⊢c cloA (s-⊆ s)) (s-⊢c s)
 s-⊢c (s-term-o opnA ⊢e ss s) = ⊢c-arr (⊆-⊢c (ss--⊢c ss) (s-⊆ s)) (s-⊢c s)
 s-⊢c (s-∀l s upᶜ upᵉ upC upD) = ⊢c-∀ (⊢c-◆0 (s-⊢c s))
 s-⊢c (s-∀l-no s upᶜ upᵉ upC upD) = ⊢c-∀ (⊢c-◇0 (s-⊢c s))
-s-⊢c (s-tapp s upᶜ) = ⊢c-∀ (⊢c-◆0 (s-⊢c s))
 s-⊢c (s-svar-term x s) = ⊢c-var-= (∋:=to∋= x)
-s-⊢c (s-svar-tapp x s) = ⊢c-var-= (∋:=to∋= x)
 s-⊢c (s-evar-infers infs inst) = ⊢c-var-= (inst-∋= inst)
 
 
@@ -261,7 +240,5 @@ s-⊆/ (s-term-c cloA ap ⊢e s) = ext-arr (⊆/-refl (s-env-in s) cloA) (s-⊆/
 s-⊆/ (s-term-o opnA ⊢e ss s) = ext-arr (ss--⊆/ ss) (s-⊆/ s)
 s-⊆/ (s-∀l s upᶜ upᵉ upC upD) = ext-∀ (⊆/-◇◆0 (s-⊆/ s))
 s-⊆/ (s-∀l-no s upᶜ upᵉ upC upD) = ext-∀ (⊆/-◇◇0 (s-⊆/ s))
-s-⊆/ (s-tapp s upᶜ) = ext-∀ (⊆/-◆◆0 (s-⊆/ s))
 s-⊆/ (s-svar-term x s) = ⊆/-refl (s-env-in s) (⊢c-var-= (∋:=to∋= x))
-s-⊆/ (s-svar-tapp x s) = ⊆/-refl (s-env-in s) (⊢c-var-= (∋:=to∋= x))
 s-⊆/ (s-evar-infers infs inst) = ext-var (inst-⊆/x inst)

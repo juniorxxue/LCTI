@@ -102,9 +102,11 @@ data _⊢_⇒_⇒_ where
     → Γ ⊢ τ (`∀ B) ⇒ Λ e ⇒ `∀ A
 
   ⊢tapp :
-      Γ ⊢ A ⓪↝ Σ ⇒ e ⇒ `∀ B
+      Γ ⊢ □ ⇒ e ⇒ `∀ B
     → (st : ⟦ A ⟧ B ⇘ B*)
-    → Γ ⊢ Σ ⇒ e ⓪ A ⇒ B*
+    → (regA : Γ ⊢r A)
+    → (s : Γ ⋈ ⊢ B* ≤⁺ Σ ⊣ Γ ⋈ ↪ C)
+    → Γ ⊢ Σ ⇒ e ⓪ A ⇒ C
 
 data _⊢_≤⁺_⊣_↪_ where
 
@@ -148,20 +150,10 @@ data _⊢_≤⁺_⊣_↪_ where
     → (upD : ↑ty0 D ⇘ D')
     → Δ ⊢ `∀ A ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ C `→ D
 
-  s-tapp :
-      Δ ,= B ⊢ A ≤⁺ Σ' ⊣ Ψ ,= B ↪ C
-    → (upᶜ : ↑tyᶜ0 Σ ⇘ Σ')
-    → Δ ⊢ `∀ A ≤⁺ (B ⓪↝ Σ) ⊣ Ψ ↪ `∀ C
-
   s-svar-term :
       Δ ∋ X := A
     → Δ ⊢ A ≤⁺ ([ e ]↝ Σ) ⊣ Δ ↪ B `→ C
     → Δ ⊢ ‶ X ≤⁺ ([ e ]↝ Σ) ⊣ Δ ↪ B `→ C
-
-  s-svar-tapp :
-      Δ ∋ X := A
-    → Δ ⊢ A ≤⁺ (B ⓪↝ Σ) ⊣ Δ ↪ `∀ C
-    → Δ ⊢ ‶ X ≤⁺ (B ⓪↝ Σ) ⊣ Δ ↪ `∀ C
 
   s-evar-infers :
       (infs : 𝕣 Δ ⊨ [ e ]↝ Σ ⟹ A)
