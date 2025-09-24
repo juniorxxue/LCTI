@@ -7,7 +7,7 @@ open import Implicit.Language.All
 ----------------------------------------------------------------------
 
 infix 3 _⊢_#_⌞_⌝_
-data _⊢_#_⌞_⌝_ : Env n m → Counter m → Type m → Polar → Type m → Set where
+data _⊢_#_⌞_⌝_ : Env n m → Counter → Type m → Polar → Type m → Set where
   s-refl :
       (regΔ : SRegular Δ)
     → (cloA : Δ ⊢c A)
@@ -37,25 +37,20 @@ data _⊢_#_⌞_⌝_ : Env n m → Counter m → Type m → Polar → Type m →
       Δ ,∙ ⊢ ∞ # A ⌞ ≤ ⌝ B
     → Δ ⊢ ∞ # `∀ A ⌞ ≤ ⌝ `∀ B
   s-∀l :
-      Δ ,= B ⊢ j' # A ⌞ ≤⁺ ⌝ C' `→ D'
+      Δ ,= B ⊢ j # A ⌞ ≤⁺ ⌝ C' `→ D'
     → (ic : (𝕚𝕔 j))
-    → (fd : find A #0 j')
+    → (fd : find A #0 j)
     → (upC : ↑ty0 C ⇘ C')
     → (upD : ↑ty0 D ⇘ D')
-    → (upj : ↑tyʲ0 j ⇘ j')
     → Δ ⊢ j # `∀ A ⌞ ≤⁺ ⌝ C `→ D
   s-∀l-no-appear :
-      Δ ,^ ⊢ j' # A ⌞ ≤⁺ ⌝ C' `→ D'
+      Δ ,^ ⊢ j # A ⌞ ≤⁺ ⌝ C' `→ D'
     → (ic : (𝕚𝕔 j))
     → (fd : #0 ¬ε A)
     → (upC : ↑ty0 C ⇘ C')
     → (upD : ↑ty0 D ⇘ D')
-    → (upj : ↑tyʲ0 j ⇘ j')
     → Δ ⊢ j # `∀ A ⌞ ≤⁺ ⌝ C `→ D
-  s-tapp :
-      Δ ,= B ⊢ j' # A ⌞ ≤⁺ ⌝ C
-    → (upj : ↑tyʲ0 j ⇘ j')
-    → Δ ⊢ 𝕥₍ B ₎ j # `∀ A ⌞ ≤⁺ ⌝ `∀ C
+
   -- two atomic rules
   s-svar-l : ∀ {X A}
     → (SRegular Δ)
@@ -73,10 +68,6 @@ data _⊢_#_⌞_⌝_ : Env n m → Counter m → Type m → Polar → Type m →
       Δ ∋ X := C
     → Δ ⊢ (𝕔 j) # C ⌞ ≤⁺ ⌝ A `→ B
     → Δ ⊢ (𝕔 j) # ‶ X ⌞ ≤⁺ ⌝ A `→ B
-  s-svar-𝕥 :
-      Δ ∋ X := B
-    → Δ ⊢ (𝕥₍ A ₎ j) # B ⌞ ≤⁺ ⌝ `∀ C
-    → Δ ⊢ (𝕥₍ A ₎ j) # ‶ X ⌞ ≤⁺ ⌝ `∀ C
 
 s-refl-∞ : SRegular Γ
          → Γ ⊢r A
@@ -91,7 +82,7 @@ s-refl-∞ regΓ (⊢r-∀ regA) = s-∀ (s-refl-∞ (reg-S∙ regΓ) regA)
 ----------------------------------------------------------------------
 
 infix 3 _⊢_#_⦂_
-data _⊢_#_⦂_ : Env n m → Counter m → Term n m → Type m → Set where
+data _⊢_#_⦂_ : Env n m → Counter → Term n m → Type m → Set where
   ⊢lit : ∀ {num : ℕ}
     → (regΓ : TRegular Γ)
     → Γ ⊢ Z # (lit num) ⦂ Int
@@ -128,6 +119,8 @@ data _⊢_#_⦂_ : Env n m → Counter m → Term n m → Type m → Set where
   ⊢tabs-∞ :
       Γ ,∙ ⊢ ∞ # e ⦂ A
     → Γ ⊢ ∞ # Λ e ⦂ `∀ A
-  ⊢tapp : Γ ⊢ 𝕥₍ A ₎ j # e ⦂ `∀ B
+  ⊢tapp : Γ ⊢ Z # e ⦂ `∀ B
+        → (regA : Γ ⊢r A)
         → (st : ⟦ A ⟧ B ⇘ B*)
-        → Γ ⊢ j # e ⓪ A ⦂ B*
+        → (s : Γ ⋈ ⊢ j # B* ⌞ ≤⁺ ⌝ C)
+        → Γ ⊢ j # e ⓪ A ⦂ C
