@@ -74,9 +74,8 @@ s-sound (s-arr₁ s s₁) = if-arr (s-sound s) (s-sound s₁)
 s-sound (s-arr₂ s s₁) = if-arr (s-sound s) (s-sound s₁)
 s-sound (s-arr₃ regA s) = if-arr if-refl (s-sound s)
 s-sound (s-∀ s) = if-∀ (s-sound s)
-s-sound (s-∀l regB st s ic fd upj) = if-∀L st regB (s-sound s)
+s-sound (s-∀l regB st s ic fd) = if-∀L st regB (s-sound s)
 s-sound (s-∀l-no-appear regB st s ic fd) = if-∀L st regB (s-sound s)
-s-sound (s-tapp regB st s upC) = if-∀L st regB (if-trans (s-sound s) (if-∀R if-refl upC))
 
 sound : Γ ⊢d j # e ⦂ A
       → Erasure e M
@@ -91,4 +90,4 @@ sound (⊢app₂ ⊢e ⊢e₁) (era-app era era₁) = ela-app (sound ⊢e era) (
 sound (⊢sub ⊢e B≤A gc j≢Z) era = ela-sub (sound ⊢e era) (s-sound B≤A)
 sound (⊢tabs ⊢e) (era-tlam era) = ela-∀i (sound ⊢e era)
 sound (⊢tabs-∞ ⊢e) (era-tlam era) = ela-∀i (sound ⊢e era)
-sound (⊢tapp ⊢e st) (era-tapp era) = ela-sub (sound ⊢e era) (if-∀L st ⊢r-int if-refl)
+sound (⊢tapp ⊢e regA st s) (era-tapp era) = ela-sub (sound ⊢e era) (if-∀L st (⊢r-𝕣 regA) (s-sound s))

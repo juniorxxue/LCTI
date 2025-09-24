@@ -1,16 +1,15 @@
 module Implicit.Annotatability.IF where
 
 open import Implicit.Language.All
--- open import Implicit.Decl.All
 open import Implicit.Annotatability.DeclPartial
 open import Implicit.Decl.Subtyping
 open import Implicit.Annotatability.Elaboration
 
 private variable
-  𝕛 𝕛' : Counter m
+  𝕛 𝕛' : Counter
 
 infix 3 _⊢_⟾_
-data _⊢_⟾_ : Env n m → Counter m × Type m → Counter m × Type m → Set where
+data _⊢_⟾_ : Env n m → Counter × Type m → Counter × Type m → Set where
 
   base : Γ ⊢ A 𝕄 B
        → Γ ⊢ ⟨ ∞ , A ⟩ ⟾ ⟨ 𝕚 ∞ , B ⟩
@@ -72,24 +71,22 @@ data _⊢_⟾_ : Env n m → Counter m × Type m → Counter m × Type m → Set
 
 
 ⟾-weaken^0 : Γ ⊢ ⟨ j , A ⟩ ⟾ ⟨ 𝕛 , B ⟩
-            → ↑tyʲ0 j ⇘ j'
-            → ↑tyʲ0 𝕛 ⇘ 𝕛'
             → ↑ty0 A ⇘ A'
             → ↑ty0 B ⇘ B'
-            → Γ ,^ ⊢ ⟨ j' , A' ⟩ ⟾ ⟨ 𝕛' , B' ⟩
+            → Γ ,^ ⊢ ⟨ j , A' ⟩ ⟾ ⟨ 𝕛 , B' ⟩
+⟾-weaken^0 (base x) upA upB = base (𝕄-weaken^0 x upA upB)
+⟾-weaken^0 (case-𝕚 cv) (↑ty-arr upA upA₁) (↑ty-arr upB upB₁)
+  with refl ← ↑ty-unique upA upB = case-𝕚 (⟾-weaken^0 cv upA₁ upB₁)
+⟾-weaken^0 (case-𝕔 cv) (↑ty-arr upA upA₁) (↑ty-arr upB upB₁)
+  with refl ← ↑ty-unique upA upB = case-𝕔 (⟾-weaken^0 cv upA₁ upB₁)
 
-⟾-weaken^0 (base x) ↑tyʲ-∞ (↑tyʲ-𝕚 ↑tyʲ-∞) upA upB = base (𝕄-weaken^0 x upA upB)
-⟾-weaken^0 (case-𝕚 cv) (↑tyʲ-𝕚 upj) (↑tyʲ-𝕚 up𝕛) (↑ty-arr upA upA₁) (↑ty-arr upB upB₁)
-  with refl ← ↑ty-unique upA upB = case-𝕚 (⟾-weaken^0 cv upj up𝕛 upA₁ upB₁)
-⟾-weaken^0 (case-𝕔 cv) (↑tyʲ-𝕔 upj) (↑tyʲ-𝕔 up𝕛) (↑ty-arr upA upA₁) (↑ty-arr upB upB₁)
-  with refl ← ↑ty-unique upA upB = case-𝕔 (⟾-weaken^0 cv upj up𝕛 upA₁ upB₁)
 
 find-iso-gen : k ε A
              → find A k (𝕚 ∞)
 find-iso-gen ε-var = f-iso i∞-z
 find-iso-gen (ε-arr-l inA) = f-arr-𝕚-l inA
 find-iso-gen (ε-arr-r ¬inA inA) = f-arr-𝕚-r ¬inA (f-∞ inA)
-find-iso-gen (ε-∀ inA) = f-∀-𝕚 (find-iso-gen inA) ↑tyʲ-∞
+find-iso-gen (ε-∀ inA) = f-∀-𝕚 (find-iso-gen inA)
 
 ⟾-find : find A k j
         → Γ ⊢ ⟨ j , B ⟩ ⟾ ⟨ 𝕛 , C ⟩
@@ -99,14 +96,12 @@ find-iso-gen (ε-∀ inA) = f-∀-𝕚 (find-iso-gen inA) ↑tyʲ-∞
 ⟾-find (f-arr-𝕚-l x) (case-𝕚 cv) = f-arr-𝕚-l x
 ⟾-find (f-arr-𝕚-r ¬inA fd) (case-𝕚 cv) = f-arr-𝕚-r ¬inA (⟾-find fd cv)
 ⟾-find (f-arr-𝕔 ¬inA fd) (case-𝕔 cv) = f-arr-𝕔 ¬inA (⟾-find fd cv)
-⟾-find (f-∀-𝕚 fd upj) (case-𝕚 {B = B} {𝕛 = 𝕛} {D = C} cv)
-  with ⟨ 𝕛' , up𝕛 ⟩ ← ↑tyʲ0-total 𝕛
+⟾-find (f-∀-𝕚 fd) (case-𝕚 {B = B} {𝕛 = 𝕛} {D = C} cv)
   with ⟨ B' , upB ⟩ ← ↑ty0-total B
-  with ⟨ C' , upC ⟩ ← ↑ty0-total C = f-∀-𝕚 (⟾-find fd (case-𝕚 {A = Int} (⟾-weaken^0 cv upj up𝕛 upB upC))) up𝕛
-⟾-find (f-∀-𝕔 fd upj) (case-𝕔 {B = B} {𝕛 = 𝕛} {D = C} cv)
-  with ⟨ 𝕛' , up𝕛 ⟩ ← ↑tyʲ0-total 𝕛
+  with ⟨ C' , upC ⟩ ← ↑ty0-total C = f-∀-𝕚 (⟾-find fd (case-𝕚 {A = Int} (⟾-weaken^0 cv upB upC)))
+⟾-find (f-∀-𝕔 fd) (case-𝕔 {B = B} {𝕛 = 𝕛} {D = C} cv)
   with ⟨ B' , upB ⟩ ← ↑ty0-total B
-  with ⟨ C' , upC ⟩ ← ↑ty0-total C = f-∀-𝕔 (⟾-find fd (case-𝕔  {A = Int} (⟾-weaken^0 cv upj up𝕛 upB upC))) up𝕛
+  with ⟨ C' , upC ⟩ ← ↑ty0-total C = f-∀-𝕔 (⟾-find fd (case-𝕔  {A = Int} (⟾-weaken^0 cv upB upC)))
 
 mm-sub : Γ ⊢ A 𝕄 B
        → SRegular Γ
@@ -114,7 +109,7 @@ mm-sub : Γ ⊢ A 𝕄 B
        → Γ ⊢d 𝕚 ∞ # A ≤ B
 mm-sub 𝕄-arr regΓ (⊢r-arr regA regA₁) = s-arr₂ (s-refl-∞ regΓ regA) (s-refl-∞ regΓ regA₁)
 mm-sub (M-∀ {A = A} x st mm) regΓ regA with ε-dec {k = #0} {A = A}
-... | inj₁ p = s-∀l x st (mm-sub mm regΓ (st0-⊢r regA x st)) case-𝕚 (find-iso-gen p) (↑tyʲ-𝕚 ↑tyʲ-∞)
+... | inj₁ p = s-∀l x st (mm-sub mm regΓ (st0-⊢r regA x st)) case-𝕚 (find-iso-gen p)
 ... | inj₂ ¬p = s-∀l-no-appear x st (mm-sub mm regΓ (st0-⊢r regA x st)) case-𝕚 ¬p
 
 conv-sub-gen-s : Γ ⊢d j # A ≤ B
@@ -127,16 +122,14 @@ conv-sub-gen-s (s-arr₂ s s₁) (case-𝕚 cv) = s-arr₂ s (conv-sub-gen-s s�
 conv-sub-gen-s (s-arr₃ regA s) (case-𝕔 cv) = s-arr₃ regA (conv-sub-gen-s s cv)
 conv-sub-gen-s (s-∀ s) (base mm)
   with refl ← s-trans-∞-eq s  = mm-sub mm (s-sregular (s-∀ s)) (⊢r-∀ (s1-⊢r-l s))
-conv-sub-gen-s (s-∀l regB st s case-𝕚 fd (↑tyʲ-𝕚 upj)) (case-𝕚 {B = B} {𝕛 = 𝕛} {D = D} cv)
-  with ⟨ 𝕛' , up𝕛 ⟩ ← ↑tyʲ0-total 𝕛
+conv-sub-gen-s (s-∀l regB st s case-𝕚 fd ) (case-𝕚 {B = B} {𝕛 = 𝕛} {D = D} cv)
   with ⟨ B' , upB ⟩ ← ↑ty0-total B
   with ⟨ D' , upD ⟩ ← ↑ty0-total D
-  = s-∀l regB st (conv-sub-gen-s s (case-𝕚 cv)) case-𝕚 (⟾-find fd (case-𝕚  {A = Int} (⟾-weaken^0 cv upj up𝕛 upB upD))) (↑tyʲ-𝕚 up𝕛)
-conv-sub-gen-s (s-∀l regB st s case-𝕔 fd (↑tyʲ-𝕔 upj)) (case-𝕔 {B = B} {𝕛 = 𝕛} {D = D} cv)
-  with ⟨ 𝕛' , up𝕛 ⟩ ← ↑tyʲ0-total 𝕛
+  = s-∀l regB st (conv-sub-gen-s s (case-𝕚 cv)) case-𝕚 (⟾-find fd (case-𝕚  {A = Int} (⟾-weaken^0 cv upB upD)))
+conv-sub-gen-s (s-∀l regB st s case-𝕔 fd) (case-𝕔 {B = B} {𝕛 = 𝕛} {D = D} cv)
   with ⟨ B' , upB ⟩ ← ↑ty0-total B
   with ⟨ D' , upD ⟩ ← ↑ty0-total D
-  = s-∀l regB st (conv-sub-gen-s s (case-𝕔 cv)) case-𝕔 (⟾-find fd (case-𝕔  {A = Int} (⟾-weaken^0 cv upj up𝕛 upB upD))) (↑tyʲ-𝕔 up𝕛)
+  = s-∀l regB st (conv-sub-gen-s s (case-𝕔 cv)) case-𝕔 (⟾-find fd (case-𝕔  {A = Int} (⟾-weaken^0 cv upB upD)))
 conv-sub-gen-s (s-∀l-no-appear regB st s case-𝕚 fd) (case-𝕚 cv) = s-∀l-no-appear regB st (conv-sub-gen-s s (case-𝕚 cv)) case-𝕚 fd
 conv-sub-gen-s (s-∀l-no-appear regB st s case-𝕔 fd) (case-𝕔 cv) = s-∀l-no-appear regB st (conv-sub-gen-s s (case-𝕔 cv)) case-𝕔 fd
 
