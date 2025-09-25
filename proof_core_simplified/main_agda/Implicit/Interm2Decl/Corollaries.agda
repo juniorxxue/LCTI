@@ -34,4 +34,4 @@ sound0' regA regB s = sound' s (⊢r-≫-eq regA) (⊢r-≫-eq regB)
 ⊢sound (⊢sub ⊢e B≤A gc j≢Z) = ⊢sub (⊢sound ⊢e) (si→sd B≤A (⊢r-𝕣 (I.t-⊢r ⊢e))) gc j≢Z
 ⊢sound (⊢tabs ⊢e) = ⊢tabs (⊢sound ⊢e)
 ⊢sound (⊢tabs-∞ ⊢e) = ⊢tabs-∞ (⊢sound ⊢e)
-⊢sound (⊢tapp ⊢e st) = ⊢tapp (⊢sound ⊢e) st
+⊢sound (⊢tapp ⊢e st regA s) = ⊢tapp (⊢sound ⊢e) st regA (si→sd s (⊢r-𝕣 (st0-⊢r (I.t-⊢r ⊢e) st regA)))

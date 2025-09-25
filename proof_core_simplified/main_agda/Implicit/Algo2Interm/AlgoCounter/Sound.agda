@@ -22,20 +22,18 @@ tc-sound (⊢lam₁ ⊢e) = ⊢lam₁ (tc-sound ⊢e)
 tc-sound (⊢lam₂ ⊢e up-c ⊢e₁) = ⊢lam₂ (tc-sound ⊢e) up-c (tc-sound ⊢e₁)
 tc-sound (⊢sub ⊢e ne gc s) = ⊢sub (tc-sound ⊢e) ne gc (sc-sound s)
 tc-sound (⊢tabs ⊢e) = ⊢tabs (tc-sound ⊢e)
-tc-sound {e = e ⓪ A} (⊢tapp s st) = ⊢tapp (tc-sound s) st
+tc-sound {e = e ⓪ A} (⊢tapp s st regA s') = ⊢tapp (tc-sound s) st regA (sc-sound s')
 tc-sound {e = Λ e} (⊢tabs-τ x) = ⊢tabs-τ (tc-sound x)
 
 sc-sound (s-empty regΓ cloA x) = s-empty regΓ cloA x
 sc-sound (s-type ss) = s-type ss
 sc-sound (s-term-c cloA ap ⊢e s) = s-term-c cloA ap (tc-sound ⊢e) (sc-sound s)
 sc-sound (s-term-o opnA ⊢e ss s) = s-term-o opnA (tc-sound ⊢e) ss (sc-sound s)
-sc-sound (s-∀l-𝕚 s upᶜ upj upᵉ upC upD) = s-∀l (sc-sound s) upᶜ upᵉ upC upD
-sc-sound (s-∀l-𝕔 s upᶜ upj upᵉ upC upD) = s-∀l (sc-sound s) upᶜ upᵉ upC upD
-sc-sound (s-tapp s upᶜ upj) = s-tapp (sc-sound s) upᶜ
+sc-sound (s-∀l-𝕚 s upᶜ upᵉ upC upD) = s-∀l (sc-sound s) upᶜ upᵉ upC upD
+sc-sound (s-∀l-𝕔 s upᶜ upᵉ upC upD) = s-∀l (sc-sound s) upᶜ upᵉ upC upD
 sc-sound (s-svar-term inΓ s) = s-svar-term inΓ (sc-sound s)
-sc-sound (s-svar-tapp inΓ s) = s-svar-tapp inΓ (sc-sound s)
-sc-sound (s-∀l-no-𝕚 x upᶜ upj upᵉ upC upD) = s-∀l-no (sc-sound x) upᶜ upᵉ upC upD
-sc-sound (s-∀l-no-𝕔 x upᶜ upj upᵉ upC upD) = s-∀l-no (sc-sound x) upᶜ upᵉ upC upD
+sc-sound (s-∀l-no-𝕚 x upᶜ upᵉ upC upD) = s-∀l-no (sc-sound x) upᶜ upᵉ upC upD
+sc-sound (s-∀l-no-𝕔 x upᶜ upᵉ upC upD) = s-∀l-no (sc-sound x) upᶜ upᵉ upC upD
 sc-sound (s-evar-infers infs inst) = s-evar-infers (infsc-sound infs) inst
 
 infsc-sound (infs-z regΓ regA) = infs-z regΓ regA

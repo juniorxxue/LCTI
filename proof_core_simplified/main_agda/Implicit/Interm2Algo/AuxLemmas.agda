@@ -31,17 +31,15 @@ s+-⊆/ (s-arr₂ s s₁) = ⊆I (s--⊆/ s) (s+-⊆/ s₁)
 s+-⊆/ (s-arr₃ cloA grd s) = ⊆C cloA (s+-⊆/ s)
 s+-⊆/ (s-∀ s) with s+-⊆/ s
 ... | ⊆∞ x = ⊆∞ (ext-∀ x)
-s+-⊆/ (s-∀l s ic fd upC upD upj) with s+-⊆/ s
-s+-⊆/ (s-∀l s case-𝕚 fd upC upD (↑tyʲ-𝕚 upj)) | r = ⊆∀-I (⊆/c-irrev-^0 r fd) upj
-s+-⊆/ (s-∀l s case-𝕔 fd upC upD (↑tyʲ-𝕔 upj)) | r = ⊆∀-C (⊆/c-irrev-^0 r fd) upj
-s+-⊆/ (s-∀l-no-appear s ic fd upC upD upj) with s+-⊆/ s
-s+-⊆/ (s-∀l-no-appear s case-𝕚 fd upC upD (↑tyʲ-𝕚 upj)) | r = ⊆∀-I-no r upj
-s+-⊆/ (s-∀l-no-appear s case-𝕔 fd upC upD (↑tyʲ-𝕔 upj)) | r = ⊆∀-C-no r upj
+s+-⊆/ (s-∀l s ic fd upC upD) with s+-⊆/ s
+s+-⊆/ (s-∀l s case-𝕚 fd upC upD) | r = ⊆∀-I (⊆/c-irrev-^0 r fd)
+s+-⊆/ (s-∀l s case-𝕔 fd upC upD) | r = ⊆∀-C (⊆/c-irrev-^0 r fd)
+s+-⊆/ (s-∀l-no-appear s ic fd upC upD) with s+-⊆/ s
+s+-⊆/ (s-∀l-no-appear s case-𝕚 fd upC upD) | r = ⊆∀-I-no r
+s+-⊆/ (s-∀l-no-appear s case-𝕔 fd upC upD) | r = ⊆∀-C-no r
 s+-⊆/ (s-svar-l x inΔ) = ⊆∞ (ext-var (⊆/x-refl x (⊢c-var-= (∋:=to∋= inΔ))))
-s+-⊆/ (s-tapp s upj) = ⊆∀-T (s+-⊆/ s) upj
 s+-⊆/ (s-svar-𝕚 inΓ s) = ⊆I-X (s-sregular s) (⊢c-var-= (∋:=to∋= inΓ))
 s+-⊆/ (s-svar-𝕔 inΓ s) = ⊆C-X (s-sregular s) (⊢c-var-= (∋:=to∋= inΓ))
-s+-⊆/ (s-svar-𝕥 inΓ s) = ⊆T-X (s-sregular s) (⊢c-var-= (∋:=to∋= inΓ))
 
 
 infix 3 _≤_⟹_
@@ -220,7 +218,7 @@ complete-infs : Γ ⊢ ⟨ j , B ⟩ ~s Σ
 complete-infs (~I ⊢e ~∞) (⊢r-arr regB regB₁) i∞-z = infs-s ⊢e (infs-z (t-env ⊢e) (⊢r-𝕣' regB₁))
 complete-infs (~I ⊢e ~j) (⊢r-arr regB regB₁) (i∞-i iso) = infs-s ⊢e (complete-infs ~j regB₁ iso)
 
-data Complete (A : Type m) (j : Counter m) (Σ : Context n m) (Γ : Env n m) (Δ : Env n m) (B : Type m) : Set where
+data Complete (A : Type m) (j : Counter) (Σ : Context n m) (Γ : Env n m) (Δ : Env n m) (B : Type m) : Set where
   normal :     (cond : ¬ (∃[ k ](k ε' A) × Γ ∋^ k))
                → (s : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B)
                → Complete A j Σ Γ Δ B

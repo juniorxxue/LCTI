@@ -17,8 +17,6 @@ nonempty : NonZ j
 nonempty nz-∞ ~∞ = ne-τ
 nonempty nz-I (~I ⊢e j~Σ) = ne-app
 nonempty nz-C (~C ⊢e j~Σ) = ne-app
-nonempty nz-T (~T ~j st) = ne-tapp
-
 
 complete : Γ ⊢ j # e ⦂ A
          → Γ ⊢ ⟨ j , A ⟩ ~t Σ
@@ -36,7 +34,7 @@ complete (⊢app₂ ⊢e ⊢e₁) j~Σ = ⊢app (complete ⊢e (~I (complete ⊢
 complete (⊢sub ⊢e B≤A gc j≢Z) j~Σ = ⊢sub (complete ⊢e ~Z) (nonempty j≢Z j~Σ) gc (complete-s0 B≤A j~Σ)
 complete (⊢tabs-∞ x) ~∞ = ⊢tabs-τ (complete x ~∞)
 complete (⊢tabs ⊢e) ~Z = ⊢tabs (complete ⊢e ~Z)
-complete (⊢tapp ⊢e st) ~j = ⊢tapp (complete ⊢e (~T ~j st)) st
+complete (⊢tapp ⊢e st regA s) ~j = ⊢tapp (complete ⊢e ~Z) regA st (complete-s0 s ~j)
 
 -- corollaries
 complete-0 : Γ ⊢ Z # e ⦂ A

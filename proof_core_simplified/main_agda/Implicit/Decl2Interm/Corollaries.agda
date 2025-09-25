@@ -36,4 +36,4 @@ complete-' s grd = complete- (⊢d→⊢d² s) grd
 ⊢complete (⊢sub ⊢e B≤A gc j≢Z) = ⊢sub (⊢complete ⊢e) (complete+ (⊢d→⊢d² B≤A) (⊢r-≫-eq (⊢r-𝕣 (D.t-⊢r ⊢e)))) gc j≢Z
 ⊢complete (⊢tabs ⊢e) = ⊢tabs (⊢complete ⊢e)
 ⊢complete (⊢tabs-∞ ⊢e) = ⊢tabs-∞ (⊢complete ⊢e)
-⊢complete (⊢tapp ⊢e st) = ⊢tapp (⊢complete ⊢e) st
+⊢complete (⊢tapp ⊢e st regA s) = ⊢tapp (⊢complete ⊢e) st regA (complete+ (⊢d→⊢d² s) (⊢r-≫-eq (⊢r-𝕣 (st0-⊢r (D.t-⊢r ⊢e) st regA))))
