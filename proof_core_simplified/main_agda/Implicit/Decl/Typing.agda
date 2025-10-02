@@ -1,5 +1,3 @@
-{-# OPTIONS --allow-unsolved-metas #-}
-{-# OPTIONS --allow-incomplete-matches #-}
 module Implicit.Decl.Typing where
 
 open import Implicit.Language.All
@@ -101,7 +99,7 @@ t-⊢r (⊢app₂ ⊢e ⊢e₁) with t-⊢r ⊢e
 t-⊢r (⊢sub ⊢e B≤A gc j≢Z) = ⊢r-𝕣' (s1-⊢r-r B≤A)
 t-⊢r (⊢tabs ⊢e) = ⊢r-∀ (t-⊢r ⊢e)
 t-⊢r (⊢tabs-∞ ⊢e) = ⊢r-∀ (t-⊢r ⊢e)
-t-⊢r (⊢tapp ⊢e regA st s) = {!!}
+t-⊢r (⊢tapp ⊢e regA st s) = ⊢r-𝕣' (s1-⊢r-r s)
 
 
 infix 3 _≋_
@@ -180,11 +178,39 @@ s-trans (s-∀l-no-appear regB st s1 ic fd) (𝕔≋ ~j) (s-arr₃ regA s3)
   = s-∀l-no-appear regB st (s-trans s1 (𝕔≋ ~j) (s-arr₃ regA s3)) case-𝕔 fd
 
 
-postulate
-  gen-sub : Γ ⊢d j # e ⦂ A
+
+gen-sub : Γ ⊢d j # e ⦂ A
         → j ≋ j'
         → Γ ⋈ ⊢d j' # A ≤ B
         → Γ ⊢d j' # e ⦂ B
+gen-sub {j' = Z} ⊢e Z≋ (s-refl regΔ cloA) = ⊢e
+
+gen-sub {j' = ∞} (⊢lit regΓ) Z≋ s = ⊢sub (⊢lit regΓ) s gc-i nz-∞
+gen-sub {j' = ∞} (⊢var regΓ x∈Γ) Z≋ s = ⊢sub (⊢var regΓ x∈Γ) s gc-var nz-∞
+gen-sub {j' = ∞} (⊢ann ⊢e) Z≋ s = ⊢sub (⊢ann ⊢e) s gc-ann nz-∞
+gen-sub {j' = ∞} (⊢app₁ ⊢e ⊢e₁) Z≋ s = ⊢app₁ (gen-sub ⊢e (𝕔≋ Z≋) (s-arr₃ (⊢r-𝕣 (t-⊢r ⊢e₁)) s)) ⊢e₁
+gen-sub {j' = ∞} (⊢app₂ ⊢e ⊢e₁) Z≋ s = ⊢app₂ (gen-sub ⊢e (𝕚≋ Z≋) (s-arr₂ ((s-refl-∞ (s-sregular s) (⊢r-𝕣 (t-⊢r ⊢e₁)))) s)) ⊢e₁
+gen-sub {j' = ∞} (⊢tabs ⊢e) Z≋ s = ⊢sub (⊢tabs ⊢e) s gc-tlam nz-∞
+gen-sub {j' = ∞} (⊢tapp ⊢e regA st s₁) Z≋ s = ⊢tapp ⊢e regA st (s-trans s₁ Z≋ s)
+
+gen-sub {j' = 𝕚 j'} (⊢var regΓ x∈Γ) newj s = ⊢sub (⊢var regΓ x∈Γ) s gc-var nz-I
+gen-sub {j' = 𝕚 j'} (⊢ann ⊢e) newj s = ⊢sub (⊢ann ⊢e) s gc-ann nz-I
+gen-sub {j' = 𝕚 j'} (⊢lam₂ ⊢e) (𝕚≋ newj) (s-arr₂ s s₁)
+  with reg-S, regΓ regA ← t-tregular ⊢e
+  with refl ← s-trans-∞-eq s = ⊢lam₂ (gen-sub ⊢e newj (s1-weaken,0 s₁ regA))
+gen-sub {j' = 𝕚 j'} (⊢app₁ ⊢e ⊢e₁) ~j s = ⊢app₁ (gen-sub ⊢e (𝕔≋ ~j) (s-arr₃ (⊢r-𝕣 (t-⊢r ⊢e₁)) s)) ⊢e₁
+gen-sub {j' = 𝕚 j'} (⊢app₂ ⊢e ⊢e₁) ~j s = ⊢app₂ (gen-sub ⊢e (𝕚≋ ~j) (s-arr₂ (s-refl-∞ (s-sregular s) (⊢r-𝕣 (t-⊢r ⊢e₁))) s)) ⊢e₁
+gen-sub {j' = 𝕚 j'} (⊢sub ⊢e B≤A gc j≢Z) (𝕚≋ ~j) s = ⊢sub ⊢e (s-trans B≤A (𝕚≋ ~j) s) gc nz-I
+gen-sub {j' = 𝕚 j'} (⊢tabs ⊢e) newj s = ⊢sub (⊢tabs ⊢e) s gc-tlam nz-I
+gen-sub {j' = 𝕚 j'} (⊢tapp ⊢e regA st s₁) newj s = ⊢tapp ⊢e regA st (s-trans s₁ newj s)
+
+gen-sub {j' = 𝕔 j'} (⊢var regΓ x∈Γ) newj s = ⊢sub (⊢var regΓ x∈Γ) s gc-var nz-C
+gen-sub {j' = 𝕔 j'} (⊢ann ⊢e) newj s = ⊢sub (⊢ann ⊢e) s gc-ann nz-C
+gen-sub {j' = 𝕔 j'} (⊢app₁ ⊢e ⊢e₁) ~j s = ⊢app₁ (gen-sub ⊢e (𝕔≋ ~j) (s-arr₃ (⊢r-𝕣 (t-⊢r ⊢e₁)) s)) ⊢e₁
+gen-sub {j' = 𝕔 j'} (⊢app₂ ⊢e ⊢e₁) ~j s = ⊢app₂ (gen-sub ⊢e (𝕚≋ ~j) (s-arr₂ (s-refl-∞ (s-sregular s) (⊢r-𝕣 (t-⊢r ⊢e₁))) s)) ⊢e₁
+gen-sub {j' = 𝕔 j'} (⊢sub ⊢e B≤A gc j≢Z) (𝕔≋ ~j) s = ⊢sub ⊢e (s-trans B≤A (𝕔≋ ~j) s) gc nz-C
+gen-sub {j' = 𝕔 j'} (⊢tabs ⊢e) newj s = ⊢sub (⊢tabs ⊢e) s gc-tlam nz-C
+gen-sub {j' = 𝕔 j'} (⊢tapp ⊢e regA st s₁) newj s = ⊢tapp ⊢e regA st (s-trans s₁ newj s)
 
 gen-sub0 : Γ ⊢d Z # g ⦂ A
          → Γ ⋈ ⊢d j # A ≤ B
