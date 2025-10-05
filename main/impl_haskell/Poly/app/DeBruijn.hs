@@ -3,8 +3,6 @@
 {-# HLINT ignore "Redundant multi-way if" #-}
 module DeBruijn where
 
-import Debug.Trace
-
 import Syntax
 
 -- shifting --
