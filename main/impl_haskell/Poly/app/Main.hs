@@ -12,7 +12,6 @@ import DeBruijn
 import Log
 import Syntax
 import System.Environment (getArgs)
-import System.IO (withFile, IOMode(WriteMode), hPutStrLn, Handle)
 import Examples (examples, Example(..), getExample, getExamplesInGroup)
 
 lookupEnv :: Int -> Env -> WriterT Log Maybe Typ
@@ -374,7 +373,6 @@ main = do
   args <- getArgs
   let showDrv = "--drv" `elem` args
       showHelp = "--help" `elem` args || "-h" `elem` args
-      outputToFile = "--output" `elem` args || "--file" `elem` args
   
   if showHelp
     then do
@@ -383,90 +381,43 @@ main = do
       putStrLn "Options:"
       putStrLn "  --help, -h        Show this help message"
       putStrLn "  --drv, -d         Show detailed derivation steps"
-      putStrLn "  --output, --file  Write output to outputs/results.out instead of terminal"
       putStrLn ""
       putStrLn "Examples:"
       putStrLn "  cabal run Poly                    # Run all examples (default)"
       putStrLn "  cabal run Poly -- A1              # Run specific example"
       putStrLn "  cabal run Poly -- A1 A2 A3        # Run multiple examples"
       putStrLn "  cabal run Poly -- --drv A1        # Run with derivation"
-      putStrLn "  cabal run Poly -- --output        # Write all output to file"
-      putStrLn "  cabal run Poly -- --file --drv A1 # Write derivation to file"
     else do
       -- Filter out flags to get example names
       let requestedExamples = filter (not . isFlag) args
-          isFlag arg = arg `elem` ["--drv", "--help", "-h", "--output", "--file"]
-      if outputToFile
-        then do
-          putStrLn "Writing output to outputs/results.out..."
-          withFile "outputs/results.out" WriteMode $ \h -> do
-            if null requestedExamples
-              then runAllExamples h showDrv
-              else runSpecificExamples h showDrv requestedExamples
-        else do
-          if null requestedExamples
-            then runAllExamplesConsole showDrv
-            else runSpecificExamplesConsole showDrv requestedExamples
+          isFlag arg = arg `elem` ["--drv", "--help", "-h"]
+      if null requestedExamples
+        then runAllExamples showDrv
+        else runSpecificExamples showDrv requestedExamples
 
--- File output functions
-runAllExamples :: Handle -> Bool -> IO ()
-runAllExamples h showDrv = do
+runAllExamples :: Bool -> IO ()
+runAllExamples showDrv = do
   forM_ examples $ \example -> do
-    runSingleExample h example showDrv
+    runSingleExample example showDrv
 
-runSpecificExamples :: Handle -> Bool -> [String] -> IO ()
-runSpecificExamples h showDrv names = do
-  forM_ names $ \name -> do
-    let groupExamples = getExamplesInGroup name
-    if not (null groupExamples)
-      then do
-        hPutStrLn h $ "Running examples: " ++ name
-        forM_ groupExamples $ \example -> do
-          runSingleExample h example showDrv
-      else do
-        case getExample name of
-          Just example -> runSingleExample h example showDrv
-          Nothing -> do
-            hPutStrLn h $ "Error: Example or group '" ++ name ++ "' not found."
-            hPutStrLn h "Use --help to see usage information."
-
-runSingleExample :: Handle -> Example -> Bool -> IO ()
-runSingleExample h example showDrv = do
-  hPutStrLn h $ replicate 80 '-'
-  hPutStrLn h $ exampleName example ++ ": " ++ exampleDescription example
-  case runWriterT (infer (exampleEnv example) CEmpty (exampleTerm example)) of
-    Just (tyA, logs) -> do
-      hPutStrLn h $ "[✓] Typing result: " ++ show tyA
-      when showDrv $ do
-        hPutStrLn h ""
-        mapM_ (hPutStrLn h) logs
-    Nothing -> do
-      hPutStrLn h "[x] Typing failed"
-
--- Console output functions
-runAllExamplesConsole :: Bool -> IO ()
-runAllExamplesConsole showDrv = do
-  forM_ examples $ \example -> do
-    runSingleExampleConsole example showDrv
-
-runSpecificExamplesConsole :: Bool -> [String] -> IO ()
-runSpecificExamplesConsole showDrv names = do
+runSpecificExamples :: Bool -> [String] -> IO ()
+runSpecificExamples showDrv names = do
   forM_ names $ \name -> do
     let groupExamples = getExamplesInGroup name
     if not (null groupExamples)
       then do
         putStrLn $ "Running examples: " ++ name
         forM_ groupExamples $ \example -> do
-          runSingleExampleConsole example showDrv
+          runSingleExample example showDrv
       else do
         case getExample name of
-          Just example -> runSingleExampleConsole example showDrv
+          Just example -> runSingleExample example showDrv
           Nothing -> do
             putStrLn $ "Error: Example or group '" ++ name ++ "' not found."
             putStrLn "Use --help to see usage information."
 
-runSingleExampleConsole :: Example -> Bool -> IO ()
-runSingleExampleConsole example showDrv = do
+runSingleExample :: Example -> Bool -> IO ()
+runSingleExample example showDrv = do
   putStrLn $ replicate 80 '-'
   putStrLn $ exampleName example ++ ": " ++ exampleDescription example
   case runWriterT (infer (exampleEnv example) CEmpty (exampleTerm example)) of
