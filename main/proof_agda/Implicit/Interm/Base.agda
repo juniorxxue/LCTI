@@ -60,12 +60,23 @@ data _⊢_#_⌞_⌝_ : Env n m → Counter m → Type m → Polar → Type m →
   s-svar-l : ∀ {X A}
     → (SRegular Δ)
     → (inΔ : Δ ∋ X := A)
-    → Δ ⊢ j # A ⌞ ≤⁺ ⌝ B
-    → Δ ⊢ j # ‶ X ⌞ ≤⁺ ⌝ B
+    → Δ ⊢ ∞ # ‶ X ⌞ ≤⁺ ⌝ A
   s-svar-r : ∀ {X A}
     → (SRegular Δ)
     → (inΔ : Δ ∋ X := A)
     → Δ ⊢ ∞ # A ⌞ ≤⁻ ⌝ ‶ X
+  s-svar-𝕚 :
+      Δ ∋ X := C
+    → Δ ⊢ (𝕚 j) # C ⌞ ≤⁺ ⌝ A `→ B
+    → Δ ⊢ (𝕚 j) # ‶ X ⌞ ≤⁺ ⌝ A `→ B
+  s-svar-𝕔 :
+      Δ ∋ X := C
+    → Δ ⊢ (𝕔 j) # C ⌞ ≤⁺ ⌝ A `→ B
+    → Δ ⊢ (𝕔 j) # ‶ X ⌞ ≤⁺ ⌝ A `→ B
+  s-svar-𝕥 :
+      Δ ∋ X := B
+    → Δ ⊢ (𝕥₍ A ₎ j) # B ⌞ ≤⁺ ⌝ `∀ C
+    → Δ ⊢ (𝕥₍ A ₎ j) # ‶ X ⌞ ≤⁺ ⌝ `∀ C
 
 s-refl-∞ : SRegular Γ
          → Γ ⊢r A

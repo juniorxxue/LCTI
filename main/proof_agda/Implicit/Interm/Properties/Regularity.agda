@@ -17,10 +17,13 @@ s-sregular (s-∀l s ic fd upC upD upj) with s-sregular s
 ... | reg-S= r regA = r
 s-sregular (s-∀l-no-appear s ic fd upC upD upj) with s-sregular s
 ... | reg-S^ r = r
-s-sregular (s-svar-l x inΔ s) = {!!}
+s-sregular (s-svar-l x inΔ) = x
 s-sregular (s-svar-r x inΔ) = x
 s-sregular (s-tapp s upj) with s-sregular s
 ... | reg-S= r regA = r
+s-sregular (s-svar-𝕚 _ x) = s-sregular x
+s-sregular (s-svar-𝕔 _ x) = s-sregular x
+s-sregular (s-svar-𝕥 x x₁) = s-sregular x₁
 
 t-tregular : Γ ⊢ j # e ⦂ A
            → TRegular Γ
@@ -93,8 +96,11 @@ s-⊢rʲ (s-∀l s ic fd upC upD upj) = ⊢rʲ-strengthen=0 (s-⊢rʲ s) upj
 s-⊢rʲ (s-∀l-no-appear s ic fd upC upD upj) = ⊢rʲ-strengthen^0 (s-⊢rʲ s) upj
 s-⊢rʲ (s-tapp s upj) with s-sregular s
 ... | reg-S= r regA = j-𝕥 (⊢rʲ-strengthen=0 (s-⊢rʲ s) upj) regA
-s-⊢rʲ (s-svar-l x inΔ s) = {!!}
+s-⊢rʲ (s-svar-l x inΔ) = j-∞
 s-⊢rʲ (s-svar-r x inΔ) = j-∞
+s-⊢rʲ (s-svar-𝕚 _ x) = s-⊢rʲ x
+s-⊢rʲ (s-svar-𝕔 _ x) = s-⊢rʲ x
+s-⊢rʲ (s-svar-𝕥 x x₁) = s-⊢rʲ x₁
 
 ⊢r-⋈ : Γ ⊢rʲ j
      → 𝕣 Γ ⊢rʲ j
