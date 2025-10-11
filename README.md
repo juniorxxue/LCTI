@@ -44,7 +44,7 @@ To facilitate the reading of the mechanized proofs, we provide a nicely prebuilt
 ## Virtual Machine (QEMU)
 
 
-Make sure the virtual machine is running, and you can type this command in the host machine:
+Make sure the virtual machine is running, and you can use those commands in the host machine:
 
 ```
 scp -P 5555 -r ./popl26 artifact@localhost:/home/artifact/
@@ -53,7 +53,8 @@ scp -P 5555 -r ./popl26 artifact@localhost:/home/artifact/
 Here's another helpful command to copy files from the virtual machine to the host machine:
 
 ```
-scp -P 5555 -r artifact@localhost:/home/artifact/pop26 .
+scp -P 5555 artifact@localhost:/home/artifact/popl26/main/impl_haskell/Poly/outputs/results.out .
+scp -P 5555 -r artifact@localhost:/home/artifact/popl26/main/proof_agda/html .
 ```
 
 ## QEMU Instructions
