@@ -22,13 +22,15 @@ We note that we briefly mention two variants in the related work section of the 
 
 2. `proof_variant_right2left`: a variant of the main system that differs in directionality (right-to-left instead of left-to-right) from the main system. All properties of the main system are also proven for this variant.
 
-## Kick-the-tires instructions and installation
+## Kick-the-tires instructions
 
 Reviewers have two options to evaluate the artifact:
 
 1. Run the code directly on their own machine. This is recommended for reviewers who have experience with theorem provers. Our environment setup is straightforward but involves three different languages. The artifact is expected to work with recent versions of these languages.
 
 2. Run the code in a virtual machine (QEMU) with Debian Linux installed. We have installed all dependencies and placed the source code in the root directory. This option is recommended for a quick sanity check or kick-the-tires evaluation if reviewers do not already have Agda, Rocq, and Haskell installed.
+
+After setting up the environment or downloading the virtual machine image, we expect that it will take less than 30 minutes to walk through the whole process.
 
 ### Option 1: Evaluate the artifact on the host machine
 
@@ -101,9 +103,9 @@ We tested the virtual machine on both Apple chip MacBook and Intel x86 iMac.
 
 4. You will see the source code in the `popl26` folder in the home directory. Change directory to this folder.
 
-5. You can follow the same steps as in Option 1 to evaluate the artifact.
+5. You can follow the same steps as in [Option 1: 2. Running the code](#2-running-the-code) to evaluate the artifact.
 
-There are two additional helpful commands to facilitate the evaluation in the virtual machine:
+There are three additional helpful commands to facilitate the evaluation in the virtual machine:
 
 1. Since the terminal may not be scrollable in the virtual machine, to read the terminal output, you can redirect the output to a temporary file using the `>` operator. For example:
 
@@ -118,39 +120,28 @@ scp -P 5555 artifact@localhost:/home/artifact/popl26/main/impl_haskell/Poly/hask
 scp -P 5555 -r artifact@localhost:/home/artifact/popl26/main/proof_agda/html .
 ```
 
-## Claims in the paper
-
-We make two claims related to the artifact in the paper:
-
-1. We claim that all results shown in the paper have been formally proven and mechanized in theorem provers. The evaluation instructions can be found in the [Mechanized Proofs](#mechanized-proofs) section.
-
-2. We claim that we have a prototype implementation that can run all the examples presented in the paper. The evaluation instructions can be found in the [Implementation](#implementation) section.
-
-## Mechanized Proofs
-
-The first claim can be verified by checking the mechanized proofs in Agda and Rocq,
-locating the corresponding lemmas and theorems in the code, comparing them with the statements in the paper,
-and verifying that the proofs are complete without any admitted axioms.
-To facilitate reading the mechanized proofs, we provide nicely formatted HTML documentation with a table of contents in the sidebar.
-
-## Implementation
-
-
-## Virtual Machine (QEMU)
-
-
-Ensure the virtual machine is running, then you can use these commands on the host machine:
+3. You can also replace the source code in the virtual machine with the source code in the host machine. First remove the existing `popl26` folder in the virtual machine, then use the `scp` command on the host machine to copy the `popl26` folder from the host machine to the virtual machine. For example:
 
 ```
 scp -P 5555 -r ./popl26 artifact@localhost:/home/artifact/
 ```
 
-Here's another helpful command to copy files from the virtual machine to the host machine:
+## Claims in the paper
 
-```
-scp -P 5555 artifact@localhost:/home/artifact/popl26/main/impl_haskell/Poly/outputs/results.out .
-scp -P 5555 -r artifact@localhost:/home/artifact/popl26/main/proof_agda/html .
-```
+We make two claims related to the artifact in the paper:
+
+1. We claim that all results shown in the paper have been formally proven and mechanized in theorem provers.
+
+2. We claim that we have a prototype implementation that can run all the examples presented in the paper.
+
+## Full Evaluation
+
+### Mechanized Proofs
+
+The first claim can be verified by checking the mechanized proofs in Agda and Rocq,
+locating the corresponding lemmas and theorems in the code, comparing them with the statements in the paper,
+and verifying that the proofs are complete without any admitted axioms.
+To facilitate reading the mechanized proofs, we provide nicely formatted HTML documentation with a table of contents in the sidebar.
 
 ## QEMU Instructions
 
@@ -230,28 +221,4 @@ To shutdown the guest system cleanly, login to it via ssh and use
 $ sudo shutdown now
 ```
 
-### Artifact Preparation
-
-Authors should install software dependencies into the VM image as needed,
-preferably via the standard Debian package manager. For example, to install
-GHC and cabal-install, login to the host and type:
-
-```
-$ sudo apt update
-$ sudo apt install ghc
-$ sudo apt install cabal-install
-```
-
-If you really need a GUI then you can install X as follows, but we prefer
-console-only artifacts whenever possible.
-
-```
-$ sudo apt install xorg
-$ sudo apt install xfce4   # or some other window manager
-$ startx
-```
-
 See Debugging.md for advice on resolving other potential problems.
-
-If your artifact needs lots of memory you may need to increase the value
-of the `QEMU_MEM_MB` variable in the `start.sh` script.
