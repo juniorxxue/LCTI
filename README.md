@@ -126,7 +126,11 @@ We make two claims related to the artifact in the paper:
 
 1. We claim that all results shown in the paper have been formally proven and mechanized in theorem provers.
 
+Reviewers can use `main/proof_agda/Implicit/README.agda` as the checklist.
+
 2. We claim that we have a prototype implementation that can run all the examples presented in the paper.
+
+Reviewers can use the reference table in `main/impl_haskell/Poly/README.md` as the checklist.
 
 ## Full Evaluation
 
@@ -161,6 +165,20 @@ Another way to read the Agda code is through the well-maintained folder structur
 6. `Decl2Interm` and `Interm2Decl`: soundness and completeness proofs between the declarative system and the intermediate system.
 
 7. `Annotatability`: the formalization of Implicit System F, including the soundness and completeness (also called annotatability) proofs between Contextual System F and Implicit System F, corresponding to the system presented in Section 3.3 in the paper.
+
+Based on this folder structure, we provide a table mapping from figures in the paper to files in the mechanization:
+
+| Figures                                                  | Definitions             | Locations                                                   |
+| -------------------------------------------------------- | ----------------------- | ----------------------------------------------------------- |
+| Fig. 2. Declarative typing rules.                        | `_⊢d_#_⦂_`              | main/proof_agda/Implicit/Decl/Typing.agda:11                |
+| Fig. 3 Declarative subtyping rules                       | _`⊢d_#_≤`_              | main/proof_agda/Implicit/Decl/Subtyping.agda:10             |
+| Fig. 3 Instantiability                                   | `find`                  | main/proof_agda/Implicit/Language/Find/Base.agda:94         |
+| Fig. 5 Elaboration rules for implicit system F           | `_⊢_⦂_⟶_`               | main/proof_agda/Implicit/Annotatability/Elaboration.agda:15 |
+| Fig. 6 Matching subtyping                                | `_⊢_#_⌞_⌝_`             | main/proof_agda/Implicit/Interm/Base.agda:10                |
+| Fig. 7 Typing rules for the algorithmic system           | `_⊢_⇒_⇒_`               | main/proof_agda/Implicit/Algo/Base.agda:60                  |
+| Fig. 8. Rules for subtyping inference                    | `_⊢_≤⁺_⊣_↪_`            | main/proof_agda/Implicit/Algo/Base.agda:109                 |
+| Fig. 9. Rules for subtyping checking                     | `_⊢_⌞_⌝_⊣_`             | main/proof_agda/Implicit/Algo/Base.agda:11                  |
+| Fig. 10. Environment Extension under variables and types | `_⊆_w/t_` and `_⊆_w/v_` | main/proof_agda/Implicit/Language/Extension/Base.agda:33    |
 
 For the Rocq code, the file structure is straightforward, and the decidability theorems can be found in `Dec.v`.
 
