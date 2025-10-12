@@ -218,7 +218,9 @@ Specifically, we request to be badged as Reusable based on the following reasons
 
 2. Our mechanization is suitable for adding extensions for new language constructs and features. Our mechanizations of the three systems are separated into different folders, with their metatheory unentangled. The metatheory for the declarative system is very simple, allowing for the study of new features (including new typing and subtyping rules) without worrying about other algorithmic details.
 
-3. Our Haskell implementation can be tested with more inputs. This is documented in the `README.md` file in the `main/impl_haskell/Poly` folder.
+3. The contextual typing is modular designed, also mentioned in the paper that most rules are not affected by adding the polymorphic types. This is also true for our mechanization. For example, one can add product types to the system by adding a few cases to the syntax and typing, subtyping.
+
+4. Our Haskell implementation can be tested with more inputs. This is documented in the `README.md` file in the `main/impl_haskell/Poly` folder.
 
 
 ## QEMU Instructions
