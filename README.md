@@ -1,6 +1,12 @@
 #  Local Contextual Type Inference (Artifact)
 
-## Overview
+Table of Contents:
+
+1. [Artifact Overview](#artifact-overview): A brief description of the contents of the artifact.
+2. [Kick-the-tires instructions and installation](#kick-the-tires-instructions-and-installation): Instructions for setting up the environment and running the code, including an option to run the code in a virtual machine.
+3. [Claims in the paper](#claims-in-the-paper): A summary of the claims
+
+## Artifact Overview
 
 This artifact consists of three main parts:
 
@@ -77,7 +83,40 @@ For code in the `/variants` folder, the evaluation instructions are similar to t
 
 ### Option 2: Evaluate the artifact in the QEMU virtual machine
 
+We decided to follow the suggestions from [ICFP 2025 AE](https://icfp25.sigplan.org/track/icfp-2025-artifacts?#VM-Image) to use QEMU as our virtual machine, since we believe that it can work both armed and x86 machines. We provide an image file `disk.qcow` and a startup script `start.sh` (`start.bat` for Windows).
 
+The script is default to assign 4GB of RAM to the virtual machine, which should be sufficient for running our artifact. If you have a machine with more memory and want to allocate more memory to the virtual machine, you can modify the `QEMU_MEM_MB` variable in the `start.sh` script.
+
+The installation of QEMU can be found in the [QEMU Instructions](#qemu-instructions) section at the bottom.
+
+We tested the virtual machine on both Apple chip MacBook and Intel x86 iMac.
+
+**Detailed Instructions**
+
+1. Change directory to the folder containing `start.sh` and `disk.qcow`.
+
+2. Run `./start.sh` to start the virtual machine. This will open a graphical console on the host machine and create a virtualized network interface.
+
+3. In the login page, use the username `artifact` and password `password` to log in.
+
+4. You will see the source code in the `popl26` folder at the home directory. Change directory to this folder.
+
+5. You can do the same steps as in Option 1 to evaluate the artifact.
+
+There are two more helpful commands to facilitate the evaluation in the virtual machine:
+
+1. Since the terminal may not be scrollable in the virtual machine. To read the terminal output, you can redirect the output to a temp file using `>` operator. For example:
+
+```
+cabal run Poly > haskell.out
+```
+
+2. You can use `scp` command on the host machine to copy output files like `haskell.out` or `html` folder to the host machine. And you can read them on your editors or browsers. For example:
+
+```
+scp -P 5555 artifact@localhost:/home/artifact/popl26/main/impl_haskell/Poly/haskell.out .
+scp -P 5555 -r artifact@localhost:/home/artifact/popl26/main/proof_agda/html .
+```
 
 ## Claims in the paper
 
