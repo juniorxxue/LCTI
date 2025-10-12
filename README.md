@@ -83,9 +83,9 @@ For code in the `/variants` folder, the evaluation instructions are similar to t
 
 ### Option 2: Evaluate the artifact in the QEMU virtual machine
 
-We decided to follow the suggestions from [ICFP 2025 AE](https://icfp25.sigplan.org/track/icfp-2025-artifacts?#VM-Image) to use QEMU as our virtual machine, since we believe that it can work both armed and x86 machines. We provide an image file `disk.qcow` and a startup script `start.sh` (`start.bat` for Windows).
+We decided to follow the suggestions from [ICFP 2025 AE](https://icfp25.sigplan.org/track/icfp-2025-artifacts?#VM-Image) to use QEMU as our virtual machine, since we believe that it can work on both ARM and x86 machines. We provide an image file `disk.qcow` and a startup script `start.sh` (`start.bat` for Windows).
 
-The script is default to assign 4GB of RAM to the virtual machine, which should be sufficient for running our artifact. If you have a machine with more memory and want to allocate more memory to the virtual machine, you can modify the `QEMU_MEM_MB` variable in the `start.sh` script.
+The script defaults to assigning 4GB of RAM to the virtual machine, which should be sufficient for running our artifact. If you have a machine with more memory and want to allocate more memory to the virtual machine, you can modify the `QEMU_MEM_MB` variable in the `start.sh` script.
 
 The installation of QEMU can be found in the [QEMU Instructions](#qemu-instructions) section at the bottom.
 
@@ -99,19 +99,19 @@ We tested the virtual machine on both Apple chip MacBook and Intel x86 iMac.
 
 3. In the login page, use the username `artifact` and password `password` to log in.
 
-4. You will see the source code in the `popl26` folder at the home directory. Change directory to this folder.
+4. You will see the source code in the `popl26` folder in the home directory. Change directory to this folder.
 
-5. You can do the same steps as in Option 1 to evaluate the artifact.
+5. You can follow the same steps as in Option 1 to evaluate the artifact.
 
-There are two more helpful commands to facilitate the evaluation in the virtual machine:
+There are two additional helpful commands to facilitate the evaluation in the virtual machine:
 
-1. Since the terminal may not be scrollable in the virtual machine. To read the terminal output, you can redirect the output to a temp file using `>` operator. For example:
+1. Since the terminal may not be scrollable in the virtual machine, to read the terminal output, you can redirect the output to a temporary file using the `>` operator. For example:
 
 ```
 cabal run Poly > haskell.out
 ```
 
-2. You can use `scp` command on the host machine to copy output files like `haskell.out` or `html` folder to the host machine. And you can read them on your editors or browsers. For example:
+2. You can use the `scp` command on the host machine to copy output files like `haskell.out` or the `html` folder to the host machine. You can then read them in your editors or browsers. For example:
 
 ```
 scp -P 5555 artifact@localhost:/home/artifact/popl26/main/impl_haskell/Poly/haskell.out .
@@ -130,8 +130,8 @@ We make two claims related to the artifact in the paper:
 
 The first claim can be verified by checking the mechanized proofs in Agda and Rocq,
 locating the corresponding lemmas and theorems in the code, comparing them with the statements in the paper,
-and verifying that the proofs are completed without any admitted axioms.
-To facilitate reading of the mechanized proofs, we provide nicely formatted HTML documentation with a table of contents in the sidebar.
+and verifying that the proofs are complete without any admitted axioms.
+To facilitate reading the mechanized proofs, we provide nicely formatted HTML documentation with a table of contents in the sidebar.
 
 ## Implementation
 
