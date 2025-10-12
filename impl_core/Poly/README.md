@@ -149,3 +149,33 @@ The table below summarizes every example used in the paper.
 - `k : forall a. a -> [a] -> a`
 - `lst : [forall a. Int -> a -> a]`
 - `r : (forall a. a -> forall b. b -> b) -> Int`
+
+### Adding Custom Examples
+
+To add and test your own examples, simply append new entries to the `examplesList` in `app/Examples.hs`. Each example should be defined as an `Example` record, specifying the following fields:
+
+- **`exampleName`**: A unique identifier for the example (e.g., "MyExample")
+- **`exampleEnv`**: The typing environment using De Bruijn indices
+- **`exampleTerm`**: The term to be type-checked using De Bruijn indices
+- **`exampleDescription`**: A description of what the example demonstrates
+
+**Example structure:**
+```haskell
+    Example
+      "MyExample"
+      (ETrm TInt EEmpty)
+      (Abs (Var 0) `App` Var 0)
+      "y : Int |- (λx. x) y"
+```
+
+**Running custom examples:**
+```bash
+cabal run Poly -- MyExample              # Run single custom example
+cabal run Poly -- MyExample OtherExample # Run multiple custom examples
+cabal run Poly -- --drv MyExample        # Show detailed derivation
+```
+
+**Note:** You'll need to rebuild the project after adding examples:
+```bash
+cabal build
+```
