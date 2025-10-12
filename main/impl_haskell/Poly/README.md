@@ -171,7 +171,6 @@ To add and test your own examples, simply append new entries to the `examplesLis
 **Running custom examples:**
 ```bash
 cabal run Poly -- MyExample              # Run single custom example
-cabal run Poly -- MyExample OtherExample # Run multiple custom examples
 cabal run Poly -- --drv MyExample        # Show detailed derivation
 ```
 
