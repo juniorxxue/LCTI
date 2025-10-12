@@ -4,43 +4,43 @@
 
 This artifact consists of three main parts:
 
-1. Mechanized proofs of the main results in Agda, including soundness, completeness and other properties shown in the paper, excluding the decidability of the algorithmic system, which can be found in `main/proof_agda`.
+1. Mechanized proofs of the main results in Agda, including soundness, completeness, and other properties shown in the paper, excluding the decidability of the algorithmic system, which can be found in `main/proof_agda`.
 
-2. Mechanized proof of the decidability of the algorithmic system in Rocq Prover, which can be found in `main/decidability_rocq`. The reason we use Rocq for this part is simply that Rocq is good at handling numerical automation, which is heavy in the decidability proof.
+2. A mechanized proof of the decidability of the algorithmic system in Rocq Prover, which can be found in `main/decidability_rocq`. We use Rocq for this part because Rocq excels at handling numerical automation, which is heavily used in the decidability proof.
 
-3. Haskell's prototype implementation of the algorithmic system, including all examples shown in the paper, which can be found in `main/impl_haskell`.
+3. A prototype implementation of the algorithmic system in Haskell, including all examples shown in the paper, which can be found in `main/impl_haskell`.
 
-We wish to remark that we briefly mention two variants in the related work section of the paper. Although they are not the main focus of the paper, we provide the mechanization of two variants in the `/variants` folder:
+We note that we briefly mention two variants in the related work section of the paper. Although they are not the main focus of the paper, we provide the mechanization of these two variants in the `/variants` folder:
 
-1. `proof_core_top_bot`: a variant extending main system with top and bottom types, which only contains two systems: declarative and intermediate systems, and their soundness and completeness proofs.
+1. `proof_core_top_bot`: a variant extending the main system with top and bottom types, which contains only two systems: declarative and intermediate systems, along with their soundness and completeness proofs.
 
-2. `proof_variant_right2left`: a variant of main system, which is different from the directionality (left-to-right) of the main system. All properties of the main system are also proved for this variant.
+2. `proof_variant_right2left`: a variant of the main system that differs in directionality (right-to-left instead of left-to-right) from the main system. All properties of the main system are also proven for this variant.
 
 ## Kick-the-tires instructions and installation
 
 Reviewers have two options to evaluate the artifact:
 
-1. Directly run the code in their own machine. This is recommended for reviewers who have experience with theorem provers. Our environment setup is not complex but involves three different languages. The artifact is expected to work on recent versions of those languages.
+1. Run the code directly on their own machine. This is recommended for reviewers who have experience with theorem provers. Our environment setup is straightforward but involves three different languages. The artifact is expected to work with recent versions of these languages.
 
-2. Run the code in a virtual machine (QEMU) provided, with the Debian Linux installed. We have installed all dependencies, and put the source code in the root. This is recommended for quick sanity check or kick-the-tires phase if reviewers do not have Agda, Rocq and Haskell installed already.
+2. Run the code in a virtual machine (QEMU) with Debian Linux installed. We have installed all dependencies and placed the source code in the root directory. This option is recommended for a quick sanity check or kick-the-tires evaluation if reviewers do not already have Agda, Rocq, and Haskell installed.
 
-### Option 1: evaluate the artifact in the host machine
+### Option 1: Evaluate the artifact on the host machine
 
 #### 1. Environment setup
 
 Our artifact requires the following dependencies:
 
-1. Agda and its standard library. We tested the code with the version 2.7.0.1 of Agda and the version 2.3 of the standard library. But the latest version of them is expected to work as well.
+1. Agda and its standard library. We tested the code with Agda version 2.7.0.1 and standard library version 2.3. However, the latest versions are expected to work as well.
 
-2. Rocq Prover and CoqHammer tactics. We tested the code with version 8.20.1 of Rocq and version 1.3.2 of CoqHammer. But the latest version of them is expected to work as well.
+2. Rocq Prover and CoqHammer tactics. We tested the code with Rocq version 8.20.1 and CoqHammer version 1.3.2. However, the latest versions are expected to work as well.
 
-3. Haskell's GHC and Cabal. We tested the code with version 9.0.2 of GHC and version 3.4.1.0 of Cabal. But the latest version of them is expected to work as well.
+3. Haskell GHC and Cabal. We tested the code with GHC version 9.0.2 and Cabal version 3.4.1.0. However, the latest versions are expected to work as well.
 
-The installation of Agda, Rocq and Haskell can be found on their official websites or by package managers like `homebrew` or `apt`.
+Installation instructions for Agda, Rocq, and Haskell can be found on their official websites or through package managers such as `homebrew` or `apt`.
 
-For Agda standard library, we suggest to follow the instructions in its [GitHub repository](https://github.com/agda/agda-stdlib/blob/master/doc/installation-guide.md).
+For the Agda standard library, we recommend following the instructions in its [GitHub repository](https://github.com/agda/agda-stdlib/blob/master/doc/installation-guide.md).
 
-For CoqHammer tactics, we suggest installing it via `opam`, recommended by its [documentation](https://coqhammer.github.io/#installation). Installing `coq-hammer-tactics` would suffice.
+For CoqHammer tactics, we recommend installing them via `opam`, as recommended by the [documentation](https://coqhammer.github.io/#installation). Installing `coq-hammer-tactics` will suffice.
 
 ```
 opam repo add coq-released https://coq.inria.fr/opam/released
@@ -49,50 +49,50 @@ opam install coq-hammer-tactics
 
 #### 2. Running the code
 
-**Main Proof of Agda**
+**Main Agda Proofs**
 
-1. Change directory `cd` into `main/proof_agda` folder, and run `make`, which will let Agda check entry file `README.agda` in the proof and generate a `html` folder. This process may take a 2~5 minutes (dependent on the machine), the compilation message of each file will be printed on the terminal.
+1. Change directory to the `main/proof_agda` folder and run `make`, which will instruct Agda to check the entry file `README.agda` in the proof and generate an `html` folder. This process may take 2–5 minutes (depending on the machine); the compilation messages for each file will be printed to the terminal.
 
-2. Make sure the compilation finishes without any error, and the `html` folder is successfully generated. Open `html/Implicit.README.html` in a web browser, and you will see a page listing all theorems stated in the paper and their corresponding (clickable) mechanized proofs in Agda.
+2. Ensure the compilation finishes without any errors and that the `html` folder is successfully generated. Open `html/Implicit.README.html` in a web browser, and you will see a page listing all theorems stated in the paper along with their corresponding (clickable) mechanized proofs in Agda.
 
-3. To double-check there is no admitted axioms you can use `grep -r "postulate"` to make sure there's no postulates in the Agda. The printed results should only be from html's configuration files or comments.
+3. To verify there are no admitted axioms, you can use `grep -r "postulate"` to ensure there are no postulates in the Agda code. The results should only come from HTML configuration files or comments.
 
-**Decidability Proof of Rocq**
+**Rocq Decidability Proofs**
 
-1. Change directory `cd` into `main/decidability_rocq/Dec` folder, and run `make` to let Rocq compile. This process may take less than a minute, the compilation message of each file will be printed on the terminal.
+1. Change directory to the `main/decidability_rocq/Dec` folder and run `make` to compile with Rocq. This process may take less than a minute; the compilation messages for each file will be printed to the terminal.
 
-2. Make sure the compilation finishes without any error, and the `html` folder is successfully generated. Open `html/toc.html`, you can see a table of contents page, listing language definitions and decidability theorems at the bottom.
+2. Ensure the compilation finishes without any errors and that the `html` folder is successfully generated. Open `html/toc.html` to see a table of contents page listing language definitions and decidability theorems at the bottom.
 
-3. To double-check there is no admitted axioms you can use `grep -r "Admitted"` and `grep -r "Axiom"` to make sure there's no axioms in the Rocq code. The printed results should only be from html's configuration files or binary files.
+3. To verify there are no admitted axioms, you can use `grep -r "Admitted"` and `grep -r "Axiom"` to ensure there are no axioms in the Rocq code. The results should only come from HTML configuration files or binary files.
 
-**Implementation of Haskell**
+**Haskell Implementation**
 
-1. Change directory `cd` into `main/impl_haskell/Poly` folder, and run `cabal build`. It will download dependencies and build the project. This process may take less one minute.
+1. Change directory to the `main/impl_haskell/Poly` folder and run `cabal build`. This will download dependencies and build the project. This process may take less than one minute.
 
-2. Make sure the compilation finishes without any error.
+2. Ensure the compilation finishes without any errors.
 
-3. Run `cabal run Poly` will test all examples, and print the results on the terminal.
+3. Running `cabal run Poly` will test all examples and print the results to the terminal.
 
-For codes in the `/variants` folder, the evaluation instructions are similar to the instructions above.
+For code in the `/variants` folder, the evaluation instructions are similar to those above.
 
-### Option 2: evaluate the artifact in the QEMU virtual machine
+### Option 2: Evaluate the artifact in the QEMU virtual machine
 
 
 
 ## Claims in the paper
 
-We have two claims related to artifacts in the paper:
+We make two claims related to the artifact in the paper:
 
-1. We claim all results shown in the paper, have been formally proven and mechanized in theorem provers. The evaluation instructions can be found in section ([Mechanized Proofs](##Mechanized Proofs)).
+1. We claim that all results shown in the paper have been formally proven and mechanized in theorem provers. The evaluation instructions can be found in the [Mechanized Proofs](#mechanized-proofs) section.
 
-2. We claim that we have a prototype implementation, which can run all the examples presented in the paper. The evaluation instructions can be found in section ([Implementation](##Implementation)).
+2. We claim that we have a prototype implementation that can run all the examples presented in the paper. The evaluation instructions can be found in the [Implementation](#implementation) section.
 
 ## Mechanized Proofs
 
-For the first claim, it can be verified by checking the mechanized proofs in Agda and Rocq,
-by locating the corresponding lemmas and theorems in the code, and compare them with the statements in the paper,
-and checking the proofs is proved without any admitted axioms.
-To facilitate the reading of the mechanized proofs, we provide a nicely prebuilt HTML, decorated with table of contents on the sidebar.
+The first claim can be verified by checking the mechanized proofs in Agda and Rocq,
+locating the corresponding lemmas and theorems in the code, comparing them with the statements in the paper,
+and verifying that the proofs are completed without any admitted axioms.
+To facilitate reading of the mechanized proofs, we provide nicely formatted HTML documentation with a table of contents in the sidebar.
 
 ## Implementation
 
@@ -100,7 +100,7 @@ To facilitate the reading of the mechanized proofs, we provide a nicely prebuilt
 ## Virtual Machine (QEMU)
 
 
-Make sure the virtual machine is running, and you can use those commands in the host machine:
+Ensure the virtual machine is running, then you can use these commands on the host machine:
 
 ```
 scp -P 5555 -r ./popl26 artifact@localhost:/home/artifact/
