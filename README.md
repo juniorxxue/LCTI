@@ -1,20 +1,14 @@
 #  Local Contextual Type Inference (Artifact)
 
-Table of Contents:
-
-1. [Artifact Overview](#artifact-overview): A brief description of the contents of the artifact.
-2. [Kick-the-tires instructions and installation](#kick-the-tires-instructions-and-installation): Instructions for setting up the environment and running the code, including an option to run the code in a virtual machine.
-3. [Claims in the paper](#claims-in-the-paper): A summary of the claims
-
 ## Artifact Overview
 
 This artifact consists of three main parts:
 
-1. Mechanized proofs of the main results in Agda, including soundness, completeness, and other properties shown in the paper, excluding the decidability of the algorithmic system, which can be found in `main/proof_agda`.
+1. Mechanized proofs of the main results in Agda. This includes the formalization of three systems: declarative system (Contextual System F, a variant of Implicit System F), intermediate system (matching subtyping), and algorithmic system. It also includes the proofs of soundness and completeness between these systems. All stated theorem excluding the decidability of the algorithmic system are proved in Agda.
 
-2. A mechanized proof of the decidability of the algorithmic system in Rocq Prover, which can be found in `main/decidability_rocq`. We use Rocq for this part because Rocq excels at handling numerical automation, which is heavily used in the decidability proof.
+2. A mechanized proof of the decidability of the algorithmic system in Rocq Prover. We use Rocq for this part because Rocq excels at handling numerical automation, which is heavily used in the decidability proof.
 
-3. A prototype implementation of the algorithmic system in Haskell, including all examples shown in the paper, which can be found in `main/impl_haskell`.
+3. A prototype implementation of the algorithmic system in Haskell, which can type-checks all the examples presented in the paper.
 
 We note that we briefly mention two variants in the related work section of the paper. Although they are not the main focus of the paper, we provide the mechanization of these two variants in the `/variants` folder:
 
@@ -136,12 +130,78 @@ We make two claims related to the artifact in the paper:
 
 ## Full Evaluation
 
-### Mechanized Proofs
+### Mechanization
 
-The first claim can be verified by checking the mechanized proofs in Agda and Rocq,
-locating the corresponding lemmas and theorems in the code, comparing them with the statements in the paper,
-and verifying that the proofs are complete without any admitted axioms.
-To facilitate reading the mechanized proofs, we provide nicely formatted HTML documentation with a table of contents in the sidebar.
+Then entry point to read Agda code is the `README.agda` file in the `main/proof_agda/Implicit/` folder, which lists all theorems stated in the paper along with their corresponding mechanized proofs in Agda. They are like:
+
+```agda
+-- Theorem 3.1 (Reflexivity of Subtyping)
+import Implicit.Decl.Typing using (s-refl-∞)
+
+-- Theorem 3.2 (Transitivity of subtyping)
+import Implicit.Decl.Trans using (s-trans')
+
+-- Theorem 3.3 (Soundness to Implicit System F)
+import Implicit.Annotatability.Soundness using (sound)
+```
+
+We recommend reading the Agda code in `html` format, where you can click on the imported theorems to navigate to their definitions and proofs.
+Another way to read the Agda code is by the well-maintained folder structure:
+
+1. `Language`: language definitions, including syntax of types, terms, environments, and auxiliary judgments appearing in the rules.
+
+2. `Decl`: declarative system, including typing rules and subtyping rules, along with their properties, corresponding to the system presented in Section 3 in the paper.
+
+3. `Interm`: intermediate language, including matching subtyping, corresponding to the system presented in Section 4 in the paper.
+
+4. `Algo`: algorithmic system, including typing rules and subtyping rules, along with their properties, corresponding to the system presented in Section 5 in the paper.
+
+5. `Algo2Interm` and `Interm2Algo`: soundness and completeness proofs between the algorithmic system and the intermediate system.
+
+6. `Decl2Interm` and `Interm2Decl`: soundness and completeness proofs between the declarative system and the intermediate system.
+
+7. `Annotatability`: the formalization of Implicit System F, including the soundness and completeness (also called annotatability) proofs between Contextual System F and Implicit System F, corresponding to the system presented in Section 3.3 in the paper.
+
+For the Rocq code, the file structure is obvious, and the decidability theorems can be found at `Dec.v`.
+
+**Discrepancies between the paper and the mechanization**
+
+We would like to point out a few discrepancies between the paper and the mechanization, all of them are due to the choices of easy-to-present and easy-to-mechanize, and we believe that they do not affect the correctness of the mechanization.
+
+1. **Binding Techniques:** The mechanization uses a well-scoped de Bruijn representation for the syntax, including with several shifts over language constructs, while the paper uses named variables for better readability.
+
+2. **Environmental Representation:** In the paper, three systems use three different kinds of environments, while in the mechanization, we use a single unified environment representation for all three systems to simplify the implementation, while enforcing some well-formedness invariants.
+
+3. **Invariants:** In the paper we omit most invariants enforced for the system, while explaining them in the text, like `regular`. In the mechanization, we inline those invariants into the base case of the rules.
+
+4. **Encoding all functions as relations:** In the paper, we present some operations as functions, including `grounding` and environmental lookup. In the mechanization, we encode almost all of them as relations to facilitate reasoning about them, since functions will block the case analysis in Agda, and relations are more suitable for dependent pattern matching.
+
+5. **Unifying rules:** In the paper, for the simplicity of presentation, we unify some rules in the paper, while in the mechanization they are split into multiple rules, these including the following:
+
+   - Instantiability (Figure 3): In the paper, we present a single rule for $\forall L$ rule, while in the mechanization we split it into two: `s-∀l` and `s-∀l-no-appear` in the `Decl/Subtyping.agda`. The side conditions in two rules are the same with the one in the paper.
+
+   - `DS-Arr` rule (Figure 3): In the paper, we present a single rule for function subtyping with a meta-operations on the counters. While in the mechanization, we specilize it into three rules, `s-arr₁`, `s-arr₂`, and `s-arr₃`, corresponding to the three cases of the meta-operation. Note that `s-arr₃` we omit a premise since it is a tautology for declarative subtyping.
+
+   - `IS-Var-L` rule (Figure 4): In the paper, we present a single left rule for matching variables (with arbitrary counters), while in the mechanization we split the counters (along with their supertypes) to three cases, corresponding to three rules: `s-svar-l`, `s-svar-𝕚`, `s-svar-𝕔` and `s-svar-𝕥`. We do a similar simplification for the algorithmic system.
+
+For others, we believe they are straightforward translations from the paper to the mechanization, and we try our best to match the Agda notation to the notation in the paper.
+
+### Implementation
+
+In the file `main/impl_haskell/Poly/README.md`, we provide a detailed explanation of how to run this code, and the meaning of the output, and a table listing all the examples presented in the paper.
+
+## Reusability Guidelines
+
+To our knowledge, we are the first to mechanize local type inference algorithms, which are widely used in practical programming languages like Java, Scala and TypeScript. We believe that not only our conceptual model of contextual type inference, but also our mechanization techniques can lay a solid foundation for future mechanization of practical type inference algorithms.
+
+Specifically, we wish to be badged for Reusable based on the following reasons:
+
+1. Our infrastructure of well-scoped de Bruijn can be reusable for mechanizing other type systems, especially for polymorphic type systems. We found that by tracking the number of free variables in the environment, we can avoid many pitfalls when reasoning. Well-scoped de Bruijn is not a new idea, but rarely used in mechanizing complex type inference algorithms. We believe that our mechanization can serve as a good reference for future mechanization of polymorphic type systems.
+
+2. Our mechanization is suitable for adding extensions for new language constructs and features. Our mechanization about three systems are separated into different folders, with their metatheory unentangled. The metatheory for the declarative system is very simple for studying new features (including new typing and subtyping) without worrying about other algorithmic details.
+
+3. Our Haskell implementation can be tested with more inputs. This is documented in the `README.md` file in the `main/impl_haskell/Poly` folder.
+
 
 ## QEMU Instructions
 
