@@ -1,18 +1,12 @@
-{-# LANGUAGE RankNTypes #-}
-{-# LANGUAGE TypeSynonymInstances #-}
-{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
-
-{-# HLINT ignore "Redundant multi-way if" #-}
-{-# HLINT ignore "Use if" #-}
 module Main where
 
 import Control.Monad (forM_, when)
 import Control.Monad.Writer
 import DeBruijn
+import Examples (Example (..), examples, getExample, getExamplesInGroup)
 import Log
 import Syntax
 import System.Environment (getArgs)
-import Examples (examples, Example(..), getExample, getExamplesInGroup)
 
 lookupEnv :: Int -> Env -> WriterT Log Maybe Typ
 lookupEnv 0 (ETrm ty _) = do
@@ -373,7 +367,7 @@ main = do
   args <- getArgs
   let showDrv = "--drv" `elem` args
       showHelp = "--help" `elem` args || "-h" `elem` args
-  
+
   if showHelp
     then do
       putStrLn "Usage: cabal run Poly -- [OPTIONS] [EXAMPLE_NAME]"

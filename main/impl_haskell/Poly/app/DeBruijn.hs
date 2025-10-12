@@ -1,7 +1,6 @@
-{-# LANGUAGE MultiWayIf, LambdaCase, RankNTypes, TypeSynonymInstances #-}
-{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
-{-# HLINT ignore "Redundant multi-way if" #-}
 module DeBruijn where
+
+-- import Debug.Trace
 
 import Syntax
 
@@ -10,8 +9,9 @@ import Syntax
 shiftTyp :: Int -> Typ -> Typ
 shiftTyp _ TInt = TInt
 shiftTyp _ TBool = TBool
-shiftTyp k (TVar x) = if | x < k -> TVar x
-                         | otherwise -> TVar (x + 1)
+shiftTyp k (TVar x)
+  | x < k = TVar x
+  | otherwise = TVar (x + 1)
 shiftTyp k (TArr t1 t2) = TArr (shiftTyp k t1) (shiftTyp k t2)
 shiftTyp k (TForall t) = TForall (shiftTyp (k + 1) t)
 shiftTyp k (TList t) = TList (shiftTyp k t)
@@ -24,9 +24,11 @@ shiftTyp0 = shiftTyp 0
 substTyp :: Int -> Typ -> Typ -> Typ
 substTyp _ _ TInt = TInt
 substTyp _ _ TBool = TBool
-substTyp k tyA (TVar x) = if | k == x -> tyA
-                             | otherwise -> TVar $ punchOut k x
-                          where punchOut i j = if j > i then j - 1 else j
+substTyp k tyA (TVar x)
+  | k == x = tyA
+  | otherwise = TVar $ punchOut k x
+  where
+    punchOut i j = if j > i then j - 1 else j
 substTyp k tyA (TArr t1 t2) = TArr (substTyp k tyA t1) (substTyp k tyA t2)
 substTyp k tyA (TForall tyB) = TForall (substTyp (k + 1) (shiftTyp0 tyA) tyB)
 substTyp k tyA (TList tyB) = TList (substTyp k tyA tyB)
@@ -35,17 +37,18 @@ substTyp k tyA (TST tyB1 tyB2) = TST (substTyp k tyA tyB1) (substTyp k tyA tyB2)
 
 substTyp0 :: Typ -> Typ -> Typ
 -- substTyp0 a b | trace ("substTyp0 " ++ show a ++ " " ++ show b) False = undefined
-substTyp0 a b = substTyp 0 a b
+substTyp0 = substTyp 0
 
 unshiftTyp0 :: Typ -> Typ
 -- unshiftTyp0 a | trace ("unshiftTyp0 " ++ show a) False = undefined
-unshiftTyp0 a = substTyp 0 TInt a
+unshiftTyp0 = substTyp 0 TInt
 
 shiftTerm :: Int -> Trm -> Trm
 shiftTerm _ (LitInt i) = LitInt i
 shiftTerm _ (LitBool b) = LitBool b
-shiftTerm k (Var x) = if | x < k -> Var x
-                         | otherwise -> Var (x + 1)
+shiftTerm k (Var x)
+  | x < k = Var x
+  | otherwise = Var (x + 1)
 shiftTerm k (Abs t) = Abs (shiftTerm (k + 1) t)
 shiftTerm k (AbsAnn ty t) = AbsAnn ty (shiftTerm (k + 1) t)
 shiftTerm k (App t1 t2) = App (shiftTerm k t1) (shiftTerm k t2)
@@ -69,13 +72,11 @@ shiftContext k (CTApp ty ctx) = CTApp ty (shiftContext k ctx)
 shiftContext0 :: Context -> Context
 shiftContext0 = shiftContext 0
 
-
-
 -- type shift in term
 shiftTyTerm :: Int -> Trm -> Trm
 shiftTyTerm _ (LitInt i) = LitInt i
 shiftTyTerm _ (LitBool b) = LitBool b
-shiftTyTerm _ (Var x) = (Var x)
+shiftTyTerm _ (Var x) = Var x
 shiftTyTerm k (Abs t) = Abs (shiftTyTerm k t)
 shiftTyTerm k (AbsAnn ty t) = AbsAnn (shiftTyp k ty) (shiftTyTerm k t)
 shiftTyTerm k (App t1 t2) = App (shiftTyTerm k t1) (shiftTyTerm k t2)

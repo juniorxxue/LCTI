@@ -1,10 +1,11 @@
-{-# LANGUAGE RankNTypes, TypeSynonymInstances #-}
-{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
-{-# HLINT ignore "Redundant multi-way if" #-}
 module Syntax where
 
+-- import Debug.Trace
+
 type Log = [String]
+
 data Typ = TInt | TBool | TVar Int | TArr Typ Typ | TForall Typ | TList Typ | TProd Typ Typ | TST Typ Typ deriving (Eq)
+
 data Trm = LitInt Int | LitBool Bool | Var Int | Abs Trm | AbsAnn Typ Trm | App Trm Trm | Ann Trm Typ | TAbs Trm | TApp Trm Typ | Nil | Cons | Pair | ST
 
 instance Show Typ where
@@ -66,11 +67,9 @@ genericConsumer Cons = True
 genericConsumer Pair = True
 genericConsumer _ = False
 
-
 nonEmptyContext :: Context -> Bool
 nonEmptyContext CEmpty = False
 nonEmptyContext _ = True
-
 
 isEvar :: Env -> Int -> Bool
 isEvar EEmpty _ = False
