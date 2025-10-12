@@ -210,7 +210,7 @@ In the file `main/impl_haskell/Poly/README.md`, we provide a detailed explanatio
 
 ## Reusability Guidelines
 
-To our knowledge, we are the first to mechanize local type inference algorithms, which are widely used in practical programming languages such as Java, Scala, and TypeScript. We believe that not only our conceptual model of contextual type inference, but also our mechanization techniques can lay a solid foundation for future mechanization of practical type inference algorithms.
+To our knowledge, we are the first to mechanize local type inference algorithms, which are widely used in practical programming languages such as Java, Scala, and TypeScript. We believe that not only our conceptual model of local contextual type inference, but also our mechanization techniques can lay a solid foundation for future mechanization of practical type inference algorithms.
 
 Specifically, we request to be badged as Reusable based on the following reasons:
 
