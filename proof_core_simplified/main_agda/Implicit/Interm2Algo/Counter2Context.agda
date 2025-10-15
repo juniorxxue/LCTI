@@ -9,43 +9,42 @@ open import Implicit.Interm.Base
 ----------------------------------------------------------------------
 
 infix 3 _⊢_~s_
-data _⊢_~s_ : Env n m → Counter × Type m → Context n m → Set where
+data _⊢_~s_ : Env n m → Mask × Type m → Context n m → Set where
 
   ~Z : ∀ {Γ : Env n m} {A}
-    → Γ ⊢ ⟨ Z , A ⟩ ~s □
+    → Γ ⊢ ⟨ `■ , A ⟩ ~s □
 
   ~∞ : ∀ {Γ : Env n m} {A }
-    → Γ ⊢ ⟨ ∞ , A ⟩ ~s τ A
+    → Γ ⊢ ⟨ `□ , A ⟩ ~s τ A
 
   ~I : ∀ {Γ : Env n m} {j A B Σ e}
     → (⊢e : 𝕣 Γ ⊢ □ ⇒ e ⇒ A)
---    → Γ ⊆ Ω w/t A
     → Γ ⊢ ⟨ j , B ⟩ ~s Σ
-    → Γ ⊢ ⟨ 𝕚 j , A `→ B ⟩ ~s ([ e ]↝ Σ)
+    → Γ ⊢ ⟨ □ · j , A `→ B ⟩ ~s ([ e ]↝ Σ)
 
   ~C : ∀ {Γ : Env n m} {j B Σ e}
     → (⊢e : 𝕣 Γ ⊢ τ A% ⇒ e ⇒ A%)
     → Γ ⊢ ⟨ j , B ⟩ ~s Σ
-    → Γ ⊢ ⟨ 𝕔 j , A% `→ B ⟩ ~s ([ e ]↝ Σ)
+    → Γ ⊢ ⟨ ■ · j , A% `→ B ⟩ ~s ([ e ]↝ Σ)
 
 infix 3 _⊢_~t_
-data _⊢_~t_ : Env n m → Counter × Type m → Context n m → Set where
+data _⊢_~t_ : Env n m → Mask × Type m → Context n m → Set where
 
   ~Z : ∀ {Γ : Env n m} {A}
-    → Γ ⊢ ⟨ Z , A ⟩ ~t □
+    → Γ ⊢ ⟨ `■ , A ⟩ ~t □
 
   ~∞ : ∀ {Γ : Env n m} {A }
-    → Γ ⊢ ⟨ ∞ , A ⟩ ~t τ A
+    → Γ ⊢ ⟨ `□ , A ⟩ ~t τ A
 
   ~I : ∀ {Γ : Env n m} {j A B Σ e}
     → (⊢e : Γ ⊢ □ ⇒ e ⇒ A)
     → Γ ⊢ ⟨ j , B ⟩ ~t Σ
-    → Γ ⊢ ⟨ 𝕚 j , A `→ B ⟩ ~t ([ e ]↝ Σ)
+    → Γ ⊢ ⟨ □ · j , A `→ B ⟩ ~t ([ e ]↝ Σ)
 
   ~C : ∀ {Γ : Env n m} {j B Σ e}
     → (⊢e : Γ ⊢ τ A% ⇒ e ⇒ A%)
     → Γ ⊢ ⟨ j , B ⟩ ~t Σ
-    → Γ ⊢ ⟨ 𝕔 j , A% `→ B ⟩ ~t ([ e ]↝ Σ)
+    → Γ ⊢ ⟨ ■ · j , A% `→ B ⟩ ~t ([ e ]↝ Σ)
 
 ~weaken,0 : Γ ⊢ ⟨ j , B ⟩ ~t Σ
           → ↑tmᶜ0 Σ ⇘ Σ'

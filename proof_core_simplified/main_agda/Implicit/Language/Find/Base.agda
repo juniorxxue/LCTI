@@ -7,7 +7,7 @@ open import Implicit.Language.Occur.Base
 open import Implicit.Language.Regular.Base
 
 data □like : Mask → Set where
-  □like-Z : □like `□
+  □like-Z : □like (□ · `□)
   □like-S : □like j
           → □like (□ · j)
 

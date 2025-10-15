@@ -29,18 +29,18 @@ complete (⊢lam₂ ⊢e) (~I {Σ = Σ} ⊢e₁ j~Σ)
   with reg-S, regΓ regA ← t-tregular ⊢e
   with ⟨ Σ' , upΣ ⟩ ← ↑tmᶜ0-total Σ
   = ⊢lam₂ ⊢e₁ upΣ (complete ⊢e (~weaken,0 j~Σ upΣ regA))
-complete (⊢app₁ ⊢e ⊢e₁) j~Σ = ⊢app (complete ⊢e (~C (complete ⊢e₁ ~∞) j~Σ))
-complete (⊢app₂ ⊢e ⊢e₁) j~Σ = ⊢app (complete ⊢e (~I (complete ⊢e₁ ~Z) j~Σ))
+complete (⊢app {i = □} ⊢e ⊢e₁) j~Σ = ⊢app (complete ⊢e (~C (complete ⊢e₁ ~∞) j~Σ))
+complete (⊢app {i = ■} ⊢e ⊢e₁) j~Σ = ⊢app (complete ⊢e (~I (complete ⊢e₁ ~Z) j~Σ))
 complete (⊢sub ⊢e B≤A gc j≢Z) j~Σ = ⊢sub (complete ⊢e ~Z) (nonempty j≢Z j~Σ) gc (complete-s0 B≤A j~Σ)
-complete (⊢tabs-∞ x) ~∞ = ⊢tabs-τ (complete x ~∞)
 complete (⊢tabs ⊢e) ~Z = ⊢tabs (complete ⊢e ~Z)
+complete (⊢tabs ⊢e) ~∞ = ⊢tabs-τ (complete ⊢e ~∞)
 complete (⊢tapp ⊢e st regA s) ~j = ⊢tapp (complete ⊢e ~Z) regA st (complete-s0 s ~j)
 
 -- corollaries
-complete-0 : Γ ⊢ Z # e ⦂ A
+complete-0 : Γ ⊢ `■ # e ⦂ A
            → Γ ⊢ □ ⇒ e ⇒ A
 complete-0 ⊢e = complete ⊢e ~Z
 
-complete-∞ : Γ ⊢ ∞ # e ⦂ A
+complete-∞ : Γ ⊢ `□ # e ⦂ A
            → Γ ⊢ τ A ⇒ e ⇒ A
 complete-∞ ⊢e = complete ⊢e ~∞
