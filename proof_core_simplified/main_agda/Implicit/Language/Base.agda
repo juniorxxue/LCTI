@@ -80,24 +80,33 @@ variable
             → X ≡ Y
 ‶-injective refl = refl
 
-data Counter : Set where
-  Z : Counter
-  ∞ : Counter
-  𝕚 : Counter → Counter
-  𝕔 : Counter → Counter
+data Mode : Set where
+  □ : Mode
+  ■ : Mode
+
+data Mask : Set where
+  `_ : Mode → Mask
+  _·_ : Mode → Mask → Mask
+
+`□ : Mask
+`□ = ` □
+
+`■ : Mask
+`■ = ` ■
 
 variable
-  j j′ j″  : Counter
-  j' j'' : Counter
+  i : Mode
+  j j′ j″  : Mask
+  j' j'' : Mask
 
-data NonZ : Counter → Set where
-  nz-∞ : NonZ ∞
-  nz-I : NonZ (𝕚 j)
-  nz-C : NonZ (𝕔 j)
+data NonZ : Mask → Set where
+  nz-□ : NonZ (` □)
+  nz-app : NonZ (i · j)
 
-data 𝕚𝕔 : Counter → Set where
-  case-𝕚 : 𝕚𝕔 (𝕚 j)
-  case-𝕔 : 𝕚𝕔 (𝕔 j)
+fp : Mode → Mode
+fp □ = ■
+fp ■ = □
+
 
 data Polar : Set where
   ≤⁺ ≤⁻ : Polar

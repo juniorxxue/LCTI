@@ -29,11 +29,9 @@ sc-sound (s-empty regΓ cloA x) = s-empty regΓ cloA x
 sc-sound (s-type ss) = s-type ss
 sc-sound (s-term-c cloA ap ⊢e s) = s-term-c cloA ap (tc-sound ⊢e) (sc-sound s)
 sc-sound (s-term-o opnA ⊢e ss s) = s-term-o opnA (tc-sound ⊢e) ss (sc-sound s)
-sc-sound (s-∀l-𝕚 s upᶜ upᵉ upC upD) = s-∀l (sc-sound s) upᶜ upᵉ upC upD
-sc-sound (s-∀l-𝕔 s upᶜ upᵉ upC upD) = s-∀l (sc-sound s) upᶜ upᵉ upC upD
+sc-sound (s-∀l s upᶜ upᵉ upC upD) = s-∀l (sc-sound s) upᶜ upᵉ upC upD
 sc-sound (s-svar-term inΓ s) = s-svar-term inΓ (sc-sound s)
-sc-sound (s-∀l-no-𝕚 x upᶜ upᵉ upC upD) = s-∀l-no (sc-sound x) upᶜ upᵉ upC upD
-sc-sound (s-∀l-no-𝕔 x upᶜ upᵉ upC upD) = s-∀l-no (sc-sound x) upᶜ upᵉ upC upD
+sc-sound (s-∀l-no x upᶜ upᵉ upC upD) = s-∀l-no (sc-sound x) upᶜ upᵉ upC upD
 sc-sound (s-evar-infers infs inst) = s-evar-infers (infsc-sound infs) inst
 
 infsc-sound (infs-z regΓ regA) = infs-z regΓ regA

@@ -6,54 +6,54 @@ open import Implicit.Algo.All
 open import Implicit.Algo2Interm.AlgoCounter.All
 
 infix 3 _⊢_~t_
-data _⊢_~t_ : Env n m → Counter × Type m → Context n m → Set where
+data _⊢_~t_ : Env n m → Mask × Type m → Context n m → Set where
 
   ~tZ : ∀ {Γ : Env n m} {A}
-    → Γ ⊢ ⟨ Z , A ⟩ ~t □
+    → Γ ⊢ ⟨ `■ , A ⟩ ~t □
 
   ~t∞ : ∀ {Γ : Env n m} {A }
-    → Γ ⊢ ⟨ ∞ , A ⟩ ~t τ A
+    → Γ ⊢ ⟨ `□ , A ⟩ ~t τ A
 
   ~tI : ∀ {Γ : Env n m} {j A B Σ e}
-    → (⊢e : Γ ⊢ Z # e ⦂ A)
+    → (⊢e : Γ ⊢ `■ # e ⦂ A)
     → Γ ⊢ ⟨ j , B ⟩ ~t Σ
-    → Γ ⊢ ⟨ 𝕚 j , A `→ B ⟩ ~t ([ e ]↝ Σ)
+    → Γ ⊢ ⟨ □ · j , A `→ B ⟩ ~t ([ e ]↝ Σ)
 
   ~tC : ∀ {Γ : Env n m} {j A B Σ e}
-    (⊢e : Γ ⊢ ∞ # e ⦂ A)
+    (⊢e : Γ ⊢ `□ # e ⦂ A)
     → Γ ⊢ ⟨ j , B ⟩ ~t Σ
-    → Γ ⊢ ⟨ 𝕔 j , A `→ B ⟩ ~t ([ e ]↝ Σ)
+    → Γ ⊢ ⟨ ■ · j , A `→ B ⟩ ~t ([ e ]↝ Σ)
 
 infix 3 _⊢_~inf_
-data _⊢_~inf_ : Env n m → Counter × Type m → Context n m → Set where
+data _⊢_~inf_ : Env n m → Mask × Type m → Context n m → Set where
 
   ~i∞ : ∀ {Γ : Env n m} {A }
-    → Γ ⊢ ⟨ ∞ , A ⟩ ~inf τ A
+    → Γ ⊢ ⟨ `□ , A ⟩ ~inf τ A
 
   ~iI : ∀ {Γ : Env n m} {j A B Σ e}
-    → (⊢e : Γ ⊢ Z # e ⦂ A)
+    → (⊢e : Γ ⊢ `■ # e ⦂ A)
     → Γ ⊢ ⟨ j , B ⟩ ~inf Σ
-    → Γ ⊢ ⟨ 𝕚 j , A `→ B ⟩ ~inf ([ e ]↝ Σ)
+    → Γ ⊢ ⟨ □ · j , A `→ B ⟩ ~inf ([ e ]↝ Σ)
 
 
 infix 3 _⊢_~s_
-data _⊢_~s_ : Env n m → Counter × Type m → Context n m → Set where
+data _⊢_~s_ : Env n m → Mask × Type m → Context n m → Set where
 
   ~sZ : ∀ {Γ : Env n m} {A}
-    → Γ ⊢ ⟨ Z , A ⟩ ~s □
+    → Γ ⊢ ⟨ `■ , A ⟩ ~s □
 
   ~s∞ : ∀ {Γ : Env n m} {A }
-    → Γ ⊢ ⟨ ∞ , A ⟩ ~s τ A
+    → Γ ⊢ ⟨ `□ , A ⟩ ~s τ A
 
   ~sI : ∀ {Γ : Env n m} {j A B Σ e}
-    → (⊢e : 𝕣 Γ ⊢ Z # e ⦂ A)
+    → (⊢e : 𝕣 Γ ⊢ `■ # e ⦂ A)
     → Γ ⊢ ⟨ j , B ⟩ ~s Σ
-    → Γ ⊢ ⟨ 𝕚 j , A `→ B ⟩ ~s ([ e ]↝ Σ)
+    → Γ ⊢ ⟨ □ · j , A `→ B ⟩ ~s ([ e ]↝ Σ)
 
   ~sC : ∀ {Γ : Env n m} {j A B Σ e}
-    (⊢e : 𝕣 Γ ⊢ ∞ # e ⦂ A)
+    (⊢e : 𝕣 Γ ⊢ `□ # e ⦂ A)
     → Γ ⊢ ⟨ j , B ⟩ ~s Σ
-    → Γ ⊢ ⟨ 𝕔 j , A `→ B ⟩ ~s ([ e ]↝ Σ)
+    → Γ ⊢ ⟨ ■ · j , A `→ B ⟩ ~s ([ e ]↝ Σ)
 
 ~s-~t : Γ ⊢ ⟨ j , A ⟩ ~s Σ
       → 𝕣 Γ ⊢ ⟨ j , A ⟩ ~t Σ
@@ -85,10 +85,9 @@ data _⊢_~s_ : Env n m → Counter × Type m → Context n m → Set where
 NonEmpty-NonZ : NonEmpty Σ
               → Γ ⊢ ⟨ j , A ⟩ ~t Σ
               → NonZ j
-NonEmpty-NonZ ne-τ ~t∞ = nz-∞
-NonEmpty-NonZ ne-app (~tI ⊢e j~Σ) = nz-I
-NonEmpty-NonZ ne-app (~tC ⊢e j~Σ) = nz-C
-
+NonEmpty-NonZ ne-τ ~t∞ = nz-□
+NonEmpty-NonZ ne-app (~tI ⊢e newj) = nz-app
+NonEmpty-NonZ ne-app (~tC ⊢e newj) = nz-app
 
 
 ~s-strengthen^0 : Γ ,^ ⊢ ⟨ j , A' ⟩ ~s Σ'

@@ -13,14 +13,12 @@ s-sregular (s-arr₂ s s₁) = s-sregular s
 s-sregular (s-arr₃ cloA grd s) = s-sregular s
 s-sregular (s-∀ s) with s-sregular s
 ... | reg-S∙ r = r
-s-sregular (s-∀l s ic fd upC upD) with s-sregular s
+s-sregular (s-∀l s fd upC upD) with s-sregular s
 ... | reg-S= r regA = r
-s-sregular (s-∀l-no-appear s ic fd upC upD) with s-sregular s
+s-sregular (s-∀l-no-appear s fd upC upD) with s-sregular s
 ... | reg-S^ r = r
-s-sregular (s-svar-l x inΔ) = x
+s-sregular (s-svar-l inΔ s) = s-sregular s
 s-sregular (s-svar-r x inΔ) = x
-s-sregular (s-svar-𝕚 _ x) = s-sregular x
-s-sregular (s-svar-𝕔 _ x) = s-sregular x
 
 t-tregular : Γ ⊢ j # e ⦂ A
            → TRegular Γ
@@ -31,11 +29,8 @@ t-tregular (⊢lam₁ ⊢e) with t-tregular ⊢e
 ... | reg-S, r regA = r
 t-tregular (⊢lam₂ ⊢e) with t-tregular ⊢e
 ... | reg-S, r regA = r
-t-tregular (⊢app₁ ⊢e ⊢e₁) = t-tregular ⊢e
-t-tregular (⊢app₂ ⊢e ⊢e₁) = t-tregular ⊢e
+t-tregular (⊢app ⊢e ⊢e₁) = t-tregular ⊢e
 t-tregular (⊢sub ⊢e B≤A x j≢Z) = t-tregular ⊢e
 t-tregular (⊢tabs ⊢e) with t-tregular ⊢e
-... | reg-S∙ r = r
-t-tregular (⊢tabs-∞ ⊢e) with t-tregular ⊢e
 ... | reg-S∙ r = r
 t-tregular {e = e ⓪ A} (⊢tapp ⊢e regA st s) = t-tregular ⊢e
