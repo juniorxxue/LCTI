@@ -8,7 +8,7 @@ open import Implicit.Algo2Interm.Context2Counter
 
 infs-isoinf : Γ ⊨ [ e ]↝ Σ ⟹ A ↡ j
             → □like j
-infs-isoinf (infs-s ⊢e (infs-z regΓ regA)) = □like-S □like-Z
+infs-isoinf (infs-s ⊢e (infs-z regΓ regA)) = □like-Z
 infs-isoinf (infs-s ⊢e (infs-s ⊢e₁ infs)) = □like-S (infs-isoinf (infs-s ⊢e infs))
 
 ss-find-l : Γ ⊢ A ⌞ ≤⁺ ⌝ B ⊣ Δ

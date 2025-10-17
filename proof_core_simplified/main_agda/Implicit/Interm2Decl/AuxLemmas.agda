@@ -25,7 +25,7 @@ sd-strengthen= (s-arr₃ regA s) new (↑ty-arr upA upA₁) (↑ty-arr upB upB�
   = s-arr₃ (⊢r-strengthen= regA new upB) (sd-strengthen= s new upA₁ upB₁)
 sd-strengthen= (s-∀ s) new (↑ty-∀ upA) (↑ty-∀ upB)
   = s-∀ (sd-strengthen= s (◀S∙ new) upA upB)
-sd-strengthen= {j = j} (s-∀l {B = B} grd regA' s ic fd upC upD) new (↑ty-∀ upA) (↑ty-arr {A = A′} {B = B′} upB upB₁)
+sd-strengthen= {j = j} (s-∀l {B = B} grd regA' s fd upC upD) new (↑ty-∀ upA) (↑ty-arr {A = A′} {B = B′} upB upB₁)
   with ⟨ A″ , upA′ ⟩ ← ↑ty0-total A′
   with ⟨ B″ , upB′ ⟩ ← ↑ty0-total B′
   with reg-S= regΓ regA ← s2-sregular s
@@ -38,9 +38,8 @@ sd-strengthen= {j = j} (s-∀l {B = B} grd regA' s ic fd upC upD) new (↑ty-∀
   = s-∀l (≫-strengthen= grd (reg-S= regΓ regA) (◀S= new upB') upA upA%)
          (⊢r-strengthen= regA' (◀S∙ new) upA)
          (sd-strengthen= s (◀S= new upB') upA% (↑ty-arr (↑ty-comm0' upB upC upA′) (↑ty-comm0' upB₁ upD upB′)))
-         ic
          (↑ty-find0' fd upA) upA′ upB′
-sd-strengthen= {j = j} (s-∀l-no-appear grd regA' s ic fd upC upD) new (↑ty-∀ upA) (↑ty-arr {A = A′} {B = B′} upB upB₁)
+sd-strengthen= {j = j} (s-∀l-no-appear grd regA' s fd upC upD) new (↑ty-∀ upA) (↑ty-arr {A = A′} {B = B′} upB upB₁)
   with ⟨ A″ , upA′ ⟩ ← ↑ty0-total A′
   with ⟨ B″ , upB′ ⟩ ← ↑ty0-total B′
   with reg-S^ regΓ  ← s2-sregular s
@@ -51,7 +50,6 @@ sd-strengthen= {j = j} (s-∀l-no-appear grd regA' s ic fd upC upD) new (↑ty-�
   = s-∀l-no-appear (≫-strengthen= grd (reg-S^ regΓ) (◀S^ new) upA upA%)
                    (⊢r-strengthen= regA' (◀S∙ new) upA)
                    (sd-strengthen= s (◀S^ new) upA% (↑ty-arr (↑ty-comm0' upB upC upA′) (↑ty-comm0' upB₁ upD upB′)))
-                   ic
                    (¬ε-↑ty'-inv0 fd upA)
                    upA′ upB′
 
@@ -65,7 +63,7 @@ sd-strengthen=0 s upA upB = sd-strengthen= s ◀Z upA upB
 
 sd-refl-∞ : SRegular Γ
           → Γ ⊢r A
-          → Γ ⊢d² ∞ # A ≤ A
+          → Γ ⊢d² `□ # A ≤ A
 sd-refl-∞ regΓ ⊢r-int = s-int regΓ
 sd-refl-∞ regΓ (⊢r-var-∙ inΓ) = s-var-∙ regΓ inΓ
 sd-refl-∞ regΓ (⊢r-arr regA regA₁) = s-arr₁ (sd-refl-∞ regΓ regA) (sd-refl-∞ regΓ regA₁)

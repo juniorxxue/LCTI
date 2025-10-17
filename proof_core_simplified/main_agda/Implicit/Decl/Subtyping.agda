@@ -7,47 +7,45 @@ open import Implicit.Language.All
 ----------------------------------------------------------------------
 
 infix 3 _⊢d_#_≤_
-data _⊢d_#_≤_ : Env n m → Counter → Type m → Type m → Set where
+data _⊢d_#_≤_ : Env n m → Mask → Type m → Type m → Set where
   s-refl :
       (regΔ : SRegular Δ)
     → (cloA : Δ ⊢r A)
-    → Δ ⊢d Z # A ≤ A
+    → Δ ⊢d `■ # A ≤ A
   s-int :
       (regΔ : SRegular Δ)
-    → Δ ⊢d ∞ # Int ≤ Int
+    → Δ ⊢d `□ # Int ≤ Int
   s-var-∙ :
       (regΔ : SRegular Δ)
     → (inΔ : Δ ∋∙ X)
-    → Δ ⊢d ∞ # ‶ X ≤ ‶ X
+    → Δ ⊢d `□ # ‶ X ≤ ‶ X
   s-arr₁ :
-      Δ ⊢d ∞ # C ≤ A
-    → Δ ⊢d ∞ # B ≤ D
-    → Δ ⊢d ∞ # A `→ B ≤ C `→ D
+      Δ ⊢d `□ # C ≤ A
+    → Δ ⊢d `□ # B ≤ D
+    → Δ ⊢d `□ # A `→ B ≤ C `→ D
   s-arr₂ :
-      Δ ⊢d ∞ # C ≤ A
+      Δ ⊢d `□ # C ≤ A
     → Δ ⊢d j # B ≤ D
-    → Δ ⊢d 𝕚 j # A `→ B ≤ C `→ D
+    → Δ ⊢d □ · j # A `→ B ≤ C `→ D
   s-arr₃ :
       (regA : Δ ⊢r A)
     → Δ ⊢d j # B ≤ D
-    → Δ ⊢d 𝕔 j # A `→ B ≤ A `→ D
+    → Δ ⊢d ■ · j # A `→ B ≤ A `→ D
   s-∀ :
-      Δ ,∙ ⊢d ∞ # A ≤ B
-    → Δ ⊢d ∞ # `∀ A ≤ `∀ B
+      Δ ,∙ ⊢d `□ # A ≤ B
+    → Δ ⊢d `□ # `∀ A ≤ `∀ B
   s-∀l :
       (regB : Γ ⊢r B)
     → (st : ⟦ B ⟧ A ⇘ A*)
-    → Γ ⊢d j # A* ≤ C `→ D
-    → (ic : (𝕚𝕔 j))
-    → (fd : find A #0 j)
-    → Γ ⊢d j # `∀ A ≤ C `→ D
+    → Γ ⊢d (i · j) # A* ≤ C `→ D
+    → (fd : find A #0 (i · j))
+    → Γ ⊢d (i · j) # `∀ A ≤ C `→ D
   s-∀l-no-appear :
       (regB : Γ ⊢r B)
     → (st : ⟦ B ⟧ A ⇘ A*)
-    → Γ ⊢d j # A* ≤ C `→ D
-    → (ic : (𝕚𝕔 j))
+    → Γ ⊢d (i · j) # A* ≤ C `→ D
     → (fd : #0 ¬ε A)
-    → Γ ⊢d j # `∀ A ≤ C `→ D
+    → Γ ⊢d (i · j) # `∀ A ≤ C `→ D
 
 
 
@@ -64,8 +62,8 @@ s1-⊢r-l (s-arr₁ s s₁) = ⊢r-arr (s1-⊢r-r s) (s1-⊢r-l s₁)
 s1-⊢r-l (s-arr₂ s s₁) = ⊢r-arr (s1-⊢r-r s) (s1-⊢r-l s₁)
 s1-⊢r-l (s-arr₃ regA s) = ⊢r-arr regA (s1-⊢r-l s)
 s1-⊢r-l (s-∀ s) = ⊢r-∀ (s1-⊢r-l s)
-s1-⊢r-l (s-∀l regB st s ic fd) = st0-⊢r' (s1-⊢r-l s) regB st
-s1-⊢r-l (s-∀l-no-appear regB st s ic fd) = st0-⊢r' (s1-⊢r-l s) regB st
+s1-⊢r-l (s-∀l regB st s fd) = st0-⊢r' (s1-⊢r-l s) regB st
+s1-⊢r-l (s-∀l-no-appear regB st s fd) = st0-⊢r' (s1-⊢r-l s) regB st
 
 s1-⊢r-r (s-refl regΔ cloA) = cloA
 s1-⊢r-r (s-int regΔ) = ⊢r-int
@@ -74,8 +72,8 @@ s1-⊢r-r (s-arr₁ s s₁) = ⊢r-arr (s1-⊢r-l s) (s1-⊢r-r s₁)
 s1-⊢r-r (s-arr₂ s s₁) = ⊢r-arr (s1-⊢r-l s) (s1-⊢r-r s₁)
 s1-⊢r-r (s-arr₃ regA s) = ⊢r-arr regA (s1-⊢r-r s)
 s1-⊢r-r (s-∀ s) = ⊢r-∀ (s1-⊢r-r s)
-s1-⊢r-r (s-∀l regB st s ic fd) = s1-⊢r-r s
-s1-⊢r-r (s-∀l-no-appear regB st s ic fd) = s1-⊢r-r s
+s1-⊢r-r (s-∀l regB st s fd) = s1-⊢r-r s
+s1-⊢r-r (s-∀l-no-appear regB st s fd) = s1-⊢r-r s
 
 s1-strengthen= : Γ ⊢d j # A' ≤ B'
               → Γ ◀ k =⇘ Γ'
@@ -95,7 +93,7 @@ s1-strengthen= (s-arr₃ regA s) new (↑ty-arr upA upA₁) (↑ty-arr upB upB�
   with refl ← ↑ty-unique-inver upA upB
   = s-arr₃ (⊢r-strengthen= regA new upB) (s1-strengthen= s new upA₁ upB₁)
 s1-strengthen= (s-∀ s) new (↑ty-∀ upA) (↑ty-∀ upB) = s-∀ (s1-strengthen= s (◀S∙ new) upA upB)
-s1-strengthen= {j = j} (s-∀l {B = B} {A* = A*} regB st s ic fd) new (↑ty-∀ upA) (↑ty-arr upB upB₁)
+s1-strengthen= {j = j} (s-∀l {B = B} {A* = A*} regB st s fd) new (↑ty-∀ upA) (↑ty-arr upB upB₁)
   with regA* ← s1-⊢r-l s
   with k¬εA* ← ⊢r-¬ε regA* (◀=-∋=' new)
   with ⟨ preA* , upA* ⟩ ← ↑ty-surjective k¬εA*
@@ -103,8 +101,8 @@ s1-strengthen= {j = j} (s-∀l {B = B} {A* = A*} regB st s ic fd) new (↑ty-∀
   with ⟨ preB , upB' ⟩ ← ↑ty-surjective k¬εB
   = s-∀l (⊢r-strengthen= regB new upB')
          (↑ty-st-comm0'' st upB' upA upA*)
-         (s1-strengthen= s new upA* (↑ty-arr upB upB₁)) ic (↑ty-find0' fd upA)
-s1-strengthen= (s-∀l-no-appear {B = B} {A* = A*} regB st s ic fd) new (↑ty-∀ upA) (↑ty-arr upB upB₁)
+         (s1-strengthen= s new upA* (↑ty-arr upB upB₁)) (↑ty-find0' fd upA)
+s1-strengthen= (s-∀l-no-appear {B = B} {A* = A*} regB st s fd) new (↑ty-∀ upA) (↑ty-arr upB upB₁)
   with regA* ← s1-⊢r-l s
   with k¬εA* ← ⊢r-¬ε regA* (◀=-∋=' new)
   with ⟨ preA* , upA* ⟩ ← ↑ty-surjective k¬εA*
@@ -112,7 +110,7 @@ s1-strengthen= (s-∀l-no-appear {B = B} {A* = A*} regB st s ic fd) new (↑ty-�
   with ⟨ preB , upB' ⟩ ← ↑ty-surjective k¬εB
   = s-∀l-no-appear (⊢r-strengthen= regB new upB')
          (↑ty-st-comm0'' st upB' upA upA*)
-         (s1-strengthen= s new upA* (↑ty-arr upB upB₁)) ic (¬ε-↑ty'-inv0 fd upA)
+         (s1-strengthen= s new upA* (↑ty-arr upB upB₁)) (¬ε-↑ty'-inv0 fd upA)
 
 s1-strengthen=0 : Γ ,= T ⊢d j # A' ≤ B'
             → ↑ty0 A ⇘ A'
@@ -132,8 +130,8 @@ s1-weaken, (s-arr₂ s s₁) new = s-arr₂ (s1-weaken, s new) (s1-weaken, s₁ 
 s1-weaken, (s-arr₃ regA s) new = s-arr₃ (⊢r-weaken,s regA new) (s1-weaken, s new)
 s1-weaken, {T = T} (s-∀ s) new
   with ⟨ T , upT ⟩ ← ↑ty0-total T = s-∀ (s1-weaken, s (▶sS∙ new upT))
-s1-weaken, (s-∀l regB st s ic fd) new = s-∀l (⊢r-weaken,s regB new) st (s1-weaken, s new) ic fd
-s1-weaken, (s-∀l-no-appear regB st s ic fd) new = s-∀l-no-appear (⊢r-weaken,s regB new) st (s1-weaken, s new) ic fd
+s1-weaken, (s-∀l regB st s fd) new = s-∀l (⊢r-weaken,s regB new) st (s1-weaken, s new) fd
+s1-weaken, (s-∀l-no-appear regB st s fd) new = s-∀l-no-appear (⊢r-weaken,s regB new) st (s1-weaken, s new) fd
 
 
 s1-weaken,0 : Γ ⋈ ⊢d j # A ≤ B
@@ -161,7 +159,7 @@ s1-strengthen^ (s-arr₃ regA s) new (↑ty-arr upA upA₁) (↑ty-arr upB upB�
   with refl ← ↑ty-unique-inver upA upB
   = s-arr₃ (⊢r-strengthen^ regA new upB) (s1-strengthen^ s new upA₁ upB₁)
 s1-strengthen^ (s-∀ s) new (↑ty-∀ upA) (↑ty-∀ upB) = s-∀ (s1-strengthen^ s (◀S∙ new) upA upB)
-s1-strengthen^ {j = j} (s-∀l {B = B} {A* = A*} regB st s ic fd) new (↑ty-∀ upA) (↑ty-arr upB upB₁)
+s1-strengthen^ {j = j} (s-∀l {B = B} {A* = A*} regB st s fd) new (↑ty-∀ upA) (↑ty-arr upB upB₁)
   with regA* ← s1-⊢r-l s
   with k¬εA* ← ⊢r-¬ε-^ regA* (◀^-∋^' new)
   with ⟨ preA* , upA* ⟩ ← ↑ty-surjective k¬εA*
@@ -169,8 +167,8 @@ s1-strengthen^ {j = j} (s-∀l {B = B} {A* = A*} regB st s ic fd) new (↑ty-∀
   with ⟨ preB , upB' ⟩ ← ↑ty-surjective k¬εB
   = s-∀l (⊢r-strengthen^ regB new upB')
          (↑ty-st-comm0'' st upB' upA upA*)
-         (s1-strengthen^ s new upA* (↑ty-arr upB upB₁)) ic (↑ty-find0' fd upA)
-s1-strengthen^ (s-∀l-no-appear {B = B} {A* = A*} regB st s ic fd) new (↑ty-∀ upA) (↑ty-arr upB upB₁)
+         (s1-strengthen^ s new upA* (↑ty-arr upB upB₁)) (↑ty-find0' fd upA)
+s1-strengthen^ (s-∀l-no-appear {B = B} {A* = A*} regB st s fd) new (↑ty-∀ upA) (↑ty-arr upB upB₁)
   with regA* ← s1-⊢r-l s
   with k¬εA* ← ⊢r-¬ε-^ regA* (◀^-∋^' new)
   with ⟨ preA* , upA* ⟩ ← ↑ty-surjective k¬εA*
@@ -178,7 +176,7 @@ s1-strengthen^ (s-∀l-no-appear {B = B} {A* = A*} regB st s ic fd) new (↑ty-�
   with ⟨ preB , upB' ⟩ ← ↑ty-surjective k¬εB
   = s-∀l-no-appear (⊢r-strengthen^ regB new upB')
          (↑ty-st-comm0'' st upB' upA upA*)
-         (s1-strengthen^ s new upA* (↑ty-arr upB upB₁)) ic (¬ε-↑ty'-inv0 fd upA)
+         (s1-strengthen^ s new upA* (↑ty-arr upB upB₁)) (¬ε-↑ty'-inv0 fd upA)
 
 s1-strengthen^0 : Γ ,^ ⊢d j # A' ≤ B'
             → ↑ty0 A ⇘ A'

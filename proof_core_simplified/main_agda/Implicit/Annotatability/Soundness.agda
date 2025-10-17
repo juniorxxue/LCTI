@@ -10,7 +10,6 @@ data IFTerm : ℕ → Set where
   ƛ_       : (e : IFTerm (1 + n)) → IFTerm n
   _·_      : (e₁ : IFTerm n) → (e₂ : IFTerm n) → IFTerm n
 
-
 private variable
   M M' N N' J K P : IFTerm n
 
@@ -74,8 +73,8 @@ s-sound (s-arr₁ s s₁) = if-arr (s-sound s) (s-sound s₁)
 s-sound (s-arr₂ s s₁) = if-arr (s-sound s) (s-sound s₁)
 s-sound (s-arr₃ regA s) = if-arr if-refl (s-sound s)
 s-sound (s-∀ s) = if-∀ (s-sound s)
-s-sound (s-∀l regB st s ic fd) = if-∀L st regB (s-sound s)
-s-sound (s-∀l-no-appear regB st s ic fd) = if-∀L st regB (s-sound s)
+s-sound (s-∀l regB st s fd) = if-∀L st regB (s-sound s)
+s-sound (s-∀l-no-appear regB st s fd) = if-∀L st regB (s-sound s)
 
 sound : Γ ⊢d j # e ⦂ A
       → Erasure e M
@@ -85,9 +84,7 @@ sound (⊢var regΓ x∈Γ) era-var = ela-var regΓ x∈Γ
 sound (⊢ann ⊢e) (era-ann era) = sound ⊢e era
 sound (⊢lam₁ ⊢e) (era-lam era) = ela-lam (sound ⊢e era)
 sound (⊢lam₂ ⊢e) (era-lam era) = ela-lam (sound ⊢e era)
-sound (⊢app₁ ⊢e ⊢e₁) (era-app era era₁) = ela-app (sound ⊢e era) (sound ⊢e₁ era₁)
-sound (⊢app₂ ⊢e ⊢e₁) (era-app era era₁) = ela-app (sound ⊢e era) (sound ⊢e₁ era₁)
+sound (⊢app ⊢e ⊢e₁) (era-app era era₁) = ela-app (sound ⊢e era) (sound ⊢e₁ era₁)
 sound (⊢sub ⊢e B≤A gc j≢Z) era = ela-sub (sound ⊢e era) (s-sound B≤A)
 sound (⊢tabs ⊢e) (era-tlam era) = ela-∀i (sound ⊢e era)
-sound (⊢tabs-∞ ⊢e) (era-tlam era) = ela-∀i (sound ⊢e era)
 sound (⊢tapp ⊢e regA st s) (era-tapp era) = ela-sub (sound ⊢e era) (if-∀L st (⊢r-𝕣 regA) (s-sound s))

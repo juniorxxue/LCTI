@@ -19,9 +19,9 @@ complete+0' : Γ ⋈ ⊢d j # A ≤ B
 complete+0' s regA regB = complete+' s (⊢r-≫-eq regA)
 
 
-complete-' : Γ ⊢d ∞ # A ≤ B%
+complete-' : Γ ⊢d `□ # A ≤ B%
           → Γ ≫ B ⇘ B%
-          → Γ ⊢ ∞ # A ⌞ ≤⁻ ⌝ B
+          → Γ ⊢ `□ # A ⌞ ≤⁻ ⌝ B
 complete-' s grd = complete- (⊢d→⊢d² s) grd
 
 ⊢complete : Γ ⊢d j # e ⦂ A
@@ -31,9 +31,7 @@ complete-' s grd = complete- (⊢d→⊢d² s) grd
 ⊢complete (⊢ann ⊢e) = ⊢ann (⊢complete ⊢e)
 ⊢complete (⊢lam₁ ⊢e) = ⊢lam₁ (⊢complete ⊢e)
 ⊢complete (⊢lam₂ ⊢e) = ⊢lam₂ (⊢complete ⊢e)
-⊢complete (⊢app₁ ⊢e ⊢e₁) = ⊢app₁ (⊢complete ⊢e) (⊢complete ⊢e₁)
-⊢complete (⊢app₂ ⊢e ⊢e₁) = ⊢app₂ (⊢complete ⊢e) (⊢complete ⊢e₁)
+⊢complete (⊢app ⊢e ⊢e₁) = ⊢app (⊢complete ⊢e) (⊢complete ⊢e₁)
 ⊢complete (⊢sub ⊢e B≤A gc j≢Z) = ⊢sub (⊢complete ⊢e) (complete+ (⊢d→⊢d² B≤A) (⊢r-≫-eq (⊢r-𝕣 (D.t-⊢r ⊢e)))) gc j≢Z
 ⊢complete (⊢tabs ⊢e) = ⊢tabs (⊢complete ⊢e)
-⊢complete (⊢tabs-∞ ⊢e) = ⊢tabs-∞ (⊢complete ⊢e)
 ⊢complete (⊢tapp ⊢e st regA s) = ⊢tapp (⊢complete ⊢e) st regA (complete+ (⊢d→⊢d² s) (⊢r-≫-eq (⊢r-𝕣 (st0-⊢r (D.t-⊢r ⊢e) st regA))))
