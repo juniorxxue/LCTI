@@ -51,8 +51,7 @@ exampleGroups =
       ("F6", ["F6", "F6 (uncurried)"]),
       ("F7", ["F7", "F7 (uncurried)"]),
       ("F8", ["F8"]),
-      ("Pair", ["Pair", "Pair (Fc translation 1)", "Pair (Fc translation 2)"]),
-      ("PairNew", ["Pair0", "Pair1", "Pair2", "Pair3"]),
+      ("Pair", ["Pair", "Pair0", "Pair1", "Pair2", "Pair3"]),
       ("Const", ["Const", "Const (uncurried)"]),
       ( "Uncurry",
         [ "A1 (uncurried)",
@@ -886,17 +885,17 @@ examplesList =
       "Pair"
       EEmpty
       (Pair (Abs (Var 0)) (LitInt 1) `Ann` ((TInt `TArr` TInt) `TProd` TInt))
-      "(Pair (λx. x) 1) : (Int → Int) × Int",
-    Example
-      "Pair (Fc translation 1)"
-      EEmpty
-      (Pair (Abs (Var 0) `Ann` TArr TInt TInt) (LitInt 1) `Ann` ((TInt `TArr` TInt) `TProd` TInt))
-      "(Pair (λx. x : Int → Int) 1) : (Int → Int) × Int",
-    Example
-      "Pair (Fc translation 2)"
-      EEmpty
-      (Pair (AbsAnn TInt (Var 0)) (LitInt 1) `Ann` ((TInt `TArr` TInt) `TProd` TInt))
-      "(Pair (λx : Int. x) 1) : (Int → Int) × Int",
+      "(λx. x, 1) : (Int → Int) × Int",
+    -- Example
+    --   "Pair (Fc translation 1)"
+    --   EEmpty
+    --   (Pair (Abs (Var 0) `Ann` TArr TInt TInt) (LitInt 1) `Ann` ((TInt `TArr` TInt) `TProd` TInt))
+    --   "(Pair (λx. x : Int → Int) 1) : (Int → Int) × Int",
+    -- Example
+    --   "Pair (Fc translation 2)"
+    --   EEmpty
+    --   (Pair (AbsAnn TInt (Var 0)) (LitInt 1) `Ann` ((TInt `TArr` TInt) `TProd` TInt))
+    --   "(Pair (λx : Int. x) 1) : (Int → Int) × Int",
     Example
       "Const"
       EEmpty
