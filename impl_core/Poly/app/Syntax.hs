@@ -22,6 +22,8 @@ data Trm
   | Nil
   | Cons
   | Pair Trm Trm
+  | Fst Trm
+  | Snd Trm
   | ST
   | ConsUncurry
   | STUncurry
@@ -55,6 +57,8 @@ instance Show Trm where
   showsPrec _ Nil = showString "Nil"
   showsPrec _ Cons = showString "Cons"
   showsPrec _ (Pair t1 t2) = showParen True $ shows t1 . showString ", " . shows t2
+  showsPrec p (Fst t) = showParen (p > 9) $ showString "fst " . showsPrec 10 t
+  showsPrec p (Snd t) = showParen (p > 9) $ showString "snd " . showsPrec 10 t
   showsPrec _ ST = showString "ST"
   showsPrec _ ConsUncurry = showString "Cons"
   showsPrec _ STUncurry = showString "ST"

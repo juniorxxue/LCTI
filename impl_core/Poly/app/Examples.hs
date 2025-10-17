@@ -52,6 +52,7 @@ exampleGroups =
       ("F7", ["F7", "F7 (uncurried)"]),
       ("F8", ["F8"]),
       ("Pair", ["Pair", "Pair (Fc translation 1)", "Pair (Fc translation 2)"]),
+      ("PairNew", ["Pair0", "Pair1", "Pair2", "Pair3"]),
       ("Const", ["Const", "Const (uncurried)"]),
       ( "Uncurry",
         [ "A1 (uncurried)",
@@ -905,5 +906,25 @@ examplesList =
       "Const (uncurried)"
       EEmpty
       (TAbs (TAbs (AbsUncurryAnn [TVar 1] (AbsUncurryAnn [TVar 0] (Var 1)))) `AppUncurry` [LitInt 1] `AppUncurry` [LitBool True])
-      "(Λa. Λb. λ(x : a). λ(y : b). x)(1)(True)"
+      "(Λa. Λb. λ(x : a). λ(y : b). x)(1)(True)",
+    Example
+      "Pair0"
+      EEmpty
+      (Fst (Pair (Abs (Var 0)) (LitInt 2)) `Ann` TArr TInt TInt)
+      "(fst (λx. x, 2)) : Int → Int",
+    Example
+      "Pair1"
+      (ETrm (TProd TInt TInt) EEmpty)
+      (Fst (Var 0))
+      "f : Int × Int |- fst f",
+    Example
+      "Pair2"
+      (ETrm (TProd idTyp TInt) EEmpty)
+      (Fst (Var 0) `App` LitInt 1)
+      "f : (∀a. a → a) × Int |- (fst f) 1",
+    Example
+      "Pair3"
+      (ETrm idTyp EEmpty)
+      (Fst (Pair (Var 0) (LitInt 1)) `App` LitInt 1)
+      "(fst (id, 1)) 1"
   ]

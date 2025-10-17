@@ -302,6 +302,16 @@ sub (env, senv) (TVar k) (CTerm e h) | isUvar (envConcat env senv) k = do
       tell $ indentAll _log
       return (newenv, tyA)
     Nothing -> lift Nothing
+sub (env, senv) (TProd tyA tyB) (CFst h) = do
+  ((senv', tyA'), _log) <- peek $ sub (env, senv) tyA h
+  tell ["[S-Prod-Fst] " ++ logSubFull (env, senv) (TProd tyA tyB) (CFst h) senv' tyA']
+  tell $ indentAll _log
+  return (senv', TProd tyA' tyB)
+sub (env, senv) (TProd tyA tyB) (CSnd h) = do
+  ((senv', tyB'), _log) <- peek $ sub (env, senv) tyB h
+  tell ["[S-Prod-Snd] " ++ logSubFull (env, senv) (TProd tyA tyB) (CSnd h) senv' tyB']
+  tell $ indentAll _log
+  return (senv', TProd tyA tyB')
 sub _ _ _ = lift Nothing
 
 infers :: Env -> Context -> WriterT Log Maybe Typ
@@ -408,6 +418,50 @@ infer env (CFullType (TForall tyA)) (TAbs tm) = do
   tell ["[Ty-TAbs-Chk] " ++ logInferFull env (CFullType (TForall tyA)) (TAbs tm) (TForall tyA)]
   tell $ indentAll _log
   return $ TForall tyA
+infer env CEmpty (Pair tm1 tm2) = do
+  (tyA, _log1) <- peek $ infer env CEmpty tm1
+  (tyB, _log2) <- peek $ infer env CEmpty tm2
+  tell ["[Ty-Pair1] " ++ logInferFull env CEmpty (Pair tm1 tm2) (TProd tyA tyB)]
+  tell $ indentAll _log1
+  tell $ indentAll _log2
+  return $ TProd tyA tyB
+infer env (CFullType (TProd tyA tyB)) (Pair tm1 tm2) = do
+  (tyA', _log1) <- peek $ infer env (CFullType tyA) tm1
+  (tyB', _log2) <- peek $ infer env (CFullType tyB) tm2
+  tell ["[Ty-Pair2] " ++ logInferFull env (CFullType (TProd tyA tyB)) (Pair tm1 tm2) (TProd tyA' tyB')]
+  tell $ indentAll _log1
+  tell $ indentAll _log2
+  return $ TProd tyA' tyB'
+infer env h (Fst tm) = do
+  (ty, _log1) <- peek $ infer env (CFst h) tm
+  case ty of
+    TProd tyA _ -> do
+      tell ["[Ty-Fst] " ++ logInferFull env h (Fst tm) tyA]
+      tell $ indentAll _log1
+      return tyA
+    _ -> lift Nothing
+infer env h (Snd tm) = do
+  (ty, _log1) <- peek $ infer env (CSnd h) tm
+  case ty of
+    TProd _ tyB -> do
+      tell ["[Ty-Snd] " ++ logInferFull env h (Snd tm) tyB]
+      tell $ indentAll _log1
+      return tyB
+    _ -> lift Nothing
+infer env (CFst h) (Pair tm1 tm2) = do
+  (tyA, _log1) <- peek $ infer env h tm1
+  (tyB, _log2) <- peek $ infer env CEmpty tm2
+  tell ["[Ty-Pair-Fst] " ++ logInferFull env (CFst h) (Pair tm1 tm2) (TProd tyA tyB)]
+  tell $ indentAll _log1
+  tell $ indentAll _log2
+  return $ TProd tyA tyB
+infer env (CSnd h) (Pair tm1 tm2) = do
+  (tyA, _log1) <- peek $ infer env CEmpty tm1
+  (tyB, _log2) <- peek $ infer env h tm2
+  tell ["[Ty-Pair-Snd] " ++ logInferFull env (CSnd h) (Pair tm1 tm2) (TProd tyA tyB)]
+  tell $ indentAll _log1
+  tell $ indentAll _log2
+  return $ TProd tyA tyB
 infer env h g | genericConsumer g && nonEmptyContext h = do
   (tyA, _log1) <- peek $ infer env CEmpty g
   ((EEmpty, tyB), _log2) <- peek $ sub (env, EEmpty) tyA h
