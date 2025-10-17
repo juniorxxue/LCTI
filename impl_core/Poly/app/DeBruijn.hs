@@ -60,10 +60,9 @@ shiftTerm k (TAbs t) = TAbs (shiftTerm k t)
 shiftTerm k (TApp t ty) = TApp (shiftTerm k t) ty
 shiftTerm _ Nil = Nil
 shiftTerm _ Cons = Cons
-shiftTerm _ Pair = Pair
+shiftTerm k (Pair t1 t2) = Pair (shiftTerm k t1) (shiftTerm k t2)
 shiftTerm _ ST = ST
 shiftTerm _ ConsUncurry = ConsUncurry
-shiftTerm _ PairUncurry = PairUncurry
 shiftTerm _ STUncurry = STUncurry
 
 shiftTerm0 :: Trm -> Trm
@@ -75,6 +74,8 @@ shiftContext _ (CFullType ty) = CFullType ty
 shiftContext k (CTerm trm ctx) = CTerm (shiftTerm k trm) (shiftContext k ctx)
 shiftContext k (CTApp ty ctx) = CTApp ty (shiftContext k ctx)
 shiftContext k (CUncurry ts ctx) = CUncurry (map (shiftTerm k) ts) (shiftContext k ctx)
+shiftContext k (CFst ctx) = CFst (shiftContext k ctx)
+shiftContext k (CSnd ctx) = CSnd (shiftContext k ctx)
 
 shiftContext0 :: Context -> Context
 shiftContext0 = shiftContext 0
@@ -95,10 +96,9 @@ shiftTyTerm k (TAbs t) = TAbs (shiftTyTerm (1 + k) t)
 shiftTyTerm k (TApp t ty) = TApp (shiftTyTerm k t) (shiftTyp k ty)
 shiftTyTerm _ Nil = Nil
 shiftTyTerm _ Cons = Cons
-shiftTyTerm _ Pair = Pair
+shiftTyTerm k (Pair t1 t2) = Pair (shiftTyTerm k t1) (shiftTyTerm k t2)
 shiftTyTerm _ ST = ST
 shiftTyTerm _ ConsUncurry = ConsUncurry
-shiftTyTerm _ PairUncurry = PairUncurry
 shiftTyTerm _ STUncurry = STUncurry
 
 -- type shift in context
@@ -108,6 +108,8 @@ shiftTyContext k (CFullType ty) = CFullType (shiftTyp k ty)
 shiftTyContext k (CTerm trm ctx) = CTerm (shiftTyTerm k trm) (shiftTyContext k ctx)
 shiftTyContext k (CTApp ty ctx) = CTApp (shiftTyp k ty) (shiftTyContext k ctx)
 shiftTyContext k (CUncurry ts ctx) = CUncurry (map (shiftTyTerm k) ts) (shiftTyContext k ctx)
+shiftTyContext k (CFst ctx) = CFst (shiftTyContext k ctx)
+shiftTyContext k (CSnd ctx) = CSnd (shiftTyContext k ctx)
 
 shiftTyContext0 :: Context -> Context
 shiftTyContext0 = shiftTyContext 0

@@ -21,10 +21,9 @@ data Trm
   | TApp Trm Typ
   | Nil
   | Cons
-  | Pair
+  | Pair Trm Trm
   | ST
   | ConsUncurry
-  | PairUncurry
   | STUncurry
 
 instance Show Typ where
@@ -55,10 +54,9 @@ instance Show Trm where
   showsPrec p (TApp t ty) = showParen (p > 9) $ showsPrec 9 t . showString " @" . showsPrec 10 ty
   showsPrec _ Nil = showString "Nil"
   showsPrec _ Cons = showString "Cons"
-  showsPrec _ Pair = showString "Pair"
+  showsPrec _ (Pair t1 t2) = showParen True $ shows t1 . showString ", " . shows t2
   showsPrec _ ST = showString "ST"
   showsPrec _ ConsUncurry = showString "Cons"
-  showsPrec _ PairUncurry = showString "Pair"
   showsPrec _ STUncurry = showString "ST"
 
 data Env = EEmpty | ETrm Typ Env | EUvar Env | EEvar Env | ESvar Typ Env
@@ -77,7 +75,7 @@ instance Show Env where
   show (ESvar ty env) = show env ++ ", =" ++ show ty
   show (EEvar env) = show env ++ ", ^"
 
-data Context = CEmpty | CFullType Typ | CTerm Trm Context | CTApp Typ Context | CUncurry [Trm] Context
+data Context = CEmpty | CFullType Typ | CTerm Trm Context | CTApp Typ Context | CUncurry [Trm] Context | CFst Context | CSnd Context
 
 instance Show Context where
   show CEmpty = "□"
@@ -85,6 +83,8 @@ instance Show Context where
   show (CTerm trm ctx) = "[" ++ show trm ++ "]" ++ " ↝ " ++ show ctx
   show (CTApp ty ctx) = show ty ++ " @↝ " ++ show ctx
   show (CUncurry ts ctx) = "(" ++ intercalate ", " (map show ts) ++ ") ↝ " ++ show ctx
+  show (CFst ctx) = "fst ↝ " ++ show ctx
+  show (CSnd ctx) = "snd ↝ " ++ show ctx
 
 genericConsumer :: Trm -> Bool
 genericConsumer (LitInt _) = True
@@ -93,10 +93,8 @@ genericConsumer (Var _) = True
 genericConsumer (Ann _ _) = True
 genericConsumer (TAbs _) = True
 genericConsumer Cons = True
-genericConsumer Pair = True
 genericConsumer ST = True
 genericConsumer ConsUncurry = True
-genericConsumer PairUncurry = True
 genericConsumer STUncurry = True
 genericConsumer _ = False
 

@@ -51,7 +51,7 @@ exampleGroups =
       ("F6", ["F6", "F6 (uncurried)"]),
       ("F7", ["F7", "F7 (uncurried)"]),
       ("F8", ["F8"]),
-      ("Pair", ["Pair", "Pair (Fc translation 1)", "Pair (Fc translation 2)", "Pair (uncurried)", "Pair (Fc translation 1, uncurried)", "Pair (Fc translation 2, uncurried)"]),
+      ("Pair", ["Pair", "Pair (Fc translation 1)", "Pair (Fc translation 2)"]),
       ("Const", ["Const", "Const (uncurried)"]),
       ( "Uncurry",
         [ "A1 (uncurried)",
@@ -118,9 +118,6 @@ exampleGroups =
           "F6 (uncurried)",
           "F7 (uncurried)",
           "F8 (uncurried)",
-          "Pair (uncurried)",
-          "Pair (Fc translation 1, uncurried)",
-          "Pair (Fc translation 2, uncurried)",
           "Const (uncurried)"
         ]
       )
@@ -495,33 +492,18 @@ examplesList =
     Example
       "B1"
       EEmpty
-      (Abs (Pair `App` (Var 0 `App` LitInt 1) `App` (Var 0 `App` LitBool True)))
+      (Abs (Pair (Var 0 `App` LitInt 1) (Var 0 `App` LitBool True)))
       "λf. (f 1, f True)",
     Example
       "B1 (Fc translation 1)"
       EEmpty
-      (Abs (Pair `App` (Var 0 `App` LitInt 1) `App` (Var 0 `App` LitBool True)) `Ann` (idTyp `TArr` TProd TInt TBool))
+      (Abs (Pair (Var 0 `App` LitInt 1) (Var 0 `App` LitBool True)) `Ann` (idTyp `TArr` TProd TInt TBool))
       "(λf. (f 1, f True)) : (∀a. a → a) → Int × Bool",
     Example
       "B1 (Fc translation 2)"
       EEmpty
-      (AbsAnn idTyp (Pair `App` (Var 0 `App` LitInt 1) `App` (Var 0 `App` LitBool True)))
+      (AbsAnn idTyp (Pair (Var 0 `App` LitInt 1) (Var 0 `App` LitBool True)))
       "λf : ∀a. a → a. (f 1, f True)",
-    Example
-      "B1 (uncurried)"
-      EEmpty
-      (AbsUncurry 1 (PairUncurry `AppUncurry` [Var 0 `AppUncurry` [LitInt 1], Var 0 `AppUncurry` [LitBool True]]))
-      "λ(f). (f(1), f(True))",
-    Example
-      "B1 (Fc translation 1, uncurried)"
-      EEmpty
-      (AbsUncurry 1 (PairUncurry `AppUncurry` [Var 0 `AppUncurry` [LitInt 1], Var 0 `AppUncurry` [LitBool True]]) `Ann` TUncurry [idTypUncurry] (TProd TInt TBool))
-      "(λ(f). (f(1), f(True))) : (∀a. (a) → a) → Int × Bool",
-    Example
-      "B1 (Fc translation 2, uncurried)"
-      EEmpty
-      (AbsUncurryAnn [idTypUncurry] (PairUncurry `AppUncurry` [Var 0 `AppUncurry` [LitInt 1], Var 0 `AppUncurry` [LitBool True]]))
-      "λ(f : ∀a. (a) → a). (f(1), f(True))",
     Example
       "B2"
       (ETrm polyTyp (ETrm headTyp EEmpty))
@@ -902,33 +884,18 @@ examplesList =
     Example
       "Pair"
       EEmpty
-      ((Pair `App` Abs (Var 0) `App` LitInt 1) `Ann` ((TInt `TArr` TInt) `TProd` TInt))
+      (Pair (Abs (Var 0)) (LitInt 1) `Ann` ((TInt `TArr` TInt) `TProd` TInt))
       "(Pair (λx. x) 1) : (Int → Int) × Int",
     Example
       "Pair (Fc translation 1)"
       EEmpty
-      ((Pair `App` (Abs (Var 0) `Ann` TArr TInt TInt) `App` LitInt 1) `Ann` ((TInt `TArr` TInt) `TProd` TInt))
+      (Pair (Abs (Var 0) `Ann` TArr TInt TInt) (LitInt 1) `Ann` ((TInt `TArr` TInt) `TProd` TInt))
       "(Pair (λx. x : Int → Int) 1) : (Int → Int) × Int",
     Example
       "Pair (Fc translation 2)"
       EEmpty
-      ((Pair `App` AbsAnn TInt (Var 0) `App` LitInt 1) `Ann` ((TInt `TArr` TInt) `TProd` TInt))
+      (Pair (AbsAnn TInt (Var 0)) (LitInt 1) `Ann` ((TInt `TArr` TInt) `TProd` TInt))
       "(Pair (λx : Int. x) 1) : (Int → Int) × Int",
-    Example
-      "Pair (uncurried)"
-      EEmpty
-      ((PairUncurry `AppUncurry` [AbsUncurry 1 (Var 0), LitInt 1]) `Ann` (([TInt] `TUncurry` TInt) `TProd` TInt))
-      "(Pair(λ(x). x, 1) : ((Int) → Int) × Int",
-    Example
-      "Pair (Fc translation 1, uncurried)"
-      EEmpty
-      ((PairUncurry `AppUncurry` [AbsUncurry 1 (Var 0) `Ann` TUncurry [TInt] TInt, LitInt 1]) `Ann` (([TInt] `TUncurry` TInt) `TProd` TInt))
-      "(Pair(λ(x). x : (Int) → Int), 1) : ((Int) → Int) × Int",
-    Example
-      "Pair (Fc translation 2, uncurried)"
-      EEmpty
-      ((PairUncurry `AppUncurry` [AbsUncurryAnn [TInt] (Var 0), LitInt 1]) `Ann` (([TInt] `TUncurry` TInt) `TProd` TInt))
-      "(Pair(λ(x : Int). x, 1) : ((Int) → Int) × Int",
     Example
       "Const"
       EEmpty
