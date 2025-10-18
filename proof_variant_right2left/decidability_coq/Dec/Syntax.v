@@ -30,18 +30,15 @@ Notation "e @ A "   := (TApp e A) (at level 50, left associativity).
 Inductive Context : Set :=
 | CtxEmpty : Context
 | CtxTyp   : Typ -> Context
-| CtxTrm   : Trm -> Context -> Context
-| CtxTApp  : Typ -> Context -> Context.
+| CtxTrm   : Trm -> Context -> Context.
 
-Notation "□"        := CtxEmpty (at level 50).
+Notation "■"        := CtxEmpty (at level 50).
 Notation "τ~ A"      := (CtxTyp A) (at level 50).
 Notation "[ e ]↝ Σ" := (CtxTrm e Σ) (at level 53, right associativity).
-Notation "A ⓪↝ Σ"  := (CtxTApp A Σ) (at level 54, right associativity).
 
 Inductive NonEmpty : Context -> Prop :=
 | ne_τ    : forall A,   NonEmpty (CtxTyp A)
-| ne_app  : forall e Σ, NonEmpty (CtxTrm e Σ)
-| ne_tapp : forall A Σ, NonEmpty (CtxTApp A Σ).
+| ne_app  : forall e Σ, NonEmpty (CtxTrm e Σ).
 
 (* Inductive GenericConsumer : Trm -> Prop :=
 | gc_i    : forall n,   GenericConsumer (Lit n)
@@ -114,7 +111,6 @@ Fixpoint ty_shift_ctx (Σ : Context) (k : nat) : Context :=
   | CtxEmpty    => CtxEmpty
   | CtxTyp A    => CtxTyp (ty_shift A k)
   | CtxTrm e Σ  => CtxTrm (ty_shift_tm e k) (ty_shift_ctx Σ k)
-  | CtxTApp A Σ => CtxTApp (ty_shift A k) (ty_shift_ctx Σ k)
   end.
 
 Fixpoint tm_shift_ctx (Σ : Context) (k : nat) : Context :=
@@ -122,7 +118,6 @@ Fixpoint tm_shift_ctx (Σ : Context) (k : nat) : Context :=
   | CtxEmpty    => CtxEmpty
   | CtxTyp A    => CtxTyp A
   | CtxTrm e Σ  => CtxTrm (tm_shift e k) (tm_shift_ctx Σ k)
-  | CtxTApp A Σ => CtxTApp A (tm_shift_ctx Σ k)
   end.
 
 (* lookup an entry: term variable, won't bypass the ⋈, since assume in TypEnv *)
@@ -180,56 +175,56 @@ Fixpoint subst (A : Typ) (k : nat) (T : Typ) : Typ :=
   | All A => All (subst A (S k) (ty_shift T 0))
   end.
 
-(* a regular type, just like system-f types *)
-Inductive RegularTyp : Env -> Typ -> Prop :=
-| r_int : forall Γ, RegularTyp Γ Int
+(* a ground type, just like system-f types *)
+Inductive GroundTyp : Env -> Typ -> Prop :=
+| r_int : forall Γ, GroundTyp Γ Int
 | r_var : forall Γ n,
     lookupTy Γ n ->
-    RegularTyp Γ (TVar n)
+    GroundTyp Γ (TVar n)
 | r_arr : forall Γ A B,
-    RegularTyp Γ A ->
-    RegularTyp Γ B ->
-    RegularTyp Γ (Arr A B)
+    GroundTyp Γ A ->
+    GroundTyp Γ B ->
+    GroundTyp Γ (Arr A B)
 | r_all : forall Γ A,
-    RegularTyp (TyCons Γ) A ->
-    RegularTyp Γ (All A).
+    GroundTyp (TyCons Γ) A ->
+    GroundTyp Γ (All A).
 
-Inductive TRegular : Env -> Prop :=
-| treg_Z : TRegular EnvEmpty
+Inductive TGround : Env -> Prop :=
+| treg_Z : TGround EnvEmpty
 | treg_STm : forall Γ A,
-    TRegular Γ ->
-    RegularTyp Γ A ->
-    TRegular (TmCons Γ A)
+    TGround Γ ->
+    GroundTyp Γ A ->
+    TGround (TmCons Γ A)
 | treg_STy : forall Γ,
-    TRegular Γ ->
-    TRegular (TyCons Γ)
+    TGround Γ ->
+    TGround (TyCons Γ)
 | treg_SEx : forall Γ,
-    TRegular Γ ->
-    TRegular (ExCons Γ)
+    TGround Γ ->
+    TGround (ExCons Γ)
 | treg_SExTy : forall Γ A,
-    TRegular Γ ->
-    RegularTyp Γ A ->
-    TRegular (ExTyCons Γ A).
+    TGround Γ ->
+    GroundTyp Γ A ->
+    TGround (ExTyCons Γ A).
 
-Inductive SRegular : Env -> Prop :=
-| sreg_Z : forall Γ, TRegular Γ -> SRegular (SepCons Γ)
+Inductive SGround : Env -> Prop :=
+| sreg_Z : forall Γ, TGround Γ -> SGround (SepCons Γ)
 | sreg_STy : forall Δ,
-    SRegular Δ ->
-    SRegular (TyCons Δ)
+    SGround Δ ->
+    SGround (TyCons Δ)
 | sreg_SEx : forall Δ,
-    SRegular Δ ->
-    SRegular (ExCons Δ)
+    SGround Δ ->
+    SGround (ExCons Δ)
 | sreg_SExTy : forall Δ A,
-    SRegular Δ ->
-    RegularTyp Δ A ->
-    SRegular (ExTyCons Δ A).
+    SGround Δ ->
+    GroundTyp Δ A ->
+    SGround (ExTyCons Δ A).
 
 (* replace entry ^a with a solution ^a=A in an environment *)
 Inductive substEnv : Typ -> nat -> Env -> Env -> Prop :=
 | se_ExZ : forall A A' Γ,
     A' = ty_shift A 0 ->
-    RegularTyp Γ A ->
-    SRegular Γ ->
+    GroundTyp Γ A ->
+    SGround Γ ->
     substEnv A' 0 (ExCons Γ) (ExTyCons Γ A)
 | se_ExS : forall k A A' Γ Γ',
     substEnv A k Γ Γ' ->
@@ -242,7 +237,7 @@ Inductive substEnv : Typ -> nat -> Env -> Env -> Prop :=
 | se_ExTyS : forall k A A' B Γ Γ',
     substEnv A k Γ Γ' ->
     A' = ty_shift A 0 ->
-    RegularTyp Γ B ->
+    GroundTyp Γ B ->
     substEnv A' (S k) (ExTyCons Γ B) (ExTyCons Γ' B).
 
 Inductive Polar : Set :=

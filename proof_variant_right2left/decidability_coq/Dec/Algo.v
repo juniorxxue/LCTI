@@ -2,10 +2,10 @@ Require Import Syntax.
 
 Inductive sub : Env -> Typ -> Polar -> Typ -> Env -> Prop :=
 | s_int : forall Δ p,
-    SRegular Δ ->
+    SGround Δ ->
     sub Δ Int p Int Δ
 | s_var_ty : forall Δ p x,
-    SRegular Δ ->
+    SGround Δ ->
     lookupTy Δ x ->
     sub Δ (TVar x) p (TVar x) Δ
 | s_ex_l : forall Δ Ψ x A,
@@ -15,11 +15,11 @@ Inductive sub : Env -> Typ -> Polar -> Typ -> Env -> Prop :=
     substEnv A x Δ Ψ ->
     sub Δ A Neg (TVar x) Ψ
 | s_exty_l : forall Δ x A,
-    SRegular Δ ->
+    SGround Δ ->
     lookupExTy Δ x A ->
     sub Δ (TVar x) Pos A Δ
 | s_exty_r : forall Δ x A,
-    SRegular Δ ->
+    SGround Δ ->
     lookupExTy Δ x A ->
     sub Δ A Neg (TVar x) Δ
 | s_arr : forall Δ Ω Ψ p A B C D,
@@ -58,10 +58,10 @@ Fixpoint rm_sep (Γ : Env) : Env :=
     
 Inductive ty : Env -> Context -> Trm -> Typ -> Prop :=
 | ty_lit : forall Γ n,
-    TRegular Γ ->
+    TGround Γ ->
     ty Γ CtxEmpty (Lit n) Int
 | ty_var : forall Γ x A,
-    TRegular Γ ->
+    TGround Γ ->
     lookupTm Γ x A ->
     ty Γ CtxEmpty (Var x) A
 | ty_ann : forall Γ e A B,
@@ -86,10 +86,11 @@ Inductive ty : Env -> Context -> Trm -> Typ -> Prop :=
 | ty_tabs : forall Γ e A,
     ty (TyCons Γ) CtxEmpty e A ->
     ty Γ CtxEmpty (TLam e) (All A)
-| ty_tapp : forall Γ Σ e A B B',
-    ty Γ (CtxTApp A Σ) e (All B) ->
+| ty_tapp : forall Γ Σ e A B B' C,
+    ty Γ CtxEmpty e (All B) ->
     B' = subst B 0 A ->
-    ty Γ Σ (TApp e A) B'
+    sub_ctx (SepCons Γ) B' Σ (SepCons Γ) C ->
+    ty Γ Σ (TApp e A) C
 | ty_tabs_ty : forall Γ e A B,
     ty (TyCons Γ) (CtxTyp A) e B ->
     ty Γ (CtxTyp (All A)) (TLam e) (All A)
@@ -102,7 +103,7 @@ Inductive ty : Env -> Context -> Trm -> Typ -> Prop :=
 with
 sub_ctx : Env -> Typ -> Context -> Env -> Typ -> Prop :=
 | s_empty : forall Δ A A',
-    SRegular Δ ->
+    SGround Δ ->
     close Δ A ->
     grd_typ Δ A A' ->
     sub_ctx Δ A CtxEmpty Δ A'
@@ -127,17 +128,10 @@ sub_ctx : Env -> Typ -> Context -> Env -> Typ -> Prop :=
 | s_alll_no : forall Δ A e Σ Ψ C D,
     sub_ctx (ExCons Δ) A (CtxTrm (ty_shift_tm e 0) (ty_shift_ctx Σ 0)) (ExCons Ψ) (Arr (ty_shift C 0) (ty_shift D 0)) ->
     sub_ctx Δ (All A) (CtxTrm e Σ) Ψ (Arr C D)
-| s_tapp : forall Δ A B Σ Ψ C,
-    sub_ctx (ExTyCons Δ B) A (ty_shift_ctx Σ 0) (ExTyCons Ψ B) C ->
-    sub_ctx Δ (All A) (CtxTApp B Σ) Ψ (All C)
 | s_svar_trm : forall Δ x e Σ A B C,
     lookupExTy Δ x A ->
     sub_ctx Δ A (CtxTrm e Σ) Δ (Arr B C) ->
     sub_ctx Δ (TVar x) (CtxTrm e Σ) Δ (Arr B C)
-| s_svar_tapp : forall Δ x Σ A B C,
-    lookupExTy Δ x A ->
-    sub_ctx Δ A (CtxTApp B Σ) Δ (All C) ->
-    sub_ctx Δ (TVar x) (CtxTApp B Σ) Δ (All C)
 | s_evar_infers : forall Δ x e Σ Ψ A,
     infs Δ (CtxTrm e Σ) A ->
     substEnv A x Δ Ψ ->
@@ -145,8 +139,8 @@ sub_ctx : Env -> Typ -> Context -> Env -> Typ -> Prop :=
 with
 infs : Env -> Context -> Typ -> Prop :=
 | infs_z : forall Γ A,
-    TRegular Γ ->
-    RegularTyp Γ A ->
+    TGround Γ ->
+    GroundTyp Γ A ->
     infs Γ (CtxTyp A) A
 | infs_s : forall Γ e Σ A B,
     ty Γ CtxEmpty e A ->
