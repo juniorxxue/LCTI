@@ -279,15 +279,6 @@ sub (env, senv) (TForall tyA) (CUncurry es h) = do
   tell ["[S-Forall-L-UC] " ++ logSubFull (env, senv) (TForall tyA) (CUncurry es h) senv' (unshiftTyp0 tyB)]
   tell $ indentAll _log1
   return (senv', unshiftTyp0 tyB)
-sub (env, senv) (TForall tyA) (CTApp tyB h) = do
-  ((senv', tyC), _log1) <- peek $ sub (env, ESvar tyB senv) tyA (shiftTyContext0 h)
-  senv'' <- case senv' of
-    ESvar _ senv'' -> return senv''
-    EEvar senv'' -> return senv''
-    _ -> lift Nothing
-  tell ["[S-Forall-TApp] " ++ logSubFull (env, senv) (TForall tyA) (CTApp tyB h) senv'' (TForall tyC)]
-  tell $ indentAll _log1
-  return (senv'', TForall tyC)
 sub (env, senv) (TVar k) h | isSvar (envConcat env senv) k = do
   tyA <- findSol (envConcat env senv) k
   ((senv', tyB), _log) <- peek $ sub (env, senv) tyA h
@@ -475,10 +466,12 @@ infer env CEmpty (TAbs tm) = do
   tell $ indentAll _log
   return $ TForall tyA
 infer env h (TApp tm tyA) = do
-  (TForall tyB, _log) <- peek $ infer env (CTApp tyA h) tm
-  tell ["[Ty-TApp] " ++ logInferFull env h (TApp tm tyA) (substTyp0 tyA tyB)]
-  tell $ indentAll _log
-  return (substTyp0 tyA tyB)
+  (TForall tyB, _log1) <- peek $ infer env CEmpty tm
+  ((EEmpty, tyC), _log2) <- peek $ sub (env, EEmpty) (substTyp0 tyA tyB) h
+  tell ["[Ty-TApp] " ++ logInferFull env h (TApp tm tyA) tyC]
+  tell $ indentAll _log1
+  tell $ indentAll _log2
+  return tyC
 infer env (CFullType (TList tyA)) Nil = do
   tell ["[Ty-Nil-Chk] " ++ logInferFull env (CFullType (TList tyA)) Nil (TList tyA)]
   return (TList tyA)

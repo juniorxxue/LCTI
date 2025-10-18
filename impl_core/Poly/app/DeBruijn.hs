@@ -74,7 +74,6 @@ shiftContext :: Int -> Context -> Context
 shiftContext _ CEmpty = CEmpty
 shiftContext _ (CFullType ty) = CFullType ty
 shiftContext k (CTerm trm ctx) = CTerm (shiftTerm k trm) (shiftContext k ctx)
-shiftContext k (CTApp ty ctx) = CTApp ty (shiftContext k ctx)
 shiftContext k (CUncurry ts ctx) = CUncurry (map (shiftTerm k) ts) (shiftContext k ctx)
 shiftContext k (CFst ctx) = CFst (shiftContext k ctx)
 shiftContext k (CSnd ctx) = CSnd (shiftContext k ctx)
@@ -110,7 +109,6 @@ shiftTyContext :: Int -> Context -> Context
 shiftTyContext _ CEmpty = CEmpty
 shiftTyContext k (CFullType ty) = CFullType (shiftTyp k ty)
 shiftTyContext k (CTerm trm ctx) = CTerm (shiftTyTerm k trm) (shiftTyContext k ctx)
-shiftTyContext k (CTApp ty ctx) = CTApp (shiftTyp k ty) (shiftTyContext k ctx)
 shiftTyContext k (CUncurry ts ctx) = CUncurry (map (shiftTyTerm k) ts) (shiftTyContext k ctx)
 shiftTyContext k (CFst ctx) = CFst (shiftTyContext k ctx)
 shiftTyContext k (CSnd ctx) = CSnd (shiftTyContext k ctx)

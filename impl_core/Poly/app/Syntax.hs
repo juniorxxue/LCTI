@@ -79,13 +79,12 @@ instance Show Env where
   show (ESvar ty env) = show env ++ ", =" ++ show ty
   show (EEvar env) = show env ++ ", ^"
 
-data Context = CEmpty | CFullType Typ | CTerm Trm Context | CTApp Typ Context | CUncurry [Trm] Context | CFst Context | CSnd Context
+data Context = CEmpty | CFullType Typ | CTerm Trm Context | CUncurry [Trm] Context | CFst Context | CSnd Context
 
 instance Show Context where
   show CEmpty = "□"
   show (CFullType ty) = show ty
   show (CTerm trm ctx) = "[" ++ show trm ++ "]" ++ " ↝ " ++ show ctx
-  show (CTApp ty ctx) = show ty ++ " @↝ " ++ show ctx
   show (CUncurry ts ctx) = "(" ++ intercalate ", " (map show ts) ++ ") ↝ " ++ show ctx
   show (CFst ctx) = "fst ↝ " ++ show ctx
   show (CSnd ctx) = "snd ↝ " ++ show ctx
