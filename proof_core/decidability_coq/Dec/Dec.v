@@ -175,8 +175,8 @@ Proof.
     destruct (IHΔ x) as [Hlk | Hnlk]; sauto lq: on.
 Qed.
 
-Lemma dec_RegularTyp : forall Γ A,
-  {RegularTyp Γ A} + {~ RegularTyp Γ A}.
+Lemma dec_GroundTyp : forall Γ A,
+  {GroundTyp Γ A} + {~ GroundTyp Γ A}.
 Proof.
   intros Γ A. generalize dependent Γ.
   induction A; intro Γ; try sfirstorder.
@@ -185,24 +185,24 @@ Proof.
   - specialize (IHA (TyCons Γ)). sauto q: on.
 Qed.
 
-Lemma dec_TRegular : forall Δ,
-  {TRegular Δ} + {~ TRegular Δ}.
+Lemma dec_TGround : forall Δ,
+  {TGround Δ} + {~ TGround Δ}.
 Proof.
   intro Δ. induction Δ; try sfirstorder.
-  - destruct (dec_RegularTyp Δ t); sauto lq: on.
+  - destruct (dec_GroundTyp Δ t); sauto lq: on.
   - sauto lq: on.
   - sauto lq: on.
-  - destruct (dec_RegularTyp Δ t); sauto lq: on.
+  - destruct (dec_GroundTyp Δ t); sauto lq: on.
   - sauto lq: on.
 Qed.
 
-Lemma dec_SRegular : forall Δ,
-  {SRegular Δ} + {~ SRegular Δ}.
+Lemma dec_SGround : forall Δ,
+  {SGround Δ} + {~ SGround Δ}.
 Proof.
   intro Δ. induction Δ.
   1 - 4 : sauto lq: on.
-  - destruct (dec_RegularTyp Δ t); sauto lq: on.
-  - destruct (dec_TRegular Δ); sauto lq: on.
+  - destruct (dec_GroundTyp Δ t); sauto lq: on.
+  - destruct (dec_TGround Δ); sauto lq: on.
 Qed.
 
 Lemma dec_substEnv : forall A x Γ,
@@ -213,9 +213,9 @@ Proof.
   - sauto lq: on.
   - sauto lq: on.
   - destruct x.
-    + destruct (dec_SRegular Γ). 2 : sauto lq: on.
+    + destruct (dec_SGround Γ). 2 : sauto lq: on.
       destruct (dec_ty_unshift A 0) as [[A' Heq] | Hneq]; subst. 2 : sauto lq: on.
-      destruct (dec_RegularTyp Γ A'); sauto lq: on use: ty_unshift_det.
+      destruct (dec_GroundTyp Γ A'); sauto lq: on use: ty_unshift_det.
     + destruct (dec_ty_unshift A 0) as [[A' Heq] | Hneq]; subst.
       * specialize (IHΓ A' x). sauto q: on use: ty_unshift_det.
       * sauto lq: on rew: off use: ty_unshift_det.
@@ -225,7 +225,7 @@ Proof.
     + sauto lq: on rew: off use: ty_unshift_det.
   - destruct x. sauto lq: on.
     destruct (dec_ty_unshift A 0) as [[A' Heq] | Hneq]; subst. 2 : sauto lq: on.
-    destruct (dec_RegularTyp Γ t). 2 : sauto lq: on.
+    destruct (dec_GroundTyp Γ t). 2 : sauto lq: on.
     specialize (IHΓ A' x). destruct IHΓ.
     + sauto lq: on use: ty_unshift_det.
     + right. intros [Γ' Heq]. sauto lq: on rew: off use: ty_unshift_det.
@@ -283,17 +283,17 @@ Proof.
   { intros x Heq Hnvar. subst.
     destruct p. 2 : sauto lq: on.
     destruct (dec_substEnv B x Δ) as [[Δ' Hsubst] | Hsubst]. sauto lq: on.
-    destruct (dec_SRegular Δ). 2 : sauto lq: on.
+    destruct (dec_SGround Δ). 2 : sauto lq: on.
     destruct (dec_lookupExTyO Δ x B); sauto lq: on. }
   assert (TVarR: forall x, NotVar A -> B = TVar x -> {Ω | sub Δ A p B Ω} + {~ exists Ω, sub Δ A p B Ω}).
   { intros x Hnvar Heq. subst.
     destruct p. sauto lq: on.
     destruct (dec_substEnv A x Δ) as [[Δ' Hsubst] | Hsubst]. sauto lq: on.
-    destruct (dec_SRegular Δ). 2 : sauto lq: on.
+    destruct (dec_SGround Δ). 2 : sauto lq: on.
     destruct (dec_lookupExTyO Δ x A); sauto lq: on. }
   destruct A.
   - destruct B.
-    + destruct (dec_SRegular Δ); sauto lq: on.
+    + destruct (dec_SGround Δ); sauto lq: on.
     + hauto lq: on use: TVarR.
     + sauto lq: on.
     + sauto lq: on.
@@ -302,23 +302,23 @@ Proof.
     + clear TVarL. destruct (dec_lookupTy Δ n0).
       * destruct (dec_lookupTy Δ n1).
         -- destruct (Nat.eq_dec n0 n1); subst.
-           ++ destruct (dec_SRegular Δ). sauto lq: on.
+           ++ destruct (dec_SGround Δ). sauto lq: on.
               sauto lq: on use: lookupTy_Ex, lookupTy_ExTy, substEnv_Ex.
            ++ sauto l: on use: lookupTy_Ex, lookupTy_ExTy, substEnv_Ex.
         -- destruct p. sauto lq: on use: lookupTy_Ex, lookupTy_ExTy, substEnv_Ex.
            destruct (dec_substEnv (TVar n0) n1 Δ) as [[Δ' Hsubst] | Hsubst]. sauto lq: on.
            destruct (dec_lookupExTyO Δ n1 (TVar n0)).
-           ++ destruct (dec_SRegular Δ). sauto lq: on.
+           ++ destruct (dec_SGround Δ). sauto lq: on.
               sauto lq: on use: lookupTy_Ex, lookupTy_ExTy, substEnv_Ex.
            ++ sauto lq: on use: lookupTy_Ex, lookupTy_ExTy, substEnv_Ex.
       * destruct (dec_substEnv (TVar n1) n0 Δ) as [[Δ' Hsubst] | Hsubst].
         -- destruct p. sauto lq: on.
            destruct (dec_substEnv (TVar n0) n1 Δ) as [[Δ'' Hsubst'] | Hsubst']. sauto lq: on.
-           destruct (dec_SRegular Δ). 2 : sauto lq: on.
+           destruct (dec_SGround Δ). 2 : sauto lq: on.
            destruct (dec_lookupExTyO Δ n1 (TVar n0)). sauto lq: on.
            sauto lq: on use: lookupTy_Ex, lookupTy_ExTy, substEnv_Ex.
         -- destruct (dec_lookupExTyO Δ n0 (TVar n1)).
-           ++ destruct (dec_SRegular Δ).
+           ++ destruct (dec_SGround Δ).
               ** destruct p. sauto lq: on use: lookupTy_Ex, lookupTy_ExTy, substEnv_Ex.
                  destruct (dec_lookupTy Δ n1). sauto lq: on use: lookupTy_Ex, lookupTy_ExTy, substEnv_Ex.
                  destruct (dec_substEnv (TVar n0) n1 Δ) as [[Δ' Hsubst'] | Hsubst']. sauto lq: on.
@@ -333,7 +333,7 @@ Proof.
               destruct p; sauto lq: on.
               destruct (dec_lookupExTyO Δ n1 (TVar n0)).
               ** destruct p. sauto lq: on.
-                 destruct (dec_SRegular Δ). sauto lq: on.
+                 destruct (dec_SGround Δ). sauto lq: on.
                  sauto lq: on use: lookupTy_Ex, lookupTy_ExTy, substEnv_Ex.
               ** sauto lq: on use: lookupTy_Ex, lookupTy_ExTy, substEnv_Ex.
     + hauto lq: on use: TVarL.
@@ -387,7 +387,6 @@ Fixpoint ctx_size (Σ : Context) : nat :=
   | CtxEmpty => 0
   | CtxTyp _ => 1
   | CtxTrm e Σ' => 2 + tm_size e + ctx_size Σ'
-  | CtxTApp _ Σ' => 1 + ctx_size Σ'
   end.
 
 Lemma NonEmpty_ctx_size_gt0 : forall Σ,
@@ -468,63 +467,63 @@ Proof.
   induction Hsubst; intros * Hlk; sauto lq: on.
 Qed.
 
-Lemma substEnv_RegularTyp : forall Γ B, RegularTyp Γ B ->
-  forall A x Γ', substEnv A x Γ Γ' -> RegularTyp Γ' B.
+Lemma substEnv_GroundTyp : forall Γ B, GroundTyp Γ B ->
+  forall A x Γ', substEnv A x Γ Γ' -> GroundTyp Γ' B.
 Proof.
   intros Γ B Hreg. dependent induction Hreg;
   intros * Hsubst; sauto lq: on use: substEnv_lookupTy.
 Qed.
 
-Lemma substEnv_SRegular_in : forall A x Γ Γ',
-  substEnv A x Γ Γ' -> SRegular Γ.
+Lemma substEnv_SGround_in : forall A x Γ Γ',
+  substEnv A x Γ Γ' -> SGround Γ.
 Proof.
   intros A x Γ Γ' Hsubst.
   dependent induction Hsubst; sauto lq: on rew: off.
 Qed.
 
-Lemma substEnv_SRegular_out : forall A x Γ Γ',
-  substEnv A x Γ Γ' -> SRegular Γ'.
+Lemma substEnv_SGround_out : forall A x Γ Γ',
+  substEnv A x Γ Γ' -> SGround Γ'.
 Proof.
   intros A x Γ Γ' Hsubst.
   dependent induction Hsubst;
-    sauto lq: on rew: off use: substEnv_RegularTyp.
+    sauto lq: on rew: off use: substEnv_GroundTyp.
 Qed.
 
-Lemma sub_SRegular_in : forall Δ A p B Ω,
-  sub Δ A p B Ω -> SRegular Δ.
+Lemma sub_SGround_in : forall Δ A p B Ω,
+  sub Δ A p B Ω -> SGround Δ.
 Proof.
   intros Δ A p B Ω Hsub.
-  dependent induction Hsub; try sfirstorder use: substEnv_SRegular_in.
+  dependent induction Hsub; try sfirstorder use: substEnv_SGround_in.
   sauto lq: on.
 Qed.
 
-Lemma sub_SRegular_out : forall Δ A p B Ω,
-  sub Δ A p B Ω -> SRegular Ω.
+Lemma sub_SGround_out : forall Δ A p B Ω,
+  sub Δ A p B Ω -> SGround Ω.
 Proof.
   intros Δ A p B Ω Hsub.
-  dependent induction Hsub; try sfirstorder use: substEnv_SRegular_out.
+  dependent induction Hsub; try sfirstorder use: substEnv_SGround_out.
   sauto lq: on.
 Qed.
 
-Lemma RegularTyp_weaken_gen : forall Γ A,
-  RegularTyp Γ A -> forall Γ', (forall x, lookupTy Γ x -> lookupTy Γ' x) -> RegularTyp Γ' A.
+Lemma GroundTyp_weaken_gen : forall Γ A,
+  GroundTyp Γ A -> forall Γ', (forall x, lookupTy Γ x -> lookupTy Γ' x) -> GroundTyp Γ' A.
 Proof.
   intros Γ A Hreg.
   dependent induction Hreg; intros Γ' Hlk; sauto lq: on.
 Qed.
 
-Lemma RegularTyp_weaken_TmCons : forall Γ A,
-  RegularTyp Γ A -> forall B, RegularTyp (TmCons Γ B) A.
+Lemma GroundTyp_weaken_TmCons : forall Γ A,
+  GroundTyp Γ A -> forall B, GroundTyp (TmCons Γ B) A.
 Proof.
   intros Γ A Hreg.
   dependent induction Hreg; intros;
-    sauto lq: on rew: off use: RegularTyp_weaken_gen.
+    sauto lq: on rew: off use: GroundTyp_weaken_gen.
 Qed.
 
-Lemma RegularTyp_weaken_gen_shift : forall Γ A,
-  RegularTyp Γ A -> forall Γ' k,
+Lemma GroundTyp_weaken_gen_shift : forall Γ A,
+  GroundTyp Γ A -> forall Γ' k,
     (forall x, lookupTy Γ x -> if k <=? x then lookupTy Γ' (S x) else lookupTy Γ' x) ->
-  RegularTyp Γ' (ty_shift A k).
+  GroundTyp Γ' (ty_shift A k).
 Proof.
   intros Γ A Hreg.
   dependent induction Hreg; intros Γ' k Hlk;
@@ -535,72 +534,72 @@ Proof.
     sfirstorder. scrush.
 Qed.
 
-Lemma RegularTyp_weaken_TyCons : forall Γ A,
-  RegularTyp Γ A -> RegularTyp (TyCons Γ) (ty_shift A 0).
+Lemma GroundTyp_weaken_TyCons : forall Γ A,
+  GroundTyp Γ A -> GroundTyp (TyCons Γ) (ty_shift A 0).
 Proof.
   intros Γ A Hreg.
-  dependent induction Hreg; sauto use: RegularTyp_weaken_gen_shift.
+  dependent induction Hreg; sauto use: GroundTyp_weaken_gen_shift.
 Qed.
 
-Lemma RegularTyp_weaken_ExCons : forall Γ A,
-  RegularTyp Γ A -> RegularTyp (ExCons Γ) (ty_shift A 0).
+Lemma GroundTyp_weaken_ExCons : forall Γ A,
+  GroundTyp Γ A -> GroundTyp (ExCons Γ) (ty_shift A 0).
 Proof.
   intros Γ A Hreg.
-  dependent induction Hreg; sauto use: RegularTyp_weaken_gen_shift.
+  dependent induction Hreg; sauto use: GroundTyp_weaken_gen_shift.
 Qed.
 
-Lemma RegularTyp_weaken_ExTyCons : forall Γ A,
-  RegularTyp Γ A -> forall B, RegularTyp (ExTyCons Γ B) (ty_shift A 0).
+Lemma GroundTyp_weaken_ExTyCons : forall Γ A,
+  GroundTyp Γ A -> forall B, GroundTyp (ExTyCons Γ B) (ty_shift A 0).
 Proof.
   intros Γ A Hreg.
-  dependent induction Hreg; sauto use: RegularTyp_weaken_gen_shift.
+  dependent induction Hreg; sauto use: GroundTyp_weaken_gen_shift.
 Qed.
 
-Lemma TRegular_lookupTm_RegularTyp : forall x Γ A,
-  TRegular Γ -> lookupTm Γ x A -> RegularTyp Γ A.
+Lemma TGround_lookupTm_GroundTyp : forall x Γ A,
+  TGround Γ -> lookupTm Γ x A -> GroundTyp Γ A.
 Proof.
   intros * Hreg Hlk.
   dependent induction Hlk;
-     sauto lq: on use: RegularTyp_weaken_TmCons, RegularTyp_weaken_TyCons,
-                       RegularTyp_weaken_ExCons, RegularTyp_weaken_ExTyCons.
+     sauto lq: on use: GroundTyp_weaken_TmCons, GroundTyp_weaken_TyCons,
+                       GroundTyp_weaken_ExCons, GroundTyp_weaken_ExTyCons.
 Qed.
 
-Lemma SRegular_lookupExTy_RegularTyp : forall x Γ A,
-  SRegular Γ -> lookupExTy Γ x A -> RegularTyp Γ A.
+Lemma SGround_lookupExTy_GroundTyp : forall x Γ A,
+  SGround Γ -> lookupExTy Γ x A -> GroundTyp Γ A.
 Proof.
   intros * Hreg Hlk.
   dependent induction Hlk;
-     sauto lq: on use: RegularTyp_weaken_TmCons, RegularTyp_weaken_TyCons,
-                       RegularTyp_weaken_ExCons, RegularTyp_weaken_ExTyCons.
+     sauto lq: on use: GroundTyp_weaken_TmCons, GroundTyp_weaken_TyCons,
+                       GroundTyp_weaken_ExCons, GroundTyp_weaken_ExTyCons.
 Qed.
 
-Lemma ty_TRegular : forall Γ Σ e A, ty Γ Σ e A -> TRegular Γ.
+Lemma ty_TGround : forall Γ Σ e A, ty Γ Σ e A -> TGround Γ.
 Proof.
   intros Γ Σ e A Hty. dependent induction Hty; simpl in *;
     try sfirstorder; sauto lq: on.
 Qed.
 
-Lemma sub_ctx_SRegular_in : forall Δ A Σ Δ' B,
-  sub_ctx Δ A Σ Δ' B -> SRegular Δ.
+Lemma sub_ctx_SGround_in : forall Δ A Σ Δ' B,
+  sub_ctx Δ A Σ Δ' B -> SGround Δ.
 Proof.
   intros * Hsub. dependent induction Hsub;
-    sauto lq: on rew: off use: sub_SRegular_in.
+    sauto lq: on rew: off use: sub_SGround_in.
 Qed.
 
-Lemma sub_ctx_SRegular_out : forall Δ A Σ Δ' B,
-  sub_ctx Δ A Σ Δ' B -> SRegular Δ'.
+Lemma sub_ctx_SGround_out : forall Δ A Σ Δ' B,
+  sub_ctx Δ A Σ Δ' B -> SGround Δ'.
 Proof.
   intros * Hsub. dependent induction Hsub;
-    ecrush use: sub_SRegular_out.
+    ecrush use: sub_SGround_out.
 Qed.
 
-Lemma TRegularTyp_strengthen_TmCons : forall Γ A B,
-  TRegular Γ -> RegularTyp (TmCons Γ B) A -> RegularTyp Γ A.
-Proof. sauto lq: on use: RegularTyp_weaken_gen. Qed.
+Lemma TGroundTyp_strengthen_TmCons : forall Γ A B,
+  TGround Γ -> GroundTyp (TmCons Γ B) A -> GroundTyp Γ A.
+Proof. sauto lq: on use: GroundTyp_weaken_gen. Qed.
 
-Lemma TRegularTyp_strengthen_SepCons : forall Γ A,
-  TRegular Γ -> RegularTyp (SepCons Γ) A -> RegularTyp Γ A.
-Proof. sauto lq: on use: RegularTyp_weaken_gen. Qed.
+Lemma TGroundTyp_strengthen_SepCons : forall Γ A,
+  TGround Γ -> GroundTyp (SepCons Γ) A -> GroundTyp Γ A.
+Proof. sauto lq: on use: GroundTyp_weaken_gen. Qed.
 
 (** ** Determinism of Typing and Subtyping *)
 
@@ -626,6 +625,8 @@ Proof.
       eapply IHty in Hty1; eauto; simpl; try lia. subst.
       eapply IHsub with (Δ1 := (Γ ⋈)) in H1; eauto; simpl; try lia. sfirstorder.
     + sauto lq: on rew: off.
+    + subst. eapply IHty in Hty1 as Heq; eauto; simpl; try lia. dependent destruction Heq.
+      eapply IHsub with (Δ1 := (Γ ⋈)) in H0; eauto; simpl; try lia. sfirstorder.
     + sauto lq: on rew: off.
   - split.
     + intros Δ A Σ Δ1 Δ2 A1 A2 Hlt Hsub1 Hsub2.
@@ -642,7 +643,6 @@ Proof.
         eapply IHsub in Hsub1; eauto; simpl; try lia. sfirstorder.
       * eapply lookupExTy_det in H; eauto. subst. sfirstorder.
       * sauto lq: on rew: off use: substEnv_Ex, lookupEx_ExTy.
-      * eapply lookupExTy_det in H; eauto. subst. sfirstorder.
       * sauto lq: on rew: off use: substEnv_Ex, lookupEx_ExTy.
       * dependent destruction H. dependent destruction H2.
         eapply IHty in H; eauto; simpl; try lia. subst.
@@ -713,8 +713,8 @@ Fixpoint num_solved (Γ : Env) (A : Typ) : nat :=
   | All A    => num_solved (TyCons Γ) A
   end.
 
-Lemma num_solved_RegularTyp : forall Γ A,
-  RegularTyp Γ A -> num_solved Γ A = 0.
+Lemma num_solved_GroundTyp : forall Γ A,
+  GroundTyp Γ A -> num_solved Γ A = 0.
 Proof.
   intros Γ A Hreg. dependent induction Hreg; simpl; try sfirstorder.
   hauto lq: on use: lookupExTy'_lookupExTy, lookupTy_ExTy, dec_lookupExTy'.
@@ -814,10 +814,10 @@ Proof.
         + right. intros [Γ'' Hc]. dependent destruction Hc; try sfirstorder use: NonEmpty_false. }
     destruct e; simpl in *.
     + destruct (dec_CtxEmpty Σ); subst; try sfirstorder.
-      destruct (dec_TRegular Γ); sauto q: on.
+      destruct (dec_TGround Γ); sauto q: on.
     + destruct (dec_CtxEmpty Σ); subst; try sfirstorder.
       destruct (dec_lookupTm Γ n0) as [[A' Hlk] | Hnlk].
-      * destruct (dec_TRegular Γ). sauto lq: on.
+      * destruct (dec_TGround Γ). sauto lq: on.
         right. intros [Γ' Hc]. dependent destruction Hc; sfirstorder use: NonEmpty_false.
       * right. intros [Γ' Hc]. dependent destruction Hc; try sfirstorder use: NonEmpty_false.
     + destruct Σ.
@@ -837,7 +837,6 @@ Proof.
            right. intros [Γ' Hc]. dependent destruction Hc; try sfirstorder use: NonEmpty_false.
            eapply ty_det in Hty; eauto. sfirstorder.
         -- right. intros [Γ' Hc]. dependent destruction Hc; try sfirstorder use: NonEmpty_false.
-      * sauto lq: on.
     + assert (Hlt': tm_size e1 + ctx_size (CtxTrm e2 Σ) < n). { simpl in *. lia. }
       eapply IHty with (Γ := Γ) in Hlt' as Hty.
       destruct Hty as [[A Hty] | Hnty].
@@ -855,25 +854,33 @@ Proof.
       eapply IHty with (Γ := TyCons Γ) in Hlt' as Hty.
       destruct Hty as [[A Hty] | Hnty]. sauto lq: on.
       right. intros [Γ' Hc]. dependent destruction Hc; try sfirstorder use: NonEmpty_false.
-    + assert (Hlt': tm_size e + ctx_size (CtxTApp t Σ) < n). { simpl in *. lia. }
+    + assert (Hlt': tm_size e + ctx_size CtxEmpty < n) by (simpl; lia).
       eapply IHty with (Γ := Γ) in Hlt' as Hty.
       destruct Hty as [[A Hty] | Hnty].
-      * destruct A; try solve [right; intros [Γ' Hc]; dependent destruction Hc; try sfirstorder;
+      * destruct A; try solve [right; intros [A' Hc]; dependent destruction Hc; try sfirstorder;
           eapply ty_det in Hty; eauto; sfirstorder].
-        sauto lq: on.
+        assert (Hlt'':ctx_size Σ < n) by lia.
+        eapply IHsub with (Δ := SepCons Γ) (A := subst A 0 t) in Hlt'' as Hsub; eauto.
+        destruct Hsub as [[Γ' [A' Hsub]] | Hnsub].
+        -- destruct (eq_dec_env Γ' (SepCons Γ)); subst. sauto lq: on rew: off.
+           right. intros [A'' Hc]. dependent destruction Hc; try sfirstorder.
+           eapply ty_det in Hty as Heq; eauto. dependent destruction Heq.
+           eapply sub_ctx_det in Hsub; eauto. sfirstorder.
+        -- right. intros [Γ' Hc]. dependent destruction Hc; try sfirstorder.
+           eapply ty_det in Hty as Heq; eauto. dependent destruction Heq. sfirstorder.
       * right. intros [Γ' Hc]. dependent destruction Hc; try sfirstorder use: NonEmpty_false.
   - intro k. induction k; try lia.
     intro m. induction m; try lia.
     intros Δ A Σ Hlt1 Hlt2 Hlt3. destruct Σ.
-    + destruct (dec_SRegular Δ). 2 : sauto lq: on rew: off.
+    + destruct (dec_SGround Δ). 2 : sauto lq: on rew: off.
       destruct (dec_close Δ A) as [Hc | Hnc]. 2 : sauto lq: on.
       destruct (dec_grd_typ Δ A) as [[A' Hgrd] | Hngrd]; sauto lq: on.
     + destruct (dec_sub Δ A Pos t) as [[Δ' Hsub] | Hnsub]; sauto lq: on.
     + destruct A. sauto lq: on rew: off.
-      * destruct (dec_SRegular Δ). 2 : sauto lq: on use: sub_ctx_SRegular_in.
+      * destruct (dec_SGround Δ). 2 : sauto lq: on use: sub_ctx_SGround_in.
         destruct (dec_lookupExTy Δ n0) as [[A Hlk] | Hnlk].
-        -- eapply SRegular_lookupExTy_RegularTyp in Hlk as Hreg; eauto.
-           eapply num_solved_RegularTyp in Hreg. simpl in *.
+        -- eapply SGround_lookupExTy_GroundTyp in Hlk as Hreg; eauto.
+           eapply num_solved_GroundTyp in Hreg. simpl in *.
            eapply lookupExTy_lookupExTy' in Hlk as Hlk'.
            assert (Hlt2': num_solved Δ A < k) by hauto l: on.
            eapply IHk with (Σ := CtxTrm t Σ) in Hlt2' as Hsub; eauto; eauto.
@@ -951,40 +958,10 @@ Proof.
               ** right. intros [Δ'' [A'' Hcontra]]. dependent destruction Hcontra; try sfirstorder;
                  eapply sub_ctx_det in Hsub; eauto; sfirstorder.
         -- sauto lq: on.
-    + destruct A.
-      * sauto lq: on.
-      * destruct (dec_SRegular Δ). 2 : sauto lq: on rew: off use: sub_ctx_SRegular_in.
-        destruct (dec_lookupExTy Δ n0) as [[A Hlk] | Hnlk]. 2 : sauto lq: on rew: off.
-        assert (0 < k) by hauto l: on use: lookupExTy_lookupExTy'.
-        eapply SRegular_lookupExTy_RegularTyp in Hlk as Hreg; eauto.
-        eapply num_solved_RegularTyp in Hreg.
-        assert (Hlt2': num_solved Δ A < k) by scongruence.
-        eapply IHk with (Σ := CtxTApp t Σ) in Hlt2' as Hsub; eauto.
-        destruct Hsub as [[Δ' [A' Hsub]] | Hnsub].
-        -- destruct (eq_dec_env Δ' Δ); subst.
-           ++ destruct A'; sauto q: on.
-           ++ right. intros [Δ'' [A'' Hcontra]].
-              dependent destruction Hcontra; try sfirstorder.
-              eapply lookupExTy_det in Hlk; eauto. subst.
-              eapply sub_ctx_det in Hsub; eauto. sfirstorder.
-        -- right. intros [Δ'' [A'' Hcontra]].
-           dependent destruction Hcontra; try sfirstorder.
-           eapply lookupExTy_det in Hlk; eauto. sfirstorder.
-      * sauto lq: on.
-      * assert (Hlt': ctx_size (ty_shift_ctx Σ 0) < n).
-        { simpl in *. rewrite ctx_size_ty_shift. lia. }
-        eapply IHsub with (Δ := ExTyCons Δ t) (A := A) in Hlt' as Hsub; eauto.
-        destruct Hsub as [[Δ' [A' Hsub]] | Hnsub].
-        -- destruct Δ'; try solve [right; intros [Δ'' [A'' Hcontra]];
-            dependent destruction Hcontra; eapply sub_ctx_det in Hsub; eauto; hauto q: on].
-            destruct (eq_dec_ty t t0); subst. sauto lq: on.
-            right. intros [Δ'' [A'' Hcontra]]. dependent destruction Hcontra; try sfirstorder.
-            eapply sub_ctx_det in Hsub; eauto. sfirstorder.
-        -- right. intros [Δ'' [A'' Hcontra]]. dependent destruction Hcontra; try sfirstorder.
   - intros Γ Σ Hlt.
-    destruct Σ. 1, 4 : sauto lq: on rew: off.
-    + destruct (dec_TRegular Γ). 2 : sauto q: on rew: off.
-      destruct (dec_RegularTyp Γ t) as [Hreg' | Hnreg]. 2 : sauto lq: on.
+    destruct Σ. sauto lq: on rew: off.
+    + destruct (dec_TGround Γ). 2 : sauto q: on rew: off.
+      destruct (dec_GroundTyp Γ t) as [Hreg' | Hnreg]. 2 : sauto lq: on.
       sauto lq: on.
     + assert (Hlt': tm_size t + ctx_size CtxEmpty < n). { simpl in *. lia. }
       eapply IHty with (Γ := Γ) in Hlt' as Hty.
