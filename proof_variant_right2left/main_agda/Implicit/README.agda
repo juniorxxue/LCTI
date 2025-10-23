@@ -1,4 +1,7 @@
 module Implicit.README where
+-- Note: the variant uses the old notion of "counters"
+-- with the isomorphism proved in core calculus
+-- it would be straightforward to derive a "mask" system
 
 open import Implicit.Language.All
 import Implicit.Decl.All
