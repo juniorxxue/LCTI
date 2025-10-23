@@ -19,7 +19,6 @@ data Type : ℕ → Set where
   _`→_   : (A : Type m) → (B : Type m) → Type m
   `∀_    : (A : Type (1 + m)) → Type m
 
-
 variable
   A  B  C  D  E  T  : Type m
   A% B% C% D% E% T% : Type m
@@ -81,27 +80,33 @@ variable
             → X ≡ Y
 ‶-injective refl = refl
 
-infixr 9 𝕥₍_₎_
-data Counter : ℕ → Set where
-  Z : Counter m
-  ∞ : Counter m
-  𝕚 : Counter m → Counter m
-  𝕔 : Counter m → Counter m
-  𝕥₍_₎_ : Type m → Counter m → Counter m
+data Mode : Set where
+  □ : Mode
+  ■ : Mode
+
+data Mask : Set where
+  `_ : Mode → Mask
+  _·_ : Mode → Mask → Mask
+
+`□ : Mask
+`□ = ` □
+
+`■ : Mask
+`■ = ` ■
 
 variable
-  j j′ j″  : Counter m
-  j' j'' : Counter m
+  i : Mode
+  j j′ j″  : Mask
+  j' j'' : Mask
 
-data NonZ : Counter m → Set where
-  nz-∞ : NonZ (Counter m ∋⦂ ∞)
-  nz-I : NonZ (𝕚 j)
-  nz-C : NonZ (𝕔 j)
-  nz-T : NonZ (𝕥₍ A ₎ j)
+data NonZ : Mask → Set where
+  nz-□ : NonZ (` □)
+  nz-app : NonZ (i · j)
 
-data 𝕚𝕔 : Counter m → Set where
-  case-𝕚 : 𝕚𝕔 (𝕚 j)
-  case-𝕔 : 𝕚𝕔 (𝕔 j)
+fp : Mode → Mode
+fp □ = ■
+fp ■ = □
+
 
 data Polar : Set where
   ≤⁺ ≤⁻ : Polar

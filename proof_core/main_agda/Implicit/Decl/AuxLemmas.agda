@@ -2,8 +2,6 @@ module Implicit.Decl.AuxLemmas where
 
 open import Implicit.Language.All
 
-
-
 infix 3 _▶'_,=_⇘_
 data _▶'_,=_⇘_ : Env n m → Fin (1 + m) → Type m → Env n (1 + m) → Set where
   ▶'Z  : (regA : Γ ⊢r A)

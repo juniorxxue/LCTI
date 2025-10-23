@@ -115,14 +115,9 @@ s-weaken^ {k = k} (s-∀l-no s upᶜ upᵉ upC upD) new (↑ty-∀ upA) (↑ty�
          (↑tyᶜ-comm0' (↑tyᶜ-e up-e upΣ) (↑tyᶜ-e upe″ upΣ″) (↑tyᶜ-e upᵉ upᶜ))
          (↑ty-arr (↑ty-comm0' upC' upC″ upC) (↑ty-comm0' upD' upD″ upD)))
          upΣ″ upe″ upC″ upD″
-s-weaken^ (s-tapp s upᶜ) new (↑ty-∀ upA) (↑tyᶜ-⓪ {Σ' = Σ'} upA' upΣ) (↑ty-∀ upB)
-  with ⟨ Σ″ , upΣ″ ⟩ ← ↑tyᶜ0-total Σ' = s-tapp (s-weaken^ s (▶S= new upA') upA (↑tyᶜ-comm0' upΣ upΣ″ upᶜ) upB) upΣ″
 s-weaken^ {k = k} (s-svar-term {A = A} inΓ s) new ↑ty-var (↑tyᶜ-e up-e upΣ) (↑ty-arr upB upB₁)
   with ⟨ A' , upA ⟩ ← ↑ty-total A k
   with refl ← ▶⨟^-unique new = s-svar-term (∋:=-weaken^ inΓ upA (▶⨟^-▶^-l new)) (s-weaken^ s new upA (↑tyᶜ-e up-e upΣ) (↑ty-arr upB upB₁))
-s-weaken^ {k = k} (s-svar-tapp {A = A} inΓ s) new ↑ty-var (↑tyᶜ-⓪ upA upΣ) (↑ty-∀ upB)
-  with ⟨ A' , upA' ⟩ ← ↑ty-total A k
-  with refl ← ▶⨟^-unique new = s-svar-tapp (∋:=-weaken^ inΓ upA' (▶⨟^-▶^-l new)) (s-weaken^ s new upA' (↑tyᶜ-⓪ upA upΣ) (↑ty-∀ upB))
 s-weaken^ (s-evar-infers infs inst) new ↑ty-var (↑tyᶜ-e up-e upΣ) upB
   = s-evar-infers (infs-weaken^ infs (▶^-𝕣 (▶⨟^-▶^-l new)) (↑tyᶜ-e up-e upΣ) upB) (inst-weaken^ inst new upB)
 
@@ -146,8 +141,11 @@ t-weaken^ {k = k} (⊢sub {A = A} ⊢e ne gc s) newΓ upΣ upe upA
          (nonempty-↑tyᶜ' ne upΣ) (gc-↑tyᵉ gc upe) (s-weaken^ s (▶S⋈ (▶^-▶⨟^ newΓ)) upA' upΣ upA)
 t-weaken^ (⊢tabs ⊢e) newΓ ↑tyᶜ-□ (↑tyᵉ-Λ upe) (↑ty-∀ upA) = ⊢tabs (t-weaken^ ⊢e (▶S∙ newΓ) ↑tyᶜ-□ upe upA)
 t-weaken^ (⊢tabs-τ ⊢e) newΓ (↑tyᶜ-τ (↑ty-∀ upA')) (↑tyᵉ-Λ upe) (↑ty-∀ upA) = ⊢tabs-τ (t-weaken^ ⊢e (▶S∙ newΓ) (↑tyᶜ-τ upA') upe upA)
-t-weaken^ {k = k} (⊢tapp {B = B} ⊢e st) newΓ upΣ (↑tyᵉ-⓪ upe upA₁) upA
-  with ⟨ B' , upB ⟩ ← ↑ty-total B (#S k) = ⊢tapp (t-weaken^ ⊢e newΓ (↑tyᶜ-⓪ upA₁ upΣ) upe (↑ty-∀ upB)) (↑ty-st-comm0 st upA₁ upB upA)
+t-weaken^ {k = k} (⊢tapp {B = B} {B* = B*} ⊢e st regA s) newΓ upΣ (↑tyᵉ-⓪ upe upA₁) upA
+  with ⟨ B' , upB ⟩ ← ↑ty-total B (#S k)
+  with ⟨ B*' , upB* ⟩ ← ↑ty-total B* k
+  = ⊢tapp (t-weaken^ ⊢e newΓ ↑tyᶜ-□ upe (↑ty-∀ upB))
+          (↑ty-st-comm0 st upA₁ upB upB*) (⊢r-weaken^ regA newΓ upA₁) (s-weaken^ s (▶^-▶⨟^ (▶S⋈ newΓ)) upB* upΣ upA)
 
 t-weaken^0 : Γ ⊢ Σ ⇒ e ⇒ A
            → ↑tyᶜ0 Σ ⇘ Σ'

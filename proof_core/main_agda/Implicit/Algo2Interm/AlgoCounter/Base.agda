@@ -3,69 +3,64 @@ module Implicit.Algo2Interm.AlgoCounter.Base where
 open import Implicit.Language.All
 open import Implicit.Algo.Base
 
-✫ : Counter m → Counter m
-✫ Z = Z
-✫ ∞ = ∞
-✫ (𝕚 j) = j
-✫ (𝕔 j) = j
-✫ (𝕥₍ A ₎ j) = j
-
 infix 3 _⊢_⇒_⇒_↡_
 infix 3 _⊢_≤⁺_⊣_↪_↡_
 infix 3 _⊨_⟹_↡_
 
-data _⊢_⇒_⇒_↡_ : Env n m → Context n m → Term n m → Type m → Counter m → Set
-data _⊢_≤⁺_⊣_↪_↡_ : Env n m → Type m → Context n m → Env n m → Type m → Counter m → Set
-data _⊨_⟹_↡_ : Env n m → Context n m → Type m → Counter m → Set
+data _⊢_⇒_⇒_↡_ : Env n m → Context n m → Term n m → Type m → Mask → Set
+data _⊢_≤⁺_⊣_↪_↡_ : Env n m → Type m → Context n m → Env n m → Type m → Mask → Set
+data _⊨_⟹_↡_ : Env n m → Context n m → Type m → Mask → Set
 
 
 data _⊢_⇒_⇒_↡_ where
   ⊢lit : ∀ {num : ℕ}
     → (regΓ : TRegular Γ)
-    → Γ ⊢ □ ⇒ lit num ⇒ Int ↡ Z
+    → Γ ⊢ □ ⇒ lit num ⇒ Int ↡ `■
 
   ⊢var :
       (regΓ : TRegular Γ)
     → (x∈Γ : Γ ∋ x ⦂ A)
-    → Γ ⊢ □ ⇒ ` x ⇒ A ↡ Z
+    → Γ ⊢ □ ⇒ ` x ⇒ A ↡ `■
 
   ⊢ann :
-      Γ ⊢ τ A ⇒ e ⇒ B ↡ ∞
-    → Γ ⊢ □ ⇒ e ⦂ A ⇒ A ↡ Z
+      Γ ⊢ τ A ⇒ e ⇒ B ↡ `□
+    → Γ ⊢ □ ⇒ e ⦂ A ⇒ A ↡ `■
 
   ⊢app :
-      Γ ⊢ [ e₂ ]↝ Σ ⇒ e₁ ⇒ A `→ B ↡ j
-    → Γ ⊢ Σ ⇒ e₁ · e₂ ⇒ B ↡ (✫ j)
+      Γ ⊢ [ e₂ ]↝ Σ ⇒ e₁ ⇒ A `→ B ↡ (i · j)
+    → Γ ⊢ Σ ⇒ e₁ · e₂ ⇒ B ↡ j
 
   ⊢lam₁ :
-      Γ , A ⊢ τ B ⇒ e ⇒ C ↡ ∞
-    → Γ ⊢ τ (A `→ B) ⇒ ƛ e ⇒ A `→ C ↡ ∞
+      Γ , A ⊢ τ B ⇒ e ⇒ C ↡ `□
+    → Γ ⊢ τ (A `→ B) ⇒ ƛ e ⇒ A `→ C ↡ `□
 
   ⊢lam₂ :
-      Γ ⊢ □ ⇒ e₂ ⇒ A ↡ Z
+      Γ ⊢ □ ⇒ e₂ ⇒ A ↡ `■
     → (up-c : ↑tmᶜ0 Σ ⇘ Σ')
     → Γ , A ⊢ Σ' ⇒ e ⇒ B ↡ j
-    → Γ ⊢ [ e₂ ]↝ Σ ⇒ ƛ e ⇒ A `→ B ↡ (𝕚 j)
+    → Γ ⊢ [ e₂ ]↝ Σ ⇒ ƛ e ⇒ A `→ B ↡ (□ · j)
 
   ⊢sub :
-      Γ ⊢ □ ⇒ g ⇒ A ↡ Z
+      Γ ⊢ □ ⇒ g ⇒ A ↡ `■
     → (ne : NonEmpty Σ)
     → (gc : GenericConsumer g)
     → (s : Γ ⋈ ⊢ A ≤⁺ Σ ⊣ Γ ⋈ ↪ B ↡ j)
     → Γ ⊢ Σ ⇒ g ⇒ B ↡ j
 
   ⊢tabs :
-      Γ ,∙ ⊢ □ ⇒ e ⇒ A ↡ Z
-    → Γ ⊢ □ ⇒ Λ e ⇒ `∀ A ↡ Z
+      Γ ,∙ ⊢ □ ⇒ e ⇒ A ↡ `■
+    → Γ ⊢ □ ⇒ Λ e ⇒ `∀ A ↡ `■
 
   ⊢tabs-τ :
-      Γ ,∙ ⊢ τ B ⇒ e ⇒ A ↡ ∞
-    → Γ ⊢ τ (`∀ B) ⇒ Λ e ⇒ `∀ A ↡ ∞
+      Γ ,∙ ⊢ τ B ⇒ e ⇒ A ↡ `□
+    → Γ ⊢ τ (`∀ B) ⇒ Λ e ⇒ `∀ A ↡ `□
 
   ⊢tapp :
-      Γ ⊢ A ⓪↝ Σ ⇒ e ⇒ `∀ B ↡ 𝕥₍ A ₎ j
+      Γ ⊢ □ ⇒ e ⇒ `∀ B ↡ `■
     → (st : ⟦ A ⟧ B ⇘ B*)
-    → Γ ⊢ Σ ⇒ e ⓪ A ⇒ B* ↡ j
+    → (regA : Γ ⊢r A)
+    → (s : Γ ⋈ ⊢ B* ≤⁺ Σ ⊣ Γ ⋈ ↪ C ↡ j)
+    → Γ ⊢ Σ ⇒ e ⓪ A ⇒ C ↡ j
 
 
 data _⊢_≤⁺_⊣_↪_↡_ where
@@ -74,87 +69,56 @@ data _⊢_≤⁺_⊣_↪_↡_ where
       (regΓ : SRegular Δ)
     → (cloA : Δ ⊢c A)
     → Δ ≫ A ⇘ A%
-    → Δ ⊢ A ≤⁺ □ ⊣ Δ ↪ A% ↡ Z
+    → Δ ⊢ A ≤⁺ □ ⊣ Δ ↪ A% ↡ `■
 
   s-type :
       (ss : Δ ⊢ A ⌞ ≤⁺ ⌝ B ⊣ Ψ)
-    → Δ ⊢ A ≤⁺ (τ B) ⊣ Ψ ↪ B ↡ ∞
+    → Δ ⊢ A ≤⁺ (τ B) ⊣ Ψ ↪ B ↡ `□
 
   s-term-c :
       (cloA : Δ ⊢c A)
     → (ap : Δ ≫ A ⇘ A%)
-    → (⊢e : 𝕣 Δ ⊢ τ A% ⇒ e ⇒ A' ↡ ∞)
+    → (⊢e : 𝕣 Δ ⊢ τ A% ⇒ e ⇒ A' ↡ `□)
     → Δ ⊢ B ≤⁺ Σ ⊣ Ψ ↪ D ↡ j
-    → Δ ⊢ (A `→ B) ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ A% `→ D ↡ 𝕔 j
+    → Δ ⊢ (A `→ B) ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ A% `→ D ↡ (■ · j)
 
   s-term-o :
       (opnA : Δ ⊢o A)
-    → (⊢e : 𝕣 Δ ⊢ □ ⇒ e ⇒ C ↡ Z)
+    → (⊢e : 𝕣 Δ ⊢ □ ⇒ e ⇒ C ↡ `■)
     → (ss : Δ ⊢ C ⌞ ≤⁻ ⌝ A ⊣ Ω)
     → Ω ⊢ B ≤⁺ Σ ⊣ Ψ ↪ D ↡ j
-    → Δ ⊢ A `→ B ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ C `→ D ↡ 𝕚 j
+    → Δ ⊢ A `→ B ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ C `→ D ↡ (□ · j)
 
-  s-∀l-𝕚 :
-      Δ ,^ ⊢ A ≤⁺ ([ e' ]↝ Σ') ⊣ Ψ ,= B ↪ (C' `→ D') ↡ (𝕚 j')
+  s-∀l :
+      Δ ,^ ⊢ A ≤⁺ ([ e' ]↝ Σ') ⊣ Ψ ,= B ↪ (C' `→ D') ↡ (i · j)
     → (upᶜ : ↑tyᶜ0 Σ ⇘ Σ')
-    → (upj : ↑tyʲ0 j ⇘ j')
     → (upᵉ : ↑tyᵉ0 e ⇘ e')
     → (upC : ↑ty0 C ⇘ C')
     → (upD : ↑ty0 D ⇘ D')
-    → Δ ⊢ `∀ A ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ C `→ D ↡ (𝕚 j)
+    → Δ ⊢ `∀ A ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ C `→ D ↡ (i · j)
 
-  s-∀l-𝕔 :
-      Δ ,^ ⊢ A ≤⁺ ([ e' ]↝ Σ') ⊣ Ψ ,= B ↪ (C' `→ D') ↡ (𝕔 j')
+  s-∀l-no :
+      Δ ,^ ⊢ A ≤⁺ ([ e' ]↝ Σ') ⊣ Ψ ,^ ↪ (C' `→ D') ↡ (i · j)
     → (upᶜ : ↑tyᶜ0 Σ ⇘ Σ')
-    → (upj : ↑tyʲ0 j ⇘ j')
     → (upᵉ : ↑tyᵉ0 e ⇘ e')
     → (upC : ↑ty0 C ⇘ C')
     → (upD : ↑ty0 D ⇘ D')
-    → Δ ⊢ `∀ A ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ C `→ D ↡ (𝕔 j)
-
-  s-∀l-no-𝕚 :
-      Δ ,^ ⊢ A ≤⁺ ([ e' ]↝ Σ') ⊣ Ψ ,^ ↪ (C' `→ D') ↡ (𝕚 j')
-    → (upᶜ : ↑tyᶜ0 Σ ⇘ Σ')
-    → (upj : ↑tyʲ0 j ⇘ j')
-    → (upᵉ : ↑tyᵉ0 e ⇘ e')
-    → (upC : ↑ty0 C ⇘ C')
-    → (upD : ↑ty0 D ⇘ D')
-    → Δ ⊢ `∀ A ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ C `→ D  ↡ (𝕚 j)
-
-  s-∀l-no-𝕔 :
-      Δ ,^ ⊢ A ≤⁺ ([ e' ]↝ Σ') ⊣ Ψ ,^ ↪ (C' `→ D') ↡ (𝕔 j')
-    → (upᶜ : ↑tyᶜ0 Σ ⇘ Σ')
-    → (upj : ↑tyʲ0 j ⇘ j')
-    → (upᵉ : ↑tyᵉ0 e ⇘ e')
-    → (upC : ↑ty0 C ⇘ C')
-    → (upD : ↑ty0 D ⇘ D')
-    → Δ ⊢ `∀ A ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ C `→ D ↡ (𝕔 j)
-
-  s-tapp :
-      Δ ,= B ⊢ A ≤⁺ Σ' ⊣ Ψ ,= B ↪ C ↡ j'
-    → (upᶜ : ↑tyᶜ0 Σ ⇘ Σ')
-    → (upj : ↑tyʲ0 j ⇘ j')
-    → Δ ⊢ `∀ A ≤⁺ (B ⓪↝ Σ) ⊣ Ψ ↪ `∀ C ↡ (𝕥₍ B ₎ j)
+    → Δ ⊢ `∀ A ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ C `→ D  ↡ (i · j)
 
   s-svar-term :
       Δ ∋ X := A
     → Δ ⊢ A ≤⁺ ([ e ]↝ Σ) ⊣ Δ ↪ B `→ C ↡ j
     → Δ ⊢ ‶ X ≤⁺ ([ e ]↝ Σ) ⊣ Δ ↪ B `→ C ↡ j
 
-  s-svar-tapp :
-      Δ ∋ X := A
-    → Δ ⊢ A ≤⁺ (B ⓪↝ Σ) ⊣ Δ ↪ `∀ C ↡ (𝕥₍ B ₎ j)
-    → Δ ⊢ ‶ X ≤⁺ (B ⓪↝ Σ) ⊣ Δ ↪ `∀ C ↡ (𝕥₍ B ₎ j)
-
   s-evar-infers :
-      (infs : 𝕣 Δ ⊨ [ e ]↝ Σ ⟹ A ↡ (𝕚 j))
+      (infs : 𝕣 Δ ⊨ [ e ]↝ Σ ⟹ A ↡ (□ · j))
     → (inst : [ A / X ] Δ ⟹ Ψ) -- implies Γ ∋^k
-    → Δ ⊢ ‶ X ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ A ↡ (𝕚 j)
+    → Δ ⊢ ‶ X ≤⁺ ([ e ]↝ Σ) ⊣ Ψ ↪ A ↡ (□ · j)
 
 data _⊨_⟹_↡_ where
   infs-z : (regΓ : TRegular Γ)
          → (regA : Γ ⊢r A)
-         → Γ ⊨ τ A ⟹ A ↡ ∞
-  infs-s : (⊢e : Γ ⊢ □ ⇒ e ⇒ A ↡ Z)
+         → Γ ⊨ τ A ⟹ A ↡ `□
+  infs-s : (⊢e : Γ ⊢ □ ⇒ e ⇒ A ↡ `■)
          → Γ ⊨ Σ ⟹ B ↡ j
-         → Γ ⊨ [ e ]↝ Σ ⟹ A `→ B ↡ 𝕚 j
+         → Γ ⊨ [ e ]↝ Σ ⟹ A `→ B ↡ (□ · j)

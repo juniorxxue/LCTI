@@ -16,8 +16,6 @@ open import Implicit.Algo.Properties.Polarity
        → Σ₁' ≊ Σ₂'
 ≊-↑ty0 ≊Z ↑tyᶜ-□ (↑tyᶜ-τ up-t) = ≊Z
 ≊-↑ty0 (≊S newΣ) (↑tyᶜ-e up-e up1) (↑tyᶜ-e up-e₁ up2) with refl ← ↑tyᵉ-unique up-e up-e₁ = ≊S (≊-↑ty0 newΣ up1 up2)
-≊-↑ty0 (≊⓪ newΣ) (↑tyᶜ-⓪ x up1) (↑tyᶜ-⓪ x₁ up2)
-  with refl ← ↑ty-unique x₁ x = ≊⓪ (≊-↑ty0 newΣ up1 up2)
 
 
 ss-grd+ : SRegular Γ
@@ -102,11 +100,9 @@ abstract
                                          (↑tyᶜ-e upᵉ upΣ′) (↑ty-arr upA%' upD')) (≊S (≊-↑ty0 newΣ upᶜ upΣ′))) upΣ′ upᵉ upA%' upD'
   s-trans s'@(s-∀l-no s1 upᶜ upᵉ upC upD) (s-term-o opnA ⊢e x s2) (≊S newΣ)
     with (⊢r-arr regC regD) ← s-⊢r s' = let regA = ⊆-⊢r regC (s-⊆ s') in ⊥-elim (⊢r-⊢o-false regA opnA)
-  s-trans {C = C} (s-tapp {B = B} s1 upᶜ) (s-tapp s2 upᶜ₁) (≊⓪ {Σ' = Σ'} newΣ) = s-tapp (s-trans s1 s2 (≊-↑ty0 newΣ upᶜ upᶜ₁)) upᶜ₁
   s-trans (s-svar-term inΓ s) (s-term-c cloA ap ⊢e s2) (≊S newΣ) = s-svar-term inΓ (s-trans s (s-term-c cloA ap ⊢e s2) (≊S newΣ))
   s-trans (s-svar-term inΓ s) (s-term-o opnA ⊢e ss s2) (≊S newΣ)
     with ⊢r-arr regA regB ← s-⊢r s = ⊥-elim (⊢r-⊢o-false regA opnA)
-  s-trans (s-svar-tapp inΓ s) (s-tapp s2 upᶜ) (≊⓪ newΣ) = s-svar-tapp inΓ (s-trans s (s-tapp s2 upᶜ) (≊⓪ newΣ))
   s-trans (s-evar-infers (infs-s x infs) inst) s2 (≊S newΣ) = ⊥-elim (≊-infs-false infs newΣ)
           where ≊-infs-false : Γ ⊨ Σ ⟹ A
                              → Σ ≊ Σ'

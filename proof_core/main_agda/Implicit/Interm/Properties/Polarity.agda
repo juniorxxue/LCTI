@@ -17,13 +17,9 @@ s+-polarity (s-arr₁ s s₁) = ⊢r-arr (s--polarity s) (s+-polarity s₁)
 s+-polarity (s-arr₂ s s₁) = ⊢r-arr (s--polarity s) (s+-polarity s₁)
 s+-polarity (s-arr₃ cloA grd s) = ⊢r-arr (⊢c-≫-⊢r (s-sregular s) cloA grd) (s+-polarity s)
 s+-polarity (s-∀ s) = ⊢r-∀ (s+-polarity s)
-s+-polarity (s-∀l s ic fd upC upD upj) = ⊢r-strengthen=0 (s+-polarity s) (↑ty-arr upC upD)
-s+-polarity (s-∀l-no-appear s ic fd upC upD upj) = ⊢r-strengthen^0 (s+-polarity s) (↑ty-arr upC upD)
-s+-polarity (s-svar-l x inΔ) = ∋:=-⊢r x inΔ
-s+-polarity (s-tapp s upj) = ⊢r-∀ (⊢r-◆0 (s+-polarity s))
-s+-polarity (s-svar-𝕚 _ x) = s+-polarity x
-s+-polarity (s-svar-𝕔 inΓ s) = s+-polarity s
-s+-polarity (s-svar-𝕥 inΓ s) = s+-polarity s
+s+-polarity (s-∀l s fd upC upD) = ⊢r-strengthen=0 (s+-polarity s) (↑ty-arr upC upD)
+s+-polarity (s-∀l-no-appear s fd upC upD) = ⊢r-strengthen^0 (s+-polarity s) (↑ty-arr upC upD)
+s+-polarity (s-svar-l inΔ s) = s+-polarity s
 
 s--polarity (s-int regΔ) = ⊢r-int
 s--polarity (s-var-∙ regΔ inΔ) = ⊢r-var-∙ inΔ
@@ -41,15 +37,11 @@ t-⊢r (⊢lam₁ ⊢e) with t-tregular ⊢e
 ... | reg-S, r regA = ⊢r-arr regA (⊢r-strengthen,0 (t-⊢r ⊢e))
 t-⊢r (⊢lam₂ ⊢e) with t-tregular ⊢e
 ... | reg-S, r regA = ⊢r-arr regA (⊢r-strengthen,0 (t-⊢r ⊢e))
-t-⊢r (⊢app₁ ⊢e ⊢e₁) with t-⊢r ⊢e
-... | ⊢r-arr r r₁ = r₁
-t-⊢r (⊢app₂ ⊢e ⊢e₁) with t-⊢r ⊢e
+t-⊢r (⊢app ⊢e ⊢e₁) with t-⊢r ⊢e
 ... | ⊢r-arr r r₁ = r₁
 t-⊢r (⊢sub ⊢e B≤A gc j≢Z) = ⊢r-𝕣' (s+-polarity B≤A)
 t-⊢r (⊢tabs ⊢e) = ⊢r-∀ (t-⊢r ⊢e)
-t-⊢r (⊢tabs-∞ ⊢e) = ⊢r-∀ (t-⊢r ⊢e)
-t-⊢r (⊢tapp ⊢e st) with t-⊢rʲ ⊢e
-... | j-𝕥 r x = st0-⊢r (t-⊢r ⊢e) x st
+t-⊢r (⊢tapp ⊢e regA st s) = ⊢r-𝕣' (s+-polarity s)
 
 
 s-⊢c-l : Γ ⊢ j # A ⌞ ≤ ⌝ B
@@ -65,14 +57,10 @@ s-⊢c-l {≤ = ≤⁺} (s-arr₁ s s₁) = ⊢c-arr (s-⊢c-r s) (s-⊢c-l s₁
 s-⊢c-l {≤ = ≤⁺} (s-arr₂ s s₁) = ⊢c-arr (s-⊢c-r s) (s-⊢c-l s₁)
 s-⊢c-l {≤ = ≤⁺} (s-arr₃ cloA grd s) = ⊢c-arr cloA (s-⊢c-l s)
 s-⊢c-l {≤ = ≤⁺} (s-∀ s) = ⊢c-∀ (s-⊢c-l s)
-s-⊢c-l {≤ = ≤⁺} (s-∀l s ic fd upC upD upj) = ⊢c-∀ (⊢c-◆0 (s-⊢c-l s))
-s-⊢c-l {≤ = ≤⁺} (s-∀l-no-appear s ic fd upC upD upj) = ⊢c-∀ (⊢c-◇0 (s-⊢c-l s))
-s-⊢c-l {≤ = ≤⁺} (s-tapp s upj) = ⊢c-∀ (⊢c-◆0 (s-⊢c-l s))
-s-⊢c-l {≤ = ≤⁺} (s-svar-l x inΔ) = ⊢c-var-= (∋:=to∋= inΔ)
+s-⊢c-l {≤ = ≤⁺} (s-∀l s fd upC upD) = ⊢c-∀ (⊢c-◆0 (s-⊢c-l s))
+s-⊢c-l {≤ = ≤⁺} (s-∀l-no-appear s fd upC upD) = ⊢c-∀ (⊢c-◇0 (s-⊢c-l s))
+s-⊢c-l {≤ = ≤⁺} (s-svar-l inΔ s) = ⊢c-var-= (∋:=to∋= inΔ)
 s-⊢c-l {≤ = ≤⁻} s = ⊢r-⊢c (s--polarity s)
-s-⊢c-l {≤ = ≤⁺} (s-svar-𝕚 inΓ s) = ⊢c-var-= (∋:=to∋= inΓ)
-s-⊢c-l {≤ = ≤⁺} (s-svar-𝕔 inΓ s) = ⊢c-var-= (∋:=to∋= inΓ)
-s-⊢c-l {≤ = ≤⁺} (s-svar-𝕥 inΓ s) = ⊢c-var-= (∋:=to∋= inΓ)
 
 s-⊢c-r {≤ = ≤⁺} s = ⊢r-⊢c (s+-polarity s)
 s-⊢c-r {≤ = ≤⁻} (s-int regΔ) = ⊢c-int

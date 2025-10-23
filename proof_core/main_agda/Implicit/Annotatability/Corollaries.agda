@@ -14,17 +14,16 @@ par-complete (⊢var regΓ x∈Γ) = ⊢var regΓ x∈Γ
 par-complete (⊢ann ⊢e) = ⊢ann (par-complete ⊢e)
 par-complete (⊢lam₁ ⊢e) = ⊢lam₁ (par-complete ⊢e)
 par-complete (⊢lam₂ ⊢e) = ⊢lam₂ (par-complete ⊢e)
-par-complete (⊢app₁ ⊢e ⊢e₁) = ⊢app₁ (par-complete ⊢e) (par-complete ⊢e₁)
-par-complete (⊢app₂ ⊢e ⊢e₁) = ⊢app₂ (par-complete ⊢e) (par-complete ⊢e₁)
+par-complete (⊢app ⊢e ⊢e₁) = ⊢app (par-complete ⊢e) (par-complete ⊢e₁)
 par-complete (⊢sub ⊢e B≤A gc j≢Z) = ⊢sub (par-complete ⊢e) B≤A gc j≢Z
 par-complete (⊢tabs ⊢e) = ⊢tabs (par-complete ⊢e)
 
 annotatability-real : Γ ⊢ e ⦂ A ⟶ e'
-                    → Γ ⊢d ∞ # e' ⦂ A
+                    → Γ ⊢d `□ # e' ⦂ A
 annotatability-real ⊢e with annotatability ⊢e
 ... | bd = par-complete bd
 
 
 annotatability-real' : Γ ⊢ e ⦂ A ⟶ e'
-                     → Γ ⊢d Z # (e' ⦂ A) ⦂ A
+                     → Γ ⊢d `■ # (e' ⦂ A) ⦂ A
 annotatability-real' ⊢e = ⊢ann (annotatability-real ⊢e)

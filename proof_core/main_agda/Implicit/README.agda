@@ -1,5 +1,8 @@
 module Implicit.README where
 
+-- Mask-notation is isomorphic with Counter-notation
+import Implicit.Language.Counter2Mask using (iso1; iso2)
+
 ----------------------------------------------------------------------
 --+                           Section 3                            +--
 ----------------------------------------------------------------------

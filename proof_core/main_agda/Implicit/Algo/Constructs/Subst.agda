@@ -15,10 +15,6 @@ data ⟦_/_⟧ᶜ_⇘_ : Fin (1 + m) → Type m → Context n (1 + m) → Contex
       ⟦ k / A ⟧ᶜ Σ ⇘ Σ'
     → (ste : ⟦ k / A ⟧ᵉ e ⇘ e')
     → ⟦ k / A ⟧ᶜ ([ e ]↝ Σ) ⇘ (Context n m ∋⦂ ([ e' ]↝ Σ'))
-  tapp :
-       ⟦ k / T ⟧ᶜ Σ ⇘ Σ'
-    → ⟦ k / T ⟧ A ⇘ A'
-      → ⟦ k / T ⟧ᶜ (A ⓪↝ Σ) ⇘ (A' ⓪↝ Σ')
 
 infix 3 ⟦_⟧ᶜ_⇘_
 ⟦_⟧ᶜ_⇘_ : Type m → Context n (1 + m) → Context n m → Set

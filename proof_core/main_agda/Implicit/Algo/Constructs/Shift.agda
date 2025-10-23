@@ -12,8 +12,6 @@ data _↑tmᶜ_⇘_ : Context n m → Fin (1 + n) → Context (1 + n) m → Set 
   ↑tmᶜ-e : (up-e : e ↑tm x ⇘ e')
          → Σ ↑tmᶜ x ⇘ Σ'
          → [ e ]↝ Σ ↑tmᶜ x ⇘ [ e' ]↝ Σ'
-  ↑tmᶜ-⓪ : Σ ↑tmᶜ x ⇘ Σ'
-         → (A ⓪↝ Σ) ↑tmᶜ x ⇘ A ⓪↝ Σ'
 
 infix 3 ↑tmᶜ0_⇘_
 ↑tmᶜ0_⇘_ : Context n m → Context (1 + n) m → Set
@@ -27,9 +25,6 @@ data _↑tyᶜ_⇘_ : Context n m → Fin (1 + m) → Context n (1 + m) → Set 
   ↑tyᶜ-e : (up-e : e ↑tyᵉ k ⇘ e')
          → Σ ↑tyᶜ k ⇘ Σ'
          → [ e ]↝ Σ ↑tyᶜ k ⇘ [ e' ]↝ Σ'
-  ↑tyᶜ-⓪ : (upA : A ↑ty k ⇘ A')
-         → Σ ↑tyᶜ k ⇘ Σ'
-         → (A ⓪↝ Σ) ↑tyᶜ k ⇘ A' ⓪↝ Σ'
 
 infix 3 ↑tyᶜ0_⇘_
 ↑tyᶜ0_⇘_ : Context n m → Context n (1 + m) → Set

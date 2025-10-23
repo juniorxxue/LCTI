@@ -7,9 +7,9 @@ open import Implicit.Algo2Interm.AlgoCounter.All
 open import Implicit.Algo2Interm.Context2Counter
 
 infs-isoinf : Γ ⊨ [ e ]↝ Σ ⟹ A ↡ j
-            → IsoInf j
-infs-isoinf (infs-s ⊢e (infs-z regΓ regA)) = i∞-z
-infs-isoinf (infs-s ⊢e (infs-s ⊢e₁ infs)) = i∞-i (infs-isoinf (infs-s ⊢e₁ infs))
+            → □like j
+infs-isoinf (infs-s ⊢e (infs-z regΓ regA)) = □like-Z
+infs-isoinf (infs-s ⊢e (infs-s ⊢e₁ infs)) = □like-S (infs-isoinf (infs-s ⊢e infs))
 
 ss-find-l : Γ ⊢ A ⌞ ≤⁺ ⌝ B ⊣ Δ
               → Γ ∋^ k
@@ -29,20 +29,16 @@ s-find : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B ↡ j
        → Δ ∋= k
        → find A k j
 s-find (s-empty regΓ cloA x) inΓ inΔ = ⊥-elim (∋^-∋=-false inΓ inΔ)
-s-find (s-type ss) inΓ inΔ = f-∞ (ss-find-l ss inΓ inΔ)
-s-find (s-term-c cloA ap ⊢e s) inΓ inΔ = f-arr-𝕔 (⊢c-^∈-¬ε cloA inΓ) (s-find s inΓ inΔ)
+s-find (s-type ss) inΓ inΔ = f-□ (ss-find-l ss inΓ inΔ)
+s-find (s-term-c cloA ap ⊢e s) inΓ inΔ = f-arr-r (⊢c-^∈-¬ε cloA inΓ) (s-find s inΓ inΔ)
 s-find {k = k} (s-term-o {A = A} opnA ⊢e ss s) inΓ inΔ with ε-dec {k = k} {A = A}
-... | inj₁ inA  = f-arr-𝕚-l inA
-... | inj₂ ¬inA = f-arr-𝕚-r ¬inA (s-find s (⊆/-^in-^out (ss--⊆/ ss) ¬inA inΓ) inΔ)
-s-find (s-∀l-𝕚 s upᶜ upj upᵉ upC upD) inΓ inΔ = f-∀-𝕚 (s-find s (S^ inΓ) (S= inΔ)) upj
-s-find (s-∀l-𝕔 s upᶜ upj upᵉ upC upD) inΓ inΔ = f-∀-𝕔 (s-find s (S^ inΓ) (S= inΔ)) upj
-s-find (s-tapp s upᶜ upj) inΓ inΔ = f-𝕥 (s-find s (S= inΓ) (S= inΔ)) upj
-s-find (s-svar-term in' s) inΓ inΔ = ⊥-elim (∋^-∋=-false inΓ inΔ)
-s-find (s-svar-tapp in' s) inΓ inΔ = ⊥-elim (∋^-∋=-false inΓ inΔ)
-s-find (s-∀l-no-𝕚 s upᶜ upj upᵉ upC upD) inΓ inΔ = f-∀-𝕚 (s-find s (S^ inΓ) (S^ inΔ)) upj
-s-find (s-∀l-no-𝕔 s upᶜ upj upᵉ upC upD) inΓ inΔ = f-∀-𝕔 (s-find s (S^ inΓ) (S^ inΔ)) upj
+... | inj₁ inA = f-arr-l inA
+... | inj₂ ¬inA = f-arr-r ¬inA (s-find s (⊆/-^in-^out (ss--⊆/ ss) ¬inA inΓ) inΔ)
+s-find (s-∀l s upᶜ upᵉ upC upD) inΓ inΔ = f-∀ (s-find s (S^ inΓ) (S= inΔ))
+s-find (s-∀l-no s upᶜ upᵉ upC upD) inΓ inΔ = f-∀ (s-find s (S^ inΓ) (S^ inΔ))
+s-find (s-svar-term x s) inΓ inΔ = ⊥-elim (∋^-∋=-false inΓ inΔ)
 s-find (s-evar-infers infs inst) inΓ inΔ
-  with ε-var ← ^in-=out-ε (ext-var (inst-⊆/x inst)) inΓ inΔ = f-iso (infs-isoinf infs)
+   with ε-var ← ^in-=out-ε (ext-var (inst-⊆/x inst)) inΓ inΔ = f-iso (infs-isoinf infs)
 
 s-find0 : Γ ,^ ⊢ A ≤⁺ [ e' ]↝ Σ' ⊣ Δ ,= B ↪ C `→ D ↡ j
               → ↑tyᵉ0 e ⇘ e'
@@ -87,7 +83,5 @@ s-¬ε (s-term-o opnA ⊢e ss s) inΓ inΔ = let inΩ = ⊆-∋^-middle inΓ in�
                                        in ¬ε-arr (ss-¬ε- ss inΓ inΩ) (s-¬ε s inΩ inΔ)
 s-¬ε (s-∀l s upᶜ upᵉ upC upD) inΓ inΔ = ¬ε-∀ (s-¬ε s (S^ inΓ) (S= inΔ))
 s-¬ε (s-∀l-no s upᶜ upᵉ upC upD) inΓ inΔ = ¬ε-∀ (s-¬ε s (S^ inΓ) (S^ inΔ))
-s-¬ε (s-tapp s upᶜ) inΓ inΔ = ¬ε-∀ (s-¬ε s (S= inΓ) (S= inΔ))
 s-¬ε (s-svar-term x s) inΓ inΔ = ¬ε-var (∋=-∋^-≢ (∋:=to∋= x) inΓ)
-s-¬ε (s-svar-tapp x s) inΓ inΔ = ¬ε-var (∋=-∋^-≢ (∋:=to∋= x) inΓ)
 s-¬ε (s-evar-infers infs inst) inΓ inΔ = ¬ε-var (∋=-∋^-≢ (inst-∋= inst) inΔ)

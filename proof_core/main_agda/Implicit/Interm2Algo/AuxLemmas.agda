@@ -13,7 +13,7 @@ open import Implicit.Interm2Algo.Find
 s+-⊆/ : Δ ⊢ j # A ⌞ ≤⁺ ⌝ B
       → Δ ⊆ Δ w/t A w/c j
 
-s--⊆/ : Δ ⊢ ∞ # A ⌞ ≤⁻ ⌝ B
+s--⊆/ : Δ ⊢ `□ # A ⌞ ≤⁻ ⌝ B
       → Δ ⊆ Δ w/t B
 s--⊆/ (s-int regΔ) = ext-int regΔ
 s--⊆/ (s-var-∙ regΔ inΔ) = ext-var (reg-⊆/x∙ regΔ inΔ)
@@ -31,17 +31,11 @@ s+-⊆/ (s-arr₂ s s₁) = ⊆I (s--⊆/ s) (s+-⊆/ s₁)
 s+-⊆/ (s-arr₃ cloA grd s) = ⊆C cloA (s+-⊆/ s)
 s+-⊆/ (s-∀ s) with s+-⊆/ s
 ... | ⊆∞ x = ⊆∞ (ext-∀ x)
-s+-⊆/ (s-∀l s ic fd upC upD upj) with s+-⊆/ s
-s+-⊆/ (s-∀l s case-𝕚 fd upC upD (↑tyʲ-𝕚 upj)) | r = ⊆∀-I (⊆/c-irrev-^0 r fd) upj
-s+-⊆/ (s-∀l s case-𝕔 fd upC upD (↑tyʲ-𝕔 upj)) | r = ⊆∀-C (⊆/c-irrev-^0 r fd) upj
-s+-⊆/ (s-∀l-no-appear s ic fd upC upD upj) with s+-⊆/ s
-s+-⊆/ (s-∀l-no-appear s case-𝕚 fd upC upD (↑tyʲ-𝕚 upj)) | r = ⊆∀-I-no r upj
-s+-⊆/ (s-∀l-no-appear s case-𝕔 fd upC upD (↑tyʲ-𝕔 upj)) | r = ⊆∀-C-no r upj
-s+-⊆/ (s-svar-l x inΔ) = ⊆∞ (ext-var (⊆/x-refl x (⊢c-var-= (∋:=to∋= inΔ))))
-s+-⊆/ (s-tapp s upj) = ⊆∀-T (s+-⊆/ s) upj
-s+-⊆/ (s-svar-𝕚 inΓ s) = ⊆I-X (s-sregular s) (⊢c-var-= (∋:=to∋= inΓ))
-s+-⊆/ (s-svar-𝕔 inΓ s) = ⊆C-X (s-sregular s) (⊢c-var-= (∋:=to∋= inΓ))
-s+-⊆/ (s-svar-𝕥 inΓ s) = ⊆T-X (s-sregular s) (⊢c-var-= (∋:=to∋= inΓ))
+s+-⊆/ (s-∀l s fd upC upD) = ⊆∀ (⊆/c-irrev-^0 (s+-⊆/ s) fd)
+s+-⊆/ (s-∀l-no-appear s fd upC upD) = ⊆∀-no (s+-⊆/ s)
+s+-⊆/ {j = ` □} (s-svar-l inΔ s) = ⊆∞ (ext-var (⊆/x-refl (s-sregular s) (⊢c-var-= (∋:=to∋= inΔ))))
+s+-⊆/ {j = ` ■} (s-svar-l inΔ s) = ⊆Z (s-sregular s)
+s+-⊆/ {j = i · j} (s-svar-l inΔ s) = ⊆X (s-sregular s) (⊢c-var-= (∋:=to∋= inΔ))
 
 
 infix 3 _≤_⟹_
@@ -92,11 +86,11 @@ data _ε'_ : Fin m → Type m → Set where
 ... | is-ex inΓ = is-ex (S= inΓ)
 ... | is-sol inΓ = is-sol (S= inΓ)
 
-complete-ss+ : Δ ⊢ ∞ # A ⌞ ≤⁺ ⌝ B
+complete-ss+ : Δ ⊢ `□ # A ⌞ ≤⁺ ⌝ B
              → Γ ⊆ Δ w/t A
              → Γ ⊢ A ⌞ ≤⁺ ⌝ B ⊣ Δ
 
-complete-ss- : Δ ⊢ ∞ # A ⌞ ≤⁻ ⌝ B
+complete-ss- : Δ ⊢ `□ # A ⌞ ≤⁻ ⌝ B
              → Γ ⊆ Δ w/t B
              → Γ ⊢ A ⌞ ≤⁻ ⌝ B ⊣ Δ
 
@@ -110,9 +104,14 @@ complete-ss+ (s-arr₁ s s₁) (ext-arr ext ext₁)
   with ih ← complete-ss- {Γ = Ψ} s (ⅆ-⊆/ diff ext)
   = s-arr (s--subirrev-final ih diff (⊆/-⊢c ext)) (complete-ss+ s₁ ext₁)
 complete-ss+ (s-∀ s) (ext-∀ ext) = s-∀ (complete-ss+ s ext)
-complete-ss+ (s-svar-l x inΔ) ext'@(ext-var x₁) with ⊆/x-=out-in x₁ (∋:=to∋= inΔ)
-... | is-ex inΓ = s-ex-l^ (⊆/x-^in-=out-inst inΓ inΔ x₁)
-... | is-sol inΓ with refl ← ⊆/-⊢c-eq ext' (⊢c-var-= inΓ) = s-ex-l= x inΔ
+complete-ss+ (s-svar-l inΔ s) ext'@(ext-var x₁) with ⊆/x-=out-in x₁ (∋:=to∋= inΔ)
+... | is-ex inΓ
+  with refl ← ⊢r-≫-eq' (∋:=-⊢r (s-sregular s) inΔ) (s+-≫ s)
+  = s-ex-l^ (⊆/x-^in-=out-inst inΓ inΔ x₁)
+... | is-sol inΓ with refl ← ⊆/-⊢c-eq ext' (⊢c-var-= inΓ)
+  with refl ← ⊢r-≫-eq' (∋:=-⊢r (s-sregular s) inΔ) (s+-≫ s)
+  = s-ex-l= (s-sregular s) inΔ
+
 
 complete-ss- (s-int regΔ) ext with ⊆/-⊢c-eq ext ⊢c-int
 ... | refl = s-int regΔ
@@ -215,12 +214,13 @@ complete-false₃ regA inA inΔ = ⊢c-^∈-false (ε'-ε inA) inΔ (⊢r-⊢c r
 
 complete-infs : Γ ⊢ ⟨ j , B ⟩ ~s Σ
               → Γ ⊢r B
-              → IsoInf j
+              → □like j
               → 𝕣 Γ ⊨ Σ ⟹ B
-complete-infs (~I ⊢e ~∞) (⊢r-arr regB regB₁) i∞-z = infs-s ⊢e (infs-z (t-env ⊢e) (⊢r-𝕣' regB₁))
-complete-infs (~I ⊢e ~j) (⊢r-arr regB regB₁) (i∞-i iso) = infs-s ⊢e (complete-infs ~j regB₁ iso)
+complete-infs (~I ⊢e ~∞) (⊢r-arr regB regB₁) □like-Z = infs-s ⊢e (infs-z (t-env ⊢e) (⊢r-𝕣' regB₁))
+complete-infs (~I ⊢e ~j) (⊢r-arr regB regB₁) (□like-S wlike) = infs-s ⊢e (complete-infs ~j regB₁ wlike)
 
-data Complete (A : Type m) (j : Counter m) (Σ : Context n m) (Γ : Env n m) (Δ : Env n m) (B : Type m) : Set where
+
+data Complete (A : Type m) (j : Mask) (Σ : Context n m) (Γ : Env n m) (Δ : Env n m) (B : Type m) : Set where
   normal :     (cond : ¬ (∃[ k ](k ε' A) × Γ ∋^ k))
                → (s : Γ ⊢ A ≤⁺ Σ ⊣ Δ ↪ B)
                → Complete A j Σ Γ Δ B
@@ -234,7 +234,7 @@ data Complete (A : Type m) (j : Counter m) (Σ : Context n m) (Γ : Env n m) (Δ
                → Complete A j Σ Γ Δ B
 
 ss-complete : Γ ⊢ A ⌞ ≤⁺ ⌝ B ⊣ Δ
-            → Complete A ∞ (τ B) Γ Δ B
+            → Complete A `□ (τ B) Γ Δ B
 ss-complete (s-int regΓ) = normal (λ ()) (s-type (s-int regΓ))
 ss-complete (s-var-∙ regΓ inΔ) = normal (⊢c-¬ε' (⊢c-var-∙ inΔ)) (s-type (s-var-∙ regΓ inΔ))
 ss-complete (s-ex-l^ inst) = special ε-var (inst-∋^ inst) ett-var (inst-=⟹ inst) (s-type (s-ex-l^ inst))

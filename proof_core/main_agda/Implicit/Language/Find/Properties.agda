@@ -1,79 +1,47 @@
 module Implicit.Language.Find.Properties where
 
-
 open import Implicit.Language.Base
 open import Implicit.Language.Shift.All
 open import Implicit.Language.Occur.All
 open import Implicit.Language.Find.Base
 
-↑tyʲ-iso : IsoInf j
-         → j ↑tyʲ k ⇘ j'
-         → IsoInf j'
-↑tyʲ-iso i∞-z (↑tyʲ-𝕚 ↑tyʲ-∞) = i∞-z
-↑tyʲ-iso (i∞-i iso) (↑tyʲ-𝕚 upj) = i∞-i (↑tyʲ-iso iso upj)
-
-↑tyʲ-iso' : IsoInf j'
-         → j ↑tyʲ k ⇘ j'
-         → IsoInf j
-↑tyʲ-iso' i∞-z (↑tyʲ-𝕚 ↑tyʲ-∞) = i∞-z
-↑tyʲ-iso' (i∞-i iso) (↑tyʲ-𝕚 upj) = i∞-i (↑tyʲ-iso' iso upj)
-
 ↑ty-find : find A X j
          → A ↑ty k ⇘ A'
-         → j ↑tyʲ k ⇘ j'
          → X #< k
-         → find A' (inject₁ X) j'
-↑ty-find (f-∞ x) upA ↑tyʲ-∞ lt = f-∞ (↑ty-ε x upA lt)
-↑ty-find (f-iso x) ↑ty-var upj lt rewrite punchIn-inject lt = f-iso (↑tyʲ-iso x upj)
-↑ty-find (f-arr-𝕚-l x) (↑ty-arr upA upA₁) (↑tyʲ-𝕚 upj) lt = f-arr-𝕚-l (↑ty-ε x upA lt)
-↑ty-find (f-arr-𝕚-r ¬inA fd) (↑ty-arr upA upA₁) (↑tyʲ-𝕚 upj) lt = f-arr-𝕚-r (↑ty-¬ε-prv ¬inA upA lt) (↑ty-find fd upA₁ upj lt)
-↑ty-find (f-arr-𝕔 ¬inA fd) (↑ty-arr upA upA₁) (↑tyʲ-𝕔 upj) lt = f-arr-𝕔 (↑ty-¬ε-prv ¬inA upA lt) (↑ty-find fd upA₁ upj lt)
-↑ty-find (f-∀-𝕚 fd upj₁) (↑ty-∀ upA) (↑tyʲ-𝕚 {j' = j'} upj) lt
-  with ⟨ j″ , upj' ⟩ ← ↑tyʲ0-total j' = f-∀-𝕚 (↑ty-find fd upA (↑tyʲ-comm0' (↑tyʲ-𝕚 upj) (↑tyʲ-𝕚 upj') (↑tyʲ-𝕚 upj₁)) (s≤s lt)) upj'
-↑ty-find (f-∀-𝕔 fd upj₁) (↑ty-∀ upA) (↑tyʲ-𝕔 {j' = j'} upj) lt
-  with ⟨ j″ , upj' ⟩ ← ↑tyʲ0-total j' = f-∀-𝕔 (↑ty-find fd upA (↑tyʲ-𝕔 (↑tyʲ-comm0' upj upj' upj₁)) (s≤s lt)) upj'
-↑ty-find (f-𝕥 fd upj₁) (↑ty-∀ upA) (↑tyʲ-𝕥 {j' = j'} upj upA₁) lt
-  with ⟨ j″ , upj' ⟩ ← ↑tyʲ0-total j' = f-𝕥 (↑ty-find fd upA (↑tyʲ-comm0' upj upj' upj₁) (s≤s lt)) upj'
+         → find A' (inject₁ X) j
+↑ty-find (f-□ inA) upA lt = f-□ (↑ty-ε inA upA lt)
+↑ty-find (f-iso iso) ↑ty-var lt rewrite punchIn-inject lt = f-iso iso
+↑ty-find (f-arr-l inA) (↑ty-arr upA upA₁) lt = f-arr-l (↑ty-ε inA upA lt)
+↑ty-find (f-arr-r ¬inA fd) (↑ty-arr upA upA₁) lt = f-arr-r (↑ty-¬ε-prv ¬inA upA lt) (↑ty-find fd upA₁ lt)
+↑ty-find (f-∀ fd) (↑ty-∀ upA) lt = f-∀ (↑ty-find fd upA (s≤s lt))
 
 ↑ty-find0 : find A #0 j
           → A ↑ty (#S k) ⇘ A'
-          → j ↑tyʲ (#S k) ⇘ j'
-          → find A' #0 j'
-↑ty-find0 fd upA upj = ↑ty-find fd upA upj (s≤s z≤n)
+          → find A' #0 j
+↑ty-find0 fd upA = ↑ty-find fd upA (s≤s z≤n)
 
 
-↑ty-find' : find A' (inject₁ X) j'
+↑ty-find' : find A' (inject₁ X) j
           → A ↑ty k ⇘ A'
-          → j ↑tyʲ k ⇘ j'
           → X #< k
           → find A X j
-↑ty-find' (f-∞ x) upA ↑tyʲ-∞ lt = f-∞ (↑ty-ε' x lt upA)
-↑ty-find' (f-iso x) upA upj lt rewrite punchIn-inject lt with ↑ty-var-inv-helper upA refl
-... | refl = f-iso (↑tyʲ-iso' x upj)
-↑ty-find' (f-arr-𝕚-l x) (↑ty-arr upA upA₁) (↑tyʲ-𝕚 upj) lt = f-arr-𝕚-l (↑ty-ε' x lt upA)
-↑ty-find' (f-arr-𝕚-r ¬inA fd) (↑ty-arr upA upA₁) (↑tyʲ-𝕚 upj) lt = f-arr-𝕚-r (¬ε-↑ty'-inv ¬inA upA lt) (↑ty-find' fd upA₁ upj lt)
-↑ty-find' (f-arr-𝕔 ¬inA fd) (↑ty-arr upA upA₁) (↑tyʲ-𝕔 upj) lt = f-arr-𝕔 (¬ε-↑ty'-inv ¬inA upA lt) (↑ty-find' fd upA₁ upj lt)
-↑ty-find' (f-∀-𝕚 fd upj₁) (↑ty-∀ upA) (↑tyʲ-𝕚 {j = j} upj) lt
-  with ⟨ j' , upj' ⟩ ← ↑tyʲ0-total j = f-∀-𝕚 (↑ty-find' fd upA (↑tyʲ-𝕚 (↑tyʲ-comm0' upj upj₁ upj')) (s≤s lt)) upj'
-↑ty-find' (f-∀-𝕔 fd upj₁) (↑ty-∀ upA) (↑tyʲ-𝕔 {j = j} upj) lt
-  with ⟨ j' , upj' ⟩ ← ↑tyʲ0-total j = f-∀-𝕔 (↑ty-find' fd upA (↑tyʲ-𝕔 (↑tyʲ-comm0' upj upj₁ upj')) (s≤s lt)) upj'
-↑ty-find' (f-𝕥 fd upj₁) (↑ty-∀ upA) (↑tyʲ-𝕥 {j = j} upj upA₁) lt
-  with ⟨ j' , upj' ⟩ ← ↑tyʲ0-total j = f-𝕥 (↑ty-find' fd upA (↑tyʲ-comm0' upj upj₁ upj') (s≤s lt)) upj'
+↑ty-find' (f-□ inA) upA lt = f-□ (↑ty-ε' inA lt upA)
+↑ty-find' (f-iso iso) upA lt rewrite punchIn-inject lt with ↑ty-var-inv-helper upA refl
+... | refl = f-iso iso
+↑ty-find' (f-arr-l inA) (↑ty-arr upA upA₁) lt = f-arr-l (↑ty-ε' inA lt upA)
+↑ty-find' (f-arr-r ¬inA fd) (↑ty-arr upA upA₁) lt = f-arr-r (¬ε-↑ty'-inv ¬inA upA lt) (↑ty-find' fd upA₁ lt)
+↑ty-find' (f-∀ fd) (↑ty-∀ upA) lt = f-∀ (↑ty-find' fd upA (s≤s lt))
 
-↑ty-find0' : find A' #0 j'
+↑ty-find0' : find A' #0 j
             → A ↑ty (#S k) ⇘ A'
-            → j ↑tyʲ (#S k) ⇘ j'
             → find A #0 j
-↑ty-find0' fd upA upj = ↑ty-find' fd upA upj (s≤s z≤n)
+↑ty-find0' fd upA = ↑ty-find' fd upA (s≤s z≤n)
 
 
 find-ε-gen : find A k j
            → k ε A
-find-ε-gen (f-∞ x) = x
+find-ε-gen (f-□ inA) = inA
 find-ε-gen (f-iso iso) = ε-var
-find-ε-gen (f-arr-𝕚-l x) = ε-arr-l x
-find-ε-gen (f-arr-𝕚-r ¬inA fd) = ε-arr-r ¬inA (find-ε-gen fd)
-find-ε-gen (f-arr-𝕔 ¬inA fd) = ε-arr-r ¬inA (find-ε-gen fd)
-find-ε-gen (f-∀-𝕚 fd upj) = ε-∀ (find-ε-gen fd)
-find-ε-gen (f-∀-𝕔 fd upj) = ε-∀ (find-ε-gen fd)
-find-ε-gen (f-𝕥 fd upj) = ε-∀ (find-ε-gen fd)
+find-ε-gen (f-arr-l inA) = ε-arr-l inA
+find-ε-gen (f-arr-r ¬inA fd) = ε-arr-r ¬inA (find-ε-gen fd)
+find-ε-gen (f-∀ fd) = ε-∀ (find-ε-gen fd)

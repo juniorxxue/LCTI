@@ -72,7 +72,8 @@ abstract
   t-strengthen, (⊢sub ⊢e ne gc s) newΓ upΣ upe = ⊢sub (t-strengthen, ⊢e newΓ ↑tmᶜ-□ upe) (nonempty-↑tmᶜ' ne upΣ) (↑tm-gc' gc upe) (s-strengthen, s (◀S⋈ newΓ) (◀S⋈ newΓ) upΣ)
   t-strengthen, (⊢tabs ⊢e) newΓ ↑tmᶜ-□ (↑tm-Λ upe) = ⊢tabs (t-strengthen, ⊢e (◀S∙ newΓ) ↑tmᶜ-□ upe)
   t-strengthen, (⊢tabs-τ ⊢e) newΓ ↑tmᶜ-τ (↑tm-Λ upe) = ⊢tabs-τ (t-strengthen, ⊢e (◀S∙ newΓ) ↑tmᶜ-τ upe)
-  t-strengthen, (⊢tapp ⊢e st) newΓ newΣ (↑tm-⓪ upe) = ⊢tapp (t-strengthen, ⊢e newΓ (↑tmᶜ-⓪ newΣ) upe) st
+  t-strengthen, (⊢tapp ⊢e regA st s) newΓ newΣ (↑tm-⓪ upe)
+    = ⊢tapp (t-strengthen, ⊢e newΓ ↑tmᶜ-□ upe) regA (⊢r-strengthen, st newΓ) (s-strengthen, s (◀S⋈ newΓ) (◀S⋈ newΓ) newΣ)
 
   s-strengthen, (s-empty regΓ cloA x) newΓ newΔ ↑tmᶜ-□ with refl ← ◀,-unique newΓ newΔ = s-empty (sregular-strengthen, regΓ newΓ)
                                                                                                  (⊢c-strengthen, cloA newΓ)
@@ -90,13 +91,8 @@ abstract
     with ⟨ Σ' , upΣ' ⟩ ← ↑tyᶜ0-total Σ
     with ⟨ e' , upe ⟩ ← ↑tyᵉ0-total e
     = s-∀l-no (s-strengthen, s (◀S^ newΓ) (◀S^ newΔ) (↑tmᶜ-e (↑tm-↑tyᵉ-comm up-e upᵉ upe) (↑tmᶜ-↑tyᶜ-comm upΣ upᶜ upΣ'))) upΣ' upe upC upD
-  s-strengthen, (s-tapp s upᶜ) newΓ newΔ (↑tmᶜ-⓪ {Σ = Σ} upΣ)
-    with ⟨ Σ' , upΣ' ⟩ ← ↑tyᶜ0-total Σ
-    = s-tapp (s-strengthen, s (◀S= newΓ) (◀S= newΔ) (↑tmᶜ-↑tyᶜ-comm upΣ upᶜ upΣ')) upΣ'
   s-strengthen, (s-svar-term inΓ s) newΓ newΔ (↑tmᶜ-e up-e upΣ)
     with refl ← ◀,-unique newΓ newΔ = s-svar-term (∋:=-strengthen, inΓ newΓ) (s-strengthen, s newΓ newΓ (↑tmᶜ-e up-e upΣ))
-  s-strengthen, (s-svar-tapp inΓ s) newΓ newΔ (↑tmᶜ-⓪ upΣ)
-    with refl ← ◀,-unique newΓ newΔ = s-svar-tapp (∋:=-strengthen, inΓ newΓ) (s-strengthen, s newΓ newΓ (↑tmᶜ-⓪ upΣ))
   s-strengthen, (s-evar-infers infs inst) newΓ newΔ (↑tmᶜ-e up-e upΣ)
     = s-evar-infers (infs-strengthen, infs (◀,-𝕣 newΓ) (↑tmᶜ-e up-e upΣ)) (inst-strengthen, inst newΓ newΔ)
 

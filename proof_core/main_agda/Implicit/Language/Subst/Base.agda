@@ -3,10 +3,6 @@ module Implicit.Language.Subst.Base where
 open import Implicit.Language.Base
 open import Implicit.Language.Shift.All
 
-private variable
-  i : ℕ
-
-
 ----------------------------------------------------------------------
 --+                         Relation Ver.                          +--
 ----------------------------------------------------------------------
@@ -47,8 +43,8 @@ infix 3 ⟦_⟧_⇘_
 -- type subst in term
 infix 3 ⟦_/_⟧ᵉ_⇘_
 data ⟦_/_⟧ᵉ_⇘_ : Fin (1 + m) → Type m → Term n (1 + m) → Term n m → Set where
-  st-lit :
-      ⟦ k / A ⟧ᵉ lit i ⇘ (Term n m ∋⦂ lit i)
+  st-lit : ∀ {i}
+    → ⟦ k / A ⟧ᵉ lit i ⇘ (Term n m ∋⦂ lit i)
   st-var :
       ⟦ k / A ⟧ᵉ ` x ⇘ (Term n m ∋⦂ ` x)
   st-ƛ :
