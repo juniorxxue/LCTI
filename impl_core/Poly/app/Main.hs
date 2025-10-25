@@ -8,6 +8,8 @@ import Examples (Example (..), examples, getExample, getExamplesInGroup)
 import Log
 import Syntax
 import System.Environment (getArgs)
+-- import Parser
+import Convert
 
 lookupEnv :: Int -> Env -> WriterT Log Maybe Typ
 lookupEnv 0 (ETrm ty _) = do
@@ -499,61 +501,7 @@ infer _ _ _ = lift Nothing
 
 main :: IO ()
 main = do
-  args <- getArgs
-  let showDrv = "--drv" `elem` args
-      showHelp = "--help" `elem` args || "-h" `elem` args
-
-  if showHelp
-    then do
-      putStrLn "Usage: cabal run Poly -- [OPTIONS] [EXAMPLE_NAME]"
-      putStrLn ""
-      putStrLn "Options:"
-      putStrLn "  --help, -h        Show this help message"
-      putStrLn "  --drv, -d         Show detailed derivation steps"
-      putStrLn ""
-      putStrLn "Examples:"
-      putStrLn "  cabal run Poly                    # Run all examples (default)"
-      putStrLn "  cabal run Poly -- A1              # Run specific example"
-      putStrLn "  cabal run Poly -- A1 A2 A3        # Run multiple examples"
-      putStrLn "  cabal run Poly -- --drv A1        # Run with derivation"
-    else do
-      -- Filter out flags to get example names
-      let requestedExamples = filter (not . isFlag) args
-          isFlag arg = arg `elem` ["--drv", "--help", "-h"]
-      if null requestedExamples
-        then runAllExamples showDrv
-        else runSpecificExamples showDrv requestedExamples
-
-runAllExamples :: Bool -> IO ()
-runAllExamples showDrv = do
-  forM_ examples $ \example -> do
-    runSingleExample example showDrv
-
-runSpecificExamples :: Bool -> [String] -> IO ()
-runSpecificExamples showDrv names = do
-  forM_ names $ \name -> do
-    let groupExamples = getExamplesInGroup name
-    if not (null groupExamples)
-      then do
-        putStrLn $ "Running examples: " ++ name
-        forM_ groupExamples $ \example -> do
-          runSingleExample example showDrv
-      else do
-        case getExample name of
-          Just example -> runSingleExample example showDrv
-          Nothing -> do
-            putStrLn $ "Error: Example or group '" ++ name ++ "' not found."
-            putStrLn "Use --help to see usage information."
-
-runSingleExample :: Example -> Bool -> IO ()
-runSingleExample example showDrv = do
-  putStrLn $ replicate 80 '-'
-  putStrLn $ exampleName example ++ ": " ++ exampleDescription example
-  case runWriterT (infer (exampleEnv example) CEmpty (exampleTerm example)) of
-    Just (tyA, logs) -> do
-      putStrLn $ "[✓] Typing result: " ++ show tyA
-      when showDrv $ do
-        putStrLn ""
-        mapM_ putStrLn logs
-    Nothing -> do
-      putStrLn "[x] Typing failed"
+  let desList = map exampleDescription examples
+  mapM_ (\des -> do
+    putStrLn $ show . parseAndConvertTerm $ des) 
+    desList
