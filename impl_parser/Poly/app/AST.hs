@@ -10,21 +10,21 @@ data NamedTyp = TInt | TBool
               | TST NamedTyp NamedTyp 
               deriving (Eq, Show)
 
-data NamedTerm = LitInt Int
-              | LitBool Bool
-              | Var String
-              | Abs String NamedTerm
-              | AbsAnn NamedTyp NamedTerm
-              | AbsUncurry String NamedTerm
-              | AbsUncurryAnn [NamedTyp] NamedTerm
-              | App NamedTerm NamedTerm
-              | AppUncurry NamedTerm [NamedTerm]
-              | Ann NamedTerm NamedTyp
-              | TAbs NamedTerm
-              | TApp NamedTerm NamedTyp
-              | Nil
-              | Cons
-              | Pair NamedTerm NamedTerm
-              | Fst NamedTerm
-              | Snd NamedTerm
+data NamedTerm = LitInt Int                           -- natural number n
+              | LitBool Bool                          -- true | false
+              | Var String                            -- variable x
+              | Abs String NamedTerm                  -- λx. e
+              | AbsAnn String NamedTyp NamedTerm      -- λx : t. e
+              | AbsUncurry [String] NamedTerm         -- λ{x, ...}. e
+              | AbsUncurryAnn [(String, NamedTyp)] NamedTerm  -- λ{x : t, ...}. e
+              | App NamedTerm NamedTerm               -- e1 e2
+              | AppUncurry NamedTerm [NamedTerm]      -- e {e1, ...}
+              | Ann NamedTerm NamedTyp                -- e : t
+              | TAbs String NamedTerm                 -- Λa. e
+              | TApp NamedTerm NamedTyp               -- e @ t
+              | Nil                                   -- nil
+              | Cons                                  -- cons
+              | Pair NamedTerm NamedTerm              -- <e1, e2>
+              | Fst NamedTerm                         -- fst e
+              | Snd NamedTerm                         -- snd e
               deriving (Eq, Show)
