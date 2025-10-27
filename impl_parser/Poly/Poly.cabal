@@ -61,39 +61,16 @@ executable Poly
     main-is:          Main.hs
 
     -- Modules included in this executable, other than Main.
-    other-modules: Lexer, AST, Parser
+    other-modules: Lexer, AST, Parser, Convert, Infer, DeBruijn, Syntax, Log, Examples
 
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:
 
     -- Other library packages from which modules are imported.
     build-depends:    base ^>=4.18.3.0,
-                      array
-
-    build-tool-depends: happy:happy, alex:alex
-
-    -- Directories containing source files.
-    hs-source-dirs:   app
-
-    -- Base language which the package is written in.
-    default-language: Haskell2010
-
-executable TestExamples
-    -- Import common warning flags.
-    import:           warnings
-
-    -- .hs or .lhs file containing the Main module.
-    main-is:          TestExamples.hs
-
-    -- Modules included in this executable, other than Main.
-    other-modules: Lexer, AST, Parser
-
-    -- LANGUAGE extensions used by modules in this package.
-    -- other-extensions:
-
-    -- Other library packages from which modules are imported.
-    build-depends:    base ^>=4.18.3.0,
-                      array
+                      array,
+                      mtl,
+                      containers
 
     build-tool-depends: happy:happy, alex:alex
 
