@@ -68,7 +68,6 @@ data Token
   | TTrueKw       -- "true"
   | TFalseKw      -- "false"
   | TNilKw        -- "nil"
-  | TConsKw       -- "cons"
   | TFstKw        -- "fst"
   | TSndKw        -- "snd"
   | TNat Int      -- natural number
@@ -89,7 +88,6 @@ kwOrIdent s = case s of
   "true"   -> TTrueKw
   "false"  -> TFalseKw
   "nil"    -> TNilKw
-  "cons"   -> TConsKw
   "fst"    -> TFstKw
   "snd"    -> TSndKw
   "lambda" -> TLambda

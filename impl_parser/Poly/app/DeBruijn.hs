@@ -59,13 +59,9 @@ shiftTerm k (Ann t ty) = Ann (shiftTerm k t) ty
 shiftTerm k (TAbs t) = TAbs (shiftTerm k t)
 shiftTerm k (TApp t ty) = TApp (shiftTerm k t) ty
 shiftTerm _ Nil = Nil
-shiftTerm _ Cons = Cons
 shiftTerm k (Pair t1 t2) = Pair (shiftTerm k t1) (shiftTerm k t2)
 shiftTerm k (Fst t) = Fst (shiftTerm k t)
 shiftTerm k (Snd t) = Snd (shiftTerm k t)
-shiftTerm _ ST = ST
-shiftTerm _ ConsUncurry = ConsUncurry
-shiftTerm _ STUncurry = STUncurry
 
 shiftTerm0 :: Trm -> Trm
 shiftTerm0 = shiftTerm 0
@@ -96,13 +92,9 @@ shiftTyTerm k (Ann t ty) = Ann (shiftTyTerm k t) (shiftTyp k ty)
 shiftTyTerm k (TAbs t) = TAbs (shiftTyTerm (1 + k) t)
 shiftTyTerm k (TApp t ty) = TApp (shiftTyTerm k t) (shiftTyp k ty)
 shiftTyTerm _ Nil = Nil
-shiftTyTerm _ Cons = Cons
 shiftTyTerm k (Pair t1 t2) = Pair (shiftTyTerm k t1) (shiftTyTerm k t2)
 shiftTyTerm k (Fst t) = Fst (shiftTyTerm k t)
 shiftTyTerm k (Snd t) = Snd (shiftTyTerm k t)
-shiftTyTerm _ ST = ST
-shiftTyTerm _ ConsUncurry = ConsUncurry
-shiftTyTerm _ STUncurry = STUncurry
 
 -- type shift in context
 shiftTyContext :: Int -> Context -> Context

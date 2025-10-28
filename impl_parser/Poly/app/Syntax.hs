@@ -20,13 +20,9 @@ data Trm
   | TAbs Trm
   | TApp Trm Typ
   | Nil
-  | Cons
   | Pair Trm Trm
   | Fst Trm
   | Snd Trm
-  | ST
-  | ConsUncurry
-  | STUncurry
 
 instance Show Typ where
   showsPrec _ TInt = showString "Int"
@@ -55,13 +51,9 @@ instance Show Trm where
   showsPrec p (TAbs t) = showParen (p > 0) $ showString "Λ. " . shows t
   showsPrec p (TApp t ty) = showParen (p > 9) $ showsPrec 9 t . showString " @" . showsPrec 10 ty
   showsPrec _ Nil = showString "Nil"
-  showsPrec _ Cons = showString "Cons"
   showsPrec _ (Pair t1 t2) = showParen True $ shows t1 . showString ", " . shows t2
   showsPrec p (Fst t) = showParen (p > 9) $ showString "fst " . showsPrec 10 t
   showsPrec p (Snd t) = showParen (p > 9) $ showString "snd " . showsPrec 10 t
-  showsPrec _ ST = showString "ST"
-  showsPrec _ ConsUncurry = showString "Cons"
-  showsPrec _ STUncurry = showString "ST"
 
 data Env = EEmpty | ETrm Typ Env | EUvar Env | EEvar Env | ESvar Typ Env
 
@@ -95,10 +87,6 @@ genericConsumer (LitBool _) = True
 genericConsumer (Var _) = True
 genericConsumer (Ann _ _) = True
 genericConsumer (TAbs _) = True
-genericConsumer Cons = True
-genericConsumer ST = True
-genericConsumer ConsUncurry = True
-genericConsumer STUncurry = True
 genericConsumer _ = False
 
 nonEmptyContext :: Context -> Bool

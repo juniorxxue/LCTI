@@ -35,6 +35,9 @@ preEnvStrings =
   , ("cons", "forall a. a -> [a] -> [a]")
   , ("fst", "forall a. forall b. a * b -> a")
   , ("snd", "forall a. forall b. a * b -> b")
+  , ("st", "forall a. forall b. a -> b -> ST a b")
+  , ("f1", "int * int")
+  , ("f2", "(forall a. a -> a) * int")
   -- Uncurried versions
   , ("id_uc", "forall a. {a} -> a")
   , ("choose_uc", "forall a. {a, a} -> a")
@@ -58,10 +61,10 @@ preEnvStrings =
   , ("k_uc", "forall a. {a} -> {[a]} -> a")
   , ("lst_uc", "[forall a. {int} -> {a} -> a]")
   , ("r_uc", "{forall a. {a} -> (forall b. {b} -> b)} -> int")
-  , ("nil_uc", "forall a. [a]")
   , ("cons_uc", "forall a. {a, [a]} -> [a]")
   , ("fst_uc", "forall a. forall b. {a * b} -> a")
   , ("snd_uc", "forall a. forall b. {a * b} -> b")
+  , ("st_uc", "forall a. forall b. {a, b} -> ST a b")
   ] 
 
 examplesList :: [Example]
@@ -76,8 +79,8 @@ examplesList =
   , Example "A2 (uncurried)" "choose_uc {id_uc}"
   , Example "A3" "choose nil ids"
   , Example "A3 (Fc translation)" "choose (nil : [forall a. a -> a]) ids"
-  , Example "A3 (uncurried)" "choose_uc {nil_uc, ids_uc}"
-  , Example "A3 (Fc translation, uncurried)" "choose_uc {(nil_uc : [forall a. {a} -> a]), ids_uc}"
+  , Example "A3 (uncurried)" "choose_uc {nil, ids_uc}"
+  , Example "A3 (Fc translation, uncurried)" "choose_uc {(nil : [forall a. {a} -> a]), ids_uc}"
   , Example "A4" "lambda x. x x"
   , Example "A4 (Fc translation 1)" "(lambda x. x x) : (forall a. a -> a) -> (forall a. a -> a)"
   , Example "A4 (Fc translation 2)" "lambda x : (forall a. a -> a). x x"
@@ -170,14 +173,14 @@ examplesList =
   , Example "D5 (Fc translation 2)" "revapp argST (lambda x. runST (Lambda a. x @ a) : (forall a. ST a int) -> int)"
   , Example "D5 (uncurried)" "revapp_uc {argST_uc, runST_uc}"
   , Example "D5 (Fc translation 1, uncurried)" "revapp_uc {argST_uc, (runST_uc @ int)}"
-  , Example "D5 (Fc translation 2, uncurried)" "revapp_uc {argST_uc, (lambda {x}. runST_uc {Lambda a. x @ a} : {forall a. ST a int} -> int)}"
+  , Example "D5 (Fc translation 2, uncurried)" "revapp_uc {argST_uc, (lambda {x}. runST_uc {Lambda a. x @ a}) : {forall a. ST a int} -> int}"
   , Example "E1" "k h lst"
   , Example "E1 (uncurried)" "k_uc {h_uc} {lst_uc}"
   , Example "E2" "k (lambda x. h x) lst"
-  , Example "E2 (Fc translation 1)" "k (Lambda a. lambda x. h x @ a : int -> a -> a) lst"
+  , Example "E2 (Fc translation 1)" "k (Lambda a. ((lambda x. h x @ a) : (int -> a -> a))) lst"
   , Example "E2 (Fc translation 2)" "k (Lambda a. lambda x : int. h x @ a) lst"
   , Example "E2 (uncurried)" "k_uc {lambda {x}. h_uc {x}} {lst_uc}"
-  , Example "E2 (Fc translation 1, uncurried)" "k_uc {(Lambda a. lambda {x}. h_uc {x} @ a : {int} -> {a} -> a)} {lst_uc}"
+  , Example "E2 (Fc translation 1, uncurried)" "k_uc {(Lambda a. ((lambda {x}. h_uc {x} @ a) : {int} -> {a} -> a))} {lst_uc}"
   , Example "E2 (Fc translation 2, uncurried)" "k_uc {(Lambda a. lambda {x : int}. h_uc {x} @ a)} {lst_uc}"
   , Example "E3" "r (lambda x. lambda y. y)"
   , Example "E3 (Fc translation 1)" "r (Lambda a. (lambda x. Lambda b. lambda y. y) : a -> forall b. b -> b)"
@@ -196,7 +199,7 @@ examplesList =
   , Example "Const" "(Lambda a. Lambda b. lambda x : a. lambda y : b. x) 1 true"
   , Example "Const (uncurried)" "(Lambda a. Lambda b. lambda {x : a}. lambda {y : b}. x) {1} {true}"
   , Example "Pair0" "(fst <lambda x. x, 2>) : int -> int"
-  , Example "Pair1" "fst f"
-  , Example "Pair2" "(fst f) 1"
+  , Example "Pair1" "fst f1"
+  , Example "Pair2" "(fst f2) 1"
   , Example "Pair3" "(fst <id, 1>) 1"
   ]  

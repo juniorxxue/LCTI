@@ -34,7 +34,6 @@ data NamedTerm = LitInt Int                           -- natural number n
               | TAbs String NamedTerm                 -- Λa. e
               | TApp NamedTerm NamedTyp               -- e @ t
               | Nil                                   -- nil
-              | Cons                                  -- cons
               | Pair NamedTerm NamedTerm              -- <e1, e2>
               | Fst NamedTerm                         -- fst e
               | Snd NamedTerm                         -- snd e

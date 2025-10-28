@@ -83,7 +83,6 @@ convertNamedTerm env (P.TAbs name body) =
 convertNamedTerm env (P.TApp e ty) = 
   S.TApp (convertNamedTerm env e) (convertNamedTyp env ty)
 convertNamedTerm env P.Nil = S.Nil
-convertNamedTerm env P.Cons = S.Cons
 convertNamedTerm env (P.Pair e1 e2) = 
   S.Pair (convertNamedTerm env e1) (convertNamedTerm env e2)
 convertNamedTerm env (P.Fst e) = 

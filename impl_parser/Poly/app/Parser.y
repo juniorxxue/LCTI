@@ -39,7 +39,6 @@ import Lexer
   TRUE     { TTrueKw }         -- true
   FALSE    { TFalseKw }        -- false
   NIL      { TNilKw }          -- nil
-  CONS     { TConsKw }         -- cons
   FST      { TFstKw }          -- fst
   SND      { TSndKw }          -- snd
   NAT      { TNat $$ }         -- natural number (Int)
@@ -105,7 +104,6 @@ AtomTerm :: { AST.NamedTerm }
   | FALSE                                                   { AST.LitBool False }                -- false
   | IDENT                                                   { AST.Var $1 }                       -- x
   | NIL                                                     { AST.Nil }                          -- nil
-  | CONS                                                    { AST.Cons }                         -- cons
   | LANGLE Term COMMA Term RANGLE                           { AST.Pair $2 $4 }                   -- <e1, e2>
   | LPAREN Term RPAREN                                      { $2 }                               -- (e)
 
