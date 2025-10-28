@@ -16,7 +16,6 @@ preEnvNamed = foldr (\(name, tyStr) env -> ETrm name (parseTyp tyStr) env) EEmpt
 preEnv :: S.Env
 preEnv = Convert.convertNamedEnv preEnvNamed
 
-
 main :: IO ()
 main = do
   putStrLn "Welcome to the type inference REPL of Fc. Type :q to quit."
