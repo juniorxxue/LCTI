@@ -70,7 +70,9 @@ executable Poly
     build-depends:    base,
                       array,
                       mtl,
-                      containers
+                      containers,
+                      text,
+                      haskeline
 
     build-tool-depends: happy:happy, alex:alex
 

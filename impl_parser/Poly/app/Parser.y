@@ -85,6 +85,7 @@ Term :: { AST.NamedTerm }
   : AppTerm                                                 { $1 }
   | LAMBDA IDENT DOT Term                                   { AST.Abs $2 $4 }                    -- λx. e
   | LAMBDA IDENT COLON Type DOT Term                        { AST.AbsAnn $2 $4 $6 }              -- λx : t. e
+  | LAMBDA LPAREN IDENT COLON Type RPAREN DOT Term          { AST.AbsAnn $3 $5 $8 }              -- λ(x : t). e
   | LAMBDA LBRACE IdentList RBRACE DOT Term                 { AST.AbsUncurry $3 $6 }             -- λ{x, ...}. e
   | LAMBDA LBRACE AnnotList RBRACE DOT Term                 { AST.AbsUncurryAnn $3 $6 }          -- λ{x : t, ...}. e
   | BIGLAM IDENT DOT Term                                   { AST.TAbs $2 $4 }                   -- Λa. e
