@@ -19,7 +19,7 @@ logSub senv ty ctx = show senv ++ " ⊢ " ++ show ty ++ " <: " ++ show ctx ++ " 
 -- logSubFull (env, senv) ty ctx envout ty' = show env ++ "; " ++ show senv ++ " ⊢ " ++ show ty ++ " <: " ++ show ctx ++ " ⊣ " ++ show envout ++ " ⇝ " ++ show ty'
 
 logInferUncurry :: (Env, Env) -> Typ -> Trm -> Typ -> Env -> String
-logInferUncurry (env, senv) tyA e tyA' envout =
+logInferUncurry (_, senv) tyA e tyA' envout =
   grey
     -- ++ show env
     ++ "; "
@@ -41,7 +41,7 @@ logInferUncurry (env, senv) tyA e tyA' envout =
     ++ reset
 
 logSubFull :: (Env, Env) -> Typ -> Context -> Env -> Typ -> String
-logSubFull (env, senv) ty ctx envout ty' =
+logSubFull (_, senv) ty ctx envout ty' =
   grey
     -- ++ show env
     ++ "; "
@@ -63,7 +63,7 @@ logSubFull (env, senv) ty ctx envout ty' =
     ++ reset
 
 logSSubFull :: (Env, Env) -> Typ -> Typ -> Env -> String
-logSSubFull (env, senv) ty1 ty2 envout =
+logSSubFull (_, senv) ty1 ty2 envout =
   grey
     -- ++ show env
     ++ "; "
@@ -84,7 +84,7 @@ logInfers :: Env -> Context -> String
 logInfers env ctx = show env ++ " ⊢ " ++ show ctx ++ " ⇒ "
 
 logInfersFull :: Env -> Context -> Typ -> String
-logInfersFull env ctx ty =
+logInfersFull _ ctx ty =
   grey
     -- ++ show env
     ++ " ⊢ "
@@ -99,7 +99,7 @@ logInfer :: Env -> Context -> Trm -> String
 logInfer env ctx tm = show env ++ " ⊢ " ++ show ctx ++ " ⇒ " ++ show tm ++ " ⇒ "
 
 logInferFull :: Env -> Context -> Trm -> Typ -> String
-logInferFull env ctx tm ty =
+logInferFull _ ctx tm ty =
   -- show env
     " ⊢ "
     ++ show ctx

@@ -1,6 +1,6 @@
 module Infer where
 
-import Control.Monad (foldM, forM_, when)
+import Control.Monad (foldM)
 import Control.Monad.Writer
 import DeBruijn
 import Log

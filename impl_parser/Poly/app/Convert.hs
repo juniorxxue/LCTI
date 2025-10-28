@@ -3,8 +3,6 @@ module Convert where
 import qualified Syntax as S
 import qualified AST as P
 
-import Data.List (elemIndex)
-
 -- environment : choose : forall a. a -> a, id : forall a. a -> a, a, b
 -- (choose id) @a @b ===> (1 0) @1 @0
 
@@ -32,8 +30,8 @@ findTermVarIndex name (P.ESvar _ _ env) = findTermVarIndex name env
 
 -- Convert a named type to a de Bruijn indexed type
 convertNamedTyp :: P.NamedEnv -> P.NamedTyp -> S.Typ
-convertNamedTyp env P.TInt = S.TInt
-convertNamedTyp env P.TBool = S.TBool
+convertNamedTyp _ P.TInt = S.TInt
+convertNamedTyp _ P.TBool = S.TBool
 convertNamedTyp env (P.TVar name) = 
   case findTypeVarIndex name env of
     Just i -> S.TVar i
@@ -53,8 +51,8 @@ convertNamedTyp env (P.TST t1 t2) =
 
 -- Convert a named term to a de Bruijn indexed term
 convertNamedTerm :: P.NamedEnv -> P.NamedTerm -> S.Trm
-convertNamedTerm env (P.LitInt n) = S.LitInt n
-convertNamedTerm env (P.LitBool b) = S.LitBool b
+convertNamedTerm _ (P.LitInt n) = S.LitInt n
+convertNamedTerm _ (P.LitBool b) = S.LitBool b
 convertNamedTerm env (P.Var name) = 
   case findTermVarIndex name env of
     Just i -> S.Var i
@@ -68,7 +66,7 @@ convertNamedTerm env (P.AbsUncurry names body) =
       env' = foldr (\name acc -> P.ETrm name (P.TVar "_dummy") acc) env (reverse names)
   in S.AbsUncurry n (convertNamedTerm env' body)
 convertNamedTerm env (P.AbsUncurryAnn bindings body) = 
-  let (names, types) = unzip bindings
+  let (_, types) = unzip bindings
       convertedTypes = map (convertNamedTyp env) types
       env' = foldr (\(name, ty) acc -> P.ETrm name ty acc) env (reverse bindings)
   in S.AbsUncurryAnn convertedTypes (convertNamedTerm env' body)
@@ -82,7 +80,7 @@ convertNamedTerm env (P.TAbs name body) =
   S.TAbs (convertNamedTerm (P.EUvar name env) body)
 convertNamedTerm env (P.TApp e ty) = 
   S.TApp (convertNamedTerm env e) (convertNamedTyp env ty)
-convertNamedTerm env P.Nil = S.Nil
+convertNamedTerm _ P.Nil = S.Nil
 convertNamedTerm env (P.Pair e1 e2) = 
   S.Pair (convertNamedTerm env e1) (convertNamedTerm env e2)
 convertNamedTerm env (P.Fst e) = 
@@ -92,11 +90,11 @@ convertNamedTerm env (P.Snd e) =
 
 convertNamedEnv :: P.NamedEnv -> S.Env
 convertNamedEnv P.EEmpty = S.EEmpty
-convertNamedEnv (P.ETrm name ty env) = 
+convertNamedEnv (P.ETrm _ ty env) = 
   S.ETrm (convertNamedTyp env ty) (convertNamedEnv env)
-convertNamedEnv (P.EUvar name env) = 
+convertNamedEnv (P.EUvar _ env) = 
   S.EUvar (convertNamedEnv env)
-convertNamedEnv (P.EEvar name env) = 
+convertNamedEnv (P.EEvar _ env) = 
   S.EEvar (convertNamedEnv env)
-convertNamedEnv (P.ESvar name ty env) = 
+convertNamedEnv (P.ESvar _ ty env) = 
   S.ESvar (convertNamedTyp env ty) (convertNamedEnv env)  
