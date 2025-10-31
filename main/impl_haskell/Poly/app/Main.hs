@@ -3,7 +3,7 @@ module Main where
 import Control.Monad (forM_, when)
 import Control.Monad.Writer
 import DeBruijn
-import Examples (Example (..), examples, getExample, getExamplesInGroup)
+import Examples (Example (..), PaperExample (..), examples, paperExamples, getExample, getExamplesInGroup)
 import Log
 import Syntax
 import System.Environment (getArgs)
@@ -242,7 +242,7 @@ sub (env, senv) (TVar k) (CTApp tyT h) | isSvar (envConcat env senv) k = do
   tell ["[S-Svar-TApp] " ++ logSubFull (env, senv) (TVar k) (CTApp tyT h) senv' tyBC]
   tell $ indentAll _log
   return (senv', tyBC)
-sub (env, senv) (TVar k) (CTerm e h) | isUvar (envConcat env senv) k = do
+sub (env, senv) (TVar k) (CTerm e h) | isEvar (envConcat env senv) k = do
   (tyA, _log) <- peek $ infers (envConcat env senv) (CTerm e h)
   case inst senv k tyA of
     Just newenv -> do
@@ -367,6 +367,7 @@ main = do
   args <- getArgs
   let showDrv = "--drv" `elem` args
       showHelp = "--help" `elem` args || "-h" `elem` args
+      showPaper = "--paper" `elem` args
 
   if showHelp
     then do
@@ -375,19 +376,23 @@ main = do
       putStrLn "Options:"
       putStrLn "  --help, -h        Show this help message"
       putStrLn "  --drv, -d         Show detailed derivation steps"
+      putStrLn "  --paper           Show paper examples"
       putStrLn ""
       putStrLn "Examples:"
       putStrLn "  cabal run Poly                    # Run all examples (default)"
       putStrLn "  cabal run Poly -- A1              # Run specific example"
       putStrLn "  cabal run Poly -- A1 A2 A3        # Run multiple examples"
       putStrLn "  cabal run Poly -- --drv A1        # Run with derivation"
-    else do
-      -- Filter out flags to get example names
-      let requestedExamples = filter (not . isFlag) args
-          isFlag arg = arg `elem` ["--drv", "--help", "-h"]
-      if null requestedExamples
-        then runAllExamples showDrv
-        else runSpecificExamples showDrv requestedExamples
+      putStrLn "  cabal run Poly -- --paper          # Run paper examples"
+    else if showPaper
+      then runPaperExamples showDrv
+      else do
+        -- Filter out flags to get example names
+        let requestedExamples = filter (not . isFlag) args
+            isFlag arg = arg `elem` ["--drv", "--help", "-h", "--paper"]
+        if null requestedExamples
+          then runAllExamples showDrv
+          else runSpecificExamples showDrv requestedExamples
 
 runAllExamples :: Bool -> IO ()
 runAllExamples showDrv = do
@@ -422,3 +427,18 @@ runSingleExample example showDrv = do
         mapM_ putStrLn logs
     Nothing -> do
       putStrLn "[x] Typing failed"
+
+runPaperExamples :: Bool -> IO ()
+runPaperExamples showDrv = do
+  forM_ paperExamples $ \paperExample -> do
+    putStrLn $ replicate 80 '-'
+    putStrLn $ "Line " ++ show (paperLineNumber paperExample) ++ ": " ++ paperExampleDescription paperExample
+    case runWriterT (infer (paperExampleEnv paperExample) CEmpty (paperExampleTerm paperExample)) of
+      Just (tyA, logs) -> do
+        putStrLn $ "[✓] Typing result: " ++ show tyA
+        when showDrv $ do
+          putStrLn ""
+          mapM_ putStrLn logs
+      Nothing -> do
+        putStrLn "[x] Typing failed"
+    putStrLn ""

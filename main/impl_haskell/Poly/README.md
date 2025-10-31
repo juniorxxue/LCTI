@@ -12,6 +12,23 @@ This directory contains a Haskell implementation of local contextual type infere
 
 ### Usage
 
+* **Run paper examples**
+  ```bash
+  cabal run Poly -- --paper
+  ```
+
+  Expected Output: The output will show the type-checking results of all paper examples. `[✓]` denotes success; `[x]` denotes failure. For example:
+
+  ```bash
+  --------------------------------------------------------------------------------
+  Line 135: f : (Int → Int) → Int |- f (\x. x)
+  [✓] Typing result: Int
+
+  --------------------------------------------------------------------------------
+  Line 154: ((\x. x + 1) : Int → Int) 1
+  [✓] Typing result: Int
+  ```
+
 * **Run all examples**
 
   To test all the examples presented in the paper in one go:

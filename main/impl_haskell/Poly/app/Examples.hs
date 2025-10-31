@@ -12,6 +12,14 @@ data Example = Example
     exampleDescription :: String
   }
 
+data PaperExample = PaperExample
+  { paperExampleName :: String,
+    paperExampleEnv :: Env,
+    paperExampleTerm :: Trm,
+    paperExampleDescription :: String,
+    paperLineNumber :: Int
+  }
+
 exampleGroups :: Map String [String]
 exampleGroups =
   Map.fromList
@@ -479,4 +487,111 @@ examplesList =
       EEmpty
       ((Pair `App` AbsAnn TInt (Var 0) `App` LitInt 1) `Ann` ((TInt `TArr` TInt) `TProd` TInt))
       "(Pair (λx : Int. x) 1) : (Int → Int) × Int"
+  ]
+
+-- Helper types for paper examples
+fIntIntIntTyp :: Typ
+fIntIntIntTyp = TArr (TArr TInt TInt) TInt
+
+hBoolForallTyp :: Typ
+hBoolForallTyp = TArr TBool (TForall (TArr (TVar 0) (TVar 0)))
+
+constTyp :: Typ
+constTyp = TForall $ TForall $ TArr (TVar 1) $ TArr (TVar 0) (TVar 1)
+
+twiceTyp :: Typ
+twiceTyp = TForall $ TArr (TVar 0) $ TArr (TArr (TVar 0) (TVar 0)) (TVar 0)
+
+gTyp :: Typ
+gTyp = TForall $ TForall $ TArr (TVar 1) $ TArr (TArr (TVar 1) (TVar 1)) $ TArr (TVar 0) (TVar 0)
+
+fComplexTyp :: Typ
+fComplexTyp = TForall $ TForall $ TArr (TVar 1) $ TArr (TArr (TVar 1) (TVar 1)) $ TArr (TVar 0) $ TForall (TVar 0)
+
+paperExamples :: [PaperExample]
+paperExamples =
+  [ PaperExample
+      "Paper-135"
+      (ETrm fIntIntIntTyp EEmpty)
+      (Var 0 `App` Abs (Var 0))
+      "f : (Int → Int) → Int |- f (\\x. x)"
+      135,
+    PaperExample
+      "Paper-154"
+      EEmpty
+      (Abs (Var 0) `Ann` (TArr TInt TInt) `App` LitInt 1)
+      "((\\x. x + 1) : Int → Int) 1"
+      154,
+    PaperExample
+      "Paper-155"
+      EEmpty
+      (AbsAnn TInt (Var 0) `App` LitInt 1)
+      "(\\x:Int. x + 1) 1"
+      155,
+    PaperExample
+      "Paper-161"
+      (ETrm idTyp (ETrm chooseTyp EEmpty))
+      (Var 1 `App` Var 0)
+      "choose id"
+      161,
+    PaperExample
+      "Paper-165"
+      (ETrm chooseTyp (ETrm idTyp (ETrm autoTyp EEmpty)))
+      (Var 0 `App` (Var 1 `TApp` idTyp) `App` Var 2)
+      "choose (id @ (∀a. a → a)) auto"
+      165,
+    PaperExample
+      "Paper-177"
+      (ETrm fIntIntIntTyp (ETrm idTyp EEmpty))
+      (Var 0 `App` Abs (Var 2 `App` Var 0))
+      "f : (Int → Int) → Int |- f (\\x. id x)"
+      177,
+    PaperExample
+      "Paper-183"
+      (ETrm singleTyp (ETrm idTyp EEmpty))
+      (Var 0 `App` Var 1)
+      "single id"
+      183,
+    PaperExample
+      "Paper-188"
+      (ETrm hBoolForallTyp EEmpty)
+      (Var 0 `App` LitBool True `App` LitInt 1)
+      "h : Bool → (∀a. a → a) |- h true 1"
+      188,
+    PaperExample
+      "Paper-234"
+      (ETrm constTyp EEmpty)
+      (Var 0 `App` LitBool True `App` LitInt 1)
+      "const : ∀a. ∀b. a → b → a |- const true 1"
+      234,
+    PaperExample
+      "Paper-261"
+      (ETrm twiceTyp EEmpty)
+      (Var 0 `App` LitInt 1 `App` Abs (Var 0))
+      "twice : ∀a. a → (a → a) → a |- twice 1 (\\x. x)"
+      261,
+    PaperExample
+      "Paper-272"
+      (ETrm gTyp EEmpty)
+      (Var 0 `App` LitInt 1 `App` Abs (Var 0) `App` LitInt 2)
+      "g : ∀a. ∀b. a → (a → a) → b → b |- g 1 (\\x. x) 2"
+      272,
+    PaperExample
+      "Paper-348"
+      EEmpty
+      (Abs (Abs (Var 1)) `App` LitInt 1 `App` LitInt 2)
+      "(\\x. \\y. x + y) 1 2"
+      348,
+    PaperExample
+      "Paper-407"
+      (ETrm idTyp EEmpty)
+      (Var 0 `App` Var 0 `App` LitInt 1)
+      "id id 1"
+      407,
+    PaperExample
+      "Paper-479"
+      (ETrm fComplexTyp EEmpty)
+      ((Var 0 `App` LitInt 1 `App` Abs (Var 0) `App` LitInt 2 `App` LitInt 3) `Ann` TInt)
+      "f : ∀a. ∀b. a → (a → a) → b → ∀c. c |- (f 1 (\\x. x) 2 3) : Int"
+      479
   ]
