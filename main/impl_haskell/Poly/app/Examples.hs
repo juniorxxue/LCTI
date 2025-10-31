@@ -535,7 +535,7 @@ paperExamples =
       "choose id"
       161,
     PaperExample
-      "Paper-165"
+      "Paper-170"
       (ETrm chooseTyp (ETrm idTyp (ETrm autoTyp EEmpty)))
       (Var 0 `App` (Var 1 `TApp` idTyp) `App` Var 2)
       "choose (id @ (∀a. a → a)) auto"
