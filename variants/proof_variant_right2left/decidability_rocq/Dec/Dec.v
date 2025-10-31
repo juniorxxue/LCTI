@@ -1006,5 +1006,3 @@ Proof. hauto lq: on use: dec_ty_sub_ctx_infs'. Qed.
 Theorem dec_infs : forall Γ Σ,
   {A | infs Γ Σ A} + {~ exists A, infs Γ Σ A}.
 Proof. hauto lq: on use: dec_ty_sub_ctx_infs'. Qed.
-
-Recursive Extraction dec_ty.
