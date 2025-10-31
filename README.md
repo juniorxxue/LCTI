@@ -57,7 +57,7 @@ opam install coq-hammer-tactics
 
 2. Ensure that the compilation finishes without any errors and that the `html` folder is successfully generated. Open `html/Implicit.README.html` in a web browser, and you will see a page listing all theorems stated in the paper along with their corresponding (clickable) mechanized proofs in Agda.
 
-3. To verify there are no admitted axioms, you can use `grep -r "postulate"` to ensure there are no postulates in the Agda code. The results should only come from HTML configuration files or comments.
+3. To verify there are no admitted axioms, you can use `grep -ri "postulate" --exclude "*.html" --exclude "*.css"` to ensure there are no postulates in the Agda code. Expected result should be empty stdout.
 
 **Rocq Decidability Proofs**
 
@@ -65,7 +65,7 @@ opam install coq-hammer-tactics
 
 2. Ensure that the compilation finishes without any errors and that the `html` folder is successfully generated. Open `html/toc.html` to see a table of contents page listing language definitions and decidability theorems at the bottom.
 
-3. To verify there are no admitted axioms, you can use `grep -r "Admitted"` and `grep -r "Axiom"` to ensure there are no axioms in the Rocq code. The results should only come from HTML configuration files or binary files.
+3. To verify there are no admitted axioms, you can use `grep -ri "axiom\|admitted" --exclude "*.js" --exclude "*.vo"` to ensure there are no axioms in the Rocq code. Expected result should be empty stdout.
 
 **Haskell Implementation**
 
