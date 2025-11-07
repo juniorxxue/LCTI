@@ -1,29 +1,33 @@
-# Supplementary Materials for "Local Contextual Type Inference"
+Paper: *Local Contextual Type Inference*. To appear at POPL 2026.
 
-This repository contains mechanized proofs and implementations organized into three main directories:
+Also check our [online Agda proof](https://types.hk/proof/lcti/). Preprint and extended version will be available soon.
+[Artifact Evaluation ver.](https://github.com/juniorxxue/LCTI/tree/popl26ae) contains more details about how to approach the code.
 
-## Core System
+## Abstract
+> Type inference is essential for programming languages, yet complete
+  and global inference quickly becomes undecidable in the presence of rich type
+  systems like System F. Pierce and Turner proposed local type
+  inference (LTI) as a scalable,
+  partially annotated alternative by relying on information local to
+  applications. While LTI has been widely adopted in practice, there
+  are significant gaps between theory and practice, with its theory
+  being underdeveloped and specifications for LTI being complex and restrictive.
+> We propose *Local Contextual Type Inference*, a principled
+  redesign of LTI grounded in contextual typing—a recent formalism
+  which captures type information flow. We present *Contextual
+    System F* (Fc), a variant of System F with implicit and
+  first-class polymorphism.  We formalize Fc using a declarative system, prove soundness, completeness, and
+  decidability, and introduce matching subtyping as a bridge between
+  declarative and algorithmic inference. This work offers the first
+  mechanized treatment of LTI, while at the same time removing
+  important practical restrictions and also demonstrating the power of
+  contextual typing in designing robust, extensible and simple to
+  implement type inference algorithms.
 
-### Mechanized Proofs
 
-* `proof_core/main_agda/`: Contains the main proof, written in Agda. This includes formalization of the declarative system, intermediate system (with matching subtyping), algorithmic system, and implicit system F, along with all lemmas and theorems presented in the paper, except for the decidability of the algorithm.
+## Overview
 
-To compile the Agda files, run `make` in the `proof_core/main_agda/` directory. This requires `agda` and its standard library to be installed. We also provide a rendered HTML version of the main proof at `proof_core/main_agda/html/Implicit.README.html`, which is the recommended way to read the proof. In particular, `README.agda` or `README.html` states all the lemmas and theorems presented in the paper in order, and shows their corresponding code in Agda.
-
-* `proof_core/decidability_coq/`: Contains the decidability proof of the algorithmic system, written in Rocq Prover. 
-
-To compile the Rocq files, run `make` in the `proof_core/decidability_coq/Dec` directory. This requires `coq` and the `CoqHammer` library to be installed. We also include a rendered HTML version of the decidability proof at `proof_core/decidability_coq/html/toc.html` for convenient reading.
-
-### Implementations
-
-* `impl_core/`: Contains the Haskell implementation of the algorithmic system, including all examples shown in the paper and appendix table.  Check the document in `impl_core/Poly/README.md` for running the examples.
-
-## Right-to-Left Variant
-
-The proof for the right-to-left variant is located in `proof_variant_right2left/`, containing all results equivalent to the main proof.
-
-The implementation of the right-to-left variant is in `impl_variant_right2left/`.
-
-## Systems with Top and Bottom Types
-
-We also provide a proof that extends the declarative system and matching subtyping with top and bottom types, with all related properties proven, located in `proof_core_top_bot/`.
+* `mech/agda`: Agda mechanization of LCTI, including three systems: declarative, intermediate, and algorithmic, along with their metatheories including soundness and completeness proofs.
+* `mech/rocq`: Rocq mechanization of the decidability of the algorithmic system.
+* `impl`: Haskell implementation of the type inference algorithm.
+* `variants`: several variants discussed in related work.
