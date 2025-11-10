@@ -20,48 +20,58 @@ data Trm
   | TAbs Trm
   | TApp Trm Typ
   | Nil
-  | Cons
   | Pair Trm Trm
   | Fst Trm
   | Snd Trm
-  | ST
-  | ConsUncurry
-  | STUncurry
 
 instance Show Typ where
-  showsPrec _ TInt = showString "Int"
-  showsPrec _ TBool = showString "Bool"
+  -- Primitive/base types align with the parser's lowercase keywords
+  showsPrec _ TInt = showString "int"
+  showsPrec _ TBool = showString "bool"
+  -- De Bruijn type variable, printed as a named identifier usable by the parser
   showsPrec _ (TVar i) = showString "t" . shows i
-  showsPrec p (TArr t1 t2) = showParen (p > 0) $ showsPrec 1 t1 . showString " → " . shows t2
-  showsPrec p (TForall t) = showParen (p > 0) $ showString "∀. " . shows t
+  -- Arrow uses ASCII '->'
+  showsPrec p (TArr t1 t2) = showParen (p > 0) $ showsPrec 1 t1 . showString " -> " . showsPrec 0 t2
+  -- Forall: we don't have names here; print a placeholder 'a' each time
+  showsPrec p (TForall t) = showParen (p > 0) $ showString "forall a. " . showsPrec 0 t
+  -- Uncurried function type uses braces and ASCII arrow
   showsPrec p (TUncurry ts t) =
     showParen (p > 0) $
-      showString "(" . showString (intercalate ", " $ map show ts) . showString ") → " . shows t
+      showString "{" . showString (intercalate ", " $ map show ts) . showString "} -> " . showsPrec 0 t
+  -- Lists as usual
   showsPrec _ (TList t) = showString "[" . shows t . showString "]"
-  showsPrec p (TProd t1 t2) = showParen (p > 1) $ showsPrec 1 t1 . showString " × " . showsPrec 1 t2
+  -- Product uses '*' instead of '×'
+  showsPrec p (TProd t1 t2) = showParen (p > 1) $ showsPrec 1 t1 . showString " * " . showsPrec 1 t2
   showsPrec p (TST t1 t2) = showParen (p > 1) $ showString "ST " . showsPrec 1 t1 . showString " " . showsPrec 1 t2
 
 instance Show Trm where
   showsPrec _ (LitInt i) = shows i
-  showsPrec _ (LitBool b) = shows b
+  -- Booleans in lowercase to match the parser
+  showsPrec _ (LitBool b) = showString (if b then "true" else "false")
+  -- De Bruijn term var printed as an identifier the parser accepts
   showsPrec _ (Var i) = showString "e" . shows i
-  showsPrec p (Abs t) = showParen (p > 0) $ showString "λ. " . shows t
-  showsPrec p (AbsAnn ty t) = showParen (p > 0) $ showString "λ" . showString " : " . shows ty . showString ". " . shows t
-  showsPrec p (AbsUncurry n t) = showParen (p > 0) $ showString "λ" . shows n . showString ". " . shows t
-  showsPrec p (AbsUncurryAnn ts t) = showParen (p > 0) $ showString "λ" . showString " : (" . showString (intercalate ", " $ map show ts) . showString "). " . shows t
+  -- Use ASCII 'lambda' instead of 'λ' for easier typing
+  showsPrec p (Abs t) = showParen (p > 0) $ showString "lambda . " . shows t
+  showsPrec p (AbsAnn ty t) = showParen (p > 0) $ showString "lambda" . showString " : " . shows ty . showString ". " . shows t
+  -- Uncurried abstractions: keep the count form for lack of names
+  showsPrec p (AbsUncurry n t) = showParen (p > 0) $ showString "lambda" . shows n . showString ". " . shows t
+  -- Uncurried annotated abstractions: print brace list of types
+  showsPrec p (AbsUncurryAnn ts t) = showParen (p > 0) $ showString "lambda" . showString " : {" . showString (intercalate ", " $ map show ts) . showString "}. " . shows t
+  -- Applications
   showsPrec p (App t1 t2) = showParen (p > 9) $ showsPrec 9 t1 . showString " " . showsPrec 10 t2
-  showsPrec p (AppUncurry t ts) = showParen (p > 9) $ showsPrec 9 t . showString "(" . showString (intercalate ", " $ map show ts) . showString ")"
+  -- Uncurried application uses braces
+  showsPrec p (AppUncurry t ts) = showParen (p > 9) $ showsPrec 9 t . showString " {" . showString (intercalate ", " $ map show ts) . showString "}"
+  -- Annotations
   showsPrec p (Ann t ty) = showParen (p > 1) $ showsPrec 1 t . showString " : " . shows ty
-  showsPrec p (TAbs t) = showParen (p > 0) $ showString "Λ. " . shows t
+  -- Type abstraction/application use ASCII 'Lambda' and '@'
+  showsPrec p (TAbs t) = showParen (p > 0) $ showString "Lambda . " . shows t
   showsPrec p (TApp t ty) = showParen (p > 9) $ showsPrec 9 t . showString " @" . showsPrec 10 ty
-  showsPrec _ Nil = showString "Nil"
-  showsPrec _ Cons = showString "Cons"
+  -- Nil and pairs
+  showsPrec _ Nil = showString "nil"
   showsPrec _ (Pair t1 t2) = showParen True $ shows t1 . showString ", " . shows t2
+  -- Projections
   showsPrec p (Fst t) = showParen (p > 9) $ showString "fst " . showsPrec 10 t
   showsPrec p (Snd t) = showParen (p > 9) $ showString "snd " . showsPrec 10 t
-  showsPrec _ ST = showString "ST"
-  showsPrec _ ConsUncurry = showString "Cons"
-  showsPrec _ STUncurry = showString "ST"
 
 data Env = EEmpty | ETrm Typ Env | EUvar Env | EEvar Env | ESvar Typ Env
 
@@ -95,10 +105,6 @@ genericConsumer (LitBool _) = True
 genericConsumer (Var _) = True
 genericConsumer (Ann _ _) = True
 genericConsumer (TAbs _) = True
-genericConsumer Cons = True
-genericConsumer ST = True
-genericConsumer ConsUncurry = True
-genericConsumer STUncurry = True
 genericConsumer _ = False
 
 nonEmptyContext :: Context -> Bool

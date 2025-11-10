@@ -29,20 +29,19 @@ version:            0.1.0.0
 -- description:
 
 -- The license under which the package is released.
-license:            MIT
+license:            BSD-3-Clause
 
 -- The file containing the license text.
 license-file:       LICENSE
 
 -- The package author(s).
-author:             Anonymous
+author:             Xu Xue
 
 -- An email address to which users can send suggestions, bug reports, and patches.
-maintainer:         anonymous@mail.com
+maintainer:         juniorxxue@gmail.com
 
 -- A copyright notice.
 -- copyright:
-category:           Language
 build-type:         Simple
 
 -- Extra doc files to be distributed with the package, such as a CHANGELOG or a README.
@@ -62,14 +61,20 @@ executable Poly
     main-is:          Main.hs
 
     -- Modules included in this executable, other than Main.
-    other-modules:   DeBruijn, Log, Syntax, Examples
-
+    other-modules: Lexer, AST, Parser, Convert, Infer, DeBruijn, Syntax, Log, Examples
 
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:
 
     -- Other library packages from which modules are imported.
-    build-depends:    base ^>=4.18.2.0, mtl, prettyprinter, containers, tree-view
+    build-depends:    base,
+                      array,
+                      mtl,
+                      containers,
+                      text,
+                      haskeline
+
+    build-tool-depends: happy:happy, alex:alex
 
     -- Directories containing source files.
     hs-source-dirs:   app
