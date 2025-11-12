@@ -61,7 +61,12 @@ executable Poly
     main-is:          Main.hs
 
     -- Modules included in this executable, other than Main.
-    other-modules: Lexer, AST, Parser, Convert, Infer, DeBruijn, Syntax, Log, Examples
+    other-modules: Lexer, 
+                   Parser,                    
+                   Infer,                    
+                   Syntax, 
+                   Log, 
+                   Examples
 
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:
@@ -72,7 +77,8 @@ executable Poly
                       mtl,
                       containers,
                       text,
-                      haskeline
+                      haskeline,
+                      unbound-generics
 
     build-tool-depends: happy:happy, alex:alex
 

@@ -2,27 +2,23 @@ module Main where
 import Parser (parseTyp, parseTerm)
 import Control.Monad.Writer
 import Examples (examplesList, Example(exampleName, exampleString), preEnvStrings)
-import Convert (convertNamedTerm, convertNamedEnv)
-import AST (NamedEnv(..))
-import qualified AST as AST
 import Infer
-import qualified Syntax as S
+import Syntax
 import System.Console.Haskeline
 import Data.Char (isSpace)
+import Unbound.Generics.LocallyNameless.Name (s2n)
+import Unbound.Generics.LocallyNameless (runFreshMT, FreshMT)
 
-preEnvNamed :: NamedEnv
-preEnvNamed = foldr (\(name, tyStr) env -> ETrm name (parseTyp tyStr) env) EEmpty preEnvStrings
-
-preEnv :: S.Env
-preEnv = Convert.convertNamedEnv preEnvNamed
+preEnv :: Env
+preEnv = foldr (\(name, tyStr) env -> ETrm (s2n name) (parseTyp tyStr) env) EEmpty preEnvStrings
 
 main :: IO ()
 main = do
   putStrLn "Welcome to the type inference REPL of Fc. Type :q to quit."
   putStrLn "Available commands: :tree, :env, :examples, :define <name> : <type>"
-  runInputT defaultSettings (repl preEnvNamed preEnv)
+  runInputT defaultSettings (repl preEnv preEnv)
 -- The REPL maintains a current named environment and its de Bruijn-converted form
-repl :: NamedEnv -> S.Env -> InputT IO ()
+repl :: Env -> Env -> InputT IO ()
 repl envNamed env = do
   minput <- getInputLine "> "
   case minput of
@@ -37,28 +33,29 @@ repl envNamed env = do
           case mDef of
             Left err -> outputStrLn err >> repl envNamed env
             Right (name, tyNamed) -> do
-              let envNamed' = ETrm name tyNamed envNamed
-                  env' = convertNamedEnv envNamed'
+              let env' = ETrm (s2n name) tyNamed envNamed                  
               -- Echo the defined type for convenience
               outputStrLn (show tyNamed)
-              repl envNamed' env'
+              repl env' env'
       | otherwise                                 -> liftIO (showInfer envNamed env input) >> repl envNamed env
 
-showInfer :: NamedEnv -> S.Env -> String -> IO ()
-showInfer envNamed env src = do
-  let term = convertNamedTerm envNamed (parseTerm src)
-  case runWriterT $ infer env S.CEmpty term of
-    Just (ty, _) -> putStrLn (show ty)
-    Nothing      -> putStrLn "failure"
+showInfer :: Env -> Env -> String -> IO ()
+showInfer envNamed _env src = do
+  let term = parseTerm src
+      results = runFreshMT $ runWriterT (infer envNamed CEmpty term :: WriterT Log (FreshMT []) Ty)
+  case results of
+    ((ty, _):_) -> putStrLn (show ty)
+    []          -> putStrLn "failure"
 
-showTree :: NamedEnv -> S.Env -> String -> IO ()
-showTree envNamed env src = do
-  let term = convertNamedTerm envNamed (parseTerm src)
-  case runWriterT $ infer env S.CEmpty term of
-    Just (_, logs) -> putStr (unlines logs)
-    Nothing        -> putStrLn "failure"
+showTree :: Env -> Env -> String -> IO ()
+showTree envNamed _env src = do
+  let term = parseTerm src
+      results = runFreshMT $ runWriterT (infer envNamed CEmpty term :: WriterT Log (FreshMT []) Ty)
+  case results of
+    ((_, logs):_) -> putStr (unlines logs)
+    []            -> putStrLn "failure"
 
-showEnvNamed :: NamedEnv -> IO ()
+showEnvNamed :: Env -> IO ()
 showEnvNamed envNamed = putStrLn (show envNamed)
 
 
@@ -71,7 +68,7 @@ showExamples =
   mapM_ (\example -> putStrLn (exampleName example ++ ":\n " ++ exampleString example ++ "\n")) examplesList
 
 -- Parse a definition line of the form "<name> : <type>"
-parseDefine :: String -> Either String (String, AST.NamedTyp)
+parseDefine :: String -> Either String (String, Ty)
 parseDefine s =
   case break (== ':') s of
     (lhs, ':' : rhs) ->

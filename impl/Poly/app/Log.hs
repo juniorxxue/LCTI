@@ -12,13 +12,13 @@ bold = "\ESC[1m" -- Bold text
 blue = "\ESC[34m" -- Blue color
 reset = "\ESC[0m" -- Reset to default
 
-logSub :: Env -> Typ -> Context -> String
+logSub :: Env -> Ty -> Context -> String
 logSub senv ty ctx = show senv ++ " ⊢ " ++ show ty ++ " <: " ++ show ctx ++ " ⊣ "
 
 -- logSubFull :: (Env, Env) -> Typ -> Context -> Env -> Typ -> String
 -- logSubFull (env, senv) ty ctx envout ty' = show env ++ "; " ++ show senv ++ " ⊢ " ++ show ty ++ " <: " ++ show ctx ++ " ⊣ " ++ show envout ++ " ⇝ " ++ show ty'
 
-logInferUncurry :: (Env, Env) -> Typ -> Trm -> Typ -> Env -> String
+logInferUncurry :: (Env, Env) -> Ty -> Tm -> Ty -> Env -> String
 logInferUncurry (_, senv) tyA e tyA' envout =
   grey
     -- ++ show env
@@ -40,7 +40,7 @@ logInferUncurry (_, senv) tyA e tyA' envout =
     ++ show envout
     ++ reset
 
-logSubFull :: (Env, Env) -> Typ -> Context -> Env -> Typ -> String
+logSubFull :: (Env, Env) -> Ty -> Context -> Env -> Ty -> String
 logSubFull (_, senv) ty ctx envout ty' =
   grey
     -- ++ show env
@@ -62,8 +62,8 @@ logSubFull (_, senv) ty ctx envout ty' =
     ++ show ty'
     ++ reset
 
-logSSubFull :: (Env, Env) -> Typ -> Typ -> Env -> String
-logSSubFull (_, senv) ty1 ty2 envout =
+logSSubFull :: (Env, Env) -> Ty -> Polar -> Ty -> Env -> String
+logSSubFull (_, senv) ty1 p ty2 envout =
   grey
     -- ++ show env
     ++ "; "
@@ -73,7 +73,9 @@ logSSubFull (_, senv) ty1 ty2 envout =
     ++ reset
     ++ " ⊢ "
     ++ show ty1
-    ++ " <: "
+    ++ " "
+    ++ show p
+    ++ " "
     ++ show ty2
     ++ " ⊣ "
     ++ red
@@ -83,7 +85,7 @@ logSSubFull (_, senv) ty1 ty2 envout =
 logInfers :: Env -> Context -> String
 logInfers env ctx = show env ++ " ⊢ " ++ show ctx ++ " ⇒ "
 
-logInfersFull :: Env -> Context -> Typ -> String
+logInfersFull :: Env -> Context -> Ty -> String
 logInfersFull _ ctx ty =
   grey
     -- ++ show env
@@ -95,10 +97,10 @@ logInfersFull _ ctx ty =
     ++ show ty
     ++ reset
 
-logInfer :: Env -> Context -> Trm -> String
+logInfer :: Env -> Context -> Tm -> String
 logInfer env ctx tm = show env ++ " ⊢ " ++ show ctx ++ " ⇒ " ++ show tm ++ " ⇒ "
 
-logInferFull :: Env -> Context -> Trm -> Typ -> String
+logInferFull :: Env -> Context -> Tm -> Ty -> String
 logInferFull _ ctx tm ty =
   -- show env
     " ⊢ "

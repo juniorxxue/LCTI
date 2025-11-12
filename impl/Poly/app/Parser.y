@@ -4,8 +4,10 @@
 -- ===========================================================
 module Parser (parseTyp, parseTypTokens, parseTerm, parseTermTokens) where
 
-import qualified AST as AST
+import qualified Syntax as S
 import Lexer
+import Unbound.Generics.LocallyNameless
+import Unbound.Generics.LocallyNameless.Name (s2n)
 }
 
 -- ===========================================================
@@ -54,23 +56,23 @@ import Lexer
 --  Grammar: faithful to NamedTyp
 -- ===========================================================
 
-typ :: { AST.NamedTyp }
+typ :: { S.Ty }
   : Type EOF { $1 }
 
 -- one production rule: directly allow all forms of type
-Type :: { AST.NamedTyp }
-  : TINTKW                     { AST.TInt }                         -- int
-  | TBOOLKW                    { AST.TBool }                        -- bool
-  | IDENT                      { AST.TVar $1 }                      -- variable
-  | FORALL IDENT DOT Type       { AST.TForall $2 $4 }               -- forall a. t
-  | Type ARROW Type            { AST.TArr $1 $3 }                   -- t1 -> t2
-  | Type STAR Type             { AST.TProd $1 $3 }                  -- t1 * t2
-  | LBRACE TypeList RBRACE ARROW Type { AST.TUncurry $2 $5 }        -- {t1,...} -> t
-  | LBRACK Type RBRACK         { AST.TList $2 }                     -- [t]
-  | TSTKW Type Type            { AST.TST $2 $3 }                    -- ST t1 t2
+Type :: { S.Ty }
+  : TINTKW                     { S.TInt }                         -- int
+  | TBOOLKW                    { S.TBool }                        -- bool
+  | IDENT                      { S.TVar (s2n $1) }      -- variable
+  | FORALL IDENT DOT Type       { S.TForall (bind (s2n $2) $4) }               -- forall a. t
+  | Type ARROW Type            { S.TArr $1 $3 }                   -- t1 -> t2
+  | Type STAR Type             { S.TProd $1 $3 }                  -- t1 * t2
+  | LBRACE TypeList RBRACE ARROW Type { S.TUncurry $2 $5 }        -- {t1,...} -> t
+  | LBRACK Type RBRACK         { S.TList $2 }                     -- [t]
+  | TSTKW Type Type            { S.TST $2 $3 }                    -- ST t1 t2
   | LPAREN Type RPAREN         { $2 }                               -- (t)
 
-TypeList :: { [AST.NamedTyp] }
+TypeList :: { [S.Ty] }
   : Type COMMA TypeList { $1 : $3 }
   | Type                { [$1] }
 
@@ -78,56 +80,56 @@ TypeList :: { [AST.NamedTyp] }
 --  Grammar: faithful to NamedTerm
 -- ===========================================================
 
-term :: { AST.NamedTerm }
+term :: { S.Tm }
   : Term EOF { $1 }
 
-Term :: { AST.NamedTerm }
+Term :: { S.Tm }
   : AppTerm                                                 { $1 }
-  | LAMBDA IDENT DOT Term                                   { AST.Abs $2 $4 }                    -- λx. e
-  | LAMBDA IDENT COLON Type DOT Term                        { AST.AbsAnn $2 $4 $6 }              -- λx : t. e
-  | LAMBDA LPAREN IDENT COLON Type RPAREN DOT Term          { AST.AbsAnn $3 $5 $8 }              -- λ(x : t). e
-  | LAMBDA LBRACE IdentList RBRACE DOT Term                 { AST.AbsUncurry $3 $6 }             -- λ{x, ...}. e
-  | LAMBDA LBRACE AnnotList RBRACE DOT Term                 { AST.AbsUncurryAnn $3 $6 }          -- λ{x : t, ...}. e
-  | BIGLAM IDENT DOT Term                                   { AST.TAbs $2 $4 }                   -- Λa. e
-  | Term COLON Type                                         { AST.Ann $1 $3 }                    -- e : t
+  | LAMBDA IDENT DOT Term                                   { S.Abs (bind (s2n $2) $4) }                    -- λx. e
+  | LAMBDA IDENT COLON Type DOT Term                        { S.AbsAnn (bind ((s2n $2, Embed $4)) $6) }              -- λx : t. e
+  | LAMBDA LPAREN IDENT COLON Type RPAREN DOT Term          { S.AbsAnn (bind ((s2n $3, Embed $5)) $8) }              -- λ(x : t). e
+  | LAMBDA LBRACE IdentList RBRACE DOT Term                 { S.AbsUncurry (bind $3 $6) }                                -- λ{x, ...}. e
+  | LAMBDA LBRACE AnnotList RBRACE DOT Term                 { S.AbsUncurryAnn (bind $3 $6) }          -- λ{x : t, ...}. e
+  | BIGLAM IDENT DOT Term                                   { S.TAbs (bind (s2n $2) $4) }                   -- Λa. e
+  | Term COLON Type                                         { S.Ann $1 $3 }                    -- e : t
 
-AppTerm :: { AST.NamedTerm }
-  : AppTerm AtomTerm                                        { AST.App $1 $2 }                    -- e1 e2
-  | AppTerm AT Type                                         { AST.TApp $1 $3 }                   -- e @ t
-  | AppTerm LBRACE TermList RBRACE                          { AST.AppUncurry $1 $3 }             -- e {e1, ...}
-  | FST AtomTerm                                            { AST.Fst $2 }                       -- fst e
-  | SND AtomTerm                                            { AST.Snd $2 }                       -- snd e
+AppTerm :: { S.Tm }
+  : AppTerm AtomTerm                                        { S.App $1 $2 }                    -- e1 e2
+  | AppTerm AT Type                                         { S.TApp $1 $3 }                   -- e @ t
+  | AppTerm LBRACE TermList RBRACE                          { S.AppUncurry $1 $3 }             -- e {e1, ...}
+  | FST AtomTerm                                            { S.Fst $2 }                       -- fst e
+  | SND AtomTerm                                            { S.Snd $2 }                       -- snd e
   | AtomTerm                                                { $1 }
 
-AtomTerm :: { AST.NamedTerm }
-  : NAT                                                     { AST.LitInt $1 }                    -- n
-  | TRUE                                                    { AST.LitBool True }                 -- true
-  | FALSE                                                   { AST.LitBool False }                -- false
-  | IDENT                                                   { AST.Var $1 }                       -- x
-  | NIL                                                     { AST.Nil }                          -- nil
-  | LANGLE Term COMMA Term RANGLE                           { AST.Pair $2 $4 }                   -- <e1, e2>
+AtomTerm :: { S.Tm }
+  : NAT                                                     { S.LitInt $1 }                    -- n
+  | TRUE                                                    { S.LitBool True }                 -- true
+  | FALSE                                                   { S.LitBool False }                -- false
+  | IDENT                                                   { S.Var (s2n $1) }         -- x
+  | NIL                                                     { S.Nil }                          -- nil
+  | LANGLE Term COMMA Term RANGLE                           { S.Pair $2 $4 }                   -- <e1, e2>
   | LPAREN Term RPAREN                                      { $2 }                               -- (e)
 
-TermList :: { [AST.NamedTerm] }
+TermList :: { [S.Tm] }
   : Term COMMA TermList { $1 : $3 }
   | Term                { [$1] }
 
-IdentList :: { [String] }
-  : IDENT COMMA IdentList { $1 : $3 }
-  | IDENT                 { [$1] }
+IdentList :: { [S.TmName] }
+  : IDENT COMMA IdentList { (s2n $1) : $3 }
+  | IDENT                 { [s2n $1] }
 
-AnnotList :: { [(String, AST.NamedTyp)] }
-  : IDENT COLON Type COMMA AnnotList { ($1, $3) : $5 }
-  | IDENT COLON Type                 { [($1, $3)] }
+AnnotList :: { [(S.TmName, Embed S.Ty)] }
+  : IDENT COLON Type COMMA AnnotList { (s2n $1, Embed $3) : $5 }
+  | IDENT COLON Type                 { [(s2n $1, Embed $3)] }
 
 {
 -- ===========================================================
 --  Footer: combine lexer + parser
 -- ===========================================================
-parseTyp :: String -> AST.NamedTyp
+parseTyp :: String -> S.Ty
 parseTyp s = parseTypTokens (lexTokens s)
 
-parseTerm :: String -> AST.NamedTerm
+parseTerm :: String -> S.Tm
 parseTerm s = parseTermTokens (lexTokens s)
 
 happyError :: [Token] -> a

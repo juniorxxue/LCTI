@@ -1,105 +1,105 @@
+{-# LANGUAGE DeriveGeneric,
+             DeriveDataTypeable,
+             FlexibleInstances,
+             FlexibleContexts,
+             MultiParamTypeClasses,
+             ScopedTypeVariables
+  #-}
 module Syntax where
 
 import Data.List (intercalate)
 
+import Unbound.Generics.LocallyNameless
+    ( name2String,
+      unbind,
+      Alpha,
+      Bind,
+      Embed,
+      Fresh,
+      Name,
+      Subst(isvar),
+      SubstName(SubstName) )
+
+import GHC.Generics
+import Data.Typeable (Typeable)
+import Control.Monad (guard)
+import Control.Applicative (Alternative, empty, (<|>))
+
+type TyName = Name Ty
+type TmName = Name Tm
+
+
 type Log = [String]
 
-data Typ = TInt | TBool | TVar Int | TArr Typ Typ | TForall Typ | TUncurry [Typ] Typ | TList Typ | TProd Typ Typ | TST Typ Typ deriving (Eq)
+data Ty = TInt 
+        | TBool 
+        | TVar TyName
+        | TArr Ty Ty 
+        | TForall (Bind TyName Ty)
+        | TUncurry [Ty] Ty 
+        | TList Ty 
+        | TProd Ty Ty 
+        | TST Ty Ty 
+        deriving (Generic, Typeable, Show)
 
-data Trm
+data Tm
   = LitInt Int
   | LitBool Bool
-  | Var Int
-  | Abs Trm
-  | AbsAnn Typ Trm
-  | AbsUncurry Int Trm
-  | AbsUncurryAnn [Typ] Trm
-  | App Trm Trm
-  | AppUncurry Trm [Trm]
-  | Ann Trm Typ
-  | TAbs Trm
-  | TApp Trm Typ
+  | Var TmName
+  | Abs (Bind TmName Tm)
+  | AbsAnn (Bind (TmName, Embed Ty) Tm)
+  | AbsUncurry (Bind [TmName] Tm)
+  | AbsUncurryAnn (Bind [(TmName, Embed Ty)] Tm)
+  | App Tm Tm
+  | AppUncurry Tm [Tm]
+  | Ann Tm Ty
+  | TAbs (Bind TyName Tm)
+  | TApp Tm Ty
   | Nil
-  | Pair Trm Trm
-  | Fst Trm
-  | Snd Trm
+  | Pair Tm Tm
+  | Fst Tm
+  | Snd Tm
+  deriving (Generic, Typeable, Show)
 
-instance Show Typ where
-  -- Primitive/base types align with the parser's lowercase keywords
-  showsPrec _ TInt = showString "int"
-  showsPrec _ TBool = showString "bool"
-  -- De Bruijn type variable, printed as a named identifier usable by the parser
-  showsPrec _ (TVar i) = showString "t" . shows i
-  -- Arrow uses ASCII '->'
-  showsPrec p (TArr t1 t2) = showParen (p > 0) $ showsPrec 1 t1 . showString " -> " . showsPrec 0 t2
-  -- Forall: we don't have names here; print a placeholder 'a' each time
-  showsPrec p (TForall t) = showParen (p > 0) $ showString "forall a. " . showsPrec 0 t
-  -- Uncurried function type uses braces and ASCII arrow
-  showsPrec p (TUncurry ts t) =
-    showParen (p > 0) $
-      showString "{" . showString (intercalate ", " $ map show ts) . showString "} -> " . showsPrec 0 t
-  -- Lists as usual
-  showsPrec _ (TList t) = showString "[" . shows t . showString "]"
-  -- Product uses '*' instead of '×'
-  showsPrec p (TProd t1 t2) = showParen (p > 1) $ showsPrec 1 t1 . showString " * " . showsPrec 1 t2
-  showsPrec p (TST t1 t2) = showParen (p > 1) $ showString "ST " . showsPrec 1 t1 . showString " " . showsPrec 1 t2
+instance Alpha Ty
+instance Alpha Tm
 
-instance Show Trm where
-  showsPrec _ (LitInt i) = shows i
-  -- Booleans in lowercase to match the parser
-  showsPrec _ (LitBool b) = showString (if b then "true" else "false")
-  -- De Bruijn term var printed as an identifier the parser accepts
-  showsPrec _ (Var i) = showString "e" . shows i
-  -- Use ASCII 'lambda' instead of 'λ' for easier typing
-  showsPrec p (Abs t) = showParen (p > 0) $ showString "lambda . " . shows t
-  showsPrec p (AbsAnn ty t) = showParen (p > 0) $ showString "lambda" . showString " : " . shows ty . showString ". " . shows t
-  -- Uncurried abstractions: keep the count form for lack of names
-  showsPrec p (AbsUncurry n t) = showParen (p > 0) $ showString "lambda" . shows n . showString ". " . shows t
-  -- Uncurried annotated abstractions: print brace list of types
-  showsPrec p (AbsUncurryAnn ts t) = showParen (p > 0) $ showString "lambda" . showString " : {" . showString (intercalate ", " $ map show ts) . showString "}. " . shows t
-  -- Applications
-  showsPrec p (App t1 t2) = showParen (p > 9) $ showsPrec 9 t1 . showString " " . showsPrec 10 t2
-  -- Uncurried application uses braces
-  showsPrec p (AppUncurry t ts) = showParen (p > 9) $ showsPrec 9 t . showString " {" . showString (intercalate ", " $ map show ts) . showString "}"
-  -- Annotations
-  showsPrec p (Ann t ty) = showParen (p > 1) $ showsPrec 1 t . showString " : " . shows ty
-  -- Type abstraction/application use ASCII 'Lambda' and '@'
-  showsPrec p (TAbs t) = showParen (p > 0) $ showString "Lambda . " . shows t
-  showsPrec p (TApp t ty) = showParen (p > 9) $ showsPrec 9 t . showString " @" . showsPrec 10 ty
-  -- Nil and pairs
-  showsPrec _ Nil = showString "nil"
-  showsPrec _ (Pair t1 t2) = showParen True $ shows t1 . showString ", " . shows t2
-  -- Projections
-  showsPrec p (Fst t) = showParen (p > 9) $ showString "fst " . showsPrec 10 t
-  showsPrec p (Snd t) = showParen (p > 9) $ showString "snd " . showsPrec 10 t
+instance Subst Tm Ty
+instance Subst Tm Tm where
+  isvar (Var x) = Just (SubstName x)
+  isvar _ = Nothing
 
-data Env = EEmpty | ETrm Typ Env | EUvar Env | EEvar Env | ESvar Typ Env
+instance Subst Ty Ty where  
+  isvar (TVar x) = Just (SubstName x)
+  isvar _ = Nothing  
+
+data Env = EEmpty | ETrm TmName Ty Env | EUvar TyName Env | EEvar TyName Env | ESvar TyName Ty Env
 
 envConcat :: Env -> Env -> Env
 envConcat env EEmpty = env
-envConcat env (ETrm ty senv) = ETrm ty (envConcat env senv)
-envConcat env (EUvar senv) = EUvar (envConcat env senv)
-envConcat env (EEvar senv) = EEvar (envConcat env senv)
-envConcat env (ESvar ty senv) = ESvar ty (envConcat env senv)
+envConcat env (ETrm x ty senv) = ETrm x ty (envConcat env senv)
+envConcat env (EUvar a senv) = EUvar a (envConcat env senv)
+envConcat env (EEvar a senv) = EEvar a (envConcat env senv)
+envConcat env (ESvar a ty senv) = ESvar a ty (envConcat env senv)
 
 instance Show Env where
   show EEmpty = "∅"
-  show (ETrm ty env) = show env ++ ", :" ++ show ty
-  show (EUvar env) = show env ++ ", •"
-  show (ESvar ty env) = show env ++ ", =" ++ show ty
-  show (EEvar env) = show env ++ ", ^"
+  show (ETrm x ty env) = show env ++ ", " ++ name2String x ++ ":" ++ show ty
+  show (EUvar a env) = show env ++ ", " ++ name2String a
+  show (EEvar a env) = show env ++ ", " ++ name2String a ++ "^"
+  show (ESvar a ty env) = show env ++ ", " ++ name2String a ++ "=" ++ show ty
 
-data Context = CEmpty | CFullType Typ | CTerm Trm Context | CUncurry [Trm] Context | CFst Context | CSnd Context
+data Context = CEmpty | CFullType Ty | CTerm Tm Context | CUncurry [Tm] Context | CFst Context | CSnd Context
 
 instance Show Context where
-  show CEmpty = "□"
+  show CEmpty = "■"
   show (CFullType ty) = show ty
-  show (CTerm trm ctx) = "[" ++ show trm ++ "]" ++ " ↝ " ++ show ctx
-  show (CUncurry ts ctx) = "(" ++ intercalate ", " (map show ts) ++ ") ↝ " ++ show ctx
+  show (CTerm tm ctx) = "[" ++ show tm ++ "]" ++ " ↝ " ++ show ctx
+  show (CUncurry ts ctx) = "{" ++ intercalate ", " (map show ts) ++ "} ↝ " ++ show ctx
   show (CFst ctx) = "fst ↝ " ++ show ctx
   show (CSnd ctx) = "snd ↝ " ++ show ctx
 
-genericConsumer :: Trm -> Bool
+genericConsumer :: Tm -> Bool
 genericConsumer (LitInt _) = True
 genericConsumer (LitBool _) = True
 genericConsumer (Var _) = True
@@ -111,40 +111,85 @@ nonEmptyContext :: Context -> Bool
 nonEmptyContext CEmpty = False
 nonEmptyContext _ = True
 
-isEvar :: Env -> Int -> Bool
-isEvar EEmpty _ = False
-isEvar (ETrm _ env) k = isEvar env k
-isEvar (EUvar env) k = (k /= 0) && isEvar env (k - 1)
-isEvar (EEvar env) k = k == 0 || isEvar env (k - 1)
-isEvar (ESvar _ env) k = (k /= 0) && isEvar env (k - 1)
+lookupTmVar :: Env -> TmName -> Maybe Ty
+lookupTmVar EEmpty _ = Nothing
+lookupTmVar (ETrm x ty env) y = case x == y of
+  True -> Just ty
+  False -> lookupTmVar env y
+lookupTmVar (EUvar _ env) y = lookupTmVar env y
+lookupTmVar (EEvar _ env) y = lookupTmVar env y
+lookupTmVar (ESvar _ _ env) y = lookupTmVar env y
 
-isUvar :: Env -> Int -> Bool
--- isUvar a b  | trace ("isUvar " ++ show a ++ " in " ++ show b) False = undefined
-isUvar EEmpty _ = False
-isUvar (ETrm _ env) k = isUvar env k
-isUvar (EUvar env) k = k == 0 || isUvar env (k - 1)
-isUvar (EEvar env) k = (k /= 0) && isUvar env (k - 1)
-isUvar (ESvar _ env) k = (k /= 0) && isUvar env (k - 1)
+data TyVars = Uvar | Evar | Svar Ty 
 
-isSvar :: Env -> Int -> Bool
-isSvar EEmpty _ = False
-isSvar (ETrm _ env) k = isSvar env k
-isSvar (EUvar env) k = (k /= 0) && isSvar env (k - 1)
-isSvar (EEvar env) k = (k /= 0) && isSvar env (k - 1)
-isSvar (ESvar _ env) k = k == 0 || isSvar env (k - 1)
+lookupTyVar :: Env -> TyName -> Maybe TyVars
+lookupTyVar EEmpty _ = Nothing
+lookupTyVar (ETrm _ _ env) a = lookupTyVar env a
+lookupTyVar (EUvar a env) b = case a == b of
+  True -> Just Uvar
+  False -> lookupTyVar env b
+lookupTyVar (EEvar a env) b = case a == b of
+  True -> Just Evar
+  False -> lookupTyVar env b
+lookupTyVar (ESvar a ty env) b = case a == b of
+  True -> Just (Svar ty)
+  False -> lookupTyVar env b
 
-closed :: Env -> Typ -> Bool
+isEvar :: Env -> TyName -> Bool
+isEvar env a = case lookupTyVar env a of
+  Just Evar -> True
+  _ -> False
+
+isUvar :: Env -> TyName -> Bool
+isUvar env a = case lookupTyVar env a of
+  Just Uvar -> True
+  _ -> False
+
+isSvar :: Env -> TyName -> Bool
+isSvar env a = case lookupTyVar env a of
+  Just (Svar _) -> True
+  _ -> False
+  
+closed :: (Fresh m, Alternative m) => Env -> Ty -> m ()
 -- closed env ty | trace ("closed " ++ show env ++ " |- " ++ show ty) False = undefined
-closed _ TInt = True
-closed _ TBool = True
-closed senv (TVar x) = not $ isEvar senv x
-closed senv (TArr t1 t2) = closed senv t1 && closed senv t2
-closed senv (TForall t) = closed (EUvar senv) t
-closed senv (TUncurry ts t) = all (closed senv) ts && closed senv t
+closed _ TInt = return ()
+closed _ TBool = return ()
+closed senv (TVar a) = if isEvar senv a then empty else return ()
+closed senv (TArr t1 t2) = (closed senv t1) >> (closed senv t2)
+closed senv (TForall b) = do
+  (a, ty) <- unbind b
+  closed (EUvar a senv) ty
+closed senv (TUncurry ts t) = mapM (closed senv) ts >> closed senv t
 closed senv (TList t) = closed senv t
-closed senv (TProd t1 t2) = closed senv t1 && closed senv t2
-closed senv (TST t1 t2) = closed senv t1 && closed senv t2
+closed senv (TProd t1 t2) = (closed senv t1) >> (closed senv t2)
+closed senv (TST t1 t2) = (closed senv t1) >> (closed senv t2)
 
-open :: Env -> Typ -> Bool
+isOpen :: (Fresh m, Alternative m) => Env -> Ty -> m ()
 -- open env ty | trace ("open " ++ show env ++ " |- " ++ show ty) False = undefined
-open senv ty = not $ closed senv ty
+isOpen senv ty = closed senv ty *> empty <|> return ()
+
+data Polar = Pos | Neg deriving (Show, Eq)  
+
+flipPolar :: Polar -> Polar
+flipPolar Pos = Neg
+flipPolar Neg = Pos
+
+inst :: Env -> TyName -> Ty -> Maybe Env
+-- inst env k a | trace ("inst " ++ show env ++ " " ++ show k ++ " " ++ show a) False = undefined
+inst EEmpty _ _ = Nothing
+inst (ETrm x ty env) a tyA = do
+  env' <- inst env a tyA
+  return $ ETrm x ty env'
+inst (EUvar a env) b tyA = do
+  env' <- inst env b tyA
+  return $ EUvar a env'
+inst (EEvar a env) b tyA = do
+  _ <- guard (a == b)
+  env' <- inst env b tyA
+  return $ ESvar a tyA env'
+inst (ESvar ty a env) b tyA = do
+  env' <- inst env b tyA
+  return $ ESvar ty a env'
+
+
+  

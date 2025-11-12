@@ -1,201 +1,116 @@
+{-# LANGUAGE FlexibleContexts #-}
 module Infer where
 
-import Control.Monad (foldM)
+import Control.Monad (foldM, guard, unless)
 import Control.Monad.Writer
-import DeBruijn
 import Log
 import Syntax
+import Unbound.Generics.LocallyNameless
+import Control.Applicative (Alternative, (<|>), empty)
 
-lookupEnv :: Int -> Env -> WriterT Log Maybe Typ
-lookupEnv 0 (ETrm ty _) = do
-  tell ["[Lookup] " ++ show ty ++ " in Γ"]
-  return ty
-lookupEnv k (ETrm _ env) = lookupEnv (k - 1) env
-lookupEnv k (EUvar env) = shiftTyp0 <$> lookupEnv k env
-lookupEnv k (EEvar env) = shiftTyp0 <$> lookupEnv k env
-lookupEnv k (ESvar _ env) = shiftTyp0 <$> lookupEnv k env
-lookupEnv _ _ = lift Nothing
+ensure :: MonadFail m => Bool -> String -> m ()
+ensure cond msg = unless cond (fail msg)
 
-findSol :: Env -> Int -> WriterT Log Maybe Typ
--- findSol a b | trace ("findSol " ++ show a ++ " |- " ++ show b) False = undefined
-findSol EEmpty _ = lift Nothing
-findSol (ESvar ty _) 0 = return $ shiftTyp0 ty
-findSol (ESvar _ senv) k | k > 0 = do
-  ty' <- findSol senv (k - 1)
-  return $ shiftTyp0 ty'
-findSol (EUvar senv) k | k > 0 = do
-  ty' <- findSol senv (k - 1)
-  return $ shiftTyp0 ty'
-findSol (EEvar senv) k | k > 0 = do
-  ty' <- findSol senv (k - 1)
-  return $ shiftTyp0 ty'
-findSol _ _ = lift Nothing
+findSol :: (MonadWriter Log m, Fresh m, MonadFail m) => Env -> TyName -> m Ty
+findSol env a = do
+  case lookupTyVar env a of
+    Just (Svar ty) -> return ty
+    _ -> fail "findSol: lookupTyVar failed"
 
-inst :: Env -> Int -> Typ -> Maybe Env
--- inst env k a | trace ("inst " ++ show env ++ " " ++ show k ++ " " ++ show a) False = undefined
-inst (EEvar senv) 0 tyA = Just $ ESvar (unshiftTyp0 tyA) senv
-inst (EEvar senv) k tyA | k > 0 = do
-  env' <- inst senv (k - 1) (unshiftTyp0 tyA)
-  return (EEvar env')
-inst (EUvar senv) k tyA | k > 0 = do
-  env' <- inst senv (k - 1) (unshiftTyp0 tyA)
-  return (EUvar env')
-inst (ESvar ty senv) k tyA | k > 0 = do
-  env' <- inst senv (k - 1) (unshiftTyp0 tyA)
-  return (ESvar ty env')
-inst _ _ _ = Nothing
-
-ssubP :: (Env, Env) -> Typ -> Typ -> WriterT Log Maybe Env
--- ssubP (a1, a2) b c | trace ("ssub " ++ show a1 ++ ";" ++ show a2 ++ " |- " ++ show b ++ " <:+ " ++ show c) False = undefined
-ssubP (env, senv) TInt TInt = do
-  tell ["[S-Int] " ++ logSSubFull (env, senv) TInt TInt senv]
+ssub :: (MonadWriter Log m, Fresh m, MonadFail m) => (Env, Env) -> Ty -> Polar -> Ty -> m Env
+ssub (env, senv) TInt p TInt = do
+  tell ["[S-Int] " ++ logSSubFull (env, senv) TInt p TInt senv]
   return senv
-ssubP (env, senv) TBool TBool = do
-  tell ["[S-Bool] " ++ logSSubFull (env, senv) TBool TBool senv]
+ssub (env, senv) TBool p TBool = do
+  tell ["[S-Bool] " ++ logSSubFull (env, senv) TBool p TBool senv]
   return senv
-ssubP (env, senv) (TVar a) (TVar b) | isUvar (envConcat env senv) a && a == b = do
-  tell ["[S-Refl] " ++ logSSubFull (env, senv) (TVar a) (TVar b) senv]
+ssub (env, senv) (TVar a) p (TVar b) | isUvar (envConcat env senv) a && a == b = do
+  tell ["[S-Refl] " ++ logSSubFull (env, senv) (TVar a) p (TVar b) senv]
   return senv
-ssubP (env, senv) (TVar a) tyA | isEvar senv a = case inst senv a tyA of
-  Just newenv -> do
-    tell ["[S-Ex-L] " ++ logSSubFull (env, senv) (TVar a) tyA newenv]
-    return newenv
-  Nothing -> lift Nothing
-ssubP (env, senv) (TVar a) tyA = do
-  tyB <- findSol senv a
-  if tyA == tyB
-    then do
-      tell ["[S-Sol-L] " ++ logSSubFull (env, senv) (TVar a) tyA senv]
+ssub (env, senv) (TVar a) Pos tyA = do
+  case lookupTyVar env a of
+    Just Evar -> do 
+      case inst senv a tyA of
+        Just newenv -> do
+          tell ["[S-MVar-L] " ++ logSSubFull (env, senv) (TVar a) Pos tyA newenv]
+          return newenv
+        Nothing -> fail "ssub: inst failed"
+    Just (Svar tyB) -> do
+      ensure (tyA `aeq` tyB) "ssub: tyA /= tyB"
+      tell ["[S-SVar-L] " ++ logSSubFull (env, senv) (TVar a) Pos tyA senv]
       return senv
-    else lift Nothing
-ssubP (env, senv) (TArr tyA tyB) (TArr tyC tyD) = do
-  (senv1, _log1) <- peek $ ssubN (env, senv) tyC tyA
-  (senv2, _log2) <- peek $ ssubP (env, senv1) tyB tyD
-  tell ["[S-Arr] " ++ logSSubFull (env, senv) (TArr tyA tyB) (TArr tyC tyD) senv2]
+    _ -> fail "ssub: lookupTyVar failed"  
+ssub (env, senv) tyA Neg (TVar a) = do
+  case lookupTyVar env a of
+    Just Evar -> do
+      case inst senv a tyA of
+        Just newenv -> do
+          tell ["[S-MVar-R] " ++ logSSubFull (env, senv) (TVar a) Neg tyA newenv]
+          return newenv
+        Nothing -> fail "ssub: inst failed"
+    Just (Svar tyB) -> do
+      ensure (tyA `aeq` tyB) "ssub: tyA /= tyB"
+      tell ["[S-SVar-R] " ++ logSSubFull (env, senv) (TVar a) Neg tyA senv]
+      return senv
+    _ -> fail "ssub: lookupTyVar failed"  
+ssub (env, senv) (TArr tyA tyB) p (TArr tyC tyD) = do
+  (senv1, _log1) <- peek $ ssub (env, senv) tyC (flipPolar p) tyA
+  (senv2, _log2) <- peek $ ssub (env, senv1) tyB p tyD
+  tell ["[S-Arr] " ++ logSSubFull (env, senv) (TArr tyA tyB) p (TArr tyC tyD) senv2]
   tell $ indentAll _log1
   tell $ indentAll _log2
   return senv2
-ssubP (env, senv) (TUncurry tsA tyA) (TUncurry tsC tyD) | length tsA == length tsC = do
+ssub (env, senv) (TUncurry tsA tyA) p (TUncurry tsC tyD) | length tsA == length tsC = do
   let foldFunc (senv', logs) (tyA', tyC') = do
-        (senv'', log') <- peek $ ssubN (env, senv') tyC' tyA'
+        (senv'', log') <- peek $ ssub (env, senv') tyC' (flipPolar p) tyA'
         return (senv'', logs ++ log')
   (result, _) <- peek $ foldM foldFunc (senv, []) (zip tsA tsC)
   let (senv1, argLogs) = result
-  (senv2, retLog) <- peek $ ssubP (env, senv1) tyA tyD
-  tell ["[S-Uncurry] " ++ logSSubFull (env, senv) (TUncurry tsA tyA) (TUncurry tsC tyD) senv2]
+  (senv2, retLog) <- peek $ ssub (env, senv1) tyA p tyD
+  tell ["[S-Uncurry] " ++ logSSubFull (env, senv) (TUncurry tsA tyA) p(TUncurry tsC tyD) senv2]
   tell $ indentAll argLogs
   tell $ indentAll retLog
   return senv2
-ssubP (env, senv) (TForall tyA) (TForall tyB) = do
-  (EUvar senv', _log) <- peek $ ssubP (env, EUvar senv) tyA tyB
-  tell ["[S-Forall] " ++ logSSubFull (env, senv) (TForall tyA) (TForall tyB) senv']
+ssub (env, senv) (TForall bdA) p (TForall bdB) = do
+  mAB <- unbind2 bdA bdB
+  (a, tyA, _, tyB) <- maybe (fail "ssub: unbind2 failed") pure mAB
+  (EUvar _ senv', _log) <- peek $ ssub (env, EUvar a senv) tyA p tyB
+  tell ["[S-Forall] " ++ logSSubFull (env, senv) (TForall bdA) p (TForall bdB) senv']
   tell $ indentAll _log
   return senv'
-ssubP (env, senv) (TList tyA) (TList tyB) = do
-  (senv', _log) <- peek $ ssubP (env, senv) tyA tyB
-  tell ["[S-List] " ++ logSSubFull (env, senv) (TList tyA) (TList tyB) senv']
-  tell $ indentAll _log
+ssub (env, senv) (TList tyA) p (TList tyB) = do
+  (senv', _log) <- peek $ ssub (env, senv) tyA p tyB
+  tell ["[S-List] " ++ logSSubFull (env, senv) (TList tyA) p (TList tyB) senv']
   return senv'
-ssubP (env, senv) (TProd tyA tyB) (TProd tyC tyD) = do
-  (senv1, _log1) <- peek $ ssubP (env, senv) tyA tyC
-  (senv2, _log2) <- peek $ ssubP (env, senv1) tyB tyD
-  tell ["[S-Prod] " ++ logSSubFull (env, senv) (TProd tyA tyB) (TProd tyC tyD) senv2]
+ssub (env, senv) (TProd tyA tyB) p (TProd tyC tyD) = do
+  (senv1, _log1) <- peek $ ssub (env, senv) tyA p tyC
+  (senv2, _log2) <- peek $ ssub (env, senv1) tyB p tyD
+  tell ["[S-Prod] " ++ logSSubFull (env, senv) (TProd tyA tyB) p (TProd tyC tyD) senv2]
   tell $ indentAll _log1
   tell $ indentAll _log2
   return senv2
-ssubP (env, senv) (TST tyA tyB) (TST tyC tyD) = do
-  (senv1, _log1) <- peek $ ssubP (env, senv) tyA tyC
-  (senv2, _log2) <- peek $ ssubN (env, senv1) tyC tyA
-  (senv3, _log3) <- peek $ ssubP (env, senv2) tyB tyD
-  tell ["[S-ST] " ++ logSSubFull (env, senv) (TST tyA tyB) (TST tyC tyD) senv2]
+ssub (env, senv) (TST tyA tyB) p (TST tyC tyD) = do
+  (senv1, _log1) <- peek $ ssub (env, senv) tyA p tyC
+  (senv2, _log2) <- peek $ ssub (env, senv1) tyB p tyD
+  (senv3, _log3) <- peek $ ssub (env, senv2) tyC p tyA
+  tell ["[S-ST] " ++ logSSubFull (env, senv) (TST tyA tyB) p (TST tyC tyD) senv3]
   tell $ indentAll _log1
   tell $ indentAll _log2
   tell $ indentAll _log3
   return senv3
-ssubP _ _ _ = lift Nothing
+ssub _ _ _ _ = fail "ssub: unexpected case"
 
-ssubN :: (Env, Env) -> Typ -> Typ -> WriterT Log Maybe Env
--- ssubN (a1, a2) b c | trace ("ssub " ++ show a1 ++ ";" ++ show a2 ++ " |- " ++ show b ++ " <:- " ++ show c) False = undefined
-ssubN (env, senv) TInt TInt = do
-  tell ["[S-Int] " ++ logSSubFull (env, senv) TInt TInt senv]
-  return senv
-ssubN (env, senv) TBool TBool = do
-  tell ["[S-Bool] " ++ logSSubFull (env, senv) TBool TBool senv]
-  return senv
-ssubN (env, senv) (TVar a) (TVar b) | isUvar (envConcat env senv) a && a == b = do
-  tell ["[S-Refl] " ++ logSSubFull (env, senv) (TVar a) (TVar b) senv]
-  return senv
-ssubN (env, senv) tyA (TVar a) | isEvar senv a = case inst senv a tyA of
-  Just newenv -> do
-    tell ["[S-Ex-R] " ++ logSSubFull (env, senv) (TVar a) tyA newenv]
-    return newenv
-  Nothing -> lift Nothing
-ssubN (env, senv) tyA (TVar a) = do
-  tyB <- findSol senv a
-  if tyA == tyB
-    then do
-      tell ["[S-Sol-R] " ++ logSSubFull (env, senv) tyA (TVar a) senv]
-      return senv
-    else lift Nothing
-ssubN (env, senv) (TArr tyA tyB) (TArr tyC tyD) = do
-  (senv1, _log1) <- peek $ ssubP (env, senv) tyC tyA
-  (senv2, _log2) <- peek $ ssubN (env, senv1) tyB tyD
-  tell ["[S-Arr] " ++ logSSubFull (env, senv) (TArr tyA tyB) (TArr tyC tyD) senv2]
-  tell $ indentAll _log1
-  tell $ indentAll _log2
-  return senv2
-ssubN (env, senv) (TUncurry tsA tyB) (TUncurry tsC tyD) | length tsA == length tsC = do
-  let foldFunc (senv', logs) (tyA', tyC') = do
-        (senv'', log') <- peek $ ssubP (env, senv') tyC' tyA'
-        return (senv'', logs ++ log')
-  (result, _) <- peek $ foldM foldFunc (senv, []) (zip tsA tsC)
-  let (senv1, argLogs) = result
-  (senv2, retLog) <- peek $ ssubN (env, senv1) tyB tyD
-  tell ["[S-Uncurry] " ++ logSSubFull (env, senv) (TUncurry tsA tyB) (TUncurry tsC tyD) senv2]
-  tell $ indentAll argLogs
-  tell $ indentAll retLog
-  return senv2
-ssubN (env, senv) (TForall tyA) (TForall tyB) = do
-  (EUvar senv', _log) <- peek $ ssubN (env, EUvar senv) tyA tyB
-  tell ["[S-Forall] " ++ logSSubFull (env, senv) (TForall tyA) (TForall tyB) senv']
-  tell $ indentAll _log
-  return senv'
-ssubN (env, senv) (TList tyA) (TList tyB) = do
-  (senv', _log) <- peek $ ssubN (env, senv) tyA tyB
-  tell ["[S-List] " ++ logSSubFull (env, senv) (TList tyA) (TList tyB) senv']
-  tell $ indentAll _log
-  return senv'
-ssubN (env, senv) (TProd tyA tyB) (TProd tyC tyD) = do
-  (senv1, _log1) <- peek $ ssubN (env, senv) tyA tyC
-  (senv2, _log2) <- peek $ ssubN (env, senv1) tyB tyD
-  tell ["[S-Prod] " ++ logSSubFull (env, senv) (TProd tyA tyB) (TProd tyC tyD) senv2]
-  tell $ indentAll _log1
-  tell $ indentAll _log2
-  return senv2
-ssubN (env, senv) (TST tyA tyB) (TST tyC tyD) = do
-  (senv1, _log1) <- peek $ ssubN (env, senv) tyA tyC
-  (senv2, _log2) <- peek $ ssubP (env, senv1) tyC tyA
-  (senv3, _log3) <- peek $ ssubN (env, senv2) tyB tyD
-  tell ["[S-ST] " ++ logSSubFull (env, senv) (TST tyA tyB) (TST tyC tyD) senv3]
-  tell $ indentAll _log1
-  tell $ indentAll _log2
-  tell $ indentAll _log3
-  return senv3
-ssubN _ _ _ = lift Nothing
-
-ground :: Env -> Typ -> WriterT Log Maybe Typ
+ground :: (MonadWriter Log m, Fresh m, MonadFail m) => Env -> Ty -> m Ty
 -- ground a b | trace ("ground " ++ show a ++ " |- " ++ show b) False = undefined
 ground _ TInt = return TInt
 ground _ TBool = return TBool
 ground env (TVar k) | isUvar env k = return (TVar k)
 ground env (TVar k) = findSol env k
-ground env (TArr tyA tyB) = do
-  tyA' <- ground env tyA
-  tyB' <- ground env tyB
-  return $ TArr tyA' tyB'
-ground env (TForall tyA) = do
-  tyA' <- ground (EUvar env) tyA
-  return $ TForall tyA'
+ground env (TArr tyA tyB) = liftA2 TArr (ground env tyA) (ground env tyB)
+ground env (TForall bdA) = do
+  (a, tyA) <- unbind bdA
+  tyA' <- ground (EUvar a env) tyA
+  return $ TForall (bind a tyA')
 ground env (TUncurry ts tyA) = do
   ts' <- mapM (ground env) ts
   tyA' <- ground env tyA
@@ -203,43 +118,41 @@ ground env (TUncurry ts tyA) = do
 ground env (TList tyA) = do
   tyA' <- ground env tyA
   return $ TList tyA'
-ground env (TProd tyA tyB) = do
-  tyA' <- ground env tyA
-  tyB' <- ground env tyB
-  return $ TProd tyA' tyB'
-ground env (TST tyA tyB) = do
-  tyA' <- ground env tyA
-  tyB' <- ground env tyB
-  return $ TST tyA' tyB'
+ground env (TProd tyA tyB) = liftA2 TProd (ground env tyA) (ground env tyB)
+ground env (TST tyA tyB) = liftA2 TST (ground env tyA) (ground env tyB)
 
-inferUncurry :: (Env, Env) -> Typ -> Trm -> WriterT Log Maybe (Env, Typ)
-inferUncurry (env, senv) tyA e | open (envConcat env senv) tyA = do
+inferUncurry :: (MonadWriter Log m, Fresh m, Alternative m, MonadFail m) => (Env, Env) -> Ty -> Tm -> m (Env, Ty)
+inferUncurry (env, senv) tyA e = do
+  isOpen (envConcat env senv) tyA
   (tyA', _log) <- peek $ infer (envConcat env senv) CEmpty e
-  (senv', _log') <- peek $ ssubN (env, senv) tyA' tyA
+  (senv', _log') <- peek $ ssub (env, senv) tyA' Pos tyA
   tell ["[UC-Infer] " ++ logInferUncurry (env, senv) tyA e tyA' senv']
   tell $ indentAll _log
   tell $ indentAll _log'
   return (senv', tyA')
-inferUncurry (env, senv) tyA e | closed (envConcat env senv) tyA = do
+  <|> do
+  closed (envConcat env senv) tyA
   grdA <- ground (envConcat env senv) tyA
   (_, _log) <- peek $ infer (envConcat env senv) (CFullType grdA) e
   tell ["[UC-Check] " ++ logInferUncurry (env, senv) tyA e tyA senv]
   tell $ indentAll _log
   return (senv, tyA)
-inferUncurry _ _ _ = lift Nothing
 
-sub :: (Env, Env) -> Typ -> Context -> WriterT Log Maybe (Env, Typ)
+sub :: (MonadWriter Log m, Fresh m, Alternative m, MonadFail m) => (Env, Env) -> Ty -> Context -> m (Env, Ty)
 -- sub (a1, a2) b c | trace ("sub " ++ show a1 ++ ";" ++ show a2 ++ " |- " ++ show b ++ " <: " ++ show c) False = undefined
-sub (env, senv) tyA CEmpty | closed (envConcat env senv) tyA = do
+sub (env, senv) tyA CEmpty = do  
+  closed (envConcat env senv) tyA
   grdA <- ground (envConcat env senv) tyA
   tell ["[S-Empty] " ++ logSubFull (env, senv) tyA CEmpty senv grdA]
   return (senv, grdA)
 sub (env, senv) tyA (CFullType tyB) = do
-  (senv', _log1) <- peek $ ssubP (env, senv) tyA tyB
+  (senv', _log1) <- peek $ ssub (env, senv) tyA Pos tyB
   tell ["[S-Type] " ++ logSubFull (env, senv) tyA (CFullType tyB) senv' tyB]
   tell $ indentAll _log1
   return (senv', tyB)
-sub (env, senv) (TArr tyA tyB) (CTerm e h) | closed (envConcat env senv) tyA = do
+sub (env, senv) (TArr tyA tyB) (CTerm e h) = 
+  do
+  closed (envConcat env senv) tyA
   grdA <- ground (envConcat env senv) tyA
   (tyC, _log1) <- peek $ infer (envConcat env senv) (CFullType grdA) e
   ((senv', tyD), _log2) <- peek $ sub (env, senv) tyB h
@@ -247,9 +160,11 @@ sub (env, senv) (TArr tyA tyB) (CTerm e h) | closed (envConcat env senv) tyA = d
   tell $ indentAll _log1
   tell $ indentAll _log2
   return (senv', TArr tyC tyD)
-sub (env, senv) (TArr tyA tyB) (CTerm e h) | open (envConcat env senv) tyA = do
+  <|> 
+  do
+  isOpen (envConcat env senv) tyA 
   (tyC, _log1) <- peek $ infer (envConcat env senv) CEmpty e
-  (senv1, _log2) <- peek $ ssubN (env, senv) tyC tyA
+  (senv1, _log2) <- peek $ ssub (env, senv) tyC Neg tyA
   ((senv2, tyD), _log3) <- peek $ sub (env, senv1) tyB h
   tell ["[S-Term-Open] " ++ logSubFull (env, senv) (TArr tyA tyB) (CTerm e h) senv2 (TArr tyC tyD)]
   tell $ indentAll _log1
@@ -266,16 +181,18 @@ sub (env, senv) (TUncurry tyAs tyB) (CUncurry es h) = do
   tell $ indentAll _log1
   tell $ indentAll _log2
   return (senv'', TUncurry tyAs' tyB')
-sub (env, senv) (TForall tyA) (CTerm e h) = do
-  ((ESvar _ senv', tyB), _log1) <- peek $ sub (env, EEvar senv) tyA (shiftTyContext0 (CTerm e h))
-  tell ["[S-Forall-L] " ++ logSubFull (env, senv) (TForall tyA) (CTerm e h) senv' (unshiftTyp0 tyB)]
+sub (env, senv) (TForall bdA) (CTerm e h) = do
+  (a, tyA) <- unbind bdA
+  ((ESvar _ _ senv', tyB), _log1) <- peek $ sub (env, EEvar a senv) tyA (CTerm e h)
+  tell ["[S-Forall-L] " ++ logSubFull (env, senv) (TForall bdA) (CTerm e h) senv' tyB]
   tell $ indentAll _log1
-  return (senv', unshiftTyp0 tyB)
-sub (env, senv) (TForall tyA) (CUncurry es h) = do
-  ((ESvar _ senv', tyB), _log1) <- peek $ sub (env, EEvar senv) tyA (shiftTyContext0 (CUncurry es h))
-  tell ["[S-Forall-L-UC] " ++ logSubFull (env, senv) (TForall tyA) (CUncurry es h) senv' (unshiftTyp0 tyB)]
+  return (senv', tyB)
+sub (env, senv) (TForall bdA) (CUncurry es h) = do
+  (a, tyA) <- unbind bdA
+  ((ESvar _ _ senv', tyB), _log1) <- peek $ sub (env, EEvar a senv) tyA (CUncurry es h)
+  tell ["[S-Forall-L-UC] " ++ logSubFull (env, senv) (TForall bdA) (CUncurry es h) senv' tyB]
   tell $ indentAll _log1
-  return (senv', unshiftTyp0 tyB)
+  return (senv', tyB)
 sub (env, senv) (TVar k) h | isSvar (envConcat env senv) k = do
   tyA <- findSol (envConcat env senv) k
   ((senv', tyB), _log) <- peek $ sub (env, senv) tyA h
@@ -289,7 +206,7 @@ sub (env, senv) (TVar k) (CTerm e h) | isUvar (envConcat env senv) k = do
       tell ["[S-Infers] " ++ logSubFull (env, senv) (TVar k) (CTerm e h) newenv tyA]
       tell $ indentAll _log
       return (newenv, tyA)
-    Nothing -> lift Nothing
+    Nothing -> fail "sub: inst failed"
 sub (env, senv) (TProd tyA tyB) (CFst h) = do
   ((senv', tyA'), _log) <- peek $ sub (env, senv) tyA h
   tell ["[S-Prod-Fst] " ++ logSubFull (env, senv) (TProd tyA tyB) (CFst h) senv' tyA']
@@ -300,9 +217,9 @@ sub (env, senv) (TProd tyA tyB) (CSnd h) = do
   tell ["[S-Prod-Snd] " ++ logSubFull (env, senv) (TProd tyA tyB) (CSnd h) senv' tyB']
   tell $ indentAll _log
   return (senv', TProd tyA tyB')
-sub _ _ _ = lift Nothing
+sub _ _ _ = fail "sub: unexpected case"
 
-infers :: Env -> Context -> WriterT Log Maybe Typ
+infers :: (MonadWriter Log m, Fresh m, Alternative m, MonadFail m) => Env -> Context -> m Ty
 infers env (CFullType tyA) = do
   tell ["[CI-Type] " ++ logInfersFull env (CFullType tyA) tyA]
   return tyA
@@ -313,9 +230,9 @@ infers env (CTerm tm h) = do
   tell $ indentAll _log1
   tell $ indentAll _log2
   return $ TArr tyA tyB
-infers _ _ = lift Nothing
+infers _ _ = fail "infers: unexpected case"
 
-infer :: Env -> Context -> Trm -> WriterT Log Maybe Typ
+infer :: (MonadWriter Log m, Fresh m, Alternative m, MonadFail m) => Env -> Context -> Tm -> m Ty
 -- infer a b c | trace ("infer " ++ show a ++ " |- " ++ show b ++ " => " ++ show c) False = undefined
 infer env CEmpty (LitInt n) = do
   tell ["[Ty-Int] " ++ logInferFull env CEmpty (LitInt n) TInt]
@@ -324,10 +241,11 @@ infer env CEmpty (LitBool b) = do
   tell ["[Ty-Bool] " ++ logInferFull env CEmpty (LitBool b) TBool]
   return TBool
 infer env CEmpty (Var i) = do
-  (tyA, _log) <- peek $ lookupEnv i env
-  tell ["[Ty-Var] " ++ logInferFull env CEmpty (Var i) tyA]
-  tell $ indentAll _log
-  return tyA
+  case lookupTmVar env i of
+    Just tyA -> do
+      tell ["[Ty-Var] " ++ logInferFull env CEmpty (Var i) tyA]    
+      return tyA
+    Nothing -> empty
 infer env CEmpty (Ann tm tyA) = do
   (_, _log) <- peek $ infer env (CFullType tyA) tm
   tell ["[Ty-Ann] " ++ logInferFull env CEmpty (Ann tm tyA) tyA]
@@ -343,69 +261,88 @@ infer env h (AppUncurry tm1 tm2s) = do
   tell ["[Ty-App-UC] " ++ logInferFull env h (AppUncurry tm1 tm2s) ty]
   tell $ indentAll _log
   return ty
-infer env (CFullType (TArr tyA tyB)) (Abs tm) = do
-  (tyC, _log) <- peek $ infer (ETrm tyA env) (CFullType tyB) tm
-  tell ["[Ty-Abs1] " ++ logInferFull env (CFullType (TArr tyA tyB)) (Abs tm) (TArr tyA tyC)]
+infer env (CFullType (TArr tyA tyB)) (Abs bdTm) = do
+  (x, tm) <- unbind bdTm
+  (tyC, _log) <- peek $ infer (ETrm x tyA env) (CFullType tyB) tm
+  tell ["[Ty-Abs1] " ++ logInferFull env (CFullType (TArr tyA tyB)) (Abs bdTm) (TArr tyA tyC)]
   tell $ indentAll _log
   return $ TArr tyA tyC
-infer env (CTerm tm2 h) (Abs tm) = do
+infer env (CTerm tm2 h) (Abs bdTm) = do
+  (x, tm) <- unbind bdTm
   (tyA, _log1) <- peek $ infer env CEmpty tm2
-  (tyB, _log2) <- peek $ infer (ETrm tyA env) (shiftContext0 h) tm
-  tell ["[Ty-Abs2] " ++ logInferFull env (CTerm tm2 h) (Abs tm) (TArr tyA tyB)]
+  (tyB, _log2) <- peek $ infer (ETrm x tyA env) h tm
+  tell ["[Ty-Abs2] " ++ logInferFull env (CTerm tm2 h) (Abs bdTm) (TArr tyA tyB)]
   tell $ indentAll _log1
   tell $ indentAll _log2
   return $ TArr tyA tyB
-infer env (CFullType (TArr tyA tyB)) (AbsAnn tyA' tm) | tyA == tyA' = do
-  (_, _log) <- peek $ infer (ETrm tyA env) (CFullType tyB) tm
-  tell ["[Ty-AbsAnn1] " ++ logInferFull env (CFullType (TArr tyA tyB)) (AbsAnn tyA' tm) (TArr tyA tyB)]
+infer env (CFullType (TArr tyA tyB)) (AbsAnn bdTm) = do
+  ((x, Embed tyA'), tm) <- unbind bdTm
+  guard (tyA `aeq` tyA')
+  (_, _log) <- peek $ infer (ETrm x tyA env) (CFullType tyB) tm
+  tell ["[Ty-AbsAnn1] " ++ logInferFull env (CFullType (TArr tyA tyB)) (AbsAnn bdTm) (TArr tyA tyB)]
   tell $ indentAll _log
   return $ TArr tyA tyB
-infer env (CTerm tm2 h) (AbsAnn tyA tm) = do
+infer env (CTerm tm2 h) (AbsAnn bdTm) = do
+  ((x, Embed tyA), tm) <- unbind bdTm
   (_, _log1) <- peek $ infer env (CFullType tyA) tm2
-  (tyB, _log2) <- peek $ infer (ETrm tyA env) (shiftContext0 h) tm
-  tell ["[Ty-AbsAnn2] " ++ logInferFull env (CTerm tm2 h) (AbsAnn tyA tm) (TArr tyA tyB)]
+  (tyB, _log2) <- peek $ infer (ETrm x tyA env) h tm
+  tell ["[Ty-AbsAnn2] " ++ logInferFull env (CTerm tm2 h) (AbsAnn bdTm) (TArr tyA tyB)]
   tell $ indentAll _log1
   tell $ indentAll _log2
   return $ TArr tyA tyB
-infer env CEmpty (AbsAnn tyA tm) = do
-  (tyB, _log) <- peek $ infer (ETrm tyA env) CEmpty tm
-  tell ["[Ty-AbsAnn3] " ++ logInferFull env CEmpty (AbsAnn tyA tm) tyB]
+infer env CEmpty (AbsAnn bdTm) = do
+  ((x, Embed tyA), tm) <- unbind bdTm  
+  (tyB, _log) <- peek $ infer (ETrm x tyA env) CEmpty tm
+  tell ["[Ty-AbsAnn3] " ++ logInferFull env CEmpty (AbsAnn bdTm) tyB]
   tell $ indentAll _log
   return $ TArr tyA tyB
-infer env (CFullType (TUncurry tyAs tyB)) (AbsUncurryAnn tyAs' tm) | all (uncurry (==)) (zip tyAs tyAs') = do
-  (_, _log) <- peek $ infer (foldl (flip ETrm) env tyAs) (CFullType tyB) tm
-  tell ["[Ty-AbsAnn-UC1] " ++ logInferFull env (CFullType (TUncurry tyAs tyB)) (AbsUncurryAnn tyAs' tm) (TUncurry tyAs tyB)]
+infer env (CFullType (TUncurry tyAs tyB)) (AbsUncurryAnn bdTm) = do
+  (xs_tyAs, tm) <- unbind bdTm
+  let xs = [ x_A | (x_A, _) <- xs_tyAs]
+      tyAs' = [ ty_A | (_, Embed ty_A) <- xs_tyAs]  
+  guard $ all (uncurry aeq) (zip tyAs tyAs')
+  (_, _log) <- peek $ infer (foldl (\env' (x, tyA) -> ETrm x tyA env') env (zip xs tyAs')) (CFullType tyB) tm
+  tell ["[Ty-AbsAnn-UC1] " ++ logInferFull env (CFullType (TUncurry tyAs tyB)) (AbsUncurryAnn bdTm) (TUncurry tyAs tyB)]
   tell $ indentAll _log
   return $ TUncurry tyAs tyB
-infer env (CUncurry tm2s h) (AbsUncurryAnn tyAs tm) | length tyAs == length tm2s = do
+infer env (CUncurry tm2s h) (AbsUncurryAnn bdTm) = do  
+  (xs_tyAs, tm) <- unbind bdTm
+  let xs = [ x_A | (x_A, _) <- xs_tyAs]
+      tyAs = [ ty_A | (_, Embed ty_A) <- xs_tyAs]
   (_, _log1) <- peek $ mapM (\(tyA, tm2) -> infer env (CFullType tyA) tm2) (zip tyAs tm2s)
-  (tyB, _log2) <- peek $ infer (foldl (flip ETrm) env tyAs) (iterate shiftContext0 h !! length tyAs) tm
-  tell ["[Ty-AbsAnn-UC2] " ++ logInferFull env (CUncurry tm2s h) (AbsUncurryAnn tyAs tm) (TUncurry tyAs tyB)]
+  (tyB, _log2) <- peek $ infer (foldl (\env' (x, tyA) -> ETrm x tyA env') env (zip xs tyAs)) h tm
+  tell ["[Ty-AbsAnn-UC2] " ++ logInferFull env (CUncurry tm2s h) (AbsUncurryAnn bdTm) (TUncurry tyAs tyB)]
   tell $ indentAll _log1
   tell $ indentAll _log2
   return $ TUncurry tyAs tyB
-infer env CEmpty (AbsUncurryAnn tyAs tm) = do
-  (tyB, _log) <- peek $ infer (foldl (flip ETrm) env tyAs) CEmpty tm
-  tell ["[Ty-AbsAnn-UC3] " ++ logInferFull env CEmpty (AbsUncurryAnn tyAs tm) tyB]
+infer env CEmpty (AbsUncurryAnn bdTm) = do
+  (xs_tyAs, tm) <- unbind bdTm
+  let xs = [ x_A | (x_A, _) <- xs_tyAs]
+      tyAs = [ ty_A | (_, Embed ty_A) <- xs_tyAs]
+  (tyB, _log) <- peek $ infer (foldl (\env' (x, tyA) -> ETrm x tyA env') env (zip xs tyAs)) CEmpty tm
+  tell ["[Ty-AbsAnn-UC3] " ++ logInferFull env CEmpty (AbsUncurryAnn bdTm) tyB]
   tell $ indentAll _log
   return $ TUncurry tyAs tyB
-infer env (CFullType (TUncurry ts tyB)) (AbsUncurry n tm) | n == length ts = do
-  (tyC, _log) <- peek $ infer (foldl (flip ETrm) env ts) (CFullType tyB) tm
-  tell ["[Ty-Abs-UC1] " ++ logInferFull env (CFullType (TUncurry ts tyB)) (AbsUncurry n tm) (TUncurry ts tyC)]
+infer env (CFullType (TUncurry ts tyB)) (AbsUncurry bdTm) = do
+  (xs, tm) <- unbind bdTm
+  (tyC, _log) <- peek $ infer (foldl (\env' (x, tyA) -> ETrm x tyA env') env (zip xs ts)) (CFullType tyB) tm
+  tell ["[Ty-Abs-UC1] " ++ logInferFull env (CFullType (TUncurry ts tyB)) (AbsUncurry bdTm) (TUncurry ts tyC)]
   tell $ indentAll _log
   return $ TUncurry ts tyC
-infer env (CUncurry tm2s h) (AbsUncurry n tm) | n == length tm2s = do
+infer env (CUncurry tm2s h) (AbsUncurry bd) = do
+  (xs, tm) <- unbind bd
   (tyAs, _log1) <- peek $ mapM (infer env CEmpty) tm2s
-  (tyB, _log2) <- peek $ infer (foldl (flip ETrm) env tyAs) (iterate shiftContext0 h !! n) tm
-  tell ["[Ty-Abs-UC2] " ++ logInferFull env (CUncurry tm2s h) (AbsUncurry n tm) (TUncurry tyAs tyB)]
+  (tyB, _log2) <- peek $ infer (foldl (\env' (x, tyA) -> ETrm x tyA env') env (zip xs tyAs)) h tm
+  tell ["[Ty-Abs-UC2] " ++ logInferFull env (CUncurry tm2s h) (AbsUncurry bd) (TUncurry tyAs tyB)]
   tell $ indentAll _log1
   tell $ indentAll _log2
   return $ TUncurry tyAs tyB
-infer env (CFullType (TForall tyA)) (TAbs tm) = do
-  (_, _log) <- peek $ infer (EUvar env) (CFullType tyA) tm
-  tell ["[Ty-TAbs-Chk] " ++ logInferFull env (CFullType (TForall tyA)) (TAbs tm) (TForall tyA)]
+infer env (CFullType (TForall bdTy)) (TAbs bdTm) = do
+  Just (a, tyA, _, tm) <- unbind2 bdTy bdTm
+  (_, _log) <- peek $ infer (EUvar a env) (CFullType tyA) tm
+  tell ["[Ty-TAbs-Chk] " ++ logInferFull env (CFullType (TForall bdTy)) (TAbs bdTm) (TForall bdTy)]
   tell $ indentAll _log
-  return $ TForall tyA
+  return $ TForall bdTy
 infer env CEmpty (Pair tm1 tm2) = do
   (tyA, _log1) <- peek $ infer env CEmpty tm1
   (tyB, _log2) <- peek $ infer env CEmpty tm2
@@ -427,7 +364,7 @@ infer env h (Fst tm) = do
       tell ["[Ty-Fst] " ++ logInferFull env h (Fst tm) tyA]
       tell $ indentAll _log1
       return tyA
-    _ -> lift Nothing
+    _ -> fail "infer: unexpected case"
 infer env h (Snd tm) = do
   (ty, _log1) <- peek $ infer env (CSnd h) tm
   case ty of
@@ -435,7 +372,7 @@ infer env h (Snd tm) = do
       tell ["[Ty-Snd] " ++ logInferFull env h (Snd tm) tyB]
       tell $ indentAll _log1
       return tyB
-    _ -> lift Nothing
+    _ -> fail "infer: unexpected case"
 infer env (CFst h) (Pair tm1 tm2) = do
   (tyA, _log1) <- peek $ infer env h tm1
   (tyB, _log2) <- peek $ infer env CEmpty tm2
@@ -457,14 +394,16 @@ infer env h g | genericConsumer g && nonEmptyContext h = do
   tell $ indentAll _log1
   tell $ indentAll _log2
   return tyB
-infer env CEmpty (TAbs tm) = do
-  (tyA, _log) <- peek $ infer (EUvar env) CEmpty tm
-  tell ["[Ty-TAbs] " ++ logInferFull env CEmpty (TAbs tm) (TForall tyA)]
+infer env CEmpty (TAbs bdTm) = do
+  (a, tm) <- unbind bdTm
+  (tyA, _log) <- peek $ infer (EUvar a env) CEmpty tm
+  tell ["[Ty-TAbs] " ++ logInferFull env CEmpty (TAbs bdTm) (TForall (bind a tyA))]
   tell $ indentAll _log
-  return $ TForall tyA
+  return $ TForall (bind a tyA)
 infer env h (TApp tm tyA) = do
-  (TForall tyB, _log1) <- peek $ infer env CEmpty tm
-  ((EEmpty, tyC), _log2) <- peek $ sub (env, EEmpty) (substTyp0 tyA tyB) h
+  (TForall bdTy, _log1) <- peek $ infer env CEmpty tm
+  (a, tyB) <- unbind bdTy
+  ((EEmpty, tyC), _log2) <- peek $ sub (env, EEmpty) (subst a tyB tyA) h
   tell ["[Ty-TApp] " ++ logInferFull env h (TApp tm tyA) tyC]
   tell $ indentAll _log1
   tell $ indentAll _log2
@@ -472,8 +411,8 @@ infer env h (TApp tm tyA) = do
 infer env (CFullType (TList tyA)) Nil = do
   tell ["[Ty-Nil-Chk] " ++ logInferFull env (CFullType (TList tyA)) Nil (TList tyA)]
   return (TList tyA)
-infer env CEmpty Nil = do
-  let tyNil = TForall (TList (TVar 0))
+infer env CEmpty Nil = do  
+  let tyNil = TForall (bind (s2n "a") (TList (TVar (s2n "a"))))
   tell ["[Ty-Nil] " ++ logInferFull env CEmpty Nil tyNil]
   return tyNil
-infer _ _ _ = lift Nothing
+infer _ _ _ = fail "infer: unexpected case"
