@@ -14,16 +14,18 @@ import Unbound.Generics.LocallyNameless
       unbind,
       Alpha,
       Bind,
-      Embed,
+      Embed(Embed),
       Fresh,
       Name,
       Subst(isvar),
-      SubstName(SubstName) )
+      SubstName(SubstName),
+      runFreshMT )
 
 import GHC.Generics
 import Data.Typeable (Typeable)
 import Control.Monad (guard)
 import Control.Applicative (Alternative, empty, (<|>))
+import Debug.Trace
 
 type TyName = Name Ty
 type TmName = Name Tm
@@ -40,7 +42,7 @@ data Ty = TInt
         | TList Ty 
         | TProd Ty Ty 
         | TST Ty Ty 
-        deriving (Generic, Typeable, Show)
+        deriving (Generic, Typeable)
 
 data Tm
   = LitInt Int
@@ -59,7 +61,142 @@ data Tm
   | Pair Tm Tm
   | Fst Tm
   | Snd Tm
-  deriving (Generic, Typeable, Show)
+  deriving (Generic, Typeable)
+
+-- Precedence levels for types
+data TypePrec = PrecAtom | PrecProd | PrecArr deriving (Eq, Ord)
+
+-- Precedence levels for terms
+data TermPrec = PrecAtomTerm | PrecAppTerm | PrecAnnTerm | PrecAbsTerm deriving (Eq, Ord)
+
+-- Pretty print a type
+prettyTyp :: (Fresh m) => Ty -> m String
+prettyTyp = prettyTyp' PrecAtom
+
+prettyTyp' :: (Fresh m) => TypePrec -> Ty -> m String
+prettyTyp' _ TInt = return "int"
+prettyTyp' _ TBool = return "bool"
+prettyTyp' _ (TVar a) = return (name2String a)
+prettyTyp' p (TArr t1 t2) = do
+  -- Arrow is right-associative
+  -- Left side: if it's an arrow, needs parentheses; if it's a product, no parentheses needed
+  -- Right side: same precedence (right-associative)
+  s1 <- case t1 of
+    TArr _ _ -> do
+      s <- prettyTyp' PrecArr t1
+      return $ "(" ++ s ++ ")"
+    _ -> prettyTyp' PrecProd t1
+  s2 <- prettyTyp' PrecArr t2
+  let result = s1 ++ " -> " ++ s2
+  return $ if p <= PrecArr then result else "(" ++ result ++ ")"
+prettyTyp' p (TProd t1 t2) = do
+  -- Product is left-associative, so left side uses same precedence
+  -- Right side uses higher precedence (PrecAtom)
+  s1 <- prettyTyp' PrecProd t1
+  s2 <- prettyTyp' PrecAtom t2
+  let s1' = if p <= PrecProd then s1 else "(" ++ s1 ++ ")"
+  return $ s1' ++ " * " ++ s2
+prettyTyp' p (TForall b) = do
+  (a, ty) <- unbind b
+  s <- prettyTyp' PrecAtom ty
+  return $ "forall " ++ name2String a ++ ". " ++ s
+prettyTyp' p (TUncurry ts t) = do
+  tsStrs <- mapM (prettyTyp' PrecAtom) ts
+  tStr <- prettyTyp' PrecAtom t
+  return $ "{" ++ intercalate ", " tsStrs ++ "} -> " ++ tStr
+prettyTyp' _ (TList t) = do
+  s <- prettyTyp' PrecAtom t
+  return $ "[" ++ s ++ "]"
+prettyTyp' _ (TST t1 t2) = do
+  s1 <- prettyTyp' PrecAtom t1
+  s2 <- prettyTyp' PrecAtom t2
+  return $ "ST " ++ s1 ++ " " ++ s2
+
+prettyTerm :: (Fresh m) => Tm -> m String
+prettyTerm = prettyTerm' PrecAtomTerm
+
+prettyTerm' :: (Fresh m) => TermPrec -> Tm -> m String
+prettyTerm' _ (LitInt n) = return (show n)
+prettyTerm' _ (LitBool True) = return "true"
+prettyTerm' _ (LitBool False) = return "false"
+prettyTerm' _ (Var x) = return (name2String x)
+prettyTerm' _ Nil = return "nil"
+prettyTerm' p (Abs b) = do
+  (x, e) <- unbind b
+  s <- prettyTerm' PrecAtomTerm e
+  let result = "λ" ++ name2String x ++ ". " ++ s
+  return $ if p <= PrecAbsTerm then result else "(" ++ result ++ ")"
+prettyTerm' p (AbsAnn b) = do
+  ((x, Embed ty), e) <- unbind b
+  tyStr <- prettyTyp' PrecAtom ty
+  s <- prettyTerm' PrecAtomTerm e
+  let result = "λ" ++ name2String x ++ " : " ++ tyStr ++ ". " ++ s
+  return $ if p <= PrecAbsTerm then result else "(" ++ result ++ ")"
+prettyTerm' p (AbsUncurry b) = do
+  (xs, e) <- unbind b
+  s <- prettyTerm' PrecAtomTerm e
+  let xsStr = intercalate ", " (map name2String xs)
+  let result = "λ{" ++ xsStr ++ "}. " ++ s
+  return $ if p <= PrecAbsTerm then result else "(" ++ result ++ ")"
+prettyTerm' p (AbsUncurryAnn b) = do
+  (anns, e) <- unbind b
+  s <- prettyTerm' PrecAtomTerm e
+  annStrs <- mapM (\(x, Embed ty) -> do
+    tyStr <- prettyTyp' PrecAtom ty
+    return $ name2String x ++ " : " ++ tyStr) anns
+  let annStr = intercalate ", " annStrs
+  let result = "λ{" ++ annStr ++ "}. " ++ s
+  return $ if p <= PrecAbsTerm then result else "(" ++ result ++ ")"
+prettyTerm' p (TAbs b) = do
+  (a, e) <- unbind b
+  s <- prettyTerm' PrecAtomTerm e
+  let result = "Λ" ++ name2String a ++ ". " ++ s
+  return $ if p <= PrecAbsTerm then result else "(" ++ result ++ ")"
+prettyTerm' p (App e1 e2) = do
+  -- Application is left-associative, so left side uses same precedence
+  -- Right side uses higher precedence (PrecAtom)
+  s1 <- prettyTerm' PrecAppTerm e1
+  s2 <- prettyTerm' PrecAtomTerm e2
+  let s1' = if p <= PrecAppTerm then s1 else "(" ++ s1 ++ ")"
+  return $ s1' ++ " " ++ s2
+prettyTerm' p (AppUncurry e es) = do
+  s1 <- prettyTerm' PrecAppTerm e
+  esStrs <- mapM (prettyTerm' PrecAtomTerm) es
+  let esStr = "{" ++ intercalate ", " esStrs ++ "}"
+  let s1' = if p <= PrecAppTerm then s1 else "(" ++ s1 ++ ")"
+  return $ s1' ++ " " ++ esStr
+prettyTerm' p (TApp e ty) = do
+  s1 <- prettyTerm' PrecAppTerm e
+  tyStr <- prettyTyp' PrecAtom ty
+  let s1' = if p <= PrecAppTerm then s1 else "(" ++ s1 ++ ")"
+  return $ s1' ++ " @ " ++ tyStr
+prettyTerm' p (Ann e ty) = do
+  s1 <- prettyTerm' PrecAnnTerm e
+  tyStr <- prettyTyp' PrecAtom ty
+  let s1' = if p <= PrecAnnTerm then s1 else "(" ++ s1 ++ ")"
+  return $ s1' ++ " : " ++ tyStr
+prettyTerm' p (Pair e1 e2) = do
+  s1 <- prettyTerm' PrecAtomTerm e1
+  s2 <- prettyTerm' PrecAtomTerm e2
+  return $ "<" ++ s1 ++ ", " ++ s2 ++ ">"
+prettyTerm' p (Fst e) = do
+  s <- prettyTerm' PrecAtomTerm e
+  return $ "fst " ++ s
+prettyTerm' p (Snd e) = do
+  s <- prettyTerm' PrecAtomTerm e
+  return $ "snd " ++ s
+
+-- Convenience functions that run in the Fresh monad
+prettyTypIO :: Ty -> String
+prettyTypIO ty = head (runFreshMT (prettyTyp ty))
+
+prettyTermIO :: Tm -> String
+prettyTermIO tm = head (runFreshMT (prettyTerm tm))
+
+instance Show Ty where
+  show = prettyTypIO
+instance Show Tm where
+  show = prettyTermIO
 
 instance Alpha Ty
 instance Alpha Tm
@@ -151,7 +288,7 @@ isSvar env a = case lookupTyVar env a of
   _ -> False
   
 closed :: (Fresh m, Alternative m) => Env -> Ty -> m ()
--- closed env ty | trace ("closed " ++ show env ++ " |- " ++ show ty) False = undefined
+closed env ty | trace ("closed " ++ " |- " ++ show ty) False = undefined
 closed _ TInt = return ()
 closed _ TBool = return ()
 closed senv (TVar a) = if isEvar senv a then empty else return ()
@@ -165,7 +302,7 @@ closed senv (TProd t1 t2) = (closed senv t1) >> (closed senv t2)
 closed senv (TST t1 t2) = (closed senv t1) >> (closed senv t2)
 
 isOpen :: (Fresh m, Alternative m) => Env -> Ty -> m ()
--- open env ty | trace ("open " ++ show env ++ " |- " ++ show ty) False = undefined
+open env ty | trace ("open " ++ " |- " ++ show ty) False = undefined
 isOpen senv ty = closed senv ty *> empty <|> return ()
 
 data Polar = Pos | Neg deriving (Show, Eq)  
@@ -192,4 +329,3 @@ inst (ESvar ty a env) b tyA = do
   return $ ESvar ty a env'
 
 
-  

@@ -7,17 +7,20 @@ import Log
 import Syntax
 import Unbound.Generics.LocallyNameless
 import Control.Applicative (Alternative, (<|>), empty)
+import Debug.Trace
+import Control.Monad.Error.Class (MonadError, throwError)
 
-ensure :: MonadFail m => Bool -> String -> m ()
-ensure cond msg = unless cond (fail msg)
+ensure :: MonadError String m => Bool -> String -> m ()
+ensure cond msg = unless cond (throwError msg)
 
-findSol :: (MonadWriter Log m, Fresh m, MonadFail m) => Env -> TyName -> m Ty
+findSol :: (MonadError String m) => Env -> TyName -> m Ty
 findSol env a = do
   case lookupTyVar env a of
     Just (Svar ty) -> return ty
-    _ -> fail "findSol: lookupTyVar failed"
+    _ -> throwError "findSol: lookupTyVar failed"    
 
-ssub :: (MonadWriter Log m, Fresh m, MonadFail m) => (Env, Env) -> Ty -> Polar -> Ty -> m Env
+ssub :: (MonadWriter Log m, MonadFail m, Fresh m, MonadError String m) => (Env, Env) -> Ty -> Polar -> Ty -> m Env
+-- ssub (env, senv) b p c | trace ("ssub " ++ ";" ++ show senv ++ " |- " ++ show b ++ " " ++ show p ++ " " ++ show c) False = undefined
 ssub (env, senv) TInt p TInt = do
   tell ["[S-Int] " ++ logSSubFull (env, senv) TInt p TInt senv]
   return senv
@@ -34,12 +37,12 @@ ssub (env, senv) (TVar a) Pos tyA = do
         Just newenv -> do
           tell ["[S-MVar-L] " ++ logSSubFull (env, senv) (TVar a) Pos tyA newenv]
           return newenv
-        Nothing -> fail "ssub: inst failed"
+        Nothing -> throwError $ "ssub: inst failed" ++ show a ++ " " ++ show tyA
     Just (Svar tyB) -> do
       ensure (tyA `aeq` tyB) "ssub: tyA /= tyB"
       tell ["[S-SVar-L] " ++ logSSubFull (env, senv) (TVar a) Pos tyA senv]
       return senv
-    _ -> fail "ssub: lookupTyVar failed"  
+    _ -> throwError $ "ssub: lookupTyVar failed" ++ show senv ++ " " ++ show tyA  
 ssub (env, senv) tyA Neg (TVar a) = do
   case lookupTyVar env a of
     Just Evar -> do
@@ -47,12 +50,12 @@ ssub (env, senv) tyA Neg (TVar a) = do
         Just newenv -> do
           tell ["[S-MVar-R] " ++ logSSubFull (env, senv) (TVar a) Neg tyA newenv]
           return newenv
-        Nothing -> fail "ssub: inst failed"
+        Nothing -> throwError $ "ssub: inst failed" ++ show a ++ " " ++ show tyA
     Just (Svar tyB) -> do
       ensure (tyA `aeq` tyB) "ssub: tyA /= tyB"
       tell ["[S-SVar-R] " ++ logSSubFull (env, senv) (TVar a) Neg tyA senv]
       return senv
-    _ -> fail "ssub: lookupTyVar failed"  
+    _ -> throwError $ "ssub: lookupTyVar failed" ++ show senv ++ " " ++ show tyA  
 ssub (env, senv) (TArr tyA tyB) p (TArr tyC tyD) = do
   (senv1, _log1) <- peek $ ssub (env, senv) tyC (flipPolar p) tyA
   (senv2, _log2) <- peek $ ssub (env, senv1) tyB p tyD
@@ -73,7 +76,7 @@ ssub (env, senv) (TUncurry tsA tyA) p (TUncurry tsC tyD) | length tsA == length 
   return senv2
 ssub (env, senv) (TForall bdA) p (TForall bdB) = do
   mAB <- unbind2 bdA bdB
-  (a, tyA, _, tyB) <- maybe (fail "ssub: unbind2 failed") pure mAB
+  (a, tyA, _, tyB) <- maybe (throwError "ssub: unbind2 failed") pure mAB
   (EUvar _ senv', _log) <- peek $ ssub (env, EUvar a senv) tyA p tyB
   tell ["[S-Forall] " ++ logSSubFull (env, senv) (TForall bdA) p (TForall bdB) senv']
   tell $ indentAll _log
@@ -100,7 +103,7 @@ ssub (env, senv) (TST tyA tyB) p (TST tyC tyD) = do
   return senv3
 ssub _ _ _ _ = fail "ssub: unexpected case"
 
-ground :: (MonadWriter Log m, Fresh m, MonadFail m) => Env -> Ty -> m Ty
+ground :: (MonadWriter Log m, Fresh m, MonadFail m, MonadError String m) => Env -> Ty -> m Ty
 -- ground a b | trace ("ground " ++ show a ++ " |- " ++ show b) False = undefined
 ground _ TInt = return TInt
 ground _ TBool = return TBool
@@ -121,7 +124,7 @@ ground env (TList tyA) = do
 ground env (TProd tyA tyB) = liftA2 TProd (ground env tyA) (ground env tyB)
 ground env (TST tyA tyB) = liftA2 TST (ground env tyA) (ground env tyB)
 
-inferUncurry :: (MonadWriter Log m, Fresh m, Alternative m, MonadFail m) => (Env, Env) -> Ty -> Tm -> m (Env, Ty)
+inferUncurry :: (MonadWriter Log m, Fresh m, Alternative m, MonadFail m, MonadError String m) => (Env, Env) -> Ty -> Tm -> m (Env, Ty)
 inferUncurry (env, senv) tyA e = do
   isOpen (envConcat env senv) tyA
   (tyA', _log) <- peek $ infer (envConcat env senv) CEmpty e
@@ -138,8 +141,8 @@ inferUncurry (env, senv) tyA e = do
   tell $ indentAll _log
   return (senv, tyA)
 
-sub :: (MonadWriter Log m, Fresh m, Alternative m, MonadFail m) => (Env, Env) -> Ty -> Context -> m (Env, Ty)
--- sub (a1, a2) b c | trace ("sub " ++ show a1 ++ ";" ++ show a2 ++ " |- " ++ show b ++ " <: " ++ show c) False = undefined
+sub :: (MonadWriter Log m, Fresh m, Alternative m, MonadFail m, MonadError String m) => (Env, Env) -> Ty -> Context -> m (Env, Ty)
+sub (a1, a2) b c | trace ("sub " ++ ";" ++ show a2 ++ " |- " ++ show b ++ " <: " ++ show c) False = undefined
 sub (env, senv) tyA CEmpty = do  
   closed (envConcat env senv) tyA
   grdA <- ground (envConcat env senv) tyA
@@ -219,7 +222,7 @@ sub (env, senv) (TProd tyA tyB) (CSnd h) = do
   return (senv', TProd tyA tyB')
 sub _ _ _ = fail "sub: unexpected case"
 
-infers :: (MonadWriter Log m, Fresh m, Alternative m, MonadFail m) => Env -> Context -> m Ty
+infers :: (MonadWriter Log m, Fresh m, Alternative m, MonadFail m, MonadError String m) => Env -> Context -> m Ty
 infers env (CFullType tyA) = do
   tell ["[CI-Type] " ++ logInfersFull env (CFullType tyA) tyA]
   return tyA
@@ -232,8 +235,8 @@ infers env (CTerm tm h) = do
   return $ TArr tyA tyB
 infers _ _ = fail "infers: unexpected case"
 
-infer :: (MonadWriter Log m, Fresh m, Alternative m, MonadFail m) => Env -> Context -> Tm -> m Ty
--- infer a b c | trace ("infer " ++ show a ++ " |- " ++ show b ++ " => " ++ show c) False = undefined
+infer :: (MonadWriter Log m, Fresh m, Alternative m, MonadFail m, MonadError String m) => Env -> Context -> Tm -> m Ty
+infer a b c | trace ("infer " ++ " |- " ++ show b ++ " => " ++ show c) False = undefined
 infer env CEmpty (LitInt n) = do
   tell ["[Ty-Int] " ++ logInferFull env CEmpty (LitInt n) TInt]
   return TInt
@@ -415,4 +418,4 @@ infer env CEmpty Nil = do
   let tyNil = TForall (bind (s2n "a") (TList (TVar (s2n "a"))))
   tell ["[Ty-Nil] " ++ logInferFull env CEmpty Nil tyNil]
   return tyNil
-infer _ _ _ = fail "infer: unexpected case"
+infer _ _ _ = throwError "infer: unexpected case"
