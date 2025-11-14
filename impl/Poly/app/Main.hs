@@ -7,8 +7,10 @@ import Infer
 import Syntax
 import System.Console.Haskeline
 import Data.Char (isSpace)
+import Data.List (isInfixOf)
 import Unbound.Generics.LocallyNameless.Name (s2n)
 import Unbound.Generics.LocallyNameless (runFreshMT, FreshMT)
+import Control.Exception (catch, SomeException, evaluate)
 
 preEnv :: Env
 preEnv = foldr (\(name, tyStr) env -> ETrm (s2n name) (parseTyp tyStr) env) EEmpty preEnvStrings
@@ -26,6 +28,7 @@ repl envNamed env = do
     Nothing     -> liftIO $ putStrLn "Bye."
     Just ":q"   -> liftIO $ putStrLn "Bye."
     Just input
+      | all isSpace input -> repl envNamed env  -- Skip empty/whitespace input
       | Just rest <- stripPrefix ":tree " input     -> liftIO (showTree envNamed env rest) >> repl envNamed env
       | Just _    <- stripPrefix ":env" input       -> liftIO (showEnvNamed envNamed) >> repl envNamed env
       | Just _    <- stripPrefix ":examples" input  -> liftIO showExamples >> repl envNamed env
@@ -34,32 +37,42 @@ repl envNamed env = do
           let mDef = parseDefine rest
           case mDef of
             Left err -> outputStrLn err >> repl envNamed env
-            Right (name, tyNamed) -> do
-              let env' = ETrm (s2n name) tyNamed envNamed                  
-              -- Echo the defined type for convenience
-              outputStrLn (show tyNamed)
-              repl env' env'
+            Right (name, tyStr) -> do
+              mty <- liftIO $ handleParseError (evaluate (parseTyp tyStr))
+              case mty of
+                Left err -> outputStrLn ("Error: " ++ err) >> repl envNamed env
+                Right tyNamed -> do
+                  let env' = ETrm (s2n name) tyNamed envNamed                  
+                  -- Echo the defined type for convenience
+                  outputStrLn (show tyNamed)
+                  repl env' env'
       | otherwise                                 -> liftIO (showInfer envNamed env input) >> repl envNamed env
 
 showInfer :: Env -> Env -> String -> IO ()
 showInfer envNamed _env src = do
-  let term = parseTerm src
-      results = runFreshMT $ runExceptT $ runWriterT (infer envNamed CEmpty term :: WriterT Log (ExceptT String (FreshMT [])) Ty)
-  case results of
-    [] -> putStrLn "Error: No solution found"
-    (result:_) -> case result of
-      Right (ty, _) -> putStrLn (show ty)
-      Left err      -> putStrLn $ "Error: " ++ err
+  mterm <- handleParseError (evaluate (parseTerm src))
+  case mterm of
+    Left err -> putStrLn $ "Error: " ++ err
+    Right term -> do
+      let results = runFreshMT $ runExceptT $ runWriterT (infer envNamed CEmpty term :: WriterT Log (ExceptT String (FreshMT [])) Ty)
+      case results of
+        [] -> putStrLn "Error: No solution found"
+        (result:_) -> case result of
+          Right (ty, _) -> putStrLn (show ty)
+          Left err      -> putStrLn $ "Error: " ++ err
 
 showTree :: Env -> Env -> String -> IO ()
 showTree envNamed _env src = do
-  let term = parseTerm src
-      results = runFreshMT $ runExceptT $ runWriterT (infer envNamed CEmpty term :: WriterT Log (ExceptT String (FreshMT [])) Ty)
-  case results of
-    [] -> putStrLn "Error: No solution found"
-    (result:_) -> case result of
-      Right (_, logs) -> putStr (unlines logs)
-      Left err        -> putStrLn $ "Error: " ++ err
+  mterm <- handleParseError (evaluate (parseTerm src))
+  case mterm of
+    Left err -> putStrLn $ "Error: " ++ err
+    Right term -> do
+      let results = runFreshMT $ runExceptT $ runWriterT (infer envNamed CEmpty term :: WriterT Log (ExceptT String (FreshMT [])) Ty)
+      case results of
+        [] -> putStrLn "Error: No solution found"
+        (result:_) -> case result of
+          Right (_, logs) -> putStr (unlines logs)
+          Left err        -> putStrLn $ "Error: " ++ err
 
 showEnvNamed :: Env -> IO ()
 showEnvNamed envNamed = putStrLn (show envNamed)
@@ -115,8 +128,25 @@ printResult (name, expr, success, result) = do
     else putStrLn $ "  Error: " ++ result
   putStrLn ""
 
+-- Handle parse errors by catching exceptions (including lexical errors)
+handleParseError :: IO a -> IO (Either String a)
+handleParseError action = catch (Right <$> action) handler
+  where
+    handler :: SomeException -> IO (Either String a)
+    handler e = return (Left (extractErrorMessage e))
+
+-- Extract a cleaner error message from exceptions
+extractErrorMessage :: SomeException -> String
+extractErrorMessage e = 
+  let msg = show e
+  in if "lexical error" `isInfixOf` msg
+     then "lexical error"
+     else if "parse error" `isInfixOf` msg
+          then "parse error"
+          else msg
+
 -- Parse a definition line of the form "<name> : <type>"
-parseDefine :: String -> Either String (String, Ty)
+parseDefine :: String -> Either String (String, String)
 parseDefine s =
   case break (== ':') s of
     (lhs, ':' : rhs) ->
@@ -124,7 +154,7 @@ parseDefine s =
           tyStr = trim rhs
       in if null name || null tyStr
            then Left "Usage: :define <name> : <type>"
-           else Right (name, parseTyp tyStr)
+           else Right (name, tyStr)
     _ -> Left "Usage: :define <name> : <type>"
   where
     trim = f . f

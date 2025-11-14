@@ -6,7 +6,7 @@ import Control.Monad.Writer
 import Log
 import Syntax
 import Unbound.Generics.LocallyNameless
-import Control.Applicative (Alternative, (<|>), empty)
+import Control.Applicative (Alternative, (<|>))
 import Control.Monad.Error.Class (MonadError, throwError)
 
 -- ANSI color code for yellow (not in Log.hs)
@@ -312,7 +312,7 @@ infer env CEmpty (Var i) = do
     Just tyA -> do
       tell ["[Ty-Var] " ++ logInferFull env CEmpty (Var i) tyA]    
       return tyA
-    Nothing -> empty
+    Nothing -> throwError $ name2String i ++ " is not in the environment"
 infer env CEmpty (Ann tm tyA) = do
   (_, _log) <- peek $ infer env (CFullType tyA) tm
   tell ["[Ty-Ann] " ++ logInferFull env CEmpty (Ann tm tyA) tyA]
