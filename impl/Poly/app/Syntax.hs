@@ -100,7 +100,7 @@ prettyTyp' p (TForall b) = do
   s <- prettyTyp' PrecAtom ty
   let result = "forall " ++ name2String a ++ ". " ++ s
   return $ if p <= PrecAtom then result else "(" ++ result ++ ")"
-prettyTyp' p (TUncurry ts t) = do
+prettyTyp' _p (TUncurry ts t) = do
   tsStrs <- mapM (prettyTyp' PrecAtom) ts
   tStr <- prettyTyp' PrecAtom t
   return $ "{" ++ intercalate ", " tsStrs ++ "} -> " ++ tStr
@@ -175,14 +175,14 @@ prettyTerm' p (Ann e ty) = do
   tyStr <- prettyTyp' PrecAtom ty
   let s1' = if p <= PrecAnnTerm then s1 else "(" ++ s1 ++ ")"
   return $ s1' ++ " : " ++ tyStr
-prettyTerm' p (Pair e1 e2) = do
+prettyTerm' _p (Pair e1 e2) = do
   s1 <- prettyTerm' PrecAtomTerm e1
   s2 <- prettyTerm' PrecAtomTerm e2
   return $ "<" ++ s1 ++ ", " ++ s2 ++ ">"
-prettyTerm' p (Fst e) = do
+prettyTerm' _p (Fst e) = do
   s <- prettyTerm' PrecAtomTerm e
   return $ "fst " ++ s
-prettyTerm' p (Snd e) = do
+prettyTerm' _p (Snd e) = do
   s <- prettyTerm' PrecAtomTerm e
   return $ "snd " ++ s
 
@@ -304,7 +304,11 @@ isOpen :: (Fresh m, Alternative m) => Env -> Ty -> m ()
 -- open env ty | trace ("open " ++ " |- " ++ show ty) False = undefined
 isOpen senv ty = closed senv ty *> empty <|> return ()
 
-data Polar = Pos | Neg deriving (Show, Eq)  
+data Polar = Pos | Neg deriving (Eq)  
+
+instance Show Polar where
+  show Pos = "≤+"
+  show Neg = "≤-"
 
 flipPolar :: Polar -> Polar
 flipPolar Pos = Neg
