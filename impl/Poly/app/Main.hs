@@ -1,6 +1,7 @@
 module Main where
 import Parser (parseTyp, parseTerm)
 import Control.Monad.Writer
+import Control.Monad.Except
 import Examples (examplesList, Example(exampleName, exampleString), preEnvStrings)
 import Infer
 import Syntax
@@ -42,18 +43,22 @@ repl envNamed env = do
 showInfer :: Env -> Env -> String -> IO ()
 showInfer envNamed _env src = do
   let term = parseTerm src
-      results = runFreshMT $ runWriterT (infer envNamed CEmpty term :: WriterT Log (FreshMT []) Ty)
+      results = runFreshMT $ runExceptT $ runWriterT (infer envNamed CEmpty term :: WriterT Log (ExceptT String (FreshMT [])) Ty)
   case results of
-    ((ty, _):_) -> putStrLn (show ty)
-    []          -> putStrLn "failure"
+    [] -> putStrLn "Error: No solution found"
+    (result:_) -> case result of
+      Right (ty, _) -> putStrLn (show ty)
+      Left err      -> putStrLn $ "Error: " ++ err
 
 showTree :: Env -> Env -> String -> IO ()
 showTree envNamed _env src = do
   let term = parseTerm src
-      results = runFreshMT $ runWriterT (infer envNamed CEmpty term :: WriterT Log (FreshMT []) Ty)
+      results = runFreshMT $ runExceptT $ runWriterT (infer envNamed CEmpty term :: WriterT Log (ExceptT String (FreshMT [])) Ty)
   case results of
-    ((_, logs):_) -> putStr (unlines logs)
-    []            -> putStrLn "failure"
+    [] -> putStrLn "Error: No solution found"
+    (result:_) -> case result of
+      Right (_, logs) -> putStr (unlines logs)
+      Left err        -> putStrLn $ "Error: " ++ err
 
 showEnvNamed :: Env -> IO ()
 showEnvNamed envNamed = putStrLn (show envNamed)

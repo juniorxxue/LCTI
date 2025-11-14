@@ -320,12 +320,11 @@ inst (ETrm x ty env) a tyA = do
 inst (EUvar a env) b tyA = do
   env' <- inst env b tyA
   return $ EUvar a env'
-inst (EEvar a env) b tyA = do
-  _ <- guard (a == b)
-  env' <- inst env b tyA
-  return $ ESvar a tyA env'
+inst (EEvar a env) b tyA = if a == b 
+  then Just $ ESvar a tyA env
+  else do
+    env' <- inst env b tyA
+    return $ EEvar a env'
 inst (ESvar ty a env) b tyA = do
   env' <- inst env b tyA
   return $ ESvar ty a env'
-
-

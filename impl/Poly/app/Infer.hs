@@ -10,6 +10,16 @@ import Control.Applicative (Alternative, (<|>), empty)
 import Debug.Trace
 import Control.Monad.Error.Class (MonadError, throwError)
 
+-- ANSI color code for yellow (not in Log.hs)
+yellow :: String
+yellow = "\ESC[33m"
+
+-- Helper function to format error messages with context
+formatError :: String -> [(String, String)] -> String
+formatError msg context = 
+  bold ++ red ++ "ERROR: " ++ reset ++ bold ++ msg ++ reset ++ "\n" ++
+  concatMap (\(label, value) -> "  " ++ yellow ++ label ++ reset ++ ": " ++ value ++ "\n") context
+
 ensure :: MonadError String m => Bool -> String -> m ()
 ensure cond msg = unless cond (throwError msg)
 
@@ -17,7 +27,10 @@ findSol :: (MonadError String m) => Env -> TyName -> m Ty
 findSol env a = do
   case lookupTyVar env a of
     Just (Svar ty) -> return ty
-    _ -> throwError "findSol: lookupTyVar failed"    
+    _ -> throwError $ formatError "findSol: lookupTyVar failed" 
+           [("Function", "findSol")
+           ,("Type variable", show a)
+           ,("Environment", show env)]    
 
 ssub :: (MonadWriter Log m, MonadFail m, Fresh m, MonadError String m) => (Env, Env) -> Ty -> Polar -> Ty -> m Env
 -- ssub (env, senv) b p c | trace ("ssub " ++ ";" ++ show senv ++ " |- " ++ show b ++ " " ++ show p ++ " " ++ show c) False = undefined
@@ -31,31 +44,63 @@ ssub (env, senv) (TVar a) p (TVar b) | isUvar (envConcat env senv) a && a == b =
   tell ["[S-Refl] " ++ logSSubFull (env, senv) (TVar a) p (TVar b) senv]
   return senv
 ssub (env, senv) (TVar a) Pos tyA = do
-  case lookupTyVar env a of
+  case lookupTyVar (envConcat env senv) a of
     Just Evar -> do 
       case inst senv a tyA of
         Just newenv -> do
           tell ["[S-MVar-L] " ++ logSSubFull (env, senv) (TVar a) Pos tyA newenv]
           return newenv
-        Nothing -> throwError $ "ssub: inst failed" ++ show a ++ " " ++ show tyA
+        Nothing -> throwError $ formatError "ssub: inst failed" 
+                   [("Function", "ssub [S-MVar-L]")
+                   ,("Polarity", "Pos")
+                   ,("Type variable", show a)
+                   ,("Type", show tyA)
+                   ,("Solution environment", show senv)]
     Just (Svar tyB) -> do
-      ensure (tyA `aeq` tyB) "ssub: tyA /= tyB"
+      ensure (tyA `aeq` tyB) $ formatError "ssub: type mismatch (tyA /= tyB)" 
+              [("Function", "ssub [S-SVar-L]")
+              ,("Polarity", "Pos")
+              ,("Type variable", show a)
+              ,("Expected type", show tyB)
+              ,("Actual type", show tyA)
+              ,("Solution environment", show senv)]
       tell ["[S-SVar-L] " ++ logSSubFull (env, senv) (TVar a) Pos tyA senv]
       return senv
-    _ -> throwError $ "ssub: lookupTyVar failed" ++ show senv ++ " " ++ show tyA  
+    _ -> throwError $ formatError "ssub: lookupTyVar failed" 
+           [("Function", "ssub [S-MVar-L/S-SVar-L]")
+           ,("Polarity", "Pos")
+           ,("Type variable", show a)
+           ,("Type", show tyA)
+           ,("Solution environment", show senv)]  
 ssub (env, senv) tyA Neg (TVar a) = do
-  case lookupTyVar env a of
+  case lookupTyVar (envConcat env senv) a of
     Just Evar -> do
       case inst senv a tyA of
         Just newenv -> do
           tell ["[S-MVar-R] " ++ logSSubFull (env, senv) (TVar a) Neg tyA newenv]
           return newenv
-        Nothing -> throwError $ "ssub: inst failed" ++ show a ++ " " ++ show tyA
+        Nothing -> throwError $ formatError "ssub: inst failed" 
+                   [("Function", "ssub [S-MVar-R]")
+                   ,("Polarity", "Neg")
+                   ,("Type variable", show a)
+                   ,("Type", show tyA)
+                   ,("Solution environment", show senv)]
     Just (Svar tyB) -> do
-      ensure (tyA `aeq` tyB) "ssub: tyA /= tyB"
+      ensure (tyA `aeq` tyB) $ formatError "ssub: type mismatch (tyA /= tyB)" 
+              [("Function", "ssub [S-SVar-R]")
+              ,("Polarity", "Neg")
+              ,("Type variable", show a)
+              ,("Expected type", show tyB)
+              ,("Actual type", show tyA)
+              ,("Solution environment", show senv)]
       tell ["[S-SVar-R] " ++ logSSubFull (env, senv) (TVar a) Neg tyA senv]
       return senv
-    _ -> throwError $ "ssub: lookupTyVar failed" ++ show senv ++ " " ++ show tyA  
+    _ -> throwError $ formatError "ssub: lookupTyVar failed" 
+           [("Function", "ssub [S-MVar-R/S-SVar-R]")
+           ,("Polarity", "Neg")
+           ,("Type variable", show a)
+           ,("Type", show tyA)
+           ,("Solution environment", show senv)]  
 ssub (env, senv) (TArr tyA tyB) p (TArr tyC tyD) = do
   (senv1, _log1) <- peek $ ssub (env, senv) tyC (flipPolar p) tyA
   (senv2, _log2) <- peek $ ssub (env, senv1) tyB p tyD
@@ -76,7 +121,11 @@ ssub (env, senv) (TUncurry tsA tyA) p (TUncurry tsC tyD) | length tsA == length 
   return senv2
 ssub (env, senv) (TForall bdA) p (TForall bdB) = do
   mAB <- unbind2 bdA bdB
-  (a, tyA, _, tyB) <- maybe (throwError "ssub: unbind2 failed") pure mAB
+  (a, tyA, _, tyB) <- maybe (throwError $ formatError "ssub: unbind2 failed" 
+                             [("Function", "ssub [S-Forall]")
+                             ,("Polarity", show p)
+                             ,("Left type", show (TForall bdA))
+                             ,("Right type", show (TForall bdB))]) pure mAB
   (EUvar _ senv', _log) <- peek $ ssub (env, EUvar a senv) tyA p tyB
   tell ["[S-Forall] " ++ logSSubFull (env, senv) (TForall bdA) p (TForall bdB) senv']
   tell $ indentAll _log
@@ -101,7 +150,12 @@ ssub (env, senv) (TST tyA tyB) p (TST tyC tyD) = do
   tell $ indentAll _log2
   tell $ indentAll _log3
   return senv3
-ssub _ _ _ _ = fail "ssub: unexpected case"
+ssub (_, senv) ty1 p ty2 = throwError $ formatError "ssub: unexpected case" 
+                          [("Function", "ssub")
+                          ,("Left type", show ty1)
+                          ,("Polarity", show p)
+                          ,("Right type", show ty2)
+                          ,("Solution environment", show senv)]
 
 ground :: (MonadWriter Log m, Fresh m, MonadFail m, MonadError String m) => Env -> Ty -> m Ty
 -- ground a b | trace ("ground " ++ show a ++ " |- " ++ show b) False = undefined
@@ -209,7 +263,13 @@ sub (env, senv) (TVar k) (CTerm e h) | isUvar (envConcat env senv) k = do
       tell ["[S-Infers] " ++ logSubFull (env, senv) (TVar k) (CTerm e h) newenv tyA]
       tell $ indentAll _log
       return (newenv, tyA)
-    Nothing -> fail "sub: inst failed"
+    Nothing -> throwError $ formatError "sub: inst failed" 
+               [("Function", "sub [S-Infers]")
+               ,("Type variable", show k)
+               ,("Type", show tyA)
+               ,("Term", show e)
+               ,("Context", show h)
+               ,("Solution environment", show senv)]
 sub (env, senv) (TProd tyA tyB) (CFst h) = do
   ((senv', tyA'), _log) <- peek $ sub (env, senv) tyA h
   tell ["[S-Prod-Fst] " ++ logSubFull (env, senv) (TProd tyA tyB) (CFst h) senv' tyA']
@@ -220,7 +280,11 @@ sub (env, senv) (TProd tyA tyB) (CSnd h) = do
   tell ["[S-Prod-Snd] " ++ logSubFull (env, senv) (TProd tyA tyB) (CSnd h) senv' tyB']
   tell $ indentAll _log
   return (senv', TProd tyA tyB')
-sub _ _ _ = fail "sub: unexpected case"
+sub (_, senv) ty ctx = throwError $ formatError "sub: unexpected case" 
+                     [("Function", "sub")
+                     ,("Type", show ty)
+                     ,("Context", show ctx)
+                     ,("Solution environment", show senv)]
 
 infers :: (MonadWriter Log m, Fresh m, Alternative m, MonadFail m, MonadError String m) => Env -> Context -> m Ty
 infers env (CFullType tyA) = do
@@ -233,7 +297,10 @@ infers env (CTerm tm h) = do
   tell $ indentAll _log1
   tell $ indentAll _log2
   return $ TArr tyA tyB
-infers _ _ = fail "infers: unexpected case"
+infers env ctx = throwError $ formatError "infers: unexpected case" 
+                 [("Function", "infers")
+                 ,("Context", show ctx)
+                 ,("Environment", show env)]
 
 infer :: (MonadWriter Log m, Fresh m, Alternative m, MonadFail m, MonadError String m) => Env -> Context -> Tm -> m Ty
 infer a b c | trace ("infer " ++ " |- " ++ show b ++ " => " ++ show c) False = undefined
@@ -367,7 +434,13 @@ infer env h (Fst tm) = do
       tell ["[Ty-Fst] " ++ logInferFull env h (Fst tm) tyA]
       tell $ indentAll _log1
       return tyA
-    _ -> fail "infer: unexpected case"
+    _ -> throwError $ formatError "infer: Fst expected TProd but got different type" 
+           [("Function", "infer [Ty-Fst]")
+           ,("Term", show (Fst tm))
+           ,("Context", show h)
+           ,("Expected type", "TProd tyA tyB")
+           ,("Actual type", show ty)
+           ,("Environment", show env)]
 infer env h (Snd tm) = do
   (ty, _log1) <- peek $ infer env (CSnd h) tm
   case ty of
@@ -375,7 +448,13 @@ infer env h (Snd tm) = do
       tell ["[Ty-Snd] " ++ logInferFull env h (Snd tm) tyB]
       tell $ indentAll _log1
       return tyB
-    _ -> fail "infer: unexpected case"
+    _ -> throwError $ formatError "infer: Snd expected TProd but got different type" 
+           [("Function", "infer [Ty-Snd]")
+           ,("Term", show (Snd tm))
+           ,("Context", show h)
+           ,("Expected type", "TProd tyA tyB")
+           ,("Actual type", show ty)
+           ,("Environment", show env)]
 infer env (CFst h) (Pair tm1 tm2) = do
   (tyA, _log1) <- peek $ infer env h tm1
   (tyB, _log2) <- peek $ infer env CEmpty tm2
@@ -418,4 +497,10 @@ infer env CEmpty Nil = do
   let tyNil = TForall (bind (s2n "a") (TList (TVar (s2n "a"))))
   tell ["[Ty-Nil] " ++ logInferFull env CEmpty Nil tyNil]
   return tyNil
-infer _ _ _ = throwError "infer: unexpected case"
+infer env ctx tm = throwError $ formatError "infer: unexpected case" 
+                   [("Function", "infer")
+                   ,("Term", show tm)
+                   ,("Context", show ctx)
+                   ,("Environment", show env)]
+
+-- Λa. (λx. h x @ a : (int -> a -> a))                   
