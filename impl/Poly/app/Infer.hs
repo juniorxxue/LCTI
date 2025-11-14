@@ -9,16 +9,6 @@ import Unbound.Generics.LocallyNameless
 import Control.Applicative (Alternative, (<|>))
 import Control.Monad.Error.Class (MonadError, throwError)
 
--- ANSI color code for yellow (not in Log.hs)
-yellow :: String
-yellow = "\ESC[33m"
-
--- Helper function to format error messages with context
-formatError :: String -> [(String, String)] -> String
-formatError msg context = 
-  bold ++ red ++ "ERROR: " ++ reset ++ bold ++ msg ++ reset ++ "\n" ++
-  concatMap (\(label, value) -> "  " ++ yellow ++ label ++ reset ++ ": " ++ value ++ "\n") context
-
 ensure :: MonadError String m => Bool -> String -> m ()
 ensure cond msg = unless cond (throwError msg)
 
