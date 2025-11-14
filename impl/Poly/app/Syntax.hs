@@ -23,9 +23,7 @@ import Unbound.Generics.LocallyNameless
 
 import GHC.Generics
 import Data.Typeable (Typeable)
-import Control.Monad (guard)
 import Control.Applicative (Alternative, empty, (<|>))
-import Debug.Trace
 
 type TyName = Name Ty
 type TmName = Name Tm
@@ -78,20 +76,21 @@ prettyTyp' _ TInt = return "int"
 prettyTyp' _ TBool = return "bool"
 prettyTyp' _ (TVar a) = return (name2String a)
 prettyTyp' p (TArr t1 t2) = do
-  -- Arrow is right-associative
-  -- Left side: if it's an arrow, needs parentheses; if it's a product, no parentheses needed
-  -- Right side: same precedence (right-associative)
   s1 <- case t1 of
     TArr _ _ -> do
       s <- prettyTyp' PrecArr t1
+      return $ "(" ++ s ++ ")"
+    TForall _ -> do
+      s <- prettyTyp' PrecAtom t1
+      return $ "(" ++ s ++ ")"
+    TUncurry _ _ -> do
+      s <- prettyTyp' PrecAtom t1
       return $ "(" ++ s ++ ")"
     _ -> prettyTyp' PrecProd t1
   s2 <- prettyTyp' PrecArr t2
   let result = s1 ++ " -> " ++ s2
   return $ if p <= PrecArr then result else "(" ++ result ++ ")"
 prettyTyp' p (TProd t1 t2) = do
-  -- Product is left-associative, so left side uses same precedence
-  -- Right side uses higher precedence (PrecAtom)
   s1 <- prettyTyp' PrecProd t1
   s2 <- prettyTyp' PrecAtom t2
   let s1' = if p <= PrecProd then s1 else "(" ++ s1 ++ ")"
@@ -99,7 +98,8 @@ prettyTyp' p (TProd t1 t2) = do
 prettyTyp' p (TForall b) = do
   (a, ty) <- unbind b
   s <- prettyTyp' PrecAtom ty
-  return $ "forall " ++ name2String a ++ ". " ++ s
+  let result = "forall " ++ name2String a ++ ". " ++ s
+  return $ if p <= PrecAtom then result else "(" ++ result ++ ")"
 prettyTyp' p (TUncurry ts t) = do
   tsStrs <- mapM (prettyTyp' PrecAtom) ts
   tStr <- prettyTyp' PrecAtom t
@@ -186,7 +186,6 @@ prettyTerm' p (Snd e) = do
   s <- prettyTerm' PrecAtomTerm e
   return $ "snd " ++ s
 
--- Convenience functions that run in the Fresh monad
 prettyTypIO :: Ty -> String
 prettyTypIO ty = head (runFreshMT (prettyTyp ty))
 
@@ -288,7 +287,7 @@ isSvar env a = case lookupTyVar env a of
   _ -> False
   
 closed :: (Fresh m, Alternative m) => Env -> Ty -> m ()
-closed env ty | trace ("closed " ++ " |- " ++ show ty) False = undefined
+-- closed env ty | trace ("closed " ++ " |- " ++ show ty) False = undefined
 closed _ TInt = return ()
 closed _ TBool = return ()
 closed senv (TVar a) = if isEvar senv a then empty else return ()
@@ -302,7 +301,7 @@ closed senv (TProd t1 t2) = (closed senv t1) >> (closed senv t2)
 closed senv (TST t1 t2) = (closed senv t1) >> (closed senv t2)
 
 isOpen :: (Fresh m, Alternative m) => Env -> Ty -> m ()
-open env ty | trace ("open " ++ " |- " ++ show ty) False = undefined
+-- open env ty | trace ("open " ++ " |- " ++ show ty) False = undefined
 isOpen senv ty = closed senv ty *> empty <|> return ()
 
 data Polar = Pos | Neg deriving (Show, Eq)  

@@ -7,7 +7,6 @@ import Log
 import Syntax
 import Unbound.Generics.LocallyNameless
 import Control.Applicative (Alternative, (<|>), empty)
-import Debug.Trace
 import Control.Monad.Error.Class (MonadError, throwError)
 
 -- ANSI color code for yellow (not in Log.hs)
@@ -29,8 +28,7 @@ findSol env a = do
     Just (Svar ty) -> return ty
     _ -> throwError $ formatError "findSol: lookupTyVar failed" 
            [("Function", "findSol")
-           ,("Type variable", show a)
-           ,("Environment", show env)]    
+           ,("Type variable", show a)]    
 
 ssub :: (MonadWriter Log m, MonadFail m, Fresh m, MonadError String m) => (Env, Env) -> Ty -> Polar -> Ty -> m Env
 -- ssub (env, senv) b p c | trace ("ssub " ++ ";" ++ show senv ++ " |- " ++ show b ++ " " ++ show p ++ " " ++ show c) False = undefined
@@ -182,7 +180,7 @@ inferUncurry :: (MonadWriter Log m, Fresh m, Alternative m, MonadFail m, MonadEr
 inferUncurry (env, senv) tyA e = do
   isOpen (envConcat env senv) tyA
   (tyA', _log) <- peek $ infer (envConcat env senv) CEmpty e
-  (senv', _log') <- peek $ ssub (env, senv) tyA' Pos tyA
+  (senv', _log') <- peek $ ssub (env, senv) tyA' Neg tyA
   tell ["[UC-Infer] " ++ logInferUncurry (env, senv) tyA e tyA' senv']
   tell $ indentAll _log
   tell $ indentAll _log'
@@ -196,7 +194,7 @@ inferUncurry (env, senv) tyA e = do
   return (senv, tyA)
 
 sub :: (MonadWriter Log m, Fresh m, Alternative m, MonadFail m, MonadError String m) => (Env, Env) -> Ty -> Context -> m (Env, Ty)
-sub (a1, a2) b c | trace ("sub " ++ ";" ++ show a2 ++ " |- " ++ show b ++ " <: " ++ show c) False = undefined
+-- sub (a1, a2) b c | trace ("sub " ++ ";" ++ show a2 ++ " |- " ++ show b ++ " <: " ++ show c) False = undefined
 sub (env, senv) tyA CEmpty = do  
   closed (envConcat env senv) tyA
   grdA <- ground (envConcat env senv) tyA
@@ -297,13 +295,12 @@ infers env (CTerm tm h) = do
   tell $ indentAll _log1
   tell $ indentAll _log2
   return $ TArr tyA tyB
-infers env ctx = throwError $ formatError "infers: unexpected case" 
+infers _env ctx = throwError $ formatError "infers: unexpected case" 
                  [("Function", "infers")
-                 ,("Context", show ctx)
-                 ,("Environment", show env)]
+                 ,("Context", show ctx)]
 
 infer :: (MonadWriter Log m, Fresh m, Alternative m, MonadFail m, MonadError String m) => Env -> Context -> Tm -> m Ty
-infer a b c | trace ("infer " ++ " |- " ++ show b ++ " => " ++ show c) False = undefined
+-- infer a b c | trace ("infer " ++ " |- " ++ show b ++ " => " ++ show c) False = undefined
 infer env CEmpty (LitInt n) = do
   tell ["[Ty-Int] " ++ logInferFull env CEmpty (LitInt n) TInt]
   return TInt
@@ -439,8 +436,7 @@ infer env h (Fst tm) = do
            ,("Term", show (Fst tm))
            ,("Context", show h)
            ,("Expected type", "TProd tyA tyB")
-           ,("Actual type", show ty)
-           ,("Environment", show env)]
+           ,("Actual type", show ty)]
 infer env h (Snd tm) = do
   (ty, _log1) <- peek $ infer env (CSnd h) tm
   case ty of
@@ -453,8 +449,7 @@ infer env h (Snd tm) = do
            ,("Term", show (Snd tm))
            ,("Context", show h)
            ,("Expected type", "TProd tyA tyB")
-           ,("Actual type", show ty)
-           ,("Environment", show env)]
+           ,("Actual type", show ty)]
 infer env (CFst h) (Pair tm1 tm2) = do
   (tyA, _log1) <- peek $ infer env h tm1
   (tyB, _log2) <- peek $ infer env CEmpty tm2
@@ -485,7 +480,7 @@ infer env CEmpty (TAbs bdTm) = do
 infer env h (TApp tm tyA) = do
   (TForall bdTy, _log1) <- peek $ infer env CEmpty tm
   (a, tyB) <- unbind bdTy
-  ((EEmpty, tyC), _log2) <- peek $ sub (env, EEmpty) (subst a tyB tyA) h
+  ((EEmpty, tyC), _log2) <- peek $ sub (env, EEmpty) (subst a tyA tyB) h
   tell ["[Ty-TApp] " ++ logInferFull env h (TApp tm tyA) tyC]
   tell $ indentAll _log1
   tell $ indentAll _log2
@@ -497,10 +492,7 @@ infer env CEmpty Nil = do
   let tyNil = TForall (bind (s2n "a") (TList (TVar (s2n "a"))))
   tell ["[Ty-Nil] " ++ logInferFull env CEmpty Nil tyNil]
   return tyNil
-infer env ctx tm = throwError $ formatError "infer: unexpected case" 
+infer _env ctx tm = throwError $ formatError "infer: unexpected case" 
                    [("Function", "infer")
                    ,("Term", show tm)
-                   ,("Context", show ctx)
-                   ,("Environment", show env)]
-
--- Λa. (λx. h x @ a : (int -> a -> a))                   
+                   ,("Context", show ctx)]

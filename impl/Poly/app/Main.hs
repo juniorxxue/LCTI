@@ -16,9 +16,9 @@ preEnv = foldr (\(name, tyStr) env -> ETrm (s2n name) (parseTyp tyStr) env) EEmp
 main :: IO ()
 main = do
   putStrLn "Welcome to the type inference REPL of Fc. Type :q to quit."
-  putStrLn "Available commands: :tree, :env, :examples, :define <name> : <type>"
+  putStrLn "Available commands: :tree, :env, :examples, :tests, :define <name> : <type>"
   runInputT defaultSettings (repl preEnv preEnv)
--- The REPL maintains a current named environment and its de Bruijn-converted form
+
 repl :: Env -> Env -> InputT IO ()
 repl envNamed env = do
   minput <- getInputLine "> "
@@ -29,6 +29,7 @@ repl envNamed env = do
       | Just rest <- stripPrefix ":tree " input     -> liftIO (showTree envNamed env rest) >> repl envNamed env
       | Just _    <- stripPrefix ":env" input       -> liftIO (showEnvNamed envNamed) >> repl envNamed env
       | Just _    <- stripPrefix ":examples" input  -> liftIO showExamples >> repl envNamed env
+      | Just _    <- stripPrefix ":tests" input     -> liftIO (runTests envNamed env) >> repl envNamed env
       | Just rest <- stripPrefix ":define " input   -> do
           let mDef = parseDefine rest
           case mDef of
@@ -71,6 +72,48 @@ stripPrefix pre s =
 showExamples :: IO ()
 showExamples =
   mapM_ (\example -> putStrLn (exampleName example ++ ":\n " ++ exampleString example ++ "\n")) examplesList
+
+-- Run all examples and show type inference results
+runTests :: Env -> Env -> IO ()
+runTests envNamed _env = do
+  putStrLn "=== Running all examples ===\n"
+  let results = map (testExample envNamed) examplesList
+  mapM_ printResult results
+  putStrLn $ "\n=== Summary ==="
+  let total = length results
+      passed = length $ filter (\(_, _, success, _) -> success) results
+      failed = total - passed
+  putStrLn $ "Total: " ++ show total
+  putStrLn $ "Passed: " ++ show passed
+  putStrLn $ "Failed: " ++ show failed
+
+testExample :: Env -> Example -> (String, String, Bool, String)
+testExample envNamed example = 
+  let expr = exampleString example
+      name = exampleName example
+  in case parseAndInfer envNamed expr of
+    Right ty -> (name, expr, True, show ty)
+    Left err -> (name, expr, False, err)
+
+parseAndInfer :: Env -> String -> Either String Ty
+parseAndInfer envNamed src = 
+  let term = parseTerm src
+      results = runFreshMT $ runExceptT $ runWriterT (infer envNamed CEmpty term :: WriterT Log (ExceptT String (FreshMT [])) Ty)
+  in case results of
+    [] -> Left "No solution found"
+    (result:_) -> case result of
+      Right (ty, _) -> Right ty
+      Left err -> Left err
+
+printResult :: (String, String, Bool, String) -> IO ()
+printResult (name, expr, success, result) = do
+  let status = if success then "✓" else "✗"
+  putStrLn $ status ++ " " ++ name
+  putStrLn $ "  Expression: " ++ expr
+  if success
+    then putStrLn $ "  Type: " ++ result
+    else putStrLn $ "  Error: " ++ result
+  putStrLn ""
 
 -- Parse a definition line of the form "<name> : <type>"
 parseDefine :: String -> Either String (String, Ty)
