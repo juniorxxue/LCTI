@@ -61,8 +61,8 @@ int
 
 ### Available commands
 
-* `:tree <term>`: show the derivationtree of the given term.
-* `:env`: show the current environment for preloaded expressions.
+* `:tree <term>`: show the derivation tree of the given term.
+* `:env`: show the current environment (we preload some).
 * `:examples`: show a list of examples.
 * `:tests`: run all examples (failed cases accompanied with translation and errors).
 * `:define <name> : <type>`: introduce a new binding.
