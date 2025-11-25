@@ -1,7 +1,7 @@
 #  Local Contextual Type Inference (Artifact)
 
 **Note:** This version is published under [Zenodo](https://doi.org/10.5281/zenodo.17491013) and badged as *Resuable*. It is stable and for long-term study. 
-However for latest version (including new notation in Agda and polished implementation), we recommend switching to our default `publish` branch.
+However for latest version (including new notation in Agda and polished implementation), we recommend switching to our default `public` branch.
 
 ## Artifact Overview
 
