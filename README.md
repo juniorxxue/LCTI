@@ -1,7 +1,7 @@
 Paper: *Local Contextual Type Inference*. To appear at POPL 2026.
 
 Also check our [online Agda proof](https://types.hk/proof/lcti/). Preprint and extended version will be available soon.
-[Artifact Evaluation ver.](https://github.com/juniorxxue/LCTI/tree/popl26ae) contains more details about how to approach the code.
+[Artifact Evaluation ver. (Resuable Badge)](https://github.com/juniorxxue/LCTI/tree/popl26ae) contains more details about how to approach the code.
 
 ## Abstract
 > Type inference is essential for programming languages, yet complete
