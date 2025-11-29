@@ -1,9 +1,10 @@
 module Main where
 import Parser (parseTyp, parseTerm)
-import Control.Monad.Writer
 import Control.Monad.Except
+import Control.Monad.IO.Class (liftIO)
 import Examples (examplesList, Example(exampleName, exampleString), preEnvStrings)
 import Infer
+import Derivation (Derived(..), showDerivation)
 import Syntax
 import System.Console.Haskeline
 import Data.Char (isSpace)
@@ -42,7 +43,7 @@ repl envNamed env = do
               case mty of
                 Left err -> outputStrLn ("Error: " ++ err) >> repl envNamed env
                 Right tyNamed -> do
-                  let env' = ETrm (s2n name) tyNamed envNamed                  
+                  let env' = ETrm (s2n name) tyNamed envNamed
                   -- Echo the defined type for convenience
                   outputStrLn (show tyNamed)
                   repl env' env'
@@ -54,12 +55,12 @@ showInfer envNamed _env src = do
   case mterm of
     Left err -> putStrLn $ "Error: " ++ err
     Right term -> do
-      let results = runFreshMT $ runExceptT $ runWriterT (infer envNamed CEmpty term :: WriterT Log (ExceptT String (FreshMT [])) Ty)
+      let results = runFreshMT $ runExceptT (infer envNamed CEmpty term :: ExceptT String (FreshMT []) (Derived Ty))
       case results of
         [] -> putStrLn "Error: No solution found"
-        (result:_) -> case result of
-          Right (ty, _) -> putStrLn (show ty)
-          Left err      -> putStrLn $ "Error: " ++ err
+        (res:_) -> case res of
+          Right (Derived ty _) -> putStrLn (show ty)
+          Left err             -> putStrLn $ "Error: " ++ err
 
 showTree :: Env -> Env -> String -> IO ()
 showTree envNamed _env src = do
@@ -67,12 +68,12 @@ showTree envNamed _env src = do
   case mterm of
     Left err -> putStrLn $ "Error: " ++ err
     Right term -> do
-      let results = runFreshMT $ runExceptT $ runWriterT (infer envNamed CEmpty term :: WriterT Log (ExceptT String (FreshMT [])) Ty)
+      let results = runFreshMT $ runExceptT (infer envNamed CEmpty term :: ExceptT String (FreshMT []) (Derived Ty))
       case results of
         [] -> putStrLn "Error: No solution found"
-        (result:_) -> case result of
-          Right (_, logs) -> putStr (unlines logs)
-          Left err        -> putStrLn $ "Error: " ++ err
+        (res:_) -> case res of
+          Right (Derived _ d) -> putStr (showDerivation d)
+          Left err            -> putStrLn $ "Error: " ++ err
 
 showEnvNamed :: Env -> IO ()
 showEnvNamed envNamed = putStrLn (show envNamed)
@@ -101,7 +102,7 @@ runTests envNamed _env = do
   putStrLn $ "Failed: " ++ show failed
 
 testExample :: Env -> Example -> (String, String, Bool, String)
-testExample envNamed example = 
+testExample envNamed example =
   let expr = exampleString example
       name = exampleName example
   in case parseAndInfer envNamed expr of
@@ -109,23 +110,23 @@ testExample envNamed example =
     Left err -> (name, expr, False, err)
 
 parseAndInfer :: Env -> String -> Either String Ty
-parseAndInfer envNamed src = 
+parseAndInfer envNamed src =
   let term = parseTerm src
-      results = runFreshMT $ runExceptT $ runWriterT (infer envNamed CEmpty term :: WriterT Log (ExceptT String (FreshMT [])) Ty)
+      results = runFreshMT $ runExceptT (infer envNamed CEmpty term :: ExceptT String (FreshMT []) (Derived Ty))
   in case results of
     [] -> Left "No solution found"
-    (result:_) -> case result of
-      Right (ty, _) -> Right ty
+    (res:_) -> case res of
+      Right (Derived ty _) -> Right ty
       Left err -> Left err
 
 printResult :: (String, String, Bool, String) -> IO ()
-printResult (name, expr, success, result) = do
+printResult (name, expr, success, res) = do
   let status = if success then "✓" else "✗"
   putStrLn $ status ++ " " ++ name
   putStrLn $ "  Expression: " ++ expr
   if success
-    then putStrLn $ "  Type: " ++ result
-    else putStrLn $ "  Error: " ++ result
+    then putStrLn $ "  Type: " ++ res
+    else putStrLn $ "  Error: " ++ res
   putStrLn ""
 
 -- Handle parse errors by catching exceptions (including lexical errors)
@@ -137,7 +138,7 @@ handleParseError action = catch (Right <$> action) handler
 
 -- Extract a cleaner error message from exceptions
 extractErrorMessage :: SomeException -> String
-extractErrorMessage e = 
+extractErrorMessage e =
   let msg = show e
   in if "lexical error" `isInfixOf` msg
      then "lexical error"
