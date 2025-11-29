@@ -37,24 +37,24 @@ findSol env a = case lookupTyVar env a of
 ssub :: InferC m => (Env, Env) -> Ty -> Polar -> Ty -> m (Derived Env)
 
 -- [S-Int]
-ssub (env, senv) TInt p TInt =
-  axiomM "[S-Int]" (logSSubFull (env, senv) TInt p TInt senv) senv
+ssub envs@(_, senv) TInt p TInt =
+  axiomM "[S-Int]" (logSSubFull envs TInt p TInt senv) senv
 
 -- [S-Bool]
-ssub (env, senv) TBool p TBool =
-  axiomM "[S-Bool]" (logSSubFull (env, senv) TBool p TBool senv) senv
+ssub envs@(_, senv) TBool p TBool =
+  axiomM "[S-Bool]" (logSSubFull envs TBool p TBool senv) senv
 
 -- [S-Refl]
-ssub (env, senv) (TVar a) p (TVar b) | isUvar (envConcat env senv) a && a == b =
-  axiomM "[S-Refl]" (logSSubFull (env, senv) (TVar a) p (TVar b) senv) senv
+ssub envs@(env, senv) ty1@(TVar a) p ty2@(TVar b) | isUvar (envConcat env senv) a && a == b =
+  axiomM "[S-Refl]" (logSSubFull envs ty1 p ty2 senv) senv
 
 -- [S-MVar-L] / [S-SVar-L]
-ssub (env, senv) (TVar a) Pos tyA = do
+ssub envs@(env, senv) ty1@(TVar a) Pos tyA = do
   case lookupTyVar (envConcat env senv) a of
     Just Evar ->
       case inst senv a tyA of
         Just newenv ->
-          axiomM "[S-MVar-L]" (logSSubFull (env, senv) (TVar a) Pos tyA newenv) newenv
+          axiomM "[S-MVar-L]" (logSSubFull envs ty1 Pos tyA newenv) newenv
         Nothing -> throwError $ formatError "ssub: inst failed"
                    [("Function", "ssub [S-MVar-L]"), ("Polarity", "Pos")
                    ,("Type variable", show a), ("Type", show tyA)
@@ -64,19 +64,19 @@ ssub (env, senv) (TVar a) Pos tyA = do
               [("Function", "ssub [S-SVar-L]"), ("Polarity", "Pos")
               ,("Type variable", show a), ("Expected type", show tyB)
               ,("Actual type", show tyA), ("Solution environment", show senv)]
-      axiomM "[S-SVar-L]" (logSSubFull (env, senv) (TVar a) Pos tyA senv) senv
+      axiomM "[S-SVar-L]" (logSSubFull envs ty1 Pos tyA senv) senv
     _ -> throwError $ formatError "ssub: lookupTyVar failed"
            [("Function", "ssub [S-MVar-L/S-SVar-L]"), ("Polarity", "Pos")
            ,("Type variable", show a), ("Type", show tyA)
            ,("Solution environment", show senv)]
 
 -- [S-MVar-R] / [S-SVar-R]
-ssub (env, senv) tyA Neg (TVar a) = do
+ssub envs@(env, senv) tyA Neg ty2@(TVar a) = do
   case lookupTyVar (envConcat env senv) a of
     Just Evar ->
       case inst senv a tyA of
         Just newenv ->
-          axiomM "[S-MVar-R]" (logSSubFull (env, senv) tyA Neg (TVar a) newenv) newenv
+          axiomM "[S-MVar-R]" (logSSubFull envs tyA Neg ty2 newenv) newenv
         Nothing -> throwError $ formatError "ssub: inst failed"
                    [("Function", "ssub [S-MVar-R]"), ("Polarity", "Neg")
                    ,("Type variable", show a), ("Type", show tyA)
@@ -86,21 +86,21 @@ ssub (env, senv) tyA Neg (TVar a) = do
               [("Function", "ssub [S-SVar-R]"), ("Polarity", "Neg")
               ,("Type variable", show a), ("Expected type", show tyB)
               ,("Actual type", show tyA), ("Solution environment", show senv)]
-      axiomM "[S-SVar-R]" (logSSubFull (env, senv) tyA Neg (TVar a) senv) senv
+      axiomM "[S-SVar-R]" (logSSubFull envs tyA Neg ty2 senv) senv
     _ -> throwError $ formatError "ssub: lookupTyVar failed"
            [("Function", "ssub [S-MVar-R/S-SVar-R]"), ("Polarity", "Neg")
            ,("Type variable", show a), ("Type", show tyA)
            ,("Solution environment", show senv)]
 
 -- [S-Arr]
-ssub (env, senv) (TArr tyA tyB) p (TArr tyC tyD) =
-  deriveWith "[S-Arr]" (logSSubFull (env, senv) (TArr tyA tyB) p (TArr tyC tyD)) $ do
+ssub envs@(env, senv) ty1@(TArr tyA tyB) p ty2@(TArr tyC tyD) =
+  deriveWith "[S-Arr]" (logSSubFull envs ty1 p ty2) $ do
     senv1 <- premise $ ssub (env, senv) tyC (flipPolar p) tyA
     premise $ ssub (env, senv1) tyB p tyD
 
 -- [S-Uncurry]
-ssub (env, senv) (TUncurry tsA tyA) p (TUncurry tsC tyD) | length tsA == length tsC =
-  deriveWith "[S-Uncurry]" (logSSubFull (env, senv) (TUncurry tsA tyA) p (TUncurry tsC tyD)) $ do
+ssub envs@(env, senv) ty1@(TUncurry tsA tyA) p ty2@(TUncurry tsC tyD) | length tsA == length tsC =
+  deriveWith "[S-Uncurry]" (logSSubFull envs ty1 p ty2) $ do
     senv1 <- liftD $ foldM foldArg senv (zip tsA tsC)
     premise $ ssub (env, senv1) tyA p tyD
   where
@@ -109,30 +109,29 @@ ssub (env, senv) (TUncurry tsA tyA) p (TUncurry tsC tyD) | length tsA == length 
       return senv''
 
 -- [S-Forall]
-ssub (env, senv) (TForall bdA) p (TForall bdB) = do
+ssub envs@(env, senv) ty1@(TForall bdA) p ty2@(TForall bdB) = do
   mAB <- unbind2 bdA bdB
   (a, tyA, _, tyB) <- maybe (throwError $ formatError "ssub: unbind2 failed"
                              [("Function", "ssub [S-Forall]"), ("Polarity", show p)
-                             ,("Left type", show (TForall bdA))
-                             ,("Right type", show (TForall bdB))]) pure mAB
-  deriveWith "[S-Forall]" (logSSubFull (env, senv) (TForall bdA) p (TForall bdB)) $ do
+                             ,("Left type", show ty1), ("Right type", show ty2)]) pure mAB
+  deriveWith "[S-Forall]" (logSSubFull envs ty1 p ty2) $ do
     EUvar _ senv' <- premise $ ssub (env, EUvar a senv) tyA p tyB
     return senv'
 
 -- [S-List]
-ssub (env, senv) (TList tyA) p (TList tyB) =
-  deriveWith "[S-List]" (logSSubFull (env, senv) (TList tyA) p (TList tyB)) $ do
+ssub envs@(env, senv) ty1@(TList tyA) p ty2@(TList tyB) =
+  deriveWith "[S-List]" (logSSubFull envs ty1 p ty2) $ do
     premise $ ssub (env, senv) tyA p tyB
 
 -- [S-Prod]
-ssub (env, senv) (TProd tyA tyB) p (TProd tyC tyD) =
-  deriveWith "[S-Prod]" (logSSubFull (env, senv) (TProd tyA tyB) p (TProd tyC tyD)) $ do
+ssub envs@(env, senv) ty1@(TProd tyA tyB) p ty2@(TProd tyC tyD) =
+  deriveWith "[S-Prod]" (logSSubFull envs ty1 p ty2) $ do
     senv1 <- premise $ ssub (env, senv) tyA p tyC
     premise $ ssub (env, senv1) tyB p tyD
 
 -- [S-ST]
-ssub (env, senv) (TST tyA tyB) p (TST tyC tyD) =
-  deriveWith "[S-ST]" (logSSubFull (env, senv) (TST tyA tyB) p (TST tyC tyD)) $ do
+ssub envs@(env, senv) ty1@(TST tyA tyB) p ty2@(TST tyC tyD) =
+  deriveWith "[S-ST]" (logSSubFull envs ty1 p ty2) $ do
     senv1 <- premise $ ssub (env, senv) tyA p tyC
     senv2 <- premise $ ssub (env, senv1) tyB p tyD
     premise $ ssub (env, senv2) tyC p tyA
@@ -169,10 +168,10 @@ ground env (TST tyA tyB) = TST <$> ground env tyA <*> ground env tyB
 -------------------------------------------------------------------------------
 
 inferUncurry :: InferC m => (Env, Env) -> Ty -> Tm -> m (Derived (Env, Ty))
-inferUncurry (env, senv) tyA e =
+inferUncurry envs@(env, senv) tyA e =
   -- Try open first
   (do isOpen (envConcat env senv) tyA
-      deriveWith "[UC-Infer]" (\(senv', tyA') -> logInferUncurry (env, senv) tyA e tyA' senv') $ do
+      deriveWith "[UC-Infer]" (\(senv', tyA') -> logInferUncurry envs tyA e tyA' senv') $ do
         tyA' <- premise $ infer (envConcat env senv) CEmpty e
         senv' <- premise $ ssub (env, senv) tyA' Neg tyA
         return (senv', tyA'))
@@ -180,7 +179,7 @@ inferUncurry (env, senv) tyA e =
   -- Fallback to closed
   (do closed (envConcat env senv) tyA
       grdA <- ground (envConcat env senv) tyA
-      deriveWith "[UC-Check]" (const $ logInferUncurry (env, senv) tyA e tyA senv) $ do
+      deriveWith "[UC-Check]" (const $ logInferUncurry envs tyA e tyA senv) $ do
         _ <- premise $ infer (envConcat env senv) (CFullType grdA) e
         return (senv, tyA))
 
@@ -191,38 +190,38 @@ inferUncurry (env, senv) tyA e =
 sub :: InferC m => (Env, Env) -> Ty -> Context -> m (Derived (Env, Ty))
 
 -- [S-Empty]
-sub (env, senv) tyA CEmpty = do
+sub envs@(env, senv) tyA CEmpty = do
   closed (envConcat env senv) tyA
   grdA <- ground (envConcat env senv) tyA
-  axiomM "[S-Empty]" (logSubFull (env, senv) tyA CEmpty senv grdA) (senv, grdA)
+  axiomM "[S-Empty]" (logSubFull envs tyA CEmpty senv grdA) (senv, grdA)
 
 -- [S-Type]
-sub (env, senv) tyA (CFullType tyB) =
-  deriveWith "[S-Type]" (\(senv', _) -> logSubFull (env, senv) tyA (CFullType tyB) senv' tyB) $ do
+sub envs@(env, senv) tyA ctx@(CFullType tyB) =
+  deriveWith "[S-Type]" (\(senv', _) -> logSubFull envs tyA ctx senv' tyB) $ do
     senv' <- premise $ ssub (env, senv) tyA Pos tyB
     return (senv', tyB)
 
 -- [S-Term-Closed] <|> [S-Term-Open]
-sub (env, senv) (TArr tyA tyB) (CTerm e h) =
+sub envs@(env, senv) ty@(TArr tyA tyB) ctx@(CTerm e h) =
   -- Try closed first
   (do closed (envConcat env senv) tyA
       grdA <- ground (envConcat env senv) tyA
-      deriveWith "[S-Term-Closed]" (\(senv', tyD) -> logSubFull (env, senv) (TArr tyA tyB) (CTerm e h) senv' (TArr grdA tyD)) $ do
+      deriveWith "[S-Term-Closed]" (\(senv', tyD) -> logSubFull envs ty ctx senv' (TArr grdA tyD)) $ do
         tyC <- premise $ infer (envConcat env senv) (CFullType grdA) e
         (senv', tyD) <- premise $ sub (env, senv) tyB h
         return (senv', TArr tyC tyD))
   <|>
   -- Fallback to open
   (do isOpen (envConcat env senv) tyA
-      deriveWith "[S-Term-Open]" (\(senv2, tyD) -> logSubFull (env, senv) (TArr tyA tyB) (CTerm e h) senv2 (TArr tyA tyD)) $ do
+      deriveWith "[S-Term-Open]" (\(senv2, tyD) -> logSubFull envs ty ctx senv2 (TArr tyA tyD)) $ do
         tyC <- premise $ infer (envConcat env senv) CEmpty e
         senv1 <- premise $ ssub (env, senv) tyC Neg tyA
         (senv2, tyD) <- premise $ sub (env, senv1) tyB h
         return (senv2, TArr tyC tyD))
 
 -- [S-Arr-UC]
-sub (env, senv) (TUncurry tyAs tyB) (CUncurry es h) =
-  deriveWith "[S-Arr-UC]" (\(senv'', tyB') -> logSubFull (env, senv) (TUncurry tyAs tyB) (CUncurry es h) senv'' (TUncurry tyAs tyB')) $ do
+sub envs@(env, senv) ty@(TUncurry tyAs tyB) ctx@(CUncurry es h) =
+  deriveWith "[S-Arr-UC]" (\(senv'', tyB') -> logSubFull envs ty ctx senv'' (TUncurry tyAs tyB')) $ do
     (senv', tyAs') <- liftD $ foldM foldFunc (senv, []) (zip tyAs es)
     (senv'', tyB') <- premise $ sub (env, senv') tyB h
     return (senv'', TUncurry tyAs' tyB')
@@ -232,28 +231,28 @@ sub (env, senv) (TUncurry tyAs tyB) (CUncurry es h) =
       return (senv'', tyAs' ++ [tyA''])
 
 -- [S-Forall-L]
-sub (env, senv) (TForall bdA) (CTerm e h) = do
+sub envs@(env, senv) ty@(TForall bdA) ctx@(CTerm e h) = do
   (a, tyA) <- unbind bdA
-  deriveWith "[S-Forall-L]" (\(senv', tyB) -> logSubFull (env, senv) (TForall bdA) (CTerm e h) senv' tyB) $ do
+  deriveWith "[S-Forall-L]" (\(senv', tyB) -> logSubFull envs ty ctx senv' tyB) $ do
     (ESvar _ _ senv', tyB) <- premise $ sub (env, EEvar a senv) tyA (CTerm e h)
     return (senv', tyB)
 
 -- [S-Forall-L-UC]
-sub (env, senv) (TForall bdA) (CUncurry es h) = do
+sub envs@(env, senv) ty@(TForall bdA) ctx@(CUncurry es h) = do
   (a, tyA) <- unbind bdA
-  deriveWith "[S-Forall-L-UC]" (\(senv', tyB) -> logSubFull (env, senv) (TForall bdA) (CUncurry es h) senv' tyB) $ do
+  deriveWith "[S-Forall-L-UC]" (\(senv', tyB) -> logSubFull envs ty ctx senv' tyB) $ do
     (ESvar _ _ senv', tyB) <- premise $ sub (env, EEvar a senv) tyA (CUncurry es h)
     return (senv', tyB)
 
 -- [S-Svar]
-sub (env, senv) (TVar k) h | isSvar (envConcat env senv) k = do
+sub envs@(env, senv) ty@(TVar k) ctx | isSvar (envConcat env senv) k = do
   tyA <- findSol (envConcat env senv) k
-  deriveWith "[S-Svar]" (\(senv', tyB) -> logSubFull (env, senv) (TVar k) h senv' tyB) $ do
-    premise $ sub (env, senv) tyA h
+  deriveWith "[S-Svar]" (\(senv', tyB) -> logSubFull envs ty ctx senv' tyB) $ do
+    premise $ sub (env, senv) tyA ctx
 
 -- [S-Infers]
-sub (env, senv) (TVar k) (CTerm e h) | isUvar (envConcat env senv) k =
-  deriveWith "[S-Infers]" (\(newenv, tyA) -> logSubFull (env, senv) (TVar k) (CTerm e h) newenv tyA) $ do
+sub envs@(env, senv) ty@(TVar k) ctx@(CTerm e h) | isUvar (envConcat env senv) k =
+  deriveWith "[S-Infers]" (\(newenv, tyA) -> logSubFull envs ty ctx newenv tyA) $ do
     tyA <- premise $ infers (envConcat env senv) (CTerm e h)
     case inst senv k tyA of
       Just newenv -> return (newenv, tyA)
@@ -263,14 +262,14 @@ sub (env, senv) (TVar k) (CTerm e h) | isUvar (envConcat env senv) k =
                  ,("Solution environment", show senv)]
 
 -- [S-Prod-Fst]
-sub (env, senv) (TProd tyA tyB) (CFst h) =
-  deriveWith "[S-Prod-Fst]" (\(senv', tyA') -> logSubFull (env, senv) (TProd tyA tyB) (CFst h) senv' tyA') $ do
+sub envs@(env, senv) ty@(TProd tyA tyB) ctx@(CFst h) =
+  deriveWith "[S-Prod-Fst]" (\(senv', tyA') -> logSubFull envs ty ctx senv' (TProd tyA' tyB)) $ do
     (senv', tyA') <- premise $ sub (env, senv) tyA h
     return (senv', TProd tyA' tyB)
 
 -- [S-Prod-Snd]
-sub (env, senv) (TProd tyA tyB) (CSnd h) =
-  deriveWith "[S-Prod-Snd]" (\(senv', tyB') -> logSubFull (env, senv) (TProd tyA tyB) (CSnd h) senv' tyB') $ do
+sub envs@(env, senv) ty@(TProd tyA tyB) ctx@(CSnd h) =
+  deriveWith "[S-Prod-Snd]" (\(senv', tyB') -> logSubFull envs ty ctx senv' (TProd tyA tyB')) $ do
     (senv', tyB') <- premise $ sub (env, senv) tyB h
     return (senv', TProd tyA tyB')
 
@@ -285,11 +284,11 @@ sub (_, senv) ty ctx = throwError $ formatError "sub: unexpected case"
 
 infers :: InferC m => Env -> Context -> m (Derived Ty)
 
-infers env (CFullType tyA) =
-  axiomM "[CI-Type]" (logInfersFull env (CFullType tyA) tyA) tyA
+infers env ctx@(CFullType tyA) =
+  axiomM "[CI-Type]" (logInfersFull env ctx tyA) tyA
 
-infers env (CTerm tm h) =
-  deriveWith "[CI-Term]" (logInfersFull env (CTerm tm h)) $ do
+infers env ctx@(CTerm tm h) =
+  deriveWith "[CI-Term]" (logInfersFull env ctx) $ do
     tyA <- premise $ infer env CEmpty tm
     tyB <- premise $ infers env h
     return $ TArr tyA tyB
@@ -304,205 +303,203 @@ infers _env ctx = throwError $ formatError "infers: unexpected case"
 infer :: InferC m => Env -> Context -> Tm -> m (Derived Ty)
 
 -- [Ty-Int]
-infer env CEmpty (LitInt n) =
-  axiomM "[Ty-Int]" (logInferFull env CEmpty (LitInt n) TInt) TInt
+infer env ctx@CEmpty tm@(LitInt _) =
+  axiomM "[Ty-Int]" (logInferFull env ctx tm TInt) TInt
 
 -- [Ty-Bool]
-infer env CEmpty (LitBool b) =
-  axiomM "[Ty-Bool]" (logInferFull env CEmpty (LitBool b) TBool) TBool
+infer env ctx@CEmpty tm@(LitBool _) =
+  axiomM "[Ty-Bool]" (logInferFull env ctx tm TBool) TBool
 
 -- [Ty-Var]
-infer env CEmpty (Var i) = case lookupTmVar env i of
-  Just tyA -> axiomM "[Ty-Var]" (logInferFull env CEmpty (Var i) tyA) tyA
+infer env ctx@CEmpty tm@(Var i) = case lookupTmVar env i of
+  Just tyA -> axiomM "[Ty-Var]" (logInferFull env ctx tm tyA) tyA
   Nothing -> throwError $ name2String i ++ " is not in the environment"
 
 -- [Ty-Ann]
-infer env CEmpty (Ann tm tyA) =
-  deriveWith "[Ty-Ann]" (const $ logInferFull env CEmpty (Ann tm tyA) tyA) $ do
-    _ <- premise $ infer env (CFullType tyA) tm
+infer env ctx@CEmpty tm@(Ann e tyA) =
+  deriveWith "[Ty-Ann]" (const $ logInferFull env ctx tm tyA) $ do
+    _ <- premise $ infer env (CFullType tyA) e
     return tyA
 
 -- [Ty-App]
-infer env h (App tm1 tm2) =
-  deriveWith "[Ty-App]" (logInferFull env h (App tm1 tm2)) $ do
-    TArr _ ty <- premise $ infer env (CTerm tm2 h) tm1
+infer env ctx tm@(App tm1 tm2) =
+  deriveWith "[Ty-App]" (logInferFull env ctx tm) $ do
+    TArr _ ty <- premise $ infer env (CTerm tm2 ctx) tm1
     return ty
 
 -- [Ty-App-UC]
-infer env h (AppUncurry tm1 tm2s) =
-  deriveWith "[Ty-App-UC]" (logInferFull env h (AppUncurry tm1 tm2s)) $ do
-    TUncurry _ ty <- premise $ infer env (CUncurry tm2s h) tm1
+infer env ctx tm@(AppUncurry tm1 tm2s) =
+  deriveWith "[Ty-App-UC]" (logInferFull env ctx tm) $ do
+    TUncurry _ ty <- premise $ infer env (CUncurry tm2s ctx) tm1
     return ty
 
 -- [Ty-Abs1]
-infer env (CFullType (TArr tyA tyB)) (Abs bdTm) = do
-  (x, tm) <- unbind bdTm
-  deriveWith "[Ty-Abs1]" (logInferFull env (CFullType (TArr tyA tyB)) (Abs bdTm)) $ do
-    tyC <- premise $ infer (ETrm x tyA env) (CFullType tyB) tm
+infer env ctx@(CFullType (TArr tyA tyB)) tm@(Abs bdTm) = do
+  (x, body) <- unbind bdTm
+  deriveWith "[Ty-Abs1]" (logInferFull env ctx tm) $ do
+    tyC <- premise $ infer (ETrm x tyA env) (CFullType tyB) body
     return $ TArr tyA tyC
 
 -- [Ty-Abs2]
-infer env (CTerm tm2 h) (Abs bdTm) = do
-  (x, tm) <- unbind bdTm
-  deriveWith "[Ty-Abs2]" (logInferFull env (CTerm tm2 h) (Abs bdTm)) $ do
+infer env ctx@(CTerm tm2 h) tm@(Abs bdTm) = do
+  (x, body) <- unbind bdTm
+  deriveWith "[Ty-Abs2]" (logInferFull env ctx tm) $ do
     tyA <- premise $ infer env CEmpty tm2
-    tyB <- premise $ infer (ETrm x tyA env) h tm
+    tyB <- premise $ infer (ETrm x tyA env) h body
     return $ TArr tyA tyB
 
 -- [Ty-AbsAnn1]
-infer env (CFullType (TArr tyA tyB)) (AbsAnn bdTm) = do
-  ((x, Embed tyA'), tm) <- unbind bdTm
+infer env ctx@(CFullType tyArr@(TArr tyA tyB)) tm@(AbsAnn bdTm) = do
+  ((x, Embed tyA'), body) <- unbind bdTm
   guard (tyA `aeq` tyA')
-  deriveWith "[Ty-AbsAnn1]" (const $ logInferFull env (CFullType (TArr tyA tyB)) (AbsAnn bdTm) (TArr tyA tyB)) $ do
-    _ <- premise $ infer (ETrm x tyA env) (CFullType tyB) tm
-    return $ TArr tyA tyB
+  deriveWith "[Ty-AbsAnn1]" (const $ logInferFull env ctx tm tyArr) $ do
+    _ <- premise $ infer (ETrm x tyA env) (CFullType tyB) body
+    return tyArr
 
 -- [Ty-AbsAnn2]
-infer env (CTerm tm2 h) (AbsAnn bdTm) = do
-  ((x, Embed tyA), tm) <- unbind bdTm
-  deriveWith "[Ty-AbsAnn2]" (logInferFull env (CTerm tm2 h) (AbsAnn bdTm)) $ do
+infer env ctx@(CTerm tm2 h) tm@(AbsAnn bdTm) = do
+  ((x, Embed tyA), body) <- unbind bdTm
+  deriveWith "[Ty-AbsAnn2]" (logInferFull env ctx tm) $ do
     _ <- premise $ infer env (CFullType tyA) tm2
-    tyB <- premise $ infer (ETrm x tyA env) h tm
+    tyB <- premise $ infer (ETrm x tyA env) h body
     return $ TArr tyA tyB
 
 -- [Ty-AbsAnn3]
-infer env CEmpty (AbsAnn bdTm) = do
-  ((x, Embed tyA), tm) <- unbind bdTm
-  deriveWith "[Ty-AbsAnn3]" (logInferFull env CEmpty (AbsAnn bdTm)) $ do
-    tyB <- premise $ infer (ETrm x tyA env) CEmpty tm
+infer env ctx@CEmpty tm@(AbsAnn bdTm) = do
+  ((x, Embed tyA), body) <- unbind bdTm
+  deriveWith "[Ty-AbsAnn3]" (logInferFull env ctx tm) $ do
+    tyB <- premise $ infer (ETrm x tyA env) CEmpty body
     return $ TArr tyA tyB
 
 -- [Ty-AbsAnn-UC1]
-infer env (CFullType (TUncurry tyAs tyB)) (AbsUncurryAnn bdTm) = do
-  (xs_tyAs, tm) <- unbind bdTm
-  let xs = [x_A | (x_A, _) <- xs_tyAs]
-      tyAs' = [ty_A | (_, Embed ty_A) <- xs_tyAs]
+infer env ctx@(CFullType tyUC@(TUncurry tyAs tyB)) tm@(AbsUncurryAnn bdTm) = do
+  (xs_tyAs, body) <- unbind bdTm
+  let xs = [x | (x, _) <- xs_tyAs]
+      tyAs' = [ty | (_, Embed ty) <- xs_tyAs]
   guard $ all (uncurry aeq) (zip tyAs tyAs')
-  deriveWith "[Ty-AbsAnn-UC1]" (const $ logInferFull env (CFullType (TUncurry tyAs tyB)) (AbsUncurryAnn bdTm) (TUncurry tyAs tyB)) $ do
-    _ <- premise $ infer (foldl (\env' (x, tyA) -> ETrm x tyA env') env (zip xs tyAs')) (CFullType tyB) tm
-    return $ TUncurry tyAs tyB
+  deriveWith "[Ty-AbsAnn-UC1]" (const $ logInferFull env ctx tm tyUC) $ do
+    _ <- premise $ infer (foldl (\env' (x, tyA) -> ETrm x tyA env') env (zip xs tyAs')) (CFullType tyB) body
+    return tyUC
 
 -- [Ty-AbsAnn-UC2]
-infer env (CUncurry tm2s h) (AbsUncurryAnn bdTm) = do
-  (xs_tyAs, tm) <- unbind bdTm
-  let xs = [x_A | (x_A, _) <- xs_tyAs]
-      tyAs = [ty_A | (_, Embed ty_A) <- xs_tyAs]
-  deriveWith "[Ty-AbsAnn-UC2]" (logInferFull env (CUncurry tm2s h) (AbsUncurryAnn bdTm)) $ do
-    _ <- liftD $ mapM (\(tyA, tm2) -> infer env (CFullType tyA) tm2) (zip tyAs tm2s)
-    tyB <- premise $ infer (foldl (\env' (x, tyA) -> ETrm x tyA env') env (zip xs tyAs)) h tm
+infer env ctx@(CUncurry tm2s h) tm@(AbsUncurryAnn bdTm) = do
+  (xs_tyAs, body) <- unbind bdTm
+  let xs = [x | (x, _) <- xs_tyAs]
+      tyAs = [ty | (_, Embed ty) <- xs_tyAs]
+  deriveWith "[Ty-AbsAnn-UC2]" (logInferFull env ctx tm) $ do
+    _ <- liftD $ mapM (\(tyA, e) -> infer env (CFullType tyA) e) (zip tyAs tm2s)
+    tyB <- premise $ infer (foldl (\env' (x, tyA) -> ETrm x tyA env') env (zip xs tyAs)) h body
     return $ TUncurry tyAs tyB
 
 -- [Ty-AbsAnn-UC3]
-infer env CEmpty (AbsUncurryAnn bdTm) = do
-  (xs_tyAs, tm) <- unbind bdTm
-  let xs = [x_A | (x_A, _) <- xs_tyAs]
-      tyAs = [ty_A | (_, Embed ty_A) <- xs_tyAs]
-  deriveWith "[Ty-AbsAnn-UC3]" (logInferFull env CEmpty (AbsUncurryAnn bdTm)) $ do
-    tyB <- premise $ infer (foldl (\env' (x, tyA) -> ETrm x tyA env') env (zip xs tyAs)) CEmpty tm
+infer env ctx@CEmpty tm@(AbsUncurryAnn bdTm) = do
+  (xs_tyAs, body) <- unbind bdTm
+  let xs = [x | (x, _) <- xs_tyAs]
+      tyAs = [ty | (_, Embed ty) <- xs_tyAs]
+  deriveWith "[Ty-AbsAnn-UC3]" (logInferFull env ctx tm) $ do
+    tyB <- premise $ infer (foldl (\env' (x, tyA) -> ETrm x tyA env') env (zip xs tyAs)) CEmpty body
     return $ TUncurry tyAs tyB
 
 -- [Ty-Abs-UC1]
-infer env (CFullType (TUncurry ts tyB)) (AbsUncurry bdTm) = do
-  (xs, tm) <- unbind bdTm
-  deriveWith "[Ty-Abs-UC1]" (logInferFull env (CFullType (TUncurry ts tyB)) (AbsUncurry bdTm)) $ do
-    tyC <- premise $ infer (foldl (\env' (x, tyA) -> ETrm x tyA env') env (zip xs ts)) (CFullType tyB) tm
+infer env ctx@(CFullType (TUncurry ts tyB)) tm@(AbsUncurry bdTm) = do
+  (xs, body) <- unbind bdTm
+  deriveWith "[Ty-Abs-UC1]" (logInferFull env ctx tm) $ do
+    tyC <- premise $ infer (foldl (\env' (x, tyA) -> ETrm x tyA env') env (zip xs ts)) (CFullType tyB) body
     return $ TUncurry ts tyC
 
 -- [Ty-Abs-UC2]
-infer env (CUncurry tm2s h) (AbsUncurry bd) = do
-  (xs, tm) <- unbind bd
-  deriveWith "[Ty-Abs-UC2]" (logInferFull env (CUncurry tm2s h) (AbsUncurry bd)) $ do
+infer env ctx@(CUncurry tm2s h) tm@(AbsUncurry bd) = do
+  (xs, body) <- unbind bd
+  deriveWith "[Ty-Abs-UC2]" (logInferFull env ctx tm) $ do
     tyAs <- liftD $ mapM (fmap result . infer env CEmpty) tm2s
-    tyB <- premise $ infer (foldl (\env' (x, tyA) -> ETrm x tyA env') env (zip xs tyAs)) h tm
+    tyB <- premise $ infer (foldl (\env' (x, tyA) -> ETrm x tyA env') env (zip xs tyAs)) h body
     return $ TUncurry tyAs tyB
 
 -- [Ty-TAbs]
-infer env CEmpty (TAbs bdTm) = do
-  (a, tm) <- unbind bdTm
-  deriveWith "[Ty-TAbs]" (logInferFull env CEmpty (TAbs bdTm)) $ do
-    tyA <- premise $ infer (EUvar a env) CEmpty tm
+infer env ctx@CEmpty tm@(TAbs bdTm) = do
+  (a, body) <- unbind bdTm
+  deriveWith "[Ty-TAbs]" (logInferFull env ctx tm) $ do
+    tyA <- premise $ infer (EUvar a env) CEmpty body
     return $ TForall (bind a tyA)
 
 -- [Ty-TAbs-Chk]
-infer env (CFullType (TForall bdTy)) (TAbs bdTm) = do
-  Just (a, tyA, _, tm) <- unbind2 bdTy bdTm
-  deriveWith "[Ty-TAbs-Chk]" (const $ logInferFull env (CFullType (TForall bdTy)) (TAbs bdTm) (TForall bdTy)) $ do
-    _ <- premise $ infer (EUvar a env) (CFullType tyA) tm
-    return $ TForall bdTy
+infer env ctx@(CFullType tyForall@(TForall bdTy)) tm@(TAbs bdTm) = do
+  Just (a, tyA, _, body) <- unbind2 bdTy bdTm
+  deriveWith "[Ty-TAbs-Chk]" (const $ logInferFull env ctx tm tyForall) $ do
+    _ <- premise $ infer (EUvar a env) (CFullType tyA) body
+    return tyForall
 
 -- [Ty-TApp]
-infer env h (TApp tm tyA) =
-  deriveWith "[Ty-TApp]" (logInferFull env h (TApp tm tyA)) $ do
-    TForall bdTy <- premise $ infer env CEmpty tm
+infer env ctx tm@(TApp e tyA) =
+  deriveWith "[Ty-TApp]" (logInferFull env ctx tm) $ do
+    TForall bdTy <- premise $ infer env CEmpty e
     (a, tyB) <- liftD $ unbind bdTy
-    (EEmpty, tyC) <- premise $ sub (env, EEmpty) (subst a tyA tyB) h
+    (EEmpty, tyC) <- premise $ sub (env, EEmpty) (subst a tyA tyB) ctx
     return tyC
 
 -- [Ty-Pair1]
-infer env CEmpty (Pair tm1 tm2) =
-  deriveWith "[Ty-Pair1]" (logInferFull env CEmpty (Pair tm1 tm2)) $ do
+infer env ctx@CEmpty tm@(Pair tm1 tm2) =
+  deriveWith "[Ty-Pair1]" (logInferFull env ctx tm) $ do
     tyA <- premise $ infer env CEmpty tm1
     tyB <- premise $ infer env CEmpty tm2
     return $ TProd tyA tyB
 
 -- [Ty-Pair2]
-infer env (CFullType (TProd tyA tyB)) (Pair tm1 tm2) =
-  deriveWith "[Ty-Pair2]" (logInferFull env (CFullType (TProd tyA tyB)) (Pair tm1 tm2)) $ do
+infer env ctx@(CFullType (TProd tyA tyB)) tm@(Pair tm1 tm2) =
+  deriveWith "[Ty-Pair2]" (logInferFull env ctx tm) $ do
     tyA' <- premise $ infer env (CFullType tyA) tm1
     tyB' <- premise $ infer env (CFullType tyB) tm2
     return $ TProd tyA' tyB'
 
 -- [Ty-Fst]
-infer env h (Fst tm) =
-  deriveWith "[Ty-Fst]" (logInferFull env h (Fst tm)) $ do
-    ty <- premise $ infer env (CFst h) tm
+infer env ctx tm@(Fst e) =
+  deriveWith "[Ty-Fst]" (logInferFull env ctx tm) $ do
+    ty <- premise $ infer env (CFst ctx) e
     case ty of
       TProd tyA _ -> return tyA
-      _ -> throwError $ formatError "infer: Fst expected TProd but got different type"
-             [("Function", "infer [Ty-Fst]"), ("Term", show (Fst tm))
-             ,("Context", show h), ("Expected type", "TProd tyA tyB")
-             ,("Actual type", show ty)]
+      _ -> throwError $ formatError "infer: Fst expected TProd"
+             [("Function", "infer [Ty-Fst]"), ("Term", show tm)
+             ,("Context", show ctx), ("Actual type", show ty)]
 
 -- [Ty-Snd]
-infer env h (Snd tm) =
-  deriveWith "[Ty-Snd]" (logInferFull env h (Snd tm)) $ do
-    ty <- premise $ infer env (CSnd h) tm
+infer env ctx tm@(Snd e) =
+  deriveWith "[Ty-Snd]" (logInferFull env ctx tm) $ do
+    ty <- premise $ infer env (CSnd ctx) e
     case ty of
       TProd _ tyB -> return tyB
-      _ -> throwError $ formatError "infer: Snd expected TProd but got different type"
-             [("Function", "infer [Ty-Snd]"), ("Term", show (Snd tm))
-             ,("Context", show h), ("Expected type", "TProd tyA tyB")
-             ,("Actual type", show ty)]
+      _ -> throwError $ formatError "infer: Snd expected TProd"
+             [("Function", "infer [Ty-Snd]"), ("Term", show tm)
+             ,("Context", show ctx), ("Actual type", show ty)]
 
 -- [Ty-Pair-Fst]
-infer env (CFst h) (Pair tm1 tm2) =
-  deriveWith "[Ty-Pair-Fst]" (logInferFull env (CFst h) (Pair tm1 tm2)) $ do
+infer env ctx@(CFst h) tm@(Pair tm1 tm2) =
+  deriveWith "[Ty-Pair-Fst]" (logInferFull env ctx tm) $ do
     tyA <- premise $ infer env h tm1
     tyB <- premise $ infer env CEmpty tm2
     return $ TProd tyA tyB
 
 -- [Ty-Pair-Snd]
-infer env (CSnd h) (Pair tm1 tm2) =
-  deriveWith "[Ty-Pair-Snd]" (logInferFull env (CSnd h) (Pair tm1 tm2)) $ do
+infer env ctx@(CSnd h) tm@(Pair tm1 tm2) =
+  deriveWith "[Ty-Pair-Snd]" (logInferFull env ctx tm) $ do
     tyA <- premise $ infer env CEmpty tm1
     tyB <- premise $ infer env h tm2
     return $ TProd tyA tyB
 
 -- [Ty-Sub] - generic consumer with non-empty context
-infer env h g | genericConsumer g && nonEmptyContext h =
-  deriveWith "[Ty-Sub]" (logInferFull env h g) $ do
-    tyA <- premise $ infer env CEmpty g
-    (EEmpty, tyB) <- premise $ sub (env, EEmpty) tyA h
+infer env ctx tm | genericConsumer tm && nonEmptyContext ctx =
+  deriveWith "[Ty-Sub]" (logInferFull env ctx tm) $ do
+    tyA <- premise $ infer env CEmpty tm
+    (EEmpty, tyB) <- premise $ sub (env, EEmpty) tyA ctx
     return tyB
 
 -- [Ty-Nil-Chk]
-infer env (CFullType (TList tyA)) Nil =
-  axiomM "[Ty-Nil-Chk]" (logInferFull env (CFullType (TList tyA)) Nil (TList tyA)) (TList tyA)
+infer env ctx@(CFullType tyList@(TList _)) tm@Nil =
+  axiomM "[Ty-Nil-Chk]" (logInferFull env ctx tm tyList) tyList
 
 -- [Ty-Nil]
-infer env CEmpty Nil = do
+infer env ctx@CEmpty tm@Nil = do
   let tyNil = TForall (bind (s2n "a") (TList (TVar (s2n "a"))))
-  axiomM "[Ty-Nil]" (logInferFull env CEmpty Nil tyNil) tyNil
+  axiomM "[Ty-Nil]" (logInferFull env ctx tm tyNil) tyNil
 
 -- Fallback
 infer _env ctx tm = throwError $ formatError "infer: unexpected case"
