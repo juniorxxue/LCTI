@@ -3,86 +3,117 @@
 module Log where
 
 import Control.Monad.Writer
+import qualified Data.Text as T
+import Prettyprinter
+import Prettyprinter.Render.Terminal (AnsiStyle, renderStrict)
+import qualified Prettyprinter.Render.Terminal as Ansi
 import Syntax
 
-escGrey, escRed, escBold, escBlue, escReset, escYellow :: String
-escGrey = "\ESC[90m" -- Grey color (bright black)
-escRed = "\ESC[31m" -- Red color
-escBold = "\ESC[1m" -- Bold text
-escBlue = "\ESC[34m" -- Blue color
-escReset = "\ESC[0m" -- Reset to default
-escYellow = "\ESC[33m" -- Yellow color
+type LogDoc = Doc AnsiStyle
 
-grey, red, bold, blue, yellow :: String -> String
-grey s = escGrey ++ s ++ escReset
-red s = escRed ++ s ++ escReset
-bold s = escBold ++ s ++ escReset
-blue s = escBlue ++ s ++ escReset
-yellow s = escYellow ++ s ++ escReset
+renderLogDoc :: LogDoc -> String
+renderLogDoc = T.unpack . renderStrict . layoutPretty defaultLayoutOptions
+
+prettyShowDoc :: Show a => a -> LogDoc
+prettyShowDoc = pretty . show
+
+withStyle :: AnsiStyle -> LogDoc -> LogDoc
+withStyle style = annotate style
+
+grey, red, bold, blue, yellow :: LogDoc -> LogDoc
+grey = withStyle (Ansi.color Ansi.Black)
+red = withStyle (Ansi.color Ansi.Red)
+blue = withStyle (Ansi.color Ansi.Blue)
+yellow = withStyle (Ansi.color Ansi.Yellow)
+bold = withStyle Ansi.bold
+
+logLine :: [LogDoc] -> String
+logLine = renderLogDoc . hsep
+
+symbol :: String -> LogDoc
+symbol = pretty
+
+semiDoc :: LogDoc
+semiDoc = grey (symbol ";")
+
+envDoc :: Env -> LogDoc
+envDoc = prettyShowDoc
+
+blueEnv :: Env -> LogDoc
+blueEnv = blue . envDoc
+
+redEnv :: Env -> LogDoc
+redEnv = red . envDoc
+
+tyDoc :: Ty -> LogDoc
+tyDoc = prettyShowDoc
+
+ctxDoc :: Context -> LogDoc
+ctxDoc = prettyShowDoc
+
+tmDoc :: Tm -> LogDoc
+tmDoc = prettyShowDoc
 
 logSub :: Env -> Ty -> Context -> String
-logSub senv ty ctx = show senv ++ " ⊢ " ++ show ty ++ " <: " ++ show ctx ++ " ⊣ "
+logSub senv ty ctx =
+  logLine [envDoc senv, symbol "⊢", tyDoc ty, pretty "<:", ctxDoc ctx, symbol "⊣"]
 
 logInferUncurry :: (Env, Env) -> Ty -> Tm -> Ty -> Env -> String
 logInferUncurry (_, senv) tyA e tyA' envout =
-  grey "; "
-    ++ blue (show senv)
-    ++ " ⊢ "
-    ++ show tyA
-    ++ " ⇉ "
-    ++ show e
-    ++ " ⇉ "
-    ++ bold (show tyA')
-    ++ " ⊣ "
-    ++ red (show envout)
+  logLine
+    [ semiDoc
+    , blueEnv senv
+    , symbol "⊢"
+    , tyDoc tyA
+    , pretty "⇉"
+    , tmDoc e
+    , pretty "⇉"
+    , bold (tyDoc tyA')
+    , symbol "⊣"
+    , redEnv envout
+    ]
 
 logSubFull :: (Env, Env) -> Ty -> Context -> Env -> Ty -> String
 logSubFull (_, senv) ty ctx envout ty' =
-  grey "; "
-    ++ blue (show senv)
-    ++ " ⊢ "
-    ++ show ty
-    ++ " <: "
-    ++ show ctx
-    ++ " ⊣ "
-    ++ red (show envout)
-    ++ " ⇝ "
-    ++ bold (show ty')
+  logLine
+    [ semiDoc
+    , blueEnv senv
+    , symbol "⊢"
+    , tyDoc ty
+    , pretty "<:"
+    , ctxDoc ctx
+    , symbol "⊣"
+    , redEnv envout
+    , pretty "⇝"
+    , bold (tyDoc ty')
+    ]
 
 logSSubFull :: (Env, Env) -> Ty -> Polar -> Ty -> Env -> String
 logSSubFull (_, senv) ty1 p ty2 envout =
-  grey "; "
-    ++ blue (show senv)
-    ++ " ⊢ "
-    ++ show ty1
-    ++ " "
-    ++ show p
-    ++ " "
-    ++ show ty2
-    ++ " ⊣ "
-    ++ red (show envout)
+  logLine
+    [ semiDoc
+    , blueEnv senv
+    , symbol "⊢"
+    , tyDoc ty1
+    , pretty (show p)
+    , tyDoc ty2
+    , symbol "⊣"
+    , redEnv envout
+    ]
 
 logInfers :: Env -> Context -> String
-logInfers env ctx = show env ++ " ⊢ " ++ show ctx ++ " ⇒ "
+logInfers env ctx = logLine [envDoc env, symbol "⊢", ctxDoc ctx, pretty "⇒"]
 
 logInfersFull :: Env -> Context -> Ty -> String
 logInfersFull _ ctx ty =
-  grey " ⊢ "
-    ++ show ctx
-    ++ " ⇒ "
-    ++ bold (show ty)
+  logLine [grey (symbol "⊢"), ctxDoc ctx, pretty "⇒", bold (tyDoc ty)]
 
 logInfer :: Env -> Context -> Tm -> String
-logInfer env ctx tm = show env ++ " ⊢ " ++ show ctx ++ " ⇒ " ++ show tm ++ " ⇒ "
+logInfer env ctx tm = logLine [envDoc env, symbol "⊢", ctxDoc ctx, pretty "⇒", tmDoc tm, pretty "⇒"]
 
 logInferFull :: Env -> Context -> Tm -> Ty -> String
 logInferFull _ ctx tm ty =
-  " ⊢ "
-    ++ show ctx
-    ++ " ⇒ "
-    ++ show tm
-    ++ " ⇒ "
-    ++ bold (show ty)
+  logLine [grey (symbol "⊢"), ctxDoc ctx, pretty "⇒", tmDoc tm, pretty "⇒", bold (tyDoc ty)]
 
 indentAll :: [String] -> [String]
 indentAll = map ("  " ++)
@@ -91,6 +122,13 @@ peek :: forall w m a. (MonadWriter w m) => m a -> m (a, w)
 peek = censor (const mempty) . listen
 
 formatError :: String -> [(String, String)] -> String
-formatError msg context = 
-  bold (red "ERROR: ") ++ bold msg ++ "\n" ++
-  concatMap (\(label, value) -> "  " ++ yellow label ++ ": " ++ value ++ "\n") context
+formatError msg context =
+  renderLogDoc $
+    header <> contextBlock
+  where
+    header = bold (red (pretty "ERROR:")) <+> bold (pretty msg)
+    contextBlock
+      | null context = mempty
+      | otherwise = hardline <> vsep (map renderPair context)
+    renderPair (label, value) =
+      indent 2 (yellow (pretty label) <> pretty ":" <+> pretty value)
