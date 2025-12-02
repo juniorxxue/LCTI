@@ -1,6 +1,6 @@
 Paper: *Local Contextual Type Inference*. To appear at POPL 2026.
 
-Also check our [online Agda proof](https://types.hk/proof/lcti/). Preprint and extended version will be available soon.
+Also check our [online Agda proof*](https://types.hk/proof/lcti/). Preprint and extended version will be available soon.
 [Artifact Evaluation ver. (Resuable Badge)](https://github.com/juniorxxue/LCTI/tree/popl26ae) contains more details about how to approach the code.
 
 ## Abstract
@@ -97,3 +97,6 @@ e1, e2 ::= n | true | false       -- literals
          | <e1, e2>               -- pair
          | nil                    -- nil literal
 ```
+--------
+
+*Notes: The Agda HTML template was originally created by [tsung-ju](https://github.com/tsung-ju) and has been adapted for this project.
