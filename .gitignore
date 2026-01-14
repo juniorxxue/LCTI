@@ -1,6 +1,5 @@
 .DS_Store
 .texpadtmp/
-*.pdf
 *.swp
 *.agdai
 *.~undo-tree~
@@ -14,9 +13,6 @@
 *.fls
 
 live.*
-
-# PDF output - usually a bad idea to keep this in Git
-*.pdf
 
 # Latexmk
 *.fdb_latexmk
