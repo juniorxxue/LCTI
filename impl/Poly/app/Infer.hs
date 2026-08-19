@@ -206,14 +206,14 @@ sub envs@(env, senv) ty@(TArr tyA tyB) ctx@(CTerm e h) =
   -- Try closed first
   (do closed (envConcat env senv) tyA
       grdA <- ground (envConcat env senv) tyA
-      deriveWith "[S-Term-Closed]" (\(senv', tyD) -> logSubFull envs ty ctx senv' (TArr grdA tyD)) $ do
+      deriveWith "[S-Term-Closed]" (\(senv', tyOut) -> logSubFull envs ty ctx senv' tyOut) $ do
         tyC <- premise $ infer (envConcat env senv) (CFullType grdA) e
         (senv', tyD) <- premise $ sub (env, senv) tyB h
         return (senv', TArr tyC tyD))
   <|>
   -- Fallback to open
   (do isOpen (envConcat env senv) tyA
-      deriveWith "[S-Term-Open]" (\(senv2, tyD) -> logSubFull envs ty ctx senv2 (TArr tyA tyD)) $ do
+      deriveWith "[S-Term-Open]" (\(senv2, tyOut) -> logSubFull envs ty ctx senv2 tyOut) $ do
         tyC <- premise $ infer (envConcat env senv) CEmpty e
         senv1 <- premise $ ssub (env, senv) tyC Neg tyA
         (senv2, tyD) <- premise $ sub (env, senv1) tyB h
@@ -221,7 +221,7 @@ sub envs@(env, senv) ty@(TArr tyA tyB) ctx@(CTerm e h) =
 
 -- [S-Arr-UC]
 sub envs@(env, senv) ty@(TUncurry tyAs tyB) ctx@(CUncurry es h) =
-  deriveWith "[S-Arr-UC]" (\(senv'', tyB') -> logSubFull envs ty ctx senv'' (TUncurry tyAs tyB')) $ do
+  deriveWith "[S-Arr-UC]" (\(senv'', tyOut) -> logSubFull envs ty ctx senv'' tyOut) $ do
     (senv', tyAs') <- liftD $ foldM foldFunc (senv, []) (zip tyAs es)
     (senv'', tyB') <- premise $ sub (env, senv') tyB h
     return (senv'', TUncurry tyAs' tyB')
@@ -263,13 +263,13 @@ sub envs@(env, senv) ty@(TVar k) ctx@(CTerm e h) | isUvar (envConcat env senv) k
 
 -- [S-Prod-Fst]
 sub envs@(env, senv) ty@(TProd tyA tyB) ctx@(CFst h) =
-  deriveWith "[S-Prod-Fst]" (\(senv', tyA') -> logSubFull envs ty ctx senv' (TProd tyA' tyB)) $ do
+  deriveWith "[S-Prod-Fst]" (\(senv', tyOut) -> logSubFull envs ty ctx senv' tyOut) $ do
     (senv', tyA') <- premise $ sub (env, senv) tyA h
     return (senv', TProd tyA' tyB)
 
 -- [S-Prod-Snd]
 sub envs@(env, senv) ty@(TProd tyA tyB) ctx@(CSnd h) =
-  deriveWith "[S-Prod-Snd]" (\(senv', tyB') -> logSubFull envs ty ctx senv' (TProd tyA tyB')) $ do
+  deriveWith "[S-Prod-Snd]" (\(senv', tyOut) -> logSubFull envs ty ctx senv' tyOut) $ do
     (senv', tyB') <- premise $ sub (env, senv) tyB h
     return (senv', TProd tyA tyB')
 
